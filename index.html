@@ -87,13 +87,16 @@
     --treasure-deep: #8B6914;
     --treasure-shadow: #6B5010;
     /* Type scale — reader foundation commit. Every reader element maps to
-       one of these steps. Font-family choices unchanged. */
-    --fs-eyebrow: 11px;
-    --fs-caption: 12px;
-    --fs-ui:      14px;
-    --fs-body:    16px;
-    --fs-strong:  18px;
-    --fs-heading: 21px;
+       one of these steps. Font-family choices unchanged. Sizes wrap through
+       --text-scale so the A+/A− rail in the reader can scale all reading
+       text in lockstep (line-heights are unitless → scale automatically). */
+    --text-scale: 1;
+    --fs-eyebrow: calc(11px * var(--text-scale));
+    --fs-caption: calc(12px * var(--text-scale));
+    --fs-ui:      calc(14px * var(--text-scale));
+    --fs-body:    calc(16px * var(--text-scale));
+    --fs-strong:  calc(18px * var(--text-scale));
+    --fs-heading: calc(21px * var(--text-scale));
     --lh-tight:   1.4;
     --lh-snug:    1.5;
     --lh-body:    1.6;
@@ -2362,6 +2365,48 @@
     height: 36px;
     border-radius: 50%;
   }
+  /* ── Reader A+/A− text-size rail ──
+     Fixed to the leading edge (RTL-safe via inset-inline-start). Idle opacity
+     is quiet-but-legible so a first-time reader can still spot it; pulses to
+     full opacity on the session's first reader open (see _updateTextSizeUI)
+     and briefly on each tap. Buttons disable at TEXT_SIZE_MIN/MAX bounds. */
+  .reader-text-size-rail {
+    position: fixed;
+    inset-inline-start: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 90;
+    opacity: 0.5;
+    transition: opacity 0.25s ease;
+    pointer-events: auto;
+  }
+  .reader-text-size-rail:hover,
+  .reader-text-size-rail:focus-within,
+  .reader-text-size-rail.is-active { opacity: 1; }
+  .reader-text-size-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1.5px solid var(--accent-soft-border);
+    color: var(--accent);
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform 0.1s ease, background 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    padding: 0;
+  }
+  .reader-text-size-btn:hover  { background: var(--accent-tint); }
+  .reader-text-size-btn:active { transform: scale(0.92); background: var(--accent-tint-strong); }
+  .reader-text-size-btn:disabled { opacity: 0.4; cursor: default; transform: none; background: var(--surface); }
+
   /* ── Section cards ── */
   .section-card {
     background: var(--surface);
@@ -3960,31 +4005,9 @@
     color: var(--text-2);
     margin-bottom: 8px;
   }
-  .settings-text-size-row {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .text-size-btn {
-    background: var(--surface-2);
-    border: none;
-    border-radius: 8px;
-    padding: 6px 14px;
-    font-weight: 700;
-    color: var(--text);
-    cursor: pointer;
-    font-size: 14px;
-  }
-  .text-size-current {
-    font-size: 14px;
-    color: var(--text);
-    font-weight: 600;
-    min-width: 40px;
-    text-align: center;
-  }
-  /* Reader settings popover — appearance three-button pill row, same shape as
-     the text-size row but with the tint-strong active-state used by the
-     auth-mode-toggle so the current selection is obvious in either mode. */
+  /* Reader settings popover — appearance three-button pill row, uses the
+     tint-strong active-state (see .auth-mode-toggle) so the current
+     selection is obvious in either light or dark mode. */
   .settings-appearance-row {
     display: flex;
     gap: 6px;
@@ -6127,6 +6150,10 @@
     <div class="section-dots" id="section-dots"></div>
     </div>
     <div class="reader-scroll-area" id="reader-content"></div>
+    <div class="reader-text-size-rail" id="reader-text-size-rail" aria-label="Text size">
+      <button class="reader-text-size-btn plus" onclick="changeTextSize(1)" aria-label="Increase text size">A+</button>
+      <button class="reader-text-size-btn minus" onclick="changeTextSize(-1)" aria-label="Decrease text size">A−</button>
+    </div>
   </div>
 
   <div class="reader-btn-bar" id="reader-btn-bar" style="display:none"></div>
@@ -14317,19 +14344,46 @@ function readerGoBack() {
 // HOME
 // ═══════════════════════════════════════════════════════════
 
+// Reader text-size scale. changeTextSize mutates --text-scale on :root, which
+// every --fs-* token multiplies against — so body/quote/question/options/etc.
+// scale in lockstep. Range 90..130 in 10% steps; persisted across sessions.
+const TEXT_SIZE_MIN = 90;
+const TEXT_SIZE_MAX = 130;
 let textSizeLevel = 100;
 try {
   const saved = localStorage.getItem('corpus_text_size');
-  if (saved) { textSizeLevel = parseInt(saved); document.documentElement.style.fontSize = textSizeLevel + '%'; }
+  if (saved !== null) {
+    const parsed = parseInt(saved, 10);
+    if (!isNaN(parsed)) {
+      textSizeLevel = Math.min(TEXT_SIZE_MAX, Math.max(TEXT_SIZE_MIN, parsed));
+      document.documentElement.style.setProperty('--text-scale', textSizeLevel / 100);
+    }
+  }
 } catch(e) {}
 
 function changeTextSize(direction) {
-  textSizeLevel = Math.min(130, Math.max(80, textSizeLevel + direction * 10));
-  document.documentElement.style.fontSize = textSizeLevel + '%';
-  document.body.style.fontSize = textSizeLevel + '%';
-  const el = document.getElementById('text-size-current');
-  if (el) el.textContent = textSizeLevel + '%';
+  textSizeLevel = Math.min(TEXT_SIZE_MAX, Math.max(TEXT_SIZE_MIN, textSizeLevel + direction * 10));
+  document.documentElement.style.setProperty('--text-scale', textSizeLevel / 100);
   try { localStorage.setItem('corpus_text_size', textSizeLevel); } catch(e) {}
+  _updateTextSizeUI(true);
+}
+
+// Refresh the rail's disabled-at-bounds state and pulse it briefly so touch
+// users get "yes, that registered" feedback (no :hover on touch). Called from
+// changeTextSize (pulse=true) and from openReader session-first-open (also
+// pulse=true so first-time users notice the rail exists).
+function _updateTextSizeUI(pulse) {
+  const rail = document.getElementById('reader-text-size-rail');
+  if (!rail) return;
+  const plus  = rail.querySelector('.reader-text-size-btn.plus');
+  const minus = rail.querySelector('.reader-text-size-btn.minus');
+  if (plus)  plus.disabled  = textSizeLevel >= TEXT_SIZE_MAX;
+  if (minus) minus.disabled = textSizeLevel <= TEXT_SIZE_MIN;
+  if (pulse) {
+    rail.classList.add('is-active');
+    clearTimeout(rail._pulseTimer);
+    rail._pulseTimer = setTimeout(() => rail.classList.remove('is-active'), 1500);
+  }
 }
 
 function toggleSettings() {
@@ -15679,6 +15733,18 @@ function openReader(weekId, dayId) {
   renderReader();
   showScreen('reader');
   animateScreen(document.getElementById('screen-reader'), 'anim-fade');
+  // First reader open of this browser session: pulse the A+/A− rail to full
+  // opacity for 1.5s so a new user notices the controls exist. After that
+  // it stays quiet-but-legible (opacity 0.5) until interaction. Session
+  // scope means every fresh tab gets one discovery moment.
+  try {
+    if (!sessionStorage.getItem('corpus_text_size_rail_seen')) {
+      sessionStorage.setItem('corpus_text_size_rail_seen', '1');
+      setTimeout(() => _updateTextSizeUI(true), 300);
+    } else {
+      _updateTextSizeUI(false);
+    }
+  } catch(e) { _updateTextSizeUI(false); }
   // Defensive: clear a lingering .active + body scroll lock from a prior
   // openReader (Capacitor resume paths can re-fire openReader before the
   // session flag has been touched, leaving stale state). Cheap idempotent
@@ -19622,14 +19688,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <div class="settings-panel" id="settings-panel" style="display:none">
   <button class="lang-toggle-btn" id="lang-toggle-btn" onclick="toggleLang()">English</button>
-  <div class="settings-section">
-    <div class="settings-label" id="settings-text-size-label">גודל טקסט</div>
-    <div class="settings-text-size-row">
-      <button class="text-size-btn" onclick="changeTextSize(-1)">A-</button>
-      <span class="text-size-current" id="text-size-current">100%</span>
-      <button class="text-size-btn" onclick="changeTextSize(1)">A+</button>
-    </div>
-  </div>
   <!-- Appearance mirror of the profile Settings toggle. Same setAppearance()
        handler + state.appearance, so both surfaces stay in sync automatically.
        Three-button row inline (no dropdown here — real-estate is tight). -->
