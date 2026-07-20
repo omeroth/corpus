@@ -2372,13 +2372,14 @@
     border-radius: 50%;
   }
   /* ── Reader A+/A− text-size rail ──
-     Fixed to the leading edge (RTL-safe via inset-inline-start). Idle opacity
-     is quiet-but-legible so a first-time reader can still spot it; pulses to
-     full opacity on the session's first reader open (see _updateTextSizeUI)
-     and briefly on each tap. Buttons disable at TEXT_SIZE_MIN/MAX bounds. */
+     Fixed to the trailing edge (RTL-safe via inset-inline-end): right in
+     English, left in Hebrew. Idle opacity is quiet-but-legible so a
+     first-time reader can still spot it; pulses to full opacity on the
+     session's first reader open (see _updateTextSizeUI) and briefly on each
+     tap. Buttons disable at TEXT_SIZE_MIN/MAX bounds. */
   .reader-text-size-rail {
     position: fixed;
-    inset-inline-start: 12px;
+    inset-inline-end: 12px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
