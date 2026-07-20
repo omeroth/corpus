@@ -2253,6 +2253,9 @@
     padding: 12px 12px calc(80px + var(--safe-bottom));
     -webkit-overflow-scrolling: touch;
   }
+  /* DEPRECATED (editorial rollout): tinted-bar chrome. Shadowed by
+     .reader-editorial #reader-btn-bar which sets transparent bg / no border /
+     no shadow. Slate for removal in the reader-cleanup pass. */
   .reader-btn-bar {
     position: fixed;
     bottom: 0;
@@ -2296,6 +2299,9 @@
   }
   .btn-reader-next:hover { filter: brightness(0.92); }
   .btn-reader-next:active { transform: scale(0.97); filter: brightness(0.88); }
+  /* DEPRECATED (editorial rollout): background: none — legible on the base
+     tinted bar, invisible on editorial's transparent bar. Shadowed by
+     .reader-editorial #reader-btn-bar .btn-reader-back { background: var(--surface) }. */
   .btn-reader-back {
     flex: 1;
     padding: 14px;
@@ -2408,14 +2414,24 @@
   .reader-text-size-btn:disabled { opacity: 0.4; cursor: default; transform: none; background: var(--surface); }
 
   /* ═══════════════════════════════════════════════════════════════
-     Editorial reader layout — trial. Scoped by body.reader-editorial,
-     toggled in openReader based on the day's `layout: 'editorial'` flag.
-     Text sits directly on --bg with no card wrapper, big-body/bold-heading
-     typography, segmented progress pills, and floating circular nav.
-     All sizes wrap in calc(N * var(--text-scale)) so A+/A− continues to
-     scale editorial text. All colors go through tokens so subject theme
-     and dark mode propagate. Revert path: remove `layout: 'editorial'`
-     from Ch.1 D3 in the raw data — one line, no other changes needed.
+     Editorial reader layout — the default reader across all dialogues,
+     chapters, subjects (rolled out from the Cave+Marx trial). Scoped by
+     body.reader-editorial which openReader adds unconditionally; the class
+     remains on body after leaving the reader (harmless — every selector
+     below is anchored to reader-only elements: #reader-content /
+     #screen-reader / #reader-btn-bar / #modal-quiz-feedback.active).
+
+     Text sits directly on --bg with no card wrapper; big-body/bold-heading
+     typography; segmented progress pills; floating labeled nav. Every
+     font-size wraps in calc(N * var(--text-scale)) so the A+/A− rail
+     scales all reading text. Every color routes through a token so subject
+     theme (philosophy/economics/psychology) and dark mode propagate.
+
+     The old (pre-rollout) reader CSS is preserved in the file marked
+     DEPRECATED — shadowed by the rules here at every reader instance,
+     kept for the follow-up cleanup pass. Modal-scoped rules
+     (body.reader-editorial #modal-quiz-feedback.active) live at the end
+     of this block since the modal is outside the reader anchors.
      ═══════════════════════════════════════════════════════════════ */
 
   /* Reader scroll area: editorial breathing room */
@@ -2438,7 +2454,17 @@
     padding: 0;
   }
 
-  /* Eyebrow — quiet caption, no divider line, --text-2 tint */
+  /* Eyebrow — hidden by default under body.hide-section-eyebrow (added on
+     page load below). Headings already name each section and the layouts
+     are visually distinct; the label duplicates. Remove that body class to
+     bring them back (one-line revert) — the styling below then applies.
+     No top-padding rebalance needed: heading was previously spaced 24px
+     below the eyebrow which itself sat at the card top; without eyebrow,
+     heading sits at the card top with the same 24px inset already provided
+     by .section-card padding. */
+  body.reader-editorial.hide-section-eyebrow #reader-content .section-type-label {
+    display: none;
+  }
   .reader-editorial #reader-content .section-type-label {
     color: var(--text-2);
     margin-bottom: 24px;
@@ -2483,6 +2509,17 @@
     margin-bottom: 0;
   }
 
+  /* Section image (bonus chapter illustrations only — regular dialogues are
+     text-only). Sits below the body with editorial breathing room and softer
+     corners. Natural aspect preserved (width 100% inherited from base, no
+     max-height) — bonus illustrations are hand-composed and shouldn't crop.
+     max-width caps proportionally with the 640px content column. */
+  .reader-editorial #reader-content .section-image {
+    margin-top: 40px;
+    border-radius: 20px;
+    height: auto;
+  }
+
   /* Source quote — transparent, big italic centerpiece with inline-start rule.
      border-inline-end (not border-right) clears the trailing edge in both LTR
      and RTL; using border-right here would fight border-inline-start in RTL
@@ -2512,6 +2549,11 @@
     font-weight: 700;
   }
 
+  /* Quiz eyebrow — hidden alongside .section-type-label under the same
+     body.hide-section-eyebrow toggle. */
+  body.reader-editorial.hide-section-eyebrow #reader-content .quiz-eyebrow {
+    display: none;
+  }
   /* Quiz eyebrow — same quiet treatment as section-type-label. Base hardcodes
      direction: ltr and justify-content: flex-end (to right-align the pair
      against a gradient line). Editorial hides the line and un-forces the
@@ -2698,21 +2740,6 @@
     margin-inline: auto;
   }
 
-  /* RTL-aware page transitions. Base .anim-section-next/-prev translateX
-     physically (glideInRight / glideInLeft), so in Hebrew the next-page
-     slides "wrong way" relative to the reading direction. Override the
-     animation-name under [dir="rtl"] editorial so next slides in from the
-     left and back from the right — matching RTL reading flow.
-     KNOWN: the same physical-translate bug exists app-wide (base
-     .anim-section-next fires on every non-editorial reader too). Fold a
-     base-wide fix into rollout time; scoped here to keep the trial safe. */
-  [dir="rtl"] body.reader-editorial #reader-content.anim-section-next {
-    animation-name: glideInLeft;
-  }
-  [dir="rtl"] body.reader-editorial #reader-content.anim-section-prev {
-    animation-name: glideInRight;
-  }
-
   /* ══ Editorial quiz-feedback modal ══
      Scoped by body.reader-editorial (the modal is a top-level element,
      outside the #screen-reader/#reader-content/#reader-btn-bar anchors used
@@ -2756,6 +2783,9 @@
   }
 
   /* ── Section cards ── */
+  /* DEPRECATED (editorial rollout): boxed card wrapper (surface bg + border +
+     5px bottom rule + radius). Shadowed by .reader-editorial .section-card
+     (transparent, no border, no radius). Slate for removal. */
   .section-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -2768,6 +2798,9 @@
     height: auto !important;
     overflow: visible !important;
   }
+  /* DEPRECATED (editorial rollout): --accent-colored eyebrow with divider
+     line via ::after. Shadowed by .reader-editorial rules (quiet --text-2
+     eyebrow, no divider, icon-leads flex order). Slate for removal. */
   .section-type-label {
     font-size: var(--fs-eyebrow);
     font-weight: 800;
@@ -2790,6 +2823,8 @@
      use fill/stroke="currentColor" for their main purple shapes; this rule
      supplies the color from the active theme's --accent variable. */
   .section-type-label svg { color: var(--accent); }
+  /* DEPRECATED (editorial rollout): centered --accent heading. Shadowed by
+     .reader-editorial rules (34px, left-aligned, --ink, tighter tracking). */
   .section-heading {
     font-family: 'Nunito', sans-serif;
     font-size: var(--fs-heading);
@@ -2799,6 +2834,8 @@
     color: var(--accent);
     text-align: center;
   }
+  /* DEPRECATED (editorial rollout): 16px weight 400 body. Shadowed by
+     .reader-editorial rules (22px, weight 500, 1.5 lh). */
   .section-body {
     font-size: var(--fs-body);
     line-height: var(--lh-body);
@@ -2817,7 +2854,9 @@
     display: block;
   }
 
-  /* Source quote style */
+  /* DEPRECATED (editorial rollout): 5% tint bg + rounded quote block.
+     Shadowed by .reader-editorial rules (transparent, big italic 26px
+     centerpiece, thin inline-start accent rule). */
   .source-quote {
     background: rgba(var(--accent-rgb), 0.05);
     border-right: 4px solid var(--accent);
@@ -2841,6 +2880,9 @@
   }
 
   /* ── Quiz ── */
+  /* DEPRECATED (editorial rollout): right-aligned eyebrow with gradient rule,
+     hardcoded direction: ltr. Shadowed by .reader-editorial rules (icon-leads,
+     no gradient rule, respects document dir). */
   .quiz-eyebrow {
     display: flex;
     align-items: center;
@@ -2863,6 +2905,8 @@
     text-transform: uppercase;
     font-family: 'Nunito', sans-serif;
   }
+  /* DEPRECATED (editorial rollout): italic border-inline-start scene-setter.
+     Shadowed by .reader-editorial (19px --text-2, no border, more margin). */
   .quiz-intro-v2 {
     font-size: var(--fs-body);
     line-height: 1.7;
@@ -2872,6 +2916,8 @@
     padding-right: 14px;
     margin-bottom: 20px;
   }
+  /* DEPRECATED (editorial rollout): 18px 1.1rem question stem. Shadowed by
+     .reader-editorial (24px, tighter lh, more margin). */
   .quiz-question {
     font-family: 'Nunito', sans-serif;
     font-size: var(--fs-strong);
@@ -2881,6 +2927,9 @@
     color: var(--ink);
   }
   .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+  /* DEPRECATED (editorial rollout): accent-tint filled option at rest, filled
+     letter chip. Shadowed by .reader-editorial (transparent option at rest,
+     outlined letter chip; fill kicks in on hover/selected). */
   .quiz-option {
     background: var(--accent-tint);
     border: 1.5px solid var(--accent-soft-border);
@@ -2946,6 +2995,9 @@
   .quiz-block { display: flex; flex-direction: column; gap: 0; }
   .quiz-block + .quiz-block { margin-top: 4px; }
   .quiz-block-sep { height: 1px; background: var(--border); margin: 20px 0 16px; }
+  /* DEPRECATED (editorial rollout): --surface-2 callout pill for multi-Q
+     inline feedback. Shadowed by .reader-editorial (transparent, thin
+     inline-start rule). */
   .quiz-inline-feedback {
     margin-top: 12px;
     padding: 10px 14px;
@@ -3203,6 +3255,9 @@
   }
 
   /* ── Closing questions ── */
+  /* DEPRECATED (editorial rollout): 16px reflection with ✦ character prefix.
+     Shadowed by .reader-editorial (20px weight 500, decimal-leading-zero
+     numeral prefix `01. 02. 03.` in --accent). */
   .reflection-q {
     display: flex;
     align-items: flex-start;
@@ -4425,6 +4480,11 @@
   .onboarding-dot.active { background: var(--surface); width: 24px; border-radius: 4px; box-shadow: 0 0 8px rgba(255,255,255,0.6); }
 
   /* ── Learning card body typography ── */
+  /* DEPRECATED (editorial rollout): 5%/8% percent padding wrapper. Shadowed
+     by .reader-editorial #reader-content .learning-card-body { padding: 0 }
+     (padding is controlled by the editorial .section-card + #reader-content
+     insets instead). h1/h2/h3/blockquote nested rules still apply and are
+     unchanged. */
   .learning-card-body {
     font-family: 'Assistant', sans-serif;
     font-size: var(--fs-body);
@@ -4929,7 +4989,9 @@
     padding-top: 12px;
   }
 
-  /* ── Reading Progress Bar ── */
+  /* DEPRECATED (editorial rollout): 3px top scroll-progress bar. Shadowed
+     (hidden) by .reader-editorial #screen-reader .reading-progress-bar {
+     display: none } — segmented section pills carry progress instead. */
   .reading-progress-bar {
     position: fixed;
     top: 0;
@@ -4943,6 +5005,10 @@
   }
 
   /* ── Section Dots ── */
+  /* DEPRECATED (editorial rollout): center-justified 6px round dots with a
+     background bar + shadow, active pill elongates 18×6. Shadowed by
+     .reader-editorial rules (flex-fill capsule segments, active is wider +
+     taller + glow). Section-dots container styling replaced entirely. */
   .section-dots {
     display: flex;
     justify-content: center;
@@ -5180,6 +5246,12 @@
   }
   .anim-section-next { animation: glideInRight 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
   .anim-section-prev { animation: glideInLeft 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+  /* RTL-aware page transitions. glideInRight/-Left translate on physical X,
+     so in Hebrew the "next" section should slide in from the left (matching
+     RTL reading direction) and "prev" from the right. Swap animation-name
+     under [dir="rtl"] to flip the physical direction. */
+  [dir="rtl"] .anim-section-next { animation-name: glideInLeft; }
+  [dir="rtl"] .anim-section-prev { animation-name: glideInRight; }
 
   /* ===== Home: Level + Lesson Circles Layout ===== */
 
@@ -5562,7 +5634,7 @@
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.0/dist/umd/supabase.js"></script>
 </head>
-<body>
+<body class="hide-section-eyebrow">
 <!-- iOS update banner. Populated + toggled by checkForUpdate(). Hidden by default. -->
 <div id="update-banner" role="status" aria-live="polite">
   <span class="update-banner-text" id="update-banner-text"></span>
@@ -7466,7 +7538,6 @@ const corpusData = {
           title: 'משל המערה', titleEn: 'The Allegory of the Cave',
           thinker: 'אפלטון', thinkerEn: 'Plato',
           thinkerId: 'plato', xp: 50,
-          layout: 'editorial',
           sections: [
             {
               type: 'idea',
@@ -9685,6 +9756,7 @@ const corpusData = {
           },
           {
             type: 'source',
+            isRecap: true,
             title: 'ארבעת ההוגים של הפרק', titleEn: 'The Four Thinkers in This Chapter',
             quote: '״אפלטון - יש שני עולמות: עולם החושים הזמני ועולם האידאות הנצחי. שפינוזה - יש עצם אחד בלבד: אלוהים והטבע הם אותו דבר. ברקלי - אין חומר כלל: קיומו של דבר הוא תפיסה שלו. בוסטרום - אולי המציאות שלנו היא סימולציה ממוחשבת.״',
             quoteEn: '"Plato - there are two worlds: the temporary world of the senses and the eternal world of Forms. Spinoza - there is only one substance: God and Nature are the same thing. Berkeley - there is no matter at all: the existence of a thing is the perception of it. Bostrom - perhaps our reality is a computer simulation."',
@@ -9946,7 +10018,7 @@ const economicsData = {
           },
           { type: 'quiz_summary' },
         ] },
-        { id: 3, title: 'מה שסמית לא ראה', titleEn: 'What Smith Did Not See', thinker: 'קרל מרקס', thinkerEn: 'Karl Marx', thinkerId: 'marx', xp: 50, layout: 'editorial', sections: [
+        { id: 3, title: 'מה שסמית לא ראה', titleEn: 'What Smith Did Not See', thinker: 'קרל מרקס', thinkerEn: 'Karl Marx', thinkerId: 'marx', xp: 50, sections: [
           {
             type: 'idea',
             title: 'מה שסמית לא ראה', titleEn: 'What Smith Did Not See',
@@ -10295,6 +10367,7 @@ const economicsData = {
           },
           {
             type: 'source',
+            isRecap: true,
             title: 'המסע שעברנו', titleEn: 'The Journey We Traveled',
             quote: '״סמואלסון הגדיר את השאלה. סמית הציע מנגנון. מרקס גילה את הכוח. קיינס פתר משברים. פרידמן הגן על החירות. סן שאל לאן כל זה לוקח אותנו.״',
             quoteEn: '"Samuelson defined the question. Smith proposed a mechanism. Marx discovered the power. Keynes solved crises. Friedman defended freedom. Sen asked where all of this is taking us."',
@@ -10897,6 +10970,7 @@ const economicsData = {
           },
           {
             type: 'source',
+            isRecap: true,
             title: 'המסע שעברנו', titleEn: 'The Journey We Traveled',
             quote: '״סמית: ערך מגיע מעבודה. מרקס: ולכן הקפיטליזם הוא ניצול. ג\'בונס: ערך מגיע מתועלת - מהרצון של הצרכן. מרשל: בעצם, ערך הוא מפגש בין שניהם. סנדל: אבל יש דברים שאין להם מחיר. קהנמן: ובכלל, הצרכן לא רציונלי.״',
             quoteEn: '"Smith: value comes from labor. Marx: and therefore capitalism is exploitation. Jevons: value comes from utility - from the consumer\'s desire. Marshall: actually, value is a meeting between the two. Sandel: but there are things that have no price. Kahneman: and besides, the consumer is not rational."',
@@ -12000,6 +12074,7 @@ const economicsData = {
           },
           {
             type: 'source',
+            isRecap: true,
             title: 'המסע שעברנו', titleEn: 'The Journey We Traveled',
             quote: '״סמית: הון הוא כלי. ריקרדו: התפוקה השולית פוחתת - ולכן יש סתירה בין הקבוצות. מרקס: ההון משכפל את עצמו, וזו לוגיקה מבנית. פיקטי: r > g - הנתונים מוכיחים.״',
             quoteEn: '"Smith: capital is a tool. Ricardo: marginal productivity diminishes - therefore there is contradiction between groups. Marx: capital reproduces itself, and this is structural logic. Piketty: r > g - the data proves it."',
@@ -12604,6 +12679,7 @@ const economicsData = {
           },
           {
             type: 'source',
+            isRecap: true,
             title: 'המסע שעברנו', titleEn: 'The Journey We Traveled',
             quote: '״אקווינס: יש מחיר צודק. פארטו: יעילות אינה צדק. רולס: צדק נמדד מאחורי מסך הבערות. נוזיק: צדק הוא תהליך, לא תוצאה. הייק: \'צדק חברתי\' חסר משמעות. סן: צדק הוא יכולות אנושיות.״',
             quoteEn: '"Aquinas: there is a just price. Pareto: efficiency is not justice. Rawls: justice is measured behind the veil of ignorance. Nozick: justice is process, not outcome. Hayek: \'social justice\' is meaningless. Sen: justice is human capabilities."',
@@ -14307,7 +14383,6 @@ function getW() {
       thinker: lang === 'en' ? d.thinkerEn : d.thinker,
       thinkerId: d.thinkerId,
       xp: d.xp,
-      layout: d.layout,
       sections: d.sections.map(s => {
         const base = { type: s.type, title: lang === 'en' ? (s.titleEn || s.title) : s.title };
         switch (s.type) {
@@ -14319,7 +14394,8 @@ function getW() {
             return { ...base,
               quote: lang === 'en' ? s.quoteEn : s.quote,
               attr:  lang === 'en' ? s.attrEn  : s.attr,
-              body:  lang === 'en' ? s.contentEn : s.content };
+              body:  lang === 'en' ? s.contentEn : s.content,
+              isRecap: !!s.isRecap };
           case 'quiz': {
             const intro = lang === 'en' ? (s.introEn || s.intro) : s.intro;
             let questions;
@@ -16119,7 +16195,7 @@ function closeLibraryModal() {
   document.getElementById('modal-library').classList.remove('active');
 }
 
-function openReader(weekId, dayId) {
+function openReader(weekId, dayId, opts) {
   // Defensive: if the guest-signup modal is somehow still .active when we're
   // about to load a reader, close it. In the intended flow, closeCompleteModal
   // runs the prompt chain (signup → share → streak → continuation) and only
@@ -16163,11 +16239,13 @@ function openReader(weekId, dayId) {
   state.quizAnswered = {};
   state.quizAttempts = {};
   state.dayQuizResults = {};
-  // Per-day visual layout flag — trial. Scopes the .reader-editorial CSS
-  // block to just the days with layout: 'editorial' in their data. Flip is
-  // idempotent per open, so switching dialogues (e.g. via goToNextLesson)
-  // re-computes correctly on every entry.
-  document.body.classList.toggle('reader-editorial', _day.layout === 'editorial');
+  // Editorial layout is the reader default across all dialogues/chapters/subjects
+  // (rolled out from the Cave+Marx trial). The .reader-editorial class stays on
+  // body throughout — it just marks "editorial layout in force." Class remains
+  // when the user leaves the reader; harmless because every scoped selector is
+  // anchored to reader-only elements (#reader-content / #screen-reader /
+  // #reader-btn-bar / #modal-quiz-feedback.active).
+  document.body.classList.add('reader-editorial');
   renderReader();
   showScreen('reader');
   animateScreen(document.getElementById('screen-reader'), 'anim-fade');
@@ -16194,8 +16272,11 @@ function openReader(weekId, dayId) {
   // uncompleted lesson this session, sit an intro overlay on top of the
   // reader chrome. The reader is fully rendered underneath so the intro's
   // continue button just hides the overlay for an instant reveal — no
-  // section/XP/dots logic changes.
-  _showThinkerIntroIfNeeded(_day);
+  // section/XP/dots logic changes. Callers can pass { forceThinkerIntro:
+  // true } to bypass the already-completed + session-dedup gates and always
+  // show the intro (used by the D0→D1 advance in finishDay to mark the
+  // transition beat between bonus intro and the first thinker's dialogue).
+  _showThinkerIntroIfNeeded(_day, opts);
 }
 
 // Session-only map of lesson keys → true, so the thinker intro overlay
@@ -16268,13 +16349,21 @@ function _renderThinkerIntro(day, opts) {
 // Auto-show on fresh entry only. Gates: day has a thinkerId, lesson not
 // completed, not already shown this session for this key. Manual reopen
 // bypasses all three gates.
-function _showThinkerIntroIfNeeded(day) {
+function _showThinkerIntroIfNeeded(day, opts) {
   if (!day || !day.thinkerId) return;
-  if (state.completedDays[dayKey(state.currentWeek, state.currentDay)]) return;
-  const key = _thinkerIntroKey(state.currentWeek, state.currentDay);
-  if (_thinkerIntrosShown[key]) return;
+  const force = !!(opts && opts.forceThinkerIntro);
+  // Both gates below bypassed on the force path — used by the bonus D0→D1
+  // advance to mark that transition regardless of whether the user has seen
+  // the intro before. Force also SKIPS setting _thinkerIntrosShown so a
+  // subsequent normal open in this session still gets its natural once-per-
+  // session auto-show cadence.
+  if (!force) {
+    if (state.completedDays[dayKey(state.currentWeek, state.currentDay)]) return;
+    const key = _thinkerIntroKey(state.currentWeek, state.currentDay);
+    if (_thinkerIntrosShown[key]) return;
+    _thinkerIntrosShown[key] = true;
+  }
   if (!_renderThinkerIntro(day)) return;
-  _thinkerIntrosShown[key] = true;
   const overlay = document.getElementById('thinker-intro');
   overlay.classList.add('active');
   // Lock body scroll while the intro is up (matches the thinker-modal and
@@ -16404,12 +16493,27 @@ function renderReader() {
     makeNextBtn(isLast ? ui.finishBtn : ui.nextBtn, isLast);
   }
   else if (sec.type === 'source') {
-    card.innerHTML = `
-      <div class="section-type-label">${ui.labels.source}</div>
-      <div class="section-heading">${sec.title}</div>
-      <div class="source-quote"><p>${sec.quote}</p><div class="source-attr">${sec.attr}</div></div>
-      <div class="section-body">${toParas(sec.body)}</div>
-    `;
+    if (sec.isRecap) {
+      // Chapter-summary "source" — not a real thinker quote, it's an editorial
+      // synthesis of the chapter with a "Chapter N Summary" byline. Render as
+      // regular text: heading + body composed of the quote text (wrapper
+      // quote marks stripped) followed by the body content. No source-quote
+      // block, no accent bar, no italic. Attribution dropped.
+      const _quoteUnwrapped = (sec.quote || '').replace(/^[״"'«]+|[״"'»]+$/g, '');
+      const _mergedBody = _quoteUnwrapped + (sec.body ? '\n\n' + sec.body : '');
+      card.innerHTML = `
+        <div class="section-type-label">${ui.labels.source}</div>
+        <div class="section-heading">${sec.title}</div>
+        <div class="section-body">${toParas(_mergedBody)}</div>
+      `;
+    } else {
+      card.innerHTML = `
+        <div class="section-type-label">${ui.labels.source}</div>
+        <div class="section-heading">${sec.title}</div>
+        <div class="source-quote"><p>${sec.quote}</p><div class="source-attr">${sec.attr}</div></div>
+        <div class="section-body">${toParas(sec.body)}</div>
+      `;
+    }
     content.appendChild(card);
     makeNextBtn(isLast ? ui.finishBtn : ui.nextBtn, isLast);
   }
@@ -16489,12 +16593,9 @@ function renderReader() {
     const quizBtnBar = document.getElementById('reader-btn-bar');
     quizBtnBar.innerHTML = '';
     const isFirstSection = state.currentSection === 0;
-    const isFirstDay = chapter && chapter.days && chapter.days[0] && chapter.days[0].id === state.currentDay;
-    // Editorial: hide back on the first section of any dialogue (parallel to
-    // the guard in makeNextBtn). Non-editorial: original first-day-only guard.
-    const _isEditorial = document.body.classList.contains('reader-editorial');
-    const _hideQuizBack = isFirstSection && (isFirstDay || _isEditorial);
-    if (!_hideQuizBack) {
+    // Hide the floating back button on the first section of every dialogue.
+    // Topbar back button stays as the deliberate exit path from section 0.
+    if (!isFirstSection) {
       const quizRow = document.createElement('div');
       quizRow.className = 'reader-nav-row';
       const quizBackBtn = document.createElement('button');
@@ -16506,12 +16607,11 @@ function renderReader() {
     }
   }
   else if (sec.type === 'reflection') {
-    // Editorial-only reflection eyebrow — swaps the ✦ text glyph for the
-    // ic-reflect SVG so it matches the other section-type icons. Non-editorial
-    // dialogues keep ui.labels.reflection (✦) verbatim.
-    const _reflectLabel = document.body.classList.contains('reader-editorial')
-      ? `<svg viewBox="0 0 64 64" width="28" height="28"><use href="#ic-reflect"/></svg> ${state.lang === 'en' ? 'Reflect' : 'לחשוב'}`
-      : ui.labels.reflection;
+    // Reflection eyebrow — SVG icon matches the other section-type labels.
+    // The base ui.labels.reflection still uses the ✦ text glyph (deprecated
+    // shape); overriding here rather than editing UI.labels because reflection
+    // is the only label that needed the swap.
+    const _reflectLabel = `<svg viewBox="0 0 64 64" width="28" height="28"><use href="#ic-reflect"/></svg> ${state.lang === 'en' ? 'Reflect' : 'לחשוב'}`;
     card.innerHTML = `
       <div class="section-type-label">${_reflectLabel}</div>
       <div class="section-heading">${sec.title}</div>
@@ -16593,15 +16693,10 @@ function makeNextBtn(label, isFinish = false, disabled = false) {
   const btnBar = document.getElementById('reader-btn-bar');
   btnBar.innerHTML = '';
 
-  const chapter = getW().find(w => w.id === state.currentWeek);
   const isFirstSection = state.currentSection === 0;
-  const isFirstDay = chapter && chapter.days && chapter.days[0] && chapter.days[0].id === state.currentDay;
-  // Editorial dialogues also hide the floating back button on the first
-  // section — the topbar back is the only in-first-section exit. Non-editorial
-  // dialogues keep the original behavior (back visible except on the very
-  // first section of the very first day).
-  const _isEditorial = document.body.classList.contains('reader-editorial');
-  const hideBack = isFirstSection && (isFirstDay || _isEditorial);
+  // Hide the floating back button on the first section of every dialogue.
+  // The topbar back button stays visible as the exit path from section 0.
+  const hideBack = isFirstSection;
 
   const row = document.createElement('div');
   row.className = 'reader-nav-row';
@@ -16954,6 +17049,31 @@ function finishDay() {
   const ui = u();
   const isEn = state.lang === 'en';
 
+  // Day 0 (intro day, bonus chapters only — only one Day 0 exists in the
+  // entire data): skip the stats screen entirely (no quiz → 0 XP), and
+  // advance straight into the next dialogue in the chapter so the intro
+  // reads as a preamble that flows into Day 1. forceThinkerIntro makes the
+  // D1 thinker intro fire unconditionally on this transition (bypassing the
+  // completed + session-dedup gates), so every user sees the beat between
+  // D0's last page and D1's first page — even on replay, even if the intro
+  // was seen before in a chapter-view open. Normal chapter-view opens keep
+  // the natural once-per-session cadence. Falls back to goHome if there's
+  // no next dialogue (defensive — bonus chapters always have Day 1).
+  // Placed BEFORE the already-completed guard so replays skip the stats
+  // screen too.
+  if (day.id === 0) {
+    state.completedDays[key] = true;
+    try { saveState(); } catch(e) { saveStateLocal(); }
+    const _next = getNextLessonInfo();
+    closeCompleteModal({
+      continuation: () => {
+        if (_next.hasNext) openReader(_next.weekId, _next.dayId, { forceThinkerIntro: true });
+        else goHome();
+      }
+    });
+    return;
+  }
+
   // If day already completed - stats only, no thinker card
   if (state.completedDays[key]) {
     _showDcStats(
@@ -16967,20 +17087,6 @@ function finishDay() {
   }
 
   const prevLevel = getLevel(state.xp);
-
-  // Day 0 (intro day): mark complete, no XP, no thinker
-  if (day.id === 0) {
-    state.completedDays[key] = true;
-    try { saveState(); } catch(e) { saveStateLocal(); }
-    _showDcStats(
-      ui.dayCompleted(day.id),
-      isEn ? (day.titleEn || day.title) : day.title,
-      0,
-      state.correctInRow,
-      { label: isEn ? 'Back to Home' : 'חזרה לבית', fn: closeCompleteModal }
-    );
-    return;
-  }
 
   // Day completion bonus + streak bonus
   state.readerXP += 30;
