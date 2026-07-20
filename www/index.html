@@ -2407,6 +2407,354 @@
   .reader-text-size-btn:active { transform: scale(0.92); background: var(--accent-tint-strong); }
   .reader-text-size-btn:disabled { opacity: 0.4; cursor: default; transform: none; background: var(--surface); }
 
+  /* ═══════════════════════════════════════════════════════════════
+     Editorial reader layout — trial. Scoped by body.reader-editorial,
+     toggled in openReader based on the day's `layout: 'editorial'` flag.
+     Text sits directly on --bg with no card wrapper, big-body/bold-heading
+     typography, segmented progress pills, and floating circular nav.
+     All sizes wrap in calc(N * var(--text-scale)) so A+/A− continues to
+     scale editorial text. All colors go through tokens so subject theme
+     and dark mode propagate. Revert path: remove `layout: 'editorial'`
+     from Ch.1 D3 in the raw data — one line, no other changes needed.
+     ═══════════════════════════════════════════════════════════════ */
+
+  /* Reader scroll area: editorial breathing room */
+  .reader-editorial #reader-content {
+    padding: 32px 20px calc(140px + var(--safe-bottom));
+  }
+
+  /* Remove the box wrapper — text sits on --bg */
+  .reader-editorial #reader-content .section-card {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 24px 4px;
+    margin-bottom: 0;
+    counter-reset: reflection-counter;
+  }
+  /* Kill the outer learning-card-body 5%/8% padding — we control from
+     .section-card in editorial */
+  .reader-editorial #reader-content .learning-card-body {
+    padding: 0;
+  }
+
+  /* Eyebrow — quiet caption, no divider line, --text-2 tint */
+  .reader-editorial #reader-content .section-type-label {
+    color: var(--text-2);
+    margin-bottom: 24px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+  }
+  .reader-editorial #reader-content .section-type-label::after,
+  .reader-editorial #reader-content .section-type-label::before {
+    display: none;
+  }
+  .reader-editorial #reader-content .section-type-label svg {
+    color: var(--text-2);
+    opacity: 0.85;
+    /* Reset base's [dir="ltr"] override that pushes SVG to order:1 (end of row)
+       for the "line-then-label-then-icon" LTR chrome. In editorial the divider
+       is gone and we want the icon to lead — order:0 gives us "icon then text"
+       in both LTR and RTL, respecting the document flex direction. */
+    order: 0;
+  }
+
+  /* Heading — big, left-aligned, --ink */
+  .reader-editorial #reader-content .section-heading {
+    font-size: calc(34px * var(--text-scale));
+    line-height: 1.2;
+    text-align: start;
+    color: var(--ink);
+    margin-bottom: 32px;
+    letter-spacing: -0.01em;
+  }
+
+  /* Body — 22px start, weight 500 */
+  .reader-editorial #reader-content .section-body {
+    font-size: calc(22px * var(--text-scale));
+    line-height: 1.5;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .reader-editorial #reader-content .section-body p {
+    margin-bottom: 28px;
+  }
+  .reader-editorial #reader-content .section-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Source quote — transparent, big italic centerpiece with inline-start rule.
+     border-inline-end (not border-right) clears the trailing edge in both LTR
+     and RTL; using border-right here would fight border-inline-start in RTL
+     because they resolve to the same physical side (right). */
+  .reader-editorial #reader-content .source-quote {
+    background: transparent;
+    border-inline-start: 4px solid var(--accent);
+    border-inline-end: none;
+    border-radius: 0;
+    padding: 4px 0;
+    padding-inline-start: 24px;
+    margin-block: 24px 40px;
+  }
+  .reader-editorial #reader-content .source-quote p {
+    font-size: calc(26px * var(--text-scale));
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--ink);
+    font-style: italic;
+  }
+  .reader-editorial #reader-content .source-attr {
+    font-size: var(--fs-caption);
+    color: var(--text-caption);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 16px;
+    font-weight: 700;
+  }
+
+  /* Quiz eyebrow — same quiet treatment as section-type-label. Base hardcodes
+     direction: ltr and justify-content: flex-end (to right-align the pair
+     against a gradient line). Editorial hides the line and un-forces the
+     direction so the pair flows with document dir + icon leads on both. */
+  .reader-editorial #reader-content .quiz-eyebrow {
+    margin-bottom: 24px;
+    direction: unset;
+    justify-content: flex-start;
+  }
+  .reader-editorial #reader-content .quiz-eyebrow-line {
+    display: none;
+  }
+  .reader-editorial #reader-content .quiz-eyebrow-label {
+    color: var(--text-2);
+    letter-spacing: 0.1em;
+  }
+  .reader-editorial #reader-content .quiz-eyebrow svg {
+    color: var(--text-2);
+    opacity: 0.85;
+    order: -1;
+  }
+
+  /* Quiz intro — quieter scene-setter */
+  .reader-editorial #reader-content .quiz-intro-v2 {
+    font-size: calc(19px * var(--text-scale));
+    line-height: 1.5;
+    color: var(--text-2);
+    border-inline-start: none;
+    border-right: none;
+    padding-inline: 0;
+    padding-right: 0;
+    margin-bottom: 32px;
+  }
+
+  /* Quiz question stem — assertive */
+  .reader-editorial #reader-content .quiz-question {
+    font-size: calc(24px * var(--text-scale));
+    line-height: 1.35;
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 32px;
+  }
+
+  /* Options — airy pill-outlined, transparent by default */
+  .reader-editorial #reader-content .quiz-options {
+    gap: 14px;
+  }
+  .reader-editorial #reader-content .quiz-option {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 22px;
+    min-height: 64px;
+    font-weight: 500;
+  }
+  .reader-editorial #reader-content .quiz-option:hover:not(:disabled),
+  .reader-editorial #reader-content .quiz-option.selected {
+    background: var(--accent-tint);
+    border-color: var(--accent);
+  }
+  .reader-editorial #reader-content .opt-letter {
+    width: 28px;
+    height: 28px;
+    background: var(--surface);
+    color: var(--accent);
+    border: 1.5px solid var(--accent-soft-border);
+  }
+  /* Correct/wrong states — chip fills to match the option border so the
+     letter reads as the same semantic color, not a purple/blue island on a
+     green/red pill. Base has these rules unscoped but our editorial default
+     .opt-letter is higher specificity, so we restate them here. */
+  .reader-editorial #reader-content .option-correct .opt-letter {
+    background: var(--auth-success);
+    color: var(--on-accent);
+    border-color: var(--auth-success);
+  }
+  .reader-editorial #reader-content .option-wrong .opt-letter {
+    background: var(--auth-error);
+    color: var(--on-accent);
+    border-color: var(--auth-error);
+  }
+
+  /* Quiz inline feedback — drop the surface-2 callout for an inline-start rule */
+  .reader-editorial #reader-content .quiz-inline-feedback {
+    background: transparent;
+    border-inline-start: 3px solid var(--border);
+    border-radius: 0;
+    padding-inline-start: 16px;
+    padding-inline-end: 0;
+    padding-block: 4px;
+  }
+
+  /* Reflection — numbered questions, no ✦ */
+  .reader-editorial #reader-content .reflection-q {
+    font-size: calc(20px * var(--text-scale));
+    line-height: 1.5;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 24px;
+    counter-increment: reflection-counter;
+    gap: 0;
+  }
+  .reader-editorial #reader-content .reflection-q::before {
+    content: counter(reflection-counter, decimal-leading-zero) '.';
+    color: var(--accent);
+    font-weight: 800;
+    font-size: inherit;
+    margin-inline-end: 12px;
+    margin-top: 0;
+  }
+
+  /* Quiz summary — drop the surface-2 message pill */
+  .reader-editorial #reader-content .quiz-summary-msg {
+    background: transparent;
+  }
+
+  /* Segmented progress pills — reuse #section-dots with new geometry.
+     Completed: filled --accent, small. Active: filled --accent, wider (flex:
+     2.5) + taller + subtle glow so "you are here" reads at a glance.
+     Upcoming: --border, small. */
+  .reader-editorial #screen-reader #section-dots {
+    gap: 6px;
+    padding: 12px 20px 16px;
+    align-items: center;
+  }
+  .reader-editorial #screen-reader #section-dots .section-dot {
+    flex: 1;
+    height: 6px;
+    width: auto;
+    border-radius: 999px;
+    background: var(--border);
+    transition: background 0.3s ease;
+  }
+  .reader-editorial #screen-reader #section-dots .section-dot.completed {
+    background: var(--accent);
+    width: auto;
+  }
+  .reader-editorial #screen-reader #section-dots .section-dot.active {
+    background: var(--accent);
+    flex: 2.5;
+    height: 10px;
+    width: auto;
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
+
+  /* Hide the top scroll progress bar — segmented pills carry the load */
+  .reader-editorial #screen-reader .reading-progress-bar {
+    display: none;
+  }
+
+  /* Floating labeled nav — labeled back/continue pills float over the reader
+     against a transparent bar. pointer-events: none on the wrapper + auto on
+     the buttons themselves lets scroll-through work on the empty area
+     between the two buttons. No idle-fade — buttons stay at full opacity. */
+  .reader-editorial #reader-btn-bar {
+    background: transparent;
+    border-top: none;
+    box-shadow: none;
+    padding: 12px 20px;
+    padding-bottom: max(12px, var(--safe-bottom));
+    pointer-events: none;
+  }
+  .reader-editorial #reader-btn-bar .btn-reader-back,
+  .reader-editorial #reader-btn-bar .btn-reader-next {
+    pointer-events: auto;
+  }
+  /* Base .btn-reader-back is background:none — legible on the base tinted
+     bar, but scrolling content shows through with the editorial transparent
+     bar. Give it --surface so the label reads clearly. */
+  .reader-editorial #reader-btn-bar .btn-reader-back {
+    background: var(--surface);
+  }
+
+  /* Content column max-width — 640px keeps line length in the editorial
+     sweet spot (~60–70 chars at 22px) on wider viewports. Centered via
+     margin-inline: auto. On standard phones the viewport is narrower than
+     640px so there's no visible effect. */
+  .reader-editorial #reader-content .section-card {
+    max-width: 640px;
+    margin-inline: auto;
+  }
+  .reader-editorial #reader-btn-bar .reader-nav-row {
+    max-width: 640px;
+    margin-inline: auto;
+  }
+
+  /* RTL-aware page transitions. Base .anim-section-next/-prev translateX
+     physically (glideInRight / glideInLeft), so in Hebrew the next-page
+     slides "wrong way" relative to the reading direction. Override the
+     animation-name under [dir="rtl"] editorial so next slides in from the
+     left and back from the right — matching RTL reading flow.
+     KNOWN: the same physical-translate bug exists app-wide (base
+     .anim-section-next fires on every non-editorial reader too). Fold a
+     base-wide fix into rollout time; scoped here to keep the trial safe. */
+  [dir="rtl"] body.reader-editorial #reader-content.anim-section-next {
+    animation-name: glideInLeft;
+  }
+  [dir="rtl"] body.reader-editorial #reader-content.anim-section-prev {
+    animation-name: glideInRight;
+  }
+
+  /* ══ Editorial quiz-feedback modal ══
+     Scoped by body.reader-editorial (the modal is a top-level element,
+     outside the #screen-reader/#reader-content/#reader-btn-bar anchors used
+     by the rest of the editorial rules). Adding .active gate so styles only
+     apply while the modal is visible — no risk of leaking to a
+     non-editorial dialogue's modal. When user opens a non-editorial
+     dialogue next, openReader flips body.reader-editorial off and the
+     modal reverts to base. */
+  body.reader-editorial #modal-quiz-feedback.active .qfm-box {
+    max-width: 560px;
+    padding: 40px 28px;
+  }
+  body.reader-editorial #modal-quiz-feedback.active .qfm-icon {
+    font-size: 56px;
+    margin-bottom: 8px;
+  }
+  body.reader-editorial #modal-quiz-feedback.active .qfm-xp {
+    font-size: calc(24px * var(--text-scale));
+    margin-bottom: 32px;
+  }
+  body.reader-editorial #modal-quiz-feedback.active .qfm-explanation {
+    font-size: calc(20px * var(--text-scale));
+    line-height: 1.5;
+    font-weight: 500;
+    background: transparent;
+    border-radius: 0;
+    border-bottom: none;
+    padding: 0;
+    margin-bottom: 32px;
+    color: var(--ink);
+  }
+  body.reader-editorial #modal-quiz-feedback.active #qfm-continue-btn {
+    /* Keep the .nav-btn structure/color but tone the loud chrome so the
+       button reads as a piece of the editorial page rather than a shouty
+       CTA — matching the airy feel of the surrounding text. */
+    text-transform: none;
+    letter-spacing: 0;
+    font-family: inherit;
+    font-weight: 700;
+    border-bottom-width: 3px;
+  }
+
   /* ── Section cards ── */
   .section-card {
     background: var(--surface);
@@ -5448,6 +5796,15 @@
       <circle cx="43" cy="45" r="5" fill="none" stroke="#C7892C" stroke-width="0.8" stroke-dasharray="1.5 1"/>
       <path d="M43 41 L 44 44 L 47 44.4 L 44.6 46.2 L 45.4 49 L 43 47.4 L 40.6 49 L 41.4 46.2 L 39 44.4 L 42 44 Z" fill="#FFFFFF" stroke="#2A1266" stroke-width="1" stroke-linejoin="round"/>
     </symbol>
+    <symbol id="ic-reflect" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="22" fill="#9B6FE4" stroke="#2A1266" stroke-width="2"/>
+      <path d="M32 10 A 22 22 0 0 1 32 54 A 18 22 0 0 0 32 10 Z" fill="#5E37A8" opacity=".5"/>
+      <circle cx="32" cy="32" r="19.5" fill="none" stroke="#F5B544" stroke-width="1" opacity=".7"/>
+      <path d="M16 22 Q 20 14 28 12" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" opacity=".9"/>
+      <path d="M32 16 L 34 30 L 48 32 L 34 34 L 32 48 L 30 34 L 16 32 L 30 30 Z" fill="#FFFFFF" stroke="#2A1266" stroke-width="1.6" stroke-linejoin="round"/>
+      <path d="M50 20 L 50.8 21.6 L 52.4 22 L 50.8 22.5 L 50 24.2 L 49.2 22.5 L 47.6 22 L 49.2 21.6 Z" fill="#FFD982" stroke="#C7892C" stroke-width="0.6" stroke-linejoin="round"/>
+      <path d="M14 44 L 14.8 45.6 L 16.4 46 L 14.8 46.5 L 14 48.2 L 13.2 46.5 L 11.6 46 L 13.2 45.6 Z" fill="#FFD982" stroke="#C7892C" stroke-width="0.6" stroke-linejoin="round"/>
+    </symbol>
     <symbol id="ic-bonus" viewBox="0 0 64 64">
       <circle cx="32" cy="32" r="22" fill="#F5B544" stroke="#2A1266" stroke-width="2"/>
       <path d="M32 10 A 22 22 0 0 1 32 54 A 18 22 0 0 0 32 10 Z" fill="#C7892C" opacity=".55"/>
@@ -7109,6 +7466,7 @@ const corpusData = {
           title: 'משל המערה', titleEn: 'The Allegory of the Cave',
           thinker: 'אפלטון', thinkerEn: 'Plato',
           thinkerId: 'plato', xp: 50,
+          layout: 'editorial',
           sections: [
             {
               type: 'idea',
@@ -9588,7 +9946,7 @@ const economicsData = {
           },
           { type: 'quiz_summary' },
         ] },
-        { id: 3, title: 'מה שסמית לא ראה', titleEn: 'What Smith Did Not See', thinker: 'קרל מרקס', thinkerEn: 'Karl Marx', thinkerId: 'marx', xp: 50, sections: [
+        { id: 3, title: 'מה שסמית לא ראה', titleEn: 'What Smith Did Not See', thinker: 'קרל מרקס', thinkerEn: 'Karl Marx', thinkerId: 'marx', xp: 50, layout: 'editorial', sections: [
           {
             type: 'idea',
             title: 'מה שסמית לא ראה', titleEn: 'What Smith Did Not See',
@@ -13949,6 +14307,7 @@ function getW() {
       thinker: lang === 'en' ? d.thinkerEn : d.thinker,
       thinkerId: d.thinkerId,
       xp: d.xp,
+      layout: d.layout,
       sections: d.sections.map(s => {
         const base = { type: s.type, title: lang === 'en' ? (s.titleEn || s.title) : s.title };
         switch (s.type) {
@@ -14339,6 +14698,80 @@ function readerGoBack() {
     goHome();
   }
 }
+
+// Editorial tap-to-navigate. Scoped to body.reader-editorial only. Leading
+// 28% edge of #reader-content = back; trailing 28% = advance. Direction-aware
+// via document dir. Two guards keep it safe:
+//   1. Interactive-target check on both pointerdown and pointerup. If the
+//      pointer starts or lands on any button/link/input/[role=button]/etc.,
+//      the tap is left alone — quiz answers, nav pills, A+/A− rail, topbar
+//      buttons all behave normally.
+//   2. Clean-tap check on pointerup: max 8px pointer move (dx or dy) and
+//      max 300ms duration. Anything larger is a scroll/drag/long-press and
+//      is ignored.
+// Quiz sections: tap-next only advances if #reader-next-btn exists in the
+// DOM — matches the visible UI, which only mounts the next button after the
+// user has answered.
+(function() {
+  const content = document.getElementById('reader-content');
+  if (!content) return;
+  const INTERACTIVE = 'button, a, input, textarea, select, [role="button"], [contenteditable]';
+  const MAX_MOVE = 8;         // px
+  const MAX_DURATION = 300;   // ms
+  const EDGE_FRACTION = 0.28;
+  let startX = null, startY = null, startT = 0;
+
+  content.addEventListener('pointerdown', (e) => {
+    if (!document.body.classList.contains('reader-editorial')) return;
+    if (e.target.closest(INTERACTIVE)) { startX = null; return; }
+    startX = e.clientX;
+    startY = e.clientY;
+    startT = performance.now();
+  }, { passive: true });
+
+  content.addEventListener('pointerup', (e) => {
+    if (!document.body.classList.contains('reader-editorial')) return;
+    if (startX === null) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const dt = performance.now() - startT;
+    startX = null;
+    if (Math.abs(dx) > MAX_MOVE || Math.abs(dy) > MAX_MOVE) return;
+    if (dt > MAX_DURATION) return;
+    if (e.target.closest(INTERACTIVE)) return;
+
+    const rect = content.getBoundingClientRect();
+    const relX = e.clientX - rect.left;
+    const edgeW = rect.width * EDGE_FRACTION;
+    const isRTL = document.documentElement.getAttribute('dir') === 'rtl';
+    let action = null;
+    if (relX <= edgeW)                     action = isRTL ? 'next' : 'back';
+    else if (relX >= rect.width - edgeW)   action = isRTL ? 'back' : 'next';
+    if (!action) return;
+
+    if (action === 'back') {
+      // First-section tap-back is a no-op in editorial. The floating back
+      // button is hidden on section 0 (makeNextBtn's hideBack), so the
+      // tap-zone mirrors that: no accidental "back → home" on the leading
+      // edge. Topbar back button stays the deliberate way to exit.
+      if (state.currentSection === 0) return;
+      readerGoBack();
+      return;
+    }
+
+    // action === 'next'
+    const chapter = getW().find(w => w.id === state.currentWeek);
+    const day = chapter && chapter.days.find(d => d.id === state.currentDay);
+    if (!day) return;
+    const sections = day.sections;
+    const sec = sections[state.currentSection];
+    const isLast = state.currentSection >= sections.length - 1;
+    // On quiz sections the next button only appears after the user answers;
+    // mirror that gate so tapping into an unanswered quiz doesn't skip it.
+    if (sec && sec.type === 'quiz' && !document.getElementById('reader-next-btn')) return;
+    if (isLast) finishDay(); else nextSection();
+  }, { passive: true });
+})();
 
 // ═══════════════════════════════════════════════════════════
 // HOME
@@ -15730,6 +16163,11 @@ function openReader(weekId, dayId) {
   state.quizAnswered = {};
   state.quizAttempts = {};
   state.dayQuizResults = {};
+  // Per-day visual layout flag — trial. Scopes the .reader-editorial CSS
+  // block to just the days with layout: 'editorial' in their data. Flip is
+  // idempotent per open, so switching dialogues (e.g. via goToNextLesson)
+  // re-computes correctly on every entry.
+  document.body.classList.toggle('reader-editorial', _day.layout === 'editorial');
   renderReader();
   showScreen('reader');
   animateScreen(document.getElementById('screen-reader'), 'anim-fade');
@@ -16052,7 +16490,11 @@ function renderReader() {
     quizBtnBar.innerHTML = '';
     const isFirstSection = state.currentSection === 0;
     const isFirstDay = chapter && chapter.days && chapter.days[0] && chapter.days[0].id === state.currentDay;
-    if (!(isFirstSection && isFirstDay)) {
+    // Editorial: hide back on the first section of any dialogue (parallel to
+    // the guard in makeNextBtn). Non-editorial: original first-day-only guard.
+    const _isEditorial = document.body.classList.contains('reader-editorial');
+    const _hideQuizBack = isFirstSection && (isFirstDay || _isEditorial);
+    if (!_hideQuizBack) {
       const quizRow = document.createElement('div');
       quizRow.className = 'reader-nav-row';
       const quizBackBtn = document.createElement('button');
@@ -16064,8 +16506,14 @@ function renderReader() {
     }
   }
   else if (sec.type === 'reflection') {
+    // Editorial-only reflection eyebrow — swaps the ✦ text glyph for the
+    // ic-reflect SVG so it matches the other section-type icons. Non-editorial
+    // dialogues keep ui.labels.reflection (✦) verbatim.
+    const _reflectLabel = document.body.classList.contains('reader-editorial')
+      ? `<svg viewBox="0 0 64 64" width="28" height="28"><use href="#ic-reflect"/></svg> ${state.lang === 'en' ? 'Reflect' : 'לחשוב'}`
+      : ui.labels.reflection;
     card.innerHTML = `
-      <div class="section-type-label">${ui.labels.reflection}</div>
+      <div class="section-type-label">${_reflectLabel}</div>
       <div class="section-heading">${sec.title}</div>
       <div class="section-body" style="margin-bottom:8px">${ui.reflectPrompt}</div>
       ${sec.questions.map(q => `<div class="reflection-q">${q}</div>`).join('')}
@@ -16148,7 +16596,12 @@ function makeNextBtn(label, isFinish = false, disabled = false) {
   const chapter = getW().find(w => w.id === state.currentWeek);
   const isFirstSection = state.currentSection === 0;
   const isFirstDay = chapter && chapter.days && chapter.days[0] && chapter.days[0].id === state.currentDay;
-  const hideBack = isFirstSection && isFirstDay;
+  // Editorial dialogues also hide the floating back button on the first
+  // section — the topbar back is the only in-first-section exit. Non-editorial
+  // dialogues keep the original behavior (back visible except on the very
+  // first section of the very first day).
+  const _isEditorial = document.body.classList.contains('reader-editorial');
+  const hideBack = isFirstSection && (isFirstDay || _isEditorial);
 
   const row = document.createElement('div');
   row.className = 'reader-nav-row';
