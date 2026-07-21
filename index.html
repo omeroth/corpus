@@ -15014,8 +15014,43 @@ function migrateCompletedDaysKeys() {
 }
 
 // === Daily streak (consecutive days) ===
+// Streak day-derivation: local time, with a 03:00 grace boundary. A "day"
+// for streak purposes runs from 03:00 local to 03:00 the next local morning.
+// A completion at 00:30 counts toward the PREVIOUS logical day so users
+// finishing late at night don't wake up to a broken streak.
+//
+// This fixes two coupled bugs at once:
+//   1. The prior toISOString() code used UTC dates, so a user in LA (UTC-8)
+//      had their streak roll at 16:00 local — mid-workday. New code uses
+//      local time throughout.
+//   2. Late-night completions (00:00–02:59 local) reset the streak because
+//      they crossed midnight local. The 03:00 grace fixes that.
+//
+// Scope: streak logic only. Non-streak consumers of "today" (stats-modal
+// once-per-day display gate at line ~16930, guest-prompt cadence at ~17315/56,
+// profile week-row calendar at ~19625/32) continue using UTC ISO. See the
+// audit for the flagged trade-off on the profile week row for completions
+// between 00:00 and 03:00 local (activity checkmark lands on the prior
+// calendar day — consistent with the grace intent).
+function _streakDay(dateObj) {
+  const d = dateObj ? new Date(dateObj) : new Date();
+  if (d.getHours() < 3) d.setDate(d.getDate() - 1);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+// Yesterday's streak day, computed from a given date. Used for
+// consecutive-day comparisons.
+function _streakDayBefore(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const prev = new Date(y, m - 1, d - 1);
+  return _streakDay(prev);
+}
+
 function updateDailyStreak() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = _streakDay();
   const lastDate = state.lastActiveDate;
 
   if (!lastDate) {
@@ -15026,9 +15061,7 @@ function updateDailyStreak() {
     saveStateLocal();
     return;
   } else {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    const yesterdayStr = _streakDayBefore(today);
     state.dailyStreak = (lastDate === yesterdayStr) ? ((state.dailyStreak || 0) + 1) : 1;
   }
 
@@ -15040,7 +15073,10 @@ function updateDailyStreak() {
   saveStateLocal();
 }
 
-// Repairs state.dailyStreak from state.activeDates (runs once on app load)
+// Repairs state.dailyStreak from state.activeDates (runs once on app load).
+// activeDates may contain a mix of legacy UTC-derived dates (pre-grace) and
+// new local-with-grace dates; the chain walker only cares about consecutive
+// N/N-1 pairs, so mixed origins compose correctly going forward.
 function recalculateStreak() {
   const activeDates = (state.activeDates || []).slice().sort();
   if (activeDates.length === 0) {
@@ -15048,18 +15084,14 @@ function recalculateStreak() {
     saveStateLocal();
     return;
   }
-  const today = new Date().toISOString().split('T')[0];
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().split('T')[0];
+  const today = _streakDay();
+  const yesterdayStr = _streakDayBefore(today);
   const lastActive = activeDates[activeDates.length - 1];
 
   if (lastActive === today || lastActive === yesterdayStr) {
     let streak = 1;
     for (let i = activeDates.length - 2; i >= 0; i--) {
-      const currentDate = new Date(activeDates[i + 1]);
-      currentDate.setDate(currentDate.getDate() - 1);
-      const expectedPrev = currentDate.toISOString().split('T')[0];
+      const expectedPrev = _streakDayBefore(activeDates[i + 1]);
       if (activeDates[i] === expectedPrev) streak++;
       else break;
     }
