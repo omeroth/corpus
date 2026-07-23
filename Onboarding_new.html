@@ -716,6 +716,12 @@
   const skipBtn = document.getElementById('skip');
   let idx = 0;
 
+  // Session-scoped dedup so bouncing between slides via dots doesn't
+  // multi-fire the same slide index. Funnel: onboarding_carousel_slide.
+  const _slidesSeen = new Set();
+  function _phPost(event, props) {
+    try { window.parent.postMessage({ type: 'ph', event: event, props: props || {} }, '*'); } catch(e) {}
+  }
   function goTo(n){
     idx = Math.max(0, Math.min(slides.length-1, n));
     rail.style.transform = `translateX(-${idx * (100/3)}%)`;
@@ -725,6 +731,10 @@
     });
     slides.forEach((s, i) => s.dataset.active = (i === idx) ? 'true' : 'false');
     topBar.classList.toggle('dark', idx >= 1);
+    if (!_slidesSeen.has(idx)) {
+      _slidesSeen.add(idx);
+      _phPost('onboarding_carousel_slide', { slide_index: idx });
+    }
   }
 
   document.querySelectorAll('[data-action="next"]').forEach(b =>
@@ -733,9 +743,13 @@
     b.addEventListener('click', () => {
       b.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],
         {duration:380,easing:'ease-out'});
+      _phPost('onboarding_carousel_completed', { method: 'finish', last_slide: idx });
       window.parent.postMessage('intro-done', '*');
     }));
-  skipBtn.addEventListener('click', () => window.parent.postMessage('intro-done', '*'));
+  skipBtn.addEventListener('click', () => {
+    _phPost('onboarding_carousel_completed', { method: 'skip', last_slide: idx });
+    window.parent.postMessage('intro-done', '*');
+  });
   dots.forEach(d => d.addEventListener('click', () => goTo(+d.dataset.i)));
 
   // ===== swipe (LTR) =====

@@ -1347,7 +1347,7 @@
   #intro-overlay .star.tiny{width:2px;height:2px;opacity:.6}
   @keyframes twinkle{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
   #intro-overlay .star{animation:twinkle 3s ease-in-out infinite}
-  #intro-overlay .moon{position:absolute;top:14%;left:14%;width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFF0C7 0%,#F5B544 60%,#C97D1A 100%);box-shadow:0 0 30px 6px rgba(245,181,68,.45),inset -6px -8px 0 rgba(42,18,102,.18)}
+  #intro-overlay .moon{position:absolute;top:14%;left:14%;width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFF0C7 0%,#F59E0B 60%,#C97D1A 100%);box-shadow:0 0 30px 6px rgba(245,181,68,.45),inset -6px -8px 0 rgba(42,18,102,.18)}
   #intro-overlay .moon::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 70% 70%,rgba(42,18,102,.18) 0,transparent 35%),radial-gradient(circle at 50% 30%,rgba(42,18,102,.15) 0,transparent 25%)}
   #intro-overlay .constellation{position:absolute;inset:0;pointer-events:none;width:100%;height:100%}
   #intro-overlay .constellation path{stroke:rgba(255,233,176,.55);stroke-width:1;fill:none;stroke-dasharray:200;stroke-dashoffset:200;transition:stroke-dashoffset 1.6s ease .5s}
@@ -1541,7 +1541,7 @@
   }
   .pantheon-card-back-star {
     font-size: 24px;
-    color: #F5B544;
+    color: #F59E0B;
     text-shadow: 0 0 8px rgba(245,181,68,0.4);
     position: relative;
     z-index: 1;
@@ -1670,10 +1670,10 @@
   .week-item.locked { opacity: 0.5; cursor: default; }
   .week-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 16px; background: var(--surface); border: 1.5px solid var(--border); cursor: pointer; transition: transform 0.15s; margin-bottom: 10px; }
   .week-row:active { transform: scale(0.98); }
-  .week-row-bonus { background: #FFFBF0; border-color: #F5B544; }
+  .week-row-bonus { background: #FFFBF0; border-color: #F59E0B; }
   .week-row-locked { opacity: 0.78; cursor: default; background: #F8F5FF; border: 1.5px dashed #C9BFE0; }
   .week-row-num { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; flex-shrink: 0; box-shadow: 0 2px 0 var(--ink); }
-  .week-row-num-bonus { background: #F5B544; box-shadow: 0 2px 0 #C7892C; color: var(--ink); }
+  .week-row-num-bonus { background: #F59E0B; box-shadow: 0 2px 0 #C7892C; color: var(--ink); }
   .week-row-num-locked { background: #C9BFE0; box-shadow: 0 2px 0 #8D7DAE; }
   .next-lesson-btn {
     display: block;
@@ -1699,7 +1699,7 @@
   .week-row-ttl { font-weight: 700; font-size: 14px; color: var(--ink); }
   .week-row-sub { font-size: 11px; color: #8D7DAE; }
   .week-row-chev { color: #B6A8D4; font-size: 18px; font-weight: 700; }
-  .week-row-bonus-special { background: linear-gradient(135deg, #FFFBF0 0%, #FFF3D0 100%); border: 1.5px solid #F5B544; box-shadow: 0 2px 12px rgba(245,181,68,0.15); }
+  .week-row-bonus-special { background: linear-gradient(135deg, #FFFBF0 0%, #FFF3D0 100%); border: 1.5px solid #F59E0B; box-shadow: 0 2px 12px rgba(245,181,68,0.15); }
   .week-row-bonus-locked { background: #F8F5FF; border: 1.5px dashed #C9BFE0; box-shadow: none; opacity: 0.78; cursor: default; }
   .week-row-bonus-badge { flex-shrink: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
   .week-row-bonus-tag { font-size: 9px; font-weight: 900; letter-spacing: 0.14em; color: #C7892C; text-transform: uppercase; margin-bottom: 2px; }
@@ -1714,7 +1714,7 @@
   .week-bonus-progress { margin-top: 5px; height: 4px; border-radius: 2px; background: var(--surface); border: 1px solid var(--border); overflow: hidden; margin-bottom: 3px; }
   .week-bonus-progress span { display: block; height: 100%; background: linear-gradient(90deg, var(--purple-light), var(--accent), var(--purple-light)); background-size: 200% 100%; border-radius: 2px; animation: p1-shine 3s linear infinite; }
   @keyframes p1-shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-  .week-bonus-progress-warm span { background: linear-gradient(90deg, var(--accent), #F5B544, #FFD982, #F5B544, var(--accent)); background-size: 300% 100%; animation: p2-flow 2.4s linear infinite; }
+  .week-bonus-progress-warm span { background: linear-gradient(90deg, var(--accent), #F59E0B, #FFD982, #F59E0B, var(--accent)); background-size: 300% 100%; animation: p2-flow 2.4s linear infinite; }
   @keyframes p2-flow { 0% { background-position: 0 0; } 100% { background-position: -300% 0; } }
   .week-bonus-step { font-size: 10px; color: #8D7DAE; font-weight: 700; }
   .unlock-overlay-wrap { position: absolute; inset: 0; background: radial-gradient(circle at 50% 42%, rgba(255,217,130,.95) 0%, rgba(245,181,68,.82) 28%, rgba(42,18,102,.92) 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 32px; animation: p3-fade .4s ease-out both; }
@@ -1734,12 +1734,12 @@
   .unlock-h3 { font-size: 24px; font-weight: 900; color: var(--on-accent); margin: 0; animation: p3-rise .6s ease-out .55s both; z-index: 1; }
   .unlock-p { font-size: 13px; color: #FFD982; font-weight: 600; margin: 0; line-height: 1.6; animation: p3-rise .6s ease-out .7s both; z-index: 1; }
   @keyframes p3-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .unlock-cta-btn { margin-top: 8px; background: linear-gradient(180deg, #FFD982, #F5B544); border: 1px solid #C7892C; color: #3a2400; font-weight: 800; font-size: 15px; padding: 12px 32px; border-radius: 999px; cursor: pointer; font-family: inherit; box-shadow: 0 2px 0 #C7892C, inset 0 1px 0 rgba(255,255,255,.5); animation: p3-rise .6s ease-out .85s both, p3-cta-bob 1.8s ease-in-out 1.5s infinite; z-index: 1; }
+  .unlock-cta-btn { margin-top: 8px; background: linear-gradient(180deg, #FFD982, #F59E0B); border: 1px solid #C7892C; color: #3a2400; font-weight: 800; font-size: 15px; padding: 12px 32px; border-radius: 999px; cursor: pointer; font-family: inherit; box-shadow: 0 2px 0 #C7892C, inset 0 1px 0 rgba(255,255,255,.5); animation: p3-rise .6s ease-out .85s both, p3-cta-bob 1.8s ease-in-out 1.5s infinite; z-index: 1; }
   @keyframes p3-cta-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
-  .week-row-bonus-unlocked { position: relative; background: radial-gradient(ellipse at 75% 0%, rgba(255,217,130,.45) 0%, transparent 60%), linear-gradient(180deg, #FFFBEC 0%, #FFEED0 100%); border: 2px solid #F5B544; border-radius: 18px; padding: 12px 16px; box-shadow: 0 0 0 3px rgba(245,181,68,.18), 0 4px 14px -4px rgba(245,181,68,.4); cursor: pointer; margin-bottom: 10px; overflow: hidden; display: flex; flex-direction: column; gap: 8px; transition: transform 0.15s; }
+  .week-row-bonus-unlocked { position: relative; background: radial-gradient(ellipse at 75% 0%, rgba(255,217,130,.45) 0%, transparent 60%), linear-gradient(180deg, #FFFBEC 0%, #FFEED0 100%); border: 2px solid #F59E0B; border-radius: 18px; padding: 12px 16px; box-shadow: 0 0 0 3px rgba(245,181,68,.18), 0 4px 14px -4px rgba(245,181,68,.4); cursor: pointer; margin-bottom: 10px; overflow: hidden; display: flex; flex-direction: column; gap: 8px; transition: transform 0.15s; }
   .week-row-bonus-unlocked:active { transform: scale(0.98); }
   .week-row-bonus-unlocked-top { display: flex; align-items: center; justify-content: space-between; }
-  .week-bonus-ribbon { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #3a2400; background: linear-gradient(180deg, #FFD982, #F5B544); border: 1px solid #C7892C; padding: 2px 8px; border-radius: 999px; box-shadow: 0 1px 0 #C7892C; }
+  .week-bonus-ribbon { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #3a2400; background: linear-gradient(180deg, #FFD982, #F59E0B); border: 1px solid #C7892C; padding: 2px 8px; border-radius: 999px; box-shadow: 0 1px 0 #C7892C; }
   .week-bonus-open-flag { font-size: 9px; font-weight: 800; color: #3C8C5A; display: inline-flex; align-items: center; gap: 3px; }
   .week-row-bonus-unlocked-body { display: flex; align-items: center; gap: 10px; padding-right: 8px; }
   .week-bonus-disc { flex-shrink: 0; filter: drop-shadow(0 4px 8px rgba(245,181,68,.45)); align-self: flex-start; margin-top: 4px; }
@@ -1983,6 +1983,127 @@
     padding: 24px;
     margin: 12px 16px 20px;
     animation: gentlePulse 3s ease-in-out infinite;
+  }
+
+  /* ── Streak repair card ── */
+  /* Home-screen card, tinted amber to signal urgency without alarm. Sits
+     above the level cards near the flame area. Content is filled by
+     renderStreakRepairCard; holder hides itself when no repair is
+     available or the user dismisses it this session. */
+  .streak-repair-card {
+    position: relative;
+    background: var(--surface);
+    border: 1.5px solid var(--amber);
+    border-radius: 20px;
+    padding: 20px 22px 22px;
+    margin: 12px 16px 16px;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.18);
+  }
+  .streak-repair-dismiss {
+    position: absolute;
+    top: 8px;
+    inset-inline-end: 10px;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 400;
+    color: var(--text-2);
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 0;
+  }
+  .streak-repair-dismiss:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .streak-repair-icon {
+    font-size: 28px;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .streak-repair-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(20px * var(--text-scale));
+    font-weight: 900;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+  .streak-repair-body {
+    font-size: calc(15px * var(--text-scale));
+    line-height: 1.5;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+  .streak-repair-cta {
+    display: inline-block;
+    padding: 12px 24px;
+    background: var(--amber);
+    color: #ffffff;
+    border: none;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: calc(15px * var(--text-scale));
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .streak-repair-cta:hover { background: #F59E0B; }
+  .streak-repair-cta:active { transform: scale(0.97); }
+
+  /* ── Streak repair modal ── */
+  .streak-repair-box {
+    padding: 28px 24px 24px;
+    max-width: 420px;
+    text-align: start;
+  }
+  .streak-repair-eyebrow {
+    font-size: var(--fs-eyebrow);
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    color: var(--text-2);
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .streak-repair-progress {
+    font-size: calc(13px * var(--text-scale));
+    color: var(--text-2);
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  .streak-repair-question.quiz-question {
+    font-size: calc(20px * var(--text-scale));
+    margin-bottom: 20px;
+    text-align: start;
+  }
+  .streak-repair-options.quiz-options {
+    gap: 12px;
+  }
+  .streak-repair-result {
+    text-align: center;
+    padding: 32px 24px 24px;
+  }
+  .streak-repair-result-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(24px * var(--text-scale));
+    font-weight: 900;
+    color: var(--ink);
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+  .streak-repair-result-body {
+    font-size: calc(16px * var(--text-scale));
+    line-height: 1.5;
+    color: var(--text);
+    margin-bottom: 24px;
+  }
+  .streak-repair-result-cta {
+    max-width: 240px;
+    margin-inline: auto;
   }
   .hero-continue-title {
     font-family: 'Nunito', sans-serif;
@@ -4437,7 +4558,1085 @@
     color: var(--accent);
     box-shadow: 0 1px 4px rgba(var(--accent-rgb), 0.18);
   }
-  /* ── Onboarding ── */
+  /* ═══════════════════════════════════════════════════════════
+     BRIGHT CINEMATIC ONBOARDING — Screens 1–5 + Endowment + Nudge.
+     Bright and playful: white base, soft accent-tinted radial edge
+     per screen, one confident statement, one hero object. All colors
+     trace to existing tokens: --ink, --surface, --accent (per theme),
+     --amber, --bg. No hardcoded hex outside those aliases.
+     ═══════════════════════════════════════════════════════════ */
+
+  /* Onboarding color system. Each screen sets --onb-edge (the radial
+     edge tint) via a subject class; center stays --surface (white).
+     Text uses --onb-text-primary / --onb-text-2 keyed to --ink so
+     contrast stays AAA on the bright base. */
+  .onb-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: none;
+    flex-direction: column;
+    padding: calc(24px + var(--safe-top)) 20px calc(20px + var(--safe-bottom));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    color: var(--onb-text-primary, #2A1266);
+    /* Opaque --surface layer beneath the radial gradient so screens sit on
+       a solid base — the gradient's edge stop uses rgba() with low alpha,
+       which would otherwise let #screen-home + fixed .topbar / .stats-
+       subheader bleed through under the onboarding overlay. */
+    background-color: var(--surface);
+    background-image:
+      radial-gradient(
+        circle at 50% 32%,
+        var(--surface) 0%,
+        var(--onb-edge, rgba(123, 79, 212, 0.10)) 100%
+      );
+    --onb-text-primary: #2A1266;
+    --onb-text-2: rgba(42, 18, 102, 0.72);
+    --onb-text-3: rgba(42, 18, 102, 0.5);
+    --onb-surface-glass: rgba(255, 255, 255, 0.75);
+    --onb-border-glass: rgba(42, 18, 102, 0.10);
+  }
+  .onb-screen.onb-active { display: flex; }
+  /* Screen 1 (big statement) + Screen 3 (Socrates): philosophy purple
+     edge tint. --accent-tint is #F1E8FE on philosophy theme. */
+  .onb-bg-philosophy {
+    --onb-edge: rgba(123, 79, 212, 0.14);
+    --onb-accent: #7B4FD4;
+    --onb-accent-shadow: rgba(123, 79, 212, 0.32);
+    --onb-accent-shadow-soft: rgba(123, 79, 212, 0.20);
+  }
+  /* Screen 2 (streak beat) + Endowment: amber edge tint. */
+  .onb-bg-flame {
+    --onb-edge: rgba(245, 158, 11, 0.14);
+    --onb-accent: #F59E0B;
+    --onb-accent-shadow: rgba(245, 158, 11, 0.32);
+    --onb-accent-shadow-soft: rgba(245, 158, 11, 0.20);
+  }
+  /* Screen 5 (goal) — very soft brand tint, amber lights only on select. */
+  .onb-bg-brand {
+    --onb-edge: rgba(123, 79, 212, 0.08);
+    --onb-accent: #7B4FD4;
+    --onb-accent-shadow: rgba(123, 79, 212, 0.30);
+    --onb-accent-shadow-soft: rgba(123, 79, 212, 0.18);
+  }
+
+  /* Onboarding CTA — filled in the screen's accent (not a white pill).
+     Overrides base .nav-btn so the primary action carries the screen's
+     color forward. Text color is ink for amber (contrast) and white for
+     purple/blue. Per-screen override chosen via .onb-cta-on-amber. */
+  .onb-cta-holder {
+    margin-top: auto;
+    padding-top: 24px;
+    max-width: 480px;
+    width: 100%;
+    margin-inline: auto;
+  }
+  .onb-screen .onb-cta.nav-btn {
+    width: 100%;
+    background: var(--onb-accent, #7B4FD4);
+    color: #FFFFFF;
+    border: none;
+    border-bottom: 5px solid rgba(0, 0, 0, 0.14);
+    text-transform: none;
+    letter-spacing: 0;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: calc(17px * var(--text-scale));
+    box-shadow: 0 10px 28px -6px var(--onb-accent-shadow, rgba(123, 79, 212, 0.35));
+  }
+  /* Amber CTA needs ink text for contrast — --amber sits ~5.4:1 on ink. */
+  .onb-screen.onb-bg-flame .onb-cta.nav-btn { color: var(--ink); }
+  .onb-screen .onb-cta.nav-btn:disabled {
+    background: rgba(42, 18, 102, 0.08);
+    color: rgba(42, 18, 102, 0.4);
+    border-bottom-color: transparent;
+    box-shadow: none;
+  }
+
+  /* ── Progress pills (5-step: beat → streak → welcome → subject → goal) ──
+     Light-bg variant: unfilled pills are ink at low alpha, filled pills
+     take the screen's accent. Current step is wider. */
+  .onb-progress {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    align-items: center;
+    padding: 4px 20px 20px;
+    max-width: 240px;
+    margin: 0 auto;
+  }
+  .onb-progress .onb-pill {
+    height: 5px;
+    width: 22px;
+    border-radius: 999px;
+    background: rgba(42, 18, 102, 0.12);
+    transition: background 0.25s ease, width 0.25s ease;
+  }
+  .onb-progress[data-step="2"] .onb-pill:nth-child(-n+1),
+  .onb-progress[data-step="3"] .onb-pill:nth-child(-n+2),
+  .onb-progress[data-step="4"] .onb-pill:nth-child(-n+3),
+  .onb-progress[data-step="5"] .onb-pill:nth-child(-n+4) {
+    background: rgba(42, 18, 102, 0.42);
+  }
+  .onb-progress[data-step="1"] .onb-pill:nth-child(1),
+  .onb-progress[data-step="2"] .onb-pill:nth-child(2),
+  .onb-progress[data-step="3"] .onb-pill:nth-child(3),
+  .onb-progress[data-step="4"] .onb-pill:nth-child(4),
+  .onb-progress[data-step="5"] .onb-pill:nth-child(5) {
+    background: var(--onb-accent, #7B4FD4);
+    width: 32px;
+  }
+  /* Subject-select drawer entry: hide the pill row when body is on subject
+     screen via drawer (existing-user subject switch, not new onboarding). */
+  body.drawer-open .subj-onb-progress { display: none; }
+
+  /* ── Language toggle (bright variant) ──
+     dir="ltr" pinned on the container so button positions never swap.
+     Ink-tinted glass on white, sliding indicator becomes an ink pill,
+     unselected labels dim to muted ink, selected label goes white. */
+  .onb-welcome-lang {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    background: rgba(42, 18, 102, 0.06);
+    border: 1px solid rgba(42, 18, 102, 0.08);
+    border-radius: 999px;
+    padding: 4px;
+    max-width: 220px;
+    margin: 0 auto 8px;
+  }
+  .onb-lang-indicator {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    border-radius: 999px;
+    background: var(--ink);
+    box-shadow: 0 4px 10px rgba(42, 18, 102, 0.25);
+    transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+    pointer-events: none;
+  }
+  .onb-lang-indicator.is-en { left: 50%; }
+  .onb-lang-btn {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    padding: 8px 14px;
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: var(--fs-ui);
+    font-weight: 700;
+    color: rgba(42, 18, 102, 0.55);
+    cursor: pointer;
+    transition: color 0.28s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .onb-lang-btn.is-active { color: #FFFFFF; }
+  .onb-welcome-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 520px;
+    width: 100%;
+    margin-inline: auto;
+    padding-block: 12px;
+    gap: 40px;
+  }
+  /* Hero card — real thinker card composition (portrait + name scroll),
+     bright variant. Card face has a subject-colored keyline border and a
+     soft accent-tinted shadow (no more dark drop shadow). Portrait fills
+     upper ~72%, name + era ride a translucent scrim at the bottom. */
+  .onb-hero-card {
+    position: relative;
+    width: 150px;
+    height: 210px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 3px solid var(--onb-accent, #7B4FD4);
+    transform: rotate(-4deg);
+    box-shadow:
+      0 24px 44px -14px var(--onb-accent-shadow, rgba(123, 79, 212, 0.32)),
+      0 8px 18px -6px var(--onb-accent-shadow-soft, rgba(123, 79, 212, 0.20));
+    animation: onbHeroFloat 6s ease-in-out infinite;
+  }
+  .onb-hero-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 22%;
+    display: block;
+  }
+  /* Scroll strip — translucent white/ink gradient, ink text. Reads as
+     the card's nameplate on the bright body. */
+  .onb-hero-card-scroll {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    padding: 32px 12px 14px;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.85) 55%,
+      rgba(255, 255, 255, 0.98) 100%
+    );
+    text-align: center;
+    z-index: 1;
+  }
+  .onb-hero-card-name {
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(17px * var(--text-scale));
+    font-weight: 900;
+    color: var(--ink);
+    letter-spacing: -0.005em;
+    line-height: 1.1;
+    margin-bottom: 2px;
+  }
+  .onb-hero-card-era {
+    font-size: calc(10px * var(--text-scale));
+    color: rgba(42, 18, 102, 0.62);
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    font-weight: 700;
+  }
+  @keyframes onbHeroFloat {
+    0%, 100% { transform: rotate(-4deg) translateY(0); }
+    50%      { transform: rotate(-3deg) translateY(-6px); }
+  }
+  .onb-welcome-copy {
+    text-align: center;
+    max-width: 460px;
+  }
+  .onb-welcome-head {
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(28px * var(--text-scale));
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--onb-text-primary);
+    margin-bottom: 10px;
+    letter-spacing: -0.015em;
+  }
+  .onb-welcome-sub {
+    font-size: calc(15px * var(--text-scale));
+    line-height: 1.5;
+    font-weight: 500;
+    color: var(--onb-text-2);
+  }
+
+  /* ── Beat screen — 3-card fan, consolidated from the old 2-beat pair.
+     Center card ~120px, side cards rotated + smaller, each with a
+     subject-tinted glow behind. Headline + subline below. */
+  .onb-beat-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 520px;
+    width: 100%;
+    margin-inline: auto;
+    padding-block: 12px;
+    gap: 40px;
+  }
+  /* Beat fan — three portrait CARDS (not circles), bright variant.
+     Each card carries its subject-color border + soft accent shadow.
+     Sizes per brief: center 135px wide (larger anchor), sides 115px
+     wide. Fan overlap via rotation + translateX. Container widened. */
+  .onb-beat-fan {
+    position: relative;
+    height: 260px;
+    width: 360px;
+    max-width: calc(100vw - 32px);
+  }
+  .onb-beat-fan-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--surface);
+    transform-origin: center;
+    /* Per-card subject color piped in via --card-accent so border /
+       shadow key from the same token per subject slot. */
+    border: 2.5px solid var(--card-accent, #7B4FD4);
+    box-shadow:
+      0 18px 34px -12px var(--card-accent-shadow, rgba(123, 79, 212, 0.28)),
+      0 6px 14px -6px var(--card-accent-shadow-soft, rgba(123, 79, 212, 0.18));
+  }
+  .onb-beat-fan-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+  }
+  .onb-beat-fan-card .onb-beat-fan-scroll {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    padding: 20px 6px 8px;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.88) 55%,
+      rgba(255, 255, 255, 0.98) 100%
+    );
+    text-align: center;
+    z-index: 1;
+  }
+  .onb-beat-fan-name {
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(12px * var(--text-scale));
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1.1;
+    letter-spacing: -0.005em;
+  }
+  /* Card 1 — side, philosophy purple, 115×162. */
+  .onb-beat-fan-card-1 {
+    width: 115px;
+    height: 162px;
+    --card-accent: #7B4FD4;
+    --card-accent-shadow: rgba(123, 79, 212, 0.28);
+    --card-accent-shadow-soft: rgba(123, 79, 212, 0.16);
+    transform: translate(calc(-50% - 78px), -50%) rotate(-14deg);
+    z-index: 1;
+  }
+  /* Card 2 — center anchor, economics blue, 135×190. */
+  .onb-beat-fan-card-2 {
+    width: 135px;
+    height: 190px;
+    --card-accent: #2563EB;
+    --card-accent-shadow: rgba(37, 99, 235, 0.30);
+    --card-accent-shadow-soft: rgba(37, 99, 235, 0.18);
+    transform: translate(-50%, -50%);
+    z-index: 3;
+  }
+  /* Card 3 — side, psychology amber, 115×162. */
+  .onb-beat-fan-card-3 {
+    width: 115px;
+    height: 162px;
+    --card-accent: #F59E0B;
+    --card-accent-shadow: rgba(245, 158, 11, 0.30);
+    --card-accent-shadow-soft: rgba(245, 158, 11, 0.18);
+    transform: translate(calc(-50% + 78px), -50%) rotate(14deg);
+    z-index: 2;
+  }
+  /* Bright variant: glows drop to keep the palette calm. Kept the class
+     so the HTML doesn't need to change; each becomes a no-op. */
+  .onb-beat-fan-glow { display: none; }
+  .onb-beat-copy {
+    text-align: center;
+    max-width: 460px;
+  }
+  .onb-beat-head {
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(28px * var(--text-scale));
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--onb-text-primary);
+    margin-bottom: 12px;
+    letter-spacing: -0.015em;
+  }
+  .onb-beat-sub {
+    font-size: calc(16px * var(--text-scale));
+    line-height: 1.5;
+    font-weight: 500;
+    color: var(--onb-text-2);
+    letter-spacing: 0;
+  }
+
+  /* ── Streak beat (Screen 2) — bright amber ──
+     Restored beat: large flame hero in a soft amber container, a row of
+     four small thinker cards (three unlocked in subject colors + one
+     mystery "?"), and a caption line. Colors: --amber for the flame /
+     the mystery keyline, subject accents on the tinted mini-cards. */
+  .onb-streak-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 520px;
+    width: 100%;
+    margin-inline: auto;
+    padding-block: 12px;
+    gap: 26px;
+  }
+  .onb-streak-hero {
+    width: 128px;
+    height: 128px;
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245, 158, 11, 0.10);
+    border: 1.5px solid rgba(245, 158, 11, 0.28);
+    box-shadow:
+      0 22px 44px -14px rgba(245, 158, 11, 0.35),
+      0 8px 18px -6px rgba(245, 158, 11, 0.22);
+    animation: onbHeroFloat 6s ease-in-out infinite;
+  }
+  .onb-streak-hero svg {
+    color: #F59E0B;
+    width: 78px;
+    height: 78px;
+    filter: drop-shadow(0 8px 14px rgba(245, 158, 11, 0.35));
+  }
+  .onb-streak-copy {
+    text-align: center;
+    max-width: 460px;
+  }
+  .onb-streak-head {
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(26px * var(--text-scale));
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--onb-text-primary);
+    margin-bottom: 10px;
+    letter-spacing: -0.015em;
+  }
+  .onb-streak-sub {
+    font-size: calc(15px * var(--text-scale));
+    line-height: 1.5;
+    font-weight: 500;
+    color: var(--onb-text-2);
+  }
+  /* Collection row — 3 tinted portrait mini-cards + 1 mystery card. No
+     labels: the row is a preview of the collection, not the subject
+     picker. Mystery card gets a "?" glyph inside a dashed keyline. */
+  .onb-streak-row {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+  }
+  .onb-streak-mini {
+    width: 62px;
+    height: 86px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 2px solid var(--mini-accent, #7B4FD4);
+    box-shadow: 0 8px 16px -8px var(--mini-shadow, rgba(123, 79, 212, 0.30));
+    position: relative;
+  }
+  .onb-streak-mini img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+  }
+  .onb-streak-mini-1 {
+    --mini-accent: #7B4FD4;
+    --mini-shadow: rgba(123, 79, 212, 0.28);
+  }
+  .onb-streak-mini-2 {
+    --mini-accent: #2563EB;
+    --mini-shadow: rgba(37, 99, 235, 0.28);
+  }
+  .onb-streak-mini-3 {
+    --mini-accent: #F59E0B;
+    --mini-shadow: rgba(245, 158, 11, 0.28);
+  }
+  .onb-streak-mini-mystery {
+    background: rgba(42, 18, 102, 0.04);
+    border: 2px dashed rgba(42, 18, 102, 0.25);
+    box-shadow: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(42, 18, 102, 0.42);
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(28px * var(--text-scale));
+    font-weight: 900;
+  }
+  .onb-streak-caption {
+    font-size: calc(13px * var(--text-scale));
+    color: var(--onb-text-3);
+    text-align: center;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  /* ── Daily-goal screen — bright ──
+     White cards on the soft brand-tinted screen. Selected option lights
+     in flame amber (tint + border + soft glow) — the visual seed of the
+     streak. Colors trace to --amber + --ink. */
+  .onb-goal-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 480px;
+    width: 100%;
+    margin-inline: auto;
+    padding-block: 12px;
+  }
+  .onb-goal-copy {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .onb-goal-head {
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(28px * var(--text-scale));
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--onb-text-primary);
+    margin-bottom: 10px;
+    letter-spacing: -0.015em;
+  }
+  .onb-goal-sub {
+    font-size: calc(15px * var(--text-scale));
+    line-height: 1.5;
+    font-weight: 500;
+    color: var(--onb-text-2);
+  }
+  .onb-goal-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .onb-goal-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    background: var(--surface);
+    border: 1.5px solid rgba(42, 18, 102, 0.10);
+    border-radius: 16px;
+    font-family: inherit;
+    color: var(--ink);
+    text-align: start;
+    cursor: pointer;
+    transition: background 0.25s ease, border-color 0.25s ease,
+                box-shadow 0.25s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    width: 100%;
+    position: relative;
+    box-shadow: 0 4px 12px -6px rgba(42, 18, 102, 0.12);
+  }
+  .onb-goal-card:hover:not(.is-selected) {
+    border-color: rgba(42, 18, 102, 0.22);
+    box-shadow: 0 8px 20px -8px rgba(42, 18, 102, 0.18);
+  }
+  .onb-goal-card.is-selected {
+    border-color: #F59E0B;
+    background: rgba(245, 158, 11, 0.08);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18),
+                0 14px 32px -12px rgba(245, 158, 11, 0.42);
+  }
+  .onb-goal-card:active { transform: scale(0.985); }
+  .onb-goal-icon {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(42, 18, 102, 0.55);
+    transition: color 0.25s ease;
+  }
+  .onb-goal-icon svg { display: block; }
+  .onb-goal-card.is-selected .onb-goal-icon { color: #F59E0B; }
+  .onb-goal-icon-double {
+    position: relative;
+    width: 50px;
+    direction: ltr;
+  }
+  .onb-goal-icon-double svg:first-child {
+    transform: translateX(6px);
+  }
+  .onb-goal-icon-double svg:last-child {
+    transform: translateX(-10px);
+    opacity: 0.85;
+  }
+
+  /* ── Beat screens ── */
+  .onb-beat-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 520px;
+    width: 100%;
+    margin-inline: auto;
+    padding-block: 12px;
+    gap: 32px;
+  }
+  .onb-beat-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+  }
+  .onb-beat-copy {
+    text-align: center;
+    max-width: 460px;
+  }
+  .onb-beat-head {
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(26px * var(--text-scale));
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+  .onb-beat-sub {
+    font-size: calc(16px * var(--text-scale));
+    line-height: 1.5;
+    font-weight: 500;
+    color: var(--text-2);
+  }
+
+  /* Beat 1 — mock dialogue card. Scaled-down editorial reader snapshot.
+     Uses real tokens + real ic-idea icon so the user sees exactly what
+     the reader looks like. */
+  /* Goal option text (inside .onb-goal-card) */
+  .onb-goal-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .onb-goal-title {
+    font-size: calc(17px * var(--text-scale));
+    font-weight: 800;
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+  }
+  .onb-goal-hint {
+    font-size: calc(13px * var(--text-scale));
+    color: rgba(42, 18, 102, 0.62);
+    line-height: 1.4;
+  }
+
+  /* ── Day-1 endowment overlay — bright amber ──
+     Modal shell keeps its .modal-overlay backdrop; the box gets a white
+     center → soft amber edge radial. Flame glow softens, headline in ink. */
+  #endowment-overlay .modal-box,
+  #goal-met-overlay .modal-box {
+    /* Opaque base beneath the radial (see .onb-screen fix): the box itself
+       must not be see-through, or reader content underneath shows. */
+    background-color: var(--surface);
+    background-image:
+      radial-gradient(circle at 50% 32%, var(--surface) 0%, rgba(245, 158, 11, 0.16) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.28);
+    color: var(--ink);
+    box-shadow: 0 30px 80px -20px rgba(245, 158, 11, 0.35);
+  }
+  .endowment-box {
+    text-align: center;
+    padding: 40px 26px 28px;
+    max-width: 400px;
+  }
+  .endowment-icon {
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: center;
+    filter: drop-shadow(0 12px 20px rgba(245, 158, 11, 0.35));
+    animation: onbHeroFloat 6s ease-in-out infinite;
+    transform-origin: 50% 80%;
+  }
+  .endowment-icon svg { color: #F59E0B; }
+  .endowment-eyebrow {
+    font-size: var(--fs-eyebrow);
+    color: #F59E0B;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+  .endowment-head {
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(28px * var(--text-scale));
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1.2;
+    margin-bottom: 20px;
+    letter-spacing: -0.01em;
+  }
+  .endowment-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    background: var(--accent-tint);
+    border-radius: 14px;
+    text-align: start;
+  }
+  .endowment-stat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .endowment-stat-icon {
+    color: var(--accent);
+    flex: 0 0 auto;
+  }
+  .endowment-stat-text {
+    font-size: calc(15px * var(--text-scale));
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .endowment-tomorrow {
+    font-size: calc(15px * var(--text-scale));
+    line-height: 1.5;
+    color: var(--text-2);
+    margin-bottom: 22px;
+    font-weight: 500;
+  }
+  /* Endowment stats block — tinted card on bright base. */
+  .endowment-box .endowment-stats {
+    background: rgba(245, 158, 11, 0.06);
+    border: 1px solid rgba(245, 158, 11, 0.18);
+  }
+  .endowment-box .endowment-stat-icon { color: #F59E0B; }
+  .endowment-box .endowment-stat-text { color: var(--ink); }
+  .endowment-box .endowment-tomorrow { color: rgba(42, 18, 102, 0.68); }
+  .endowment-cta {
+    text-transform: none;
+    letter-spacing: 0;
+    font-family: inherit;
+    font-weight: 800;
+    max-width: 260px;
+    margin-inline: auto;
+    background: #F59E0B !important;
+    color: var(--ink) !important;
+    border: none !important;
+    border-bottom: 5px solid rgba(0, 0, 0, 0.14) !important;
+    box-shadow: 0 10px 28px -6px rgba(245, 158, 11, 0.42);
+  }
+
+  /* Goal-met overlay — reuses .endowment-box (now bright). Count-stat
+     keeps the amber accent it always had. */
+  .goal-met-box .goal-met-count-stat .endowment-stat-text {
+    font-size: calc(17px * var(--text-scale));
+    font-weight: 800;
+    color: #F59E0B;
+  }
+
+  /* Partway-progress line under stats metrics on the completion modal:
+     "1 of 2 today" — shown on the 1st completion when the goal is 'two'. */
+  .dc-goal-progress {
+    margin-top: 8px;
+    font-size: calc(13px * var(--text-scale));
+    color: var(--text-2);
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+  }
+
+  /* ── Loss-framed guest-signup nudge — bright purple ──
+     Modal shell overrides the base .modal-box to a white center → soft
+     purple edge. Ink text; stat rows become soft tinted tiles; the third
+     row shows a real thinker portrait (small circle, cover fit). */
+  #modal-guest-signup .modal-box {
+    /* Opaque base beneath the radial (see .onb-screen fix). */
+    background-color: var(--surface);
+    background-image:
+      radial-gradient(circle at 50% 22%, var(--surface) 0%, rgba(123, 79, 212, 0.12) 100%);
+    border: 1px solid rgba(123, 79, 212, 0.20);
+    color: var(--ink);
+    box-shadow: 0 30px 80px -20px rgba(123, 79, 212, 0.28);
+    padding: 34px 26px 26px;
+    max-width: 400px;
+  }
+  #modal-guest-signup .modal-title {
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(24px * var(--text-scale));
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
+  }
+  #modal-guest-signup .modal-subtitle {
+    color: rgba(42, 18, 102, 0.68);
+    font-size: calc(14px * var(--text-scale));
+    line-height: 1.5;
+    margin-bottom: 4px;
+  }
+  .guest-signup-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 14px;
+    margin-top: 18px;
+    margin-bottom: 18px;
+    background: rgba(123, 79, 212, 0.05);
+    border: 1px solid rgba(123, 79, 212, 0.16);
+    border-radius: 14px;
+  }
+  .guest-signup-stat {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: start;
+  }
+  .guest-signup-stat svg {
+    flex: 0 0 auto;
+    color: #F59E0B;
+  }
+  .guest-signup-stat-text {
+    font-size: calc(14px * var(--text-scale));
+    font-weight: 600;
+    color: var(--ink);
+  }
+  /* Third-row portrait: 40×40 circle populated from
+     /images/<thinkerId>.webp. Falls back to #ic-pantheon SVG if the
+     lookup fails at render time. */
+  .guest-signup-portrait {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: rgba(123, 79, 212, 0.08);
+    border: 2px solid rgba(123, 79, 212, 0.30);
+    box-shadow: 0 4px 10px rgba(123, 79, 212, 0.20);
+  }
+  .guest-signup-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+  }
+  .guest-signup-portrait svg { display: block; margin: 8px; color: #F59E0B; }
+  /* Primary CTA — filled purple */
+  #modal-guest-signup .nav-btn {
+    background: #7B4FD4 !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-bottom: 4px solid rgba(0, 0, 0, 0.14) !important;
+    font-weight: 800;
+    text-transform: none;
+    letter-spacing: 0;
+    box-shadow: 0 10px 28px -6px rgba(123, 79, 212, 0.42);
+  }
+  #modal-guest-signup .auth-btn-social {
+    background: var(--surface) !important;
+    color: var(--ink) !important;
+    border: 1px solid rgba(42, 18, 102, 0.16) !important;
+    border-bottom: 1px solid rgba(42, 18, 102, 0.24) !important;
+  }
+  #modal-guest-signup .share-modal-skip {
+    color: rgba(42, 18, 102, 0.55);
+  }
+
+  /* ── Subject select — bright cinematic vertical stack ──
+     Shown for new-user onboarding (body has on-subject-screen but NOT
+     drawer-open). Bright base (white + soft purple edge), three portrait
+     cards in their own subject colors, selected card lifts + glows in
+     that subject's accent. Existing carousel hidden in this mode. */
+  body.on-subject-screen:not(.drawer-open) #screen-subject {
+    /* Opaque --surface layer beneath the radial so the previously-rendered
+       home screen (or any other .screen.active still in the DOM) can't
+       bleed through the low-alpha edge of the gradient. */
+    background-color: var(--surface);
+    background-image:
+      radial-gradient(circle at 50% 32%, var(--surface) 0%, rgba(123, 79, 212, 0.12) 100%);
+    direction: inherit;
+  }
+  body.on-subject-screen:not(.drawer-open) .subj-carousel-wrap,
+  body.on-subject-screen:not(.drawer-open) .subj-dots {
+    display: none !important;
+  }
+  body.on-subject-screen:not(.drawer-open) .subj-header {
+    padding: calc(24px + var(--safe-top)) 24px 16px;
+  }
+  body.on-subject-screen:not(.drawer-open) .subj-cinematic {
+    display: flex;
+  }
+  body.drawer-open .subj-cinematic { display: none; }
+  body.on-subject-screen:not(.drawer-open) .subj-logo {
+    display: none;
+  }
+  body.on-subject-screen:not(.drawer-open) .subj-title {
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(26px * var(--text-scale));
+    font-weight: 900;
+    letter-spacing: -0.015em;
+  }
+  body.on-subject-screen:not(.drawer-open) .subj-subtitle {
+    color: rgba(42, 18, 102, 0.62);
+    opacity: 1;
+  }
+
+  .subj-cinematic {
+    display: none;
+    flex-direction: column;
+    gap: 14px;
+    padding: 12px 20px calc(24px + var(--safe-bottom));
+    max-width: 480px;
+    width: 100%;
+    margin-inline: auto;
+    flex: 1;
+    justify-content: center;
+  }
+  /* Subject-select cinematic cards — bright variant. White card face,
+     subject-colored keyline border, soft accent shadow. Horizontal
+     layout: portrait fills the start edge (full card height), info
+     panel on the end with thinker lineup + name + tagline. */
+  .subj-cinematic-card {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    background: var(--surface);
+    border: 1.5px solid rgba(42, 18, 102, 0.12);
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: background 0.25s ease, border-color 0.25s ease,
+                box-shadow 0.25s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    text-align: start;
+    color: var(--ink);
+    position: relative;
+    min-height: 132px;
+    box-shadow: 0 6px 16px -8px rgba(42, 18, 102, 0.14);
+  }
+  .subj-cinematic-card:hover:not(.is-selected):not(.is-locked) {
+    border-color: rgba(42, 18, 102, 0.22);
+    box-shadow: 0 10px 22px -8px rgba(42, 18, 102, 0.20);
+  }
+  .subj-cinematic-card:active { transform: scale(0.99); }
+  /* Portrait "card face" at the start edge — real webp asset, cover fit. */
+  .subj-cinematic-card .subj-cinematic-portrait {
+    flex: 0 0 auto;
+    width: 100px;
+    height: 132px;
+    position: relative;
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .subj-cinematic-card .subj-cinematic-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 22%;
+    display: block;
+  }
+  /* Subject-colored vertical accent stripe on the portrait's inner edge. */
+  .subj-cinematic-card .subj-cinematic-portrait::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    inset-inline-end: 0;
+    width: 3px;
+    background: currentColor;
+  }
+  .subj-cinematic-card.subj-c-philosophy .subj-cinematic-portrait { color: #7B4FD4; }
+  .subj-cinematic-card.subj-c-economics  .subj-cinematic-portrait { color: #2563EB; }
+  .subj-cinematic-card.subj-c-psychology .subj-cinematic-portrait { color: #F59E0B; }
+  .subj-cinematic-card .subj-cinematic-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    padding: 16px 20px;
+  }
+  .subj-cinematic-name {
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(20px * var(--text-scale));
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .subj-cinematic-thinker {
+    font-size: calc(11px * var(--text-scale));
+    color: rgba(42, 18, 102, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .subj-cinematic-tagline {
+    font-size: calc(13px * var(--text-scale));
+    color: rgba(42, 18, 102, 0.66);
+    line-height: 1.4;
+  }
+  .subj-cinematic-card.is-selected {
+    transform: scale(1.01);
+  }
+  .subj-cinematic-card.is-selected.subj-c-philosophy {
+    border-color: #7B4FD4;
+    box-shadow: 0 0 0 3px rgba(123, 79, 212, 0.16),
+                0 18px 40px -12px rgba(123, 79, 212, 0.45);
+  }
+  .subj-cinematic-card.is-selected.subj-c-economics {
+    border-color: #2563EB;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16),
+                0 18px 40px -12px rgba(37, 99, 235, 0.45);
+  }
+  .subj-cinematic-card.is-selected.subj-c-psychology {
+    border-color: #F59E0B;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.16),
+                0 18px 40px -12px rgba(245, 158, 11, 0.45);
+  }
+  .subj-cinematic-card.is-locked {
+    opacity: 0.6;
+    cursor: default;
+  }
+  .subj-cinematic-card.is-locked .subj-cinematic-locked-tag {
+    position: absolute;
+    top: 12px;
+    inset-inline-end: 16px;
+    font-size: calc(11px * var(--text-scale));
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: rgba(42, 18, 102, 0.55);
+    font-weight: 700;
+  }
+  /* Cinematic subject-select CTA — filled in previewed subject accent.
+     Falls back to --accent (currently-themed subject). */
+  .subj-cinematic-cta-holder {
+    padding-top: 12px;
+  }
+  .subj-cinematic-cta {
+    width: 100%;
+    background: var(--accent, #7B4FD4);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 999px;
+    padding: 16px 24px;
+    font-family: inherit;
+    font-size: calc(17px * var(--text-scale));
+    font-weight: 800;
+    cursor: pointer;
+    border-bottom: 5px solid rgba(0, 0, 0, 0.14);
+    box-shadow: 0 10px 28px -6px var(--accent-glow, rgba(123, 79, 212, 0.35));
+    transition: transform 0.15s ease, background 0.25s ease, box-shadow 0.25s ease;
+  }
+  .subj-cinematic-cta:active { transform: translateY(2px); }
+  .subj-cinematic-cta:disabled {
+    background: rgba(42, 18, 102, 0.08);
+    color: rgba(42, 18, 102, 0.4);
+    border-bottom-color: transparent;
+    box-shadow: none;
+    cursor: default;
+  }
+
+  /* ── Legacy tour overlay & spotlight (deprecated — kept for compat) ── */
   .onboarding-backdrop { position: fixed; inset: 0; z-index: 999; pointer-events: all; }
   .onboarding-owl-float { position: fixed; z-index: 1001; width: 100px; height: 100px; transition: top 0.6s cubic-bezier(0.34,1.56,0.64,1), left 0.6s cubic-bezier(0.34,1.56,0.64,1); }
   .onboarding-owl-float svg { width: 100%; height: 100%; }
@@ -5099,7 +6298,7 @@
     height: 46px;
     border-radius: 50%;
     background: radial-gradient(circle at 35% 30%, var(--lilac) 0%, var(--accent) 55%, var(--accent-dark) 100%);
-    border: 2px solid #F5B544;
+    border: 2px solid #F59E0B;
     display: grid;
     place-items: center;
     flex-shrink: 0;
@@ -5180,7 +6379,7 @@
     position: absolute;
     inset: 0;
     border-radius: 999px;
-    border: 2px solid #F5B544;
+    border: 2px solid #F59E0B;
     opacity: .6;
     animation: ccPulse 2.4s ease-out infinite;
     pointer-events: none;
@@ -5742,11 +6941,11 @@
     <symbol id="ic-idea" viewBox="0 0 64 64">
       <circle cx="32" cy="32" r="22" fill="currentColor" stroke="#2A1266" stroke-width="2"/>
       <path d="M32 10 A 22 22 0 0 1 32 54 A 18 22 0 0 0 32 10 Z" fill="currentColor" opacity=".5"/>
-      <circle cx="32" cy="32" r="19.5" fill="none" stroke="#F5B544" stroke-width="1" opacity=".7"/>
+      <circle cx="32" cy="32" r="19.5" fill="none" stroke="#F59E0B" stroke-width="1" opacity=".7"/>
       <path d="M16 22 Q 20 14 28 12" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" opacity=".9"/>
-      <path d="M32 12 L 32 15" stroke="#F5B544" stroke-width="1.6" stroke-linecap="round" opacity=".85"/>
-      <path d="M19 17 L 21 19" stroke="#F5B544" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>
-      <path d="M45 17 L 43 19" stroke="#F5B544" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>
+      <path d="M32 12 L 32 15" stroke="#F59E0B" stroke-width="1.6" stroke-linecap="round" opacity=".85"/>
+      <path d="M19 17 L 21 19" stroke="#F59E0B" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>
+      <path d="M45 17 L 43 19" stroke="#F59E0B" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>
       <path d="M22 32 Q 22 18 32 18 Q 42 18 42 32 Q 42 38 38 41 L 38 45 L 26 45 L 26 41 Q 22 38 22 32 Z" fill="currentColor" stroke="#2A1266" stroke-width="1.6" stroke-linejoin="round" transform="translate(1.5,1.5)"/>
       <path d="M22 30 Q 22 16 32 16 Q 42 16 42 30 Q 42 36 38 40 L 38 44 Q 38 46 36 46 L 28 46 Q 26 46 26 44 L 26 40 Q 22 36 22 30 Z" fill="#FFD982" stroke="#2A1266" stroke-width="1.8" stroke-linejoin="round"/>
       <path d="M36 18 Q 42 20 42 30 Q 42 36 38 40 L 38 44 Q 38 46 36 46 L 34 46 Z" fill="#C7892C" opacity=".4"/>
@@ -5762,7 +6961,7 @@
     <symbol id="ic-source" viewBox="0 0 64 64">
       <circle cx="32" cy="32" r="22" fill="currentColor" stroke="#2A1266" stroke-width="2"/>
       <path d="M32 10 A 22 22 0 0 1 32 54 A 18 22 0 0 0 32 10 Z" fill="currentColor" opacity=".5"/>
-      <circle cx="32" cy="32" r="19.5" fill="none" stroke="#F5B544" stroke-width="1" opacity=".7"/>
+      <circle cx="32" cy="32" r="19.5" fill="none" stroke="#F59E0B" stroke-width="1" opacity=".7"/>
       <path d="M16 22 Q 20 14 28 12" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" opacity=".9"/>
       <rect x="14" y="19" width="34" height="28" rx="2" fill="currentColor" stroke="#2A1266" stroke-width="1.6" transform="rotate(-5 31 33)"/>
       <path d="M14 20 L 32 20 L 32 48 L 14 48 Q 12 48 12 46 L 12 22 Q 12 20 14 20 Z" fill="currentColor" stroke="#2A1266" stroke-width="1.8" stroke-linejoin="round"/>
@@ -5771,7 +6970,7 @@
       <path d="M15 22 L 31 22 L 31 46 L 15 46 Z" fill="#FBF8FF" stroke="#2A1266" stroke-width="1.4" stroke-linejoin="round"/>
       <path d="M33 22 L 49 22 L 49 46 L 33 46 Z" fill="#FBF8FF" stroke="#2A1266" stroke-width="1.4" stroke-linejoin="round"/>
       <path d="M17 26 L 29 26" stroke="#2A1266" stroke-width="1" stroke-linecap="round" opacity=".75"/>
-      <rect x="17" y="29.5" width="10" height="2" rx="0.6" fill="#F5B544" stroke="#C7892C" stroke-width="0.5"/>
+      <rect x="17" y="29.5" width="10" height="2" rx="0.6" fill="#F59E0B" stroke="#C7892C" stroke-width="0.5"/>
       <path d="M17 35 L 29 35" stroke="#2A1266" stroke-width="1" stroke-linecap="round" opacity=".75"/>
       <path d="M17 39 L 26 39" stroke="#2A1266" stroke-width="1" stroke-linecap="round" opacity=".55"/>
       <path d="M17 43 L 29 43" stroke="#2A1266" stroke-width="1" stroke-linecap="round" opacity=".55"/>
@@ -5780,7 +6979,7 @@
       <path d="M35 34 L 44 34" stroke="#2A1266" stroke-width="1" stroke-linecap="round" opacity=".55"/>
       <path d="M35 38 L 47 38" stroke="#2A1266" stroke-width="1" stroke-linecap="round" opacity=".55"/>
       <path d="M35 42 L 42 42" stroke="#2A1266" stroke-width="1" stroke-linecap="round" opacity=".55"/>
-      <path d="M42 20 L 42 32 L 44 30 L 46 32 L 46 20 Z" fill="#F5B544" stroke="#2A1266" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M42 20 L 42 32 L 44 30 L 46 32 L 46 20 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.4" stroke-linejoin="round"/>
       <path d="M43 22 L 43 28" stroke="#FFD982" stroke-width="1" stroke-linecap="round"/>
       <path d="M16 23.5 Q 19 22.5 23 22.5" stroke="#D4BFFA" stroke-width="1" fill="none" stroke-linecap="round" opacity=".9"/>
       <path d="M52 18 L 53 20 L 55 21 L 53 22 L 52 24 L 51 22 L 49 21 L 51 20 Z" fill="#FFD982" stroke="#C7892C" stroke-width="0.7" stroke-linejoin="round"/>
@@ -5788,33 +6987,33 @@
     <symbol id="ic-explain" viewBox="0 0 64 64">
       <circle cx="32" cy="32" r="22" fill="currentColor" stroke="#2A1266" stroke-width="2"/>
       <path d="M32 10 A 22 22 0 0 1 32 54 A 18 22 0 0 0 32 10 Z" fill="currentColor" opacity=".5"/>
-      <circle cx="32" cy="32" r="19.5" fill="none" stroke="#F5B544" stroke-width="1" opacity=".7"/>
+      <circle cx="32" cy="32" r="19.5" fill="none" stroke="#F59E0B" stroke-width="1" opacity=".7"/>
       <path d="M16 22 Q 20 14 28 12" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" opacity=".9"/>
       <rect x="14" y="17" width="22" height="28" rx="2" fill="currentColor" stroke="#2A1266" stroke-width="1.6" transform="rotate(-7 25 31)"/>
       <rect x="15" y="16" width="22" height="28" rx="2" fill="#D4BFFA" stroke="#2A1266" stroke-width="1.6"/>
       <rect x="15" y="16" width="22" height="4.5" fill="currentColor"/>
       <path d="M15 20.5 L 37 20.5" stroke="#2A1266" stroke-width="1"/>
-      <circle cx="18" cy="18.3" r="0.9" fill="#F5B544"/>
+      <circle cx="18" cy="18.3" r="0.9" fill="#F59E0B"/>
       <circle cx="20.6" cy="18.3" r="0.9" fill="#FFD982" opacity=".7"/>
       <path d="M18 25 L 34 25" stroke="#2A1266" stroke-width="1.2" stroke-linecap="round" opacity=".65"/>
       <path d="M18 28.5 L 31 28.5" stroke="#2A1266" stroke-width="1.2" stroke-linecap="round" opacity=".5"/>
-      <rect x="17.5" y="31.5" width="17" height="2.6" rx="1" fill="#F5B544" stroke="#C7892C" stroke-width="0.6"/>
+      <rect x="17.5" y="31.5" width="17" height="2.6" rx="1" fill="#F59E0B" stroke="#C7892C" stroke-width="0.6"/>
       <path d="M18 37.5 L 32 37.5" stroke="#2A1266" stroke-width="1.2" stroke-linecap="round" opacity=".5"/>
       <path d="M18 41 L 27 41" stroke="#2A1266" stroke-width="1.2" stroke-linecap="round" opacity=".4"/>
       <circle cx="40" cy="32" r="8.5" fill="#2A1266" opacity=".22" transform="translate(1.4,1.6)"/>
-      <circle cx="40" cy="32" r="8.5" fill="#F5B544" stroke="#2A1266" stroke-width="1.8"/>
+      <circle cx="40" cy="32" r="8.5" fill="#F59E0B" stroke="#2A1266" stroke-width="1.8"/>
       <circle cx="40" cy="32" r="6" fill="#D4BFFA" stroke="#2A1266" stroke-width="1.4"/>
       <circle cx="40" cy="32" r="6" fill="none" stroke="#FFD982" stroke-width="0.8" opacity=".7"/>
       <path d="M36 29 Q 37 27 39 27" stroke="#FFFFFF" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".95"/>
       <path d="M46 38 L 50.5 43" stroke="#2A1266" stroke-width="3.6" stroke-linecap="round"/>
       <path d="M46 38 L 50.5 43" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      <path d="M47 38.5 L 49.5 41.5" stroke="#F5B544" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M47 38.5 L 49.5 41.5" stroke="#F59E0B" stroke-width="1.2" stroke-linecap="round"/>
     </symbol>
     <symbol id="ic-depth" viewBox="0 0 64 64">
       <circle cx="32" cy="32" r="22" fill="currentColor" stroke="#2A1266" stroke-width="2"/>
       <path d="M32 10 A 22 22 0 0 1 32 54 A 18 22 0 0 0 32 10 Z" fill="currentColor" opacity=".5"/>
       <circle cx="32" cy="32" r="19.5" fill="none" stroke="#D4BFFA" stroke-width="1" opacity=".6"/>
-      <circle cx="32" cy="32" r="19.5" fill="none" stroke="#F5B544" stroke-width="1" stroke-dasharray="2 6" opacity=".75"/>
+      <circle cx="32" cy="32" r="19.5" fill="none" stroke="#F59E0B" stroke-width="1" stroke-dasharray="2 6" opacity=".75"/>
       <path d="M16 22 Q 20 14 28 12" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" opacity=".9"/>
       <circle cx="32" cy="45" r="7" fill="currentColor" opacity=".4"/>
       <path d="M14 18 Q 32 12 50 18 L 50 24 Q 32 30 14 24 Z" fill="#EAD8FF" stroke="#2A1266" stroke-width="1.8" stroke-linejoin="round"/>
@@ -5826,7 +7025,7 @@
       <path d="M22 39 Q 32 43 42 39 L 42 43 Q 32 46.5 22 43 Z" fill="#2A1266" stroke="#2A1266" stroke-width="1.8" stroke-linejoin="round"/>
       <circle cx="32" cy="47" r="4.5" fill="#1A0A4A" stroke="#2A1266" stroke-width="1.6"/>
       <circle cx="32" cy="47" r="2.6" fill="currentColor"/>
-      <circle cx="32" cy="47" r="1.4" fill="#F5B544"/>
+      <circle cx="32" cy="47" r="1.4" fill="#F59E0B"/>
       <circle cx="31.4" cy="46.4" r=".7" fill="#FFFFFF" opacity=".9"/>
       <path d="M22 49 L 22.6 50 L 23.6 50.5 L 22.6 51 L 22 52 L 21.4 51 L 20.4 50.5 L 21.4 50 Z" fill="#FFD982" stroke="#C7892C" stroke-width="0.5" stroke-linejoin="round"/>
       <path d="M42 49 L 42.6 50 L 43.6 50.5 L 42.6 51 L 42 52 L 41.4 51 L 40.4 50.5 L 41.4 50 Z" fill="#FFD982" stroke="#C7892C" stroke-width="0.5" stroke-linejoin="round"/>
@@ -5834,19 +7033,19 @@
     <symbol id="ic-question" viewBox="0 0 64 64">
       <circle cx="32" cy="32" r="22" fill="#9B6FE4" stroke="#2A1266" stroke-width="2"/>
       <path d="M32 10 A 22 22 0 0 1 32 54 A 18 22 0 0 0 32 10 Z" fill="#5E37A8" opacity=".5"/>
-      <circle cx="32" cy="32" r="19.5" fill="none" stroke="#F5B544" stroke-width="1" opacity=".7"/>
+      <circle cx="32" cy="32" r="19.5" fill="none" stroke="#F59E0B" stroke-width="1" opacity=".7"/>
       <path d="M16 22 Q 20 14 28 12" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" opacity=".9"/>
       <path d="M19 18 L 43 18 Q 46 18 46 21 L 46 39 Q 46 42 43 42 L 28 42 L 22 47 L 23 42 L 19 42 Q 16 42 16 39 L 16 21 Q 16 18 19 18 Z" fill="#5E37A8" stroke="#2A1266" stroke-width="1.6" stroke-linejoin="round"/>
       <path d="M22 16 L 46 16 Q 49 16 49 19 L 49 37 Q 49 40 46 40 L 31 40 L 25 45 L 26 40 L 22 40 Q 19 40 19 37 L 19 19 Q 19 16 22 16 Z" fill="#FFFFFF" stroke="#2A1266" stroke-width="1.8" stroke-linejoin="round"/>
       <path d="M23 21 Q 24 19 27 19" stroke="#9B6FE4" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".7"/>
-      <path d="M28 24 Q 28 19 34 19 Q 40 19 40 24 Q 40 28 36 30 Q 34 31 34 33" fill="none" stroke="#F5B544" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M28 24 Q 28 19 34 19 Q 40 19 40 24 Q 40 28 36 30 Q 34 31 34 33" fill="none" stroke="#F59E0B" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M28 24 Q 28 19 34 19 Q 40 19 40 24 Q 40 28 36 30 Q 34 31 34 33" fill="none" stroke="#FFD982" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="34" cy="37" r="2" fill="#F5B544" stroke="#2A1266" stroke-width="1.2"/>
+      <circle cx="34" cy="37" r="2" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2"/>
       <path d="M50 22 L 51 24 L 53 25 L 51 26 L 50 28 L 49 26 L 47 25 L 49 24 Z" fill="#FFD982" stroke="#C7892C" stroke-width="0.7" stroke-linejoin="round"/>
       <path d="M14 42 L 15 43.5 L 16.5 44 L 15 44.5 L 14 46 L 13 44.5 L 11.5 44 L 13 43.5 Z" fill="#FFD982" stroke="#C7892C" stroke-width="0.6" stroke-linejoin="round"/>
     </symbol>
     <symbol id="ic-summary" viewBox="0 0 64 64">
-      <circle cx="32" cy="32" r="22" fill="#F5B544" stroke="#2A1266" stroke-width="2"/>
+      <circle cx="32" cy="32" r="22" fill="#F59E0B" stroke="#2A1266" stroke-width="2"/>
       <path d="M32 10 A 22 22 0 0 1 32 54 A 18 22 0 0 0 32 10 Z" fill="#C7892C" opacity=".55"/>
       <circle cx="32" cy="32" r="19.5" fill="none" stroke="#7B4FD4" stroke-width="1" opacity=".55"/>
       <path d="M16 22 Q 20 14 28 12" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".95"/>
@@ -5854,32 +7053,32 @@
       <rect x="17" y="17" width="28" height="30" rx="2.4" fill="#9B6FE4" stroke="#2A1266" stroke-width="1.8"/>
       <rect x="17" y="17" width="28" height="5" fill="#7B4FD4"/>
       <path d="M17 22 L 45 22" stroke="#2A1266" stroke-width="1.2"/>
-      <circle cx="21" cy="19.5" r="0.9" fill="#F5B544"/>
+      <circle cx="21" cy="19.5" r="0.9" fill="#F59E0B"/>
       <circle cx="24" cy="19.5" r="0.9" fill="#FFD982" opacity=".7"/>
-      <rect x="20" y="25" width="4" height="4" rx="0.8" fill="#F5B544" stroke="#2A1266" stroke-width="1.2"/>
+      <rect x="20" y="25" width="4" height="4" rx="0.8" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2"/>
       <path d="M20.5 27 L 22 28.5 L 23.8 25.7" stroke="#2A1266" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M26 27 L 41 27" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round"/>
-      <rect x="20" y="31" width="4" height="4" rx="0.8" fill="#F5B544" stroke="#2A1266" stroke-width="1.2"/>
+      <rect x="20" y="31" width="4" height="4" rx="0.8" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2"/>
       <path d="M20.5 33 L 22 34.5 L 23.8 31.7" stroke="#2A1266" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M26 33 L 38 33" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round"/>
-      <rect x="20" y="37" width="4" height="4" rx="0.8" fill="#F5B544" stroke="#2A1266" stroke-width="1.2"/>
+      <rect x="20" y="37" width="4" height="4" rx="0.8" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2"/>
       <path d="M20.5 39 L 22 40.5 L 23.8 37.7" stroke="#2A1266" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M26 39 L 36 39" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round"/>
-      <circle cx="43" cy="45" r="7" fill="#F5B544" stroke="#2A1266" stroke-width="1.6"/>
+      <circle cx="43" cy="45" r="7" fill="#F59E0B" stroke="#2A1266" stroke-width="1.6"/>
       <circle cx="43" cy="45" r="5" fill="none" stroke="#C7892C" stroke-width="0.8" stroke-dasharray="1.5 1"/>
       <path d="M43 41 L 44 44 L 47 44.4 L 44.6 46.2 L 45.4 49 L 43 47.4 L 40.6 49 L 41.4 46.2 L 39 44.4 L 42 44 Z" fill="#FFFFFF" stroke="#2A1266" stroke-width="1" stroke-linejoin="round"/>
     </symbol>
     <symbol id="ic-reflect" viewBox="0 0 64 64">
       <circle cx="32" cy="32" r="22" fill="#9B6FE4" stroke="#2A1266" stroke-width="2"/>
       <path d="M32 10 A 22 22 0 0 1 32 54 A 18 22 0 0 0 32 10 Z" fill="#5E37A8" opacity=".5"/>
-      <circle cx="32" cy="32" r="19.5" fill="none" stroke="#F5B544" stroke-width="1" opacity=".7"/>
+      <circle cx="32" cy="32" r="19.5" fill="none" stroke="#F59E0B" stroke-width="1" opacity=".7"/>
       <path d="M16 22 Q 20 14 28 12" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round" opacity=".9"/>
       <path d="M32 16 L 34 30 L 48 32 L 34 34 L 32 48 L 30 34 L 16 32 L 30 30 Z" fill="#FFFFFF" stroke="#2A1266" stroke-width="1.6" stroke-linejoin="round"/>
       <path d="M50 20 L 50.8 21.6 L 52.4 22 L 50.8 22.5 L 50 24.2 L 49.2 22.5 L 47.6 22 L 49.2 21.6 Z" fill="#FFD982" stroke="#C7892C" stroke-width="0.6" stroke-linejoin="round"/>
       <path d="M14 44 L 14.8 45.6 L 16.4 46 L 14.8 46.5 L 14 48.2 L 13.2 46.5 L 11.6 46 L 13.2 45.6 Z" fill="#FFD982" stroke="#C7892C" stroke-width="0.6" stroke-linejoin="round"/>
     </symbol>
     <symbol id="ic-bonus" viewBox="0 0 64 64">
-      <circle cx="32" cy="32" r="22" fill="#F5B544" stroke="#2A1266" stroke-width="2"/>
+      <circle cx="32" cy="32" r="22" fill="#F59E0B" stroke="#2A1266" stroke-width="2"/>
       <path d="M32 10 A 22 22 0 0 1 32 54 A 18 22 0 0 0 32 10 Z" fill="#C7892C" opacity=".55"/>
       <circle cx="32" cy="32" r="19.5" fill="none" stroke="#7B4FD4" stroke-width="1" opacity=".55"/>
       <path d="M16 22 Q 20 14 28 12" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".95"/>
@@ -6267,6 +7466,14 @@
   ═══════════════════════════════ -->
   <div id="screen-subject" class="screen">
     <div class="subj-screen">
+      <!-- Onboarding progress pills: subject select is step 4 of 5 when
+           the user is in the new-user flow. Hidden by CSS when the
+           subject screen is entered from the drawer (existing users
+           switching subject) — see body.on-subject-screen:not(.drawer-open)
+           gate below. -->
+      <div class="onb-progress subj-onb-progress" aria-hidden="true" data-step="4">
+        <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+      </div>
       <div class="subj-header">
         <div class="subj-logo">Corpus</div>
         <div class="subj-title">Choose Your Path</div>
@@ -6300,6 +7507,41 @@
         <div class="subj-dot"></div>
         <div class="subj-dot"></div>
       </div>
+      <!-- Cinematic vertical-stack layout for the new-user onboarding
+           flow. Shown only when body.on-subject-screen && !body.drawer-open
+           (see CSS gate above). Uses subjCinematicTap → same subjConfirm
+           handler as the carousel path, so selection logic and storage
+           stay identical. -->
+      <div class="subj-cinematic" id="subj-cinematic">
+        <button type="button" class="subj-cinematic-card subj-c-philosophy is-selected" data-subject="philosophy" onclick="subjCinematicTap('philosophy')">
+          <div class="subj-cinematic-portrait"><img src="./images/plato.webp" alt=""></div>
+          <div class="subj-cinematic-body">
+            <div class="subj-cinematic-thinker" id="subj-c-thinker-philosophy">אפלטון · סוקרטס · אריסטו</div>
+            <div class="subj-cinematic-name" id="subj-c-name-philosophy">פילוסופיה</div>
+            <div class="subj-cinematic-tagline" id="subj-c-tag-philosophy">חוכמה ליום-יום</div>
+          </div>
+        </button>
+        <button type="button" class="subj-cinematic-card subj-c-economics" data-subject="economics" onclick="subjCinematicTap('economics')">
+          <div class="subj-cinematic-portrait"><img src="./images/smith.webp" alt=""></div>
+          <div class="subj-cinematic-body">
+            <div class="subj-cinematic-thinker" id="subj-c-thinker-economics">סמית' · מרקס · קיינס</div>
+            <div class="subj-cinematic-name" id="subj-c-name-economics">כלכלה</div>
+            <div class="subj-cinematic-tagline" id="subj-c-tag-economics">איך העולם עובד</div>
+          </div>
+        </button>
+        <button type="button" class="subj-cinematic-card subj-c-psychology is-locked" data-subject="psychology" onclick="subjCinematicTap('psychology')">
+          <div class="subj-cinematic-portrait"><img src="./images/freud.webp" alt=""></div>
+          <div class="subj-cinematic-body">
+            <div class="subj-cinematic-thinker" id="subj-c-thinker-psychology">פרויד · יונג · ג'יימס</div>
+            <div class="subj-cinematic-name" id="subj-c-name-psychology">פסיכולוגיה</div>
+            <div class="subj-cinematic-tagline" id="subj-c-tag-psychology">להבין את הנפש</div>
+          </div>
+          <span class="subj-cinematic-locked-tag" id="subj-c-locked-tag">בקרוב</span>
+        </button>
+        <div class="subj-cinematic-cta-holder">
+          <button type="button" class="subj-cinematic-cta" id="subj-cinematic-cta" onclick="subjCinematicConfirm()">המשך</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -6314,6 +7556,9 @@
       <div class="thinker-carousel-wrap" id="thinker-carousel-wrap" style="display:none">
         <div class="thinker-carousel" id="thinker-carousel"></div>
       </div>
+
+      <!-- Streak repair card — filled by renderStreakRepairCard when eligible. -->
+      <div id="streak-repair-card-holder" style="display:none"></div>
 
       <!-- Legacy hero card (kept for compat; never rendered) -->
       <div id="hero-continue-card-wrap" style="display:none"></div>
@@ -6616,6 +7861,10 @@
           <div class="metric-label" id="metric-streak-days-label">ימים רצופים</div>
         </div>
       </div>
+      <!-- Partway-progress line for the two-dialogue goal on the 1st
+           completion of the day. Populated by _showDcStats + hidden by
+           default. -->
+      <div class="dc-goal-progress" id="dc-goal-progress" style="display:none"></div>
     </div>
     <button class="dc-continue-btn" id="dc-stats-continue"></button>
     <button id="dc-stats-back-home" style="display:none"></button>
@@ -6695,6 +7944,9 @@
   </div>
 </div>
 
+<!-- Streak repair modal — content rendered dynamically by _renderRepairQuestion / _showRepairResult. -->
+<div class="modal-overlay" id="modal-streak-repair"></div>
+
 <!-- Share prompt overlay -->
 <div class="modal-overlay" id="modal-share">
   <div class="modal-box share-modal-box">
@@ -6708,6 +7960,10 @@
 <div class="modal-overlay" id="modal-guest-signup">
   <div class="modal-box">
     <div class="modal-title" id="guest-signup-title">Save your progress</div>
+    <!-- Loss-framed first_completion stat list. Populated by
+         _renderGuestFirstCompletionStats when trigger === 'first_completion';
+         hidden for all other triggers (existing behavior preserved). -->
+    <div class="guest-signup-stats" id="guest-signup-stats" style="display:none"></div>
     <div class="modal-subtitle" id="guest-signup-body">Nice start. Create a free account so your progress is always here.</div>
     <button class="nav-btn auth-btn-social" id="guest-signup-google-btn" onclick="_guestSignupTap('google')" style="margin-top:16px;">
       <span class="auth-social-icon">G</span> <span id="guest-signup-google-text">Continue with Google</span>
@@ -6877,6 +8133,30 @@ async function syncProgressToSupabase() {
     }, { onConflict: 'user_id' });
     if (error) _reportSyncFailure('appearance', error);
   } catch(e) { _reportSyncFailure('appearance', e); }
+  try {
+    // Streak-repair state: dated-array fields. Server columns added in
+    // migration 20260721210000_streak_repair.sql. Separate upsert so a
+    // missing column doesn't break base sync.
+    const { error } = await sb.from('user_progress').upsert({
+      user_id: currentUser.id,
+      streak_breaks:  state.streakBreaks  || [],
+      streak_repairs: state.streakRepairs || [],
+    }, { onConflict: 'user_id' });
+    if (error) _reportSyncFailure('streak_repair', error);
+  } catch(e) { _reportSyncFailure('streak_repair', e); }
+  try {
+    // Goal state (Item 6): daily_goal_history, completions_by_day,
+    // goal_met_history. All dated arrays / maps. Server columns added in
+    // migration 20260723180000_daily_goal.sql. Separate upsert so a
+    // missing column doesn't break base sync.
+    const { error } = await sb.from('user_progress').upsert({
+      user_id: currentUser.id,
+      daily_goal_history:  state.dailyGoalHistory   || [],
+      completions_by_day:  state.completionsByDay   || {},
+      goal_met_history:    state.goalMetHistory     || [],
+    }, { onConflict: 'user_id' });
+    if (error) _reportSyncFailure('daily_goal', error);
+  } catch(e) { _reportSyncFailure('daily_goal', e); }
 }
 
 async function loadProgressFromSupabase() {
@@ -6887,6 +8167,11 @@ async function loadProgressFromSupabase() {
     //   completed_days         : union
     //   unlocked_thinkers      : union
     //   chapter_complete_shown : union
+    //   streak_breaks          : union by brokenAt (dated-array)
+    //   streak_repairs         : union by date string (dated-array)
+    //   daily_goal_history     : union by setAt (dated-array)
+    //   completions_by_day     : max per key (per-day monotonic counter)
+    //   goal_met_history       : union by metAt (dated-array)
     //   onboarding_done        : OR (server true → local true; false leaves alone)
     //   appearance             : PREFER LOCAL — server row is a backup for
     //                            reinstalls, not an override. On the current
@@ -6911,6 +8196,50 @@ async function loadProgressFromSupabase() {
     if (data.onboarding_done === true) {
       try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
     }
+    // streak_repair fields: union-merge both arrays. Union-dedup by
+    // brokenAt for streakBreaks (object entries) and by string for
+    // streakRepairs. If a repair happened on device A and hasn't synced
+    // yet to device B, this merge collapses them to a single entry per
+    // date — no free extras, no lost repairs.
+    state.streakBreaks = state.streakBreaks || [];
+    (data.streak_breaks || []).forEach(b => {
+      if (!b || !b.brokenAt) return;
+      if (!state.streakBreaks.find(x => x.brokenAt === b.brokenAt)) {
+        state.streakBreaks.push({ brokenAt: b.brokenAt, priorStreak: b.priorStreak || 0 });
+      }
+    });
+    state.streakRepairs = state.streakRepairs || [];
+    (data.streak_repairs || []).forEach(d => {
+      if (typeof d === 'string' && !state.streakRepairs.includes(d)) state.streakRepairs.push(d);
+    });
+    // Goal state (Item 6). Union-merge:
+    //   daily_goal_history: dedup by setAt (dated entries)
+    //   completions_by_day: max per key so a device with a higher count
+    //     for the same day wins (approximates the sum without double-
+    //     counting when both devices already synced through the same day)
+    //   goal_met_history:   dedup by metAt (goal fires once per day per
+    //     install; sync race can't grant double XP because the local
+    //     _todayGoalMetEntry guard checks the merged array before firing)
+    state.dailyGoalHistory = state.dailyGoalHistory || [];
+    (data.daily_goal_history || []).forEach(g => {
+      if (!g || !g.setAt) return;
+      if (!state.dailyGoalHistory.find(x => x && x.setAt === g.setAt)) {
+        state.dailyGoalHistory.push({ setAt: g.setAt, value: g.value });
+      }
+    });
+    state.completionsByDay = state.completionsByDay || {};
+    Object.keys(data.completions_by_day || {}).forEach(day => {
+      const server = data.completions_by_day[day] || 0;
+      const local  = state.completionsByDay[day] || 0;
+      if (server > local) state.completionsByDay[day] = server;
+    });
+    state.goalMetHistory = state.goalMetHistory || [];
+    (data.goal_met_history || []).forEach(g => {
+      if (!g || !g.metAt) return;
+      if (!state.goalMetHistory.find(x => x && x.metAt === g.metAt)) {
+        state.goalMetHistory.push({ metAt: g.metAt, goal: g.goal, count: g.count || 0, bonusXp: g.bonusXp || 0 });
+      }
+    });
     migrateCompletedDaysKeys();
     saveStateLocal();
   } catch(e) {
@@ -6962,6 +8291,13 @@ function showAuthScreen() {
   const nav = document.getElementById('bottom-nav');
   if (nav) nav.style.display = 'none';
   _localizeAuthScreen();
+  // Funnel: onboarding_auth_reached. Fires whenever the auth screen
+  // appears, regardless of entry point. Filter in PostHog by
+  // is_first_onboarding for the pure-onboarding funnel view.
+  _phCapture('onboarding_auth_reached', {
+    is_first_onboarding: !localStorage.getItem('corpus_onboarding_done'),
+    auth_mode: authMode,
+  });
 }
 
 // Swaps every English label on #screen-auth for its Hebrew counterpart
@@ -7001,6 +8337,8 @@ function enterAsGuest() {
   // Do NOT set appStarted (leave false so the real enterApp runs on sign-in).
   // Do NOT set currentUser (leave null — that's how the engine knows it's a guest).
   hideAuthScreen();
+  // Funnel: onboarding_auth_choice with choice='guest'.
+  _phCapture('onboarding_auth_choice', { choice: 'guest', method: null });
   renderHome();
 }
 
@@ -7182,6 +8520,10 @@ function _currentEffectiveAppearance() {
 // Called from showIntro/showAuthFlow every open path so a re-entry after
 // changing preference sees the new mode. Live updates (user flips appearance
 // while the intro is up) go through postMessage below.
+// DEPRECATED (onboarding redesign): the intro iframe was removed. This
+// function guards on iframe presence and no-ops, so any lingering caller
+// (showAuthFlow, _initIntroCarousel) is a safe no-op. Slate for removal
+// in a follow-up cleanup pass.
 function _syncIntroIframeAppearance() {
   const iframe = document.getElementById('intro-iframe');
   if (!iframe) return;
@@ -7198,11 +8540,635 @@ function _syncIntroIframeAppearance() {
   } catch(e) {}
 }
 
+// ═══════════════════════════════════════════════════════════
+// ONBOARDING FUNNEL INSTRUMENTATION
+// ═══════════════════════════════════════════════════════════
+// Baseline events for measuring the current onboarding flow (no behavior
+// changes). "First"-scoped events (first_dialogue_opened,
+// first_dialogue_completed) are gated by localStorage timestamps —
+// monotonic, once-per-install, union-merge-safe per the dated-array rule.
+// PostHog is loaded once in index.html only (line ~15); iframe events
+// (carousel slides + carousel completed) come in via postMessage and are
+// fired here from the message listener.
+
+function _phCapture(event, props) {
+  try { posthog.capture(event, props || {}); } catch(e) {}
+}
+
+function _phPlatform() {
+  try {
+    if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+      return window.Capacitor.getPlatform() || 'native';
+    }
+  } catch(e) {}
+  return 'web';
+}
+
+function _getOrSetOnboardingStart() {
+  let iso = localStorage.getItem('corpus_onboarding_started_at');
+  if (!iso) {
+    iso = new Date().toISOString();
+    try { localStorage.setItem('corpus_onboarding_started_at', iso); } catch(e) {}
+  }
+  return iso;
+}
+
+function _secondsSinceOnboardingStart() {
+  const iso = localStorage.getItem('corpus_onboarding_started_at');
+  if (!iso) return null;
+  const ms = Date.now() - Date.parse(iso);
+  if (isNaN(ms)) return null;
+  return Math.max(0, Math.round(ms / 1000));
+}
+
+// Session-scoped dedup so a spotlight-step re-render doesn't multi-fire.
+const _onboardingTourStepsSeen = new Set();
+
+// ═══════════════════════════════════════════════════════════
+// NEW ONBOARDING FLOW — welcome → subject → goal → reader
+// ═══════════════════════════════════════════════════════════
+// Replaces the deprecated 3-slide iframe carousel + 5-step spotlight tour.
+// Called from initApp for fresh-install users (no session). Signed-in
+// returning users are routed through enterApp as before; guest users with
+// completedDays are also bypassed (see startNewUserOnboarding gate).
+//
+// State touched:
+//   corpus_onboarding_started_at   — funnel timestamp (from commit 1)
+//   corpus_intro_done              — welcome screen shown ("intro" from
+//                                    the old carousel days; reused as the
+//                                    "welcome seen" gate to preserve
+//                                    existing-user semantics)
+//   corpus_subject                 — subject picked (existing)
+//   corpus_daily_goal_set          — goal screen completed (new)
+//   corpus_onboarding_done         — full flow completed (existing;
+//                                    respected so existing users bypass)
+//   corpus_endowment_shown_at      — day-1 endowment screen fired (new,
+//                                    dated array of one entry)
+
+function _onbShowScreen(screenId) {
+  // Hide the four inline onboarding screens.
+  ['onboarding-welcome', 'onboarding-beat', 'onboarding-streak', 'onboarding-goal'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.display = 'none'; el.classList.remove('onb-active'); }
+  });
+  // Also drop .active from any main app screen that may still be sitting
+  // in the DOM beneath the overlay. Without this, #screen-home (which
+  // ships with class="screen active" by default) and #screen-subject
+  // (set active by showSubjectSelect, still active when the flow advances
+  // to the goal screen) leak their content — topbar wordmark / stats /
+  // subject cards / a second progress-pill row — through the overlay.
+  // showScreen('home' | 'subject' | 'reader') at the end of the flow
+  // restores the correct one.
+  ['screen-home', 'screen-subject', 'screen-profile', 'screen-pantheon'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  document.body.classList.remove('on-subject-screen');
+  // Hide the global chrome (topbar / stats-subheader / bottom-nav / practice
+  // card). showScreen() manages these when the flow ends and we land on
+  // home/reader; onboarding screens shouldn't have them visible at all.
+  const topbar = document.getElementById('topbar');
+  if (topbar) topbar.style.display = 'none';
+  const stats = document.querySelector('.stats-subheader');
+  if (stats) stats.style.display = 'none';
+  const nav = document.getElementById('bottom-nav');
+  if (nav) nav.style.display = 'none';
+  const toggle = document.getElementById('drawer-toggle-btn');
+  if (toggle) toggle.style.display = 'none';
+  const pc = document.getElementById('practice-card');
+  if (pc) pc.style.display = 'none';
+  const target = document.getElementById(screenId);
+  if (target) { target.style.display = 'flex'; target.classList.add('onb-active'); }
+}
+
+// Cinematic redesign: owl mascot removed from welcome. Kept the stub so
+// any residual caller no-ops safely.
+function _onbMountWelcomeOwl() {}
+
+// Single language-apply for the intro flow. Toggle lives on the beat
+// screen (first paint), so this updates copy on the three intro screens
+// (beat / streak / welcome) up front — subsequent screens (subject/goal)
+// run their own _onbApplyLangTo* helpers when they're shown. Hebrew is
+// singular 2nd person throughout (דיברת / שלך) — unvocalized past-tense
+// singular is already gender-neutral in writing.
+function _onbApplyLangToWelcome(lang) {
+  const isEn = lang === 'en';
+  // Screen 1 — Beat (big statement, purple, toggle host)
+  const bHead = document.getElementById('onb-beat-head');
+  const bSub  = document.getElementById('onb-beat-sub');
+  const bCta  = document.getElementById('onb-beat-cta');
+  if (bHead) bHead.textContent = isEn ? "Five minutes a day with history's greatest minds" : 'חמש דקות ביום עם ההוגים הגדולים';
+  if (bSub)  bSub.textContent  = isEn ? 'Philosophy, economics, psychology. Short dialogue, one idea, straight from the source.' : 'פילוסופיה, כלכלה ופסיכולוגיה. דיאלוג קצר, רעיון אחד, ישר מהמקור.';
+  if (bCta)  bCta.textContent  = isEn ? "Let's start" : 'מתחילים';
+  const fanNames = isEn ? ['Kant', 'Marx', 'Freud'] : ['קאנט', 'מרקס', 'פרויד'];
+  ['onb-beat-fan-name-1', 'onb-beat-fan-name-2', 'onb-beat-fan-name-3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = fanNames[i];
+  });
+  // Screen 2 — Streak beat (amber, restored)
+  const sHead = document.getElementById('onb-streak-head');
+  const sSub  = document.getElementById('onb-streak-sub');
+  const sCap  = document.getElementById('onb-streak-caption');
+  const sCta  = document.getElementById('onb-streak-cta');
+  if (sHead) sHead.textContent = isEn ? 'Every day adds to the streak' : 'כל יום מוסיף לרצף';
+  if (sSub)  sSub.textContent  = isEn ? 'One dialogue a day keeps the flame lit. Every thinker you meet joins your collection.' : 'דיאלוג ביום מדליק את הלהבה. כל הוגה שפגשת נשמר באוסף שלך.';
+  if (sCap)  sCap.textContent  = isEn ? 'Your collection grows as you read' : 'האוסף שלך נבנה תוך כדי קריאה';
+  if (sCta)  sCta.textContent  = isEn ? 'Continue' : 'המשך';
+  // Screen 3 — Welcome (Socrates, purple)
+  const wHead = document.getElementById('onb-welcome-head');
+  const wSub  = document.getElementById('onb-welcome-sub');
+  const wCta  = document.getElementById('onb-welcome-cta');
+  if (wHead) wHead.textContent = isEn ? 'When did you last talk to Socrates?' : 'מתי בפעם האחרונה דיברת עם סוקרטס?';
+  // Socrates-specific era number (2,400 years). If this hero ever swaps to
+  // another thinker, this string must swap too — hence the explicit hook.
+  if (wSub)  wSub.textContent  = isEn ? 'Not a summary, not a commentary. What was written 2,400 years ago, in today\'s language.' : 'לא סיכום ולא פרשנות. מה שנכתב לפני 2,400 שנה, בשפה של היום.';
+  if (wCta)  wCta.textContent  = isEn ? 'Continue' : 'המשך';
+  const heroName = document.getElementById('onb-hero-card-name');
+  if (heroName) heroName.textContent = isEn ? 'Socrates' : 'סוקרטס';
+  // Toggle indicator + button active state (toggle host: beat screen).
+  document.querySelectorAll('#onboarding-beat .onb-lang-btn').forEach(btn => {
+    btn.classList.toggle('is-active', btn.dataset.lang === lang);
+  });
+  // Container is dir="ltr" pinned so the two buttons never physically swap;
+  // only .is-en on the indicator transitions.
+  const indicator = document.getElementById('onb-lang-indicator');
+  if (indicator) indicator.classList.toggle('is-en', isEn);
+  document.documentElement.dir = isEn ? 'ltr' : 'rtl';
+  document.documentElement.lang = lang;
+}
+
+function _onbSetWelcomeLang(lang) {
+  state.lang = lang;
+  try { localStorage.setItem('corpus_lang', lang); } catch (e) {}
+  _onbApplyLangToWelcome(lang);
+}
+
+function _onbApplyLangToGoal(lang) {
+  const isEn = lang === 'en';
+  const map = {
+    'onb-goal-head':  { en: 'How much time each day?', he: 'כמה זמן ביום?' },
+    'onb-goal-sub':   { en: 'Your streak builds from this. You can change it anytime.', he: 'הרצף שלך נבנה מזה. אפשר לשנות בכל רגע.' },
+    'onb-goal-t1':    { en: 'One dialogue a day', he: 'דיאלוג אחד ביום' },
+    'onb-goal-h1':    { en: 'A daily rhythm, about five minutes', he: 'קצב יומיומי, בערך חמש דקות' },
+    'onb-goal-t2':    { en: 'Two dialogues', he: 'שני דיאלוגים' },
+    'onb-goal-h2':    { en: 'Go a little deeper, about ten minutes', he: 'לצלול פנימה, בערך עשר דקות' },
+    'onb-goal-t3':    { en: 'My own pace', he: 'הקצב שלי' },
+    'onb-goal-h3':    { en: 'No pressure, learn when it fits', he: 'בלי לחץ, ללמוד כשמתאים' },
+  };
+  Object.keys(map).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = map[id][lang] || map[id].he;
+  });
+  const cta = document.getElementById('onb-goal-cta');
+  if (cta) cta.textContent = isEn ? 'To your first dialogue →' : 'לדיאלוג הראשון ←';
+}
+
+// Silent guest entry: mirrors enterAsGuest but skips hideAuthScreen (the
+// auth screen isn't up in the new flow). Guest = null currentUser, no
+// appStarted flip so a later real sign-in still fires enterApp.
+function _enterAsGuestSilent() {
+  // Fire the auth choice event so guest-by-default users are counted.
+  _phCapture('onboarding_auth_choice', { choice: 'guest', method: null });
+}
+
+// First-paint of the redesigned onboarding. Beat screen (three-card fan)
+// hosts the language toggle and fires onboarding_started. Kept the 'beat'
+// PostHog prop for funnel comparability against the baseline; the retired
+// 'how'/'what' distinction is now a constant 'cinematic'.
+function showBeat() {
+  console.log('[Onboarding] showBeat() called');
+  const lang = state.lang || localStorage.getItem('corpus_lang') || 'he';
+  state.lang = lang;
+  _onbApplyLangToWelcome(lang);
+  _onbShowScreen('onboarding-beat');
+  console.log('[Onboarding] beat display:', document.getElementById('onboarding-beat').style.display);
+  _phCapture('onboarding_beat_shown', {
+    beat: 'cinematic',
+    platform: _phPlatform(),
+    lang: lang,
+    is_redesign: true,
+  });
+  // Funnel: fire onboarding_started here (beat is now the first paint) so
+  // the redesign cohort is measurable against the baseline. Gated per the
+  // existing rule so a re-enter never double-counts.
+  if (!localStorage.getItem('corpus_onboarding_started_at')) {
+    _getOrSetOnboardingStart();
+    _phCapture('onboarding_started', {
+      platform: _phPlatform(),
+      lang: lang,
+      is_redesign: true,
+    });
+  }
+}
+
+// _onbFinishBeat — beat is screen 1. CTA "מתחילים"/"Let's start"
+// advances to the streak beat (screen 2). Intro-done flag is set at
+// welcome CTA (screen 3), so re-entering before welcome still resurfaces
+// all three intro screens.
+function _onbFinishBeat() {
+  _phCapture('onboarding_beat_cta', { beat: 'cinematic', lang: state.lang || 'he' });
+  showStreakBeat();
+}
+
+// Streak beat (Screen 2) — restored beat between the big statement and
+// the Socrates hero. Amber-tinted; the visual seed of the streak. Kept
+// under a distinct PostHog event so the redesign cohort's funnel drop
+// between beat and welcome is measurable independently.
+function showStreakBeat() {
+  console.log('[Onboarding] showStreakBeat() called');
+  const lang = state.lang || localStorage.getItem('corpus_lang') || 'he';
+  state.lang = lang;
+  _onbApplyLangToWelcome(lang);
+  _onbShowScreen('onboarding-streak');
+  _phCapture('onboarding_streak_shown', {
+    platform: _phPlatform(),
+    lang: lang,
+    is_redesign: true,
+  });
+}
+
+function _onbFinishStreakBeat() {
+  _phCapture('onboarding_streak_cta', { lang: state.lang || 'he' });
+  showWelcomeScreen();
+}
+
+// Welcome — now screen 2. Language toggle no longer here; label picked on
+// beat already applied via _onbApplyLangToWelcome. Fires the welcome_shown
+// event kept from the baseline funnel.
+function showWelcomeScreen() {
+  console.log('[Onboarding] showWelcomeScreen() called');
+  _onbMountWelcomeOwl();
+  const lang = state.lang || localStorage.getItem('corpus_lang') || 'he';
+  state.lang = lang;
+  _onbApplyLangToWelcome(lang);
+  _onbShowScreen('onboarding-welcome');
+  console.log('[Onboarding] welcome display:', document.getElementById('onboarding-welcome').style.display);
+  _phCapture('onboarding_welcome_shown', {
+    platform: _phPlatform(),
+    lang: lang,
+    is_redesign: true,
+  });
+}
+
+// _onbFinishWelcome — welcome is now screen 2. CTA "המשך"/"Continue"
+// commits corpus_intro_done and advances to subject-select (or straight
+// to goal if a subject is already picked from an interrupted prior run).
+function _onbFinishWelcome() {
+  const lang = state.lang || 'he';
+  _phCapture('onboarding_welcome_cta', { lang_picked: lang });
+  try { localStorage.setItem('corpus_intro_done', '1'); } catch (e) {}
+  const el = document.getElementById('onboarding-welcome');
+  if (el) { el.style.display = 'none'; el.classList.remove('onb-active'); }
+  // Deep-link arrivals skip subject-select entirely: the incoming URL
+  // has already expressed subject intent (economics). Set the subject
+  // here so the goal + reader steps operate on the correct chapter set,
+  // then advance straight to the goal picker (4-of-4 in the shortened
+  // pill row set up in initUI).
+  if (_pendingDeepLink === 'bonus-econ') {
+    try { setSubject('economics'); } catch (e) {}
+    showGoalScreen();
+    return;
+  }
+  if (!localStorage.getItem('corpus_subject')) {
+    showSubjectSelect();
+  } else {
+    showGoalScreen();
+  }
+}
+
+// Called from subjConfirm's continuation on new-flow path — inserted into
+// subjConfirm below so the existing subject-select screen slots in
+// unchanged and hands off to the goal screen next.
+function _onbAfterSubjectPickForNewUser() {
+  showGoalScreen();
+}
+
+// Cinematic subject-select — vertical stack tap → set active card and
+// preview the theme. Storage / final commit go through the same
+// subjConfirm() the carousel path uses, so selection semantics stay
+// identical. First tap on a locked subject flashes the "coming soon"
+// nudge without changing selection.
+let _subjCinematicSelected = 'philosophy';
+function subjCinematicTap(subjectId) {
+  if (typeof LOCKED_SUBJECTS !== 'undefined' && LOCKED_SUBJECTS.includes(subjectId)) {
+    try { _subjShowComingSoon(); } catch (e) {}
+    return;
+  }
+  _subjCinematicSelected = subjectId;
+  _previewSubjectId = subjectId;
+  document.querySelectorAll('.subj-cinematic-card').forEach(c => {
+    c.classList.toggle('is-selected', c.dataset.subject === subjectId);
+  });
+  try { previewSubjectTheme(subjectId); } catch (e) {}
+}
+function subjCinematicConfirm() {
+  if (typeof LOCKED_SUBJECTS !== 'undefined' && LOCKED_SUBJECTS.includes(_subjCinematicSelected)) {
+    try { _subjShowComingSoon(); } catch (e) {}
+    return;
+  }
+  _previewSubjectId = _subjCinematicSelected;
+  try { subjConfirm(); } catch (e) {}
+}
+
+function _applyCinematicSubjectCopy() {
+  const isEn = state.lang === 'en';
+  const setText = (id, he, en) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = isEn ? en : he;
+  };
+  const title = document.querySelector('#screen-subject .subj-title');
+  const subtitle = document.querySelector('#screen-subject .subj-subtitle');
+  if (title) title.textContent = isEn ? 'Pick a subject' : 'בחרו נושא';
+  if (subtitle) subtitle.textContent = isEn ? 'You can switch anytime' : 'אפשר לעבור בין נושאים בכל שלב';
+  setText('subj-c-name-philosophy', 'פילוסופיה', 'Philosophy');
+  setText('subj-c-tag-philosophy', 'חוכמה ליום-יום', 'Wisdom for the everyday');
+  setText('subj-c-thinker-philosophy', 'אפלטון · סוקרטס · אריסטו', 'Plato · Socrates · Aristotle');
+  setText('subj-c-name-economics', 'כלכלה', 'Economics');
+  setText('subj-c-tag-economics', 'איך העולם עובד', 'How the world works');
+  setText('subj-c-thinker-economics', "סמית' · מרקס · קיינס", 'Smith · Marx · Keynes');
+  setText('subj-c-name-psychology', 'פסיכולוגיה', 'Psychology');
+  setText('subj-c-tag-psychology', 'להבין את הנפש', 'Understand the mind');
+  setText('subj-c-thinker-psychology', "פרויד · יונג · ג'יימס", 'Freud · Jung · James');
+  setText('subj-c-locked-tag', 'בקרוב', 'Coming soon');
+  const cta = document.getElementById('subj-cinematic-cta');
+  if (cta) cta.textContent = isEn ? 'Continue' : 'המשך';
+}
+
+let _onbSelectedGoal = null;
+function showGoalScreen() {
+  _onbSelectedGoal = null;
+  const cta = document.getElementById('onb-goal-cta');
+  if (cta) cta.disabled = true;
+  document.querySelectorAll('#onboarding-goal .onb-goal-card').forEach(c => c.classList.remove('is-selected'));
+  const lang = state.lang || 'he';
+  _onbApplyLangToGoal(lang);
+  _onbShowScreen('onboarding-goal');
+}
+
+function _onbSelectGoal(value) {
+  _onbSelectedGoal = value;
+  document.querySelectorAll('#onboarding-goal .onb-goal-card').forEach(c => {
+    c.classList.toggle('is-selected', c.dataset.goal === value);
+  });
+  const cta = document.getElementById('onb-goal-cta');
+  if (cta) cta.disabled = false;
+}
+
+function _onbFinishGoal() {
+  if (!_onbSelectedGoal) return;
+  const goal = _onbSelectedGoal;
+  const today = _streakDay();
+  state.dailyGoalHistory = state.dailyGoalHistory || [];
+  // Union-dedup by setAt: same-day re-pick overwrites the entry rather than
+  // stacking duplicates. Older days preserved.
+  const existingIdx = state.dailyGoalHistory.findIndex(g => g && g.setAt === today);
+  if (existingIdx >= 0) {
+    state.dailyGoalHistory[existingIdx] = { setAt: today, value: goal };
+  } else {
+    state.dailyGoalHistory.push({ setAt: today, value: goal });
+  }
+  try { localStorage.setItem('corpus_daily_goal_set', '1'); } catch (e) {}
+  saveStateLocal();
+  try { saveState(); } catch (e) {}
+  _phCapture('onboarding_goal_selected', {
+    goal: goal,
+    is_existing_user: !!localStorage.getItem('corpus_onboarding_done'),
+  });
+  const goalEl = document.getElementById('onboarding-goal');
+  if (goalEl) { goalEl.style.display = 'none'; goalEl.classList.remove('onb-active'); }
+  // Mark tour-era flag as done for parity with existing-user semantics —
+  // this is the "user finished onboarding" gate that other code respects.
+  try { localStorage.setItem('corpus_onboarding_done', '1'); } catch (e) {}
+  try { saveState(); } catch (e) {}
+  // Deep-link arrivals route to the intended chapter instead of week 1
+  // day 1. If the promo window closed between click and now (fresh users
+  // can spend minutes in the flow), the consumer no-ops and we fall
+  // through to home — no error, no misleading first-dialogue open.
+  if (_pendingDeepLink) {
+    if (_consumePendingDeepLink()) return;
+    renderHome();
+    showScreen('home');
+    return;
+  }
+  // Straight into the first dialogue.
+  const weeks = getW();
+  if (weeks && weeks[0] && weeks[0].days && weeks[0].days.length) {
+    openReader(weeks[0].id, weeks[0].days[0].id);
+  } else {
+    renderHome();
+    showScreen('home');
+  }
+}
+
+// Fresh-install entry: welcome → subject → goal → reader. Called from
+// initApp when there's no session AND onboarding hasn't been done AND
+// the user has no local progress (guest with completedDays counts as
+// "already using the app"; bypass).
+function startNewUserOnboarding() {
+  const _localCompletionCount = Object.keys(state.completedDays || {})
+    .filter(k => !k.endsWith('-0')).length;
+  const _existingUser = !!localStorage.getItem('corpus_onboarding_done') || _localCompletionCount > 0;
+  console.log('[Onboarding] startNewUserOnboarding:', {
+    localCompletionCount: _localCompletionCount,
+    existingUser: _existingUser,
+    hasIntro: !!localStorage.getItem('corpus_intro_done'),
+    hasSubject: !!localStorage.getItem('corpus_subject'),
+    hasGoal: !!localStorage.getItem('corpus_daily_goal_set'),
+  });
+  // Guest with a session but partway through onboarding (e.g. finished
+  // welcome, closed the app before subject) — resume from the missing step.
+  if (_existingUser) {
+    // Existing user path: needs the one-time goal picker if they haven't
+    // set it yet, otherwise straight to home.
+    _enterAsGuestSilent();
+    // If initUI's synchronous deep-link consume already routed us into a
+    // specific chapter reader, don't override with home. Without this
+    // guard the async initApp path clobbers the reader that just opened.
+    if (state.currentScreen !== 'reader') {
+      renderHome();
+      showScreen('home');
+    }
+    if (!localStorage.getItem('corpus_daily_goal_set')) {
+      // Defer goal picker so home renders behind it (visual continuity
+      // when the user dismisses). Small delay lets the home paint settle.
+      setTimeout(showGoalScreen, 400);
+    }
+    return;
+  }
+  // Fresh install path — beat is now the first paint of the redesigned
+  // onboarding (see showBeat / _onbApplyLangToWelcome).
+  _enterAsGuestSilent();
+  if (!localStorage.getItem('corpus_intro_done')) {
+    showBeat();
+    return;
+  }
+  if (!localStorage.getItem('corpus_subject')) {
+    showSubjectSelect();
+    return;
+  }
+  if (!localStorage.getItem('corpus_daily_goal_set')) {
+    showGoalScreen();
+    return;
+  }
+  renderHome();
+  showScreen('home');
+}
+
+// ═══════════════════════════════════════════════════════════
+// DAY-1 ENDOWMENT (first celebration queue item)
+// ═══════════════════════════════════════════════════════════
+// Fires as the first item in state.pendingCelebrations after the first
+// dialogue completion of a fresh install (streak === 1). Once per
+// install; gated by state.endowmentShownAt dated entry.
+
+function _endowmentEligible() {
+  if (state.endowmentShownAt) return false;
+  if ((state.dailyStreak || 0) !== 1) return false;
+  if (!localStorage.getItem('corpus_first_dialogue_completed_at')) return false;
+  return true;
+}
+
+function showEndowmentOverlay(payload) {
+  const isEn = state.lang === 'en';
+  const xp = (payload && payload.xp) || 0;
+  const overlay = document.getElementById('endowment-overlay');
+  if (!overlay) return false;
+  // Cinematic copy — dynamic XP interpolated into the subline.
+  document.getElementById('endowment-eyebrow').textContent = isEn ? 'STREAK · DAY 1' : 'רצף · יום 1';
+  document.getElementById('endowment-head').textContent = isEn ? 'Your streak is lit' : 'הרצף שלך נדלק';
+  document.getElementById('endowment-tomorrow').textContent = isEn
+    ? 'Come back tomorrow to make it two. +' + xp + ' XP already yours.'
+    : 'מחר בערב הוא יהיה בן יומיים. +' + xp + ' XP כבר שלך.';
+  document.getElementById('endowment-continue-btn').textContent = isEn ? 'Continue' : 'להמשיך';
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  state.endowmentShownAt = _streakDay();
+  saveStateLocal();
+  try { saveState(); } catch (e) {}
+  _phCapture('onboarding_endowment_shown', {
+    streak_length: 1,
+    xp_earned: xp,
+    dialogue_id: String(state.currentWeek) + '-' + String(state.currentDay),
+  });
+  return true;
+}
+
+function closeEndowment() {
+  const overlay = document.getElementById('endowment-overlay');
+  if (overlay) overlay.classList.remove('active');
+  document.body.style.overflow = '';
+  _phCapture('onboarding_endowment_continued', {});
+  // Resume the celebration queue (endowment was queued as item 0; drain
+  // proceeds to level_up / chapter_complete / bonus_unlock / terminal).
+  try { _onCelebrationDismissed(); } catch (e) {}
+}
+
+// ═══════════════════════════════════════════════════════════
+// GOAL-MET CELEBRATION (+10 XP bonus, once per streak day)
+// ═══════════════════════════════════════════════════════════
+// Queued LAST in the celebration chain (after level_up / chapter_complete /
+// bonus_unlock, before terminal). Fires when the completion count for
+// today reaches the user's chosen daily goal (1 for 'one', 2 for 'two').
+// 'own_pace' and veterans with no goal set: nothing fires.
+
+const GOAL_MET_XP_BONUS = 10;
+
+function _getLatestDailyGoal() {
+  const hist = state.dailyGoalHistory || [];
+  if (!hist.length) return null;
+  // Latest-by-setAt (sorts lexicographically since ISO dates)
+  let latest = hist[0];
+  for (const g of hist) {
+    if (g && g.setAt && (!latest.setAt || g.setAt > latest.setAt)) latest = g;
+  }
+  return latest || null;
+}
+
+function _todayGoalMetEntry() {
+  const today = _streakDay();
+  return (state.goalMetHistory || []).find(g => g && g.metAt === today) || null;
+}
+
+// Increments today's completion count. Called from finishDay's non-Day-0
+// branch right after state.xp/streak/completedDays are updated. Returns
+// the new count for today.
+function _bumpTodayCompletionCount() {
+  const today = _streakDay();
+  state.completionsByDay = state.completionsByDay || {};
+  const next = (state.completionsByDay[today] || 0) + 1;
+  state.completionsByDay[today] = next;
+  return next;
+}
+
+// Checks whether this completion just crossed the daily-goal threshold.
+// Returns { goal, count, target, bonusXp } if fired, null otherwise.
+// Idempotent — records to goalMetHistory (dated dedup) so a second call
+// on the same day doesn't re-fire the celebration or re-grant XP.
+function _maybeMarkGoalMet(countToday) {
+  const g = _getLatestDailyGoal();
+  if (!g || (g.value !== 'one' && g.value !== 'two')) return null;
+  if (_todayGoalMetEntry()) return null;
+  const target = g.value === 'one' ? 1 : 2;
+  if (countToday < target) return null;
+  const today = _streakDay();
+  const entry = { metAt: today, goal: g.value, count: countToday, bonusXp: GOAL_MET_XP_BONUS };
+  state.goalMetHistory = state.goalMetHistory || [];
+  state.goalMetHistory.push(entry);
+  // Grant XP through the normal pipeline (counts toward levels + syncs).
+  state.xp = (state.xp || 0) + GOAL_MET_XP_BONUS;
+  saveStateLocal();
+  return { goal: g.value, count: countToday, target: target, bonusXp: GOAL_MET_XP_BONUS };
+}
+
+// Renders the goal-met overlay. Same visual family as endowment: real
+// flame icon, eyebrow, headline, XP bonus row, CTA. Populated + shown
+// from _playNextCelebration when the queue item's type is 'goal_met'.
+function showGoalMetOverlay(payload) {
+  const isEn = state.lang === 'en';
+  const overlay = document.getElementById('goal-met-overlay');
+  if (!overlay) return false;
+  const target = payload.target || (payload.goal === 'one' ? 1 : 2);
+  const count = payload.count || target;
+  const bonus = payload.bonusXp || GOAL_MET_XP_BONUS;
+  document.getElementById('goal-met-eyebrow').textContent = isEn ? 'Daily goal' : 'היעד היומי';
+  document.getElementById('goal-met-head').textContent = isEn ? 'Daily goal met' : 'עמדת ביעד היומי';
+  document.getElementById('goal-met-count').textContent = isEn
+    ? count + ' of ' + target
+    : count + ' מתוך ' + target;
+  document.getElementById('goal-met-xp').textContent = isEn ? '+' + bonus + ' XP bonus' : '+' + bonus + ' XP בונוס';
+  document.getElementById('goal-met-cta').textContent = isEn ? 'Continue' : 'המשך';
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  _phCapture('daily_goal_met', {
+    goal: payload.goal || null,
+    count_today: count,
+    xp_bonus: bonus,
+  });
+  return true;
+}
+
+function closeGoalMet() {
+  const overlay = document.getElementById('goal-met-overlay');
+  if (overlay) overlay.classList.remove('active');
+  document.body.style.overflow = '';
+  try { _onCelebrationDismissed(); } catch (e) {}
+}
+
 function showIntro() {
   if (localStorage.getItem('corpus_intro_done')) return;
   _syncIntroIframeAppearance();
   const overlay = document.getElementById('intro-overlay');
   if (overlay) overlay.style.display = 'block';
+  // Funnel: onboarding_started. Fires once per install, gated by the
+  // start timestamp; a returning user with corpus_intro_done cleared but
+  // corpus_onboarding_started_at set won't re-fire.
+  if (!localStorage.getItem('corpus_onboarding_started_at')) {
+    _getOrSetOnboardingStart();
+    _phCapture('onboarding_started', {
+      platform: _phPlatform(),
+      lang: state.lang || 'he',
+    });
+  }
 }
 
 function showAuthFlow() {
@@ -7242,6 +9208,15 @@ function closeIntro() {
 
 window.addEventListener('message', function(e) {
   if (e.data === 'intro-done') closeIntro();
+  // Iframe funnel forward: iframe posts { type: 'ph', event, props } for
+  // slide-view and carousel-completed events (PostHog SDK isn't loaded in
+  // the iframe). Whitelist events with the onboarding_ prefix so an
+  // unrelated postMessage source can't inject arbitrary events.
+  if (e.data && e.data.type === 'ph' && typeof e.data.event === 'string') {
+    if (e.data.event.indexOf('onboarding_') === 0) {
+      _phCapture(e.data.event, e.data.props || {});
+    }
+  }
 });
 
 function _initIntroCarousel() {
@@ -14570,6 +16545,28 @@ function defaultState() {
     lastStreakShownDate: '',
     activeDates: [],
     streakHistory: {},
+    // Streak repair (commit 2): dated-array state, union-merge-safe.
+    // streakBreaks: [{ brokenAt: 'YYYY-MM-DD', priorStreak: N }]
+    //   Detected in recalculateStreak / updateDailyStreak. Union-deduped
+    //   by brokenAt so re-detection on repeat inits doesn't grow the array.
+    // streakRepairs: ['YYYY-MM-DD', ...]
+    //   ISO date of each completed repair. 14-day cooldown enforced by
+    //   scanning for entries newer than (today - 14). Union-deduped.
+    streakBreaks: [],
+    streakRepairs: [],
+    // New onboarding — daily-goal capture. Dated array, latest entry wins
+    // for display; older entries preserved so a later "goal changed" screen
+    // has history. Union-merge-safe (dedup by setAt date).
+    // [{ setAt: 'YYYY-MM-DD', value: 'one' | 'two' | 'own_pace' }]
+    dailyGoalHistory: [],
+    // Goal-met state (Item 6). Dated arrays only.
+    // completionsByDay: { 'YYYY-MM-DD': count } — increments per non-Day-0
+    //   completion in finishDay; keyed by streak day (03:00 grace boundary).
+    // goalMetHistory: [{ metAt: 'YYYY-MM-DD', goal, count, bonusXp }] —
+    //   union-dedup by metAt so the goal-met celebration + XP bonus fire
+    //   at most once per streak day per install.
+    completionsByDay: {},
+    goalMetHistory: [],
     chapterCompleteShown: {}, // { weekId: true } — fires the chapter-complete overlay once per chapter
     chapterXPByWeek: {},      // XP tallied per chapter for chapter-complete metrics
     guestSignupPromptShown: false,  // legacy single-shot flag — kept for back-compat; migrated into guestPrompt below on load
@@ -15048,6 +17045,61 @@ function _streakDayBefore(dateStr) {
   const prev = new Date(y, m - 1, d - 1);
   return _streakDay(prev);
 }
+function _streakDayAfter(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const next = new Date(y, m - 1, d + 1);
+  return _streakDay(next);
+}
+
+// Detects a break in the streak and records it into state.streakBreaks.
+// Called from recalculateStreak (init) and updateDailyStreak (completion
+// path that resets the streak). Idempotent via union-dedup on brokenAt.
+// Returns the recorded break info, or null if no break was detected.
+function _detectAndRecordBreak() {
+  if (!state.lastActiveDate) return null;
+  const today = _streakDay();
+  const lastActive = state.lastActiveDate;
+  if (lastActive === today || lastActive === _streakDayBefore(today)) return null;
+  // Gap of 2+ streak days: something got missed. The break day is the day
+  // AFTER lastActive (the first missed day).
+  const breakDay = _streakDayAfter(lastActive);
+  const priorStreak = (state.streakHistory || {})[lastActive] || 0;
+  if (priorStreak <= 0) return null;
+  state.streakBreaks = state.streakBreaks || [];
+  const existing = state.streakBreaks.find(b => b.brokenAt === breakDay);
+  if (!existing) {
+    state.streakBreaks.push({ brokenAt: breakDay, priorStreak });
+    saveStateLocal();
+  }
+  return existing || { brokenAt: breakDay, priorStreak };
+}
+
+// Repair is offered when:
+//   1. There's a recorded break within the last 48h (brokenAt ∈ {yesterday,
+//      day-before-yesterday} in streak-day terms).
+//   2. The prior streak was > 0 (nothing to repair otherwise).
+//   3. No repair completed within the last 14 days.
+// Returns { brokenAt, priorStreak, daysSinceBreak } or null.
+function _isStreakRepairable() {
+  const today = _streakDay();
+  // Cooldown check first — cheapest early-out
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 14);
+  const cutoffStr = _streakDay(cutoff);
+  const recentRepair = (state.streakRepairs || []).find(d => d > cutoffStr);
+  if (recentRepair) return null;
+  const yesterdayStr = _streakDayBefore(today);
+  const dayBeforeYesterdayStr = _streakDayBefore(yesterdayStr);
+  const breaks = state.streakBreaks || [];
+  // Most recent eligible break — reverse-scan since new entries append
+  for (let i = breaks.length - 1; i >= 0; i--) {
+    const b = breaks[i];
+    if (!b || !b.brokenAt || !(b.priorStreak > 0)) continue;
+    if (b.brokenAt === yesterdayStr) return { brokenAt: b.brokenAt, priorStreak: b.priorStreak, daysSinceBreak: 1 };
+    if (b.brokenAt === dayBeforeYesterdayStr) return { brokenAt: b.brokenAt, priorStreak: b.priorStreak, daysSinceBreak: 2 };
+  }
+  return null;
+}
 
 function updateDailyStreak() {
   const today = _streakDay();
@@ -15062,6 +17114,11 @@ function updateDailyStreak() {
     return;
   } else {
     const yesterdayStr = _streakDayBefore(today);
+    if (lastDate !== yesterdayStr) {
+      // Reset path: detect and record the break before overwriting the
+      // streak. Uses streakHistory[lastDate] for the prior streak value.
+      _detectAndRecordBreak();
+    }
     state.dailyStreak = (lastDate === yesterdayStr) ? ((state.dailyStreak || 0) + 1) : 1;
   }
 
@@ -15097,10 +17154,318 @@ function recalculateStreak() {
     }
     state.dailyStreak = streak;
   } else {
+    // Streak resets on init because activeDates.last is too old. Record the
+    // break so the repair card can surface it if it's within the 48h window.
+    state.lastActiveDate = lastActive;
+    _detectAndRecordBreak();
     state.dailyStreak = 0;
   }
   state.lastActiveDate = lastActive;
   saveStateLocal();
+}
+
+// ═══════════════════════════════════════════════════════════
+// STREAK REPAIR
+// ═══════════════════════════════════════════════════════════
+
+// Samples n quiz questions from dialogues the user has completed. Draws
+// across both subjects (philosophy + economics). Returns [] if the pool
+// doesn't have enough questions to satisfy n (belt-and-suspenders — in
+// practice any user with a broken streak has completed several dialogues).
+function _sampleRepairQuestions(n) {
+  n = n || 3;
+  const pool = [];
+  const isEn = state.lang === 'en';
+  const sources = [
+    { subject: 'philosophy', data: (typeof corpusData !== 'undefined') ? corpusData : null },
+    { subject: 'economics',  data: (typeof economicsData !== 'undefined') ? economicsData : null },
+  ];
+  for (const src of sources) {
+    if (!src.data || !Array.isArray(src.data.weeks)) continue;
+    for (const week of src.data.weeks) {
+      if (!week || !Array.isArray(week.days)) continue;
+      for (const day of week.days) {
+        if (!day || !Array.isArray(day.sections)) continue;
+        const key = dayKey(week.id, day.id, src.subject);
+        if (!state.completedDays[key]) continue;
+        for (const sec of day.sections) {
+          if (!sec || sec.type !== 'quiz') continue;
+          const qs = sec.questions ? sec.questions : [sec];
+          for (const q of qs) {
+            const qText = isEn ? (q.questionEn || q.question) : q.question;
+            const opts  = isEn ? (q.optionsEn  || q.options)  : q.options;
+            if (!qText || !Array.isArray(opts) || opts.length < 2) continue;
+            if (typeof q.correctIndex !== 'number') continue;
+            pool.push({ question: qText, options: opts, correctIndex: q.correctIndex });
+          }
+        }
+      }
+    }
+  }
+  // Fisher-Yates
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, n);
+}
+
+// Repair state machine. Kept out of state.* so it doesn't sync; repair is
+// a session-scoped ephemeral flow. Resets on every _startStreakRepair.
+const _repairFlow = {
+  active: false,
+  info: null,        // { brokenAt, priorStreak, daysSinceBreak }
+  questions: [],
+  currentIdx: 0,
+  correctCount: 0,
+  attempt: 1,        // 1 | 2
+};
+
+// Copy strings — bilingual, gender-neutral Hebrew, no em-dashes.
+const REPAIR_COPY = {
+  he: {
+    card_title:      'הסטריק שלך נשבר',
+    card_body_tpl:   'ענה על שלוש שאלות מדיאלוגים שכבר עברת, והסטריק חוזר לרצף של {N} ימים',
+    card_cta:        'לתקן את הסטריק',
+    card_dismiss:    'לסגור',
+    eyebrow:         'תיקון סטריק',
+    prompt:          'ענה נכון על שלוש שאלות והסטריק שלך יחזור',
+    progress_tpl:    'שאלה {N} מתוך 3',
+    wrong_body:      'לא נורא. עוד ניסיון אחד עם שלוש שאלות אחרות',
+    wrong_cta:       'לנסות שוב',
+    failed_body:     'אפשר לנסות שוב עוד 14 יום. עד אז, הסטריק מתחיל מחדש',
+    failed_cta:      'להמשיך',
+    success_title:   'הסטריק חזר',
+    success_body_tpl:'{N} ימים ברצף. יופי',
+    success_cta:     'להמשיך',
+  },
+  en: {
+    card_title:      'Your streak broke',
+    card_body_tpl:   "Answer three questions from dialogues you've completed to restore your {N}-day streak",
+    card_cta:        'Fix streak',
+    card_dismiss:    'Dismiss',
+    eyebrow:         'Streak repair',
+    prompt:          'Answer three correctly to restore your streak',
+    progress_tpl:    'Question {N} of 3',
+    wrong_body:      'Not a match. One more try with three different questions',
+    wrong_cta:       'Try again',
+    failed_body:     'You can try again in 14 days. Until then, the streak starts fresh',
+    failed_cta:      'Continue',
+    success_title:   'Your streak is back',
+    success_body_tpl:'{N} days running. Nice',
+    success_cta:     'Continue',
+  },
+};
+function _repairCopy() { return REPAIR_COPY[state.lang] || REPAIR_COPY.he; }
+function _repairInterp(tpl, N) { return tpl.replace('{N}', String(N)); }
+
+// Session-only dismiss flag for the home card. Repair remains available;
+// the user just chose to hide the card until the app re-opens (or the
+// window closes / repair succeeds naturally).
+let _repairCardDismissedThisSession = false;
+
+function renderStreakRepairCard() {
+  const holder = document.getElementById('streak-repair-card-holder');
+  if (!holder) return;
+  const info = _isStreakRepairable();
+  if (!info || _repairCardDismissedThisSession) {
+    holder.innerHTML = '';
+    holder.style.display = 'none';
+    return;
+  }
+  // Fire the "offered" event at most once per session per break (dedup key:
+  // brokenAt), so refreshing the home render doesn't double-count.
+  window._offeredRepairs = window._offeredRepairs || {};
+  if (!window._offeredRepairs[info.brokenAt]) {
+    window._offeredRepairs[info.brokenAt] = true;
+    try {
+      posthog.capture('streak_repair_offered', {
+        streak_length: info.priorStreak,
+        days_since_break: info.daysSinceBreak,
+      });
+    } catch (e) {}
+  }
+  const c = _repairCopy();
+  const body = _repairInterp(c.card_body_tpl, info.priorStreak);
+  holder.innerHTML =
+    '<div class="streak-repair-card" role="region" aria-label="' + c.eyebrow + '">' +
+      '<button class="streak-repair-dismiss" aria-label="' + c.card_dismiss + '" onclick="dismissStreakRepairCard()">×</button>' +
+      '<div class="streak-repair-icon">🔥</div>' +
+      '<div class="streak-repair-title">' + c.card_title + '</div>' +
+      '<div class="streak-repair-body">' + body + '</div>' +
+      '<button class="streak-repair-cta" onclick="startStreakRepair()">' + c.card_cta + '</button>' +
+    '</div>';
+  holder.style.display = '';
+}
+
+function dismissStreakRepairCard() {
+  _repairCardDismissedThisSession = true;
+  renderStreakRepairCard();
+}
+
+function startStreakRepair() {
+  const info = _isStreakRepairable();
+  if (!info) return;
+  _repairFlow.info = info;
+  _repairFlow.questions = _sampleRepairQuestions(3);
+  if (_repairFlow.questions.length < 3) return;  // pool too shallow — silently bail
+  _repairFlow.currentIdx = 0;
+  _repairFlow.correctCount = 0;
+  _repairFlow.attempt = 1;
+  _repairFlow.active = true;
+  try {
+    posthog.capture('streak_repair_started', {
+      streak_length: info.priorStreak,
+      days_since_break: info.daysSinceBreak,
+    });
+  } catch (e) {}
+  _renderRepairQuestion();
+  document.getElementById('modal-streak-repair').classList.add('active');
+}
+
+function _renderRepairQuestion() {
+  const c = _repairCopy();
+  const q = _repairFlow.questions[_repairFlow.currentIdx];
+  const progress = _repairInterp(c.progress_tpl, _repairFlow.currentIdx + 1);
+  const optsHtml = q.options.map((opt, i) =>
+    '<button class="quiz-option repair-option" data-i="' + i + '" onclick="handleRepairAnswer(' + i + ')">' +
+      '<span class="opt-letter">' + (state.lang === 'en' ? ['A','B','C'][i] : ['א','ב','ג'][i]) + '</span>' +
+      '<span class="opt-text">' + opt + '</span>' +
+    '</button>'
+  ).join('');
+  document.getElementById('modal-streak-repair').innerHTML =
+    '<div class="modal-box streak-repair-box">' +
+      '<div class="streak-repair-eyebrow">' + c.eyebrow + '</div>' +
+      '<div class="streak-repair-progress">' + progress + '</div>' +
+      '<div class="quiz-question streak-repair-question">' + q.question + '</div>' +
+      '<div class="quiz-options streak-repair-options">' + optsHtml + '</div>' +
+    '</div>';
+}
+
+let _repairAnswering = false;
+function handleRepairAnswer(chosen) {
+  if (_repairAnswering) return;
+  _repairAnswering = true;
+  const q = _repairFlow.questions[_repairFlow.currentIdx];
+  const isCorrect = chosen === q.correctIndex;
+  if (isCorrect) _repairFlow.correctCount++;
+  const opts = document.querySelectorAll('.repair-option');
+  opts.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === chosen) btn.classList.add(isCorrect ? 'option-correct' : 'option-wrong');
+    else if (!isCorrect && i === q.correctIndex) btn.classList.add('option-correct');
+    else btn.classList.add('option-faded');
+  });
+  setTimeout(() => {
+    _repairFlow.currentIdx++;
+    if (_repairFlow.currentIdx < _repairFlow.questions.length) {
+      _renderRepairQuestion();
+    } else {
+      _finalizeRepair();
+    }
+    _repairAnswering = false;
+  }, 1100);
+}
+
+function _finalizeRepair() {
+  const c = _repairCopy();
+  const info = _repairFlow.info;
+  if (_repairFlow.correctCount === _repairFlow.questions.length) {
+    // Success: restore streak + record repair.
+    const today = _streakDay();
+    state.streakRepairs = state.streakRepairs || [];
+    if (!state.streakRepairs.includes(today)) state.streakRepairs.push(today);
+    // Bridge activeDates: fill the missing day(s) so recalculateStreak
+    // computes the restored chain on next init. We add the break day AND
+    // today (since the user is completing the repair action right now,
+    // they're active today for streak purposes).
+    state.activeDates = state.activeDates || [];
+    if (info && info.brokenAt && !state.activeDates.includes(info.brokenAt)) {
+      state.activeDates.push(info.brokenAt);
+    }
+    if (!state.activeDates.includes(today)) state.activeDates.push(today);
+    state.lastActiveDate = today;
+    // Prior streak + 1 for today's completion of the repair itself.
+    state.dailyStreak = (info && info.priorStreak ? info.priorStreak : 0) + 1;
+    state.streakHistory = state.streakHistory || {};
+    state.streakHistory[today] = state.dailyStreak;
+    saveStateLocal();
+    try { saveState(); } catch (e) {}
+    try {
+      posthog.capture('streak_repair_completed', {
+        streak_length: state.dailyStreak,
+        days_since_break: info ? info.daysSinceBreak : null,
+        attempts: _repairFlow.attempt,
+      });
+    } catch (e) {}
+    _showRepairResult('success', state.dailyStreak);
+  } else if (_repairFlow.attempt === 1) {
+    // Offer one retry with a reshuffled set.
+    _showRepairResult('retry_offer');
+  } else {
+    // Second attempt failed — record as consumed (14-day cooldown) and end.
+    const today = _streakDay();
+    state.streakRepairs = state.streakRepairs || [];
+    if (!state.streakRepairs.includes(today)) state.streakRepairs.push(today);
+    saveStateLocal();
+    try { saveState(); } catch (e) {}
+    try {
+      // Which question tripped the fail on attempt 2 (0-indexed of the
+      // three questions on this attempt). If multiple wrong, first wrong.
+      const wrongIdx = _repairFlow.questions.findIndex((_, i) =>
+        _repairFlow.questions[i] && _repairFlow.wrongIndices && _repairFlow.wrongIndices.includes(i)
+      );
+      posthog.capture('streak_repair_failed', {
+        streak_length: info ? info.priorStreak : 0,
+        days_since_break: info ? info.daysSinceBreak : null,
+        wrong_on: wrongIdx >= 0 ? wrongIdx : null,
+      });
+    } catch (e) {}
+    _showRepairResult('final_fail');
+  }
+}
+
+function _showRepairResult(kind, N) {
+  const c = _repairCopy();
+  let title = '';
+  let body  = '';
+  let cta   = '';
+  let onCta = 'closeStreakRepair()';
+  if (kind === 'success') {
+    title = c.success_title;
+    body  = _repairInterp(c.success_body_tpl, N);
+    cta   = c.success_cta;
+  } else if (kind === 'retry_offer') {
+    body  = c.wrong_body;
+    cta   = c.wrong_cta;
+    onCta = 'retryStreakRepair()';
+  } else if (kind === 'final_fail') {
+    body  = c.failed_body;
+    cta   = c.failed_cta;
+  }
+  const titleHtml = title ? '<div class="streak-repair-result-title">' + title + '</div>' : '';
+  document.getElementById('modal-streak-repair').innerHTML =
+    '<div class="modal-box streak-repair-box streak-repair-result">' +
+      titleHtml +
+      '<div class="streak-repair-result-body">' + body + '</div>' +
+      '<button class="nav-btn streak-repair-result-cta" onclick="' + onCta + '">' + cta + '</button>' +
+    '</div>';
+}
+
+function retryStreakRepair() {
+  _repairFlow.attempt = 2;
+  _repairFlow.questions = _sampleRepairQuestions(3);
+  if (_repairFlow.questions.length < 3) { closeStreakRepair(); return; }
+  _repairFlow.currentIdx = 0;
+  _repairFlow.correctCount = 0;
+  _renderRepairQuestion();
+}
+
+function closeStreakRepair() {
+  document.getElementById('modal-streak-repair').classList.remove('active');
+  _repairFlow.active = false;
+  renderStreakRepairCard();  // clears the card if repair succeeded
+  try { renderHome(); } catch (e) {}
 }
 
 // === Daily reminder (local notification) ===
@@ -15336,7 +17701,7 @@ let _playedCelebrations = [];
 // a celebration overlay from landing on top of guest-signup / share / quiz
 // feedback. Resumed by the drainer calls in every prompt-close path.
 function _promptModalActiveForCelebrations() {
-  const ids = ['modal-guest-signup', 'modal-share', 'modal-quiz-feedback'];
+  const ids = ['modal-guest-signup', 'modal-share', 'modal-quiz-feedback', 'endowment-overlay', 'goal-met-overlay'];
   return ids.some(id => {
     const el = document.getElementById(id);
     return !!(el && el.classList.contains('active'));
@@ -15368,13 +17733,22 @@ function _playNextCelebration() {
   const item = q[0];
   let rendered = false;
   try {
-    if (item.type === 'level_up') {
+    if (item.type === 'endowment') {
+      rendered = !!showEndowmentOverlay({ xp: item.xp, dialogueTitle: item.dialogueTitle });
+    } else if (item.type === 'level_up') {
       rendered = !!showLevelUp(item.levelIndex);
     } else if (item.type === 'chapter_complete') {
       const chapter = getW().find(w => w.id === item.weekId);
       rendered = !!showChapterCompleteOverlay(chapter);
     } else if (item.type === 'bonus_unlock') {
       rendered = !!showUnlockOverlay();
+    } else if (item.type === 'goal_met') {
+      rendered = !!showGoalMetOverlay({
+        goal: item.goal,
+        count: item.count,
+        target: item.target,
+        bonusXp: item.bonusXp,
+      });
     }
   } catch (e) {
     console.error('[celebration] render failed', item, e);
@@ -15676,6 +18050,10 @@ if (!window._safeAreaObserverInstalled) {
 
 function renderHome() {
   const ui = u();
+  // Streak-repair card: rendered near the top of the scroll. Function is
+  // safe to call unconditionally — it clears the holder if the user isn't
+  // eligible or has dismissed it this session.
+  try { renderStreakRepairCard(); } catch (e) {}
   // Dir + toggle label
   document.documentElement.dir = state.lang === 'en' ? 'ltr' : 'rtl';
   document.documentElement.lang = state.lang;
@@ -15770,7 +18148,10 @@ function renderHome() {
           1: true,
           2: isWeekCompleted(1),
           3: isWeekCompleted(2),
-          'bonusEcon1': isWeekCompleted(1),
+          // Promo window overrides the earned-unlock check; see
+          // isEconBonusPromoActive. OR short-circuits on real unlock so
+          // users who earned it keep access after the window closes.
+          'bonusEcon1': isWeekCompleted(1) || isEconBonusPromoActive(),
           4: isWeekCompleted(3),
         }
       : {
@@ -16030,7 +18411,11 @@ function populateCarousel() {
       if (state.completedDays[`${subject}-1-${dy}`]) completedCount++;
     }
     const progress = Math.min(1, completedCount / totalDays);
-    const isUnlocked = completedCount >= totalDays;
+    // Same promo override as the weekLockMap: economics-only, gated by the
+    // fixed date window. Doesn't affect the ring progress display — that
+    // stays keyed to real chapter-1 completions.
+    const isUnlocked = completedCount >= totalDays
+      || (subject === 'economics' && isEconBonusPromoActive());
     const r = 30;
     const circumference = 2 * Math.PI * r;
     const dashOffset = circumference * (1 - progress);
@@ -16254,6 +18639,9 @@ function openReader(weekId, dayId, opts) {
   const _onbOverlay = document.getElementById('onboarding-overlay');
   if (_onbOverlay && _onbOverlay.style.display !== 'none') {
     _onbOverlay.style.display = 'none';
+    // Funnel: onboarding_tour_skipped. Fires when the user bypasses the
+    // remaining tour steps by tapping the spotlight target directly.
+    _phCapture('onboarding_tour_skipped', { last_step_index: onboardingStep });
     try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
     try { saveState(); } catch(e) {}  // sync the flag to Supabase if signed in (no-op for guests)
   }
@@ -16265,6 +18653,15 @@ function openReader(weekId, dayId, opts) {
     return;
   }
   try { posthog.capture('lesson_started', { chapter: weekId, day: dayId }); } catch(e) {}
+  // Funnel: first_dialogue_opened. Once per install (gated by
+  // corpus_first_dialogue_opened_at). Monotonic timestamp, never cleared.
+  if (!localStorage.getItem('corpus_first_dialogue_opened_at')) {
+    try { localStorage.setItem('corpus_first_dialogue_opened_at', new Date().toISOString()); } catch(e) {}
+    _phCapture('first_dialogue_opened', {
+      dialogue_id: String(weekId) + '-' + String(dayId),
+      subject: state.subject || null,
+    });
+  }
   state.currentWeek = weekId;
   state.currentDay = dayId;
   state.currentSection = 0;
@@ -16975,6 +19372,25 @@ function _showDcStats(titleText, subtitleText, xpAmount, streakCount, onContinue
   const xpEl = document.getElementById('complete-xp');
   xpEl.textContent = '+0';
 
+  // Partway-progress line (Item 6): show "1 of 2 today" on the 1st
+  // completion of the day when the user's goal is 'two'. Hidden for
+  // 'one' (goal met already fires its own celebration), 'own_pace',
+  // and any completion after goal is already met.
+  const _goalProgressEl = document.getElementById('dc-goal-progress');
+  if (_goalProgressEl) {
+    _goalProgressEl.style.display = 'none';
+    _goalProgressEl.textContent = '';
+    try {
+      const _g = _getLatestDailyGoal();
+      const _todayCnt = (state.completionsByDay || {})[_streakDay()] || 0;
+      const _alreadyMet = !!_todayGoalMetEntry();
+      if (_g && _g.value === 'two' && _todayCnt === 1 && !_alreadyMet) {
+        _goalProgressEl.textContent = isEn ? '1 of 2 today' : 'דיאלוג 1 מתוך 2 היום';
+        _goalProgressEl.style.display = '';
+      }
+    } catch (e) {}
+  }
+
   const continueBtn = document.getElementById('dc-stats-continue');
   const backHomeBtn = document.getElementById('dc-stats-back-home');
   const next = getNextLessonInfo();
@@ -17158,6 +19574,18 @@ function finishDay() {
     posthog.capture('day_completed', { chapter: state.currentWeek, day: state.currentDay });
     if (completedInWeek === totalDays) posthog.capture('week_completed', { chapter: state.currentWeek });
   } catch(e) {}
+  // Funnel: first_dialogue_completed. Once per install. Includes
+  // seconds_since_onboarding_started if the start timestamp is available
+  // (users who onboarded before this commit shipped have no timestamp;
+  // the prop is null for them — filter in PostHog).
+  if (!localStorage.getItem('corpus_first_dialogue_completed_at')) {
+    try { localStorage.setItem('corpus_first_dialogue_completed_at', new Date().toISOString()); } catch(e) {}
+    _phCapture('first_dialogue_completed', {
+      dialogue_id: String(state.currentWeek) + '-' + String(state.currentDay),
+      subject: state.subject || null,
+      seconds_since_onboarding_started: _secondsSinceOnboardingStart(),
+    });
+  }
 
   // Build the celebration queue for this completion. Gate conditions are
   // evaluated NOW, but lifetime flags are NOT touched here — each overlay's
@@ -17166,8 +19594,20 @@ function finishDay() {
   // means a mid-queue app close resumes cleanly on next entry (see
   // _resumeCelebrationsIfPending).
   //
-  // Order: level_up → chapter_complete → bonus_unlock (biggest wins first).
+  // Order: endowment (day-1 only) → level_up → chapter_complete → bonus_unlock.
+  // Endowment goes FIRST so a fresh user sees it as the payoff of their first
+  // completion, before any other celebration. Gated by _endowmentEligible so it
+  // fires exactly once per install (state.endowmentShownAt).
   const _newCelebrations = [];
+  const _dayXpForEndowment = state.readerXP;
+  const _dialogueTitleForEndowment = state.lang === 'en' ? (day.titleEn || day.title) : day.title;
+  if (_endowmentEligible()) {
+    _newCelebrations.push({
+      type: 'endowment',
+      xp: _dayXpForEndowment,
+      dialogueTitle: _dialogueTitleForEndowment,
+    });
+  }
   if (newLevel > prevLevel) {
     _newCelebrations.push({ type: 'level_up', levelIndex: newLevel - 1 });
   }
@@ -17182,6 +19622,21 @@ function finishDay() {
   if (state.currentWeek === 1 && isWeekCompleted(1) && !state.bonusUnlockShown[state.subject]) {
     try { posthog.capture('bonus_unlocked', { user_id: currentUser?.id || null, subject: state.subject }); } catch(e) {}
     _newCelebrations.push({ type: 'bonus_unlock', subject: state.subject });
+  }
+  // Goal-met (Item 6): count today's completion, then check whether we
+  // just crossed the user's daily goal threshold. Enqueued LAST so it
+  // plays after level/chapter/bonus. Grants +10 XP through the normal
+  // pipeline (state.xp already touched inside _maybeMarkGoalMet).
+  const _countToday = _bumpTodayCompletionCount();
+  const _goalMet = _maybeMarkGoalMet(_countToday);
+  if (_goalMet) {
+    _newCelebrations.push({
+      type: 'goal_met',
+      goal: _goalMet.goal,
+      count: _goalMet.count,
+      target: _goalMet.target,
+      bonusXp: _goalMet.bonusXp,
+    });
   }
   if (_newCelebrations.length) {
     state.pendingCelebrations = (state.pendingCelebrations || []).concat(_newCelebrations);
@@ -17375,6 +19830,63 @@ let _guestSignupPendingFn = null;
 // dismissGuestSignupPrompt and _guestSignupTap so the follow-up analytics
 // events carry the same trigger as the shown event they descend from.
 let _currentGuestTrigger = null;
+function _renderGuestFirstCompletionStats(trigger, isEn) {
+  const holder = document.getElementById('guest-signup-stats');
+  if (!holder) return;
+  if (trigger !== 'first_completion') {
+    holder.style.display = 'none';
+    holder.innerHTML = '';
+    return;
+  }
+  const _completionCount = Object.keys(state.completedDays || {})
+    .filter(k => !k.endsWith('-0')).length;
+  const _streak = state.dailyStreak || 0;
+  const _xp = state.xp || 0;
+  const streakTxt = isEn
+    ? (_streak === 1 ? '1-day streak' : _streak + '-day streak')
+    : 'רצף של ' + _streak + (_streak === 1 ? ' יום' : ' ימים');
+  const xpTxt = isEn ? _xp + ' XP' : _xp + ' XP';
+  // Third row: real earned thinker portrait if we can resolve one from
+  // the current day; falls back to #ic-pantheon SVG otherwise. Portrait
+  // renders as a 40px round circle in .guest-signup-portrait.
+  let _thinkerName = '';
+  let _thinkerImg = '';
+  try {
+    const _wk = getW().find(w => w.id === state.currentWeek);
+    const _dy = _wk && _wk.days ? _wk.days.find(d => d.id === state.currentDay) : null;
+    if (_dy) {
+      _thinkerName = _dy.thinker || '';
+      const _tid = _dy.thinkerId;
+      if (_tid) {
+        const _t = (getT ? getT().find(x => x.id === _tid) : null);
+        if (_t && _t.image) _thinkerImg = _t.image;
+      }
+    }
+  } catch (e) {}
+  const thinkerTxt = _thinkerName
+    ? (isEn ? 'You met ' + _thinkerName : 'פגשת את ' + _thinkerName)
+    : (isEn
+        ? (_completionCount === 1 ? '1 dialogue completed' : _completionCount + ' dialogues completed')
+        : (_completionCount === 1 ? 'דיאלוג אחד שסיימת' : _completionCount + ' דיאלוגים שסיימת'));
+  const portraitInner = _thinkerImg
+    ? '<img src="' + _thinkerImg + '" alt="">'
+    : '<svg viewBox="0 0 64 64" width="24" height="24"><use href="#ic-pantheon"/></svg>';
+  holder.innerHTML =
+    '<div class="guest-signup-stat">' +
+      '<svg viewBox="0 0 64 64" width="22" height="22"><use href="#icon-streak"/></svg>' +
+      '<span class="guest-signup-stat-text">' + streakTxt + '</span>' +
+    '</div>' +
+    '<div class="guest-signup-stat">' +
+      '<svg viewBox="0 0 64 64" width="22" height="22"><use href="#icon-xp"/></svg>' +
+      '<span class="guest-signup-stat-text">' + xpTxt + '</span>' +
+    '</div>' +
+    '<div class="guest-signup-stat">' +
+      '<span class="guest-signup-portrait">' + portraitInner + '</span>' +
+      '<span class="guest-signup-stat-text">' + thinkerTxt + '</span>' +
+    '</div>';
+  holder.style.display = '';
+}
+
 function showGuestSignupPrompt(originalFn, trigger) {
   _guestSignupPendingFn = originalFn || null;
   _currentGuestTrigger = trigger || 'unknown';
@@ -17424,7 +19936,7 @@ function showGuestSignupPrompt(originalFn, trigger) {
   const TITLES = {
     level_up:         { en: 'Level up!',                he: 'עלית רמה!' },
     streak_milestone: { en: `${_streak}-day streak!`,   he: `רצף של ${_streak} ימים!` },
-    first_completion: { en: 'Nice start!',              he: 'התחלה יפה!' },
+    first_completion: { en: 'All of this lives only here', he: 'כל זה קיים רק כאן' },
     chapter_complete: { en: 'Chapter complete!',        he: 'סיימת פרק!' },
     bonus_unlock:     { en: 'Well done!',               he: 'כל הכבוד!' },
     profile:          { en: 'Save your progress',       he: 'שמור על ההתקדמות שלך' },
@@ -17443,14 +19955,12 @@ function showGuestSignupPrompt(originalFn, trigger) {
       en: `You're on a ${_streak}-day streak. Sign in so you don't lose it.`,
       he: `אתה על רצף של ${_streak} ימים. התחבר כדי לא לאבד אותו.`,
     },
-    first_completion: _thinkerName ? {
-      en: `You just met ${_thinkerName}. Sign in so your progress is always saved.`,
-      he: `הרגע פגשת את ${_thinkerName}. התחבר כדי שההתקדמות תישמר תמיד.`,
-    } : {
-      // Fallback when the day lookup misses (e.g. subject swap between finish
-      // and prompt) — no visible {placeholder} leaks through.
-      en: 'Great start. Sign in so your progress is always saved.',
-      he: 'התחלה מצוינת. התחבר כדי שההתקדמות תישמר תמיד.',
+    first_completion: {
+      // Cinematic loss-framed prompt — no "sign in" imperative in the
+      // body; the stat list (rendered by _renderGuestFirstCompletionStats)
+      // does the emotional work, primary CTA below finishes the ask.
+      en: 'Without an account, your progress stays on this device only.',
+      he: 'בלי חשבון, ההתקדמות נשארת במכשיר הזה בלבד.',
     },
     chapter_complete: {
       en: "You finished a whole chapter. Sign in so you don't lose your progress.",
@@ -17473,8 +19983,19 @@ function showGuestSignupPrompt(originalFn, trigger) {
   const bodies = BODIES[trigger] || BODIES._default;
   document.getElementById('guest-signup-title').textContent = isEn ? titles.en : titles.he;
   document.getElementById('guest-signup-body').textContent  = isEn ? bodies.en : bodies.he;
+  // Loss-framed stat list on first_completion only. Renders three rows
+  // with real app icons: streak, XP, dialogue count. Hidden for other
+  // triggers so their existing layout stays unchanged.
+  _renderGuestFirstCompletionStats(trigger, isEn);
   const emailBtn = document.getElementById('guest-signup-email-btn');
-  if (emailBtn) emailBtn.textContent = isEn ? 'Sign up with email' : 'הרשמה עם אימייל';
+  // For the cinematic first_completion trigger, the primary CTA is the
+  // "Save your progress" pitch; other triggers keep the "Sign up with
+  // email" label. Distinguishing on trigger keeps the cinematic loss-
+  // framing focused while leaving level_up / streak_milestone / etc.
+  // callsites unaffected.
+  if (emailBtn) emailBtn.textContent = (trigger === 'first_completion')
+    ? (isEn ? 'Save your progress' : 'לשמור את ההתקדמות')
+    : (isEn ? 'Sign up with email' : 'הרשמה עם אימייל');
   const skip = document.getElementById('guest-signup-skip');
   if (skip) skip.textContent = isEn ? 'Maybe later' : 'אולי אחר כך';
   // Google + Apple text spans — icon SVG is a sibling so we update the
@@ -18504,6 +21025,12 @@ function startOnboarding() {
 
 function renderOnboardingStep() {
   const step = ONBOARDING_STEPS[onboardingStep];
+  // Funnel: onboarding_tour_step. Session-scoped dedup so the recursive
+  // re-render for the lang-select "come home first" path doesn't refire.
+  if (!_onboardingTourStepsSeen.has(onboardingStep)) {
+    _onboardingTourStepsSeen.add(onboardingStep);
+    _phCapture('onboarding_tour_step', { step_index: onboardingStep });
+  }
 
   // For the lang-select step, make sure we're on home (in case coming from subject screen)
   if (step.isLangSelect && state.currentScreen !== 'home') {
@@ -18630,6 +21157,9 @@ function nextOnboardingStep() {
   if (onboardingStep >= ONBOARDING_STEPS.length) {
     document.getElementById('onboarding-overlay').style.display = 'none';
     localStorage.setItem('corpus_onboarding_done', '1');
+    // Funnel: onboarding_tour_completed. Fired here from the fallback exit
+    // (steps array walked to the end). Normal exit is finishOnboardingWithLang.
+    _phCapture('onboarding_tour_completed', { via: 'steps_end', lang: state.lang || 'he' });
     // Push the onboarding-done flag to Supabase so this device's choice
     // survives on other devices / after a reinstall. Fire-and-forget (saveState
     // calls syncProgressToSupabase without awaiting); never break onboarding on error.
@@ -18651,6 +21181,8 @@ function finishOnboardingWithLang(lang) {
   document.getElementById('onboarding-lang-buttons').style.display = 'none';
   document.getElementById('onboarding-btn').style.display = '';
   localStorage.setItem('corpus_onboarding_done', '1');
+  // Funnel: onboarding_tour_completed. Normal exit through the language pick.
+  _phCapture('onboarding_tour_completed', { via: 'lang_select', lang: lang });
   // Push the onboarding-done flag to Supabase so this device's choice
   // survives on other devices / after a reinstall. Fire-and-forget; never break onboarding on error.
   try { saveState(); } catch(e) {}
@@ -18808,6 +21340,62 @@ function toggleDrawer() {
 
 // === Subject Select ===
 const LOCKED_SUBJECTS = ['psychology'];
+
+// ─── Economics bonus chapter — 7-day promo window ────────────────
+// Client-side date-window unlock. No new synced state, no migration.
+// Boundaries are Israel local midnight (IDT = UTC+3 in late July);
+// literals carry the offset so intent is documented at the source.
+// Users who earned the unlock via chapter-1 completion keep it after
+// the window closes (see isWeekCompleted OR below); completions banked
+// during the window stay recorded (state.completedDays is unaffected
+// by lock state — see openReader / finishDay).
+const BONUS_ECON_PROMO_START = Date.parse('2026-07-23T00:00:00+03:00');
+const BONUS_ECON_PROMO_END   = Date.parse('2026-07-30T00:00:00+03:00');
+function isEconBonusPromoActive() {
+  const now = Date.now();
+  return now >= BONUS_ECON_PROMO_START && now < BONUS_ECON_PROMO_END;
+}
+
+// ─── Deep-link intent (?open=<slug>) ─────────────────────────────
+// Captured at initUI top, consumed after the onboarding gate resolves
+// (fresh users: end of _onbFinishGoal; existing users: right after
+// showScreen('home')). Universal Links / App Links are NOT wired for
+// this project, so this URL always resolves to the web app even for
+// users who have the native app installed.
+let _pendingDeepLink = null;
+
+function _consumePendingDeepLink() {
+  if (_pendingDeepLink !== 'bonus-econ') return false;
+  _pendingDeepLink = null;
+  // Window closed after the link was captured (and the user hasn't earned
+  // it the normal way): land on home, no error. Report the outcome so the
+  // funnel distinguishes arrivals from actual opens.
+  if (!isEconBonusPromoActive() && !isWeekCompleted(1)) {
+    _phCapture('bonus_link_landed', {
+      subject: 'economics',
+      opened: false,
+      reason: 'window_closed',
+    });
+    return false;
+  }
+  // Persist the subject switch — the user expressed intent by tapping an
+  // economics link. setSubject is a no-op if state.subject is already
+  // 'economics' (e.g. from the fresh-user path we already ran).
+  try { setSubject('economics'); } catch (e) {}
+  const wk = getW().find(w => w.id === 'bonusEcon1');
+  const day = wk && wk.days && wk.days[0];
+  if (day) {
+    _phCapture('bonus_link_landed', { subject: 'economics', opened: true });
+    openReader('bonusEcon1', day.id);
+    return true;
+  }
+  _phCapture('bonus_link_landed', {
+    subject: 'economics',
+    opened: false,
+    reason: 'chapter_missing',
+  });
+  return false;
+}
 
 const SUBJECTS = [
   { id: 'philosophy', name: 'Philosophy', icon: 'assets/icons/subjects/philosophy-icon.png' },
@@ -18993,6 +21581,13 @@ function subjConfirm() {
     _subjShowComingSoon();
     return;
   }
+  // Funnel: onboarding_subject_selected. Fires once per install on the
+  // first confirmed subject pick. Later subject switches (via the drawer)
+  // don't re-fire — they're not part of the onboarding funnel.
+  if (!localStorage.getItem('corpus_first_subject_selected')) {
+    try { localStorage.setItem('corpus_first_subject_selected', '1'); } catch(e) {}
+    _phCapture('onboarding_subject_selected', { subject: subjectId });
+  }
   setSubject(subjectId);
 
   // Icon scale-up + screen fade-out animation
@@ -19017,12 +21612,21 @@ function subjConfirm() {
       // Drawer mode: slide drawer back up, home stays put underneath
       closeDrawer(() => { renderHome(); });
     } else {
-      // First-time / standalone subject-select mode
+      // First-time / standalone subject-select mode. New-flow users
+      // (welcome-seen but no goal set yet) advance to the daily-goal
+      // screen; already-onboarded users fall back to the legacy spotlight
+      // tour (kept behind its own gates for existing users mid-flow).
       document.body.classList.remove('on-subject-screen');
-      showScreen('home');
-      renderHome();
-      animateScreen(document.getElementById('screen-home'), 'anim-fade');
-      setTimeout(startOnboarding, 600);
+      const _newFlow = !!localStorage.getItem('corpus_intro_done')
+        && !localStorage.getItem('corpus_daily_goal_set');
+      if (_newFlow) {
+        showGoalScreen();
+      } else {
+        showScreen('home');
+        renderHome();
+        animateScreen(document.getElementById('screen-home'), 'anim-fade');
+        setTimeout(startOnboarding, 600);
+      }
     }
   }, 450);
 }
@@ -19030,6 +21634,11 @@ function subjConfirm() {
 function showSubjectSelect() {
   document.body.classList.add('on-subject-screen');
   showScreen('subject');                              // .active → display:flex; gives the carousel a layout box
+  // Cinematic vertical stack copy — populated whenever the subject
+  // screen shows via the new-user path. Drawer entries (subject switch
+  // later on) don't affect this because the cinematic block is hidden
+  // by CSS under body.drawer-open.
+  try { _applyCinematicSubjectCopy(); } catch (e) {}
   // Set the carousel's scroll position SYNCHRONOUSLY, before the browser paints,
   // so the selected subject card is already centered on the very first painted frame.
   // void offsetWidth forces a synchronous layout flush so scrollLeft sticks
@@ -19068,13 +21677,12 @@ function _initSubjCarousel() {
 }
 // === End Subject Select ===
 
-// Pushes the parent's cached Android safe-area insets into the intro-iframe's
-// documentElement so CSS inside Onboarding_new.html can consume them via
-// var(--android-safe-*, env(...)). Called both when EdgeToEdge.getInsets()
-// resolves in the parent AND on the iframe's `load` event — whichever order
-// fires first, the iframe eventually gets the values. Same-origin so
-// contentDocument access is unrestricted; noop if the iframe isn't in the
-// DOM yet, hasn't loaded, or the parent hasn't cached insets yet.
+// DEPRECATED (onboarding redesign): iframe is gone; the parent's
+// --android-safe-* CSS custom properties are still set on documentElement
+// by _applyAndroidInsets, and the new welcome screen consumes them
+// directly via var(--android-safe-top, env(safe-area-inset-top, 0px)) in
+// the .onb-screen CSS. This function's cross-frame push is now a no-op;
+// slate for removal.
 function _pushInsetsToIntroIframe() {
   try {
     const i = window._latestAndroidInsets;
@@ -19122,6 +21730,13 @@ async function enterApp(user) {
       const isNewUser = !!user.created_at && (Date.now() - new Date(user.created_at).getTime() < 60000);
       if (isNewUser) posthog.capture('user_signed_up', { method });
       posthog.capture('user_logged_in', { method });
+      // Funnel: onboarding_auth_choice. Signup vs signin inferred from the
+      // account-creation age window used above. method captures which
+      // provider (email/google/apple).
+      _phCapture('onboarding_auth_choice', {
+        choice: isNewUser ? 'signup' : 'signin',
+        method: method,
+      });
     } catch(e) {}
     try {
       posthog.identify(user.id, {
@@ -19142,14 +21757,24 @@ async function enterApp(user) {
   // Resume any celebration queue persisted from a prior session that
   // closed mid-play. Session-guarded so this fires at most once per open.
   try { _resumeCelebrationsIfPending(); } catch(e) {}
-  showIntro();
-  // If intro already done, handle routing now; otherwise closeIntro() handles it
-  if (localStorage.getItem('corpus_intro_done')) {
-    if (!localStorage.getItem('corpus_subject')) {
-      showSubjectSelect();
-    } else {
-      setTimeout(startOnboarding, 500);
-    }
+  // Onboarding redesign: signed-in users who haven't set a daily goal
+  // yet get the one-time picker after home renders. Fresh signup users
+  // go through the new flow entirely (via startNewUserOnboarding on the
+  // no-session path); this branch covers returning users mid-migration.
+  if (localStorage.getItem('corpus_onboarding_done') && !localStorage.getItem('corpus_daily_goal_set')) {
+    setTimeout(showGoalScreen, 400);
+    return;
+  }
+  // Existing behavior: no-intro-done users see the intro; that path used
+  // to open the iframe carousel and now falls through to the welcome
+  // screen via startNewUserOnboarding's flag chain. Preserved as a guard
+  // for any never-migrated signed-in user.
+  if (!localStorage.getItem('corpus_intro_done')) {
+    startNewUserOnboarding();
+    return;
+  }
+  if (!localStorage.getItem('corpus_subject')) {
+    showSubjectSelect();
   }
 }
 
@@ -19222,6 +21847,33 @@ function initUI() {
   try {
     console.log('[Init] initUI started, corpusData chapters:', corpusData && corpusData.weeks && corpusData.weeks.length);
     console.log('[Init] THINKERS length:', THINKERS && THINKERS.length);
+    // Deep-link intent capture — runs first so the onboarding gate and any
+    // downstream renders see the flag. See _consumePendingDeepLink for the
+    // dispatch model (existing user / fresh user). URL is stripped after
+    // capture so a refresh mid-flow doesn't retrigger the event or override
+    // subsequent navigation.
+    try {
+      const params = new URLSearchParams(location.search);
+      const open = params.get('open');
+      if (open === 'bonus-econ') {
+        _pendingDeepLink = 'bonus-econ';
+        _phCapture('bonus_link_opened', {
+          subject: 'economics',
+          promo_active: isEconBonusPromoActive(),
+        });
+        try { history.replaceState(null, '', location.pathname); } catch (e) {}
+        // Shrink the onboarding progress rows from 5 pills to 4: deep-link
+        // arrivals skip the subject-select step. Also flip goal's data-step
+        // from 5 to 4 so it reads as the last step in the shortened flow.
+        // Runs synchronously so the first paint of the beat screen already
+        // shows the 4-pill row.
+        document.querySelectorAll('.onb-progress').forEach(row => {
+          const pills = row.querySelectorAll('.onb-pill');
+          if (pills.length === 5) row.removeChild(pills[4]);
+          if (row.dataset.step === '5') row.dataset.step = '4';
+        });
+      }
+    } catch (e) {}
     // Platform detect — CSS scopes performance-sensitive treatments (e.g. the
     // modal backdrop-filter blur, which janks Android WebView main-thread and
     // delays input processing) off Android without touching iOS.
@@ -19305,10 +21957,44 @@ function initUI() {
     applyTheme(state.subject);
     document.documentElement.dir = state.lang === 'en' ? 'ltr' : 'rtl';
     document.documentElement.lang = state.lang;
-    // Render home immediately from local state so the screen is never blank.
-    // Auth check runs in parallel and calls renderHome() again once resolved.
-    renderHome();
-    showScreen('home');
+    // Onboarding gate — runs synchronously in initUI BEFORE any home render.
+    // Decoupled from Supabase auth resolution: fresh users see the welcome
+    // screen immediately, regardless of whether Supabase's INITIAL_SESSION
+    // ever fires (incognito third-party-cookie blocking, CDN failures, etc).
+    //
+    // Gate criteria:
+    //   - No completed dialogues locally (state.completedDays empty)
+    //   - No corpus_onboarding_done flag
+    //   - No corpus_intro_done flag
+    // ANY of these being false → returning user → render home instead.
+    // Note: signed-in returning users may hit this and go straight to home
+    // — enterApp still fires later and handles goal-migration for them.
+    const _completedCount = Object.keys(state.completedDays || {}).length;
+    const _hasIntro = !!localStorage.getItem('corpus_intro_done');
+    const _hasOnbDone = !!localStorage.getItem('corpus_onboarding_done');
+    console.log('[Onboarding] initUI gate:', {
+      completedCount: _completedCount,
+      hasIntro: _hasIntro,
+      hasOnbDone: _hasOnbDone,
+    });
+    if (!_hasIntro && !_hasOnbDone && _completedCount === 0) {
+      console.log('[Onboarding] Fresh install → showBeat()');
+      showBeat();
+    } else if (_hasIntro && !localStorage.getItem('corpus_subject')) {
+      console.log('[Onboarding] Welcome done, no subject → subject select');
+      showSubjectSelect();
+    } else if (_hasIntro && localStorage.getItem('corpus_subject') && !localStorage.getItem('corpus_daily_goal_set')) {
+      console.log('[Onboarding] Welcome + subject done, no goal → goal screen');
+      showGoalScreen();
+    } else {
+      console.log('[Onboarding] Existing user → home');
+      renderHome();
+      showScreen('home');
+      // Deep-link consume for existing users happens right after home
+      // renders. If the promo window is closed and they haven't earned it,
+      // this is a no-op and they stay on home (no error).
+      try { _consumePendingDeepLink(); } catch (e) {}
+    }
   } catch(e) {
     console.error('[Init] initUI failed:', e);
   }
@@ -19443,8 +22129,8 @@ function initUI() {
           rescheduleReminderFromToday();
         } else if (event === 'INITIAL_SESSION' && !session) {
           initialEventReceived = true;
-          console.log('[Auth] No session - showing auth screen');
-          showAuthFlow();
+          console.log('[Auth] No session - entering new onboarding flow');
+          startNewUserOnboarding();
           // Guest mode: reschedule from local state (no Supabase round-trip).
           rescheduleReminderFromToday();
         } else if (event === 'SIGNED_OUT') {
@@ -19463,11 +22149,13 @@ function initUI() {
         }
       });
 
-      // Fallback: if INITIAL_SESSION never fires (e.g. Supabase CDN blocked), show auth screen
+      // Fallback: if INITIAL_SESSION never fires (e.g. Supabase CDN blocked),
+      // route into the new onboarding flow so users aren't stuck on a blank
+      // screen. Same behavior as the no-session path.
       setTimeout(() => {
         if (!initialEventReceived) {
-          console.log('[Auth] onAuthStateChange timeout - showing auth screen');
-          showAuthFlow();
+          console.log('[Auth] onAuthStateChange timeout - entering new onboarding flow');
+          startNewUserOnboarding();
         }
       }, 3000);
     } catch(e) {
@@ -20234,9 +22922,192 @@ document.addEventListener('DOMContentLoaded', function() {
   </button>
 </nav>
 
-<!-- INTRO CAROUSEL -->
-<div id="intro-overlay" style="display:none;position:fixed;inset:0;z-index:1100;overflow:hidden;">
-  <iframe id="intro-iframe" src="Onboarding_new.html" style="width:100%;height:100%;border:none;"></iframe>
+<!-- NEW ONBOARDING — Beat + Streak + Welcome + Subject + Daily Goal.
+     Replaces the deprecated Onboarding_new.html iframe carousel + spotlight
+     tour. Fresh users flow:
+       beat → streak → welcome → subject → goal → openReader(1,1).
+     Progress pill row on each inline screen reflects the 5-step position.
+     Existing-user gates preserved (see startNewUserOnboarding / initApp). -->
+<!-- Screen 1: Beat (bright philosophy purple). Three-card fan hero.
+     Language toggle lives here — first paint — and controls copy on all
+     downstream screens through _onbApplyLangToWelcome. -->
+<div id="onboarding-beat" class="onb-screen onb-bg-philosophy" style="display:none">
+  <div class="onb-welcome-lang" id="onb-welcome-lang" dir="ltr">
+    <span class="onb-lang-indicator" id="onb-lang-indicator"></span>
+    <button type="button" class="onb-lang-btn" data-lang="he" onclick="_onbSetWelcomeLang('he')">עברית</button>
+    <button type="button" class="onb-lang-btn" data-lang="en" onclick="_onbSetWelcomeLang('en')">English</button>
+  </div>
+  <div class="onb-progress" aria-hidden="true" data-step="1">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-beat-inner">
+    <div class="onb-beat-fan" aria-hidden="true">
+      <div class="onb-beat-fan-glow onb-beat-fan-glow-1"></div>
+      <div class="onb-beat-fan-glow onb-beat-fan-glow-2 subj-economics"></div>
+      <div class="onb-beat-fan-glow onb-beat-fan-glow-3"></div>
+      <div class="onb-beat-fan-card onb-beat-fan-card-1">
+        <img src="./images/kant.webp" alt="">
+        <div class="onb-beat-fan-scroll"><div class="onb-beat-fan-name" id="onb-beat-fan-name-1">קאנט</div></div>
+      </div>
+      <div class="onb-beat-fan-card onb-beat-fan-card-2">
+        <img src="./images/marx.webp" alt="">
+        <div class="onb-beat-fan-scroll"><div class="onb-beat-fan-name" id="onb-beat-fan-name-2">מרקס</div></div>
+      </div>
+      <div class="onb-beat-fan-card onb-beat-fan-card-3">
+        <img src="./images/freud.webp" alt="">
+        <div class="onb-beat-fan-scroll"><div class="onb-beat-fan-name" id="onb-beat-fan-name-3">פרויד</div></div>
+      </div>
+    </div>
+    <div class="onb-beat-copy">
+      <h1 class="onb-beat-head" id="onb-beat-head">חמש דקות ביום עם ההוגים הגדולים</h1>
+      <p class="onb-beat-sub" id="onb-beat-sub">פילוסופיה, כלכלה ופסיכולוגיה. דיאלוג קצר, רעיון אחד, ישר מהמקור.</p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-beat-cta" onclick="_onbFinishBeat()">מתחילים</button>
+  </div>
+</div>
+
+<!-- Screen 2: Streak beat (bright amber). Restored. Large flame hero,
+     collection preview row (3 subject-tinted mini-cards + 1 mystery),
+     caption. Copy set in showStreakBeat via _onbApplyLangToWelcome. -->
+<div id="onboarding-streak" class="onb-screen onb-bg-flame" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="2">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-streak-inner">
+    <div class="onb-streak-hero" aria-hidden="true">
+      <svg viewBox="0 0 64 64" width="78" height="78"><use href="#icon-streak"/></svg>
+    </div>
+    <div class="onb-streak-copy">
+      <h1 class="onb-streak-head" id="onb-streak-head">כל יום מוסיף לרצף</h1>
+      <p class="onb-streak-sub" id="onb-streak-sub">דיאלוג ביום מדליק את הלהבה. כל הוגה שפגשת נשמר באוסף שלך.</p>
+    </div>
+    <div class="onb-streak-row" aria-hidden="true">
+      <div class="onb-streak-mini onb-streak-mini-1"><img src="./images/plato.webp" alt=""></div>
+      <div class="onb-streak-mini onb-streak-mini-2"><img src="./images/smith.webp" alt=""></div>
+      <div class="onb-streak-mini onb-streak-mini-3"><img src="./images/james.webp" alt=""></div>
+      <div class="onb-streak-mini onb-streak-mini-mystery">?</div>
+    </div>
+    <div class="onb-streak-caption" id="onb-streak-caption">האוסף שלך נבנה תוך כדי קריאה</div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-streak-cta" onclick="_onbFinishStreakBeat()">המשך</button>
+  </div>
+</div>
+
+<!-- Screen 3: Welcome (philosophy purple tint). Socrates hero card as
+     the human anchor after the streak beat. Language toggle is on the
+     beat (screen 1), not here. -->
+<div id="onboarding-welcome" class="onb-screen onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="3">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-welcome-inner">
+    <div class="onb-hero-card" aria-hidden="true">
+      <img src="./images/socrates.webp" alt="">
+      <div class="onb-hero-card-scroll">
+        <div class="onb-hero-card-name" id="onb-hero-card-name">סוקרטס</div>
+        <div class="onb-hero-card-era">470–399 BCE</div>
+      </div>
+    </div>
+    <div class="onb-welcome-copy">
+      <h1 class="onb-welcome-head" id="onb-welcome-head">מתי בפעם האחרונה דיברת עם סוקרטס?</h1>
+      <p class="onb-welcome-sub" id="onb-welcome-sub">לא סיכום ולא פרשנות. מה שנכתב לפני 2,400 שנה, בשפה של היום.</p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-welcome-cta" onclick="_onbFinishWelcome()">המשך</button>
+  </div>
+</div>
+
+<!-- Daily-goal picker. Slotted between subject-select and the first
+     dialogue. Three cards (fan-adjacent, not literal fan): one dialogue,
+     two dialogues, own pace. Choice recorded as a dated array entry in
+     state.dailyGoalHistory. -->
+<div id="onboarding-goal" class="onb-screen onb-bg-brand" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="5">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-goal-inner">
+    <div class="onb-goal-copy">
+      <h1 class="onb-goal-head" id="onb-goal-head">כמה זמן ביום?</h1>
+      <p class="onb-goal-sub" id="onb-goal-sub">הרצף שלך נבנה מזה. אפשר לשנות בכל רגע.</p>
+    </div>
+    <div class="onb-goal-options" id="onb-goal-options">
+      <button type="button" class="onb-goal-card" data-goal="one" onclick="_onbSelectGoal('one')">
+        <span class="onb-goal-icon"><svg viewBox="0 0 64 64" width="34" height="34"><use href="#icon-streak"/></svg></span>
+        <span class="onb-goal-text">
+          <span class="onb-goal-title" id="onb-goal-t1">דיאלוג אחד ביום</span>
+          <span class="onb-goal-hint" id="onb-goal-h1">קצב יומיומי, בערך חמש דקות</span>
+        </span>
+      </button>
+      <button type="button" class="onb-goal-card" data-goal="two" onclick="_onbSelectGoal('two')">
+        <span class="onb-goal-icon onb-goal-icon-double">
+          <svg viewBox="0 0 64 64" width="30" height="30"><use href="#icon-streak"/></svg>
+          <svg viewBox="0 0 64 64" width="30" height="30"><use href="#icon-streak"/></svg>
+        </span>
+        <span class="onb-goal-text">
+          <span class="onb-goal-title" id="onb-goal-t2">שני דיאלוגים</span>
+          <span class="onb-goal-hint" id="onb-goal-h2">לצלול פנימה, בערך עשר דקות</span>
+        </span>
+      </button>
+      <button type="button" class="onb-goal-card" data-goal="own_pace" onclick="_onbSelectGoal('own_pace')">
+        <span class="onb-goal-icon"><svg viewBox="0 0 64 64" width="34" height="34"><use href="#icon-level"/></svg></span>
+        <span class="onb-goal-text">
+          <span class="onb-goal-title" id="onb-goal-t3">הקצב שלי</span>
+          <span class="onb-goal-hint" id="onb-goal-h3">בלי לחץ, ללמוד כשמתאים</span>
+        </span>
+      </button>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-goal-cta" disabled onclick="_onbFinishGoal()">לדיאלוג הראשון ←</button>
+  </div>
+</div>
+
+<!-- Day-1 endowment celebration. First item in the celebration queue after
+     the very first dialogue completion. Once per install. Rendered by
+     showEndowmentOverlay; dismissed via #endowment-continue-btn. -->
+<!-- Screen 5: Endowment ("streak lit"). Deep purple + flame-amber radial
+     glow. Large flame with amber drop-shadow, "רצף · יום 1" eyebrow,
+     dynamic XP-earned line. Queue position + once-per-install flag
+     unchanged. -->
+<div id="endowment-overlay" class="modal-overlay">
+  <div class="modal-box endowment-box">
+    <div class="endowment-icon" aria-hidden="true">
+      <svg viewBox="0 0 64 64" width="88" height="88"><use href="#icon-streak"/></svg>
+    </div>
+    <div class="endowment-eyebrow" id="endowment-eyebrow">רצף · יום 1</div>
+    <div class="endowment-head" id="endowment-head">הרצף שלך נדלק</div>
+    <div class="endowment-tomorrow" id="endowment-tomorrow">מחר בערב הוא יהיה בן יומיים. +50 XP כבר שלך.</div>
+    <button type="button" class="nav-btn endowment-cta" id="endowment-continue-btn" onclick="closeEndowment()">להמשיך</button>
+  </div>
+</div>
+
+<!-- Goal-met celebration overlay. Queued LAST in the celebration chain
+     (after level_up / chapter_complete / bonus_unlock) when a completion
+     crosses the user's daily-goal threshold. Grants +10 XP through the
+     normal pipeline; once per streak day per install. -->
+<div id="goal-met-overlay" class="modal-overlay">
+  <div class="modal-box endowment-box goal-met-box">
+    <div class="endowment-icon" aria-hidden="true">
+      <svg viewBox="0 0 64 64" width="72" height="72"><use href="#icon-streak"/></svg>
+    </div>
+    <div class="endowment-eyebrow" id="goal-met-eyebrow">היעד היומי</div>
+    <div class="endowment-head" id="goal-met-head">עמדת ביעד היומי</div>
+    <div class="endowment-stats">
+      <div class="endowment-stat goal-met-count-stat">
+        <svg viewBox="0 0 64 64" width="26" height="26" class="endowment-stat-icon"><use href="#ic-summary"/></svg>
+        <span class="endowment-stat-text" id="goal-met-count">1 מתוך 1</span>
+      </div>
+      <div class="endowment-stat">
+        <svg viewBox="0 0 64 64" width="26" height="26" class="endowment-stat-icon"><use href="#icon-xp"/></svg>
+        <span class="endowment-stat-text" id="goal-met-xp">+10 XP בונוס</span>
+      </div>
+    </div>
+    <button type="button" class="nav-btn endowment-cta" id="goal-met-cta" onclick="closeGoalMet()">המשך</button>
+  </div>
 </div>
 
 <div id="unlock-overlay" style="display:none;position:fixed;inset:0;z-index:1200">
