@@ -3716,6 +3716,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    /* Safe-area padding: level-up + bonus_unlock content is vertically
+       centered, but on shorter iPhones (SE) the title + chest exceed the
+       centered space and the .levelup-title can clip the status bar. */
+    padding: var(--safe-top) 0 var(--safe-bottom);
     z-index: 9999;
     opacity: 0;
     pointer-events: none;
@@ -5764,7 +5768,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 32px 24px;
+    /* Safe-area top/bottom absorb the notch/status bar + home indicator.
+       Matches the pattern on .onb-screen and .modal-overlay so the
+       completion modal, chapter-complete overlay, and any future .dc-*
+       full-screen surface clear device chrome without hardcoded offsets. */
+    padding: calc(32px + var(--safe-top)) 24px calc(32px + var(--safe-bottom));
     overflow-y: auto;
   }
   /* Stats screen */
@@ -5945,7 +5953,9 @@
   /* Thinker screen */
   .dc-thinker-screen {
     justify-content: flex-start;
-    padding: 16px 16px 20px;
+    /* Override the tighter thinker padding but keep the safe-area contribution
+       — otherwise the 'A NEW THINKER…' title renders behind the notch. */
+    padding: calc(16px + var(--safe-top)) 16px calc(20px + var(--safe-bottom));
     gap: 8px;
     overflow-y: auto;
   }
@@ -16689,6 +16699,14 @@ function getLevelData(xp) {
 // ═══════════════════════════════════════════════════════════
 
 function showScreen(id) {
+  // Reader exit → fire dialogue_abandoned if the dialogue hasn't been
+  // marked complete. Runs BEFORE the reader teardown so state fields are
+  // still populated for _shareEventProps. finishDay commits
+  // state.completedDays[key] = true, so completion paths short-circuit
+  // inside _readerFireAbandonIfNeeded.
+  if (id !== 'reader' && state.currentScreen === 'reader') {
+    try { _readerFireAbandonIfNeeded(); } catch (e) {}
+  }
   if (id !== 'reader') {
     document.getElementById('reader-content').innerHTML = '';
     document.getElementById('reader-btn-bar').innerHTML = '';
@@ -18669,6 +18687,9 @@ function openReader(weekId, dayId, opts) {
   state.quizAnswered = {};
   state.quizAttempts = {};
   state.dayQuizResults = {};
+  // Reset page-viewed memo + abandon guard; renderReader will log the
+  // first page and every subsequent real transition.
+  _readerResetForOpen();
   // Editorial layout is the reader default across all dialogues/chapters/subjects
   // (rolled out from the Cave+Marx trial). The .reader-editorial class stays on
   // body throughout — it just marks "editorial layout in force." Class remains
@@ -18895,6 +18916,11 @@ function renderReader() {
   }
   const sec = sections[state.currentSection];
   const isLast = state.currentSection === sections.length - 1;
+
+  // Page-view instrumentation. Fires exactly once per real transition;
+  // text-size / resize re-renders leave state.currentSection unchanged
+  // and short-circuit inside _readerLogPageViewed.
+  _readerLogPageViewed(sections, state.currentSection);
 
   renderSectionDots();
   _updateThinkerIntroReopenBtn(day);
@@ -19234,7 +19260,17 @@ function handleQuiz(chosen, correctIdx, explanation, btn, questionIdx, isSingleQ
   if (!state.dayQuizResults[_dqKey]) state.dayQuizResults[_dqKey] = {};
   state.dayQuizResults[_dqKey][questionIdx] = isCorrect;
 
-  try { posthog.capture('question_answered', { correct: isCorrect, attempts: actualAttempts, chapter: state.currentWeek, day: state.currentDay }); } catch(e) {}
+  try { posthog.capture('question_answered', {
+    correct: isCorrect,
+    attempts: actualAttempts,
+    chapter: state.currentWeek,
+    day: state.currentDay,
+    // Page context added for reader-instrumentation parity with
+    // dialogue_page_viewed. Uses the memo populated in renderReader so
+    // the value reflects the page the question actually renders on.
+    page_index: _readerLastPageIndex,
+    page_type:  _readerLastPageType,
+  }); } catch(e) {}
 
   if (isSingleQ) {
     // Legacy single-question: show Continue → explanation modal (unchanged behavior)
@@ -20522,6 +20558,80 @@ function _shareEventProps() {
     dialogue_id: (wk != null && dy != null) ? `${wk}-${dy}` : null,
     lang:        state.lang    || null,
   };
+}
+
+// ─── Reader page-level instrumentation ──────────────────────────
+// Fires dialogue_page_viewed exactly once per real section transition.
+// Reset on openReader; renderReader logs when state.currentSection has
+// advanced or receded. Text-size / resize re-renders leave the index
+// unchanged and skip the log.
+let _readerLastPageIndex = -1;
+let _readerLastPageType  = null;
+let _readerLastPageTotal = 0;
+let _readerStartMs       = 0;
+// Guard so dialogue_abandoned fires at most once per reader open even
+// if the user bounces through several screens after leaving.
+let _readerAbandonPending = false;
+
+function _isFirstDialogue() {
+  // "First-ever completion" gate — same key that first_dialogue_completed
+  // uses in finishDay. During the first dialogue this is null; after the
+  // first successful finishDay it's set forever.
+  try { return !localStorage.getItem('corpus_first_dialogue_completed_at'); }
+  catch (e) { return false; }
+}
+
+function _readerBaseProps() {
+  return Object.assign(_shareEventProps(), {
+    page_index:       _readerLastPageIndex,
+    page_type:        _readerLastPageType,
+    total_pages:      _readerLastPageTotal,
+    is_first_dialogue: _isFirstDialogue(),
+  });
+}
+
+// Called from openReader before renderReader — starts a fresh timing
+// window and clears the last-index memo so the initial render always
+// counts as a real page change.
+function _readerResetForOpen() {
+  _readerLastPageIndex  = -1;
+  _readerLastPageType   = null;
+  _readerLastPageTotal  = 0;
+  _readerStartMs        = Date.now();
+  _readerAbandonPending = true;
+}
+
+// Called from renderReader with the normalized sections + current index.
+// No-op when the index hasn't changed (resize / text-size re-render).
+function _readerLogPageViewed(sections, currentIndex) {
+  if (currentIndex === _readerLastPageIndex) return;
+  const sec = sections[currentIndex];
+  _readerLastPageIndex = currentIndex;
+  _readerLastPageType  = (sec && sec.type) || null;
+  _readerLastPageTotal = sections.length;
+  _phCapture('dialogue_page_viewed', _readerBaseProps());
+}
+
+// Called from showScreen when the user navigates OUT of the reader, and
+// from visibilitychange→hidden as a backup for tab close / native app
+// background. Suppresses when the dialogue has already been marked
+// complete (finishDay commits state.completedDays[key] = true).
+function _readerFireAbandonIfNeeded() {
+  if (!_readerAbandonPending) return;
+  const wk = state.currentWeek, dy = state.currentDay;
+  if (wk == null || dy == null) { _readerAbandonPending = false; return; }
+  let completed = false;
+  try {
+    const key = dayKey(wk, dy);
+    completed = !!(state.completedDays && state.completedDays[key]);
+  } catch (e) {}
+  _readerAbandonPending = false;
+  if (completed) return; // finished, not abandoned
+  const seconds = Math.max(0, Math.round((Date.now() - (_readerStartMs || Date.now())) / 1000));
+  _phCapture('dialogue_abandoned', Object.assign(_readerBaseProps(), {
+    last_page_index:     _readerLastPageIndex,
+    seconds_in_dialogue: seconds,
+  }));
 }
 
 // TEXT + URL share primitive — no guard (caller's responsibility). Used by
@@ -22102,6 +22212,21 @@ function initUI() {
             window.Capacitor.Plugins.LocalNotifications.addListener('localNotificationReceived', (n) => {
               try { showStreakToast((n && n.body) || 'Corpus'); } catch(e) {}
             });
+            // The user actually tapped a scheduled notification and returned
+            // to the app. Separate event from *Received (which fires on
+            // delivery regardless of interaction). Notification id is stable
+            // across scheduling (REMINDER_NOTIF_ID = 1), so we surface it +
+            // the body text that was showing.
+            window.Capacitor.Plugins.LocalNotifications.addListener('localNotificationActionPerformed', (evt) => {
+              try {
+                const n = (evt && evt.notification) || {};
+                _phCapture('notification_opened', {
+                  notification_id:   n.id != null ? n.id : null,
+                  action_id:         (evt && evt.actionId) || 'tap',
+                  body:              n.body || null,
+                });
+              } catch(e) {}
+            });
             console.log('[Reminder] foreground presentation listener installed');
           } catch(e) {
             console.error('[Reminder] listener install failed:', e);
@@ -22146,6 +22271,23 @@ function initUI() {
           // Re-check for App Store updates on foreground so a user who left the
           // app in the background during a release picks up the banner.
           try { checkForUpdate(); } catch(e) {}
+        } else {
+          // Reader abandon backup: catches native-app background + browser
+          // tab hide when the user didn't tap an in-app nav button. If the
+          // user later foregrounds and taps navigation, showScreen's guard
+          // is already false (fired here first). Completion paths are
+          // still skipped inside _readerFireAbandonIfNeeded.
+          if (state.currentScreen === 'reader') {
+            try { _readerFireAbandonIfNeeded(); } catch(e) {}
+          }
+        }
+      });
+      // pagehide is the reliable terminal signal on web (fires on tab close
+      // where visibilitychange may not run to completion). Native platforms
+      // don't fire pagehide, so visibilitychange above carries the load.
+      window.addEventListener('pagehide', () => {
+        if (state.currentScreen === 'reader') {
+          try { _readerFireAbandonIfNeeded(); } catch(e) {}
         }
       });
 
@@ -22716,6 +22858,15 @@ let currentLevelUpData = null;
 function showLevelUp(newLevelIndex) {
   const levelData = LEVELS[newLevelIndex];
   if (!levelData) return false;
+
+  // Retention/engagement signal — fires once per real level transition.
+  // LEVELS is 0-indexed internally; new_level uses 1-indexed for parity
+  // with the celebration UI ("Rank Achieved: Level 3").
+  _phCapture('level_up', {
+    new_level:  newLevelIndex + 1,
+    level_name: levelData.name || null,
+    total_xp:   state.xp || 0,
+  });
 
   // Prompt-modal coexistence is now handled by _playNextCelebration (which
   // pauses the queue if a prompt modal is up and resumes via the same
