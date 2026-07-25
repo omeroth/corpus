@@ -53,9 +53,14 @@
   .html-splash-wordmark {
     font-family: 'Nunito', sans-serif;
     font-weight: 900;
-    /* Font-size scales with viewport. Matches the native PNG at
-       ~14% of the shortest edge — modest, lots of purple around it. */
-    font-size: min(14vw, 14vh);
+    /* Font-size scales with the shortest viewport edge to keep the same
+       proportion across portrait + landscape. Formula: word width ≈
+       32% of shortest edge (Mindvalley-modest). "Corpus" in Nunito
+       Black at font-size X has width ≈ 3.33 × X, so font-size = 32% /
+       3.33 ≈ 9.6% of the shortest edge. Matches the PNG generator's
+       TARGET_WORD_FRACTION in scripts/gen-splash.mjs — the native
+       splash PNG and this HTML render land at the same visual size. */
+    font-size: min(9.6vw, 9.6vh);
     letter-spacing: -0.5px;
     color: #FFFFFF;
     line-height: 1;
