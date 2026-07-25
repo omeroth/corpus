@@ -2100,6 +2100,75 @@
   .streak-repair-cta:hover { background: #F59E0B; }
   .streak-repair-cta:active { transform: scale(0.97); }
 
+  /* ── Econ bonus promo card (home) ────────────────────────────────
+     Mirrors .streak-repair-card structure exactly; tinted economics
+     blue (#2563EB) instead of amber. Shown while
+     isEconBonusPromoActive() and none of the four hide-gates fire
+     (dismissed / chapter-1 earned / bonus chapter touched / promo
+     inactive). Managed by renderEconPromoCard. */
+  .econ-promo-card {
+    position: relative;
+    background: var(--surface);
+    border: 1.5px solid #2563EB;
+    border-radius: 20px;
+    padding: 20px 22px 22px;
+    margin: 12px 16px 16px;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.18);
+  }
+  .econ-promo-dismiss {
+    position: absolute;
+    top: 8px;
+    inset-inline-end: 10px;
+    width: 32px;
+    height: 32px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 400;
+    color: var(--text-2);
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 0;
+  }
+  .econ-promo-dismiss:hover {
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .econ-promo-eyebrow {
+    font-size: calc(11px * var(--text-scale));
+    color: #2563EB;
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    /* End-align in RTL so it doesn't collide with the × in the top-end
+       corner. text-align: start handles both directions. */
+    text-align: start;
+  }
+  .econ-promo-body {
+    font-size: calc(15px * var(--text-scale));
+    line-height: 1.5;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+  .econ-promo-cta {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #2563EB;
+    color: #ffffff;
+    border: none;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: calc(15px * var(--text-scale));
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .econ-promo-cta:hover { background: #1D4ED8; }
+  .econ-promo-cta:active { transform: scale(0.97); }
+
   /* ── Streak repair modal ── */
   .streak-repair-box {
     padding: 28px 24px 24px;
@@ -7634,6 +7703,11 @@
       <!-- Streak repair card — filled by renderStreakRepairCard when eligible. -->
       <div id="streak-repair-card-holder" style="display:none"></div>
 
+      <!-- Econ bonus promo card — filled by renderEconPromoCard while
+           isEconBonusPromoActive() and the user hasn't dismissed or
+           already earned/completed the chapter. Subject-agnostic. -->
+      <div id="econ-promo-card-holder" style="display:none"></div>
+
       <!-- Legacy hero card (kept for compat; never rendered) -->
       <div id="hero-continue-card-wrap" style="display:none"></div>
 
@@ -8228,6 +8302,10 @@ async function syncProgressToSupabase() {
       daily_goal_history:  state.dailyGoalHistory   || [],
       completions_by_day:  state.completionsByDay   || {},
       goal_met_history:    state.goalMetHistory     || [],
+      // Econ bonus promo card dismissal — dated array, one entry per
+      // dismissal (there's typically ≤1 per promo window). Same union-
+      // merge convention as the other dated-array fields above.
+      econ_promo_card_dismissed: state.econPromoCardDismissed || [],
     }, { onConflict: 'user_id' });
     if (error) _reportSyncFailure('daily_goal', error);
   } catch(e) { _reportSyncFailure('daily_goal', e); }
@@ -8312,6 +8390,16 @@ async function loadProgressFromSupabase() {
       if (!g || !g.metAt) return;
       if (!state.goalMetHistory.find(x => x && x.metAt === g.metAt)) {
         state.goalMetHistory.push({ metAt: g.metAt, goal: g.goal, count: g.count || 0, bonusXp: g.bonusXp || 0 });
+      }
+    });
+    // Econ promo card dismissal — union by dismissedAt. Any local OR
+    // server entry counts; the card gate only checks presence + date
+    // vs BONUS_ECON_PROMO_START, so no ordering / max semantics needed.
+    state.econPromoCardDismissed = state.econPromoCardDismissed || [];
+    (data.econ_promo_card_dismissed || []).forEach(e => {
+      if (!e || !e.dismissedAt) return;
+      if (!state.econPromoCardDismissed.find(x => x && x.dismissedAt === e.dismissedAt)) {
+        state.econPromoCardDismissed.push({ dismissedAt: e.dismissedAt });
       }
     });
     migrateCompletedDaysKeys();
@@ -16641,6 +16729,13 @@ function defaultState() {
     //   at most once per streak day per install.
     completionsByDay: {},
     goalMetHistory: [],
+    // Economics bonus promo card (home). Dated array; any entry with
+    // dismissedAt >= _streakDay(BONUS_ECON_PROMO_START) counts as
+    // "dismissed for the current promo window." Future promos (new
+    // BONUS_ECON_PROMO_START) auto-reset since old entries won't satisfy
+    // the >= check. Union-merge-safe (dedup by dismissedAt).
+    // [{ dismissedAt: 'YYYY-MM-DD' }]
+    econPromoCardDismissed: [],
     chapterCompleteShown: {}, // { weekId: true } — fires the chapter-complete overlay once per chapter
     chapterXPByWeek: {},      // XP tallied per chapter for chapter-complete metrics
     guestSignupPromptShown: false,  // legacy single-shot flag — kept for back-compat; migrated into guestPrompt below on load
@@ -17345,6 +17440,86 @@ function _repairInterp(tpl, N) { return tpl.replace('{N}', String(N)); }
 // the user just chose to hide the card until the app re-opens (or the
 // window closes / repair succeeds naturally).
 let _repairCardDismissedThisSession = false;
+
+// ─── Econ bonus promo card (home) ──────────────────────────────────
+// Rendered near the top of home, immediately after the streak-repair
+// slot. Shows while the promo window is active and none of the four
+// hide-gates fire. Subject-agnostic — appears regardless of the user's
+// current subject. Clicking sets subject to economics (mirrors the
+// deep-link path) and opens the first day of bonusEcon1.
+
+function renderEconPromoCard() {
+  const holder = document.getElementById('econ-promo-card-holder');
+  if (!holder) return;
+  // Four hide-gates (any true → hide).
+  if (!isEconBonusPromoActive())        { holder.innerHTML = ''; holder.style.display = 'none'; return; }
+  if (_econPromoCardDismissed())        { holder.innerHTML = ''; holder.style.display = 'none'; return; }
+  if (_isEconChapter1Completed())       { holder.innerHTML = ''; holder.style.display = 'none'; return; }
+  if (_isEconBonusChapterCompleted())   { holder.innerHTML = ''; holder.style.display = 'none'; return; }
+  const isEn = state.lang === 'en';
+  // Fire econ_promo_card_shown at most once per session per home mount.
+  // Guarded via window flag so repeated renderHome invocations (subject
+  // switch, back from reader, etc.) don't inflate the count.
+  window._econPromoCardSeenThisSession = window._econPromoCardSeenThisSession || false;
+  if (!window._econPromoCardSeenThisSession) {
+    window._econPromoCardSeenThisSession = true;
+    try {
+      posthog.capture('econ_promo_card_shown', {
+        subject_at_view:      state.subject || null,
+        promo_active:         true,
+        days_left_in_window:  _econPromoDaysLeft(),
+      });
+    } catch (e) {}
+  }
+  const eyebrow    = isEn ? 'Limited-time bonus' : 'בונוס לזמן מוגבל';
+  const body       = isEn
+    ? "Iran is back in the headlines, so we've opened the oil-crisis bonus chapter free for a week. Don't miss it."
+    : 'איראן שוב בכותרות, אז החלטנו לפתוח את פרק הבונוס על משבר הנפט לשבוע, בחינם. אל תפספס.';
+  const cta        = isEn ? 'Open the chapter' : 'לפרק הבונוס';
+  const dismissLbl = isEn ? 'Dismiss' : 'לסגור';
+  holder.innerHTML =
+    '<div class="econ-promo-card" role="region" aria-label="' + eyebrow + '">' +
+      '<button class="econ-promo-dismiss" aria-label="' + dismissLbl + '" onclick="dismissEconPromoCard()">×</button>' +
+      '<div class="econ-promo-eyebrow">' + eyebrow + '</div>' +
+      '<div class="econ-promo-body">' + body + '</div>' +
+      '<button class="econ-promo-cta" onclick="openEconPromoBonus()">' + cta + '</button>' +
+    '</div>';
+  holder.style.display = '';
+}
+
+function dismissEconPromoCard() {
+  const today = _streakDay();
+  state.econPromoCardDismissed = state.econPromoCardDismissed || [];
+  // Union-dedup by dismissedAt — a second dismissal on the same day
+  // (e.g. re-render race) shouldn't grow the array.
+  if (!state.econPromoCardDismissed.find(e => e && e.dismissedAt === today)) {
+    state.econPromoCardDismissed.push({ dismissedAt: today });
+  }
+  saveStateLocal();
+  try { saveState(); } catch (e) {}
+  try {
+    posthog.capture('econ_promo_card_dismissed', {
+      subject_at_view:     state.subject || null,
+      days_left_in_window: _econPromoDaysLeft(),
+    });
+  } catch (e) {}
+  renderEconPromoCard();
+}
+
+function openEconPromoBonus() {
+  try {
+    posthog.capture('econ_promo_card_clicked', {
+      subject_at_view:     state.subject || null,
+      days_left_in_window: _econPromoDaysLeft(),
+    });
+  } catch (e) {}
+  // Mirror the deep-link path: set subject to economics so getW() returns
+  // the economics chapter list, then open the first day of bonusEcon1.
+  try { setSubject('economics'); } catch (e) {}
+  const wk = getW().find(w => w.id === 'bonusEcon1');
+  const day = wk && wk.days && wk.days[0];
+  if (day) openReader('bonusEcon1', day.id);
+}
 
 function renderStreakRepairCard() {
   const holder = document.getElementById('streak-repair-card-holder');
@@ -18228,6 +18403,10 @@ function renderHome() {
   // safe to call unconditionally — it clears the holder if the user isn't
   // eligible or has dismissed it this session.
   try { renderStreakRepairCard(); } catch (e) {}
+  // Econ bonus promo card: rendered directly below streak-repair (same
+  // idiom, tinted economics blue). Safe to call unconditionally; the
+  // four hide-gates inside clear the holder when any is unmet.
+  try { renderEconPromoCard(); } catch (e) {}
   // Dir + toggle label
   document.documentElement.dir = state.lang === 'en' ? 'ltr' : 'rtl';
   document.documentElement.lang = state.lang;
@@ -21625,6 +21804,51 @@ const BONUS_ECON_PROMO_END   = Date.parse('2026-07-30T00:00:00+03:00');
 function isEconBonusPromoActive() {
   const now = Date.now();
   return now >= BONUS_ECON_PROMO_START && now < BONUS_ECON_PROMO_END;
+}
+
+// Days-remaining in the promo window (ceiling; 0 or negative outside).
+// Used as a PostHog prop on econ_promo_card_* events.
+function _econPromoDaysLeft() {
+  const ms = BONUS_ECON_PROMO_END - Date.now();
+  return Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
+}
+
+// True iff any dismissal entry was recorded on or after the current
+// window's start date. Old dismissals from a prior promo don't count
+// (a new PROMO_START value automatically un-dismisses the card).
+function _econPromoCardDismissed() {
+  const arr = state.econPromoCardDismissed || [];
+  if (!arr.length) return false;
+  const startDay = _streakDay(new Date(BONUS_ECON_PROMO_START));
+  return arr.some(e => e && e.dismissedAt && e.dismissedAt >= startDay);
+}
+
+// True iff the user has completed every day of economics chapter 1.
+// Bypasses state.subject because the check must work regardless of
+// which subject is currently active (the promo card is subject-agnostic).
+// Keys are literal 'economics-1-<dayId>' per dayKey(), which for the
+// non-bonus branch prepends the subject verbatim.
+function _isEconChapter1Completed() {
+  // Chapter 1 has 7 days per the existing lock map convention. If the
+  // dataset ever grows, this over-strict early-false is safe (worse
+  // case: the card lingers a bit longer).
+  for (let d = 1; d <= 7; d++) {
+    if (!state.completedDays || !state.completedDays['economics-1-' + d]) return false;
+  }
+  return true;
+}
+
+// True iff the user has already opened/completed any day of the econ
+// bonus chapter. Bonus-chapter keys drop the subject prefix per dayKey
+// (dayKey returns weekId + '-' + dayId when weekId starts with 'bonus'),
+// so keys are literal 'bonusEcon1-<dayId>'. Any completed key (day 0
+// intro through day 5) means they've touched it — promo is redundant.
+function _isEconBonusChapterCompleted() {
+  const cd = state.completedDays || {};
+  for (const k of Object.keys(cd)) {
+    if (k.indexOf('bonusEcon1-') === 0 && cd[k]) return true;
+  }
+  return false;
 }
 
 // ─── Deep-link intent (?open=<slug>) ─────────────────────────────
