@@ -13,12 +13,22 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
-        <item name="android:windowBackground">@android:color/white</item>
-        <item name="android:colorBackground">#FFFFFF</item>
+        <!-- windowBackground was @android:color/white — that produced a white
+             flash between the OS splash disappearing and the webview's first
+             paint. Swapping to brand purple removes the flash: even before
+             the HTML splash div paints, the underlying window is already
+             #7B4FD4. Same value referenced by AppTheme.NoActionBarLaunch. -->
+        <item name="android:windowBackground">@color/splash_purple</item>
+        <item name="android:colorBackground">@color/splash_purple</item>
     </style>
 
 
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <item name="android:background">@drawable/splash</item>
+        <!-- Android 12+ native splash-screen API uses windowSplashScreenBackground
+             instead of the drawable-based background. Setting it to the same
+             purple keeps the native splash surface flush with the wordmark PNG
+             and the post-splash windowBackground above. -->
+        <item name="android:windowSplashScreenBackground">@color/splash_purple</item>
     </style>
 </resources>

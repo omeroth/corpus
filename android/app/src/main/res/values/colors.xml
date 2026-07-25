@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash + post-splash background. Mirrors the in-app CSS token
+         accent / purple (#7B4FD4) so the launch surface and the app's
+         brand purple match byte-for-byte. Also referenced by:
+           AppTheme.NoActionBarLaunch  (windowSplashScreenBackground)
+           AppTheme.NoActionBar        (windowBackground, kills the
+                                        post-splash white flash by
+                                        swapping out android:color/white)
+         Keep this value in sync if the brand color ever moves. -->
+    <color name="splash_purple">#7B4FD4</color>
+</resources>

@@ -8,6 +8,14 @@
       "backgroundColor": "#FFFFFF",
       "statusBarColor": "#FFFFFF",
       "navigationBarColor": "#FFFFFF"
+    },
+    "SplashScreen": {
+      "launchAutoHide": false,
+      "backgroundColor": "#7B4FD4",
+      "androidScaleType": "CENTER_CROP",
+      "splashFullScreen": true,
+      "splashImmersive": true,
+      "showSpinner": false
     }
   }
 }

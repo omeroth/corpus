@@ -21,6 +21,46 @@
   console.log("PostHog ready");
 </script>
 <style>
+  /* ─── HTML splash bridge ─────────────────────────────────────
+     Rendered first-thing in <body>. Solid --purple (#7B4FD4) with
+     the Corpus wordmark centered. Fills every safe area edge-to-
+     edge (no --safe-* padding by design — the purple should bleed
+     under the notch + home indicator). Fades out at end of initUI.
+     ────────────────────────────────────────────────────────────── */
+  #html-splash {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483000;    /* above every overlay, below dev-tools */
+    background: #7B4FD4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Kill accidental scroll/pinch during the splash. */
+    overflow: hidden;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+            user-select: none;
+    /* Cross-fade governed by .html-splash-fade below. Also protects
+       against a mid-fade re-render — pointer-events off while fading
+       so a tap can't hit an overlay that's about to appear. */
+    opacity: 1;
+    transition: opacity 320ms ease-out;
+  }
+  #html-splash.html-splash-fade {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .html-splash-wordmark {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    /* Font-size scales with viewport. Matches the native PNG at
+       ~14% of the shortest edge — modest, lots of purple around it. */
+    font-size: min(14vw, 14vh);
+    letter-spacing: -0.5px;
+    color: #FFFFFF;
+    line-height: 1;
+  }
+
   :root {
     /* Safe-area insets come from three independent sources, max()'d so the largest wins:
          var(--android-safe-top) — set by JS from @capawesome EdgeToEdge.getInsets() on Android.
@@ -6845,6 +6885,25 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.0/dist/umd/supabase.js"></script>
 </head>
 <body class="hide-section-eyebrow">
+<!-- HTML splash bridge — first paint. Covers the gap between the native
+     launch screen (iOS storyboard / Android Theme.SplashScreen) hiding and
+     the app's first meaningful render. Purple = #7B4FD4, same as the
+     native splash + AppTheme.NoActionBar.windowBackground + iOS launch
+     storyboard bg, so the transition is a straight cross-fade with no
+     color shift.
+
+     Wordmark is CSS text in Nunito 900, letter-spacing -0.5px — identical
+     to .topbar-logo / .auth-logo-text / .subj-logo, and identical to the
+     native splash PNG (which is drawn from the same Nunito-Black.woff2).
+
+     position: fixed + inset: 0 fills every safe area (status bar, notch,
+     home indicator) since fixed elements paint under system chrome unless
+     safe-area padding is added — we intentionally omit safe-area here so
+     purple bleeds edge-to-edge. Hidden via .html-splash-fade at end of
+     initUI (same tick that calls Capacitor SplashScreen.hide on native). -->
+<div id="html-splash" aria-hidden="true">
+  <div class="html-splash-wordmark">Corpus</div>
+</div>
 <!-- iOS update banner. Populated + toggled by checkForUpdate(). Hidden by default. -->
 <div id="update-banner" role="status" aria-live="polite">
   <span class="update-banner-text" id="update-banner-text"></span>
@@ -22050,6 +22109,28 @@ function _showUpdateBanner(remoteVersion) {
   banner.classList.add('visible');
 }
 
+// Splash-bridge hide. Idempotent — safe to call multiple times (rAF path
+// + error path both invoke). On native, dismisses the Capacitor native
+// launch screen (paired with launchAutoHide: false in capacitor.config).
+// On web, the SplashScreen plugin isn't available; the try/catch keeps
+// it a safe no-op.
+let _corpusSplashHidden = false;
+function _hideCorpusSplash() {
+  if (_corpusSplashHidden) return;
+  _corpusSplashHidden = true;
+  const el = document.getElementById('html-splash');
+  if (el) {
+    el.classList.add('html-splash-fade');
+    // Remove from DOM after the fade so it stops taking a compositor layer.
+    setTimeout(() => { try { el.parentNode && el.parentNode.removeChild(el); } catch(_){} }, 400);
+  }
+  try {
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SplashScreen) {
+      window.Capacitor.Plugins.SplashScreen.hide({ fadeOutDuration: 200 });
+    }
+  } catch (e) {}
+}
+
 function initUI() {
   try {
     console.log('[Init] initUI started, corpusData chapters:', corpusData && corpusData.weeks && corpusData.weeks.length);
@@ -22202,8 +22283,17 @@ function initUI() {
       // this is a no-op and they stay on home (no error).
       try { _consumePendingDeepLink(); } catch (e) {}
     }
+    // First-paint is now behind us. Hide the HTML splash bridge (cross-
+    // fade) AND tell Capacitor to dismiss the native launch screen (we
+    // configured launchAutoHide: false so it holds until we say). Called
+    // together so the transition is: native purple → HTML purple (already
+    // painted underneath) → fade to app. rAF ensures the current screen
+    // has actually flushed to the compositor before we start the fade.
+    try { requestAnimationFrame(_hideCorpusSplash); } catch (e) { _hideCorpusSplash(); }
   } catch(e) {
     console.error('[Init] initUI failed:', e);
+    // Even on failure, don't leave the user staring at a purple void.
+    try { _hideCorpusSplash(); } catch (_) {}
   }
 
   (async function initApp() {

@@ -26,6 +26,7 @@
     "@capacitor/core": "^8.3.4",
     "@capacitor/ios": "^8.3.4",
     "@capacitor/local-notifications": "^8.2.0",
+    "@capacitor/splash-screen": "^8.0.2",
     "@capacitor/status-bar": "^8.0.2",
     "@capawesome/capacitor-android-edge-to-edge-support": "^8.0.8",
     "@capgo/capacitor-social-login": "^8.3.22",
