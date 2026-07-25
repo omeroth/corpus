@@ -17487,40 +17487,78 @@ function closeStreakRepair() {
 }
 
 // === Daily reminder (local notification) ===
-// Model:
-//   - One notification at a time, id=1.
-//   - On every "app open" (initApp + visibilitychange→visible), cancel id=1 and
-//     reschedule it for the user's chosen time on the NEXT calendar day.
-//   - Result: a notification only ever fires on a day the user has NOT opened the app.
-//   - Permission is requested AFTER the user finishes their first lesson (see finishDay).
+// Model (post-fix — replaces the buggy `on: {hour, minute}, repeats: true`
+// design that fired unconditionally forever even if the user completed
+// every day):
+//
+//   - Rolling window of ONE-SHOT notifications, one per calendar day, up
+//     to REMINDER_WINDOW_DAYS ahead. Each day owns a stable id derived
+//     from its streak-day date so reconciliation is idempotent.
+//   - `_reconcileReminders()` runs on initApp, visibilitychange→visible,
+//     and at the end of finishDay. For each day in the window: if that
+//     day is completed (state.activeDates), cancel/skip; otherwise ensure
+//     a notif is scheduled at the user's chosen time.
+//   - Same-day completion before the fire time cancels tonight's notif.
+//   - Completion AFTER the fire time can't unring today's ping (OS-
+//     delivered), but tomorrow's fire is still correctly suppressed if
+//     the user opens/completes tomorrow.
+//   - iOS caps pending at 64 across the app. 14-day window + 1 reserved
+//     legacy id = 15 ids, well under budget.
+//
+// Permission is requested via maybeRequestReminderPermission (finishDay
+// path); the OS prompt itself is unchanged from prior behavior.
 
+// Legacy id from the old daily-repeat design. Cancelled once at module
+// init if it happens to exist on-device (an upgrade path for users whose
+// pending list still carries a repeating id=1 from a prior install).
 const REMINDER_NOTIF_ID = 1;
 
-// Rotating body messages. The title stays "Corpus" so the notification's source is
-// always clear; the body varies on every reschedule to keep nudges from feeling
-// repetitive. English only (per product decision; body localization not needed).
-const REMINDER_MESSAGES = [
+// Base id space for the rolling window. Each day-in-window gets a stable
+// id = REMINDER_ID_BASE + (dayOffsetFromToday). Offsets are 0..N-1, so
+// ids span [100, 100+N). Never collides with REMINDER_NOTIF_ID (1).
+const REMINDER_ID_BASE   = 100;
+const REMINDER_WINDOW_DAYS = 14;
+
+// Language-aware copy pools. Same length + index-aligned so a random
+// pick lands the same rhetorical beat in either language. Body is
+// baked at schedule time — a later language flip is reflected on the
+// next reconcile (already-fired notifs stay in their original language).
+const REMINDER_MESSAGES_EN = [
   "Socrates knew nothing and got famous. Imagine what 5 minutes does for you.",
   "Marcus Aurelius ran an empire and still journaled daily. You can spare 5 minutes.",
   "Plato says you're staring at shadows on a wall. Bold words from a guy in a toga.",
-  "I think, therefore I am. You haven't opened Corpus, therefore... concerning.",
   "Keynes said in the long run we're all dead. Cool, that's settled. One quick idea?",
-  "Kant: act as if your choice were universal law. If everyone skipped today: chaos.",
   "Adam Smith's invisible hand is currently holding your phone. Let it do its work.",
   "Your daily idea is waiting. Five minutes, that's it.",
-  "One dialogue today keeps your streak alive.",
+  "One dialogue today. That's the whole ask.",
   "A great thinker has something to say. Got five minutes?",
-  "Your streak misses you. Don't let it slip.",
   "Today's idea is ready when you are.",
   "Five minutes. One big idea. Let's go.",
   "Quick brain workout? Your daily dialogue is waiting.",
-  "Keep the streak going. One idea is all it takes."
+  "One idea, straight from the source. Under five minutes.",
+  "Small habit, big minds. Today's dialogue is waiting."
+];
+const REMINDER_MESSAGES_HE = [
+  "סוקרטס לא ידע כלום ונהיה מפורסם. תחשוב מה חמש דקות יעשו לך.",
+  "מרקוס אורליוס ניהל אימפריה ועדיין כתב ביומן כל יום. תוכל להקדיש חמש דקות.",
+  "אפלטון אומר שאתה בוהה בצללים על קיר. מילים חזקות ממישהו בטוגה.",
+  "קיינס אמר שבטווח הארוך כולנו מתים. יופי, שזה סגור. רעיון קצר אחד?",
+  "היד הנעלמה של אדם סמית מחזיקה כרגע את הטלפון שלך. תן לה לעבוד.",
+  "הרעיון היומי שלך מחכה. חמש דקות, זה הכל.",
+  "דיאלוג אחד היום. זו כל הבקשה.",
+  "להוגה גדול יש משהו לומר. יש לך חמש דקות?",
+  "הרעיון של היום מוכן כשתהיה מוכן.",
+  "חמש דקות. רעיון אחד גדול. יאללה.",
+  "אימון מוח קצר? הדיאלוג היומי שלך מחכה.",
+  "רעיון אחד, ישר מהמקור. פחות מחמש דקות.",
+  "הרגל קטן, מוחות גדולים. הדיאלוג של היום מחכה."
 ];
 
-function _reminderCopy() {
+function _reminderCopy(lang) {
+  const pool = (lang === 'en') ? REMINDER_MESSAGES_EN : REMINDER_MESSAGES_HE;
   return {
     title: 'Corpus',
-    body:  REMINDER_MESSAGES[Math.floor(Math.random() * REMINDER_MESSAGES.length)]
+    body:  pool[Math.floor(Math.random() * pool.length)],
   };
 }
 
@@ -17549,62 +17587,115 @@ async function _requestNotifPermission() {
   } catch(e) { return 'unavailable'; }
 }
 
-async function _cancelReminder() {
+// Cancels every reminder id: the legacy repeating id (1) if still lingering
+// from a prior version, plus every rolling-window id. Used to fully clear
+// the pending list when the user disables the toggle or revokes permission.
+async function _cancelAllReminders() {
+  if (!_isNotifPluginAvailable()) return;
+  const ids = [{ id: REMINDER_NOTIF_ID }];
+  for (let i = 0; i < REMINDER_WINDOW_DAYS; i++) ids.push({ id: REMINDER_ID_BASE + i });
+  try {
+    await window.Capacitor.Plugins.LocalNotifications.cancel({ notifications: ids });
+  } catch(e) {}
+}
+
+// Kept for callers that still use the old name; delegates to reconcile.
+async function _cancelReminder() { await _cancelAllReminders(); }
+
+// Cancel a single day's pending notif by id. Safe if it's already been
+// delivered (OS silently no-ops) or was never scheduled.
+async function _cancelReminderId(id) {
   if (!_isNotifPluginAvailable()) return;
   try {
     await window.Capacitor.Plugins.LocalNotifications.cancel({
-      notifications: [{ id: REMINDER_NOTIF_ID }]
+      notifications: [{ id }],
     });
   } catch(e) {}
 }
 
-// Schedules a TRUE daily-repeating notification at the given HH:MM string.
-// Using `schedule.on: { hour, minute }` with `repeats: true` tells iOS to fire
-// at that clock time every day — including today if that time is still in the
-// future, and continuing indefinitely without any user-side re-scheduling.
-// This replaces the earlier one-shot `at: <tomorrow at HH:MM>` design where
-// (a) same-day testing never fired, (b) every foreground re-cancelled and
-// pushed further out, and (c) a user who didn't reopen the app only ever got
-// one nudge before the chain broke.
-async function _scheduleReminderFor(timeHHMM) {
+// Schedules one notification at a specific device-local Date. No repeats.
+// Body copy is picked at schedule time from the language-appropriate pool.
+async function _scheduleOneEvening(fireDate, id, body) {
   if (!_isNotifPluginAvailable()) return;
-  const [hh, mm] = String(timeHHMM || '19:00').split(':').map(n => parseInt(n, 10) || 0);
-  const copy = _reminderCopy();
   try {
     await window.Capacitor.Plugins.LocalNotifications.schedule({
       notifications: [{
-        id:       REMINDER_NOTIF_ID,
-        title:    copy.title,
-        body:     copy.body,
+        id,
+        title: 'Corpus',
+        body,
         schedule: {
-          on:      { hour: hh, minute: mm },
-          repeats: true,
+          at: fireDate,
           allowWhileIdle: true,
-        }
-      }]
+        },
+      }],
     });
-    // Log the pending list for debug visibility so silent schedule failures
-    // become obvious in the WebInspector console during future troubleshooting.
-    try {
-      const pending = await window.Capacitor.Plugins.LocalNotifications.getPending();
-      console.log('[Reminder] scheduled daily at ' + hh + ':' + String(mm).padStart(2, '0') + '; pending:',
-        pending && pending.notifications ? pending.notifications : pending);
-    } catch(e) {}
-  } catch(e) { console.warn('[Reminder] schedule failed:', e && e.message); }
+  } catch(e) { console.warn('[Reminder] schedule failed for id ' + id + ':', e && e.message); }
 }
 
-// Called on every app open / foreground. Cancel-then-reschedule keeps the
-// pending list clean and ensures a fresh title/body message. Because the
-// underlying schedule is now `on: { hour, minute } + repeats: true`, this is
-// idempotent — the fire time never moves.
-async function rescheduleReminderFromToday() {
+// Builds the fire Date for a given offset (0 = today) at the user's
+// configured HH:MM. Explicit local Date constructor so no engine parses
+// this as UTC (Date.parse of 'YYYY-MM-DDTHH:MM' is inconsistent across
+// engines; the constructor is unambiguously device-local).
+function _reminderFireDateFor(dayOffset, timeHHMM) {
+  const [hh, mm] = String(timeHHMM || '19:00').split(':').map(n => parseInt(n, 10) || 0);
+  const now = new Date();
+  const fire = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + dayOffset,
+    hh, mm, 0
+  );
+  return fire;
+}
+
+// Reconciles the rolling window against state. For each day 0..N-1:
+//   - if that day's _streakDay is already in state.activeDates, cancel
+//     its id (or skip scheduling);
+//   - if the fire time for offset 0 is in the past, cancel (can't unring);
+//   - else schedule one-shot at the exact local Date.
+// Idempotent — safe to call multiple times per open. The plugin's
+// schedule() with an existing id replaces the pending entry, so we don't
+// need to explicitly cancel-then-schedule for each.
+async function _reconcileReminders(opts) {
   if (!_isNotifPluginAvailable()) return;
   const r = state.dailyReminder || {};
-  if (!r.enabled) { await _cancelReminder(); return; }
+  if (!r.enabled) { await _cancelAllReminders(); return; }
   const perm = await _checkNotifPermission();
-  if (perm !== 'granted') { await _cancelReminder(); return; }
-  await _cancelReminder();
-  await _scheduleReminderFor(r.time);
+  if (perm !== 'granted') { await _cancelAllReminders(); return; }
+  // Kill the legacy daily-repeat id once, defensively. On first reconcile
+  // after upgrading from the old scheduler, this removes the unconditional
+  // 19:00-repeats-forever notif from the pending list.
+  await _cancelReminderId(REMINDER_NOTIF_ID);
+  const windowDays = (opts && opts.windowDays) || REMINDER_WINDOW_DAYS;
+  const lang = state.lang || 'en';
+  const activeDates = new Set(state.activeDates || []);
+  const now = new Date();
+  for (let offset = 0; offset < windowDays; offset++) {
+    const fireDate = _reminderFireDateFor(offset, r.time);
+    const streakDayFor = _streakDay(fireDate);
+    const id = REMINDER_ID_BASE + offset;
+    const completed = activeDates.has(streakDayFor);
+    const alreadyPast = fireDate.getTime() <= now.getTime();
+    if (completed || alreadyPast) {
+      await _cancelReminderId(id);
+      continue;
+    }
+    const body = _reminderCopy(lang).body;
+    await _scheduleOneEvening(fireDate, id, body);
+  }
+  // Debug: report pending count on native for troubleshooting silent
+  // schedule failures. Cheap; only runs on native.
+  try {
+    const pending = await window.Capacitor.Plugins.LocalNotifications.getPending();
+    console.log('[Reminder] reconciled; pending ids:',
+      (pending && pending.notifications || []).map(n => n.id));
+  } catch(e) {}
+}
+
+// Kept name so existing callers (initApp, visibilitychange→visible) don't
+// need to change. Delegates to the new reconciler.
+async function rescheduleReminderFromToday() {
+  await _reconcileReminders();
 }
 
 // Used by the profile toggle/time-picker. Persists, requests permission if needed,
@@ -17625,16 +17716,17 @@ async function setReminder(patch) {
       saveState();
     }
     if (perm === 'granted') {
-      await _cancelReminder();
-      await _scheduleReminderFor(state.dailyReminder.time);
+      // Route through reconcile so completed days in the window get
+      // skipped and every scheduled evening carries the current pool copy.
+      await _reconcileReminders();
     } else {
       // User declined OS permission → flip the intent off so UI reflects reality.
       state.dailyReminder.enabled = false;
       saveState();
-      await _cancelReminder();
+      await _cancelAllReminders();
     }
   } else {
-    await _cancelReminder();
+    await _cancelAllReminders();
   }
   return state.dailyReminder;
 }
@@ -19605,6 +19697,11 @@ function finishDay() {
   // (no-op if already asked, plugin unavailable, or reminder disabled). Fire-and-forget;
   // the day-complete UI continues to render without waiting.
   maybeRequestReminderPermission();
+  // Reconcile the rolling reminder window now that today is complete — this
+  // cancels today's evening notif if the fire time hasn't passed yet, and
+  // ensures the window's tail is topped up. Fire-and-forget on native; a
+  // no-op on web.
+  try { _reconcileReminders(); } catch(e) {}
 
   try {
     posthog.capture('day_completed', { chapter: state.currentWeek, day: state.currentDay });
