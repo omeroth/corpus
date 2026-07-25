@@ -31,6 +31,13 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<!-- Encryption-exempt declaration. App uses only standard HTTPS +
+	     Apple-provided crypto (via URLSession / Supabase HTTPS). No
+	     custom / proprietary encryption implementations. Setting this
+	     to false lets App Store Connect skip the annual export-
+	     compliance question at every submission. -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
