@@ -17448,14 +17448,35 @@ let _repairCardDismissedThisSession = false;
 // current subject. Clicking sets subject to economics (mirrors the
 // deep-link path) and opens the first day of bonusEcon1.
 
-function renderEconPromoCard() {
+// force=true: bypass the dismissed gate for devtools debugging. Never
+// call with force from production code paths — only from the console.
+function renderEconPromoCard(force) {
+  const call = (window._econPromoCardCallCount = (window._econPromoCardCallCount || 0) + 1);
   const holder = document.getElementById('econ-promo-card-holder');
-  if (!holder) return;
-  // Four hide-gates (any true → hide).
-  if (!isEconBonusPromoActive())        { holder.innerHTML = ''; holder.style.display = 'none'; return; }
-  if (_econPromoCardDismissed())        { holder.innerHTML = ''; holder.style.display = 'none'; return; }
-  if (_isEconChapter1Completed())       { holder.innerHTML = ''; holder.style.display = 'none'; return; }
-  if (_isEconBonusChapterCompleted())   { holder.innerHTML = ''; holder.style.display = 'none'; return; }
+  if (!holder) {
+    console.log('[econ-promo #' + call + '] NO HOLDER in DOM (renderHome may not have mounted yet)');
+    return;
+  }
+  const gates = {
+    promo_active: isEconBonusPromoActive(),
+    dismissed:    _econPromoCardDismissed(),
+    force:        !!force,
+    subject:      state.subject,
+    now_iso:      new Date().toISOString(),
+  };
+  // Two gates only (per product decision): active window + not dismissed.
+  // Completion gates (_isEconChapter1Completed / _isEconBonusChapterCompleted)
+  // intentionally removed — the promo shows to everyone during the window.
+  if (!gates.promo_active) {
+    holder.innerHTML = ''; holder.style.display = 'none';
+    console.log('[econ-promo #' + call + '] HIDE — promo window inactive', gates);
+    return;
+  }
+  if (!force && gates.dismissed) {
+    holder.innerHTML = ''; holder.style.display = 'none';
+    console.log('[econ-promo #' + call + '] HIDE — dismissed', gates);
+    return;
+  }
   const isEn = state.lang === 'en';
   // Fire econ_promo_card_shown at most once per session per home mount.
   // Guarded via window flag so repeated renderHome invocations (subject
@@ -17485,6 +17506,29 @@ function renderEconPromoCard() {
       '<button class="econ-promo-cta" onclick="openEconPromoBonus()">' + cta + '</button>' +
     '</div>';
   holder.style.display = '';
+  // Diagnostic trace: confirms the injection happened AND the holder is
+  // actually painted (not clipped, not zero-height, not hidden by CSS).
+  // Read after a layout tick so getBoundingClientRect returns real values.
+  try {
+    const holderCS = getComputedStyle(holder);
+    const rect     = holder.getBoundingClientRect();
+    const inner    = holder.querySelector('.econ-promo-card');
+    const innerRect = inner ? inner.getBoundingClientRect() : null;
+    console.log('[econ-promo #' + call + '] RENDERED', {
+      holderComputedDisplay: holderCS.display,
+      holderComputedVisibility: holderCS.visibility,
+      holderHeight: Math.round(rect.height),
+      holderTop:    Math.round(rect.top),
+      innerCardFound: !!inner,
+      innerCardRect: innerRect ? {
+        top:    Math.round(innerRect.top),
+        left:   Math.round(innerRect.left),
+        width:  Math.round(innerRect.width),
+        height: Math.round(innerRect.height),
+      } : null,
+      gates,
+    });
+  } catch (e) {}
 }
 
 function dismissEconPromoCard() {
