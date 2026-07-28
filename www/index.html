@@ -2211,6 +2211,65 @@
   .econ-promo-cta:hover { background: #1D4ED8; }
   .econ-promo-cta:active { transform: scale(0.97); }
 
+  /* ── Home hint ring + tooltip ─────────────────────────────────
+     Contextual one-line nudge attached to a home affordance the
+     first time the user sees it. Ring is a fixed-position pulsing
+     outline sized to the target's rect; tooltip is a small pill
+     with the hint text. Both auto-dismiss on tap/scroll or after
+     7s. See _showHint / _homeHintsSweep. No association with the
+     old spotlight tour (that dead code lives further down). */
+  .home-hint-ring {
+    position: fixed;
+    z-index: 900;
+    pointer-events: none;
+    box-shadow:
+      0 0 0 3px var(--accent, #7B4FD4),
+      0 0 0 8px var(--accent-glow, rgba(123, 79, 212, 0.28)),
+      0 8px 24px -6px var(--accent-glow, rgba(123, 79, 212, 0.35));
+    border-radius: 16px;
+    animation: homeHintPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes homeHintPulse {
+    0%, 100% {
+      box-shadow:
+        0 0 0 3px var(--accent, #7B4FD4),
+        0 0 0 8px var(--accent-glow, rgba(123, 79, 212, 0.28)),
+        0 8px 24px -6px var(--accent-glow, rgba(123, 79, 212, 0.35));
+    }
+    50% {
+      box-shadow:
+        0 0 0 3px var(--accent, #7B4FD4),
+        0 0 0 14px var(--accent-glow, rgba(123, 79, 212, 0.18)),
+        0 10px 28px -6px var(--accent-glow, rgba(123, 79, 212, 0.42));
+    }
+  }
+  .home-hint-tip {
+    position: fixed;
+    z-index: 901;
+    max-width: 260px;
+    background: var(--surface);
+    color: var(--ink);
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 28px -6px rgba(42, 18, 102, 0.28);
+    font-family: inherit;
+    font-size: calc(14px * var(--text-scale));
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: start;
+    /* Pop in on paint so the arrival reads as a soft nudge, not a
+       full-viewport takeover. */
+    animation: homeHintTipPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes homeHintTipPop {
+    0%   { opacity: 0; transform: scale(0.92); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  html.dark .home-hint-tip {
+    box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.55);
+  }
+
   /* ── Streak repair modal ── */
   .streak-repair-box {
     padding: 28px 24px 24px;
@@ -8377,6 +8436,8 @@ async function syncProgressToSupabase() {
       // dismissal (there's typically ≤1 per promo window). Same union-
       // merge convention as the other dated-array fields above.
       econ_promo_card_dismissed: state.econPromoCardDismissed || [],
+      // Home hints seen once-ever — string array, union-dedup on load.
+      hints_seen: state.hintsSeen || [],
     }, { onConflict: 'user_id' });
     if (error) _reportSyncFailure('daily_goal', error);
   } catch(e) { _reportSyncFailure('daily_goal', e); }
@@ -8472,6 +8533,13 @@ async function loadProgressFromSupabase() {
       if (!state.econPromoCardDismissed.find(x => x && x.dismissedAt === e.dismissedAt)) {
         state.econPromoCardDismissed.push({ dismissedAt: e.dismissedAt });
       }
+    });
+    // Home hints seen — flat string array, union-dedup by id. Same
+    // shape as streakRepairs (dates); the id string IS the dedup key.
+    state.hintsSeen = state.hintsSeen || [];
+    (data.hints_seen || []).forEach(h => {
+      if (typeof h !== 'string') return;
+      if (!state.hintsSeen.includes(h)) state.hintsSeen.push(h);
     });
     migrateCompletedDaysKeys();
     saveStateLocal();
@@ -16807,6 +16875,11 @@ function defaultState() {
     // the >= check. Union-merge-safe (dedup by dismissedAt).
     // [{ dismissedAt: 'YYYY-MM-DD' }]
     econPromoCardDismissed: [],
+    // Contextual home-screen hints. Once-ever per user, dedup by
+    // string id. Same union-merge convention as streakRepairs (which
+    // is ['YYYY-MM-DD', …]) — just the string is the id, not a date.
+    // Set by _markHintSeen; read by _hasHintSeen. See HOME_HINTS.
+    hintsSeen: [],
     chapterCompleteShown: {}, // { weekId: true } — fires the chapter-complete overlay once per chapter
     chapterXPByWeek: {},      // XP tallied per chapter for chapter-complete metrics
     guestSignupPromptShown: false,  // legacy single-shot flag — kept for back-compat; migrated into guestPrompt below on load
@@ -16948,6 +17021,13 @@ function showScreen(id) {
   }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
+  // Home hints only live on home. Tearing down any active observer +
+  // DOM hint when leaving home stops a mid-observe race from surfacing
+  // a hint on a screen it doesn't belong to. Sweep re-runs from
+  // renderHome on the next visit.
+  if (id !== 'home' && state.currentScreen === 'home') {
+    try { _homeHintsTeardown(); } catch (e) {}
+  }
   state.currentScreen = id;
   window.scrollTo(0, 0);
   const readerBar = document.getElementById('reader-btn-bar');
@@ -17634,6 +17714,239 @@ function openEconPromoBonus() {
   const wk = getW().find(w => w.id === 'bonusEcon1');
   const day = wk && wk.days && wk.days[0];
   if (day) openReader('bonusEcon1', day.id);
+}
+
+// ─── Home contextual hints ──────────────────────────────────────
+// Lazy-fire, once-ever, priority-ordered. Each hint attaches a ring +
+// tooltip to a home element the first time it becomes visible on a
+// fresh user's home mount. Dedup via state.hintsSeen (union-merge-
+// safe string array; see loadProgressFromSupabase + saveState).
+//
+// Trigger: IntersectionObserver on the target's rect (≥50% visible for
+// 500ms). One hint max per renderHome mount — the picker walks
+// HOME_HINTS in priority order and returns the highest-priority
+// unseen + eligible + rendered target. Special "hooks" (streak,
+// carousel, pantheon_tab) fall out of the same picker via eligibility
+// predicates that reference state (dailyStreak > 0 for streak;
+// unlockedThinkers > 0 for the pantheon-facing hints).
+
+const HOME_HINTS = [
+  { id: 'streak',       priority: 1, selector: '.stats-subheader .topbar-stat[title="Streak"]',
+    en: 'One dialogue a day keeps the flame lit.',
+    he: 'דיאלוג אחד ביום שומר על הלהבה.',
+    eligible: () => (state.dailyStreak || 0) > 0 },
+  { id: 'next_up',      priority: 2, selector: '.lesson-circle.next-up',
+    en: 'Tap here to start your first dialogue.',
+    he: 'כאן מתחיל הדיאלוג הראשון.',
+    eligible: () => true },
+  { id: 'xp',           priority: 3, selector: '.stats-subheader .topbar-stat[title="XP"]',
+    en: 'Every correct answer earns XP.',
+    he: 'כל תשובה נכונה מזכה ב־XP.',
+    eligible: () => true },
+  { id: 'level',        priority: 4, selector: '.stats-subheader .topbar-stat[title="Level"]',
+    en: 'Enough XP and you rank up.',
+    he: 'עם מספיק XP עולים דרגה.',
+    eligible: () => true },
+  { id: 'chapters',     priority: 5, selector: '#home-levels .level-card:first-child',
+    en: 'Each chapter is a series of daily dialogues.',
+    he: 'כל פרק הוא סדרת דיאלוגים יומיים.',
+    eligible: () => true },
+  { id: 'carousel',     priority: 6, selector: '#thinker-carousel-wrap',
+    en: "Thinkers you've met live here.",
+    he: 'ההוגים שפגשת נאספים כאן.',
+    eligible: () => (state.unlockedThinkers || []).length > 0 },
+  { id: 'pantheon_tab', priority: 7, selector: '#bnav-pantheon',
+    en: 'The Pantheon holds every thinker you unlock.',
+    he: 'הפנתאון שומר כל הוגה שפתחת.',
+    eligible: () => (state.unlockedThinkers || []).length > 0 },
+];
+
+let _homeHintFiredThisMount = false;
+let _homeHintObserver       = null;
+let _homeHintActiveEls      = null;   // { ring, tip, cleanup } while a hint is up
+
+function _hasHintSeen(id)  { return (state.hintsSeen || []).includes(id); }
+function _markHintSeen(id) {
+  state.hintsSeen = state.hintsSeen || [];
+  if (state.hintsSeen.includes(id)) return;
+  state.hintsSeen.push(id);
+  saveStateLocal();
+  try { saveState(); } catch (e) {}
+}
+
+// Blocked when any celebration is queued/active, any prompt modal is up,
+// any post-completion overlay is up, any onboarding screen is active,
+// or any of the home cards (streak-repair / econ promo) currently occupy
+// the top of the scroll. Reuses the existing _promptModalActiveForCelebrations
+// (line ~18167) to stay in lockstep with the celebration queue's own
+// collision policy.
+function _homeHintsClear() {
+  if ((state.pendingCelebrations || []).length) return false;
+  try { if (_promptModalActiveForCelebrations()) return false; } catch (e) {}
+  const modalIds = [
+    'modal-complete', 'chapter-complete-overlay',
+    'onboarding-welcome', 'onboarding-beat', 'onboarding-streak', 'onboarding-goal',
+    'modal-bonus-picker', 'modal-thinker-intro',
+    'modal-streak-repair',
+  ];
+  for (const id of modalIds) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    if (el.classList.contains('active')) return false;
+    // Onboarding overlays use display:flex + .onb-active; check both.
+    if (el.classList.contains('onb-active')) return false;
+  }
+  if (document.querySelector('.levelup-overlay.active')) return false;
+  // Home cards — visually claim the top of the scroll; a hint competing
+  // for the same real estate would collide. Defer until dismissed.
+  const shR = document.getElementById('streak-repair-card-holder');
+  const eP  = document.getElementById('econ-promo-card-holder');
+  if ((shR && shR.children.length) || (eP && eP.children.length)) return false;
+  return true;
+}
+
+function _pickHomeHint() {
+  if (state.currentScreen !== 'home') return null;
+  for (const h of HOME_HINTS) {
+    if (_hasHintSeen(h.id)) continue;
+    if (!h.eligible()) continue;
+    const el = document.querySelector(h.selector);
+    if (!el) continue;
+    // Rendered + non-zero size (element exists in DOM but might be
+    // display:none or off-viewport). IO will fire only on real visibility.
+    const rect = el.getBoundingClientRect();
+    if (rect.width < 1 || rect.height < 1) continue;
+    return { hint: h, el };
+  }
+  return null;
+}
+
+// Called at the tail of renderHome. Idempotent — safe to call more than
+// once per mount; the _homeHintFiredThisMount guard makes subsequent
+// calls no-ops until the next mount (which resets the flag).
+function _homeHintsSweep() {
+  if (_homeHintFiredThisMount) return;
+  if (!_homeHintsClear()) return;
+  const pick = _pickHomeHint();
+  if (!pick) return;
+  if (_homeHintObserver) { _homeHintObserver.disconnect(); _homeHintObserver = null; }
+  let visibleTimer = null;
+  _homeHintObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+        if (visibleTimer) continue;
+        visibleTimer = setTimeout(() => {
+          if (_homeHintFiredThisMount) return;
+          if (!_homeHintsClear()) return;             // re-check on fire
+          if (_hasHintSeen(pick.hint.id)) return;
+          _homeHintFiredThisMount = true;
+          _showHint(pick.hint, pick.el);
+          if (_homeHintObserver) { _homeHintObserver.disconnect(); _homeHintObserver = null; }
+        }, 500);
+      } else if (visibleTimer) {
+        clearTimeout(visibleTimer);
+        visibleTimer = null;
+      }
+    }
+  }, { threshold: [0.5] });
+  _homeHintObserver.observe(pick.el);
+}
+
+// Torn down when the user leaves home OR when the hint dismisses.
+function _homeHintsTeardown() {
+  if (_homeHintObserver) { _homeHintObserver.disconnect(); _homeHintObserver = null; }
+  if (_homeHintActiveEls) {
+    try { _homeHintActiveEls.cleanup(); } catch (e) {}
+    _homeHintActiveEls = null;
+  }
+}
+
+function _showHint(hint, target) {
+  const isEn = state.lang === 'en';
+  const text = isEn ? hint.en : hint.he;
+  const rect = target.getBoundingClientRect();
+  const cs   = getComputedStyle(target);
+
+  const ring = document.createElement('div');
+  ring.className = 'home-hint-ring';
+  ring.style.top    = (rect.top - 4)  + 'px';
+  ring.style.left   = (rect.left - 4) + 'px';
+  ring.style.width  = (rect.width  + 8) + 'px';
+  ring.style.height = (rect.height + 8) + 'px';
+  // Inherit target's rounding (lesson-circle = 999px = becomes a real
+  // circle; level card = 20px). Fallback 16px for elements without radius.
+  ring.style.borderRadius = cs.borderRadius && cs.borderRadius !== '0px'
+    ? cs.borderRadius : '16px';
+  document.body.appendChild(ring);
+
+  const tip = document.createElement('div');
+  tip.className = 'home-hint-tip';
+  tip.textContent = text;
+  // Match app language direction so RTL Hebrew reads correctly.
+  tip.dir = isEn ? 'ltr' : 'rtl';
+  document.body.appendChild(tip);
+
+  // Position tooltip below the target unless there isn't room, then above.
+  // Horizontal centering clamped to viewport with a 12px inset.
+  requestAnimationFrame(() => {
+    const tipRect = tip.getBoundingClientRect();
+    let tipTop;
+    if (rect.bottom + tipRect.height + 16 < window.innerHeight - 12) {
+      tipTop = rect.bottom + 12;
+    } else {
+      tipTop = Math.max(12, rect.top - tipRect.height - 12);
+    }
+    const centerX  = rect.left + rect.width / 2;
+    const tipLeft  = Math.max(12,
+      Math.min(window.innerWidth - tipRect.width - 12,
+               centerX - tipRect.width / 2));
+    tip.style.top  = tipTop + 'px';
+    tip.style.left = tipLeft + 'px';
+  });
+
+  // Dismiss on tap anywhere / on scroll / after 7s auto-timeout. The
+  // method is carried in state so home_hint_dismissed can report which
+  // path fired — 'tap' means user engaged, 'scroll' means user moved on,
+  // 'timeout' means neither (they may not have noticed the hint at all).
+  let cleaned = false;
+  const cleanup = () => {
+    if (cleaned) return;
+    cleaned = true;
+    try { ring.remove(); tip.remove(); } catch (e) {}
+    document.removeEventListener('click',      onTap,        true);
+    document.removeEventListener('touchstart', onTap,        true);
+    document.removeEventListener('scroll',     onScroll,     true);
+    if (autoTimer) clearTimeout(autoTimer);
+    _homeHintActiveEls = null;
+  };
+  const dismissWith = (method) => {
+    _markHintSeen(hint.id);
+    try {
+      posthog.capture('home_hint_dismissed', {
+        hint_id: hint.id,
+        lang:    state.lang || 'he',
+        method:  method,
+      });
+    } catch (e) {}
+    cleanup();
+  };
+  const onTap      = () => dismissWith('tap');
+  const onScroll   = () => dismissWith('scroll');
+  const onTimeout  = () => dismissWith('timeout');
+  const autoTimer  = setTimeout(onTimeout, 7000);
+  // capture:true so we get the tap even if a child handler stopPropagation's
+  document.addEventListener('click',      onTap,    true);
+  document.addEventListener('touchstart', onTap,    true);
+  document.addEventListener('scroll',     onScroll, { capture: true, passive: true });
+
+  _homeHintActiveEls = { ring, tip, cleanup };
+
+  try {
+    posthog.capture('home_hint_shown', {
+      hint_id: hint.id,
+      lang:    state.lang || 'he',
+    });
+  } catch (e) {}
 }
 
 function renderStreakRepairCard() {
@@ -18513,6 +18826,12 @@ if (!window._safeAreaObserverInstalled) {
 }
 
 function renderHome() {
+  // Reset the per-mount hint guard AND tear down any prior observer so
+  // stale IO callbacks from a previous mount can't fire against DOM that
+  // renderHome is about to rebuild. _homeHintsSweep is called at the
+  // tail of this function once the level cards + stats have painted.
+  _homeHintFiredThisMount = false;
+  try { _homeHintsTeardown(); } catch (e) {}
   const ui = u();
   // Streak-repair card: rendered near the top of the scroll. Function is
   // safe to call unconditionally — it clears the holder if the user isn't
@@ -18837,6 +19156,10 @@ function renderHome() {
 
   populateCarousel();
   requestAnimationFrame(fixStatsPosition);
+  // Home contextual hints — sweep runs after the layout tick so the
+  // level cards + stats + carousel wrap have real bounding rects for
+  // the IO to observe. See _homeHintsSweep for the priority + IO logic.
+  requestAnimationFrame(() => { try { _homeHintsSweep(); } catch (e) {} });
 }
 
 const CAROUSEL_ORDER = {
