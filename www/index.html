@@ -421,6 +421,48 @@
   html.dark .pantheon-card.locked .pantheon-card-name { color: var(--text-muted); }
   html.dark .pantheon-card.locked .pantheon-card-era { color: rgba(154, 141, 192, 0.7); }
 
+  /* Onboarding dark-mode overrides. Base .onb-screen tokens
+     (--onb-text-primary etc.) now flip via var(--ink) / var(--text-2) /
+     var(--text-muted) — so head/sub across all 5 screens read light on
+     dark. The overrides here cover per-rule hardcoded rgba(42, 18, 102, …)
+     values scattered across onboarding + endowment + nudge that don't
+     flow through those tokens. Each swaps the same alpha value with a
+     light-ink base (245, 241, 255 ≈ --ink in dark). */
+  html.dark .onb-cta.nav-btn:disabled          { background: rgba(245, 241, 255, 0.08); color: rgba(245, 241, 255, 0.4); }
+  html.dark .onb-progress .onb-pill            { background: rgba(245, 241, 255, 0.16); }
+  html.dark .onb-welcome-lang                  { background: rgba(245, 241, 255, 0.08); border-color: rgba(245, 241, 255, 0.12); }
+  html.dark .onb-lang-btn                      { color: rgba(245, 241, 255, 0.60); }
+  /* Language toggle sliding indicator: --ink already flips to near-white,
+     so the pill sits on the (also lightened) toggle track. Bump the
+     unselected label color contrast (above) and set the selected label
+     to the app's deep-purple ink so it reads against the near-white pill. */
+  html.dark .onb-lang-indicator                { background: var(--ink); }
+  html.dark .onb-lang-btn.is-active            { color: #2A0F5C; }
+  html.dark .onb-hero-card-scroll              {
+    background: linear-gradient(to bottom, rgba(36, 27, 66, 0) 0%, rgba(36, 27, 66, 0.85) 55%, rgba(36, 27, 66, 0.98) 100%);
+  }
+  html.dark .onb-hero-card-era                 { color: rgba(245, 241, 255, 0.62); }
+  html.dark .onb-beat-fan-card .onb-beat-fan-scroll {
+    background: linear-gradient(to bottom, rgba(36, 27, 66, 0) 0%, rgba(36, 27, 66, 0.88) 55%, rgba(36, 27, 66, 0.98) 100%);
+  }
+  html.dark .onb-goal-card                     { border-color: rgba(245, 241, 255, 0.10); box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.5); }
+  html.dark .onb-goal-card:hover:not(.is-selected) { border-color: rgba(245, 241, 255, 0.22); box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.6); }
+  html.dark .onb-goal-hint                     { color: rgba(245, 241, 255, 0.62); }
+  html.dark .onb-goal-icon                     { color: rgba(245, 241, 255, 0.55); }
+  html.dark .onb-streak-mini-mystery           {
+    background: rgba(245, 241, 255, 0.04);
+    border-color: rgba(245, 241, 255, 0.25);
+    color: rgba(245, 241, 255, 0.62);
+  }
+  /* Subject-select cinematic cards: name is var(--ink) via base rule
+     and already flips; the muted taglines + thinker lineup + border
+     are hardcoded and need the same swap. */
+  html.dark .subj-cinematic-card               { border-color: rgba(245, 241, 255, 0.12); box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.5); }
+  html.dark .subj-cinematic-card:hover:not(.is-selected):not(.is-locked) { border-color: rgba(245, 241, 255, 0.22); box-shadow: 0 10px 22px -8px rgba(0, 0, 0, 0.55); }
+  html.dark .subj-cinematic-thinker            { color: rgba(245, 241, 255, 0.68); }
+  html.dark .subj-cinematic-tagline            { color: rgba(245, 241, 255, 0.66); }
+  html.dark .subj-cinematic-card.is-locked .subj-cinematic-locked-tag { color: rgba(245, 241, 255, 0.55); }
+
   html {
     transition: background-color 350ms ease, color 350ms ease;
   }
@@ -4709,11 +4751,29 @@
         var(--surface) 0%,
         var(--onb-edge, rgba(123, 79, 212, 0.10)) 100%
       );
+    /* Light-mode ink values — the html.dark override rule below flips
+       them to their light-ink counterparts for dark mode. Kept as
+       explicit rgba (not var(--text-2)/etc) because the per-theme
+       tokens are tuned for the --bg surface, not the whiter --surface
+       the onboarding uses — so var(--text-2) in light-mode philosophy
+       (~3.36:1) would fail AA on white. These raw alphas composite
+       cleanly on either surface. */
     --onb-text-primary: #2A1266;
     --onb-text-2: rgba(42, 18, 102, 0.72);
-    --onb-text-3: rgba(42, 18, 102, 0.5);
+    /* Was 0.5 — gave 3.05:1 on white (fails AA-body). Bumped to 0.62 →
+       4.65:1. Used by .onb-streak-caption and any other tertiary copy. */
+    --onb-text-3: rgba(42, 18, 102, 0.62);
     --onb-surface-glass: rgba(255, 255, 255, 0.75);
     --onb-border-glass: rgba(42, 18, 102, 0.10);
+  }
+  /* Dark-mode token flip. Same alphas, light-ink base — composites
+     cleanly on the dark --surface (#241B42 on philosophy dark theme). */
+  html.dark .onb-screen {
+    --onb-text-primary: #F5F1FF;
+    --onb-text-2: rgba(245, 241, 255, 0.72);
+    --onb-text-3: rgba(245, 241, 255, 0.62);
+    --onb-surface-glass: rgba(245, 241, 255, 0.06);
+    --onb-border-glass: rgba(245, 241, 255, 0.10);
   }
   .onb-screen.onb-active { display: flex; }
   /* Screen 1 (big statement) + Screen 3 (Socrates): philosophy purple
@@ -4763,8 +4823,11 @@
     font-size: calc(17px * var(--text-scale));
     box-shadow: 0 10px 28px -6px var(--onb-accent-shadow, rgba(123, 79, 212, 0.35));
   }
-  /* Amber CTA needs ink text for contrast — --amber sits ~5.4:1 on ink. */
-  .onb-screen.onb-bg-flame .onb-cta.nav-btn { color: var(--ink); }
+  /* Amber CTA text is deep purple against the amber fill regardless of
+     light/dark app theme — --amber (#F59E0B) doesn't flip, so
+     var(--ink) in dark mode would land near-white text on amber
+     (~2:1, fails AA). Hardcoded #2A1266 stays ~5.4:1 both modes. */
+  .onb-screen.onb-bg-flame .onb-cta.nav-btn { color: #2A1266; }
   .onb-screen .onb-cta.nav-btn:disabled {
     background: rgba(42, 18, 102, 0.08);
     color: rgba(42, 18, 102, 0.4);
@@ -5173,7 +5236,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(42, 18, 102, 0.42);
+    /* Was 0.42 → 2.56:1 (fails AA). Bumped to 0.62 → 4.65:1. */
+    color: rgba(42, 18, 102, 0.62);
     font-family: 'Nunito', sans-serif;
     font-size: calc(28px * var(--text-scale));
     font-weight: 900;
@@ -5279,7 +5343,11 @@
     opacity: 0.85;
   }
 
-  /* ── Beat screens ── */
+  /* ── Beat screens (legacy duplicate rule set — kept for backward
+     compat with older classnames; the current cinematic beat CSS lives
+     ~5020. Only the color assignments here matter now; layout props are
+     overridden upstream). Text colors reference the local onboarding
+     tokens so they flip in dark mode alongside the primary rules. */
   .onb-beat-inner {
     flex: 1;
     display: flex;
@@ -5308,7 +5376,7 @@
     font-size: calc(26px * var(--text-scale));
     font-weight: 900;
     line-height: 1.2;
-    color: var(--ink);
+    color: var(--onb-text-primary);
     margin-bottom: 10px;
     letter-spacing: -0.01em;
   }
@@ -5316,7 +5384,7 @@
     font-size: calc(16px * var(--text-scale));
     line-height: 1.5;
     font-weight: 500;
-    color: var(--text-2);
+    color: var(--onb-text-2);
   }
 
   /* Beat 1 — mock dialogue card. Scaled-down editorial reader snapshot.
@@ -5682,7 +5750,10 @@
   }
   .subj-cinematic-thinker {
     font-size: calc(11px * var(--text-scale));
-    color: rgba(42, 18, 102, 0.5);
+    /* Was 0.5 → 3.05:1 on white (fails AA-body). Bumped to 0.65 →
+       ~4.75:1 (passes). Small uppercase + 1.3px tracking = still reads
+       as a muted eyebrow. */
+    color: rgba(42, 18, 102, 0.65);
     text-transform: uppercase;
     letter-spacing: 1.3px;
     font-weight: 700;
