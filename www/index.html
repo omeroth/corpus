@@ -9029,6 +9029,14 @@ function _onbApplyLangToGoal(lang) {
 // appStarted flip so a later real sign-in still fires enterApp.
 function _enterAsGuestSilent() {
   // Fire the auth choice event so guest-by-default users are counted.
+  // Gated on corpus_auth_choice_fired so each install fires the event
+  // exactly once. startNewUserOnboarding re-runs on every app boot
+  // without a session (until corpus_onboarding_done is set), which
+  // pre-flag was inflating this event by N per user for anyone who
+  // took multiple sessions to finish onboarding. Now matches the
+  // once-per-install semantics of onboarding_started etc.
+  if (localStorage.getItem('corpus_auth_choice_fired')) return;
+  try { localStorage.setItem('corpus_auth_choice_fired', '1'); } catch(e) {}
   _phCapture('onboarding_auth_choice', { choice: 'guest', method: null });
 }
 
