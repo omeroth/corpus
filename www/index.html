@@ -463,6 +463,64 @@
   html.dark .subj-cinematic-tagline            { color: rgba(245, 241, 255, 0.66); }
   html.dark .subj-cinematic-card.is-locked .subj-cinematic-locked-tag { color: rgba(245, 241, 255, 0.55); }
 
+  /* Endowment overlay subline ("come back tomorrow…"). Source rule at
+     5552 hardcodes rgba(42, 18, 102, 0.68) — dark-blue text at 1.4:1 on
+     the near-white radial. Swap to the light-ink alpha counterpart. */
+  html.dark .endowment-box .endowment-tomorrow { color: rgba(245, 241, 255, 0.68); }
+
+  /* Guest signup nudge. Body copy, "Maybe later" link, and the Google
+     / Apple social-button borders all hardcode rgba(42, 18, 102, …).
+     Same-alpha light-ink swap. */
+  html.dark #modal-guest-signup .modal-subtitle { color: rgba(245, 241, 255, 0.68); }
+  html.dark #modal-guest-signup .auth-btn-social {
+    border-color: rgba(245, 241, 255, 0.16) !important;
+    border-bottom-color: rgba(245, 241, 255, 0.24) !important;
+  }
+  html.dark #modal-guest-signup .share-modal-skip { color: rgba(245, 241, 255, 0.62); }
+
+  /* Subject-select cinematic screen. Subtitle uses hardcoded ink alpha
+     (5720). The cinematic-card border/shadow already flip (460-461).
+     The .subj-cinematic-cta:disabled state at 5949 is a pre-existing
+     Chrome quirk: the :disabled rule's `background:` shorthand doesn't
+     override the base .subj-cinematic-cta's `background: var(--accent)`
+     even with !important — verified across headless Chrome 150. Fixing
+     the color-only would produce ~1.6:1 which is still below AA-large;
+     WCAG explicitly exempts disabled UI controls from contrast anyway
+     (1.4.3 note 2), so we leave it. */
+  html.dark body.on-subject-screen:not(.drawer-open) .subj-subtitle { color: rgba(245, 241, 255, 0.62); }
+
+  /* Onboarding progress pills — the "completed past" state (4914-4918).
+     Base state at 432 already flips; the higher-specificity data-step
+     nth-child selectors do not. Same 0.42 alpha, light-ink base. */
+  html.dark .onb-progress[data-step="2"] .onb-pill:nth-child(-n+1),
+  html.dark .onb-progress[data-step="3"] .onb-pill:nth-child(-n+2),
+  html.dark .onb-progress[data-step="4"] .onb-pill:nth-child(-n+3),
+  html.dark .onb-progress[data-step="5"] .onb-pill:nth-child(-n+4) { background: rgba(245, 241, 255, 0.42); }
+
+  /* Econ-promo eyebrow. #2563EB on dark philosophy surface (#241B42) is
+     3.1:1, borderline for AA-body. Lift to the dark-econ-theme accent
+     (#5B8DF0 — same value the html.dark.theme-economics block defines
+     at 337) so the tint stays "econ" but reads on dark ground. */
+  html.dark .econ-promo-eyebrow { color: #5B8DF0; }
+
+  /* Walkthrough progress dot ACTIVE state. Source at 5962 uses
+     var(--surface) which flips dark → dark dot on dark backdrop is
+     invisible. The walkthrough canvas is always dark-tinted regardless
+     of theme, so the active dot always wants to be light. */
+  html.dark .onboarding-dot.active { background: #FFFFFF; }
+
+  /* Cosmetic shadow overrides — ink-tinted drop shadows disappear on
+     dark ground; swap to true-dark rgba so elevation still reads. */
+  html.dark .onb-lang-indicator                 { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); }
+  html.dark .onboarding-speech                  { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55); }
+  html.dark .onboarding-speech.tail-left::before,
+  html.dark .onboarding-speech.tail-right::before { filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.35)); }
+  /* Pantheon flip-card back — celebratory gold border stays, but the
+     ink-purple drop shadow + #FFF8E8 outer ring both die on dark. */
+  html.dark .pantheon-card-back {
+    box-shadow: 0 6px 14px -4px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 217, 130, 0.15);
+  }
+
   html {
     transition: background-color 350ms ease, color 350ms ease;
   }
@@ -2129,7 +2187,13 @@
     display: inline-block;
     padding: 12px 24px;
     background: var(--amber);
-    color: #ffffff;
+    /* Deep-ink text on amber: 7.14:1 contrast — passes AA in BOTH light
+       and dark modes. White on amber was 2.13:1, failed AA in both.
+       Matches the endowment CTA's rule (5561) so amber CTAs stay
+       consistent across the app. Hardcoded #2A1266 (not var(--ink))
+       because var(--ink) flips to near-white in dark, which would put
+       us right back at 2:1. */
+    color: #2A1266;
     border: none;
     border-radius: 999px;
     font-family: inherit;
@@ -2211,64 +2275,67 @@
   .econ-promo-cta:hover { background: #1D4ED8; }
   .econ-promo-cta:active { transform: scale(0.97); }
 
-  /* ── Home hint ring + tooltip ─────────────────────────────────
-     Contextual one-line nudge attached to a home affordance the
-     first time the user sees it. Ring is a fixed-position pulsing
-     outline sized to the target's rect; tooltip is a small pill
-     with the hint text. Both auto-dismiss on tap/scroll or after
-     7s. See _showHint / _homeHintsSweep. No association with the
-     old spotlight tour (that dead code lives further down). */
-  .home-hint-ring {
-    position: fixed;
-    z-index: 900;
-    pointer-events: none;
-    box-shadow:
-      0 0 0 3px var(--accent, #7B4FD4),
-      0 0 0 8px var(--accent-glow, rgba(123, 79, 212, 0.28)),
-      0 8px 24px -6px var(--accent-glow, rgba(123, 79, 212, 0.35));
-    border-radius: 16px;
-    animation: homeHintPulse 1.6s ease-in-out infinite;
-  }
-  @keyframes homeHintPulse {
-    0%, 100% {
-      box-shadow:
-        0 0 0 3px var(--accent, #7B4FD4),
-        0 0 0 8px var(--accent-glow, rgba(123, 79, 212, 0.28)),
-        0 8px 24px -6px var(--accent-glow, rgba(123, 79, 212, 0.35));
-    }
-    50% {
-      box-shadow:
-        0 0 0 3px var(--accent, #7B4FD4),
-        0 0 0 14px var(--accent-glow, rgba(123, 79, 212, 0.18)),
-        0 10px 28px -6px var(--accent-glow, rgba(123, 79, 212, 0.42));
-    }
-  }
-  .home-hint-tip {
-    position: fixed;
-    z-index: 901;
-    max-width: 260px;
+  /* ── Start-first-dialogue card (home) ────────────────────────────
+     Same shape as .econ-promo-card, tinted with the current subject
+     accent so it inherits the philosophy purple by default and the
+     economics blue when the user picked economics in onboarding.
+     CTA-only — no × dismiss (this card disappears on first-dialogue
+     completion). Managed by renderStartFirstDialogueCard. */
+  .start-first-dialogue-card {
+    position: relative;
     background: var(--surface);
-    color: var(--ink);
-    padding: 12px 16px;
-    border-radius: 14px;
-    border: 1px solid var(--border);
-    box-shadow: 0 12px 28px -6px rgba(42, 18, 102, 0.28);
-    font-family: inherit;
-    font-size: calc(14px * var(--text-scale));
-    font-weight: 600;
-    line-height: 1.4;
+    border: 1.5px solid var(--accent);
+    border-radius: 20px;
+    padding: 20px 22px 22px;
+    margin: 12px 16px 16px;
+    box-shadow: 0 6px 20px var(--accent-glow);
+  }
+  .start-first-dialogue-eyebrow {
+    font-size: calc(11px * var(--text-scale));
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1.3px;
+    font-weight: 800;
+    margin-bottom: 10px;
     text-align: start;
-    /* Pop in on paint so the arrival reads as a soft nudge, not a
-       full-viewport takeover. */
-    animation: homeHintTipPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  @keyframes homeHintTipPop {
-    0%   { opacity: 0; transform: scale(0.92); }
-    100% { opacity: 1; transform: scale(1); }
+  .start-first-dialogue-title {
+    font-family: 'Nunito', 'DM Sans', sans-serif;
+    font-size: calc(22px * var(--text-scale));
+    line-height: 1.25;
+    font-weight: 900;
+    color: var(--ink);
+    margin: 0 0 10px;
+    text-align: start;
   }
-  html.dark .home-hint-tip {
-    box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.55);
+  .start-first-dialogue-body {
+    font-size: calc(15px * var(--text-scale));
+    line-height: 1.5;
+    color: var(--ink);
+    margin-bottom: 16px;
+    text-align: start;
   }
+  .start-first-dialogue-cta {
+    display: inline-block;
+    padding: 12px 24px;
+    /* Background uses --accent-dark (not --accent) so white text passes
+       AA in BOTH modes. In dark philosophy --accent is #9D7AE8 → white
+       gives 3.2:1 (fails AA-body); --accent-dark is #7B4FD4 → 5.23:1
+       (passes). Card border stays --accent so the CTA reads as a
+       stronger action inside the card frame. */
+    background: var(--accent-dark);
+    color: #ffffff;
+    border: none;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: calc(15px * var(--text-scale));
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .start-first-dialogue-cta:hover { filter: brightness(0.92); }
+  .start-first-dialogue-cta:active { transform: scale(0.97); }
 
   /* ── Streak repair modal ── */
   .streak-repair-box {
@@ -5560,7 +5627,12 @@
     max-width: 260px;
     margin-inline: auto;
     background: #F59E0B !important;
-    color: var(--ink) !important;
+    /* Deep-ink text on amber: 7.14:1 in both modes. var(--ink) was
+       flipping to near-white in dark, dropping to 2.13:1. Hardcoded
+       #2A1266 stays right across both modes — same rule the
+       .streak-repair-cta (2132) and .onb-cta.nav-btn on amber (4887)
+       already use for the amber-on-amber CTA family. */
+    color: #2A1266 !important;
     border: none !important;
     border-bottom: 5px solid rgba(0, 0, 0, 0.14) !important;
     box-shadow: 0 10px 28px -6px rgba(245, 158, 11, 0.42);
@@ -5884,17 +5956,22 @@
     cursor: default;
   }
 
-  /* ── Legacy tour overlay & spotlight (deprecated — kept for compat) ── */
+  /* ── Onboarding walkthrough (owl + spotlight) ─────────────────
+     Overlay chrome for the seven-screen walkthrough that fires from
+     the tail of _onbFinishGoal. Canvas draws a semi-opaque backdrop
+     with a punch-out around the spotlighted element; a click inside
+     the punch-out fires the shortcut-tap bail. */
   .onboarding-backdrop { position: fixed; inset: 0; z-index: 999; pointer-events: all; }
-  .onboarding-owl-float { position: fixed; z-index: 1001; width: 100px; height: 100px; transition: top 0.6s cubic-bezier(0.34,1.56,0.64,1), left 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+  .onboarding-owl-float { position: fixed; z-index: 1001; width: 100px; height: 100px; transition: top 0.6s cubic-bezier(0.34,1.56,0.64,1), left 0.6s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; }
   .onboarding-owl-float svg { width: 100%; height: 100%; }
   @keyframes floaty { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-10px) rotate(1deg); } }
   .floating { animation: floaty 2.8s ease-in-out infinite; transform-origin: 50% 80%; }
-  .onboarding-speech { position: fixed; z-index: 1001; background: var(--surface); border-radius: 20px; padding: 16px 18px; max-width: 240px; font-size: 14px; font-weight: 600; color: #2A1B4A; line-height: 1.5; box-shadow: 0 8px 32px rgba(42,27,74,0.2); transition: top 0.5s cubic-bezier(0.34,1.56,0.64,1), left 0.5s cubic-bezier(0.34,1.56,0.64,1); animation: bubblePop 0.3s cubic-bezier(0.34,1.56,0.64,1); text-align: left; direction: ltr; }
+  .onboarding-speech { position: fixed; z-index: 1001; background: var(--surface); border-radius: 20px; padding: 16px 18px; max-width: 240px; font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.5; box-shadow: 0 8px 32px rgba(42,27,74,0.2); transition: top 0.5s cubic-bezier(0.34,1.56,0.64,1), left 0.5s cubic-bezier(0.34,1.56,0.64,1); animation: bubblePop 0.3s cubic-bezier(0.34,1.56,0.64,1); text-align: start; pointer-events: auto; }
   .onboarding-speech::before { display: none; }
-  .onboarding-speech.tail-top::before { content: ''; display: block; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid white; }
-  .onboarding-speech.tail-left::before { content: ''; display: block; position: absolute; top: 20px; left: -10px; width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right: 10px solid white; filter: drop-shadow(-2px 0 2px rgba(42,27,74,0.08)); }
-  .onboarding-speech.tail-bottom::before { content: ''; display: block; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid white; }
+  .onboarding-speech.tail-top::before { content: ''; display: block; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid var(--surface); }
+  .onboarding-speech.tail-left::before { content: ''; display: block; position: absolute; top: 20px; left: -10px; width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right: 10px solid var(--surface); filter: drop-shadow(-2px 0 2px rgba(42,27,74,0.08)); }
+  .onboarding-speech.tail-right::before { content: ''; display: block; position: absolute; top: 20px; right: -10px; width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-left: 10px solid var(--surface); filter: drop-shadow(2px 0 2px rgba(42,27,74,0.08)); }
+  .onboarding-speech.tail-bottom::before { content: ''; display: block; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 10px solid var(--surface); }
   @keyframes bubblePop { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
   /* Speech-bubble tooltip for the locked bonus card. Inherits .onboarding-speech base.
      direction: inherit OVERRIDES .onboarding-speech's hardcoded direction: ltr so Hebrew
@@ -5907,10 +5984,41 @@
      tooltip's horizontal center (unchanged behavior when no clamp). */
   .bonus-tooltip.tail-top::before { border-bottom-color: #D4AF37; left: calc(50% + var(--tail-offset, 0px)); }
   .onboarding-next-btn { display: block; margin-top: 10px; background: var(--accent); color: var(--on-accent); border: none; border-radius: 50px; padding: 8px 20px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; }
-  #onboarding-lang-buttons { display: flex; }
-  .onboarding-lang-btn { flex: 1; max-width: 120px; padding: 8px 16px; background: var(--accent); color: var(--on-accent); border: none; border-radius: 50px; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1); }
-  .onboarding-lang-btn:active { transform: scale(0.93); }
   .onboarding-dots-float { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 1002; display: flex; gap: 8px; align-items: center; }
+  /* Skip button — fixed at the top-end (RTL-aware via inset-inline-end),
+     visible on every walkthrough screen including the greeting. Above
+     the canvas + owl float so it always receives its own taps. */
+  .walkthrough-skip-btn {
+    position: fixed;
+    top: 12px;
+    inset-inline-end: 12px;
+    z-index: 1003;
+    background: rgba(255, 255, 255, 0.14);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
+  }
+  .walkthrough-skip-btn:active { transform: scale(0.96); }
+  /* Start-first-dialogue card must not sit behind the walkthrough
+     overlay — the walkthrough IS the first-time entry point. Hidden
+     via CSS while the overlay is up; re-shown on skip/bail via a
+     fresh renderHome (the card's own gate re-mounts it). */
+  html.walkthrough-active #start-first-dialogue-card-holder { display: none !important; }
+  /* Scroll lock. Prevents the user from scrolling home while a step is
+     anchored to an on-screen element (scrolling would desynchronise the
+     spotlight from its target). Programmatic .scrollTop writes must
+     still work — the driver scrolls off-fold targets into view before
+     each step — so we DON'T use overflow:hidden. Instead, touch-action:
+     none on the overlay + wheel/touchmove listeners swallow user input.
+     Released on teardown. */
+  html.walkthrough-active #onboarding-overlay { touch-action: none; }
   .owl-svg [data-expr] { display: none; }
   .owl-svg.owl-neutral [data-expr="neutral"] { display: inline; }
   .owl-svg.owl-determined [data-expr="determined"] { display: inline; }
@@ -7691,12 +7799,9 @@
   </div>
   <div class="onboarding-speech" id="onboarding-speech">
     <div id="onboarding-bubble"></div>
-    <button class="onboarding-next-btn" id="onboarding-btn" onclick="nextOnboardingStep()"></button>
-    <div id="onboarding-lang-buttons" style="display:none; gap:12px; justify-content:center; margin-top:10px;">
-      <button class="onboarding-lang-btn" data-lang="he">עברית</button>
-      <button class="onboarding-lang-btn" data-lang="en">English</button>
-    </div>
+    <button class="onboarding-next-btn" id="onboarding-btn"></button>
   </div>
+  <button class="walkthrough-skip-btn" id="walkthrough-skip" onclick="_walkthroughSkip()"></button>
   <div class="onboarding-dots-float" id="onboarding-dots"></div>
 </div>
 <div id="screen-auth" class="auth-screen">
@@ -7829,6 +7934,12 @@
       <div class="thinker-carousel-wrap" id="thinker-carousel-wrap" style="display:none">
         <div class="thinker-carousel" id="thinker-carousel"></div>
       </div>
+
+      <!-- Start-first-dialogue card — filled by renderStartFirstDialogueCard
+           for a user who finished onboarding but has not yet completed
+           the first dialogue. Sits above the streak-repair + econ-promo
+           cards so it's the first thing on the scroll. -->
+      <div id="start-first-dialogue-card-holder" style="display:none"></div>
 
       <!-- Streak repair card — filled by renderStreakRepairCard when eligible. -->
       <div id="streak-repair-card-holder" style="display:none"></div>
@@ -8882,9 +8993,6 @@ function _secondsSinceOnboardingStart() {
   return Math.max(0, Math.round(ms / 1000));
 }
 
-// Session-scoped dedup so a spotlight-step re-render doesn't multi-fire.
-const _onboardingTourStepsSeen = new Set();
-
 // ═══════════════════════════════════════════════════════════
 // NEW ONBOARDING FLOW — welcome → subject → goal → reader
 // ═══════════════════════════════════════════════════════════
@@ -9259,14 +9367,14 @@ function _onbFinishGoal() {
     showScreen('home');
     return;
   }
-  // Straight into the first dialogue.
-  const weeks = getW();
-  if (weeks && weeks[0] && weeks[0].days && weeks[0].days.length) {
-    openReader(weeks[0].id, weeks[0].days[0].id);
-  } else {
-    renderHome();
-    showScreen('home');
-  }
+  // Land on home so the owl-guided walkthrough gets to fire before the
+  // reader ever opens. rAF defers the eligibility check + startup until
+  // home has painted and the spotlight targets have real bounding rects.
+  renderHome();
+  showScreen('home');
+  requestAnimationFrame(() => {
+    try { _walkthroughStartIfEligible(); } catch (e) {}
+  });
 }
 
 // Fresh-install entry: welcome → subject → goal → reader. Called from
@@ -9494,24 +9602,18 @@ function closeIntro() {
   localStorage.setItem('corpus_intro_done', '1');
   document.getElementById('intro-overlay').style.display = 'none';
   if (!currentUser) {
-    // Pre-auth path: carousel finished. Reveal the app, then pick a subject
-    // first — subjConfirm() chains into startOnboarding on its own, so do NOT
-    // call startOnboarding here (it would double-fire).
+    // Pre-auth path: carousel finished. Reveal the app, then pick a subject.
     hideAuthScreen();
     if (!localStorage.getItem('corpus_subject')) {
       showSubjectSelect();
     } else {
       renderHome();
       showScreen('home');
-      setTimeout(startOnboarding, 500);
     }
     return;
   }
-  // Post-auth path (unchanged behavior):
   if (!localStorage.getItem('corpus_subject')) {
     showSubjectSelect();
-  } else {
-    setTimeout(startOnboarding, 500);
   }
 }
 
@@ -16883,10 +16985,10 @@ function defaultState() {
     // the >= check. Union-merge-safe (dedup by dismissedAt).
     // [{ dismissedAt: 'YYYY-MM-DD' }]
     econPromoCardDismissed: [],
-    // Contextual home-screen hints. Once-ever per user, dedup by
-    // string id. Same union-merge convention as streakRepairs (which
-    // is ['YYYY-MM-DD', …]) — just the string is the id, not a date.
-    // Set by _markHintSeen; read by _hasHintSeen. See HOME_HINTS.
+    // Legacy home-hints ID array. Feature retired in favour of the
+    // owl-guided walkthrough; field kept because it's a Supabase-synced
+    // union-merge column (see 20260728120000_hints_seen.sql) and dropping
+    // it would need a schema migration. Harmless to leave (no readers).
     hintsSeen: [],
     chapterCompleteShown: {}, // { weekId: true } — fires the chapter-complete overlay once per chapter
     chapterXPByWeek: {},      // XP tallied per chapter for chapter-complete metrics
@@ -17029,13 +17131,6 @@ function showScreen(id) {
   }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
-  // Home hints only live on home. Tearing down any active observer +
-  // DOM hint when leaving home stops a mid-observe race from surfacing
-  // a hint on a screen it doesn't belong to. Sweep re-runs from
-  // renderHome on the next visit.
-  if (id !== 'home' && state.currentScreen === 'home') {
-    try { _homeHintsTeardown(); } catch (e) {}
-  }
   state.currentScreen = id;
   window.scrollTo(0, 0);
   const readerBar = document.getElementById('reader-btn-bar');
@@ -17724,237 +17819,66 @@ function openEconPromoBonus() {
   if (day) openReader('bonusEcon1', day.id);
 }
 
-// ─── Home contextual hints ──────────────────────────────────────
-// Lazy-fire, once-ever, priority-ordered. Each hint attaches a ring +
-// tooltip to a home element the first time it becomes visible on a
-// fresh user's home mount. Dedup via state.hintsSeen (union-merge-
-// safe string array; see loadProgressFromSupabase + saveState).
-//
-// Trigger: IntersectionObserver on the target's rect (≥50% visible for
-// 500ms). One hint max per renderHome mount — the picker walks
-// HOME_HINTS in priority order and returns the highest-priority
-// unseen + eligible + rendered target. Special "hooks" (streak,
-// carousel, pantheon_tab) fall out of the same picker via eligibility
-// predicates that reference state (dailyStreak > 0 for streak;
-// unlockedThinkers > 0 for the pantheon-facing hints).
-
-const HOME_HINTS = [
-  { id: 'streak',       priority: 1, selector: '.stats-subheader .topbar-stat[title="Streak"]',
-    en: 'One dialogue a day keeps the flame lit.',
-    he: 'דיאלוג אחד ביום שומר על הלהבה.',
-    eligible: () => (state.dailyStreak || 0) > 0 },
-  { id: 'next_up',      priority: 2, selector: '.lesson-circle.next-up',
-    en: 'Tap here to start your first dialogue.',
-    he: 'כאן מתחיל הדיאלוג הראשון.',
-    eligible: () => true },
-  { id: 'xp',           priority: 3, selector: '.stats-subheader .topbar-stat[title="XP"]',
-    en: 'Every correct answer earns XP.',
-    he: 'כל תשובה נכונה מזכה ב־XP.',
-    eligible: () => true },
-  { id: 'level',        priority: 4, selector: '.stats-subheader .topbar-stat[title="Level"]',
-    en: 'Enough XP and you rank up.',
-    he: 'עם מספיק XP עולים דרגה.',
-    eligible: () => true },
-  { id: 'chapters',     priority: 5, selector: '#home-levels .level-card:first-child',
-    en: 'Each chapter is a series of daily dialogues.',
-    he: 'כל פרק הוא סדרת דיאלוגים יומיים.',
-    eligible: () => true },
-  { id: 'carousel',     priority: 6, selector: '#thinker-carousel-wrap',
-    en: "Thinkers you've met live here.",
-    he: 'ההוגים שפגשת נאספים כאן.',
-    eligible: () => (state.unlockedThinkers || []).length > 0 },
-  { id: 'pantheon_tab', priority: 7, selector: '#bnav-pantheon',
-    en: 'The Pantheon holds every thinker you unlock.',
-    he: 'הפנתאון שומר כל הוגה שפתחת.',
-    eligible: () => (state.unlockedThinkers || []).length > 0 },
-];
-
-let _homeHintFiredThisMount = false;
-let _homeHintObserver       = null;
-let _homeHintActiveEls      = null;   // { ring, tip, cleanup } while a hint is up
-
-function _hasHintSeen(id)  { return (state.hintsSeen || []).includes(id); }
-function _markHintSeen(id) {
-  state.hintsSeen = state.hintsSeen || [];
-  if (state.hintsSeen.includes(id)) return;
-  state.hintsSeen.push(id);
-  saveStateLocal();
-  try { saveState(); } catch (e) {}
-}
-
-// Blocked when any celebration is queued/active, any prompt modal is up,
-// any post-completion overlay is up, any onboarding screen is active,
-// or any of the home cards (streak-repair / econ promo) currently occupy
-// the top of the scroll. Reuses the existing _promptModalActiveForCelebrations
-// (line ~18167) to stay in lockstep with the celebration queue's own
-// collision policy.
-function _homeHintsClear() {
-  if ((state.pendingCelebrations || []).length) return false;
-  try { if (_promptModalActiveForCelebrations()) return false; } catch (e) {}
-  const modalIds = [
-    'modal-complete', 'chapter-complete-overlay',
-    'onboarding-welcome', 'onboarding-beat', 'onboarding-streak', 'onboarding-goal',
-    'modal-bonus-picker', 'modal-thinker-intro',
-    'modal-streak-repair',
-  ];
-  for (const id of modalIds) {
-    const el = document.getElementById(id);
-    if (!el) continue;
-    if (el.classList.contains('active')) return false;
-    // Onboarding overlays use display:flex + .onb-active; check both.
-    if (el.classList.contains('onb-active')) return false;
+// ─── Start-first-dialogue card (home) ──────────────────────────────
+// Rendered at the very top of home for a user who finished onboarding
+// but has not yet completed their first dialogue. CTA-only (no ×).
+// Auto-disappears on the next renderHome after
+// corpus_first_dialogue_completed_at is set (the reader-complete flow
+// writes that flag once the user finishes their first dialogue).
+// Hidden by CSS while the walkthrough overlay is up (see html.walkthrough-active).
+function renderStartFirstDialogueCard() {
+  const holder = document.getElementById('start-first-dialogue-card-holder');
+  if (!holder) return;
+  const done       = !!localStorage.getItem('corpus_onboarding_done');
+  const firstDone  = !!localStorage.getItem('corpus_first_dialogue_completed_at');
+  if (!done || firstDone) {
+    holder.innerHTML = ''; holder.style.display = 'none';
+    return;
   }
-  if (document.querySelector('.levelup-overlay.active')) return false;
-  // Home cards — visually claim the top of the scroll; a hint competing
-  // for the same real estate would collide. Defer until dismissed.
-  const shR = document.getElementById('streak-repair-card-holder');
-  const eP  = document.getElementById('econ-promo-card-holder');
-  if ((shR && shR.children.length) || (eP && eP.children.length)) return false;
-  return true;
-}
-
-function _pickHomeHint() {
-  if (state.currentScreen !== 'home') return null;
-  for (const h of HOME_HINTS) {
-    if (_hasHintSeen(h.id)) continue;
-    if (!h.eligible()) continue;
-    const el = document.querySelector(h.selector);
-    if (!el) continue;
-    // Rendered + non-zero size (element exists in DOM but might be
-    // display:none or off-viewport). IO will fire only on real visibility.
-    const rect = el.getBoundingClientRect();
-    if (rect.width < 1 || rect.height < 1) continue;
-    return { hint: h, el };
-  }
-  return null;
-}
-
-// Called at the tail of renderHome. Idempotent — safe to call more than
-// once per mount; the _homeHintFiredThisMount guard makes subsequent
-// calls no-ops until the next mount (which resets the flag).
-function _homeHintsSweep() {
-  if (_homeHintFiredThisMount) return;
-  if (!_homeHintsClear()) return;
-  const pick = _pickHomeHint();
-  if (!pick) return;
-  if (_homeHintObserver) { _homeHintObserver.disconnect(); _homeHintObserver = null; }
-  let visibleTimer = null;
-  _homeHintObserver = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-        if (visibleTimer) continue;
-        visibleTimer = setTimeout(() => {
-          if (_homeHintFiredThisMount) return;
-          if (!_homeHintsClear()) return;             // re-check on fire
-          if (_hasHintSeen(pick.hint.id)) return;
-          _homeHintFiredThisMount = true;
-          _showHint(pick.hint, pick.el);
-          if (_homeHintObserver) { _homeHintObserver.disconnect(); _homeHintObserver = null; }
-        }, 500);
-      } else if (visibleTimer) {
-        clearTimeout(visibleTimer);
-        visibleTimer = null;
-      }
-    }
-  }, { threshold: [0.5] });
-  _homeHintObserver.observe(pick.el);
-}
-
-// Torn down when the user leaves home OR when the hint dismisses.
-function _homeHintsTeardown() {
-  if (_homeHintObserver) { _homeHintObserver.disconnect(); _homeHintObserver = null; }
-  if (_homeHintActiveEls) {
-    try { _homeHintActiveEls.cleanup(); } catch (e) {}
-    _homeHintActiveEls = null;
-  }
-}
-
-function _showHint(hint, target) {
   const isEn = state.lang === 'en';
-  const text = isEn ? hint.en : hint.he;
-  const rect = target.getBoundingClientRect();
-  const cs   = getComputedStyle(target);
-
-  const ring = document.createElement('div');
-  ring.className = 'home-hint-ring';
-  ring.style.top    = (rect.top - 4)  + 'px';
-  ring.style.left   = (rect.left - 4) + 'px';
-  ring.style.width  = (rect.width  + 8) + 'px';
-  ring.style.height = (rect.height + 8) + 'px';
-  // Inherit target's rounding (lesson-circle = 999px = becomes a real
-  // circle; level card = 20px). Fallback 16px for elements without radius.
-  ring.style.borderRadius = cs.borderRadius && cs.borderRadius !== '0px'
-    ? cs.borderRadius : '16px';
-  document.body.appendChild(ring);
-
-  const tip = document.createElement('div');
-  tip.className = 'home-hint-tip';
-  tip.textContent = text;
-  // Match app language direction so RTL Hebrew reads correctly.
-  tip.dir = isEn ? 'ltr' : 'rtl';
-  document.body.appendChild(tip);
-
-  // Position tooltip below the target unless there isn't room, then above.
-  // Horizontal centering clamped to viewport with a 12px inset.
-  requestAnimationFrame(() => {
-    const tipRect = tip.getBoundingClientRect();
-    let tipTop;
-    if (rect.bottom + tipRect.height + 16 < window.innerHeight - 12) {
-      tipTop = rect.bottom + 12;
-    } else {
-      tipTop = Math.max(12, rect.top - tipRect.height - 12);
-    }
-    const centerX  = rect.left + rect.width / 2;
-    const tipLeft  = Math.max(12,
-      Math.min(window.innerWidth - tipRect.width - 12,
-               centerX - tipRect.width / 2));
-    tip.style.top  = tipTop + 'px';
-    tip.style.left = tipLeft + 'px';
-  });
-
-  // Dismiss on tap anywhere / on scroll / after 7s auto-timeout. The
-  // method is carried in state so home_hint_dismissed can report which
-  // path fired — 'tap' means user engaged, 'scroll' means user moved on,
-  // 'timeout' means neither (they may not have noticed the hint at all).
-  let cleaned = false;
-  const cleanup = () => {
-    if (cleaned) return;
-    cleaned = true;
-    try { ring.remove(); tip.remove(); } catch (e) {}
-    document.removeEventListener('click',      onTap,        true);
-    document.removeEventListener('touchstart', onTap,        true);
-    document.removeEventListener('scroll',     onScroll,     true);
-    if (autoTimer) clearTimeout(autoTimer);
-    _homeHintActiveEls = null;
-  };
-  const dismissWith = (method) => {
-    _markHintSeen(hint.id);
+  // Fire start_card_shown once per session per home mount — repeated
+  // renderHome calls (subject switch, back-from-reader, etc.) shouldn't
+  // inflate the count.
+  window._startCardSeenThisSession = window._startCardSeenThisSession || false;
+  if (!window._startCardSeenThisSession) {
+    window._startCardSeenThisSession = true;
     try {
-      posthog.capture('home_hint_dismissed', {
-        hint_id: hint.id,
-        lang:    state.lang || 'he',
-        method:  method,
+      _phCapture('start_card_shown', {
+        subject: state.subject || null,
+        lang:    state.lang || null,
       });
     } catch (e) {}
-    cleanup();
-  };
-  const onTap      = () => dismissWith('tap');
-  const onScroll   = () => dismissWith('scroll');
-  const onTimeout  = () => dismissWith('timeout');
-  const autoTimer  = setTimeout(onTimeout, 7000);
-  // capture:true so we get the tap even if a child handler stopPropagation's
-  document.addEventListener('click',      onTap,    true);
-  document.addEventListener('touchstart', onTap,    true);
-  document.addEventListener('scroll',     onScroll, { capture: true, passive: true });
+  }
+  const eyebrow = isEn ? 'The first step'                : 'הצעד הראשון';
+  const title   = isEn ? 'It all starts with one dialogue' : 'הכול מתחיל בדיאלוג אחד';
+  const body    = isEn
+    ? "Take a moment to look around. Your first dialogue is waiting whenever you're ready."
+    : 'קחו רגע להכיר את המקום. הדיאלוג הראשון מחכה מתי שתרצו.';
+  const cta     = isEn ? 'Open the first dialogue' : 'לדיאלוג הראשון';
+  holder.innerHTML =
+    '<div class="start-first-dialogue-card" role="region" aria-label="' + eyebrow + '">' +
+      '<div class="start-first-dialogue-eyebrow">' + eyebrow + '</div>' +
+      '<h2 class="start-first-dialogue-title">' + title + '</h2>' +
+      '<div class="start-first-dialogue-body">' + body + '</div>' +
+      '<button class="start-first-dialogue-cta" onclick="openStartFirstDialogue()">' + cta + '</button>' +
+    '</div>';
+  holder.style.display = '';
+}
 
-  _homeHintActiveEls = { ring, tip, cleanup };
-
+function openStartFirstDialogue() {
   try {
-    posthog.capture('home_hint_shown', {
-      hint_id: hint.id,
-      lang:    state.lang || 'he',
+    _phCapture('start_card_tapped', {
+      subject: state.subject || null,
+      lang:    state.lang || null,
     });
   } catch (e) {}
+  // Subject-aware — matches the fallback target _onbFinishGoal used to
+  // call directly. Never hardcode 1-1; getW() reflects the user's
+  // current subject.
+  const weeks = getW();
+  if (weeks && weeks[0] && weeks[0].days && weeks[0].days.length) {
+    openReader(weeks[0].id, weeks[0].days[0].id);
+  }
 }
 
 function renderStreakRepairCard() {
@@ -18834,13 +18758,12 @@ if (!window._safeAreaObserverInstalled) {
 }
 
 function renderHome() {
-  // Reset the per-mount hint guard AND tear down any prior observer so
-  // stale IO callbacks from a previous mount can't fire against DOM that
-  // renderHome is about to rebuild. _homeHintsSweep is called at the
-  // tail of this function once the level cards + stats have painted.
-  _homeHintFiredThisMount = false;
-  try { _homeHintsTeardown(); } catch (e) {}
   const ui = u();
+  // Start-first-dialogue card: rendered at the very top of the scroll
+  // for a user who finished onboarding but hasn't completed their
+  // first dialogue yet. Safe to call unconditionally — it clears the
+  // holder when the completion flag flips.
+  try { renderStartFirstDialogueCard(); } catch (e) {}
   // Streak-repair card: rendered near the top of the scroll. Function is
   // safe to call unconditionally — it clears the holder if the user isn't
   // eligible or has dismissed it this session.
@@ -19164,10 +19087,6 @@ function renderHome() {
 
   populateCarousel();
   requestAnimationFrame(fixStatsPosition);
-  // Home contextual hints — sweep runs after the layout tick so the
-  // level cards + stats + carousel wrap have real bounding rects for
-  // the IO to observe. See _homeHintsSweep for the priority + IO logic.
-  requestAnimationFrame(() => { try { _homeHintsSweep(); } catch (e) {} });
 }
 
 const CAROUSEL_ORDER = {
@@ -19427,22 +19346,15 @@ function openReader(weekId, dayId, opts) {
     _guestSignupPendingFn = null;
     _guestSignupModal.classList.remove('active');
   }
-  // If the onboarding overlay is still visible, this open is the spotlight
-  // shortcut on step 3 (user tapped the highlighted lesson node directly
-  // instead of the "I'm ready!" button). Treat it as completing the tour —
-  // mirror the exit done by finishOnboardingWithLang/nextOnboardingStep —
-  // so the overlay doesn't linger behind subsequent modals (this collided
-  // with the guest sign-in prompt on first completion). Trade-off: the
-  // shortcut skips the language-pick step; default EN stays, and users can
-  // toggle later from the profile screen.
-  const _onbOverlay = document.getElementById('onboarding-overlay');
-  if (_onbOverlay && _onbOverlay.style.display !== 'none') {
-    _onbOverlay.style.display = 'none';
-    // Funnel: onboarding_tour_skipped. Fires when the user bypasses the
-    // remaining tour steps by tapping the spotlight target directly.
-    _phCapture('onboarding_tour_skipped', { last_step_index: onboardingStep });
-    try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
-    try { saveState(); } catch(e) {}  // sync the flag to Supabase if signed in (no-op for guests)
+  // Walkthrough shortcut-tap bail: if the overlay is up when openReader
+  // fires (user tapped through the spotlight punch-out onto a lesson
+  // node during, say, the next_up step), tear down the walkthrough,
+  // set the done flag, and fire walkthrough_skipped { via: 'shortcut_tap' }.
+  // The reader then proceeds normally without an overlay lingering behind
+  // the subsequent day-complete / guest-signup modals.
+  const _wtOverlay = document.getElementById('onboarding-overlay');
+  if (_wtOverlay && _wtOverlay.style.display !== 'none') {
+    try { _walkthroughShortcutBail(); } catch (e) {}
   }
 
   const _week = getW().find(function(w) { return w.id === weekId; });
@@ -21781,47 +21693,43 @@ function launchConfetti() {
 // INIT
 // ═══════════════════════════════════════════════════════════
 
-// Auth-gated startup - kept at global scope so handleAuthSubmit can access them.
-const ONBOARDING_STEPS = [
-  {
-    expr: 'owl-neutral',
-    text: "Hey! I'm here to take you on a daily adventure in the world's greatest ideas. Ready?",
-    btn: "Let's start!",
-    spotlight: null,
-    tailDirection: 'top'
-  },
-  {
-    expr: 'owl-determined',
-    text: "This is where we track your dedication - XP and daily streak. Every day counts!",
-    btn: "Got it!",
-    spotlight: '.stats-subheader',
-    tailDirection: 'left'
-  },
-  {
-    expr: 'owl-admiring',
-    text: "Here you'll find all the thinkers you collect as you complete lessons. Your personal Pantheon.",
-    btn: "Amazing!",
-    spotlight: '.thinker-carousel-wrap',
-    tailDirection: 'left'
-  },
-  {
-    expr: 'owl-action',
-    text: "And this is where the magic happens. One tap and we dive in - your first lesson is waiting.",
-    btn: "I'm ready!",
-    spotlight: '#level-card-1 .lesson-node:first-child',
-    tailDirection: 'left'
-  },
-  {
-    expr: 'owl-neutral',
-    isLangSelect: true,
-    spotlight: null,
-    tailDirection: 'top'
+// Returns the effective spotlight rect for a given step — clamped to
+// the visible interior of the viewport so the punch-out never reveals
+// the topbar, stats-subheader, or bottom-nav areas. The step's own
+// hint fields override this (max* keys) to further shrink the rect
+// when the raw element extends past the intended affordance (e.g. an
+// expanded chapter card runs to the bottom of the scroll list).
+function _walkthroughSpotlightRect(step) {
+  if (!step || !step.spotlight) return null;
+  const el = document.querySelector(step.spotlight);
+  if (!el) return null;
+  const rect = el.getBoundingClientRect();
+  let top = rect.top, left = rect.left, right = rect.right, bottom = rect.bottom;
+  // Clamp to visible interior. Topbar sits at y 0-56; stats bar 56-110
+  // (per #screen-home .scroll-content padding-top:110). Bottom nav is
+  // 64px tall + safe-area at the very bottom. Anything the spotlight
+  // extends into those chrome bands is chrome, not the affordance the
+  // step is teaching, so clip.
+  const chromeTop = step.allowChromeTop
+    ? 0
+    : (document.querySelector('.stats-subheader')?.getBoundingClientRect().bottom || 0);
+  const nav = document.querySelector('.bottom-nav');
+  const navRect = nav ? nav.getBoundingClientRect() : null;
+  const chromeBottom = step.allowChromeBottom
+    ? window.innerHeight
+    : (navRect ? navRect.top : window.innerHeight);
+  top    = Math.max(top,    chromeTop);
+  bottom = Math.min(bottom, chromeBottom);
+  // Optional per-step ceiling on the rect's height — used by 'chapters'
+  // where the expanded card runs 470+px tall and the punch-out would
+  // otherwise slice past the fold and reveal the bonus card / bottom nav.
+  if (step.maxHeight && bottom - top > step.maxHeight) {
+    bottom = top + step.maxHeight;
   }
-];
+  return { top, left, right, bottom, width: right - left, height: bottom - top, el };
+}
 
-let onboardingStep = 0;
-
-function drawSpotlight(targetSelector) {
+function drawSpotlight(step) {
   const canvas = document.getElementById('onboarding-spotlight');
   if (!canvas) return;
   canvas.width = window.innerWidth;
@@ -21831,271 +21739,506 @@ function drawSpotlight(targetSelector) {
   ctx.fillStyle = 'rgba(42, 27, 74, 0.75)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  if (targetSelector) {
-    const el = document.querySelector(targetSelector);
-    if (el) {
-      const rect = el.getBoundingClientRect();
-      const padding = 12;
-      // If the spotlight target is or contains .thinker-carousel, tighten the rect
-      // to hug the visible cards row instead of including the carousel's 50px
-      // top/bottom padding. Defensive: any error falls through with
-      // padTop = padBottom = 0 (no adjustment — preserves existing behavior for
-      // every other spotlight target).
-      let padTop = 0, padBottom = 0;
-      try {
-        const padded = el.matches && el.matches('.thinker-carousel')
-          ? el
-          : (el.querySelector && el.querySelector('.thinker-carousel'));
-        if (padded) {
-          const cs = getComputedStyle(padded);
-          padTop = parseFloat(cs.paddingTop) || 0;
-          padBottom = parseFloat(cs.paddingBottom) || 0;
-        }
-      } catch(e) {}
-      const x = rect.left - padding;
-      const y = rect.top - padding + padTop;
-      const w = rect.width + padding * 2;
-      const h = rect.height + padding * 2 - padTop - padBottom;
-      const r = 16;
+  const info = _walkthroughSpotlightRect(step);
+  if (!info) return;
 
-      ctx.save();
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.lineTo(x + w - r, y);
-      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-      ctx.lineTo(x + w, y + h - r);
-      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-      ctx.lineTo(x + r, y + h);
-      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-      ctx.lineTo(x, y + r);
-      ctx.quadraticCurveTo(x, y, x + r, y);
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(0,0,0,1)';
-      ctx.fill();
-      ctx.restore();
+  // Uniform 8px halo around every spotlight target. Border radius reads
+  // the target's own computed border-radius so a pill stays a pill and
+  // a card stays a card. Fallback to 16px for elements without a radius.
+  const padding = 8;
+  const x = info.left - padding;
+  const y = info.top  - padding;
+  const w = info.width  + padding * 2;
+  const h = info.height + padding * 2;
+  let r;
+  try {
+    const cs = getComputedStyle(info.el);
+    const rawR = parseFloat(cs.borderTopLeftRadius) || 0;
+    // If the target is a pill (radius >= half its short side), keep it a
+    // pill after padding. Otherwise clamp so the radius never exceeds half
+    // the padded rect's short side.
+    r = Math.min(rawR || 16, Math.min(w, h) / 2);
+    if (r < 6) r = 6;                                     // minimum, keeps corners visibly rounded
+  } catch (e) { r = 16; }
 
-      ctx.save();
-      ctx.strokeStyle = 'rgba(' + (getComputedStyle(document.documentElement).getPropertyValue('--accent-rgb').trim() || '123,79,212') + ', 0.6)';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.lineTo(x + w - r, y);
-      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-      ctx.lineTo(x + w, y + h - r);
-      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-      ctx.lineTo(x + r, y + h);
-      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-      ctx.lineTo(x, y + r);
-      ctx.quadraticCurveTo(x, y, x + r, y);
-      ctx.closePath();
-      ctx.stroke();
-      ctx.restore();
-    }
-  }
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(0,0,0,1)';
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(' + (getComputedStyle(document.documentElement).getPropertyValue('--accent-rgb').trim() || '123,79,212') + ', 0.6)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
 }
 
-window.addEventListener('resize', () => {
-  const step = ONBOARDING_STEPS[onboardingStep];
-  if (step && document.getElementById('onboarding-overlay').style.display !== 'none') {
-    drawSpotlight(step.spotlight);
-  }
-});
+// ─── Onboarding walkthrough (owl-guided, 7 screens) ─────────────
+// Fired once per install from the tail of _onbFinishGoal. Gated on
+// corpus_walkthrough_done, no completedDays, no corpus_first_dialogue_
+// completed_at. Existing users never see it. Skippable at every screen
+// via #walkthrough-skip; a shortcut tap on a spotlighted element also
+// bails (see openReader guard). Ends on the closing CTA which opens
+// getW()[0] day 1 — same target the start card CTA uses.
 
-function startOnboarding() {
-  if (localStorage.getItem('corpus_onboarding_done')) return;
+// spotlight — CSS selector to spotlight for the step.
+// allowChromeTop — set true when the target itself lives in the topbar
+//                  / stats-subheader band (streak step); prevents the
+//                  clamp from cropping it into oblivion.
+// allowChromeBottom — same idea for the bottom-nav band (pantheon step).
+// maxHeight — cap for tall targets so the punch-out doesn't slice past
+//             the visible fold (chapters step: the expanded card runs
+//             past 500px otherwise).
+const WALKTHROUGH_STEPS = [
+  { id: 'greeting', expr: 'owl-neutral',   spotlight: null,
+    he: 'שלום. אני אלווה אתכם בצעדים הראשונים ב-Corpus.',
+    en: "Hello. I'll walk you through your first steps in Corpus." },
+  { id: 'chapters', expr: 'owl-neutral',   spotlight: '#home-levels .level-card.expanded, #home-levels .level-card:first-child',
+    maxHeight: 220,
+    he: 'כל נושא בנוי מפרקים, וכל פרק מקבץ כמה דיאלוגים סביב שאלה אחת.',
+    en: 'Each subject is built from chapters, and each chapter gathers a few dialogues around one question.' },
+  { id: 'next_up', expr: 'owl-neutral',    spotlight: '.lesson-node:has(.lesson-circle.next-up)',
+    he: 'כאן מחכה הדיאלוג הבא בתור. לא צריך לבחור, הוא כבר מוכן.',
+    en: "The next dialogue in line waits here. Nothing to choose, it's already set." },
+  { id: 'carousel', expr: 'owl-admiring',  spotlight: '#thinker-carousel-wrap',
+    he: 'כל הוגה שפוגשים מצטרף לאוסף. הוא גדל לאט, לפי מה שקוראים.',
+    en: 'Every thinker you meet joins your collection. It grows slowly, with what you read.' },
+  { id: 'pantheon', expr: 'owl-neutral',   spotlight: '#bnav-pantheon',
+    allowChromeBottom: true,
+    he: 'הפנתיאון הוא הבית של האוסף. אפשר לחזור אליו בכל רגע.',
+    en: "The Pantheon is where your collection lives. It's there whenever you want it." },
+  { id: 'streak', expr: 'owl-determined',  spotlight: '.stats-subheader',
+    allowChromeTop: true,
+    he: 'הרצף גדל בכל יום שמשלימים בו דיאלוג. היום הוא מתחיל.',
+    en: 'Your streak grows on every day you complete a dialogue. Today it begins.' },
+  { id: 'closing', expr: 'owl-action',     spotlight: null, isClosing: true,
+    he: 'זהו, אתם מוכנים. הדיאלוג הראשון מחכה.',
+    en: "That's it, you're ready. Your first dialogue is waiting." },
+];
+
+let _walkthroughStepIdx = 0;
+const _walkthroughStepsSeen = new Set();
+
+function _walkthroughShouldStart() {
+  if (localStorage.getItem('corpus_walkthrough_done')) return false;
+  // Existing-user gates — same intuition as the initUI onboarding gate.
+  // Any signal of prior use blocks the walkthrough so returning users
+  // don't get a first-time tour on top of their existing home.
+  if (localStorage.getItem('corpus_first_dialogue_completed_at')) return false;
+  const completedCount = Object.keys(state.completedDays || {}).length;
+  if (completedCount > 0) return false;
+  return true;
+}
+
+function _walkthroughStartIfEligible() {
+  if (!_walkthroughShouldStart()) return;
   if (state.currentScreen !== 'home') return;
-  const homeScreen = document.getElementById('screen-home');
-  if (!homeScreen || !homeScreen.classList.contains('active')) return;
-  const authScreen = document.getElementById('screen-auth');
-  if (authScreen && authScreen.classList.contains('active')) return;
   const overlay = document.getElementById('onboarding-overlay');
+  if (!overlay) return;
+  _walkthroughStepIdx = 0;
+  _walkthroughStepsSeen.clear();
+  document.documentElement.classList.add('walkthrough-active');
   overlay.style.display = 'block';
+  _walkthroughWireCanvas();
+  _walkthroughLockScroll();
+  _phCapture('walkthrough_started', {
+    subject: state.subject || null,
+    lang:    state.lang || null,
+  });
+  // Two rAFs so the overlay's display flip commits, then home's rects
+  // are up-to-date, then we compute positions.
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      onboardingStep = 0;
-      renderOnboardingStep();
-    });
+    requestAnimationFrame(() => _walkthroughRenderStep());
   });
 }
 
-function renderOnboardingStep() {
-  const step = ONBOARDING_STEPS[onboardingStep];
-  // Funnel: onboarding_tour_step. Session-scoped dedup so the recursive
-  // re-render for the lang-select "come home first" path doesn't refire.
-  if (!_onboardingTourStepsSeen.has(onboardingStep)) {
-    _onboardingTourStepsSeen.add(onboardingStep);
-    _phCapture('onboarding_tour_step', { step_index: onboardingStep });
-  }
+// Hit-tests a click on the spotlight canvas: taps inside the current
+// step's spotlight rect fire the shortcut-tap bail (and forward the
+// click to the underlying element so the natural affordance runs);
+// taps in the dimmed region are swallowed. Wired once per walkthrough
+// mount; the current step's target rect is looked up fresh on each
+// click so it stays correct as the walkthrough advances.
+let _walkthroughCanvasWired = false;
+function _walkthroughWireCanvas() {
+  if (_walkthroughCanvasWired) return;
+  _walkthroughCanvasWired = true;
+  const canvas = document.getElementById('onboarding-spotlight');
+  if (!canvas) return;
+  canvas.addEventListener('click', function(ev) {
+    const step = WALKTHROUGH_STEPS[_walkthroughStepIdx];
+    if (!step || !step.spotlight) return;             // no punch-out; no shortcut path
+    const info = _walkthroughSpotlightRect(step);
+    if (!info) return;
+    const pad = 8;                                    // match drawSpotlight padding
+    const x = ev.clientX, y = ev.clientY;
+    if (x >= info.left - pad && x <= info.right + pad &&
+        y >= info.top  - pad && y <= info.bottom + pad) {
+      // Inside punch-out: bail the walkthrough first, then trigger the
+      // underlying element so the tap reads as intended (e.g. tapping
+      // the lesson node opens the reader; tapping the pantheon tab
+      // switches screens).
+      try { _walkthroughShortcutBail(); } catch (e) {}
+      requestAnimationFrame(() => { try { info.el.click(); } catch (e) {} });
+    }
+  });
+}
 
-  // For the lang-select step, make sure we're on home (in case coming from subject screen)
-  if (step.isLangSelect && state.currentScreen !== 'home') {
-    document.body.classList.remove('on-subject-screen');
-    showScreen('home');
-    renderHome();
-    setTimeout(() => renderOnboardingStep(), 100);
+// Ensure the current step's target is inside the visible interior.
+// Home uses window scroll (not a nested overflow container). While the
+// walkthrough is active, body is position:fixed at a negative top
+// offset — so a "programmatic scroll" adjusts that offset instead of
+// calling window.scrollBy. This still shifts the visible content and
+// updates viewport-relative rects, but no user input can trigger scroll.
+//
+// Steps with no spotlight (greeting, closing) explicitly RESET the
+// locked scroll to its pre-walkthrough position so they don't inherit
+// a drift from a prior step's target-into-view shift (the bug that
+// showed the closing screen with a gap above content).
+function _walkthroughScrollTargetIntoView(step) {
+  if (!step) return;
+  if (!step.spotlight) {
+    _walkthroughResetLockedScroll();
     return;
   }
+  const target = document.querySelector(step.spotlight);
+  if (!target) return;
+  const screenH = window.innerHeight;
+  const statsBottom = document.querySelector('.stats-subheader')?.getBoundingClientRect().bottom || 0;
+  const navTop = document.querySelector('.bottom-nav')?.getBoundingClientRect().top || screenH;
+  const safeTop = step.allowChromeTop    ? 0        : statsBottom;
+  const safeBot = step.allowChromeBottom ? screenH  : navTop;
+  const safeMid = (safeTop + safeBot) / 2;
+  const rect = target.getBoundingClientRect();
+  const targetMid = (rect.top + rect.bottom) / 2;
+  // If the target's midpoint is already inside the safe band's middle
+  // half, no scroll needed. Otherwise shift the "locked" scroll so
+  // target midpoint lands on safeMid.
+  const bandHalf = (safeBot - safeTop) / 4;
+  if (Math.abs(targetMid - safeMid) < bandHalf) return;
+  const delta = targetMid - safeMid;
+  _walkthroughShiftLockedScroll(delta);
+}
 
-  // Allow clicks through the spotlight canvas on subject-select step
-  const spotlightCanvas = document.getElementById('onboarding-spotlight');
-  if (spotlightCanvas) {
-    spotlightCanvas.style.pointerEvents = 'all';
+// Scroll lock: freeze the document by pinning <body> to a fixed position
+// at a negative top offset that preserves the current scroll position
+// visually. Blocks EVERY user-initiated scroll — wheel, touch, keyboard
+// (space/arrows/PgUp/PgDn/Home/End), scrollbar drag — because the
+// document simply has no scroll axis available while body is fixed at
+// height=100%. Wheel and touchmove on the overlay are also swallowed
+// as defence-in-depth for browsers that dispatch them before the layout
+// pass reads the fixed body.
+//
+// Programmatic scroll during the walkthrough (see _walkthroughScroll
+// TargetIntoView) is done by adjusting body.style.top, which changes
+// what's visible in the viewport without ever unlocking scroll.
+let _walkthroughSavedScroll = null;    // current locked offset (drifts as steps scroll targets)
+let _walkthroughInitialScroll = 0;     // scroll position at lock time; restored on unlock
+let _walkthroughMaxScroll = 0;         // max scrollable range measured BEFORE body pin
+function _walkthroughLockScroll() {
+  const y = window.scrollY || window.pageYOffset || 0;
+  _walkthroughInitialScroll = y;
+  _walkthroughSavedScroll   = y;
+  // Snapshot the real scrollable range BEFORE pinning body to fixed —
+  // once body is fixed, documentElement.scrollHeight collapses to just
+  // the viewport height and this measurement is no longer available.
+  _walkthroughMaxScroll = Math.max(
+    0,
+    Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight
+    ) - window.innerHeight
+  );
+  const body = document.body;
+  body.dataset.walkthroughScrollLock = '1';
+  body.style.position = 'fixed';
+  body.style.top      = (-y) + 'px';
+  body.style.left     = '0';
+  body.style.right    = '0';
+  body.style.width    = '100%';
+  const overlay = document.getElementById('onboarding-overlay');
+  if (overlay) {
+    // Non-passive so preventDefault suppresses the gesture on any
+    // WebView that races the fixed-body layout.
+    overlay.addEventListener('wheel',     _walkthroughSwallowEvent, { passive: false });
+    overlay.addEventListener('touchmove', _walkthroughSwallowEvent, { passive: false });
+  }
+}
+// Clamp the locked-scroll offset to [0, maxScroll]. Without this,
+// negative deltas can push savedScroll below zero, which turns
+// body.style.top POSITIVE and pushes all page content down — the gap-
+// above-content bug on the carousel step.
+function _walkthroughShiftLockedScroll(delta) {
+  if (_walkthroughSavedScroll == null) return;
+  const clamped = Math.max(0, Math.min(_walkthroughMaxScroll, _walkthroughSavedScroll + delta));
+  _walkthroughSavedScroll = clamped;
+  document.body.style.top = (-clamped) + 'px';
+}
+// Return to the pre-walkthrough scroll offset. Called from the spot
+// light-less steps (greeting, closing) so they don't inherit a drift
+// from an earlier step.
+function _walkthroughResetLockedScroll() {
+  if (_walkthroughSavedScroll == null) return;
+  _walkthroughSavedScroll = _walkthroughInitialScroll;
+  document.body.style.top = (-_walkthroughInitialScroll) + 'px';
+}
+function _walkthroughUnlockScroll() {
+  const overlay = document.getElementById('onboarding-overlay');
+  if (overlay) {
+    overlay.removeEventListener('wheel',     _walkthroughSwallowEvent);
+    overlay.removeEventListener('touchmove', _walkthroughSwallowEvent);
+  }
+  if (_walkthroughSavedScroll != null) {
+    const body = document.body;
+    body.style.position = '';
+    body.style.top      = '';
+    body.style.left     = '';
+    body.style.right    = '';
+    body.style.width    = '';
+    delete body.dataset.walkthroughScrollLock;
+    // Restore to the ORIGINAL pre-walkthrough scroll position, not the
+    // drifted savedScroll. The drift was internal choreography for
+    // spotlight anchoring — the user should land back where they were.
+    // (Also fixes an endowment-overlay displacement on capacitor: opening
+    // the reader from a drifted scrollY left downstream fixed-position
+    // overlays measuring against the wrong base.)
+    window.scrollTo(0, _walkthroughInitialScroll);
+    _walkthroughSavedScroll   = null;
+    _walkthroughInitialScroll = 0;
+    _walkthroughMaxScroll     = 0;
+  }
+}
+function _walkthroughSwallowEvent(ev) { ev.preventDefault(); }
+
+function _walkthroughRenderStep() {
+  const step = WALKTHROUGH_STEPS[_walkthroughStepIdx];
+  if (!step) return;
+
+  // Per-step fire-once dedup
+  if (!_walkthroughStepsSeen.has(step.id)) {
+    _walkthroughStepsSeen.add(step.id);
+    _phCapture('walkthrough_step_shown', {
+      step_index: _walkthroughStepIdx,
+      step_name:  step.id,
+      subject:    state.subject || null,
+      lang:       state.lang || null,
+    });
   }
 
+  // Bring the target into the visible interior BEFORE computing the
+  // spotlight rect. On short viewports (320×568) targets like the
+  // .lesson-node.next-up sit below the fold, so without this scroll
+  // the punch-out clamp collapses to a negative-height rect. Direct
+  // scrollTop assignment bypasses the CSS overflow:hidden lock — the
+  // lock only stops user-initiated scrolls.
+  _walkthroughScrollTargetIntoView(step);
+
+  const isEn = state.lang === 'en';
+  const isRtl = document.documentElement.dir === 'rtl';
+
+  // Owl expression
   const owl = document.querySelector('.onboarding-owl-float svg');
   if (owl) {
     owl.classList.remove('owl-neutral', 'owl-determined', 'owl-admiring', 'owl-action');
     owl.classList.add('owl-svg', step.expr);
   }
 
+  // Bubble text + Next / Closing-CTA
+  const bubbleText = document.getElementById('onboarding-bubble');
+  const nextBtn    = document.getElementById('onboarding-btn');
+  bubbleText.textContent = isEn ? step.en : step.he;
+  if (step.isClosing) {
+    nextBtn.textContent = isEn ? "Let's start" : 'בואו נתחיל';
+    nextBtn.onclick     = _walkthroughFinishAndOpen;
+  } else {
+    nextBtn.textContent = isEn ? 'Next' : 'הבא';
+    nextBtn.onclick     = _walkthroughNext;
+  }
+  nextBtn.style.display = '';
+
+  // Skip button label (visible throughout)
+  const skipBtn = document.getElementById('walkthrough-skip');
+  if (skipBtn) {
+    skipBtn.textContent   = isEn ? 'Skip' : 'דילוג';
+    skipBtn.style.display = '';
+  }
+
   const owlFloat = document.getElementById('onboarding-owl-float');
-  const speech = document.getElementById('onboarding-speech');
+  const speech   = document.getElementById('onboarding-speech');
 
+  // ── Owl + bubble as one composite unit ─────────────────────────
+  // Layout: owl on TOP, bubble directly under with tail-top pointing
+  // AT the owl. Bubble is always centered under the owl (or vice-
+  // versa via horizontal centering of the whole unit). Never
+  // positioned independently. This guarantees the tail always aims
+  // at the owl and the pair reads as one composition.
+  const screenH = window.innerHeight;
+  const screenW = window.innerWidth;
+  const OWL_SIZE = 100;
+  const BUBBLE_OVERLAP = 16;  // bubble.top overlaps owl.bottom slightly so tail visually plants in the owl
+  const inset = 16;
+
+  speech.classList.remove('tail-top', 'tail-left', 'tail-right', 'tail-bottom');
+  speech.classList.add('tail-top');
+
+  // Force reflow so the just-set bubble text has a fresh height to
+  // measure. Without this, bubbleH reflects the previous step's copy.
+  speech.style.left  = '';
+  speech.style.right = '';
+  speech.style.top   = '';
+  speech.style.maxWidth = Math.min(280, screenW - inset * 2) + 'px';
+  void speech.offsetHeight;
+  const bubbleH = speech.offsetHeight || 120;
+  const bubbleW = Math.min(speech.offsetWidth || 240, screenW - inset * 2);
+
+  // Composite unit height = owl height + bubble height - overlap so the
+  // tail visually plants in the owl's body. Width = max(owlSize, bubbleW).
+  const unitH = OWL_SIZE + bubbleH - BUBBLE_OVERLAP;
+  const unitW = Math.max(OWL_SIZE, bubbleW);
+
+  // Horizontal placement: unit centered in the viewport (respecting
+  // insets). Owl centered above the bubble's horizontal center.
+  const unitLeft = Math.max(inset, Math.min(screenW - unitW - inset, (screenW - unitW) / 2));
+  const bubbleLeft = unitLeft + (unitW - bubbleW) / 2;
+  const owlLeft    = unitLeft + (unitW - OWL_SIZE) / 2;
+
+  let unitTop;
   if (step.spotlight) {
-    const target = document.querySelector(step.spotlight);
-    if (target) {
-      const rect = target.getBoundingClientRect();
-      const screenH = window.innerHeight;
-      const screenW = window.innerWidth;
-      const owlSize = 100;
-      const padding = 20;
-
-      if (rect.top < screenH / 2) {
-        // Target in top half - place owl+bubble below it
-        const owlTop = rect.bottom + padding;
-        const owlLeft = padding;
-        owlFloat.style.top = owlTop + 'px';
-        owlFloat.style.left = owlLeft + 'px';
-        owlFloat.style.transform = '';
-
-        speech.style.top = owlTop + 'px';
-        speech.style.left = (owlLeft + owlSize + 12) + 'px';
-        speech.style.transform = '';
-
-        speech.classList.remove('tail-top', 'tail-left', 'tail-right', 'tail-bottom');
-        speech.classList.add('tail-left');
-      } else {
-        // Target in bottom half - place owl+bubble above it
-        const owlTop = rect.top - owlSize - padding;
-        const owlLeft = padding;
-        owlFloat.style.top = Math.max(owlTop, 60) + 'px';
-        owlFloat.style.left = owlLeft + 'px';
-        owlFloat.style.transform = '';
-
-        speech.style.top = Math.max(owlTop, 60) + 'px';
-        speech.style.left = (owlLeft + owlSize + 12) + 'px';
-        speech.style.transform = '';
-
-        speech.classList.remove('tail-top', 'tail-left', 'tail-right', 'tail-bottom');
-        speech.classList.add('tail-left');
-      }
+    const info = _walkthroughSpotlightRect(step);
+    if (info) {
+      // Prefer the side (above/below) with more room. Fall back to the
+      // side that fits at all; if neither fits, clamp to inset from top.
+      const roomAbove = info.top    - inset - inset;
+      const roomBelow = screenH - info.bottom - inset - inset;
+      const placeBelow = roomBelow >= unitH
+        ? true
+        : (roomAbove >= unitH ? false : (roomBelow > roomAbove));
+      unitTop = placeBelow
+        ? Math.min(info.bottom + inset, screenH - unitH - inset)
+        : Math.max(info.top    - inset - unitH, inset);
+    } else {
+      unitTop = (screenH - unitH) / 2;
     }
   } else {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        owlFloat.style.transition = 'none';
-        speech.style.transition = 'none';
-
-        // Fix bubble position first
-        const bubbleTop = window.innerHeight * 0.42;
-        speech.style.top = bubbleTop + 'px';
-        const speechWidth = speech.offsetWidth;
-        const centerX = window.innerWidth / 2;
-        speech.style.left = (centerX - speechWidth / 2) + 'px';
-        speech.style.transform = 'none';
-        speech.classList.remove('tail-top', 'tail-left', 'tail-right', 'tail-bottom');
-        speech.classList.add('tail-top');
-
-        // Place owl so its beak (78% down) aligns with bubble top
-        const owlSize = 100;
-        const owlTop = bubbleTop - Math.round(owlSize * 0.78);
-        const owlCenterX = window.innerWidth / 2;
-        owlFloat.style.top = Math.max(owlTop, 20) + 'px';
-        owlFloat.style.left = (owlCenterX - owlSize / 2) + 'px';
-        owlFloat.style.transform = 'none';
-
-        setTimeout(() => {
-          owlFloat.style.transition = '';
-          speech.style.transition = '';
-        }, 50);
-      });
-    });
+    // Greeting / closing: composition centered on the dimmed backdrop.
+    unitTop = Math.max(inset, (screenH - unitH) / 2);
   }
 
-  const langButtons = document.getElementById('onboarding-lang-buttons');
-  const nextBtn = document.getElementById('onboarding-btn');
-  if (step.isLangSelect) {
-    document.getElementById('onboarding-bubble').textContent = 'Which language would you like to continue in?';
-    nextBtn.style.display = 'none';
-    langButtons.style.display = 'flex';
-  } else {
-    document.getElementById('onboarding-bubble').textContent = step.text;
-    nextBtn.textContent = step.btn;
-    nextBtn.style.display = '';
-    langButtons.style.display = 'none';
-  }
+  owlFloat.style.top  = unitTop + 'px';
+  owlFloat.style.left = owlLeft + 'px';
+  speech.style.top    = (unitTop + OWL_SIZE - BUBBLE_OVERLAP) + 'px';
+  speech.style.left   = bubbleLeft + 'px';
+  speech.style.right  = '';
 
+  // Bubble pop animation
   speech.style.animation = 'none';
   speech.offsetHeight;
   speech.style.animation = 'bubblePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
 
+  // Dots
   const dots = document.getElementById('onboarding-dots');
-  dots.innerHTML = ONBOARDING_STEPS.map((_,i) =>
-    `<div class="onboarding-dot ${i===onboardingStep?'active':''}"></div>`
-  ).join('');
+  if (dots) {
+    dots.innerHTML = WALKTHROUGH_STEPS.map((_, i) =>
+      '<div class="onboarding-dot ' + (i === _walkthroughStepIdx ? 'active' : '') + '"></div>'
+    ).join('');
+  }
 
-  setTimeout(() => drawSpotlight(step.spotlight), 100);
+  // Redraw spotlight after a layout tick
+  setTimeout(() => drawSpotlight(step), 100);
 }
 
-function nextOnboardingStep() {
-  onboardingStep++;
-  if (onboardingStep >= ONBOARDING_STEPS.length) {
-    document.getElementById('onboarding-overlay').style.display = 'none';
-    localStorage.setItem('corpus_onboarding_done', '1');
-    // Funnel: onboarding_tour_completed. Fired here from the fallback exit
-    // (steps array walked to the end). Normal exit is finishOnboardingWithLang.
-    _phCapture('onboarding_tour_completed', { via: 'steps_end', lang: state.lang || 'he' });
-    // Push the onboarding-done flag to Supabase so this device's choice
-    // survives on other devices / after a reinstall. Fire-and-forget (saveState
-    // calls syncProgressToSupabase without awaiting); never break onboarding on error.
-    try { saveState(); } catch(e) {}
-    // Drop the new user straight into their first lesson. (Defense-in-depth: normally
-    // the user exits via finishOnboardingWithLang on the language-pick step; this path
-    // only fires if the language step is skipped or the steps array is ever shortened.)
-    const weeks = getW();
-    if (weeks && weeks[0] && weeks[0].days && weeks[0].days.length) {
-      openReader(weeks[0].id, weeks[0].days[0].id);
-    }
+function _walkthroughNext() {
+  _walkthroughStepIdx++;
+  if (_walkthroughStepIdx >= WALKTHROUGH_STEPS.length) {
+    // Guard against overrun; closing button uses _walkthroughFinishAndOpen.
+    _walkthroughFinishAndOpen();
     return;
   }
-  renderOnboardingStep();
+  _walkthroughRenderStep();
 }
 
-function finishOnboardingWithLang(lang) {
-  document.getElementById('onboarding-overlay').style.display = 'none';
-  document.getElementById('onboarding-lang-buttons').style.display = 'none';
-  document.getElementById('onboarding-btn').style.display = '';
-  localStorage.setItem('corpus_onboarding_done', '1');
-  // Funnel: onboarding_tour_completed. Normal exit through the language pick.
-  _phCapture('onboarding_tour_completed', { via: 'lang_select', lang: lang });
-  // Push the onboarding-done flag to Supabase so this device's choice
-  // survives on other devices / after a reinstall. Fire-and-forget; never break onboarding on error.
-  try { saveState(); } catch(e) {}
-  setTimeout(() => {
-    setAppLang(lang);
-    // Drop the new user straight into the first lesson once onboarding completes.
-    // setAppLang ran first so getW() returns correct-language strings. Defensive in case
-    // the active subject's data has no first day populated.
-    const weeks = getW();
-    if (weeks && weeks[0] && weeks[0].days && weeks[0].days.length) {
-      openReader(weeks[0].id, weeks[0].days[0].id);
-    }
-  }, 50);
+function _walkthroughSkip() {
+  const step = WALKTHROUGH_STEPS[_walkthroughStepIdx];
+  _phCapture('walkthrough_skipped', {
+    step_index: _walkthroughStepIdx,
+    step_name:  step ? step.id : null,
+    via:        'skip_btn',
+    subject:    state.subject || null,
+    lang:       state.lang || null,
+  });
+  _walkthroughTeardown({ setFlag: true });
+  // Re-render home so the start card mounts (matches spec: skip lands
+  // on home with the start card visible).
+  try { renderHome(); } catch (e) {}
 }
 
-document.querySelectorAll('.onboarding-lang-btn').forEach(btn => {
-  btn.addEventListener('click', () => finishOnboardingWithLang(btn.dataset.lang));
+// Called from the openReader shortcut-tap guard when the user taps
+// through the spotlight punch-out onto the highlighted element.
+function _walkthroughShortcutBail() {
+  const step = WALKTHROUGH_STEPS[_walkthroughStepIdx];
+  _phCapture('walkthrough_skipped', {
+    step_index: _walkthroughStepIdx,
+    step_name:  step ? step.id : null,
+    via:        'shortcut_tap',
+    subject:    state.subject || null,
+    lang:       state.lang || null,
+  });
+  _walkthroughTeardown({ setFlag: true });
+}
+
+function _walkthroughFinishAndOpen() {
+  _phCapture('walkthrough_completed', {
+    subject: state.subject || null,
+    lang:    state.lang || null,
+  });
+  _walkthroughTeardown({ setFlag: true });
+  // Same target as the start card CTA — subject-aware via getW().
+  const weeks = getW();
+  if (weeks && weeks[0] && weeks[0].days && weeks[0].days.length) {
+    openReader(weeks[0].id, weeks[0].days[0].id);
+  }
+}
+
+function _walkthroughTeardown(opts) {
+  _walkthroughUnlockScroll();
+  const overlay = document.getElementById('onboarding-overlay');
+  if (overlay) overlay.style.display = 'none';
+  document.documentElement.classList.remove('walkthrough-active');
+  if (opts && opts.setFlag) {
+    try { localStorage.setItem('corpus_walkthrough_done', '1'); } catch (e) {}
+  }
+  _walkthroughStepIdx = 0;
+  _walkthroughStepsSeen.clear();
+}
+
+// Re-position on resize (device rotation, keyboard show/hide) so the
+// spotlight rect stays on top of the target.
+window.addEventListener('resize', () => {
+  const overlay = document.getElementById('onboarding-overlay');
+  if (!overlay || overlay.style.display === 'none') return;
+  _walkthroughRenderStep();
 });
 
 async function handleEmailVerification() {
@@ -22553,10 +22696,9 @@ function subjConfirm() {
       // Drawer mode: slide drawer back up, home stays put underneath
       closeDrawer(() => { renderHome(); });
     } else {
-      // First-time / standalone subject-select mode. New-flow users
-      // (welcome-seen but no goal set yet) advance to the daily-goal
-      // screen; already-onboarded users fall back to the legacy spotlight
-      // tour (kept behind its own gates for existing users mid-flow).
+      // First-time subject-select mode. New-flow users (welcome-seen but no
+      // goal set yet) advance to the daily-goal screen; already-onboarded
+      // users returning through the subject picker just land on home.
       document.body.classList.remove('on-subject-screen');
       const _newFlow = !!localStorage.getItem('corpus_intro_done')
         && !localStorage.getItem('corpus_daily_goal_set');
@@ -22566,7 +22708,6 @@ function subjConfirm() {
         showScreen('home');
         renderHome();
         animateScreen(document.getElementById('screen-home'), 'anim-fade');
-        setTimeout(startOnboarding, 600);
       }
     }
   }, 450);
