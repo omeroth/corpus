@@ -8523,6 +8523,22 @@ async function syncProgressToSupabase() {
     if (error) _reportSyncFailure('appearance', error);
   } catch(e) { _reportSyncFailure('appearance', e); }
   try {
+    // lang: added as text column in migration 20260730120000_user_progress_lang.sql.
+    // Forwarded by the loops-progress trigger (row_to_json(NEW)) to Loops as
+    // the `language` contact property. Resolved via the same fallback chain
+    // showBeat/showStreakBeat/showWelcome use, minus the 'he' default —
+    // genuinely unset users stay null so the Edge Function omits the property
+    // rather than mislabelling everyone as Hebrew.
+    const _lang = state.lang || localStorage.getItem('corpus_lang') || null;
+    if (_lang) {
+      const { error } = await sb.from('user_progress').upsert({
+        user_id: currentUser.id,
+        lang: _lang,
+      }, { onConflict: 'user_id' });
+      if (error) _reportSyncFailure('lang', error);
+    }
+  } catch(e) { _reportSyncFailure('lang', e); }
+  try {
     // Streak-repair state: dated-array fields. Server columns added in
     // migration 20260721210000_streak_repair.sql. Separate upsert so a
     // missing column doesn't break base sync.

@@ -54,7 +54,11 @@ function deriveProgressProps(record: Record<string, unknown> | null | undefined)
   if (hasPhilosophy && hasEconomics) subjectsStarted = "both";
   else if (hasPhilosophy)            subjectsStarted = "philosophy";
   else if (hasEconomics)             subjectsStarted = "economics";
-  return {
+  // language: forwarded from user_progress.lang (migration 20260730120000).
+  // Kept out of the returned object when the value is null / empty so the
+  // spread at the callsite (body = { email, ...props }) omits the property
+  // entirely — sending "" or null would clear Loops' language field.
+  const props: Record<string, unknown> = {
     lastActiveAt:      typeof rec.last_active_at === "string" ? rec.last_active_at : null,
     // Fallback for users whose last_subject was never written: infer from
     // subjectsStarted when unambiguous; leave null when both were touched.
@@ -64,6 +68,8 @@ function deriveProgressProps(record: Record<string, unknown> | null | undefined)
     bonusUnlocked:     completedDays.some((k) => typeof k === "string" && k.startsWith("bonus")),
     chaptersCompleted: chapterCompleteShown.length,
   };
+  if (typeof rec.lang === "string" && rec.lang) props.language = rec.lang;
+  return props;
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -107,7 +113,7 @@ serve(async (req: Request): Promise<Response> => {
 
   const { data: progressRows, error: progressErr } = await admin
     .from("user_progress")
-    .select("user_id, last_active_at, last_subject, completed_days, chapter_complete_shown");
+    .select("user_id, last_active_at, last_subject, completed_days, chapter_complete_shown, lang");
   if (progressErr) {
     console.error("[backfill] user_progress fetch failed:", progressErr);
     return jsonResponse({ ok: false, error: "Progress fetch failed" }, 500);

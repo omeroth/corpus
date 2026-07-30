@@ -73,7 +73,11 @@ function deriveProgressProps(record) {
   if (hasPhilosophy && hasEconomics) subjectsStarted = 'both';
   else if (hasPhilosophy)            subjectsStarted = 'philosophy';
   else if (hasEconomics)             subjectsStarted = 'economics';
-  return {
+  // language: forwarded from user_progress.lang (migration 20260730120000).
+  // Kept out of the returned object when the value is null / empty so the
+  // spread at the callsite (body = { email, ...props }) omits the property
+  // entirely — sending "" or null would clear Loops' language field.
+  const props = {
     lastActiveAt:      typeof record.last_active_at === 'string' ? record.last_active_at : null,
     // Fallback for users whose last_subject was never written (never synced
     // since the migration): if we can prove they only touched one subject,
@@ -85,6 +89,8 @@ function deriveProgressProps(record) {
     bonusUnlocked:     completedDays.some(k => typeof k === 'string' && k.startsWith('bonus')),
     chaptersCompleted: chapterCompleteShown.length,
   };
+  if (typeof record.lang === 'string' && record.lang) props.language = record.lang;
+  return props;
 }
 
 // -- Fetch: auth.users + user_progress via Supabase REST --------------------
@@ -105,7 +111,7 @@ async function fetchAllUsers() {
     if (list.length < 1000) break;
     page += 1;
   }
-  const progressRes = await fetch(`${SUPABASE_URL}/rest/v1/user_progress?select=user_id,last_active_at,last_subject,completed_days,chapter_complete_shown`, {
+  const progressRes = await fetch(`${SUPABASE_URL}/rest/v1/user_progress?select=user_id,last_active_at,last_subject,completed_days,chapter_complete_shown,lang`, {
     headers: admin,
   });
   if (!progressRes.ok) throw new Error(`user_progress fetch: ${progressRes.status} ${await progressRes.text()}`);

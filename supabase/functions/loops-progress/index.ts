@@ -92,13 +92,20 @@ function deriveProgressProps(record: Record<string, unknown>) {
 
   const bonusUnlocked = completedDays.some((k) => typeof k === "string" && k.startsWith("bonus"));
 
-  return {
+  // language: forwarded from user_progress.lang (added in migration
+  // 20260730120000_user_progress_lang.sql). Only included in the derived
+  // props when the record has a non-empty string — null / missing stays
+  // absent so the Loops payload omits the property rather than sending
+  // "" or null, which Loops would treat as a clear.
+  const props: Record<string, unknown> = {
     lastActiveAt:      typeof record.last_active_at === "string" ? record.last_active_at : null,
     lastSubject:       typeof record.last_subject   === "string" ? record.last_subject   : null,
     subjectsStarted,
     bonusUnlocked,
     chaptersCompleted: chapterCompleteShown.length,
   };
+  if (typeof record.lang === "string" && record.lang) props.language = record.lang;
+  return props;
 }
 
 serve(async (req: Request): Promise<Response> => {
@@ -163,6 +170,10 @@ serve(async (req: Request): Promise<Response> => {
     bonusUnlocked:     derived.bonusUnlocked,
     chaptersCompleted: derived.chaptersCompleted,
   };
+  // language: forwarded only when deriveProgressProps included it (i.e. the
+  // record had a non-empty lang). Omitting on null keeps a previously-set
+  // Loops language from being cleared by a partial sync.
+  if (typeof derived.language === "string") body.language = derived.language;
 
   try {
     const updateRes = await fetch(LOOPS_UPDATE_URL, {
