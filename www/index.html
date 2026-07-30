@@ -17821,17 +17821,22 @@ function openEconPromoBonus() {
 
 // ─── Start-first-dialogue card (home) ──────────────────────────────
 // Rendered at the very top of home for a user who finished onboarding
-// but has not yet completed their first dialogue. CTA-only (no ×).
+// but has not yet completed ANY dialogue. CTA-only (no ×).
 // Auto-disappears on the next renderHome after
 // corpus_first_dialogue_completed_at is set (the reader-complete flow
-// writes that flag once the user finishes their first dialogue).
+// writes that flag once the user finishes their first dialogue) OR
+// when completedDays has any entry — the second check catches users
+// who completed dialogues before the corpus_first_dialogue_completed_at
+// flag existed (shipped alongside this card). Anyone who has ever
+// completed any day should never see this card.
 // Hidden by CSS while the walkthrough overlay is up (see html.walkthrough-active).
 function renderStartFirstDialogueCard() {
   const holder = document.getElementById('start-first-dialogue-card-holder');
   if (!holder) return;
   const done       = !!localStorage.getItem('corpus_onboarding_done');
   const firstDone  = !!localStorage.getItem('corpus_first_dialogue_completed_at');
-  if (!done || firstDone) {
+  const hasAnyDone = Object.keys(state.completedDays || {}).length > 0;
+  if (!done || firstDone || hasAnyDone) {
     holder.innerHTML = ''; holder.style.display = 'none';
     return;
   }
