@@ -23273,6 +23273,22 @@ function initUI() {
         console.log('[Auth] onAuthStateChange:', event, (session && session.user && session.user.email) || 'no session');
         if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && session) {
           initialEventReceived = true;
+          // PostHog identify. Uses session.user.id (Supabase UUID) as the
+          // stable distinct_id so any anonymous pre-login activity captured
+          // against the auto-generated distinct_id gets merged into the
+          // identified person instead of orphaning as a separate anon
+          // record. Only fires on SIGNED_IN / INITIAL_SESSION (the two
+          // "session confirmed" events) — TOKEN_REFRESHED is a silent
+          // session extension where the user was already identified on the
+          // earlier SIGNED_IN or INITIAL_SESSION fire.
+          if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session.user) {
+            try {
+              posthog.identify(session.user.id, {
+                email: session.user.email,
+                name:  session.user.user_metadata?.full_name,
+              });
+            } catch(e) {}
+          }
           await enterApp(session.user);
           // Reschedule daily reminder now that state.dailyReminder is loaded.
           rescheduleReminderFromToday();
@@ -23284,6 +23300,10 @@ function initUI() {
           rescheduleReminderFromToday();
         } else if (event === 'SIGNED_OUT') {
           appStarted = false;
+          // Break the identify binding so the post-logout session captures
+          // a fresh anonymous distinct_id — otherwise the next visitor on
+          // this device would inherit the just-signed-out user's identity.
+          try { posthog.reset(); } catch(e) {}
         }
       });
 
