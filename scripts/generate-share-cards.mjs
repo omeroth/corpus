@@ -417,12 +417,11 @@ function renderPage({ weekId, dayId, thinker, dayTitle, subject, lang }) {
   const description = isEn
     ? `A dialogue with ${thinker.name}. 5 minutes a day with history's greatest minds.`
     : `דיאלוג עם ${thinker.name}. 5 דקות ביום עם גדולי ההוגים.`;
-  // Redirect destinations. Play Store listing is not public yet (see
-  // index.html:16655), so Android falls back to the App Store — same as iOS.
-  // Desktop drops back to the marketing site so a shared link on X/Slack
-  // still opens something usable when tapped from a laptop.
+  // Redirect destinations. Desktop drops back to the marketing site so a
+  // shared link on X / Slack still opens something usable when tapped from
+  // a laptop.
   const IOS_URL     = 'https://apps.apple.com/app/id6781227385';
-  const ANDROID_URL = 'https://apps.apple.com/app/id6781227385';
+  const ANDROID_URL = 'https://play.google.com/store/apps/details?id=com.corpusapp.corpus';
   const DESKTOP_URL = 'https://corpusapp.io';
   const redirectingText = isEn ? 'Opening Corpus…' : 'פותח את Corpus…';
   const manualCTA       = isEn ? 'Open Corpus'    : 'פתח את Corpus';
