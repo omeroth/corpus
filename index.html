@@ -20441,16 +20441,40 @@ function closeCompleteModal(opts) {
     && _guestCompletionCount >= 1
     && !_shown.first_completion;
 
-  // Share prompt eligibility: chapter-1, per-subject once, after dialogue 3.
-  // Flag-based so a Next-Dialogue skip on day 3 still catches on the next
-  // eligible close. showSharePrompt's internal flag check + onDone-invoked-
-  // immediately-if-already-shown makes double-fire safe.
+  // Share prompt eligibility. Two flags:
+  //   corpus_share_shown_{subject}  — set only on successful share (doShare).
+  //                                   Permanent kill.
+  //   corpus_share_skip_{subject}   — JSON { atCount, times } set by skipShare.
+  //                                   Re-arms ONCE after +5 completions.
+  //                                   Permanent kill after 2 skips.
+  // First-time gate (neither flag): unchanged — chapter 1 + dialogue 3+.
+  // Re-arm branch relaxes the chapter-1 filter because by re-arm time the
+  // user has typically moved into chapter 2. Grandfathered users whose
+  // corpus_share_shown was stamped by the pre-split skipShare read as
+  // permanent kill (no way to tell them apart from a real sharer — small
+  // regression accepted vs a brittle data migration).
   const _currentSubject = state.subject || 'philosophy';
-  let _shareAlreadyShown = false;
-  try { _shareAlreadyShown = !!localStorage.getItem(`corpus_share_shown_${_currentSubject}`); } catch(e) {}
-  const shouldShowShare = state.currentWeek === 1
-    && !_shareAlreadyShown
-    && (_guestCompletionCount >= 3 || state.currentDay >= 3);
+  let _shareSharedFlag = false;
+  try { _shareSharedFlag = !!localStorage.getItem(`corpus_share_shown_${_currentSubject}`); } catch(e) {}
+  let _shareSkip = null;
+  try {
+    const raw = localStorage.getItem(`corpus_share_skip_${_currentSubject}`);
+    if (raw) _shareSkip = JSON.parse(raw);
+  } catch(e) {}
+  let shouldShowShare;
+  if (_shareSharedFlag) {
+    shouldShowShare = false;
+  } else if (_shareSkip && typeof _shareSkip.times === 'number' && _shareSkip.times >= 2) {
+    shouldShowShare = false;
+  } else if (_shareSkip) {
+    // Re-arm: exactly one additional chance, gated on +5 completions
+    // since the skip. Chapter-1 filter deliberately dropped for re-arm.
+    shouldShowShare = _guestCompletionCount >= (_shareSkip.atCount || 0) + 5;
+  } else {
+    // First-time gate — unchanged.
+    shouldShowShare = state.currentWeek === 1
+      && (_guestCompletionCount >= 3 || state.currentDay >= 3);
+  }
 
   // Streak milestone eligibility: 3/7/30-day streaks. Cadence gate inside
   // maybeShowGuestPrompt (once-per-day) prevents overlap with the signup.
@@ -21260,7 +21284,23 @@ let _shareInFlight = false;
 function _withShareGuard(fn) {
   if (_shareInFlight) return;
   _shareInFlight = true;
-  Promise.resolve().then(fn).catch(e => console.error('[share] guarded fn threw', e)).finally(() => {
+  // Invoke fn() SYNCHRONOUSLY within the user-gesture tick so any
+  // navigator.share call inside — up to the first `await` — inherits the
+  // gesture activation. The previous Promise.resolve().then(fn) always
+  // deferred to the next microtask; on iOS WebKit 16.4+ that break in the
+  // gesture chain caused navigator.share to throw NotAllowedError before
+  // the OS sheet ever painted (the "tap does nothing" bug).
+  let ret;
+  try {
+    ret = fn();
+  } catch(e) {
+    _shareInFlight = false;
+    console.error('[share] guarded fn threw', e);
+    return;
+  }
+  // fn may or may not be async; Promise.resolve normalises so the finally
+  // fires for both sync and async paths.
+  Promise.resolve(ret).catch(e => console.error('[share] guarded fn threw', e)).finally(() => {
     _shareInFlight = false;
   });
 }
@@ -21504,8 +21544,25 @@ async function doShare() {
 function skipShare() {
   // Share-prompt Skip tap — funnel step "dismissed" from the one-time popup.
   // _sharePromptClosing guarantees single fire per tap.
+  //
+  // Skip stamps a SEPARATE flag from a successful share:
+  //   corpus_share_shown_{subject}  — permanent kill; stamped only by doShare
+  //                                   on successful share.
+  //   corpus_share_skip_{subject}   — JSON { atCount, times } written here.
+  // runShare's eligibility gate re-arms one additional time after +5
+  // completions since skip. After the second skip (times >= 2), permanent
+  // kill for this subject. Users who dismissed before this split (they
+  // have the shown flag from the legacy code) are grandfathered as
+  // permanently done — no data migration.
   try { posthog.capture('share_prompt_dismissed', _shareEventProps()); } catch(e) {}
-  try { localStorage.setItem(`corpus_share_shown_${state.subject || 'philosophy'}`, '1'); } catch(e) {}
+  try {
+    const subject = state.subject || 'philosophy';
+    const completions = Object.keys(state.completedDays || {}).filter(k => !k.endsWith('-0')).length;
+    let prev = null;
+    try { const raw = localStorage.getItem(`corpus_share_skip_${subject}`); if (raw) prev = JSON.parse(raw); } catch(_) {}
+    const times = (prev && typeof prev.times === 'number' ? prev.times : 0) + 1;
+    localStorage.setItem(`corpus_share_skip_${subject}`, JSON.stringify({ atCount: completions, times }));
+  } catch(e) {}
   document.getElementById('modal-share').classList.remove('active');
   _finishSharePrompt();
 }
