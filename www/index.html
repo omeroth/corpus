@@ -6127,6 +6127,18 @@
     padding: calc(32px + var(--safe-top)) 24px calc(32px + var(--safe-bottom));
     overflow-y: auto;
   }
+  /* Bare `justify-content: center` symmetrically overflows content into the
+     top padding when the DC content is taller than viewport - padding — so on
+     Android devices with a combined status-bar + camera-cutout inset (~90-120px)
+     the .dc-title bleeds under the status bar. `safe center` centers when
+     content fits and falls back to flex-start when it would overflow the
+     safe area, keeping the title clear of the inset in both cases. Gated by
+     @supports so older WebViews without the `safe` keyword keep the current
+     centering rule rather than dropping the whole declaration. */
+  @supports (justify-content: safe center) {
+    .dc-screen { justify-content: safe center; }
+    #chapter-complete-overlay.dc-stats-screen { justify-content: safe center; }
+  }
   /* Stats screen */
   .dc-title {
     font-size: 28px;
