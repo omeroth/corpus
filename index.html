@@ -17222,6 +17222,9 @@ function readerGoBack() {
     renderReader();
     const scrollArea = document.getElementById('reader-content');
     if (scrollArea) {
+      // Same story as nextSection: the window is the real scroller here,
+      // #reader-content's overflow-y: auto never fires. Reset both.
+      window.scrollTo(0, 0);
       scrollArea.scrollTop = 0;
       scrollArea.classList.remove('anim-section-next', 'anim-section-prev');
       void scrollArea.offsetWidth;
@@ -19917,6 +19920,13 @@ function nextSection() {
     renderReader();
     const scrollArea = document.getElementById('reader-content');
     if (scrollArea) {
+      // .reader-scroll-area has overflow-y: auto but doesn't actually scroll —
+      // .reader-screen-shell's height: 100% resolves to auto (parent is
+      // min-height, not height), so the scroll-area grows to fit content and
+      // the window scrolls instead. Reset both: the window (real scroller
+      // today) and #reader-content (in case a future layout change makes
+      // internal scrolling live).
+      window.scrollTo(0, 0);
       scrollArea.scrollTop = 0;
       scrollArea.classList.remove('anim-section-next', 'anim-section-prev');
       void scrollArea.offsetWidth;
