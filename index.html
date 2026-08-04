@@ -8453,12 +8453,132 @@ const APP_VERSION = '1.1.5';
 
 const SUPABASE_URL = 'https://xcoikjoatcrjqxzykwlt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjb2lram9hdGNyanF4enlrd2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjc5NjYsImV4cCI6MjA4OTcwMzk2Nn0.5EhOsN9M4_kLYoRKO97dPGof8RN7PteXQrtKyx4CcKI';
+// Supabase auth-storage adapter. Default supabase-js persists tokens to
+// browser localStorage — evictable on iOS WKWebView after prolonged
+// background suspension or memory pressure, which surfaced as users being
+// signed out on resume. Wire Capacitor Preferences (NSUserDefaults on iOS,
+// SharedPreferences-backed on Android — both survive WebView storage
+// eviction) as the primary store on native. Web / PWA falls back to
+// localStorage so the browser build keeps its existing behaviour.
+function _createSupabaseAuthStorage() {
+  const _native = !!(window.Capacitor &&
+                     window.Capacitor.isNativePlatform &&
+                     window.Capacitor.isNativePlatform() &&
+                     window.Capacitor.Plugins &&
+                     window.Capacitor.Plugins.Preferences);
+  // DIAGNOSTIC (remove once auth-persistence bug is closed). Logs which
+  // branch the adapter takes and what the runtime plugin probe saw.
+  try {
+    console.log('[Auth/Storage] init',
+      'native=', _native,
+      'hasCap=', !!window.Capacitor,
+      'isNative=', !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()),
+      'hasPrefs=', !!(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Preferences));
+  } catch(e) {}
+  if (!_native) {
+    return {
+      getItem:    (key) => { try { return window.localStorage.getItem(key); } catch(e) { return null; } },
+      setItem:    (key, value) => { try { window.localStorage.setItem(key, value); } catch(e) {} },
+      removeItem: (key) => { try { window.localStorage.removeItem(key); } catch(e) {} },
+    };
+  }
+  const _P = window.Capacitor.Plugins.Preferences;
+  // Only log Supabase auth-token keys; ignore any other storage traffic.
+  const _isAuthKey = (k) => typeof k === 'string' && k.indexOf('sb-') === 0;
+  return {
+    async getItem(key) {
+      let src = 'none';
+      let prefErr = null;
+      let promoted = false;
+      try {
+        let value = null;
+        try {
+          const r = await _P.get({ key });
+          value = r && r.value;
+        } catch(e) { prefErr = (e && e.message) || String(e); }
+        if (prefErr && _isAuthKey(key)) {
+          console.warn('[Auth/Storage] Preferences.get threw for', key, prefErr);
+        }
+        if (value != null) { src = 'preferences'; return value; }
+        // One-shot migration: existing signed-in users have their token in
+        // localStorage from before this adapter shipped. If native is empty
+        // but localStorage has the key, adopt it and promote it into native
+        // storage so the switch to Preferences doesn't cost anyone a login.
+        // Subsequent launches will find the value in native and skip this.
+        let legacy = null;
+        try { legacy = window.localStorage.getItem(key); } catch(e) {}
+        if (legacy != null) {
+          try {
+            await _P.set({ key, value: legacy });
+            promoted = true;
+            src = 'localstorage-migrated';
+          } catch(e) {
+            if (_isAuthKey(key)) console.warn('[Auth/Storage] promote to Preferences failed for', key, (e && e.message) || String(e));
+            src = 'localstorage-not-migrated';
+          }
+          return legacy;
+        }
+        return null;
+      } finally {
+        if (_isAuthKey(key)) {
+          console.log('[Auth/Storage] getItem', key, '→', src, promoted ? '(promoted)' : '');
+        }
+      }
+    },
+    async setItem(key, value) {
+      let prefOk = false;
+      let prefErr = null;
+      try { await _P.set({ key, value }); prefOk = true; }
+      catch(e) { prefErr = (e && e.message) || String(e); }
+      // Mirror to localStorage as belt-and-suspenders: if the Preferences
+      // call fails mid-session (plugin gone, disk pressure), the WebView
+      // still has a copy for the remainder of this run. Harmless if native
+      // storage is the authoritative copy on next boot.
+      let lsOk = false;
+      try { window.localStorage.setItem(key, value); lsOk = true; } catch(e) {}
+      if (_isAuthKey(key)) {
+        // value.length gives a rough proof of "not empty" without leaking
+        // the token itself into logs.
+        const len = typeof value === 'string' ? value.length : -1;
+        console.log('[Auth/Storage] setItem', key, 'preferences=', prefOk, 'localstorage=', lsOk, 'len=', len);
+        if (prefErr) console.warn('[Auth/Storage] Preferences.set threw for', key, prefErr);
+      }
+    },
+    async removeItem(key) {
+      let prefOk = false;
+      let prefErr = null;
+      try { await _P.remove({ key }); prefOk = true; }
+      catch(e) { prefErr = (e && e.message) || String(e); }
+      let lsOk = false;
+      try { window.localStorage.removeItem(key); lsOk = true; } catch(e) {}
+      if (_isAuthKey(key)) {
+        console.log('[Auth/Storage] removeItem', key, 'preferences=', prefOk, 'localstorage=', lsOk);
+        if (prefErr) console.warn('[Auth/Storage] Preferences.remove threw for', key, prefErr);
+      }
+    },
+  };
+}
+
 if (!window._supabaseClient) {
-  window._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  window._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      storage: _createSupabaseAuthStorage(),
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  });
 }
 const sb = window._supabaseClient;
 
 let currentUser = null;
+
+// Set true for the duration of any interactive sign-in (email, Google, Apple).
+// The visibilitychange / appStateChange resume listeners consult this so a
+// stray foreground event during the OAuth sheet dismissal doesn't race
+// signInWithIdToken on gotrue-js's internal storage lock — that race pinned
+// "Signing in..." forever after the auth-persistence change landed.
+let _authInProgress = false;
 
 // One-place telemetry so a future column drift can't recur invisibly. Every
 // upsert catch calls this with { field, error } — we capture to PostHog so
@@ -8807,6 +8927,8 @@ async function handleAuthSubmit() {
   btn.textContent = '...';
   errEl.textContent = '';
   errEl.style.color = '';
+  _authInProgress = true;
+  try {
   if (authMode === 'signin') {
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
     if (error) {
@@ -8856,6 +8978,7 @@ async function handleAuthSubmit() {
       await enterApp(data.user);
     }
   }
+  } finally { _authInProgress = false; }
 }
 
 async function authWithGoogle() {
@@ -8868,6 +8991,7 @@ async function authWithGoogle() {
   const errEl0 = document.getElementById('auth-error');
   if (errEl0) errEl0.textContent = '';
   const _isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+  _authInProgress = true;
   try {
     if (_isNative) {
       // Native iOS: native Google Sign-In via Capgo, then hand the idToken to Supabase.
@@ -8885,12 +9009,19 @@ async function authWithGoogle() {
       const res = await window.Capacitor.Plugins.SocialLogin.login(loginArgs);
       const idToken = res && res.result && res.result.idToken;
       if (!idToken) throw new Error('No idToken from Google');
-      const { error } = await sb.auth.signInWithIdToken({ provider: 'google', token: idToken });
+      const { data, error } = await sb.auth.signInWithIdToken({ provider: 'google', token: idToken });
       if (error) throw error;
-      // Native has no automatic reload like the web OAuth redirect. The
-      // in-place render path races on device, so reload: the persisted
-      // session fires INITIAL_SESSION on fresh load and enterApp runs cleanly.
-      window.location.reload();
+      // Route through enterApp the same way handleAuthSubmit does after
+      // signInWithPassword — no full-page reload. The reload existed as a
+      // workaround from before the Capacitor Preferences storage adapter,
+      // when the in-place render "raced on device" because there was no
+      // reliable session persistence to fall back on. The adapter now
+      // persists the session before subscribers fire, so this path can
+      // just navigate the UI in place. Clearing appStarted lets enterApp
+      // run cleanly to completion here even if the SIGNED_IN subscriber's
+      // own enterApp call was still mid-await when the promise resolved.
+      appStarted = false;
+      await enterApp((data && data.session && data.session.user) || (data && data.user) || null);
     } else {
       // Web: existing OAuth redirect — unchanged.
       const { error } = await sb.auth.signInWithOAuth({
@@ -8910,7 +9041,7 @@ async function authWithGoogle() {
       if (gTxt) gTxt.textContent = isEn ? 'Continue with Google' : 'המשך עם Google';
       else btn.innerHTML = '<span class="auth-social-icon">G</span> <span id="auth-google-text">' + (isEn ? 'Continue with Google' : 'המשך עם Google') + '</span>';
     }
-  }
+  } finally { _authInProgress = false; }
 }
 
 async function authWithApple() {
@@ -8920,14 +9051,21 @@ async function authWithApple() {
   if (btn) { btn.disabled = true; if (aTxt) aTxt.textContent = isEn ? 'Signing in...' : 'מתחבר...'; }
   const errEl = document.getElementById('auth-error'); if (errEl) errEl.textContent = '';
   const _isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+  _authInProgress = true;
   try {
     if (_isNative) {
       const res = await window.Capacitor.Plugins.SocialLogin.login({ provider: 'apple', options: { scopes: ['name', 'email'] } });
       const idToken = res && res.result && res.result.idToken;
       if (!idToken) throw new Error('No idToken from Apple');
-      const { error } = await sb.auth.signInWithIdToken({ provider: 'apple', token: idToken });
+      const { data, error } = await sb.auth.signInWithIdToken({ provider: 'apple', token: idToken });
       if (error) throw error;
-      window.location.reload();
+      // Route through enterApp the same way Google now does — see the
+      // matching block in authWithGoogle for the full rationale. Session
+      // is already persisted to Preferences before subscribers fire, and
+      // enterApp's Supabase awaits are timeboxed, so the in-place
+      // transition is safe without the full-page reload.
+      appStarted = false;
+      await enterApp((data && data.session && data.session.user) || (data && data.user) || null);
     } else {
       const { error } = await sb.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: 'https://corpusapp.io/' } });
       if (error) throw error;
@@ -8940,7 +9078,7 @@ async function authWithApple() {
       if (aTxt) aTxt.textContent = isEn ? 'Continue with Apple' : 'המשך עם Apple';
       else btn.innerHTML = '<span class="auth-social-icon"></span> <span id="auth-apple-text">' + (isEn ? 'Continue with Apple' : 'המשך עם Apple') + '</span>';
     }
-  }
+  } finally { _authInProgress = false; }
 }
 
 let _introCarouselInited = false;
@@ -22883,6 +23021,23 @@ function _pushInsetsToIntroIframe() {
   }
 }
 
+// Race a Promise against a wall-clock deadline. Used to keep sign-in
+// entry from stranding on a stalled Supabase upsert/select — the network
+// stack can hold a fetch open indefinitely, especially on flaky mobile
+// connections, and gotrue-js won't cancel our own client calls for us.
+// Rejects with a labelled error on timeout so the console line names
+// which sync bailed. The underlying request keeps running in the
+// background; its result is discarded because nothing awaits it anymore.
+// A subsequent user action (nav, refresh, save) re-issues the query.
+async function _timeboxed(promise, ms, label) {
+  let _t;
+  const timer = new Promise((_, reject) => {
+    _t = setTimeout(() => reject(new Error(label + ' timed out after ' + ms + 'ms')), ms);
+  });
+  try { return await Promise.race([promise, timer]); }
+  finally { clearTimeout(_t); }
+}
+
 let appStarted = false;
 async function enterApp(user) {
   if (appStarted) return;
@@ -22892,13 +23047,17 @@ async function enterApp(user) {
   if (user && user.email === 'roth.omer@gmail.com') {
     try { posthog.opt_out_capturing(); } catch(e) {}
   }
+  // 8s budget per Supabase call. Each is best-effort background sync —
+  // the entry-critical state (session, subject, local progress) is
+  // already available before enterApp runs, so a timed-out call must
+  // NOT block the UI transition to home.
   try {
-    await loadProgressFromSupabase();
+    await _timeboxed(loadProgressFromSupabase(), 8000, 'loadProgressFromSupabase');
   } catch(e) {
     console.error('[Auth] loadProgressFromSupabase failed:', e);
   }
   try {
-    await loadSubscription();
+    await _timeboxed(loadSubscription(), 8000, 'loadSubscription');
   } catch(e) {
     console.error('[Auth] loadSubscription failed:', e);
   }
@@ -22930,7 +23089,16 @@ async function enterApp(user) {
   if (user) {
     state.userEmail = user.email || '';
     state.userMeta = user.user_metadata || {};
-    await saveState();
+    // saveState() itself is synchronous (writes localStorage + kicks
+    // off syncProgressToSupabase as a fire-and-forget), so it cannot
+    // hang today. Wrap it defensively anyway so a future refactor that
+    // turns it async can't strand the UI transition, and mirror the
+    // timeout budget used above for consistency.
+    try {
+      await _timeboxed(saveState(), 8000, 'enterApp saveState');
+    } catch(e) {
+      console.error('[Auth] enterApp saveState failed:', e);
+    }
   }
   hideAuthScreen();
   _homeExpandedWeekId = undefined;
@@ -23386,6 +23554,38 @@ function initUI() {
         }
       });
 
+      // Capacitor App resume: while the app is backgrounded the WebView's JS
+      // timers pause, so Supabase's built-in autoRefreshToken interval doesn't
+      // fire. On foreground, kick a refreshSession() manually so a token that
+      // expired during a long background is rotated on return instead of
+      // dying on the next authenticated request. Idempotent — supabase-js
+      // has its own internal lock, so double-firing with visibilitychange
+      // below is harmless. Native-only; App plugin is a no-op on web.
+      try {
+        if (window.Capacitor &&
+            window.Capacitor.isNativePlatform &&
+            window.Capacitor.isNativePlatform() &&
+            window.Capacitor.Plugins &&
+            window.Capacitor.Plugins.App &&
+            typeof window.Capacitor.Plugins.App.addListener === 'function') {
+          window.Capacitor.Plugins.App.addListener('appStateChange', (appState) => {
+            // Skip mid-sign-in: refreshSession races signInWithIdToken on
+            // gotrue-js's internal storage lock (the two contend for the
+            // same key), and the iOS Google/Apple auth sheet dismissal
+            // fires this event right as the token save is landing. Also
+            // skip when there's no session to refresh — refreshSession
+            // returns an error immediately in that case anyway, and
+            // skipping keeps the noise out of the console.
+            if (!appState || !appState.isActive) return;
+            if (_authInProgress) { console.log('[Auth] resume refresh skipped: sign-in in progress'); return; }
+            if (!currentUser)   { console.log('[Auth] resume refresh skipped: no current session'); return; }
+            sb.auth.refreshSession().catch((e) => {
+              console.warn('[Auth] resume refreshSession failed:', e && e.message);
+            });
+          });
+        }
+      } catch(e) { console.warn('[Auth] App.addListener wiring failed:', e && e.message); }
+
       // Background → foreground also counts as "user opened the app today" — reschedule
       // pushes the next notification to tomorrow so today's nudge is suppressed.
       document.addEventListener('visibilitychange', () => {
@@ -23394,6 +23594,17 @@ function initUI() {
           // Re-check for App Store updates on foreground so a user who left the
           // app in the background during a release picks up the banner.
           try { checkForUpdate(); } catch(e) {}
+          // Belt-and-suspenders session refresh for web / PWA and for any
+          // native path where the App resume event doesn't fire (older
+          // Capacitor + edge cases). Same guards as the App.addListener
+          // path above — never fire during an in-flight sign-in (races
+          // gotrue-js's storage lock), and skip when there's no session
+          // to refresh.
+          try {
+            if (!_authInProgress && currentUser) {
+              sb.auth.refreshSession().catch(() => {});
+            }
+          } catch(e) {}
         } else {
           // Reader abandon backup: catches native-app background + browser
           // tab hide when the user didn't tap an in-app nav button. If the
