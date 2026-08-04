@@ -8466,15 +8466,6 @@ function _createSupabaseAuthStorage() {
                      window.Capacitor.isNativePlatform() &&
                      window.Capacitor.Plugins &&
                      window.Capacitor.Plugins.Preferences);
-  // DIAGNOSTIC (remove once auth-persistence bug is closed). Logs which
-  // branch the adapter takes and what the runtime plugin probe saw.
-  try {
-    console.log('[Auth/Storage] init',
-      'native=', _native,
-      'hasCap=', !!window.Capacitor,
-      'isNative=', !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()),
-      'hasPrefs=', !!(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Preferences));
-  } catch(e) {}
   if (!_native) {
     return {
       getItem:    (key) => { try { return window.localStorage.getItem(key); } catch(e) { return null; } },
@@ -8483,78 +8474,37 @@ function _createSupabaseAuthStorage() {
     };
   }
   const _P = window.Capacitor.Plugins.Preferences;
-  // Only log Supabase auth-token keys; ignore any other storage traffic.
-  const _isAuthKey = (k) => typeof k === 'string' && k.indexOf('sb-') === 0;
   return {
     async getItem(key) {
-      let src = 'none';
-      let prefErr = null;
-      let promoted = false;
       try {
-        let value = null;
-        try {
-          const r = await _P.get({ key });
-          value = r && r.value;
-        } catch(e) { prefErr = (e && e.message) || String(e); }
-        if (prefErr && _isAuthKey(key)) {
-          console.warn('[Auth/Storage] Preferences.get threw for', key, prefErr);
-        }
-        if (value != null) { src = 'preferences'; return value; }
-        // One-shot migration: existing signed-in users have their token in
-        // localStorage from before this adapter shipped. If native is empty
-        // but localStorage has the key, adopt it and promote it into native
-        // storage so the switch to Preferences doesn't cost anyone a login.
-        // Subsequent launches will find the value in native and skip this.
-        let legacy = null;
-        try { legacy = window.localStorage.getItem(key); } catch(e) {}
+        const r = await _P.get({ key });
+        if (r && r.value != null) return r.value;
+      } catch(e) {}
+      // One-shot migration: existing signed-in users have their token in
+      // localStorage from before this adapter shipped. If native is empty
+      // but localStorage has the key, adopt it and promote it into native
+      // storage so the switch to Preferences doesn't cost anyone a login.
+      // Subsequent launches will find the value in native and skip this.
+      try {
+        const legacy = window.localStorage.getItem(key);
         if (legacy != null) {
-          try {
-            await _P.set({ key, value: legacy });
-            promoted = true;
-            src = 'localstorage-migrated';
-          } catch(e) {
-            if (_isAuthKey(key)) console.warn('[Auth/Storage] promote to Preferences failed for', key, (e && e.message) || String(e));
-            src = 'localstorage-not-migrated';
-          }
+          try { await _P.set({ key, value: legacy }); } catch(e) {}
           return legacy;
         }
-        return null;
-      } finally {
-        if (_isAuthKey(key)) {
-          console.log('[Auth/Storage] getItem', key, '→', src, promoted ? '(promoted)' : '');
-        }
-      }
+      } catch(e) {}
+      return null;
     },
     async setItem(key, value) {
-      let prefOk = false;
-      let prefErr = null;
-      try { await _P.set({ key, value }); prefOk = true; }
-      catch(e) { prefErr = (e && e.message) || String(e); }
+      try { await _P.set({ key, value }); } catch(e) {}
       // Mirror to localStorage as belt-and-suspenders: if the Preferences
       // call fails mid-session (plugin gone, disk pressure), the WebView
       // still has a copy for the remainder of this run. Harmless if native
       // storage is the authoritative copy on next boot.
-      let lsOk = false;
-      try { window.localStorage.setItem(key, value); lsOk = true; } catch(e) {}
-      if (_isAuthKey(key)) {
-        // value.length gives a rough proof of "not empty" without leaking
-        // the token itself into logs.
-        const len = typeof value === 'string' ? value.length : -1;
-        console.log('[Auth/Storage] setItem', key, 'preferences=', prefOk, 'localstorage=', lsOk, 'len=', len);
-        if (prefErr) console.warn('[Auth/Storage] Preferences.set threw for', key, prefErr);
-      }
+      try { window.localStorage.setItem(key, value); } catch(e) {}
     },
     async removeItem(key) {
-      let prefOk = false;
-      let prefErr = null;
-      try { await _P.remove({ key }); prefOk = true; }
-      catch(e) { prefErr = (e && e.message) || String(e); }
-      let lsOk = false;
-      try { window.localStorage.removeItem(key); lsOk = true; } catch(e) {}
-      if (_isAuthKey(key)) {
-        console.log('[Auth/Storage] removeItem', key, 'preferences=', prefOk, 'localstorage=', lsOk);
-        if (prefErr) console.warn('[Auth/Storage] Preferences.remove threw for', key, prefErr);
-      }
+      try { await _P.remove({ key }); } catch(e) {}
+      try { window.localStorage.removeItem(key); } catch(e) {}
     },
   };
 }
