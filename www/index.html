@@ -8170,7 +8170,7 @@
           <div class="pf-reminder-row">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
             <span id="pf-reminder-label" style="flex:1">תזכורת יומית</span>
-            <input type="time" id="pf-reminder-time" value="19:00" oninput="_onReminderTimeChange(event)">
+            <input type="time" id="pf-reminder-time" value="20:00" oninput="_onReminderTimeChange(event)">
             <label class="pf-reminder-toggle">
               <input type="checkbox" id="pf-reminder-toggle" onchange="_onReminderToggle(event)">
               <span class="pf-reminder-toggle-slider"></span>
@@ -17123,7 +17123,7 @@ function defaultState() {
     // Daily reminder local-notification settings. Default ON; OS permission is requested
     // after the user finishes their first lesson (not during onboarding). Until permission
     // is granted, the toggle reflects intent but no notification is actually scheduled.
-    dailyReminder: { enabled: true, time: '19:00', permissionAsked: false },
+    dailyReminder: { enabled: true, time: '20:00', permissionAsked: false },
     // Ordered queue of celebration overlays waiting to play. finishDay pushes
     // { type: 'level_up' | 'chapter_complete' | 'bonus_unlock', … } here;
     // _playNextCelebration drains it one at a time. Persisted so an app close
@@ -17163,11 +17163,28 @@ function loadState() {
     state.bonusUnlockShown.economics = !!state.bonusUnlockShown.economics;
   }
   // Normalize state.dailyReminder for existing users whose persisted state predates this field.
-  // Shape: { enabled: true, time: '19:00', permissionAsked: false }.
+  // Shape: { enabled: true, time: '20:00', permissionAsked: false }.
   state.dailyReminder = Object.assign(
-    { enabled: true, time: '19:00', permissionAsked: false },
+    { enabled: true, time: '20:00', permissionAsked: false },
     state.dailyReminder || {}
   );
+  // One-shot migration: default reminder time moved 19:00 → 20:00. Anyone
+  // whose persisted time is still '19:00' is treated as never having
+  // customized (they accepted the previous default) and gets moved to the
+  // new default; anyone with a custom time keeps it. The localStorage flag
+  // guards against re-firing on future boots, so a user who deliberately
+  // sets 19:00 later stays at 19:00. Save immediately — otherwise the
+  // in-memory mutation is lost when the next boot re-reads the old '19:00'
+  // from localStorage and (with the flag set) skips the migration.
+  try {
+    if (!localStorage.getItem('corpus_reminder_time_20_migrated')) {
+      if (state.dailyReminder.time === '19:00') {
+        state.dailyReminder.time = '20:00';
+        saveStateLocal();
+      }
+      localStorage.setItem('corpus_reminder_time_20_migrated', '1');
+    }
+  } catch(e) {}
   // Normalize state.guestPrompt for users whose persisted state predates the cadence object.
   // Also migrate from the legacy single-shot guestSignupPromptShown boolean so a returning
   // guest who already saw the v1 prompt counts as totalShown=1 (and won't immediately re-prompt today).
@@ -18360,7 +18377,7 @@ async function _scheduleOneEvening(fireDate, id, body) {
 // this as UTC (Date.parse of 'YYYY-MM-DDTHH:MM' is inconsistent across
 // engines; the constructor is unambiguously device-local).
 function _reminderFireDateFor(dayOffset, timeHHMM) {
-  const [hh, mm] = String(timeHHMM || '19:00').split(':').map(n => parseInt(n, 10) || 0);
+  const [hh, mm] = String(timeHHMM || '20:00').split(':').map(n => parseInt(n, 10) || 0);
   const now = new Date();
   const fire = new Date(
     now.getFullYear(),
@@ -18425,7 +18442,7 @@ async function rescheduleReminderFromToday() {
 // then ensures the schedule reflects the new state.
 async function setReminder(patch) {
   state.dailyReminder = Object.assign(
-    { enabled: true, time: '19:00', permissionAsked: false },
+    { enabled: true, time: '20:00', permissionAsked: false },
     state.dailyReminder || {},
     patch || {}
   );
@@ -23920,12 +23937,12 @@ function updateLangUI() {
 
 function updateReminderUI() {
   const isEn = state.lang === 'en';
-  const r = state.dailyReminder || { enabled: true, time: '19:00' };
+  const r = state.dailyReminder || { enabled: true, time: '20:00' };
   const label = document.getElementById('pf-reminder-label');
   if (label) label.textContent = isEn ? 'Daily reminder' : 'תזכורת יומית';
   const time = document.getElementById('pf-reminder-time');
   if (time) {
-    time.value = r.time || '19:00';
+    time.value = r.time || '20:00';
     time.disabled = !r.enabled;
   }
   const toggle = document.getElementById('pf-reminder-toggle');
@@ -23937,7 +23954,7 @@ function _onReminderToggle(ev) {
 }
 
 function _onReminderTimeChange(ev) {
-  const t = ev.target.value || '19:00';
+  const t = ev.target.value || '20:00';
   setReminder({ time: t }).then(updateReminderUI);
 }
 
