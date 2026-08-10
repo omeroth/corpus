@@ -18270,6 +18270,15 @@ let _pendingPostQueueFn = null;
 // fire — daily-cap gate inside maybeShowGuestPrompt dedupes.
 let _playedCelebrations = [];
 
+// Snapshot of the most recent drained _playedCelebrations, kept alive so
+// closeCompleteModal (the terminal fn 250 ms after drain) can pick the
+// right guest-prompt trigger (bonus_unlock / chapter_complete / level_up)
+// AND so runShare can defer off the chapter-finish moment. Consolidates
+// prompt dispatch into one code path (was double-dispatched from
+// _onCelebrationQueueEmpty AND closeCompleteModal, causing modal-guest-
+// signup + modal-share to stack in the same tick).
+let _lastPlayedCelebrations = [];
+
 // Prompt-modal deferral — pausing the queue when a prompt is up prevents
 // a celebration overlay from landing on top of guest-signup / share / quiz
 // feedback. Resumed by the drainer calls in every prompt-close path.
@@ -18351,6 +18360,9 @@ function _onCelebrationDismissed() {
 function _onCelebrationQueueEmpty() {
   const played = _playedCelebrations.slice();
   _playedCelebrations = [];
+  // Snapshot for closeCompleteModal (the terminal fn) so its serial
+  // prompt chain can pick a trigger derived from what actually played.
+  _lastPlayedCelebrations = played;
 
   // Bonus-card highlight (was in closeUnlockOverlay) — only if bonus_unlock
   // actually played this session.
@@ -18358,24 +18370,15 @@ function _onCelebrationQueueEmpty() {
     _highlightBonusCardOnHome();
   }
 
-  // Guest-signup nudges — same triggers each individual closer used to
-  // fire. Iterated in REVERSE queue order so the last-played celebration
-  // (bonus_unlock, the once-per-lifetime peak) wins the daily-cap over a
-  // recurring level_up when they co-occur. maybeShowGuestPrompt's
-  // daily-cap gate ensures at most one succeeds; whichever runs first
-  // stamps lastShownDate=today and subsequent calls silently bail.
-  if (!currentUser) {
-    for (const p of played.slice().reverse()) {
-      if (p.type === 'level_up') {
-        maybeShowGuestPrompt(null, 'level_up');
-      } else if (p.type === 'chapter_complete') {
-        maybeShowGuestPrompt(null, 'chapter_complete');
-      } else if (p.type === 'bonus_unlock') {
-        const _shown = (state.guestPrompt && state.guestPrompt.shownTriggers) || {};
-        if (!_shown.bonus_unlock) maybeShowGuestPrompt(null, 'bonus_unlock');
-      }
-    }
-  }
+  // Guest-signup dispatch USED to live here. It was moved into
+  // closeCompleteModal's runSignup so all guest prompts fire through
+  // one serial chain (signup → share → streak) instead of being double-
+  // dispatched from here + closeCompleteModal. The double-dispatch
+  // caused modal-guest-signup and modal-share to open in the same tick
+  // whenever a bonus_unlock celebration coincided with the first-
+  // completion trigger. closeCompleteModal reads _lastPlayedCelebrations
+  // to derive the right trigger (bonus_unlock > chapter_complete >
+  // level_up > first_completion).
 
   const fn = _pendingPostQueueFn;
   _pendingPostQueueFn = null;
@@ -20261,12 +20264,37 @@ function closeCompleteModal(opts) {
     .filter(k => !k.endsWith('-0')).length;
   const _shown = (state.guestPrompt && state.guestPrompt.shownTriggers) || {};
 
+  // Which celebrations played immediately before this call — snapshotted
+  // in _onCelebrationQueueEmpty just before it fires the terminal fn.
+  // Consumed once and cleared at the bottom of this function so a later
+  // direct call (no queue) sees an empty array.
+  const _played = _lastPlayedCelebrations || [];
+  const _hasBonusUnlock     = _played.some(p => p.type === 'bonus_unlock');
+  const _hasChapterComplete = _played.some(p => p.type === 'chapter_complete');
+  const _hasLevelUp         = _played.some(p => p.type === 'level_up');
+
   // Signup prompt eligibility: after the first real dialogue for a guest,
   // guarded by shownTriggers.first_completion so it fires at most once per
   // account (third_completion was removed — dialogue 3 now belongs to share).
   const isFirstGuestCompletion = !currentUser
     && _guestCompletionCount >= 1
     && !_shown.first_completion;
+
+  // Consolidated guest-prompt trigger. Previously _onCelebrationQueueEmpty
+  // fired guest prompts for level_up/chapter_complete/bonus_unlock AND
+  // this function fired first_completion — same tick, causing modal-
+  // guest-signup + modal-share to stack. Now ONE trigger is chosen here
+  // in priority order (rarest / highest-value first) so exactly one
+  // signup modal ever opens per completion, and its runShare callback
+  // runs after IT dismisses (never on top of it).
+  const _promptTrigger = (() => {
+    if (currentUser) return null;
+    if (_hasBonusUnlock && !_shown.bonus_unlock) return 'bonus_unlock';
+    if (_hasChapterComplete) return 'chapter_complete';
+    if (_hasLevelUp)         return 'level_up';
+    if (isFirstGuestCompletion) return 'first_completion';
+    return null;
+  })();
 
   // Share prompt eligibility. Two flags:
   //   corpus_share_shown_{subject}  — set only on successful share (doShare).
@@ -20302,17 +20330,27 @@ function closeCompleteModal(opts) {
     shouldShowShare = state.currentWeek === 1
       && (_guestCompletionCount >= 3 || state.currentDay >= 3);
   }
+  // Defer the share modal off the chapter-completion / bonus-unlock
+  // moment. Piling "share Corpus" onto the same tick as "you finished
+  // chapter 1 + your bonus is unlocked" made the sequence too dense.
+  // Re-arm logic is untouched: neither localStorage flag is written
+  // here, so the next non-chapter-finish completion re-evaluates
+  // shouldShowShare through the normal first-time / re-arm gates.
+  if (shouldShowShare && (_hasChapterComplete || _hasBonusUnlock)) {
+    shouldShowShare = false;
+  }
 
   // Streak milestone eligibility: 3/7/30-day streaks. Cadence gate inside
   // maybeShowGuestPrompt (once-per-day) prevents overlap with the signup.
   const _streakDue = [3, 7, 30].includes(state.dailyStreak);
 
-  const anyPromptDue = isFirstGuestCompletion || shouldShowShare || _streakDue;
+  const anyPromptDue = !!_promptTrigger || shouldShowShare || _streakDue;
 
   if (!anyPromptDue) {
     // Nothing to show — continuation handles navigation. On Back to Home this
     // is goHome (default); on Next Dialogue this is openReader(next). Skipping
     // the goHome here is what removes the "home flash" between two dialogues.
+    _lastPlayedCelebrations = [];
     continuation();
     return;
   }
@@ -20354,12 +20392,16 @@ function closeCompleteModal(opts) {
   };
 
   const runSignup = () => {
-    if (isFirstGuestCompletion) {
-      maybeShowGuestPrompt(runShare, 'first_completion');
+    if (_promptTrigger) {
+      maybeShowGuestPrompt(runShare, _promptTrigger);
     } else {
       runShare();
     }
   };
+
+  // Consume the played-celebration snapshot so a subsequent direct call
+  // (queue empty path) doesn't inherit stale data from a previous drain.
+  _lastPlayedCelebrations = [];
 
   runSignup();
 }
