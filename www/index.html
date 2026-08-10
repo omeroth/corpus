@@ -497,12 +497,6 @@
   html.dark .onb-progress[data-step="4"] .onb-pill:nth-child(-n+3),
   html.dark .onb-progress[data-step="5"] .onb-pill:nth-child(-n+4) { background: rgba(245, 241, 255, 0.42); }
 
-  /* Econ-promo eyebrow. #2563EB on dark philosophy surface (#241B42) is
-     3.1:1, borderline for AA-body. Lift to the dark-econ-theme accent
-     (#5B8DF0 — same value the html.dark.theme-economics block defines
-     at 337) so the tint stays "econ" but reads on dark ground. */
-  html.dark .econ-promo-eyebrow { color: #5B8DF0; }
-
   /* Walkthrough progress dot ACTIVE state. Source at 5962 uses
      var(--surface) which flips dark → dark dot on dark backdrop is
      invisible. The walkthrough canvas is always dark-tinted regardless
@@ -1978,126 +1972,11 @@
     border-color: var(--accent);
     box-shadow: 0 4px 20px var(--accent-glow);
   }
-  /* Bonus chapter card (philosophy carousel) */
-  .bonus-carousel-item { cursor: pointer; }
-  .bonus-carousel-item.locked { cursor: pointer; }
-  .bonus-circle-wrapper {
-    position: relative;
-    width: 64px;
-    height: 64px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .bonus-progress-ring {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 64px;
-    height: 64px;
-    transition: stroke-dashoffset 0.6s ease;
-  }
-  .bonus-circle {
-    position: relative;
-    z-index: 1;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-    border: 2px solid #D4AF37;
-    color: var(--accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 30px rgba(123, 79, 212, 0.7);
-    transition: transform 0.3s ease, opacity 0.3s ease;
-  }
-  .bonus-carousel-item.locked .bonus-circle { opacity: 0.5; animation: none; }
-  .bonus-carousel-item.locked .thinker-carousel-name { opacity: 0.6; }
-  .bonus-carousel-item.unlocked .bonus-circle { animation: bonusHalo 2.4s ease-in-out infinite; }
-  .bonus-carousel-item.unlocked:active .bonus-circle { transform: scale(0.95); }
-  @keyframes bonusHalo {
-    0%, 100% {
-      box-shadow:
-        0 0 0 0 rgba(123, 79, 212, 0.8),
-        0 0 30px rgba(123, 79, 212, 0.6);
-    }
-    50% {
-      box-shadow:
-        0 0 0 16px rgba(123, 79, 212, 0),
-        0 0 50px rgba(123, 79, 212, 0.9);
-    }
-  }
-  /* One-shot celebratory pulse for the first time the bonus chapter is unlocked.
-     Applied via the .just-unlocked class added by closeUnlockOverlay; removed after 2.8s,
-     after which the regular infinite bonusHalo resumes. Rule placed AFTER the .unlocked
-     rule so it wins the cascade (equal specificity, later source order). */
-  @keyframes bonusJustUnlocked {
-    0% {
-      transform: scale(1);
-      box-shadow:
-        0 0 0 0 rgba(255, 217, 130, 0.95),
-        0 0 30px rgba(123, 79, 212, 0.6);
-    }
-    50% {
-      transform: scale(1.12);
-      box-shadow:
-        0 0 0 24px rgba(255, 217, 130, 0),
-        0 0 60px rgba(255, 217, 130, 0.95);
-    }
-    100% {
-      transform: scale(1);
-      box-shadow:
-        0 0 0 0 rgba(255, 217, 130, 0),
-        0 0 30px rgba(123, 79, 212, 0.6);
-    }
-  }
-  .bonus-carousel-item.just-unlocked .bonus-circle { animation: bonusJustUnlocked 2.8s ease-out 1; }
-  /* === Economics bonus card — blue halo overrides ===
-     Keep gold ring/border/star intact (those use #D4AF37 and var(--accent) gradient).
-     Only the box-shadow halo colors are replaced with the economics blue
-     (#2563EB / rgba(37,99,235,...)). Parallel rules for .bonus-econ so philosophy purple is untouched. */
-  .bonus-carousel-item.bonus-econ .bonus-circle {
-    box-shadow: 0 0 30px rgba(37, 99, 235, 0.7);
-  }
-  .bonus-carousel-item.bonus-econ.unlocked .bonus-circle {
-    animation: bonusHaloEcon 2.4s ease-in-out infinite;
-  }
-  @keyframes bonusHaloEcon {
-    0%, 100% {
-      box-shadow:
-        0 0 0 0 rgba(37, 99, 235, 0.8),
-        0 0 30px rgba(37, 99, 235, 0.6);
-    }
-    50% {
-      box-shadow:
-        0 0 0 16px rgba(37, 99, 235, 0),
-        0 0 50px rgba(37, 99, 235, 0.9);
-    }
-  }
-  .bonus-carousel-item.bonus-econ.just-unlocked .bonus-circle {
-    animation: bonusJustUnlockedEcon 2.8s ease-out 1;
-  }
-  @keyframes bonusJustUnlockedEcon {
-    0% {
-      transform: scale(1);
-      box-shadow:
-        0 0 0 0 rgba(255, 217, 130, 0.95),
-        0 0 30px rgba(37, 99, 235, 0.6);
-    }
-    50% {
-      transform: scale(1.12);
-      box-shadow:
-        0 0 0 24px rgba(255, 217, 130, 0),
-        0 0 60px rgba(255, 217, 130, 0.95);
-    }
-    100% {
-      transform: scale(1);
-      box-shadow:
-        0 0 0 0 rgba(255, 217, 130, 0),
-        0 0 30px rgba(37, 99, 235, 0.6);
-    }
-  }
+  /* .bonus-carousel-item, .bonus-circle{-wrapper,} and the four
+     bonusHalo* / bonusJustUnlocked* keyframes were removed when the
+     carousel's bonus tile was retired. The bonus card at the top of
+     the level list (see .level-card.bonus above) is now the single
+     discovery surface. */
   .thinker-carousel-card.locked img {
     filter: grayscale(100%) brightness(0.6);
     opacity: 0.45;
@@ -2206,74 +2085,115 @@
   .streak-repair-cta:hover { background: #F59E0B; }
   .streak-repair-cta:active { transform: scale(0.97); }
 
-  /* ── Econ bonus promo card (home) ────────────────────────────────
-     Mirrors .streak-repair-card structure exactly; tinted economics
-     blue (#2563EB) instead of amber. Shown while
-     isEconBonusPromoActive() and none of the four hide-gates fire
-     (dismissed / chapter-1 earned / bonus chapter touched / promo
-     inactive). Managed by renderEconPromoCard. */
-  .econ-promo-card {
-    position: relative;
-    background: var(--surface);
-    border: 1.5px solid #2563EB;
-    border-radius: 20px;
-    padding: 20px 22px 22px;
-    margin: 12px 16px 16px;
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.18);
+  /* ── Bonus level-card (home) ────────────────────────────────────
+     Inline entry point for the bonus chapter. Renders between chapters 1
+     and 2 in the level-card list, replacing the retired econ-promo card.
+     Same shape in both states: WHITE surface (--surface flips per light/
+     dark theme so the card is readable on both) with a 2px amber border.
+     Unlocked adds a soft amber glow so it visibly lights up as reward.
+     Locked shows a chapter-1 progress bar and a countdown of remaining
+     dialogues — no dashed border, no grey, no disabled look. */
+  .level-card.bonus {
+    /* Pale amber wash so the card visibly stands apart from the neighbouring
+       white cards. Values chosen per-theme because a fixed rgba overlay
+       reads too warm on light and disappears on dark.
+       Two `background` declarations use classic CSS cascade fallback:
+       the hex sits first so browsers without color-mix() (iOS Safari
+       15.0-16.1) accept it; modern browsers parse the color-mix line as
+       valid and it wins by source order. Order matters here — swapping
+       them would make old Safari drop the invalid color-mix and be left
+       with no rule at all (no earlier background to fall back to). */
+    background: #FDF3E1;
+    background: color-mix(in srgb, var(--amber) 12%, var(--surface));
+    border: 2px solid var(--amber);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.14), 0 6px 20px -6px rgba(245, 158, 11, 0.35);
   }
-  .econ-promo-dismiss {
-    position: absolute;
-    top: 8px;
-    inset-inline-end: 10px;
-    width: 32px;
-    height: 32px;
-    background: none;
-    border: none;
-    font-size: 22px;
-    line-height: 1;
-    font-weight: 400;
+  /* Dark theme: subject-specific hex fallbacks because color-mix can
+     compute the tint at runtime from var(--surface), but the fallback
+     hex has to be hardcoded per subject surface (#241B42 for philosophy,
+     #16233D for economics, both at 16 % amber). Same two-declaration
+     cascade — hex first, color-mix second. */
+  html.dark.theme-philosophy .level-card.bonus {
+    background: #453039;
+    background: color-mix(in srgb, var(--amber) 16%, var(--surface));
+  }
+  html.dark.theme-economics .level-card.bonus {
+    background: #3A3735;
+    background: color-mix(in srgb, var(--amber) 16%, var(--surface));
+  }
+  .level-card.bonus .level-num {
+    background: rgba(245, 158, 11, 0.14);
+    color: var(--amber);
+    font-size: 20px;
+  }
+  .level-card.bonus .level-eyebrow { color: var(--amber); }
+  /* Locked keeps the pale-amber tinted card + amber border. Drops the
+     glow so unlocked visibly lights up in contrast. Overrides the
+     default .locked-week muted-text treatment: title stays full ink,
+     eyebrow stays amber. Card reads as attainable, not blocked. */
+  .level-card.bonus.locked-week {
+    background: #FDF3E1;
+    background: color-mix(in srgb, var(--amber) 12%, var(--surface));
+    border: 2px solid var(--amber);
+    box-shadow: none;
+    opacity: 1;
+    cursor: pointer;
+  }
+  html.dark.theme-philosophy .level-card.bonus.locked-week {
+    background: #453039;
+    background: color-mix(in srgb, var(--amber) 16%, var(--surface));
+  }
+  html.dark.theme-economics .level-card.bonus.locked-week {
+    background: #3A3735;
+    background: color-mix(in srgb, var(--amber) 16%, var(--surface));
+  }
+  .level-card.bonus.locked-week .level-eyebrow { color: var(--amber); }
+  .level-card.bonus.locked-week .level-title { color: var(--ink); }
+  .level-card.bonus.locked-week .level-num {
+    background: rgba(245, 158, 11, 0.14);
+    color: var(--amber);
+  }
+  /* Countdown + progress bar live below the header, indented under the
+     title so they align with .level-title (not with the num badge). */
+  .bonus-countdown {
+    padding: 0 16px 6px calc(16px + 38px + 12px);
+    font-size: 12.5px;
     color: var(--text-2);
-    cursor: pointer;
-    border-radius: 50%;
-    padding: 0;
+    line-height: 1.3;
+    margin-top: -4px;
   }
-  .econ-promo-dismiss:hover {
-    background: var(--surface-2);
-    color: var(--text);
+  [dir="rtl"] .bonus-countdown {
+    padding: 0 calc(16px + 38px + 12px) 6px 16px;
   }
-  .econ-promo-eyebrow {
-    font-size: calc(11px * var(--text-scale));
-    color: #2563EB;
-    text-transform: uppercase;
-    letter-spacing: 1.3px;
-    font-weight: 800;
-    margin-bottom: 10px;
-    /* End-align in RTL so it doesn't collide with the × in the top-end
-       corner. text-align: start handles both directions. */
-    text-align: start;
+  .bonus-progress {
+    display: flex;
+    height: 5px;
+    background: rgba(245, 158, 11, 0.16);
+    border-radius: 3px;
+    margin: 0 16px 14px calc(16px + 38px + 12px);
+    /* Deliberately NO overflow:hidden — it would clip the fill's
+       box-shadow at the track edge and make the glow invisible outside
+       the 5-px track. The fill's width:X% keeps its box inside the
+       track physically; only the shadow bleeds outside, which is the
+       whole point of the glow. */
   }
-  .econ-promo-body {
-    font-size: calc(15px * var(--text-scale));
-    line-height: 1.5;
-    color: var(--ink);
-    margin-bottom: 16px;
+  [dir="rtl"] .bonus-progress {
+    margin: 0 calc(16px + 38px + 12px) 14px 16px;
   }
-  .econ-promo-cta {
-    display: inline-block;
-    padding: 12px 24px;
-    background: #2563EB;
-    color: #ffffff;
-    border: none;
-    border-radius: 999px;
-    font-family: inherit;
-    font-size: calc(15px * var(--text-scale));
-    font-weight: 800;
-    cursor: pointer;
-    transition: transform 0.15s ease, background 0.2s ease;
-    -webkit-tap-highlight-color: transparent;
+  /* display:flex above makes flex-start honour direction — the fill
+     grows from the left in LTR and from the right in RTL, so progress
+     always reads as "from the starting side of the text." */
+  .bonus-progress-fill {
+    height: 100%;
+    background: var(--amber);
+    border-radius: 3px;
+    /* Soft amber halo so the fill reads as warm, not a flat rule.
+       Works on light + dark: --amber stays #F59E0B in both themes and
+       the shadow is set in absolute rgba so it doesn't fight the
+       surface tint. Subtle by design — not a neon streak. */
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.55);
+    transition: width 400ms cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .econ-promo-cta:hover { background: #1D4ED8; }
-  .econ-promo-cta:active { transform: scale(0.97); }
 
   /* ── Start-first-dialogue card (home) ────────────────────────────
      Same shape as .econ-promo-card, tinted with the current subject
@@ -3840,58 +3760,10 @@
     from { transform: scale(0.8); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
   }
-  /* === Bonus dialogue picker modal ===
-     Reuses .modal-overlay (backdrop) + .modal-box (border/shadow/padding) but overrides the
-     popIn animation with a "wormhole/suction" entry that emanates from the bonus star's
-     position on screen. JS sets --bonus-ox / --bonus-oy as px offsets from the modal-box
-     centre, so the calc(50% + var(...)) keeps transform-origin centred when no card is found.
-     Internal lesson-* rows are styled by the existing lesson-node CSS (no overrides). */
-  .bonus-picker-box {
-    max-width: 320px;
-    padding: 22px 18px 18px;
-    transform-origin: calc(50% + var(--bonus-ox, 0px)) calc(50% + var(--bonus-oy, 0px));
-  }
-  /* Override .modal-box's default popIn with the wormhole when the picker is active.
-     Higher specificity (id + class + class) wins over the .modal-box rule. */
-  #modal-bonus-picker.active .bonus-picker-box {
-    animation: bonusWormhole 0.5s cubic-bezier(0.34, 1.45, 0.5, 1) both;
-  }
-  @keyframes bonusWormhole {
-    0%   { transform: scale(0.05) rotate(-160deg); opacity: 0.3; filter: blur(1px); }
-    45%  { opacity: 1; filter: blur(0); }
-    72%  { transform: scale(1.05) rotate(5deg); }
-    100% { transform: scale(1) rotate(0); opacity: 1; }
-  }
-  .bonus-picker-close {
-    position: absolute; top: 8px; left: 12px;
-    background: none; border: none;
-    font-size: 22px; color: var(--text-2);
-    cursor: pointer; line-height: 1;
-    padding: 4px 8px;
-    font-family: 'Nunito', sans-serif;
-  }
-  .bonus-picker-star {
-    font-size: 34px; color: #D4AF37; line-height: 1;
-    margin-bottom: 2px;
-  }
-  .bonus-picker-title {
-    font-family: 'Nunito', sans-serif;
-    font-size: 21px; font-weight: 900;
-    color: var(--text);
-    margin: 4px 0 2px;
-  }
-  .bonus-picker-sub {
-    font-size: 12px; color: var(--text-2);
-    margin-bottom: 14px; font-weight: 600;
-  }
-  /* Stagger the row entry — each .lesson-node gets an animation-delay inline from JS. */
-  #modal-bonus-picker.active .lesson-node {
-    animation: bonusRowIn 0.34s ease both;
-  }
-  @keyframes bonusRowIn {
-    from { opacity: 0; transform: translateY(9px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  /* The bonus-picker modal (.bonus-picker-*, #modal-bonus-picker,
+     bonusWormhole / bonusRowIn keyframes) was removed with the
+     carousel bonus tile. The bonus level card at the top of the
+     chapter list expands inline to the same day list. */
   .modal-emoji { font-size: 56px; margin-bottom: 12px; }
   .modal-title {
     font-family: 'Nunito', sans-serif;
@@ -7949,17 +7821,12 @@
 
       <!-- Start-first-dialogue card — filled by renderStartFirstDialogueCard
            for a user who finished onboarding but has not yet completed
-           the first dialogue. Sits above the streak-repair + econ-promo
-           cards so it's the first thing on the scroll. -->
+           the first dialogue. Sits above the streak-repair card so it's
+           the first thing on the scroll. -->
       <div id="start-first-dialogue-card-holder" style="display:none"></div>
 
       <!-- Streak repair card — filled by renderStreakRepairCard when eligible. -->
       <div id="streak-repair-card-holder" style="display:none"></div>
-
-      <!-- Econ bonus promo card — filled by renderEconPromoCard while
-           isEconBonusPromoActive() and the user hasn't dismissed or
-           already earned/completed the chapter. Subject-agnostic. -->
-      <div id="econ-promo-card-holder" style="display:none"></div>
 
       <!-- Legacy hero card (kept for compat; never rendered) -->
       <div id="hero-continue-card-wrap" style="display:none"></div>
@@ -8425,20 +8292,6 @@
 
 </style>
 
-<!-- Bonus dialogue picker modal — opens from the bonus carousel star (philosophy + economics).
-     Reuses .modal-overlay (backdrop + dim) and .modal-box (animation override) scaffolding.
-     The lesson-path / lesson-node / lesson-circle rows are styled by the existing lesson-* CSS
-     and theme automatically per subject via CSS variables. -->
-<div class="modal-overlay bonus-picker-overlay" id="modal-bonus-picker">
-  <div class="modal-box bonus-picker-box" id="bonus-picker-box">
-    <button class="bonus-picker-close" onclick="closeBonusPicker()" aria-label="Close">×</button>
-    <div class="bonus-picker-star">★</div>
-    <div class="bonus-picker-title" id="bonus-picker-title"></div>
-    <div class="bonus-picker-sub" id="bonus-picker-sub"></div>
-    <div class="lesson-path" id="bonus-picker-path"></div>
-  </div>
-</div>
-
 <script>
 // Script Version: 1.3 - GitHub Pages Migration
 // ═══════════════════════════════════════════════════════════
@@ -8641,10 +8494,6 @@ async function syncProgressToSupabase() {
       daily_goal_history:  state.dailyGoalHistory   || [],
       completions_by_day:  state.completionsByDay   || {},
       goal_met_history:    state.goalMetHistory     || [],
-      // Econ bonus promo card dismissal — dated array, one entry per
-      // dismissal (there's typically ≤1 per promo window). Same union-
-      // merge convention as the other dated-array fields above.
-      econ_promo_card_dismissed: state.econPromoCardDismissed || [],
       // Home hints seen once-ever — string array, union-dedup on load.
       hints_seen: state.hintsSeen || [],
     }, { onConflict: 'user_id' });
@@ -8731,16 +8580,6 @@ async function loadProgressFromSupabase() {
       if (!g || !g.metAt) return;
       if (!state.goalMetHistory.find(x => x && x.metAt === g.metAt)) {
         state.goalMetHistory.push({ metAt: g.metAt, goal: g.goal, count: g.count || 0, bonusXp: g.bonusXp || 0 });
-      }
-    });
-    // Econ promo card dismissal — union by dismissedAt. Any local OR
-    // server entry counts; the card gate only checks presence + date
-    // vs BONUS_ECON_PROMO_START, so no ordering / max semantics needed.
-    state.econPromoCardDismissed = state.econPromoCardDismissed || [];
-    (data.econ_promo_card_dismissed || []).forEach(e => {
-      if (!e || !e.dismissedAt) return;
-      if (!state.econPromoCardDismissed.find(x => x && x.dismissedAt === e.dismissedAt)) {
-        state.econPromoCardDismissed.push({ dismissedAt: e.dismissedAt });
       }
     });
     // Home hints seen — flat string array, union-dedup by id. Same
@@ -17016,7 +16855,11 @@ function getW() {
     id: 'bonus1',
     title: cdBonus1.title,
     titleEn: cdBonus1.titleEn,
-    subtitle: '',
+    // Flatten subtitle to the current language so the padlock overlay
+    // (which reads chapter.subtitle) matches the economics branch above
+    // and stays in sync with the chapter data as a single source of
+    // truth. Was hardcoded '' before the chapter-object refactor.
+    subtitle: lang === 'en' ? (cdBonus1.subtitleEn || '') : (cdBonus1.subtitle || ''),
     isBonus: true,
     days: cdBonus1.days.map(function(d) { return deriveDay(d); }),
   } : null;
@@ -17094,13 +16937,6 @@ function defaultState() {
     //   at most once per streak day per install.
     completionsByDay: {},
     goalMetHistory: [],
-    // Economics bonus promo card (home). Dated array; any entry with
-    // dismissedAt >= _streakDay(BONUS_ECON_PROMO_START) counts as
-    // "dismissed for the current promo window." Future promos (new
-    // BONUS_ECON_PROMO_START) auto-reset since old entries won't satisfy
-    // the >= check. Union-merge-safe (dedup by dismissedAt).
-    // [{ dismissedAt: 'YYYY-MM-DD' }]
-    econPromoCardDismissed: [],
     // Legacy home-hints ID array. Feature retired in favour of the
     // owl-guided walkthrough; field kept because it's a Supabase-synced
     // union-merge column (see 20260728120000_hints_seen.sql) and dropping
@@ -17831,129 +17667,13 @@ function _repairInterp(tpl, N) { return tpl.replace('{N}', String(N)); }
 // window closes / repair succeeds naturally).
 let _repairCardDismissedThisSession = false;
 
-// ─── Econ bonus promo card (home) ──────────────────────────────────
-// Rendered near the top of home, immediately after the streak-repair
-// slot. Shows while the promo window is active and none of the four
-// hide-gates fire. Subject-agnostic — appears regardless of the user's
-// current subject. Clicking sets subject to economics (mirrors the
-// deep-link path) and opens the first day of bonusEcon1.
-
-// force=true: bypass the dismissed gate for devtools debugging. Never
-// call with force from production code paths — only from the console.
-function renderEconPromoCard(force) {
-  const call = (window._econPromoCardCallCount = (window._econPromoCardCallCount || 0) + 1);
-  const holder = document.getElementById('econ-promo-card-holder');
-  if (!holder) {
-    console.log('[econ-promo #' + call + '] NO HOLDER in DOM (renderHome may not have mounted yet)');
-    return;
-  }
-  const gates = {
-    promo_active: isEconBonusPromoActive(),
-    dismissed:    _econPromoCardDismissed(),
-    force:        !!force,
-    subject:      state.subject,
-    now_iso:      new Date().toISOString(),
-  };
-  // Two gates only (per product decision): active window + not dismissed.
-  // Completion gates (_isEconChapter1Completed / _isEconBonusChapterCompleted)
-  // intentionally removed — the promo shows to everyone during the window.
-  if (!gates.promo_active) {
-    holder.innerHTML = ''; holder.style.display = 'none';
-    console.log('[econ-promo #' + call + '] HIDE — promo window inactive', gates);
-    return;
-  }
-  if (!force && gates.dismissed) {
-    holder.innerHTML = ''; holder.style.display = 'none';
-    console.log('[econ-promo #' + call + '] HIDE — dismissed', gates);
-    return;
-  }
-  const isEn = state.lang === 'en';
-  // Fire econ_promo_card_shown at most once per session per home mount.
-  // Guarded via window flag so repeated renderHome invocations (subject
-  // switch, back from reader, etc.) don't inflate the count.
-  window._econPromoCardSeenThisSession = window._econPromoCardSeenThisSession || false;
-  if (!window._econPromoCardSeenThisSession) {
-    window._econPromoCardSeenThisSession = true;
-    try {
-      posthog.capture('econ_promo_card_shown', {
-        subject_at_view:      state.subject || null,
-        promo_active:         true,
-        days_left_in_window:  _econPromoDaysLeft(),
-      });
-    } catch (e) {}
-  }
-  const eyebrow    = isEn ? 'Limited-time bonus' : 'בונוס לזמן מוגבל';
-  const body       = isEn
-    ? "Iran is back in the headlines, so we've opened the oil-crisis bonus chapter free for a week. Don't miss it."
-    : 'איראן שוב בכותרות, אז החלטנו לפתוח את פרק הבונוס על משבר הנפט לשבוע, בחינם. אל תפספס.';
-  const cta        = isEn ? 'Open the chapter' : 'לפרק הבונוס';
-  const dismissLbl = isEn ? 'Dismiss' : 'לסגור';
-  holder.innerHTML =
-    '<div class="econ-promo-card" role="region" aria-label="' + eyebrow + '">' +
-      '<button class="econ-promo-dismiss" aria-label="' + dismissLbl + '" onclick="dismissEconPromoCard()">×</button>' +
-      '<div class="econ-promo-eyebrow">' + eyebrow + '</div>' +
-      '<div class="econ-promo-body">' + body + '</div>' +
-      '<button class="econ-promo-cta" onclick="openEconPromoBonus()">' + cta + '</button>' +
-    '</div>';
-  holder.style.display = '';
-  // Diagnostic trace: confirms the injection happened AND the holder is
-  // actually painted (not clipped, not zero-height, not hidden by CSS).
-  // Read after a layout tick so getBoundingClientRect returns real values.
-  try {
-    const holderCS = getComputedStyle(holder);
-    const rect     = holder.getBoundingClientRect();
-    const inner    = holder.querySelector('.econ-promo-card');
-    const innerRect = inner ? inner.getBoundingClientRect() : null;
-    console.log('[econ-promo #' + call + '] RENDERED', {
-      holderComputedDisplay: holderCS.display,
-      holderComputedVisibility: holderCS.visibility,
-      holderHeight: Math.round(rect.height),
-      holderTop:    Math.round(rect.top),
-      innerCardFound: !!inner,
-      innerCardRect: innerRect ? {
-        top:    Math.round(innerRect.top),
-        left:   Math.round(innerRect.left),
-        width:  Math.round(innerRect.width),
-        height: Math.round(innerRect.height),
-      } : null,
-      gates,
-    });
-  } catch (e) {}
-}
-
-function dismissEconPromoCard() {
-  const today = _streakDay();
-  state.econPromoCardDismissed = state.econPromoCardDismissed || [];
-  // Union-dedup by dismissedAt — a second dismissal on the same day
-  // (e.g. re-render race) shouldn't grow the array.
-  if (!state.econPromoCardDismissed.find(e => e && e.dismissedAt === today)) {
-    state.econPromoCardDismissed.push({ dismissedAt: today });
-  }
-  saveStateLocal();
-  try { saveState(); } catch (e) {}
-  try {
-    posthog.capture('econ_promo_card_dismissed', {
-      subject_at_view:     state.subject || null,
-      days_left_in_window: _econPromoDaysLeft(),
-    });
-  } catch (e) {}
-  renderEconPromoCard();
-}
-
-function openEconPromoBonus() {
-  try {
-    posthog.capture('econ_promo_card_clicked', {
-      subject_at_view:     state.subject || null,
-      days_left_in_window: _econPromoDaysLeft(),
-    });
-  } catch (e) {}
-  // Mirror the deep-link path: set subject to economics so getW() returns
-  // the economics chapter list, then open the first day of bonusEcon1.
-  try { setSubject('economics'); } catch (e) {}
-  const wk = getW().find(w => w.id === 'bonusEcon1');
-  const day = wk && wk.days && wk.days[0];
-  if (day) openReader('bonusEcon1', day.id);
-}
+// Removed: the econ promo card apparatus (renderEconPromoCard,
+// dismissEconPromoCard, openEconPromoBonus, plus their date-window
+// constants BONUS_ECON_PROMO_START/END, isEconBonusPromoActive,
+// _econPromoDaysLeft, _econPromoCardDismissed). Discovery moved to
+// the level-card list — the bonus chapter is now rendered inline
+// between chapters 1 and 2 in economics, locked until chapter 1 is
+// complete. See the .level-card.bonus branch inside renderHome.
 
 // ─── Start-first-dialogue card (home) ──────────────────────────────
 // Rendered at the very top of home for a user who finished onboarding
@@ -18533,7 +18253,10 @@ function getBonusProgress() {
 // Sequences the three celebration overlays (level_up → chapter_complete →
 // bonus_unlock) one at a time so they never stack. finishDay builds
 // state.pendingCelebrations without touching lifetime flags; each overlay's
-// show function (or, for bonus_unlock, its dismiss) flips its own flag.
+// show function flips its own flag (for bonus_unlock the flip happens at
+// the END of the sequence — on the owl coach mark's dismiss in
+// _closeBonusUnlockCoachMark — so the flag guards the full padlock+coach
+// pair rather than just the padlock).
 // The queue is persisted, so a mid-queue app close resumes cleanly on next
 // entry — see _resumeCelebrationsIfPending, hooked into enterApp.
 
@@ -18663,23 +18386,60 @@ function _onCelebrationQueueEmpty() {
   }
 }
 
-// Extracted from the old closeUnlockOverlay so the terminal handler can
-// fire it independently of when bonus_unlock actually dismisses.
+// Post-bonus-unlock highlight. Fires once, after the full-screen
+// showUnlockOverlay closes and the celebration queue drains. Scrolls
+// the newly-unlocked bonus level card into view, then hands off to the
+// owl coach mark (_showBonusUnlockCoachMark). The old one-shot ring-
+// bloom pulse (@keyframes bonusJustUnlocked / .just-unlocked class)
+// was retired here — the coach mark IS the celebratory beat now, and
+// stacking a pulse under it made the sequence four beats deep (DC
+// modal + padlock + pulse + coach).
+//
+// Guest-prompt deference: _onCelebrationQueueEmpty ALSO fires
+// maybeShowGuestPrompt('bonus_unlock') synchronously right after this
+// call. If that prompt opens, we must not stack the coach mark on top
+// of it — poll for the modal to close, then fire the coach. Times out
+// after 60 s of continuous guest-prompt visibility (defensive; in
+// practice the user dismisses or signs up in seconds).
 function _highlightBonusCardOnHome() {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      const bonusCard = document.querySelector('.bonus-carousel-item');
-      const carousel = document.getElementById('thinker-carousel');
-      if (!bonusCard || !carousel) return;
+      const bonusId = state.subject === 'economics' ? 'bonusEcon1' : 'bonus1';
+      const bonusCard = document.getElementById('level-card-' + bonusId);
+      if (!bonusCard) return;
       try {
-        bonusCard.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        bonusCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } catch (e) {}
-      bonusCard.classList.add('just-unlocked');
-      setTimeout(() => bonusCard.classList.remove('just-unlocked'), 2800);
-      if (typeof showJourneyToast === 'function') {
-        const isEn = state.lang === 'en';
-        showJourneyToast(isEn ? 'Tap to start your bonus chapter' : 'הקישו כדי להתחיל את פרק הבונוס');
-      }
+
+      const fire = () => {
+        try { _showBonusUnlockCoachMark(bonusId); } catch (e) { console.error('[coach]', e); }
+      };
+      // Reuse the celebration-queue's own "prompt modal active" check
+      // so this defers behind EVERY modal the celebration queue itself
+      // pauses for (guest-signup, share, quiz-feedback, endowment,
+      // goal-met). New modals added to that list are handled here for
+      // free — no drift.
+      const blocked = () => {
+        try { return _promptModalActiveForCelebrations(); } catch (e) { return false; }
+      };
+      // 500 ms base delay so smooth-scroll settles before the coach
+      // mark measures the spotlight rect.
+      setTimeout(() => {
+        if (!blocked()) { fire(); return; }
+        // Poll every 250 ms; bail after 60 s (defensive — in practice
+        // the user dismisses or signs up in seconds).
+        const t0 = Date.now();
+        const iv = setInterval(() => {
+          if (!blocked()) {
+            clearInterval(iv);
+            // Small settle so the previous modal's fade-out completes
+            // before the coach mark's own bubblePop animation.
+            setTimeout(fire, 250);
+          } else if (Date.now() - t0 > 60000) {
+            clearInterval(iv);
+          }
+        }, 250);
+      }, 500);
     });
   });
 }
@@ -18698,23 +18458,28 @@ function _resumeCelebrationsIfPending() {
 }
 // === End celebration queue =========================================
 
-// bonus_unlock — the emotional peak. Its lifetime flag flips ON DISMISS
-// (closeUnlockOverlay), not here at render, so an app close mid-overlay
-// leaves the flag false and the queue-persist path re-shows it next entry.
+// bonus_unlock — the emotional peak. Its lifetime flag now flips at the
+// END of the sequence (owl coach mark dismiss in _closeBonusUnlockCoach
+// Mark), so any app close mid-padlock OR mid-coach leaves the flag false
+// and the queue-persist path can replay the sequence on next entry.
 // Returns true for the queue player.
 function showUnlockOverlay() {
   const isEn = state.lang === 'en';
+  // Read subtitle live off the chapter object so this stays in sync when
+  // chapter titles/subtitles are edited. getW() returns the current
+  // subject's chapters; the bonus one is flagged with isBonus.
+  const chapter = (typeof getW === 'function' ? getW() : []).find(w => w && w.isBonus);
   const titleEl = document.getElementById('unlock-title');
   const subtitleEl = document.getElementById('unlock-subtitle');
   const ctaEl = document.getElementById('unlock-cta');
   if (titleEl) titleEl.textContent = isEn ? 'Bonus Chapter Unlocked!' : 'פרק בונוס נפתח!';
   if (subtitleEl) {
-    if (state.subject === 'economics') {
-      subtitleEl.textContent = isEn
-        ? 'The Oil Crisis · What the 2026 oil price spike teaches about all of economics'
-        : 'משבר הנפט · מה זינוק מחיר הנפט ב-2026 מלמד על כל הכלכלה';
+    if (chapter) {
+      const t = isEn ? (chapter.titleEn    || chapter.title    || '') : (chapter.title    || '');
+      const s = isEn ? (chapter.subtitleEn || chapter.subtitle || '') : (chapter.subtitle || '');
+      subtitleEl.textContent = s ? (t + ' · ' + s) : t;
     } else {
-      subtitleEl.textContent = isEn ? 'Ethics and Artificial Intelligence · Kant meets ChatGPT' : 'אתיקה ובינה מלאכותית · קאנט פוגש את ChatGPT';
+      subtitleEl.textContent = '';
     }
   }
   if (ctaEl) ctaEl.textContent = isEn ? "Let's go →" : 'בוא נראה ←';
@@ -18744,13 +18509,10 @@ function showUnlockOverlay() {
 
 function closeUnlockOverlay() {
   document.getElementById('unlock-overlay').style.display = 'none';
-  // Flip the lifetime flag ON DISMISS (not on render) so an app close
-  // mid-overlay preserves the queue's ability to re-show this on relaunch.
-  state.bonusUnlockShown = state.bonusUnlockShown || {};
-  state.bonusUnlockShown[state.subject] = true;
-  saveStateLocal();
-  // Bonus-card highlight + toast + guest-signup nudge all moved to the
-  // terminal handler (_onCelebrationQueueEmpty). Just advance the queue.
+  // Lifetime flag flip moved to _closeBonusUnlockCoachMark so the flag
+  // guards the FULL "you've seen the bonus reveal" sequence (padlock +
+  // owl coach mark), not just the padlock. Otherwise the coach mark
+  // would find the flag already true and refuse to show.
   _onCelebrationDismissed();
 }
 
@@ -18909,10 +18671,6 @@ function renderHome() {
   // safe to call unconditionally — it clears the holder if the user isn't
   // eligible or has dismissed it this session.
   try { renderStreakRepairCard(); } catch (e) {}
-  // Econ bonus promo card: rendered directly below streak-repair (same
-  // idiom, tinted economics blue). Safe to call unconditionally; the
-  // four hide-gates inside clear the holder when any is unmet.
-  try { renderEconPromoCard(); } catch (e) {}
   // Dir + toggle label
   document.documentElement.dir = state.lang === 'en' ? 'ltr' : 'rtl';
   document.documentElement.lang = state.lang;
@@ -19007,17 +18765,17 @@ function renderHome() {
           1: true,
           2: isWeekCompleted(1),
           3: isWeekCompleted(2),
-          // Promo window overrides the earned-unlock check; see
-          // isEconBonusPromoActive. OR short-circuits on real unlock so
-          // users who earned it keep access after the window closes.
-          'bonusEcon1': isWeekCompleted(1) || isEconBonusPromoActive(),
+          // Grandfather: users who opened the bonus under the retired
+          // promo window and completed at least one day keep access
+          // even if chapter 1 is still incomplete.
+          'bonusEcon1': isWeekCompleted(1) || _hasBonusProgress('bonusEcon1'),
           4: isWeekCompleted(3),
         }
       : {
           1: true,
           2: isWeekCompleted(1),
           3: isWeekCompleted(2),
-          'bonus1': isWeekCompleted(1),
+          'bonus1': isWeekCompleted(1) || _hasBonusProgress('bonus1'),
           4: isWeekCompleted(3),
         };
 
@@ -19055,11 +18813,37 @@ function renderHome() {
     if (!hl) throw new Error('home-levels missing');
     hl.innerHTML = '';
 
+    // Reorder so the subject's bonus chapter sits at the very TOP of
+    // the list, above chapter 1. Chapter 1 auto-expands by default and
+    // its dialogue list pushes anything below it well off the fold —
+    // position 2 was effectively invisible. Top placement guarantees
+    // the card is in view before the user scrolls. getW() already
+    // scopes to the current subject, so cross-subject teaser is
+    // impossible — a user in philosophy never sees the economics bonus
+    // and vice versa. Numbering is unaffected because the levelNum
+    // counter below skips bonus chapters entirely; chapter 1 stays
+    // "LEVEL 1" regardless of the bonus card's position.
+    let chaptersOrdered = chapters;
+    const _bonusChapter = chapters.find(w => w && w.isBonus);
+    if (_bonusChapter) {
+      const _withoutBonus = chapters.filter(w => !w || !w.isBonus);
+      const _c1Idx = _withoutBonus.findIndex(w => w.id === 1);
+      if (_c1Idx >= 0) {
+        chaptersOrdered = [
+          ..._withoutBonus.slice(0, _c1Idx),
+          _bonusChapter,
+          ..._withoutBonus.slice(_c1Idx),
+        ];
+      }
+    }
+
+    // Session-scoped dedup for the bonus_card_shown analytics event, keyed
+    // by { subject, locked } so a subject-switch mid-session re-fires.
+    window._bonusCardShownKeys = window._bonusCardShownKeys || {};
+
     let levelNum = 0;
-    chapters.forEach(w => {
+    chaptersOrdered.forEach(w => {
       if (!w || !w.id) return;
-      // Bonus chapters are shown in the home thinker carousel (see populateCarousel), not in the level-card list
-      if (w.isBonus) return;
       const wkUnlocked = weekLockMap[w.id] !== undefined ? weekLockMap[w.id] : true;
       const wkLocked = w.locked || w.comingSoon || !wkUnlocked || !canAccessChapter(w.id);
       const isBonus = !!w.isBonus;
@@ -19077,9 +18861,42 @@ function renderHome() {
       // Level card wrapper
       const isCompleted = w.days && w.days.length > 0 && w.days.every(d => state.completedDays[dayKey(w.id, d.id)]);
       const card = document.createElement('div');
-      card.className = 'level-card' + (isExpanded ? ' expanded' : '') + (wkLocked ? ' locked-week' : '') + (isCompleted ? ' completed' : '');
+      card.className = 'level-card'
+        + (isBonus ? ' bonus' : '')
+        + (isExpanded ? ' expanded' : '')
+        + (wkLocked ? ' locked-week' : '')
+        + (isCompleted ? ' completed' : '');
       card.id = 'level-card-' + w.id;
-      if (!wkLocked) {
+      if (isBonus) {
+        // bonus_card_shown: once per (subject + locked) tuple per session,
+        // so subject-switch mid-session re-fires but repeated home renders
+        // (nav-back, subject re-select) don't inflate counts.
+        try {
+          const _key = (state.subject || '?') + ':' + (wkLocked ? 'L' : 'U');
+          if (!window._bonusCardShownKeys[_key]) {
+            window._bonusCardShownKeys[_key] = true;
+            _phCapture('bonus_card_shown', {
+              subject: state.subject || null,
+              chapter_id: w.id,
+              locked: !!wkLocked,
+            });
+          }
+        } catch (e) {}
+        card.onclick = () => {
+          try {
+            _phCapture('bonus_card_tapped', {
+              subject: state.subject || null,
+              chapter_id: w.id,
+              locked: !!wkLocked,
+            });
+          } catch (e) {}
+          if (wkLocked) {
+            _showBonusLockToast();
+            return;
+          }
+          toggleLevel(w.id);
+        };
+      } else if (!wkLocked) {
         card.onclick = () => toggleLevel(w.id);
       } else if (w.comingSoon) {
         // Coming-soon placeholder — toast feedback so a curious tap isn't silent
@@ -19096,7 +18913,12 @@ function renderHome() {
       // canAccessChapter always returning true, this branch was already unreachable;
       // removing it lets us safely drop showPaywallModal/openCheckout.)
 
-      // Header row
+      // Header row. Right-slot rules:
+      //   - Bonus locked → no icon (the countdown + progress bar below
+      //     communicate "coming soon" without needing a padlock, per the
+      //     "reads as reward, not blocked" design brief).
+      //   - Regular locked → padlock glyph (existing behaviour).
+      //   - Unlocked (both bonus and regular) → chevron.
       const header = document.createElement('div');
       header.className = 'level-card-header';
       header.innerHTML = `
@@ -19106,10 +18928,44 @@ function renderHome() {
           <div class="level-title">${weekTitle}</div>
         </div>
         ${wkLocked
-          ? `<svg viewBox="0 0 64 64" width="18" height="18" style="flex-shrink:0;opacity:0.45"><use href="#ic-lock"/></svg>`
+          ? (isBonus
+              ? ''
+              : `<svg viewBox="0 0 64 64" width="18" height="18" style="flex-shrink:0;opacity:0.45"><use href="#ic-lock"/></svg>`)
           : `<div class="level-chevron">›</div>`}
       `;
       card.appendChild(header);
+
+      // Locked-bonus countdown + progress bar. Progress derives from
+      // chapter 1's real day count and the user's completion state —
+      // decays 7 → 6 → 5 → … → 1 → (card flips to unlocked at 0).
+      // Regular locked chapters don't get this: they're gated by
+      // ordinal progression and self-explanatory from the list order.
+      if (isBonus && wkLocked) {
+        const ch1 = chapters.find(x => x && x.id === 1);
+        const total = (ch1 && ch1.days) ? ch1.days.length : 7;
+        let done = 0;
+        if (ch1 && ch1.days) {
+          ch1.days.forEach(d => {
+            if (state.completedDays[dayKey(1, d.id)]) done++;
+          });
+        }
+        const remaining = Math.max(0, total - done);
+        const pct = total > 0 ? Math.min(100, Math.round((done / total) * 100)) : 0;
+        let cd;
+        if (isEn) {
+          cd = remaining === 1 ? '1 dialogue to go' : (remaining + ' dialogues to go');
+        } else {
+          cd = remaining === 1 ? 'עוד דיאלוג אחד ונפתח' : ('עוד ' + remaining + ' דיאלוגים ונפתח');
+        }
+        const cdEl = document.createElement('div');
+        cdEl.className = 'bonus-countdown';
+        cdEl.textContent = cd;
+        card.appendChild(cdEl);
+        const bar = document.createElement('div');
+        bar.className = 'bonus-progress';
+        bar.innerHTML = '<div class="bonus-progress-fill" style="width:' + pct + '%"></div>';
+        card.appendChild(bar);
+      }
 
       // Lesson path (only for unlocked chapters)
       if (!wkLocked && w.days && w.days.length) {
@@ -19257,59 +19113,12 @@ function populateCarousel() {
   if (!thinkers.length) { carousel.parentElement.style.display = 'none'; return; }
   carousel.parentElement.style.display = '';
   carousel.innerHTML = '';
-  // Bonus chapter card — philosophy + economics. Ring fills as the subject's chapter 1 completes.
-  if (subject === 'philosophy' || subject === 'economics') {
-    const isEn = state.lang === 'en';
-    const bonusId = subject === 'economics' ? 'bonusEcon1' : 'bonus1';
-    const bonusName = subject === 'economics'
-      ? (isEn ? 'The Oil Crisis' : 'משבר הנפט')
-      : (isEn ? 'AI & Ethics' : 'בינה ואתיקה');
-    const totalDays = 7;
-    let completedCount = 0;
-    for (let dy = 1; dy <= 7; dy++) {
-      if (state.completedDays[`${subject}-1-${dy}`]) completedCount++;
-    }
-    const progress = Math.min(1, completedCount / totalDays);
-    // Same promo override as the weekLockMap: economics-only, gated by the
-    // fixed date window. Doesn't affect the ring progress display — that
-    // stays keyed to real chapter-1 completions.
-    const isUnlocked = completedCount >= totalDays
-      || (subject === 'economics' && isEconBonusPromoActive());
-    const r = 30;
-    const circumference = 2 * Math.PI * r;
-    const dashOffset = circumference * (1 - progress);
-    const bonusCard = document.createElement('div');
-    bonusCard.id = 'bonus-carousel-card';                          // stable selector for the picker's suction origin
-    bonusCard.className = 'thinker-carousel-card bonus-carousel-item ' + (isUnlocked ? 'unlocked' : 'locked')
-      + (subject === 'economics' ? ' bonus-econ' : '');
-    bonusCard.innerHTML = `
-      <div class="bonus-circle-wrapper">
-        <svg class="bonus-progress-ring" width="64" height="64">
-          <circle cx="32" cy="32" r="${r}" fill="none" stroke="rgba(212,175,55,0.2)" stroke-width="2"/>
-          <circle cx="32" cy="32" r="${r}" fill="none" stroke="#D4AF37" stroke-width="2"
-                  stroke-dasharray="${circumference}"
-                  stroke-dashoffset="${dashOffset}"
-                  transform="rotate(-90 32 32)"/>
-        </svg>
-        <div class="bonus-circle">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="#D4AF37" stroke-width="2" stroke-linejoin="round">
-            <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
-          </svg>
-        </div>
-      </div>
-      <div class="thinker-carousel-name">${bonusName}</div>
-    `;
-    bonusCard.onclick = () => {
-      if (isUnlocked) {
-        showBonusPicker(bonusId);                                  // was: openBonusChapter(bonusId)
-      } else if (typeof showBonusTooltip === 'function') {
-        showBonusTooltip(bonusCard, isEn
-          ? 'Complete chapter 1 to unlock the bonus chapter'
-          : 'סיימו את פרק 1 כדי לפתוח את פרק הבונוס');
-      }
-    };
-    carousel.appendChild(bonusCard);
-  }
+  // The carousel's bonus-chapter tile was retired: the bonus card at
+  // the top of the level list is now the single entry point. Related
+  // CSS (.bonus-carousel-item, .bonus-circle*, bonusHalo* keyframes)
+  // + helpers (showBonusPicker, showBonusTooltip, openBonusChapter)
+  // were removed alongside this branch. See renderHome for the
+  // replacement discovery surface.
   thinkers.forEach(t => {
     const unlocked = state.unlockedThinkers.includes(t.id);
     const card = document.createElement('div');
@@ -19324,125 +19133,16 @@ function populateCarousel() {
   });
 }
 
-function openBonusChapter(bonusId) {
-  const id = bonusId || 'bonus1';                       // back-compat default
-  const allWeeks = getW();
-  const bonusWeek = allWeeks.find(w => w.id === id);
-  if (!bonusWeek || !bonusWeek.days) return;
-  const nextDay = bonusWeek.days.find(d => !state.completedDays[dayKey(id, d.id)]);
-  const target = nextDay || bonusWeek.days[0];
-  if (target) openReader(id, target.id);
-}
-
-// Bonus dialogue picker — replaces the direct openBonusChapter from the star.
-// Opens a modal listing every dialogue in the bonus chapter with the same lock rules
-// as a regular chapter (sequential: a day is tappable iff completed OR its predecessor
-// is completed). The picker animates open from the bonus card's on-screen position.
-function showBonusPicker(bonusId) {
-  const id = bonusId || (state.subject === 'economics' ? 'bonusEcon1' : 'bonus1');
-  const wk = getW().find(w => w.id === id);
-  if (!wk || !wk.days) return;
-  const rawWeeks = (state.subject === 'economics') ? economicsData.weeks : corpusData.weeks;
-  const rawChapter = rawWeeks.find(w => w.id === id);
-
-  const isEn = state.lang === 'en';
-  document.getElementById('bonus-picker-title').textContent =
-    isEn ? (wk.titleEn || wk.title) : wk.title;
-  document.getElementById('bonus-picker-sub').textContent =
-    isEn ? 'Choose a dialogue' : 'בחרו דיאלוג';
-
-  // Build the per-day rows — same isDone/lessonLocked/isNextUp logic as renderHome's
-  // day list, and the same circle classes + SVG so styling is identical and themes
-  // automatically (purple philosophy, blue economics) via var(--accent).
-  const path = document.getElementById('bonus-picker-path');
-  path.innerHTML = '';
-  const nextUpDayIdx = wk.days.findIndex(d => !state.completedDays[dayKey(id, d.id)]);
-
-  wk.days.forEach((d, di) => {
-    const isDone = !!state.completedDays[dayKey(id, d.id)];
-    const lessonLocked = di > 0 && !state.completedDays[dayKey(id, wk.days[di-1].id)];
-    const isNextUp = di === nextUpDayIdx;
-
-    const node = document.createElement('div');
-    node.className = 'lesson-node' + (lessonLocked ? ' locked-lesson' : '');
-    node.style.animationDelay = (0.18 + di * 0.06) + 's';
-
-    let circleClass, circleInner;
-    if (isDone) {
-      circleClass = 'lesson-circle completed';
-      circleInner = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-    } else if (isNextUp) {
-      circleClass = 'lesson-circle next-up';
-      circleInner = `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg><div class="lesson-sparkle">✦</div>`;
-    } else if (lessonLocked) {
-      circleClass = 'lesson-circle locked-circle';
-      circleInner = `<svg viewBox="0 0 64 64" width="18" height="18" style="opacity:0.35"><use href="#ic-lock"/></svg>`;
-    } else {
-      circleClass = 'lesson-circle next-up';
-      circleInner = `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>`;
-    }
-
-    const rawDay = rawChapter && rawChapter.days ? rawChapter.days.find(rd => rd.id === d.id) : null;
-    const rowTitle = isEn
-      ? ((rawDay && (rawDay.pickerTitleEn || rawDay.titleEn)) || d.title)
-      : ((rawDay && rawDay.pickerTitle) || d.title);
-    const thinker = isEn ? (d.thinkerEn || d.thinker || '') : (d.thinker || '');
-
-    node.innerHTML = `
-      <div class="${circleClass}">${circleInner}</div>
-      <div class="lesson-label">
-        <div class="lesson-label-title">${rowTitle}</div>
-        ${thinker ? `<div class="lesson-label-sub">${thinker}</div>` : ''}
-      </div>
-    `;
-
-    if (!lessonLocked) {
-      node.onclick = (e) => {
-        e.stopPropagation();
-        closeBonusPicker();
-        openReader(id, d.id);
-      };
-    } else {
-      node.onclick = (e) => {
-        e.stopPropagation();
-        const msg = isEn ? 'Complete previous lessons first' : 'סיימו את הדיאלוגים הקודמים תחילה';
-        const t = document.createElement('div');
-        t.style.cssText = 'position:fixed;bottom:140px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.82);color:#fff;padding:9px 18px;border-radius:999px;font-size:13px;font-weight:600;z-index:1000;pointer-events:none;white-space:nowrap;backdrop-filter:blur(8px)';
-        t.textContent = msg;
-        document.body.appendChild(t);
-        setTimeout(() => t.remove(), 1800);
-      };
-    }
-
-    path.appendChild(node);
-  });
-
-  // Suction origin — set CSS vars on the box to offsets from its centre so the
-  // wormhole keyframe emanates from the bonus star's position. If the card isn't
-  // visible / not rendered yet, fall back to 0,0 (centre — default popIn-from-middle).
-  const box = document.getElementById('bonus-picker-box');
-  const bonusCard = document.getElementById('bonus-carousel-card');
-  if (box) {
-    if (bonusCard) {
-      const r = bonusCard.getBoundingClientRect();
-      const cx = r.left + r.width / 2;
-      const cy = r.top + r.height / 2;
-      box.style.setProperty('--bonus-ox', (cx - window.innerWidth / 2) + 'px');
-      box.style.setProperty('--bonus-oy', (cy - window.innerHeight / 2) + 'px');
-    } else {
-      box.style.setProperty('--bonus-ox', '0px');
-      box.style.setProperty('--bonus-oy', '0px');
-    }
-  }
-
-  document.getElementById('modal-bonus-picker').classList.add('active');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeBonusPicker() {
-  document.getElementById('modal-bonus-picker').classList.remove('active');
-  document.body.style.overflow = '';
-}
+// Removed with the carousel bonus tile:
+//   openBonusChapter() — legacy direct-open, only ever referenced by
+//     the carousel star before it was swapped out for the picker.
+//   showBonusPicker() / closeBonusPicker() — the modal that opened
+//     from the carousel star and listed the bonus chapter's days. The
+//     bonus level card at the top of the chapter list now expands
+//     inline to the same day list, so this modal was redundant.
+//   showBonusTooltip() — locked-state tooltip shown when the carousel
+//     star was tapped; superseded by the level-card countdown.
+// #modal-bonus-picker DOM + .bonus-picker-* CSS also went.
 
 function handleHeroContinue() {
   const btn = document.getElementById('btn-hero-continue');
@@ -21792,9 +21492,8 @@ function openThinkerModal(id, options) {
     modalBox.classList.remove('has-portrait');
   }
   document.getElementById('modal-thinker').classList.add('active');
-  // Lock body scroll so the home/pantheon list underneath can't be scrolled
-  // through the modal backdrop on iOS. Matches showBonusPicker/closeBonusPicker
-  // at index.html:14574 / :14579.
+  // Lock body scroll so the home/pantheon list underneath can't be
+  // scrolled through the modal backdrop on iOS.
   document.body.style.overflow = 'hidden';
 }
 
@@ -21817,7 +21516,6 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
   m.addEventListener('click', e => {
     if (e.target === m) {
       m.classList.remove('active');
-      if (m.id === 'modal-bonus-picker') document.body.style.overflow = '';
     }
   });
 });
@@ -22237,6 +21935,77 @@ function _walkthroughUnlockScroll() {
 }
 function _walkthroughSwallowEvent(ev) { ev.preventDefault(); }
 
+// Owl + bubble as one composite unit — extracted from _walkthroughRender
+// Step so _showBonusUnlockCoachMark can reuse the exact same layout.
+// Layout: owl on TOP, bubble directly under with tail-top pointing AT
+// the owl. Bubble is always centered under the owl (or vice-versa via
+// horizontal centering of the whole unit). Never positioned indepen
+// dently. This guarantees the tail always aims at the owl and the pair
+// reads as one composition. Callers set the bubble text and owl
+// expression BEFORE calling this so the bubble's measured height is
+// current.
+function _positionOwlAndBubble(step) {
+  const owlFloat = document.getElementById('onboarding-owl-float');
+  const speech   = document.getElementById('onboarding-speech');
+  if (!owlFloat || !speech) return;
+
+  const screenH = window.innerHeight;
+  const screenW = window.innerWidth;
+  const OWL_SIZE = 100;
+  const BUBBLE_OVERLAP = 16;
+  const inset = 16;
+
+  speech.classList.remove('tail-top', 'tail-left', 'tail-right', 'tail-bottom');
+  speech.classList.add('tail-top');
+
+  // Force reflow so the just-set bubble text has a fresh height to
+  // measure. Without this, bubbleH reflects the previous step's copy.
+  speech.style.left  = '';
+  speech.style.right = '';
+  speech.style.top   = '';
+  speech.style.maxWidth = Math.min(280, screenW - inset * 2) + 'px';
+  void speech.offsetHeight;
+  const bubbleH = speech.offsetHeight || 120;
+  const bubbleW = Math.min(speech.offsetWidth || 240, screenW - inset * 2);
+
+  const unitH = OWL_SIZE + bubbleH - BUBBLE_OVERLAP;
+  const unitW = Math.max(OWL_SIZE, bubbleW);
+
+  const unitLeft = Math.max(inset, Math.min(screenW - unitW - inset, (screenW - unitW) / 2));
+  const bubbleLeft = unitLeft + (unitW - bubbleW) / 2;
+  const owlLeft    = unitLeft + (unitW - OWL_SIZE) / 2;
+
+  let unitTop;
+  if (step.spotlight) {
+    const info = _walkthroughSpotlightRect(step);
+    if (info) {
+      const roomAbove = info.top    - inset - inset;
+      const roomBelow = screenH - info.bottom - inset - inset;
+      const placeBelow = roomBelow >= unitH
+        ? true
+        : (roomAbove >= unitH ? false : (roomBelow > roomAbove));
+      unitTop = placeBelow
+        ? Math.min(info.bottom + inset, screenH - unitH - inset)
+        : Math.max(info.top    - inset - unitH, inset);
+    } else {
+      unitTop = (screenH - unitH) / 2;
+    }
+  } else {
+    unitTop = Math.max(inset, (screenH - unitH) / 2);
+  }
+
+  owlFloat.style.top  = unitTop + 'px';
+  owlFloat.style.left = owlLeft + 'px';
+  speech.style.top    = (unitTop + OWL_SIZE - BUBBLE_OVERLAP) + 'px';
+  speech.style.left   = bubbleLeft + 'px';
+  speech.style.right  = '';
+
+  // Bubble pop animation
+  speech.style.animation = 'none';
+  speech.offsetHeight;
+  speech.style.animation = 'bubblePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+}
+
 function _walkthroughRenderStep() {
   const step = WALKTHROUGH_STEPS[_walkthroughStepIdx];
   if (!step) return;
@@ -22290,77 +22059,11 @@ function _walkthroughRenderStep() {
     skipBtn.style.display = '';
   }
 
-  const owlFloat = document.getElementById('onboarding-owl-float');
-  const speech   = document.getElementById('onboarding-speech');
-
-  // ── Owl + bubble as one composite unit ─────────────────────────
-  // Layout: owl on TOP, bubble directly under with tail-top pointing
-  // AT the owl. Bubble is always centered under the owl (or vice-
-  // versa via horizontal centering of the whole unit). Never
-  // positioned independently. This guarantees the tail always aims
-  // at the owl and the pair reads as one composition.
-  const screenH = window.innerHeight;
-  const screenW = window.innerWidth;
-  const OWL_SIZE = 100;
-  const BUBBLE_OVERLAP = 16;  // bubble.top overlaps owl.bottom slightly so tail visually plants in the owl
-  const inset = 16;
-
-  speech.classList.remove('tail-top', 'tail-left', 'tail-right', 'tail-bottom');
-  speech.classList.add('tail-top');
-
-  // Force reflow so the just-set bubble text has a fresh height to
-  // measure. Without this, bubbleH reflects the previous step's copy.
-  speech.style.left  = '';
-  speech.style.right = '';
-  speech.style.top   = '';
-  speech.style.maxWidth = Math.min(280, screenW - inset * 2) + 'px';
-  void speech.offsetHeight;
-  const bubbleH = speech.offsetHeight || 120;
-  const bubbleW = Math.min(speech.offsetWidth || 240, screenW - inset * 2);
-
-  // Composite unit height = owl height + bubble height - overlap so the
-  // tail visually plants in the owl's body. Width = max(owlSize, bubbleW).
-  const unitH = OWL_SIZE + bubbleH - BUBBLE_OVERLAP;
-  const unitW = Math.max(OWL_SIZE, bubbleW);
-
-  // Horizontal placement: unit centered in the viewport (respecting
-  // insets). Owl centered above the bubble's horizontal center.
-  const unitLeft = Math.max(inset, Math.min(screenW - unitW - inset, (screenW - unitW) / 2));
-  const bubbleLeft = unitLeft + (unitW - bubbleW) / 2;
-  const owlLeft    = unitLeft + (unitW - OWL_SIZE) / 2;
-
-  let unitTop;
-  if (step.spotlight) {
-    const info = _walkthroughSpotlightRect(step);
-    if (info) {
-      // Prefer the side (above/below) with more room. Fall back to the
-      // side that fits at all; if neither fits, clamp to inset from top.
-      const roomAbove = info.top    - inset - inset;
-      const roomBelow = screenH - info.bottom - inset - inset;
-      const placeBelow = roomBelow >= unitH
-        ? true
-        : (roomAbove >= unitH ? false : (roomBelow > roomAbove));
-      unitTop = placeBelow
-        ? Math.min(info.bottom + inset, screenH - unitH - inset)
-        : Math.max(info.top    - inset - unitH, inset);
-    } else {
-      unitTop = (screenH - unitH) / 2;
-    }
-  } else {
-    // Greeting / closing: composition centered on the dimmed backdrop.
-    unitTop = Math.max(inset, (screenH - unitH) / 2);
-  }
-
-  owlFloat.style.top  = unitTop + 'px';
-  owlFloat.style.left = owlLeft + 'px';
-  speech.style.top    = (unitTop + OWL_SIZE - BUBBLE_OVERLAP) + 'px';
-  speech.style.left   = bubbleLeft + 'px';
-  speech.style.right  = '';
-
-  // Bubble pop animation
-  speech.style.animation = 'none';
-  speech.offsetHeight;
-  speech.style.animation = 'bubblePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+  // Owl + bubble positioning is shared with the post-bonus-unlock coach
+  // mark (see _showBonusUnlockCoachMark) — extracted into a helper so
+  // both callers use the exact same layout math and the coach mark can
+  // never drift from the walkthrough's proven positioning behaviour.
+  _positionOwlAndBubble(step);
 
   // Dots
   const dots = document.getElementById('onboarding-dots');
@@ -22438,11 +22141,142 @@ function _walkthroughTeardown(opts) {
   _walkthroughStepsSeen.clear();
 }
 
+// ─── Bonus-unlock owl coach mark ────────────────────────────────
+// Single-step coach mark shown after the padlock overlay closes,
+// spotlighting the newly-unlocked bonus card. Reuses the entire
+// walkthrough chrome (#onboarding-overlay + spotlight canvas + owl
+// SVG + speech bubble + CTA button) and the _positionOwlAndBubble /
+// drawSpotlight / lock-scroll helpers — no parallel machinery.
+//
+// Gating: fires once per install per subject via state.bonusUnlockShown
+// (the padlock's own flag, whose flip was moved from closeUnlockOverlay
+// to _closeBonusUnlockCoachMark so the flag guards the WHOLE sequence).
+// Grandfathered users — anyone whose flag was already set before this
+// coach mark shipped — skip it cleanly because finishDay never enqueues
+// bonus_unlock for them (line ~20198), so _highlightBonusCardOnHome is
+// never called; a second belt-and-braces guard inside this function
+// short-circuits if someone reaches it with the flag already set.
+//
+// Dots and skip button are hidden for this beat — it's one moment, not
+// a tour. Restored on function exit so a subsequent walkthrough (which
+// only fires for first-run users anyway) would render normally.
+let _bonusUnlockCoachAdStep = null;   // ad-hoc step object, kept for resize handler
+function _showBonusUnlockCoachMark(bonusChapterId) {
+  if (state.bonusUnlockShown && state.bonusUnlockShown[state.subject]) return;
+  const overlay = document.getElementById('onboarding-overlay');
+  // The coach mark spotlights a card on the HOME screen. The celebration
+  // queue's terminal continuation (goToNextLesson) may have routed the
+  // user to the reader by the time we fire — the coach mark defers
+  // behind prompt modals but not behind screen navigation. Snap back to
+  // home so the bonus card exists, then render so the DOM is fresh.
+  if (state.currentScreen !== 'home') {
+    try { showScreen('home'); } catch (e) {}
+    try { renderHome(); } catch (e) {}
+  }
+  const target  = document.getElementById('level-card-' + bonusChapterId);
+  if (!overlay || !target) return;
+  const isEn = state.lang === 'en';
+
+  _bonusUnlockCoachAdStep = {
+    id: 'bonus_unlock_coach',
+    expr: 'owl-admiring',
+    spotlight: '#level-card-' + bonusChapterId,
+    he: 'פרק בונוס ראשון נפתח. הוא כאן בראש הרשימה, זמין בכל רגע.',
+    en: 'First bonus chapter unlocked. It lives here at the top, ready anytime.',
+  };
+
+  document.documentElement.classList.add('walkthrough-active');
+  overlay.style.display = 'block';
+  _walkthroughWireCanvas();
+  _walkthroughLockScroll();
+
+  // Owl expression
+  const owl = document.querySelector('.onboarding-owl-float svg');
+  if (owl) {
+    owl.classList.remove('owl-neutral', 'owl-determined', 'owl-admiring', 'owl-action');
+    owl.classList.add('owl-svg', _bonusUnlockCoachAdStep.expr);
+  }
+
+  // Bubble copy + single dismiss CTA
+  const bubbleText = document.getElementById('onboarding-bubble');
+  const nextBtn    = document.getElementById('onboarding-btn');
+  if (bubbleText) bubbleText.textContent = isEn ? _bonusUnlockCoachAdStep.en : _bonusUnlockCoachAdStep.he;
+  if (nextBtn) {
+    nextBtn.textContent = isEn ? 'Got it' : 'הבנתי';
+    nextBtn.onclick     = _closeBonusUnlockCoachMark;
+    nextBtn.style.display = '';
+  }
+
+  // Hide walkthrough-only chrome for this single beat.
+  const dots    = document.getElementById('onboarding-dots');
+  const skipBtn = document.getElementById('walkthrough-skip');
+  if (dots)    dots.style.display    = 'none';
+  if (skipBtn) skipBtn.style.display = 'none';
+
+  try {
+    _phCapture('bonus_unlock_coach_shown', {
+      subject:  state.subject || null,
+      chapter_id: bonusChapterId,
+      lang:     state.lang || null,
+    });
+  } catch (e) {}
+
+  // Two rAFs so the overlay's display flip commits, then home's rects
+  // are up-to-date, then we compute positions and paint the spotlight.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      _walkthroughScrollTargetIntoView(_bonusUnlockCoachAdStep);
+      _positionOwlAndBubble(_bonusUnlockCoachAdStep);
+      setTimeout(() => drawSpotlight(_bonusUnlockCoachAdStep), 100);
+    });
+  });
+}
+
+function _closeBonusUnlockCoachMark() {
+  _walkthroughUnlockScroll();
+  const overlay = document.getElementById('onboarding-overlay');
+  if (overlay) overlay.style.display = 'none';
+  document.documentElement.classList.remove('walkthrough-active');
+
+  // Restore walkthrough chrome so a first-run walkthrough later (rare —
+  // both are lifetime flags) would render normally.
+  const dots    = document.getElementById('onboarding-dots');
+  const skipBtn = document.getElementById('walkthrough-skip');
+  if (dots)    dots.style.display    = '';
+  if (skipBtn) skipBtn.style.display = '';
+
+  _bonusUnlockCoachAdStep = null;
+
+  // Terminal flag flip for the whole "bonus reveal" sequence (padlock
+  // + this coach mark). Once true, finishDay never re-enqueues
+  // bonus_unlock (see line ~20198) and this function's own guard
+  // prevents replay if somehow reached again.
+  state.bonusUnlockShown = state.bonusUnlockShown || {};
+  state.bonusUnlockShown[state.subject] = true;
+  saveStateLocal();
+
+  try {
+    _phCapture('bonus_unlock_coach_dismissed', {
+      subject: state.subject || null,
+      lang:    state.lang || null,
+    });
+  } catch (e) {}
+}
+
 // Re-position on resize (device rotation, keyboard show/hide) so the
 // spotlight rect stays on top of the target.
 window.addEventListener('resize', () => {
   const overlay = document.getElementById('onboarding-overlay');
   if (!overlay || overlay.style.display === 'none') return;
+  // If the bonus-unlock coach mark is up (walkthrough chrome active but
+  // no walkthrough step at the current index), re-run its position pass
+  // against the ad-hoc step instead of the walkthrough step array.
+  if (_bonusUnlockCoachAdStep) {
+    _walkthroughScrollTargetIntoView(_bonusUnlockCoachAdStep);
+    _positionOwlAndBubble(_bonusUnlockCoachAdStep);
+    setTimeout(() => drawSpotlight(_bonusUnlockCoachAdStep), 100);
+    return;
+  }
   _walkthroughRenderStep();
 });
 
@@ -22585,66 +22419,6 @@ function toggleDrawer() {
 // === Subject Select ===
 const LOCKED_SUBJECTS = ['psychology'];
 
-// ─── Economics bonus chapter — 7-day promo window ────────────────
-// Client-side date-window unlock. No new synced state, no migration.
-// Boundaries are Israel local midnight (IDT = UTC+3 in late July);
-// literals carry the offset so intent is documented at the source.
-// Users who earned the unlock via chapter-1 completion keep it after
-// the window closes (see isWeekCompleted OR below); completions banked
-// during the window stay recorded (state.completedDays is unaffected
-// by lock state — see openReader / finishDay).
-const BONUS_ECON_PROMO_START = Date.parse('2026-07-23T00:00:00+03:00');
-const BONUS_ECON_PROMO_END   = Date.parse('2026-07-30T00:00:00+03:00');
-function isEconBonusPromoActive() {
-  const now = Date.now();
-  return now >= BONUS_ECON_PROMO_START && now < BONUS_ECON_PROMO_END;
-}
-
-// Days-remaining in the promo window (ceiling; 0 or negative outside).
-// Used as a PostHog prop on econ_promo_card_* events.
-function _econPromoDaysLeft() {
-  const ms = BONUS_ECON_PROMO_END - Date.now();
-  return Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
-}
-
-// True iff any dismissal entry was recorded on or after the current
-// window's start date. Old dismissals from a prior promo don't count
-// (a new PROMO_START value automatically un-dismisses the card).
-function _econPromoCardDismissed() {
-  const arr = state.econPromoCardDismissed || [];
-  if (!arr.length) return false;
-  const startDay = _streakDay(new Date(BONUS_ECON_PROMO_START));
-  return arr.some(e => e && e.dismissedAt && e.dismissedAt >= startDay);
-}
-
-// True iff the user has completed every day of economics chapter 1.
-// Bypasses state.subject because the check must work regardless of
-// which subject is currently active (the promo card is subject-agnostic).
-// Keys are literal 'economics-1-<dayId>' per dayKey(), which for the
-// non-bonus branch prepends the subject verbatim.
-function _isEconChapter1Completed() {
-  // Chapter 1 has 7 days per the existing lock map convention. If the
-  // dataset ever grows, this over-strict early-false is safe (worse
-  // case: the card lingers a bit longer).
-  for (let d = 1; d <= 7; d++) {
-    if (!state.completedDays || !state.completedDays['economics-1-' + d]) return false;
-  }
-  return true;
-}
-
-// True iff the user has already opened/completed any day of the econ
-// bonus chapter. Bonus-chapter keys drop the subject prefix per dayKey
-// (dayKey returns weekId + '-' + dayId when weekId starts with 'bonus'),
-// so keys are literal 'bonusEcon1-<dayId>'. Any completed key (day 0
-// intro through day 5) means they've touched it — promo is redundant.
-function _isEconBonusChapterCompleted() {
-  const cd = state.completedDays || {};
-  for (const k of Object.keys(cd)) {
-    if (k.indexOf('bonusEcon1-') === 0 && cd[k]) return true;
-  }
-  return false;
-}
-
 // ─── Deep-link intent (?open=<slug>) ─────────────────────────────
 // Captured at initUI top, consumed after the onboarding gate resolves
 // (fresh users: end of _onbFinishGoal; existing users: right after
@@ -22656,21 +22430,29 @@ let _pendingDeepLink = null;
 function _consumePendingDeepLink() {
   if (_pendingDeepLink !== 'bonus-econ') return false;
   _pendingDeepLink = null;
-  // Window closed after the link was captured (and the user hasn't earned
-  // it the normal way): land on home, no error. Report the outcome so the
-  // funnel distinguishes arrivals from actual opens.
-  if (!isEconBonusPromoActive() && !isWeekCompleted(1)) {
+  // Persist the subject switch — the user expressed intent by tapping an
+  // economics link. setSubject is a no-op if state.subject is already
+  // 'economics'. Doing this BEFORE the lock check so the home the user
+  // lands on (whether or not the reader opens) is the economics list
+  // that contains the bonus card.
+  try { setSubject('economics'); } catch (e) {}
+  // Gate: bonus is locked until economics chapter 1 is complete. If
+  // locked, land on the (now-economics) home and show a toast instead
+  // of silently returning. This is the deep-link-bypass close: even a
+  // user with the URL cannot open the bonus until they've earned it.
+  // Exception: users who opened the bonus under the retired promo
+  // window and completed at least one day retain access — see
+  // _hasBonusProgress. Same grandfather that the level card and
+  // carousel apply.
+  if (!isWeekCompleted(1) && !_hasBonusProgress('bonusEcon1')) {
     _phCapture('bonus_link_landed', {
       subject: 'economics',
       opened: false,
-      reason: 'window_closed',
+      reason: 'chapter_1_incomplete',
     });
+    try { _showBonusLockToast(); } catch (e) {}
     return false;
   }
-  // Persist the subject switch — the user expressed intent by tapping an
-  // economics link. setSubject is a no-op if state.subject is already
-  // 'economics' (e.g. from the fresh-user path we already ran).
-  try { setSubject('economics'); } catch (e) {}
   const wk = getW().find(w => w.id === 'bonusEcon1');
   const day = wk && wk.days && wk.days[0];
   if (day) {
@@ -22684,6 +22466,40 @@ function _consumePendingDeepLink() {
     reason: 'chapter_missing',
   });
   return false;
+}
+
+// Grandfather clause: any user with a completed day inside a bonus
+// chapter keeps unlock access even if they haven't finished chapter 1.
+// The old promo window (retired 2026-07-30) let people open the bonus
+// without earning it. Taking that access back after they've already
+// done the work would break trust and generate complaints. Keys off
+// state.completedDays, which is the same durable signal we use for
+// every other completion check — dayKey() at ~17483 drops the subject
+// prefix for bonus chapters, so entries look like 'bonusEcon1-<dayId>'
+// (or 'bonus1-<dayId>' for philosophy) with no risk of collision.
+function _hasBonusProgress(bonusChapterId) {
+  const cd = state.completedDays || {};
+  const prefix = String(bonusChapterId) + '-';
+  for (const k in cd) {
+    if (cd[k] && k.indexOf(prefix) === 0) return true;
+  }
+  return false;
+}
+
+// Toast shown when the user tries to reach the locked bonus chapter
+// via the ?open=bonus-econ deep link or by tapping the locked card
+// in the chapter list. Copy is gender-neutral Hebrew and matches the
+// card's inline microcopy.
+function _showBonusLockToast() {
+  const isEn = state.lang === 'en';
+  const msg = isEn
+    ? 'Finish chapter 1 to unlock the bonus.'
+    : 'יש להשלים את פרק 1 כדי לפתוח את הבונוס.';
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:140px;left:50%;transform:translateX(-50%);background:rgba(30,30,50,0.82);color:#fff;padding:9px 18px;border-radius:999px;font-size:13px;font-weight:600;z-index:1000;pointer-events:none;white-space:nowrap;backdrop-filter:blur(8px)';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 2200);
 }
 
 const SUBJECTS = [
@@ -23198,7 +23014,6 @@ function initUI() {
         _pendingDeepLink = 'bonus-econ';
         _phCapture('bonus_link_opened', {
           subject: 'economics',
-          promo_active: isEconBonusPromoActive(),
         });
         try { history.replaceState(null, '', location.pathname); } catch (e) {}
         // Shrink the onboarding progress rows from 5 pills to 4: deep-link
@@ -24087,56 +23902,6 @@ function showJourneyToast(text) {
   toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
-// Speech-bubble tooltip anchored to a thinker-carousel card. Used by the locked
-// bonus card to explain the unlock requirement right next to where it lives,
-// instead of a bottom-screen toast. Appends to the card's .thinker-carousel-wrap
-// (overflow: visible, position: relative) so the bubble isn't clipped by the
-// carousel's overflow-x: auto. RTL-safe via getBoundingClientRect + symmetric
-// translate(-50%, -100%).
-function showBonusTooltip(card, text) {
-  if (!card) return;
-  const wrap = card.closest('.thinker-carousel-wrap');
-  if (!wrap) return;
-  let tip = wrap.querySelector('.bonus-tooltip');
-  if (!tip) {
-    tip = document.createElement('div');
-    tip.className = 'bonus-tooltip onboarding-speech tail-top';
-    wrap.appendChild(tip);
-  }
-  tip.textContent = text;
-  const cardRect = card.getBoundingClientRect();
-  const wrapRect = wrap.getBoundingClientRect();
-  tip.style.position = 'absolute';
-  tip.style.left = (cardRect.left + cardRect.width / 2 - wrapRect.left) + 'px';
-  tip.style.top = (cardRect.bottom - wrapRect.top + 12) + 'px';
-  tip.style.transform = 'translate(-50%, 0)';
-  // Reset any previous clamp so measurement below reflects the natural
-  // centered position before we decide whether it needs to shift.
-  tip.style.removeProperty('--tail-offset');
-  tip.classList.add('show');
-  // Clamp the tooltip so it stays at least 8px inside both viewport edges.
-  // Because transform is translate(-50%, 0), tip.style.left is the horizontal
-  // center. We shift the tooltip by the overflow amount, then offset the
-  // arrow (::before) by the opposite so it still points at the card center.
-  // rAF gives the browser one frame to lay out the tooltip so getBoundingClientRect
-  // returns final dimensions.
-  requestAnimationFrame(() => {
-    const tipRect = tip.getBoundingClientRect();
-    const overflowRight = tipRect.right - (window.innerWidth - 8);
-    const overflowLeft  = 8 - tipRect.left;
-    let shift = 0;
-    if (overflowRight > 0) shift = -overflowRight;
-    else if (overflowLeft > 0) shift = overflowLeft;
-    if (shift !== 0) {
-      const currentLeft = parseFloat(tip.style.left) || 0;
-      tip.style.left = (currentLeft + shift) + 'px';
-      tip.style.setProperty('--tail-offset', (-shift) + 'px');
-    }
-  });
-  clearTimeout(tip._timer);
-  tip._timer = setTimeout(() => tip.classList.remove('show'), 3000);
-}
-
 // Wire the back button (the element already exists in the static HTML)
 document.addEventListener('DOMContentLoaded', () => {
   const backBtn = document.getElementById('journey-back-btn');
@@ -24571,8 +24336,13 @@ document.addEventListener('DOMContentLoaded', function() {
     <svg class="unlock-star s3" viewBox="0 0 64 64"><use href="#ic-star-burst"/></svg>
     <svg class="unlock-star s4" viewBox="0 0 64 64"><use href="#ic-star-burst"/></svg>
     <svg class="unlock-lock-big" viewBox="0 0 64 64"><use href="#ic-lock-open"/></svg>
-    <h3 class="unlock-h3" id="unlock-title">פרק בונוס נפתח!</h3>
-    <p class="unlock-p" id="unlock-subtitle">אתיקה ובינה מלאכותית · קאנט פוגש את ChatGPT</p>
+    <!-- Title + subtitle populated at show time by showUnlockOverlay from
+         the current subject's bonus chapter object. Kept empty here so
+         there's a single source of truth (the chapter data) and no risk
+         of the DOM default flashing stale copy for a subject that isn't
+         currently active. -->
+    <h3 class="unlock-h3" id="unlock-title"></h3>
+    <p class="unlock-p" id="unlock-subtitle"></p>
     <button class="unlock-cta-btn" onclick="closeUnlockOverlay()" id="unlock-cta">בוא נראה ←</button>
   </div>
 </div>
