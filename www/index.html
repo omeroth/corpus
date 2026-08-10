@@ -21317,13 +21317,14 @@ function shareCompletion() {
     const chapter = getW().find(w => w.id === state.currentWeek);
     const day = chapter ? chapter.days.find(d => d.id === state.currentDay) : null;
     const isEn = state.lang === 'en';
+    // Share title is used as-authored. The old auto-appended "?" made
+    // sense when every bonus dialogue title was phrased as a question,
+    // but the new short picker-derived titles are mostly statements
+    // ("Behind the Headline", "Teacher or Midwife") — auto-"?" turned
+    // them into ungrammatical questions. Whether a title needs a "?"
+    // is now the author's call, encoded in the title string itself.
     let title = day ? (isEn ? (day.titleEn || day.title) : (day.title || day.titleEn)) : '';
-    if (title) {
-      const trimmed = title.trim();
-      const lastChar = trimmed.slice(-1);
-      if (!/[?!.…؟]/.test(lastChar)) title = trimmed + (isEn ? '?' : '?');
-      else title = trimmed;
-    }
+    if (title) title = title.trim();
     const thinkerId = day && day.thinkerId ? day.thinkerId : null;
     let thinkerName = '';
     if (thinkerId) {
@@ -21332,13 +21333,19 @@ function shareCompletion() {
     }
     let text;
     if (title && thinkerName) {
+      // Newline (not period) between the title clause and the CTA. The old
+      // auto-appended "?" gave sentence separation via punctuation; that's
+      // gone now, and dropping just a period on question titles like
+      // "האם מותר ל-AI לשקר" reads off. \n is punctuation-neutral and
+      // preserved by every native share sheet + WhatsApp / iMessage /
+      // Twitter. URL still comes after via _shareCorpus.
       text = isEn
-        ? `Just finished a dialogue with ${thinkerName} on: ${title} Try Corpus too:`
-        : `סיימתי עכשיו דיאלוג עם ${thinkerName} על השאלה: ${title} נסה גם את Corpus:`;
+        ? `Just finished a dialogue with ${thinkerName} on: ${title}\nTry Corpus too:`
+        : `סיימתי עכשיו דיאלוג עם ${thinkerName} על: ${title}\nנסה גם את Corpus:`;
     } else {
       text = isEn
-        ? 'Just finished a dialogue on Corpus. Try Corpus too:'
-        : 'סיימתי עכשיו דיאלוג ב-Corpus. נסה גם את Corpus:';
+        ? 'Just finished a dialogue on Corpus.\nTry Corpus too:'
+        : 'סיימתי עכשיו דיאלוג ב-Corpus.\nנסה גם את Corpus:';
     }
     // Build the /d/ landing-page URL only when the dialogue has both a
     // thinker (so a page was generated) and current week/day are set.
