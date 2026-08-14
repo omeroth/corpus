@@ -14,10 +14,33 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/posthog-js@1.396.6/dist/array.full.js"></script>
 <script>
+  // capture_pageview:false — the default (true) fires an initial $pageview
+  // synchronously during posthog.init(), before the register() call below
+  // can attach super properties. Disable it here, then fire $pageview
+  // manually right after register() so the initial pageview also carries
+  // { source, app_platform }. All later autocaptures ($autocapture click
+  // events, $rageclick, etc.) inherit the super properties automatically
+  // because register() persists them to storage before any capture reads.
+  //
+  // capture_pageleave:true — required because posthog-js's default for
+  // capture_pageleave is 'if_capture_pageview' since v1.100, which would
+  // implicitly disable $pageleave when we set capture_pageview:false. Set
+  // it explicitly to keep the existing pageleave stream (~116 events in
+  // the historical data) intact.
   posthog.init("phc_vUupVqSRdBay7mQ4Aswudhu8mFHnych6PKNRpP6BHoS4", {
     api_host: "https://us.i.posthog.com",
-    person_profiles: "identified_only"
+    person_profiles: "identified_only",
+    capture_pageview: false,
+    capture_pageleave: true
   });
+  // Distinguish app events from landing-page events (same PostHog project).
+  // Capacitor.getPlatform() returns 'ios' | 'android' when the bridge is
+  // injected, else 'web' for PWA / deployed-index-in-browser.
+  posthog.register({
+    source: 'app',
+    app_platform: (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || 'web'
+  });
+  posthog.capture('$pageview');
   console.log("PostHog ready");
 </script>
 <style>
