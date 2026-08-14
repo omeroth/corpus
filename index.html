@@ -8306,6 +8306,203 @@ const APP_VERSION = '1.1.8';
 
 const SUPABASE_URL = 'https://xcoikjoatcrjqxzykwlt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjb2lram9hdGNyanF4enlrd2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjc5NjYsImV4cCI6MjA4OTcwMzk2Nn0.5EhOsN9M4_kLYoRKO97dPGof8RN7PteXQrtKyx4CcKI';
+// Auth-token removal guard. gotrue-js calls storage.removeItem() on the
+// primary sb-*-auth-token key when it decides a refresh is terminal. On
+// Android cold-boot the network may not be attached yet, and a transient
+// failure can be misclassified as terminal — wiping a still-valid refresh
+// token and forcing a sign-in on the next launch. _explicitSignOut is set
+// only inside authLogout / deleteAccount; while false, the adapter refuses
+// removals of the auth-token key and increments a persisted counter.
+// After _SUPPRESSED_LIMIT consecutive suppressions with no successful
+// refresh in between, the guard steps aside so a genuinely dead token
+// doesn't live forever. The counter resets on any SIGNED_IN or
+// TOKEN_REFRESHED event.
+let _explicitSignOut = false;
+// True while our INITIAL_SESSION-with-null recovery is calling
+// refreshSession explicitly. If that call fails, gotrue will call
+// removeItem again — the adapter still suppresses the removal (we don't
+// want to wipe a possibly-still-valid token) but does NOT count it against
+// _SUPPRESSED_LIMIT. Otherwise each launch would burn two counter slots
+// (gotrue's init attempt + our recovery), halving the "3 launches to give
+// up" budget.
+let _recoveryInProgress = false;
+// Caps the suppression counter to one strike per launch. Without this,
+// gotrue's auto-refresh timer can fire the same terminal failure every 30s
+// while the app is running, burning all 3 slots within 90s and forcing a
+// mid-session logout. Reset alongside the persistent counter on any
+// SIGNED_IN / INITIAL_SESSION-with-session / TOKEN_REFRESHED event.
+let _countedRemovalThisSession = false;
+// True while the app is running with an expired access token that we
+// couldn't refresh at cold boot (network was down, refresh call errored
+// non-terminally). Enables offline-tolerant entry: home renders from
+// local state, auth'd Supabase calls fail silently, and the app auto-
+// recovers when gotrue's on-demand or online-event refresh succeeds.
+// _reportSyncFailure suppresses PostHog captures while this is true so
+// the analytics feed isn't spammed by the same underlying auth failure.
+let _enteredWithExpiredToken = false;
+// Guards against double-registration of the window 'online' listener
+// across multiple recovery attempts within a session.
+let _onlineListenerAttached = false;
+const _AUTH_TOKEN_KEY_RE = /^sb-.*-auth-token$/;
+const _SUPPRESSED_KEY = 'corpus_auth_removal_suppressed';
+const _SUPPRESSED_LIMIT = 3;
+async function _readSuppressedCount() {
+  try {
+    const p = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Preferences;
+    if (!p) return 0;
+    const r = await p.get({ key: _SUPPRESSED_KEY });
+    return parseInt(r && r.value, 10) || 0;
+  } catch(e) { return 0; }
+}
+async function _writeSuppressedCount(n) {
+  try {
+    const p = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Preferences;
+    if (!p) return;
+    await p.set({ key: _SUPPRESSED_KEY, value: String(n) });
+  } catch(e) {}
+}
+async function _resetSuppressedCount() {
+  try {
+    const p = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Preferences;
+    if (!p) return;
+    await p.remove({ key: _SUPPRESSED_KEY });
+  } catch(e) {}
+}
+
+// Offline-tolerant session recovery. gotrue can fail its cold-boot refresh
+// terminally (network not yet up, DNS unresolved, aborted request) and emit
+// INITIAL_SESSION with a null session even though the storage guard kept
+// the refresh token intact. Rather than block on a refresh attempt, we
+// parse the stored session synchronously, enter the app immediately with
+// the stored user, and let the refresh run in the background. If it comes
+// back as a genuine server rejection ("invalid_grant" and friends), we
+// sign the user out after the fact; anything network-shaped keeps them in
+// and arms a listener that retries when connectivity returns.
+
+async function _readStoredSession() {
+  try {
+    const p = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Preferences;
+    if (!p) return null;
+    const { keys } = await p.keys();
+    const authKey = keys && keys.find(k => _AUTH_TOKEN_KEY_RE.test(k));
+    if (!authKey) return null;
+    const { value } = await p.get({ key: authKey });
+    if (!value) return null;
+    const parsed = JSON.parse(value);
+    // supabase-js has stored sessions flat and wrapped across versions;
+    // handle both so a device that upgraded across the format change still recovers.
+    const session = (parsed && parsed.currentSession) || parsed;
+    if (!session || !session.refresh_token || !session.user) return null;
+    return { user: session.user, refresh_token: session.refresh_token };
+  } catch(e) {
+    return null;
+  }
+}
+
+// Load-bearing. Getting this wrong in the "server-rejected" direction wipes
+// a user's session on a transient failure — the bug we're fixing.
+// Getting it wrong in the "network-failed" direction leaves a genuinely
+// invalid token in place for up to 3 launches before the counter escape
+// hatch fires — recoverable and self-limiting. Default to network-failed
+// whenever confidence is anything less than "the server said no."
+function _classifyRefreshError(err) {
+  if (!err) return 'network-failed';
+  const status = err.status;
+  const code = (err.code || '').toLowerCase();
+  const msg = (err.message || '').toLowerCase();
+  // Server rejection is only possible from a completed HTTP response with
+  // an auth-endpoint status. Absence of status ⇒ we never talked to the
+  // server (fetch-level failure) ⇒ network-failed.
+  if (status !== 400 && status !== 401) return 'network-failed';
+  // Explicit terminal codes from gotrue's /token endpoint.
+  if (code === 'invalid_grant' ||
+      code === 'refresh_token_not_found' ||
+      code === 'user_not_found' ||
+      code === 'session_not_found') return 'server-rejected';
+  // Message-shape fallback for older gotrue versions that don't set code.
+  // "Already used" is deliberately excluded — it's a concurrent-refresh
+  // race artifact, and treating it as terminal would resurrect the exact
+  // symptom the manual-refresh cleanup was meant to fix.
+  if (msg.includes('refresh token not found')) return 'server-rejected';
+  if (msg.includes('invalid refresh token') && !msg.includes('already used')) return 'server-rejected';
+  return 'network-failed';
+}
+
+async function _backgroundRefresh(refresh_token) {
+  _recoveryInProgress = true;
+  try {
+    const { data, error } = await sb.auth.refreshSession({ refresh_token });
+    if (data && data.session) {
+      // Success — gotrue's own TOKEN_REFRESHED event fires and the
+      // onAuthStateChange handler resets the expired-token flags and
+      // triggers a post-recovery sync.
+      console.log('[Auth] background refresh succeeded');
+      return;
+    }
+    const classification = _classifyRefreshError(error);
+    if (classification === 'server-rejected') {
+      console.warn('[Auth] refresh server-rejected — signing out:', error && error.message);
+      _enteredWithExpiredToken = false;
+      _explicitSignOut = true;
+      try { await sb.auth.signOut({ scope: 'local' }); } catch(e) {}
+      _explicitSignOut = false;
+      currentUser = null;
+      appStarted = false;
+      const lang = state.lang;
+      state = defaultState();
+      state.lang = lang;
+      try { localStorage.removeItem('corpus_state'); } catch(e) {}
+      showAuthScreen();
+      return;
+    }
+    console.warn('[Auth] refresh network-failed — staying in expired-token mode:', error && error.message);
+    _armReconnectListener();
+  } catch(e) {
+    console.warn('[Auth] background refresh errored — treating as network-failed:', e && e.message);
+    _armReconnectListener();
+  } finally {
+    _recoveryInProgress = false;
+  }
+}
+
+function _armReconnectListener() {
+  if (_onlineListenerAttached) return;
+  _onlineListenerAttached = true;
+  window.addEventListener('online', async () => {
+    if (!_enteredWithExpiredToken) return;
+    const stored = await _readStoredSession();
+    if (!stored) return;
+    console.log('[Auth] online event — retrying background refresh');
+    _backgroundRefresh(stored.refresh_token);
+  });
+}
+
+// Shared entry decision used by:
+//   - onAuthStateChange's INITIAL_SESSION-with-null branch
+//   - the eager boot check (below the subscription)
+//   - the timeout fallback for the "signed-in with stored token but gotrue
+//     is stuck in a refresh retry loop and never emits" case
+// The right thing to do in all three is the same: if a stored session exists,
+// enter immediately with the stored user and let the background refresh
+// classify the outcome; otherwise route to onboarding. Callers set
+// initialEventReceived themselves before calling to prevent double-invocation
+// when both the eager path and gotrue's emission race.
+async function _enterFromStoredOrOnboarding(reason) {
+  const stored = await _readStoredSession();
+  if (stored) {
+    console.log('[Auth] ' + reason + ' — entering with stored session; refreshing in background');
+    _enteredWithExpiredToken = true;
+    await enterApp(stored.user);
+    rescheduleReminderFromToday();
+    _backgroundRefresh(stored.refresh_token);
+    return true;
+  }
+  console.log('[Auth] ' + reason + ' — no stored session, entering onboarding');
+  startNewUserOnboarding();
+  rescheduleReminderFromToday();
+  return false;
+}
+
 // Supabase auth-storage adapter. Default supabase-js persists tokens to
 // browser localStorage — evictable on iOS WKWebView after prolonged
 // background suspension or memory pressure, which surfaced as users being
@@ -8356,6 +8553,25 @@ function _createSupabaseAuthStorage() {
       try { window.localStorage.setItem(key, value); } catch(e) {}
     },
     async removeItem(key) {
+      if (!_explicitSignOut && _AUTH_TOKEN_KEY_RE.test(key)) {
+        if (_recoveryInProgress) {
+          console.warn('[Auth] suppressed auth-token removal (recovery attempt — not counted)');
+          return;
+        }
+        if (_countedRemovalThisSession) {
+          console.warn('[Auth] suppressed auth-token removal (already counted this session)');
+          return;
+        }
+        const count = (await _readSuppressedCount()) + 1;
+        if (count < _SUPPRESSED_LIMIT) {
+          await _writeSuppressedCount(count);
+          _countedRemovalThisSession = true;
+          console.warn('[Auth] suppressed auth-token removal (' + count + '/' + _SUPPRESSED_LIMIT + ') — likely transient refresh failure');
+          return;
+        }
+        console.warn('[Auth] auth-token removal suppression limit reached — allowing removal');
+        await _resetSuppressedCount();
+      }
       try { await _P.remove({ key }); } catch(e) {}
       try { window.localStorage.removeItem(key); } catch(e) {}
     },
@@ -8386,10 +8602,39 @@ let _authInProgress = false;
 // One-place telemetry so a future column drift can't recur invisibly. Every
 // upsert catch calls this with { field, error } — we capture to PostHog so
 // silent 400s show up in the events feed instead of only in console.
+// Network-shaped failures cluster: an offline session produces one of
+// these on every upsert (base + chapter_complete_shown + onboarding_done
+// + daily_reminder + appearance + lang + streak_repair + daily_goal =
+// up to 8 identical events per saveState), which swamps the analytics
+// feed without adding any signal. Suppress PostHog capture for these
+// but keep console.error so local debugging still surfaces them.
+// The telemetry this function was built for is *schema/RLS drift* —
+// 400 (constraint / column mismatch), 403 (RLS policy), 404 (missing
+// resource) — which stays captured.
+function _isNetworkShapedSyncError(err) {
+  if (!err) return false;
+  const status = err.status;
+  const name = err.name || '';
+  const msg = (err.message || '').toLowerCase();
+  // No HTTP response reached us: fetch-level failure (offline, DNS,
+  // aborted, TypeError from fetch).
+  if (status === undefined || status === null || status === 0) return true;
+  // 401 in a sync context is JWT-expired / auth-layer failure. Clusters
+  // with the offline condition and is not a code bug we can fix from a
+  // dashboard.
+  if (status === 401) return true;
+  // Timeout / gateway / server-unavailable — Supabase's problem, not ours.
+  if (status === 408 || status === 429 || status >= 500) return true;
+  if (name === 'TypeError' || name === 'AbortError' || name === 'AuthRetryableFetchError') return true;
+  if (msg.includes('failed to fetch') || msg.includes('networkerror') || msg.includes('network request failed')) return true;
+  return false;
+}
+
 function _reportSyncFailure(field, err) {
   const msg = (err && (err.message || err.toString())) || 'unknown';
   const code = (err && err.code) || null;
   try { console.error('[Sync] user_progress upsert failed for', field, err); } catch(e) {}
+  if (_enteredWithExpiredToken || _isNetworkShapedSyncError(err)) return;
   try {
     posthog.capture('progress_sync_failed', {
       field: field,
@@ -9645,8 +9890,20 @@ function _initIntroCarousel() {
 
 async function authLogout() {
   console.log('Logout clicked');
-  // Don't await - just fire and forget
-  try { sb.auth.signOut(); } catch(e) {}
+  // scope:'local' skips the /logout network call so the button doesn't
+  // hang when offline. The refresh token stays server-side-valid until
+  // its own expiry, which is an acceptable trade for guaranteed responsive
+  // logout. Awaiting is now safe (no network) and necessary so gotrue's
+  // internal storage.removeItem fires while _explicitSignOut is still
+  // true — otherwise the adapter's guard would treat the wipe as a
+  // transient failure and suppress it.
+  _explicitSignOut = true;
+  _enteredWithExpiredToken = false;
+  try {
+    try { await sb.auth.signOut({ scope: 'local' }); } catch(e) {}
+  } finally {
+    _explicitSignOut = false;
+  }
   currentUser = null;
   appStarted = false;
   const lang = state.lang;
@@ -9673,8 +9930,11 @@ async function deleteAccount() {
     //    Any failure here is fatal — surface it to the user so they can retry.
     const { error } = await sb.functions.invoke('delete-account');
     if (error) throw error;
-    // 3. Sign out the now-deleted session.
+    // 3. Sign out the now-deleted session. Guard flag lets the adapter's
+    //    removeItem clear the auth-token key instead of suppressing it.
+    _explicitSignOut = true;
     try { await sb.auth.signOut(); } catch(e) {}
+    finally { _explicitSignOut = false; }
     // 4. Reset PostHog identified state on this device.
     try { if (typeof posthog !== 'undefined') posthog.reset(true); } catch(e) {}
     // 5. Clear ALL corpus_* localStorage keys (more thorough than authLogout's single-key removal).
@@ -23327,6 +23587,27 @@ function initUI() {
         console.log('[Auth] onAuthStateChange:', event, (session && session.user && session.user.email) || 'no session');
         if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && session) {
           initialEventReceived = true;
+          // Any "session confirmed" event proves the persisted refresh token
+          // is still working — clear the removal-suppression counter so a
+          // later genuine sign-out isn't blocked by stale counter state.
+          try { _resetSuppressedCount(); } catch(e) {}
+          _countedRemovalThisSession = false;
+          const _wasExpiredEntry = _enteredWithExpiredToken;
+          _enteredWithExpiredToken = false;
+          // Post-recovery sync when any "session confirmed" event lands
+          // after we entered in expired-token mode. enterApp is a no-op
+          // here (appStarted is already true from the earlier stored-user
+          // entry), so manually kick off the loads that were skipped:
+          // server state merge (union/max only — cannot destroy local
+          // progress) and a push of anything the user completed while
+          // offline. Widened from the previous TOKEN_REFRESHED-only check
+          // because the fallback / eager-check paths can enter with the
+          // expired flag set and then have gotrue's own INITIAL_SESSION or
+          // SIGNED_IN emission arrive as the first success signal.
+          if (_wasExpiredEntry) {
+            try { loadProgressFromSupabase(); } catch(e) {}
+            try { syncProgressToSupabase(); } catch(e) {}
+          }
           // PostHog identify. Uses session.user.id (Supabase UUID) as the
           // stable distinct_id so any anonymous pre-login activity captured
           // against the auto-generated distinct_id gets merged into the
@@ -23347,11 +23628,12 @@ function initUI() {
           // Reschedule daily reminder now that state.dailyReminder is loaded.
           rescheduleReminderFromToday();
         } else if (event === 'INITIAL_SESSION' && !session) {
+          // Guarded so the eager boot check and the timeout fallback can
+          // pre-empt this branch when gotrue is slow / stuck. Whichever
+          // path runs first flips initialEventReceived.
+          if (initialEventReceived) return;
           initialEventReceived = true;
-          console.log('[Auth] No session - entering new onboarding flow');
-          startNewUserOnboarding();
-          // Guest mode: reschedule from local state (no Supabase round-trip).
-          rescheduleReminderFromToday();
+          await _enterFromStoredOrOnboarding('INITIAL_SESSION null');
         } else if (event === 'SIGNED_OUT') {
           appStarted = false;
           // Break the identify binding so the post-logout session captures
@@ -23361,37 +23643,14 @@ function initUI() {
         }
       });
 
-      // Capacitor App resume: while the app is backgrounded the WebView's JS
-      // timers pause, so Supabase's built-in autoRefreshToken interval doesn't
-      // fire. On foreground, kick a refreshSession() manually so a token that
-      // expired during a long background is rotated on return instead of
-      // dying on the next authenticated request. Idempotent — supabase-js
-      // has its own internal lock, so double-firing with visibilitychange
-      // below is harmless. Native-only; App plugin is a no-op on web.
-      try {
-        if (window.Capacitor &&
-            window.Capacitor.isNativePlatform &&
-            window.Capacitor.isNativePlatform() &&
-            window.Capacitor.Plugins &&
-            window.Capacitor.Plugins.App &&
-            typeof window.Capacitor.Plugins.App.addListener === 'function') {
-          window.Capacitor.Plugins.App.addListener('appStateChange', (appState) => {
-            // Skip mid-sign-in: refreshSession races signInWithIdToken on
-            // gotrue-js's internal storage lock (the two contend for the
-            // same key), and the iOS Google/Apple auth sheet dismissal
-            // fires this event right as the token save is landing. Also
-            // skip when there's no session to refresh — refreshSession
-            // returns an error immediately in that case anyway, and
-            // skipping keeps the noise out of the console.
-            if (!appState || !appState.isActive) return;
-            if (_authInProgress) { console.log('[Auth] resume refresh skipped: sign-in in progress'); return; }
-            if (!currentUser)   { console.log('[Auth] resume refresh skipped: no current session'); return; }
-            sb.auth.refreshSession().catch((e) => {
-              console.warn('[Auth] resume refreshSession failed:', e && e.message);
-            });
-          });
-        }
-      } catch(e) { console.warn('[Auth] App.addListener wiring failed:', e && e.message); }
+      // Resume-time token refresh is handled by supabase-js itself:
+      // GoTrueClient listens to visibilitychange, restarts its refresh
+      // interval on foreground, and eagerly refreshes if the access token
+      // is expired. Any authenticated request also triggers on-demand
+      // refresh. The manual sb.auth.refreshSession() calls we used to keep
+      // here caused overlapping refresh attempts to spend the same
+      // single-use refresh token, producing intermittent "Invalid Refresh
+      // Token: Already Used" logouts on Android — removed.
 
       // Background → foreground also counts as "user opened the app today" — reschedule
       // pushes the next notification to tomorrow so today's nudge is suppressed.
@@ -23401,17 +23660,8 @@ function initUI() {
           // Re-check for App Store updates on foreground so a user who left the
           // app in the background during a release picks up the banner.
           try { checkForUpdate(); } catch(e) {}
-          // Belt-and-suspenders session refresh for web / PWA and for any
-          // native path where the App resume event doesn't fire (older
-          // Capacitor + edge cases). Same guards as the App.addListener
-          // path above — never fire during an in-flight sign-in (races
-          // gotrue-js's storage lock), and skip when there's no session
-          // to refresh.
-          try {
-            if (!_authInProgress && currentUser) {
-              sb.auth.refreshSession().catch(() => {});
-            }
-          } catch(e) {}
+          // Session refresh on foreground is handled by supabase-js itself —
+          // see the note above the removed appStateChange listener.
         } else {
           // Reader abandon backup: catches native-app background + browser
           // tab hide when the user didn't tap an in-app nav button. If the
@@ -23432,15 +23682,40 @@ function initUI() {
         }
       });
 
-      // Fallback: if INITIAL_SESSION never fires (e.g. Supabase CDN blocked),
-      // route into the new onboarding flow so users aren't stuck on a blank
-      // screen. Same behavior as the no-session path.
-      setTimeout(() => {
-        if (!initialEventReceived) {
-          console.log('[Auth] onAuthStateChange timeout - entering new onboarding flow');
-          startNewUserOnboarding();
+      // Eager storage-driven routing. Preferences is the source of truth
+      // for both us and gotrue, so we don't need to wait on gotrue's
+      // INITIAL_SESSION emission — which can stall for many seconds when
+      // gotrue is stuck in a refresh retry loop on a slow / offline
+      // network (this was the actual tester bug: the pre-existing 3s
+      // timeout would fire during that retry loop and route to onboarding
+      // even though the user had a valid stored session).
+      //
+      //   - No stored token → route to onboarding immediately. Zero wait.
+      //   - Stored token   → give gotrue a brief window (2s) to emit a
+      //                      fresh INITIAL_SESSION naturally, so we don't
+      //                      enter in expired-token mode when the access
+      //                      token is actually still valid. If it hasn't
+      //                      fired by then, enter with the stored user and
+      //                      let the background refresh path classify the
+      //                      outcome (server-rejected → sign out after the
+      //                      fact; network-failed → wait for online event).
+      //
+      // Whichever path wins the race with gotrue, `initialEventReceived`
+      // gates the other so no duplicate entry happens.
+      (async () => {
+        const stored = await _readStoredSession();
+        if (initialEventReceived) return;
+        if (!stored) {
+          initialEventReceived = true;
+          await _enterFromStoredOrOnboarding('boot: no stored session');
+          return;
         }
-      }, 3000);
+        setTimeout(async () => {
+          if (initialEventReceived) return;
+          initialEventReceived = true;
+          await _enterFromStoredOrOnboarding('boot: gotrue stuck with stored session');
+        }, 2000);
+      })();
     } catch(e) {
       console.error('[Auth] initApp failed:', e);
       showAuthScreen();
