@@ -17171,7 +17171,33 @@ function getW() {
       thinker: lang === 'en' ? d.thinkerEn : d.thinker,
       thinkerId: d.thinkerId,
       xp: d.xp,
-      sections: d.sections.map(s => {
+      // ─── Consecutive-quiz consolidation ───────────────────────────
+      // Legacy authoring pattern (all philosophy + economics dialogues)
+      // splits each question into its own type:'quiz' section, so a
+      // dialogue with 3 questions has 3 quiz sections and the reader
+      // renders each as a separate page — the "why do I keep tapping
+      // Continue between questions" complaint. New authoring pattern
+      // (psychology from 2026-08 onward) puts all questions into a
+      // single quiz section's questions[]. This post-processor collapses
+      // any run of consecutive type:'quiz' sections into one virtual
+      // section with concatenated questions[], so both authoring shapes
+      // present identically to the reader. Attached to the mapped output
+      // (not the source data) so the underlying content stays as-authored.
+      sections: (function consolidateQuizzes(mapped) {
+        const out = [];
+        let run = null;
+        for (const sec of mapped) {
+          if (sec.type === 'quiz') {
+            if (run) run.questions = run.questions.concat(sec.questions);
+            else run = sec;
+          } else {
+            if (run) { out.push(run); run = null; }
+            out.push(sec);
+          }
+        }
+        if (run) out.push(run);
+        return out;
+      })(d.sections.map(s => {
         const base = { type: s.type, title: lang === 'en' ? (s.titleEn || s.title) : s.title };
         // ─── Section-type authoring rule ────────────────────────────────
         // Applies to all subjects (philosophy / economics / psychology):
@@ -17229,7 +17255,7 @@ function getW() {
             return { ...base, questions: lang === 'en' ? s.questionsEn : s.questions };
           default: return base;
         }
-      }),
+      })),
     };
   }
 
@@ -21822,12 +21848,23 @@ function _isFirstDialogue() {
   catch (e) { return false; }
 }
 
+// reader_version tags the analytics stream so dashboards can distinguish
+// events emitted before vs after the 2026-08 quiz consolidation. Pre-
+// consolidation: each question was its own page (3 quiz pages per
+// dialogue); post-consolidation: all questions on one page (1 quiz page
+// per dialogue). page_index and total_pages shift as a result — filter
+// or bucket queries by reader_version so the discontinuity is visible.
+// Bump this string on any future reader-shape change that alters
+// page_index semantics.
+const READER_VERSION = 'v2-consolidated-quiz-2026-08';
+
 function _readerBaseProps() {
   return Object.assign(_shareEventProps(), {
     page_index:       _readerLastPageIndex,
     page_type:        _readerLastPageType,
     total_pages:      _readerLastPageTotal,
     is_first_dialogue: _isFirstDialogue(),
+    reader_version:   READER_VERSION,
   });
 }
 
