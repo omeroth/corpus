@@ -15394,6 +15394,29 @@ const economicsData = {
 };
 // ──────────────────────────────────────────────────────────────────────────────
 
+// ─── psychologyData: bilingual content for psychology subject ────────────────
+// Scaffolded structure — coming-soon placeholders only. Chapters get filled
+// in one at a time as content is authored (follow the shape of an
+// economicsData day: id/title/titleEn/thinker/thinkerEn/thinkerId/xp plus
+// sections[] of type idea/source/explanation/depth/quiz/reflection, each
+// with both HE and EN fields). Every psychology thinker must have
+// subject:'psychology' explicitly on both THINKERS and THINKERS_EN entries
+// (philosophy is the default-bucket when subject is omitted — see
+// index.html:19370 for the runtime rule). Titles below are placeholders and
+// will be renamed as the chapter arc solidifies.
+//
+// Still gated by LOCKED_SUBJECTS = ['psychology'] until launch. Removing
+// psychology from that array is the single flip that opens the subject.
+const psychologyData = {
+  weeks: [
+    { id: 1, title: 'היסודות', titleEn: 'The Foundations', comingSoon: true, days: [] },
+    { id: 2, title: 'התודעה והלא-מודע', titleEn: 'Consciousness and the Unconscious', comingSoon: true, days: [] },
+    { id: 3, title: 'התפתחות אנושית', titleEn: 'Human Development', comingSoon: true, days: [] },
+    { id: 4, title: 'הזהות והעצמי', titleEn: 'Identity and the Self', comingSoon: true, days: [] },
+  ],
+};
+// ──────────────────────────────────────────────────────────────────────────────
+
 const THINKERS = [
   {
     id: 'socrates',
@@ -17031,6 +17054,23 @@ function getW() {
   // Economics branch - separate data source
   if (state.subject === 'economics') {
     return economicsData.weeks.map(function(w) {
+      return {
+        id: w.id,
+        title: lang === 'en' ? w.titleEn : w.title,
+        subtitle: lang === 'en' ? w.subtitleEn : w.subtitle,
+        isBonus: w.isBonus,
+        comingSoon: w.comingSoon,
+        days: w.days.map(function(d) { return deriveDay(d); }),
+      };
+    });
+  }
+
+  // Psychology branch - separate data source, still gated by
+  // LOCKED_SUBJECTS. Coming-soon chapters render as locked cards on home
+  // (comingSoon:true + days:[] short-circuits deriveDay); filled chapters
+  // will flow through the same deriveDay pipeline as economics.
+  if (state.subject === 'psychology') {
+    return psychologyData.weeks.map(function(w) {
       return {
         id: w.id,
         title: lang === 'en' ? w.titleEn : w.title,
