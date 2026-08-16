@@ -10887,10 +10887,10 @@ const corpusData = {
           {
             type: 'source',
             title: 'מתוך "The Trolley Problem"', titleEn: 'From "The Trolley Problem"',
-            quote: 'תומסון חידדה חידה שהעלתה לראשונה פיליפה פוט: אותה תוצאה, חיים אחד שמוקרב כדי להציל חמישה, יכולה להרגיש מותרת כשמסיטים קרונית אך אסורה כשדוחפים אדם אל מותו. שאלתה הייתה מדוע האינטואיציות המוסריות שלנו מתייחסות למקרים האלה בצורה כה שונה.',
-            quoteEn: 'Thomson sharpened a puzzle first raised by Philippa Foot: the same outcome, one life sacrificed to save five, can feel permissible when we divert a trolley yet wrong when we push a person to their death. Her question was why our moral intuitions treat these cases so differently.',
-            attr: '- ג\'ודית ג\'רביס תומסון, "The Trolley Problem", Yale Law Journal, 1985',
-            attrEn: '- Judith Jarvis Thomson, "The Trolley Problem", Yale Law Journal, 1985',
+            quote: '"נניח שאתם נהגי הקרונית. הקרונית מתעקלת ומולכם מופיעים חמישה פועלי מסילה. המסילה עוברת בעמק תלול-דפנות, וכדי לא לדרוס את החמישה עליכם לעצור. אתם דורכים על הבלמים, אך אבוי - הם אינם פועלים. לפתע אתם רואים ענף מסילה המוביל ימינה. אפשר להסיט את הקרונית אליו ובכך להציל את החמישה. לרוע המזל, גברת פוט סידרה שיש שם פועל אחד. הוא לא יוכל להתחמק בזמן, ואם תסיטו את הקרונית - תהרגו אותו."',
+            quoteEn: '"Suppose you are the driver of a trolley. The trolley rounds a bend, and there come into view ahead five track workmen, who have been repairing the track. The track goes through a bit of a valley at that point, and the sides are steep, so you must stop the trolley if you are to avoid running the five men down. You step on the brakes, but alas they don\'t work. Now you suddenly see a spur of track leading off to the right. You can turn the trolley onto it, and thus save the five men on the straight track ahead. Unfortunately, Mrs. Foot has arranged that there is one track workman on that spur of track. He can no more get off the track in time than the five can, so you will kill him if you turn the trolley onto him."',
+            attr: '- ג\'ודית ג\'רביס תומסון, "The Trolley Problem", Yale Law Journal 94:6, 1985',
+            attrEn: '- Judith Jarvis Thomson, "The Trolley Problem", Yale Law Journal 94:6, 1985',
             content: '',
             contentEn: '',
           },
@@ -11666,7 +11666,7 @@ const corpusData = {
             title: 'קאנט על הידע', titleEn: 'Kant on Knowledge',
             quote: '"עד כה הונח שהכרתנו חייבת להתאים לעצמים. הבה ננסה אפוא אם לא נצליח יותר במטאפיזיקה, אם נניח שהעצמים חייבים להתאים להכרתנו."',
             quoteEn: '"It has hitherto been assumed that our cognition must conform to the objects. Let us then make the experiment whether we may not be more successful in metaphysics, if we assume that the objects must conform to our cognition."',
-            attr: 'עמנואל קאנט, ביקורת התבונה הטהורה, 1781', attrEn: 'Immanuel Kant, Critique of Pure Reason, 1781',
+            attr: 'עמנואל קאנט, ביקורת התבונה הטהורה, הקדמה למהדורה השנייה, 1787', attrEn: 'Immanuel Kant, Critique of Pure Reason, Preface to the 2nd edition, 1787',
             content: '', contentEn: '',
           },
           {
@@ -17012,6 +17012,27 @@ function getW() {
       xp: d.xp,
       sections: d.sections.map(s => {
         const base = { type: s.type, title: lang === 'en' ? (s.titleEn || s.title) : s.title };
+        // ─── Section-type authoring rule ────────────────────────────────
+        // Applies to all subjects (philosophy / economics / psychology):
+        //
+        //   'source'  — a REAL quotation from the cited primary work,
+        //               translated from the original where applicable.
+        //               attr / attrEn must name the work + year (+
+        //               chapter/section when known) and the translator
+        //               for non-English originals. If the wording cannot
+        //               be verified against the primary source, do NOT
+        //               dress an author summary as a source section.
+        //
+        //   'explanation' / 'depth' — author-voice prose. Analysis,
+        //               framing, paraphrase, and interpretation live
+        //               here, not in 'source'.
+        //
+        // Legacy economics dialogues predating this rule (~15 sections
+        // across chapters 1-4) contain paraphrase-in-quotes and are
+        // tracked for a separate correction pass. Philosophy is
+        // largely compliant. See the check-thinker-links validator
+        // for the reference on subject / thinker joins.
+        // ────────────────────────────────────────────────────────────────
         switch (s.type) {
           case 'idea':
           case 'explanation':
