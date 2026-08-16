@@ -19958,7 +19958,7 @@ function makeNextBtn(label, isFinish = false, disabled = false) {
     backBtn.className = 'btn-reader-back';
     backBtn.id = 'reader-section-back-btn';
     backBtn.textContent = state.lang === 'he' ? '→ חזור' : '← Back';
-    backBtn.onclick = readerGoBack;
+    backBtn.onclick = () => _readerBtnFire('reader-section-back-btn', false, 'click');
     row.appendChild(backBtn);
   }
 
@@ -19967,7 +19967,11 @@ function makeNextBtn(label, isFinish = false, disabled = false) {
   nextBtn.id = 'reader-next-btn';
   nextBtn.textContent = label;
   nextBtn.disabled = disabled;
-  nextBtn.onclick = isFinish ? finishDay : nextSection;
+  // dataset.finish is read by both onclick and the delegated touchend
+  // listener on #reader-btn-bar so both paths route to finishDay vs
+  // nextSection consistently.
+  nextBtn.dataset.finish = isFinish ? '1' : '0';
+  nextBtn.onclick = () => _readerBtnFire('reader-next-btn', isFinish, 'click');
   row.appendChild(nextBtn);
 
   btnBar.appendChild(row);
@@ -21459,6 +21463,49 @@ let _readerStartMs       = 0;
 // Guard so dialogue_abandoned fires at most once per reader open even
 // if the user bounces through several screens after leaving.
 let _readerAbandonPending = false;
+
+// ─── Reader nav-button tap plumbing ──────────────────────────────
+// Android WebView can delay the synthetic 'click' event several hundred
+// ms behind the real touch under GPU load (section-slide animation,
+// scroll-reset reflow, backdrop-filter blur). The reader's Continue → /
+// ← Back get tapped rapidly by users who think the button is unresponsive
+// (~24 users' worth of $rageclick events in PostHog). Mirror the
+// touchend+preventDefault pattern that already fixes #qfm-continue-btn
+// (23347) and the guest-signup / share buttons.
+//
+// _readerBtnClosing: 600ms guard covers both (a) the touchend-then-
+// synthetic-click double-fire on WebViews where preventDefault isn't
+// honored, and (b) rage-click flurries that would otherwise skip
+// multiple sections. Long enough to absorb the worst-case click lag
+// (~500ms observed), short enough that a deliberate tap-tap-tap
+// navigation at human speed (>600ms between taps) still works.
+//
+// _readerBtnTouchStart: timestamp captured on touchstart, used by
+// _readerBtnFire to emit a reader_btn_tap PostHog event with the
+// perceived tap→handler lag. Lets us verify the fix in prod without
+// guessing.
+let _readerBtnClosing   = false;
+let _readerBtnTouchStart = 0;
+
+function _readerBtnFire(btnId, isFinishFlag, via) {
+  if (_readerBtnClosing) return;
+  _readerBtnClosing = true;
+  setTimeout(() => { _readerBtnClosing = false; }, 600);
+  const lag = _readerBtnTouchStart ? Math.round(performance.now() - _readerBtnTouchStart) : null;
+  _readerBtnTouchStart = 0;
+  try {
+    posthog.capture('reader_btn_tap', {
+      btn:    btnId === 'reader-section-back-btn' ? 'back' : (isFinishFlag ? 'finish' : 'next'),
+      via:    via,
+      lag_ms: lag,
+      chapter: state.currentWeek,
+      day:     state.currentDay,
+      section: state.currentSection,
+    });
+  } catch(e) {}
+  if (btnId === 'reader-section-back-btn') { readerGoBack(); return; }
+  if (isFinishFlag) finishDay(); else nextSection();
+}
 
 function _isFirstDialogue() {
   // "First-ever completion" gate — same key that first_dialogue_completed
@@ -23342,6 +23389,55 @@ function initUI() {
     try {
       if (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'android') {
         document.documentElement.classList.add('platform-android');
+      }
+    } catch(e) {}
+    // Reader Continue → and ← Back: delegated touchstart+touchend on the
+    // static #reader-btn-bar (the buttons themselves are recreated by
+    // makeNextBtn every render, so a per-button listener would need to be
+    // re-bound each time; delegating on the parent is bind-once and can't
+    // be orphaned). Same rationale as the qfm fix below — Android WebView
+    // click dispatch can lag hundreds of ms under GPU load, which reads as
+    // "the button ignored my tap" and drives the reader $rageclick spike.
+    // touchend fires the handler immediately + preventDefault suppresses
+    // the synthetic click; _readerBtnClosing (600ms) covers WebView
+    // variants where preventDefault isn't honored and also absorbs
+    // rage-click flurries so we don't skip sections.
+    try {
+      const _rBar = document.getElementById('reader-btn-bar');
+      if (_rBar) {
+        _rBar.addEventListener('touchstart', function(e) {
+          const btn = e.target.closest('#reader-next-btn, #reader-section-back-btn');
+          if (!btn) return;
+          _readerBtnTouchStart = performance.now();
+        }, { passive: true });
+        _rBar.addEventListener('touchend', function(e) {
+          const btn = e.target.closest('#reader-next-btn, #reader-section-back-btn');
+          if (!btn) return;
+          e.preventDefault();
+          const isFinish = btn.id === 'reader-next-btn' && btn.dataset.finish === '1';
+          _readerBtnFire(btn.id, isFinish, 'touchend');
+        }, { passive: false });
+      }
+    } catch(e) {}
+    // Level-up Continue ›: static button, safe to bind touchend directly.
+    // Same rationale as the reader buttons — clicked under the level-up
+    // celebration's GPU-heavy chest/badge animation, which is exactly the
+    // load profile that triggers the WebView click-lag. The button's
+    // pointer-events is already gated on .levelup-reveal.active (which
+    // couples with .levelup-text-stack opacity 0→1, so it's never
+    // visible-but-unresponsive) — no CSS change needed.
+    try {
+      const _luBtn = document.getElementById('levelup-continue');
+      if (_luBtn) {
+        _luBtn.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          // Guard: only fire once per touch cycle. The click listener at
+          // 24446 (hideLevelUp) still runs on WebView variants where
+          // preventDefault fails to suppress it — hideLevelUp is idempotent
+          // (returns early if currentLevelUpData is null after the first
+          // call clears it), so no explicit flag needed here.
+          if (typeof hideLevelUp === 'function') hideLevelUp();
+        }, { passive: false });
       }
     } catch(e) {}
     // Quiz feedback Continue: bind touchend + preventDefault so Android WebView
