@@ -8803,6 +8803,9 @@ async function loadProgressFromSupabase() {
     });
     state.chapterCompleteShown = state.chapterCompleteShown || {};
     (data.chapter_complete_shown || []).forEach(k => { state.chapterCompleteShown[k] = true; });
+    // Union-merge above may re-inject legacy bare-number keys from cloud
+    // copies still living on old app versions. Migrate again to normalize.
+    try { migrateChapterCompleteShown(); } catch(e) {}
     if (data.onboarding_done === true) {
       try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
     }
@@ -17257,6 +17260,11 @@ function loadState() {
     state.bonusUnlockShown.philosophy = !!state.bonusUnlockShown.philosophy;
     state.bonusUnlockShown.economics = !!state.bonusUnlockShown.economics;
   }
+  // Migrate legacy chapterCompleteShown keys ({1:true, 2:true, ...}) to the
+  // subject-scoped format ({philosophy-1:true, ...}). See helper for the
+  // full attribution heuristic. Also runs from loadProgressFromSupabase
+  // because the cloud copy still has legacy keys for existing users.
+  try { migrateChapterCompleteShown(); } catch(e) { console.warn('[migrate] chapterCompleteShown failed', e); }
   // Normalize state.dailyReminder for existing users whose persisted state predates this field.
   // Shape: { enabled: true, time: '20:00', permissionAsked: false }.
   state.dailyReminder = Object.assign(
@@ -17638,6 +17646,82 @@ function dayKey(weekId, dayId, subject) {
   const sub = subject || state.subject || 'philosophy';
   if (String(weekId).startsWith('bonus')) return weekId + '-' + dayId;
   return sub + '-' + weekId + '-' + dayId;
+}
+
+// === Subject-scoped chapter-complete-shown key ===
+// Mirrors dayKey exactly: bonus IDs (bonus1, bonusEcon1, ...) are already
+// globally unique so they get no prefix; regular integer chapter IDs
+// collide across subjects (philosophy chapter 1 vs economics chapter 1
+// both key on 1) so we subject-prefix them. Before this helper, the
+// chapter-complete overlay was silently suppressed on the second subject
+// after a user completed the same-numbered chapter in the first.
+function chapterCompleteKey(subject, chapterId) {
+  const sub = subject || state.subject || 'philosophy';
+  if (String(chapterId).startsWith('bonus')) return String(chapterId);
+  return sub + '-' + chapterId;
+}
+
+// One-shot migration for legacy state.chapterCompleteShown entries keyed
+// on the bare chapter id. Attribution ordered by confidence:
+//   1. Every day of chapter N in a subject is completed → the overlay
+//      definitively fired for that subject (overlay only fires on the
+//      last-day completion of a chapter). Attribute the flag to that
+//      subject. If both subjects are fully complete, attribute to both.
+//   2. Neither subject fully complete → chapter grew after the user
+//      completed it. Attribute to the subject with the most partial
+//      progress in that chapter.
+//   3. Neither subject has any progress in chapter N (stale flag from
+//      corrupted or wiped completedDays) → attribute to current
+//      state.subject as a best-guess fallback.
+// Bonus keys ('bonus1', 'bonusEcon1', ...) already globally unique →
+// left unchanged. Idempotent: /^\d+$/ detects only legacy keys, so
+// re-runs after migration are no-ops. Called from loadState AND from
+// loadProgressFromSupabase (which re-injects legacy keys via the union
+// merge from cloud storage until every device has synced back).
+function migrateChapterCompleteShown() {
+  if (!state.chapterCompleteShown || typeof state.chapterCompleteShown !== 'object') {
+    state.chapterCompleteShown = {};
+    return;
+  }
+  const legacyKeys = Object.keys(state.chapterCompleteShown).filter(k => /^\d+$/.test(k));
+  if (legacyKeys.length === 0) return;
+  const sources = [
+    { subject: 'philosophy', data: (typeof corpusData    !== 'undefined') ? corpusData    : null },
+    { subject: 'economics',  data: (typeof economicsData !== 'undefined') ? economicsData : null },
+  ];
+  const completed = state.completedDays || {};
+  for (const legacyKey of legacyKeys) {
+    if (!state.chapterCompleteShown[legacyKey]) {
+      delete state.chapterCompleteShown[legacyKey];
+      continue;
+    }
+    const chapterN = parseInt(legacyKey, 10);
+    const perSubjectProgress = {}; // subject → completed-day count in chapter N
+    const fullyComplete = [];      // subjects where every day of chapter N is done
+    for (const src of sources) {
+      if (!src.data || !Array.isArray(src.data.weeks)) continue;
+      const chapter = src.data.weeks.find(w => w.id === chapterN);
+      if (!chapter || !Array.isArray(chapter.days) || chapter.days.length === 0) continue;
+      const doneCount = chapter.days.filter(d => completed[src.subject + '-' + chapterN + '-' + d.id]).length;
+      perSubjectProgress[src.subject] = doneCount;
+      if (doneCount === chapter.days.length) fullyComplete.push(src.subject);
+    }
+    let attributions;
+    if (fullyComplete.length > 0) {
+      attributions = fullyComplete; // Tier 1
+    } else {
+      const withProgress = Object.keys(perSubjectProgress).filter(s => perSubjectProgress[s] > 0);
+      if (withProgress.length > 0) {
+        attributions = [withProgress.sort((a, b) => perSubjectProgress[b] - perSubjectProgress[a])[0]]; // Tier 2
+      } else {
+        attributions = [state.subject || 'philosophy']; // Tier 3
+      }
+    }
+    for (const subject of attributions) {
+      state.chapterCompleteShown[subject + '-' + chapterN] = true;
+    }
+    delete state.chapterCompleteShown[legacyKey];
+  }
 }
 
 (function migrateShareFlag() {
@@ -18787,9 +18871,10 @@ function showChapterCompleteOverlay(chapter) {
   if (!overlay || !chapter) return false;
   // Idempotent guard + flag flip AT RENDER TIME (moved out of finishDay so
   // the flag only turns on when the user actually sees the overlay).
-  if (state.chapterCompleteShown && state.chapterCompleteShown[chapter.id]) return false;
+  const _ccKey = chapterCompleteKey(state.subject, chapter.id);
+  if (state.chapterCompleteShown && state.chapterCompleteShown[_ccKey]) return false;
   state.chapterCompleteShown = state.chapterCompleteShown || {};
-  state.chapterCompleteShown[chapter.id] = true;
+  state.chapterCompleteShown[_ccKey] = true;
   saveStateLocal();
   const isEn = state.lang === 'en';
   const weekNumber = typeof chapter.id === 'number' ? chapter.id : '';
@@ -20463,7 +20548,7 @@ function finishDay() {
   const completedWeek = getW().find(w => w.id === currentWeekId);
   const _chapterQualifies = completedWeek && completedWeek.days && completedWeek.days.length > 0 &&
       completedWeek.days.every(d => state.completedDays[dayKey(completedWeek.id, d.id)]) &&
-      !(state.chapterCompleteShown && state.chapterCompleteShown[completedWeek.id]);
+      !(state.chapterCompleteShown && state.chapterCompleteShown[chapterCompleteKey(state.subject, completedWeek.id)]);
   if (_chapterQualifies) {
     _newCelebrations.push({ type: 'chapter_complete', weekId: completedWeek.id });
   }
