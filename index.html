@@ -126,6 +126,19 @@
     --accent-tint-strong: #D8C4FF;
     --accent-soft-border: #C4A8F5;
     --accent-bar-bg: #F8F5FF;
+    /* Derived shading tokens for 3D-rendered icons (#icon-level, #icon-xp).
+       Mix percentages reproduce the original hand-picked philosophy palette
+       (#9B6FE4 / #5E37A8 / #B995F3 / #D4BFFA), then track any theme's
+       --accent automatically. Two-declaration cascade: hex fallback first
+       for pre-16.2 Safari, color-mix second wins in modern engines. */
+    --accent-hi:        #9B6FE4;
+    --accent-hi:        color-mix(in srgb, var(--accent) 75%, white);
+    --accent-lo:        #5E37A8;
+    --accent-lo:        color-mix(in srgb, var(--accent) 75%, black);
+    --accent-rim:       #B995F3;
+    --accent-rim:       color-mix(in srgb, var(--accent) 50%, white);
+    --accent-highlight: #D4BFFA;
+    --accent-highlight: color-mix(in srgb, var(--accent) 30%, white);
     --red: #EF5350;
     --red-light: #FFEBEE;
     /* Semantic status tokens — added for dark-mode phase 1. Values match the
@@ -5763,9 +5776,15 @@
     width: 3px;
     background: currentColor;
   }
-  .subj-cinematic-card.subj-c-philosophy .subj-cinematic-portrait { color: #7B4FD4; }
-  .subj-cinematic-card.subj-c-economics  .subj-cinematic-portrait { color: #2563EB; }
-  .subj-cinematic-card.subj-c-psychology .subj-cinematic-portrait { color: #F59E0B; }
+  /* Each card shows ITS OWN subject's accent regardless of the app's
+     current theme (the subject picker always shows all three at once).
+     Scoped custom properties so both the portrait color and the
+     is-selected border+shadow below use a single expression per card. */
+  .subj-cinematic-card                    { --card-accent: var(--accent); --card-accent-rgb: var(--accent-rgb); }
+  .subj-cinematic-card.subj-c-philosophy  { --card-accent: #7B4FD4; --card-accent-rgb: 123, 79, 212; }
+  .subj-cinematic-card.subj-c-economics   { --card-accent: #2563EB; --card-accent-rgb:  37, 99, 235; }
+  .subj-cinematic-card.subj-c-psychology  { --card-accent: #C2410C; --card-accent-rgb: 194, 65,  12; }
+  .subj-cinematic-card .subj-cinematic-portrait { color: var(--card-accent); }
   .subj-cinematic-card .subj-cinematic-body {
     flex: 1;
     display: flex;
@@ -5800,21 +5819,9 @@
   }
   .subj-cinematic-card.is-selected {
     transform: scale(1.01);
-  }
-  .subj-cinematic-card.is-selected.subj-c-philosophy {
-    border-color: #7B4FD4;
-    box-shadow: 0 0 0 3px rgba(123, 79, 212, 0.16),
-                0 18px 40px -12px rgba(123, 79, 212, 0.45);
-  }
-  .subj-cinematic-card.is-selected.subj-c-economics {
-    border-color: #2563EB;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16),
-                0 18px 40px -12px rgba(37, 99, 235, 0.45);
-  }
-  .subj-cinematic-card.is-selected.subj-c-psychology {
-    border-color: #F59E0B;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.16),
-                0 18px 40px -12px rgba(245, 158, 11, 0.45);
+    border-color: var(--card-accent);
+    box-shadow: 0 0 0 3px rgba(var(--card-accent-rgb), 0.16),
+                0 18px 40px -12px rgba(var(--card-accent-rgb), 0.45);
   }
   .subj-cinematic-card.is-locked {
     opacity: 0.6;
@@ -7139,25 +7146,32 @@
 </div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
+    <!-- Level + XP icons: 3D-shaded per subject. Fills use theme-derived
+         shading tokens (--accent-hi / --accent-lo / --accent-rim /
+         --accent-highlight) so a subject swap propagates automatically.
+         --ink drives the outline so it matches the theme's darkest tone
+         (near-white in dark mode). Amber star (#F59E0B) and star
+         highlights are left hardcoded — they carry the shared warm-gold
+         accent that runs through the stat bar alongside the streak flame. -->
     <symbol id="icon-level" viewBox="0 0 64 64">
-      <path d="M22 38 L 14 56 L 22 52 L 26 58 L 32 44 Z" fill="#9B6FE4" stroke="#2A1266" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M22 38 L 14 56 L 22 52 L 26 58 L 32 44 Z" fill="var(--accent-hi)" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/>
       <path d="M22 38 L 14 56 L 19 53 L 28 41 Z" fill="var(--accent)"/>
-      <path d="M42 38 L 50 56 L 42 52 L 38 58 L 32 44 Z" fill="#9B6FE4" stroke="#2A1266" stroke-width="2" stroke-linejoin="round"/>
-      <path d="M42 38 L 50 56 L 45 53 L 36 41 Z" fill="#5E37A8" opacity=".7"/>
-      <circle cx="32" cy="26" r="17" fill="#2A1266"/>
+      <path d="M42 38 L 50 56 L 42 52 L 38 58 L 32 44 Z" fill="var(--accent-hi)" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/>
+      <path d="M42 38 L 50 56 L 45 53 L 36 41 Z" fill="var(--accent-lo)" opacity=".7"/>
+      <circle cx="32" cy="26" r="17" fill="var(--ink)"/>
       <circle cx="32" cy="26" r="15.5" fill="var(--accent)"/>
-      <circle cx="32" cy="26" r="12" fill="none" stroke="#5E37A8" stroke-width="1.4" opacity=".75"/>
-      <path d="M19 22 Q 24 14 32 13" stroke="#B995F3" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".9"/>
-      <path d="M44 28 Q 42 38 32 40" stroke="#4A2A8F" stroke-width="2" fill="none" stroke-linecap="round" opacity=".5"/>
-      <path d="M32 16 L 35.2 22.5 L 42 23.5 L 37 28.5 L 38.2 35.5 L 32 32 L 25.8 35.5 L 27 28.5 L 22 23.5 L 28.8 22.5 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.6" stroke-linejoin="round"/>
+      <circle cx="32" cy="26" r="12" fill="none" stroke="var(--accent-lo)" stroke-width="1.4" opacity=".75"/>
+      <path d="M19 22 Q 24 14 32 13" stroke="var(--accent-rim)" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".9"/>
+      <path d="M44 28 Q 42 38 32 40" stroke="var(--accent-lo)" stroke-width="2" fill="none" stroke-linecap="round" opacity=".5"/>
+      <path d="M32 16 L 35.2 22.5 L 42 23.5 L 37 28.5 L 38.2 35.5 L 32 32 L 25.8 35.5 L 27 28.5 L 22 23.5 L 28.8 22.5 Z" fill="#F59E0B" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/>
       <path d="M30 22 L 32 26" stroke="#FFCF7A" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".9"/>
       <circle cx="30" cy="24" r="1" fill="#FFFFFF"/>
     </symbol>
     <symbol id="icon-xp" viewBox="0 0 64 64">
-      <path d="M32 8 C 34 20, 40 24, 52 28 C 40 32, 34 38, 32 56 C 30 38, 24 32, 12 28 C 24 24, 30 20, 32 8 Z" fill="var(--accent)" stroke="#2A1266" stroke-width="2.2" stroke-linejoin="round"/>
-      <path d="M32 8 C 30 20, 24 24, 12 28 C 24 24, 30 16, 32 8 Z" fill="#9B6FE4"/>
-      <path d="M32 56 C 34 38, 40 32, 52 28 C 40 32, 34 38, 32 56 Z" fill="#5E37A8" opacity=".55"/>
-      <path d="M30 14 Q 32 22 30 28" stroke="#D4BFFA" stroke-width="2" fill="none" stroke-linecap="round" opacity=".9"/>
+      <path d="M32 8 C 34 20, 40 24, 52 28 C 40 32, 34 38, 32 56 C 30 38, 24 32, 12 28 C 24 24, 30 20, 32 8 Z" fill="var(--accent)" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M32 8 C 30 20, 24 24, 12 28 C 24 24, 30 16, 32 8 Z" fill="var(--accent-hi)"/>
+      <path d="M32 56 C 34 38, 40 32, 52 28 C 40 32, 34 38, 32 56 Z" fill="var(--accent-lo)" opacity=".55"/>
+      <path d="M30 14 Q 32 22 30 28" stroke="var(--accent-highlight)" stroke-width="2" fill="none" stroke-linecap="round" opacity=".9"/>
       <circle cx="27" cy="22" r="1.8" fill="#FFFFFF"/>
     </symbol>
     <symbol id="ic-pantheon" viewBox="0 0 24 24">
