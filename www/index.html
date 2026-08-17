@@ -1746,21 +1746,29 @@
   }
   /* Psychology-scoped: unlocked Pantheon cards get the same warm ring
      as the home carousel via --thinker-frame. Not applied to
-     philosophy or economics because their Pantheon cards have never
-     had a border, and adding one would be a visual regression for
-     the "unchanged" subjects. Inset box-shadow instead of outline so
-     it follows border-radius on every browser (outline-radius has an
-     iOS<16.4 gap) and doesn't push the portrait image inward.
-     The :hover rule below re-declares the inset frame and appends
-     the lift shadow so the frame stays visible during hover;
-     without the re-declare, the base .pantheon-card:hover
-     box-shadow would overwrite it. */
-  html.theme-psychology .pantheon-card:not(.locked) {
-    box-shadow: inset 0 0 0 2px var(--thinker-frame);
-  }
-  html.theme-psychology .pantheon-card:not(.locked):hover {
-    box-shadow: inset 0 0 0 2px var(--thinker-frame),
-                0 12px 28px rgba(var(--accent-rgb), 0.25);
+     philosophy or economics — their Pantheon cards have never had a
+     frame, and adding one in the "unchanged" subjects would be a
+     visual regression.
+
+     Uses ::after (not border, outline, or box-shadow inset) because
+     the pantheon-card DOM has an absolutely-positioned front face
+     (.pantheon-card-front) with a full-bleed <img> inside; a
+     box-shadow on the outer card is drawn but immediately overpainted
+     by the front + image. The pseudo-element sits above the image
+     via z-index, follows the outer border-radius on every browser,
+     and pointer-events:none passes clicks through to the underlying
+     flip handler. Placed on the OUTER card (not on -front) so the
+     frame stays put during the flip transform on .pantheon-card-inner
+     — the ring is a persistent identity element, not part of the
+     flipping face. */
+  html.theme-psychology .pantheon-card:not(.locked)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--thinker-frame);
+    border-radius: 18px;
+    pointer-events: none;
+    z-index: 2;
   }
   .pantheon-card.locked {
     /* Locked cards now open a teaser modal via openThinkerModal(id, {locked: true}). */
