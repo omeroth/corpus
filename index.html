@@ -23187,9 +23187,9 @@ function _showBonusLockToast() {
 }
 
 const SUBJECTS = [
-  { id: 'philosophy', name: 'Philosophy', icon: 'assets/icons/subjects/philosophy-icon.png' },
-  { id: 'economics',  name: 'Economics',  icon: 'assets/icons/subjects/economics.png'  },
-  { id: 'psychology', name: 'Psychology', icon: 'assets/icons/subjects/psychology.png' },
+  { id: 'philosophy', name: 'Philosophy', nameHe: 'פילוסופיה', icon: 'assets/icons/subjects/philosophy-icon.png' },
+  { id: 'economics',  name: 'Economics',  nameHe: 'כלכלה',     icon: 'assets/icons/subjects/economics.png'  },
+  { id: 'psychology', name: 'Psychology', nameHe: 'פסיכולוגיה', icon: 'assets/icons/subjects/psychology.png' },
 ];
 window.SUBJECTS = SUBJECTS;
 
@@ -24232,21 +24232,24 @@ function renderPantheon() {
       </div>`;
   }
 
-  const subjects = [
-    { id: 'philosophy', labelEn: 'Philosophy', labelHe: 'פילוסופיה' },
-    { id: 'economics', labelEn: 'Economics', labelHe: 'כלכלה' },
-  ];
-
-  container.innerHTML = subjects.map(subj => {
+  // Sections are derived from the global SUBJECTS list so adding a
+  // fourth subject only requires updating that one array. Ordering
+  // within a section comes from CAROUSEL_ORDER[id]; empty array or
+  // missing entry falls back to the raw pool (bucketed by t.subject,
+  // with the philosophy-default rule for records that omit .subject).
+  // A section with no thinkers is dropped entirely so pre-launch
+  // subjects don't render an empty header.
+  container.innerHTML = SUBJECTS.map(subj => {
     const order = CAROUSEL_ORDER[subj.id] || [];
     const pool = allThinkers.filter(t => (t.subject || 'philosophy') === subj.id);
     const subjectThinkers = order.length
       ? order.map(id => pool.find(t => t.id === id)).filter(Boolean)
       : pool;
     if (!subjectThinkers.length) return '';
+    const label = isEn ? subj.name : (subj.nameHe || subj.name);
     return `
       <div class="pantheon-section">
-        <div class="pantheon-section-title">${isEn ? subj.labelEn : subj.labelHe}</div>
+        <div class="pantheon-section-title">${label}</div>
         <div class="pantheon-grid">${subjectThinkers.map(cardHtml).join('')}</div>
       </div>`;
   }).join('');
