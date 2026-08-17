@@ -139,6 +139,16 @@
     --accent-rim:       color-mix(in srgb, var(--accent) 50%, white);
     --accent-highlight: #D4BFFA;
     --accent-highlight: color-mix(in srgb, var(--accent) 30%, white);
+    /* Large decorative surfaces (auth screen bg, level-up modal box) —
+       separated from --accent so a subject can pick a brighter surface
+       hex than the AA-text --accent. --on-accent-surface pairs the
+       text color. Defaults map to --accent / --accent-dark / --accent-hi
+       so philosophy and economics render unchanged; psychology overrides
+       to a bright #F97316-family gradient with dark ink for contrast. */
+    --accent-surface:    var(--accent);
+    --accent-surface-lo: var(--accent-dark);
+    --accent-surface-hi: var(--accent-hi);
+    --on-accent-surface: var(--on-accent);
     --red: #EF5350;
     --red-light: #FFEBEE;
     /* Semantic status tokens — added for dark-mode phase 1. Values match the
@@ -304,6 +314,14 @@
     /* Mystery-mark gold gradient tinted 15% toward --accent. */
     --mystery-top: #FFD09B;
     --mystery-bottom: #C2410C;
+    /* Large decorative surfaces override — brighter orange family than
+       --accent (#C2410C reads brown as a large fill; #F97316 reads as
+       true bright orange). Dark ink #2E0A03 passes AA-text 4.5:1 on
+       every stop of the modal gradient (contrast: 6.10 / 4.92 / 10.4). */
+    --accent-surface:    #F97316;
+    --accent-surface-lo: #EA580C;
+    --accent-surface-hi: #FDBA74;
+    --on-accent-surface: #2E0A03;
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
@@ -436,6 +454,13 @@
     --card-back-text: #E8F1F5;
     --mystery-top: #FDBA74;
     --mystery-bottom: #EA580C;
+    /* --accent-surface / -lo / -hi inherit from :root defaults (var(--accent)
+       etc.) which resolve to the dark-mode bright orange family here.
+       --on-accent-surface overridden to dark ink so text on the bright-orange
+       level-up modal gradient passes AA (7.6 / 4.92 / 9.3 on the three stops).
+       Auth screen in dark uses --bg → --surface-2 (dark neutrals), so its
+       text is scoped separately below and stays light. */
+    --on-accent-surface: #2E0A03;
   }
 
   /* Status tokens (subject-agnostic) — lifted foregrounds + dark-tinted
@@ -3881,12 +3906,41 @@
   }
 
   /* ── Level up modal ── */
+  /* Gradient stops reference --accent-surface tokens so a subject can pick
+     its own hue for large decorative fills without changing the AA-tuned
+     --accent. Philosophy and economics inherit the accent family via
+     :root defaults (unchanged look); psychology overrides all three stops
+     to a bright-orange family (#F97316 → #EA580C → #FDBA74) that reads as
+     true orange in both light and dark mode. */
   .levelup-modal .modal-box {
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 50%, var(--purple-light) 100%);
+    background: linear-gradient(135deg, var(--accent-surface) 0%, var(--accent-surface-lo) 50%, var(--accent-surface-hi) 100%);
     border-color: rgba(var(--accent-rgb), 0.4);
   }
-  .levelup-modal .modal-title { color: var(--on-accent); }
+  .levelup-modal .modal-title { color: var(--on-accent-surface); }
   .levelup-modal .modal-subtitle { color: rgba(255,255,255,0.7); }
+  /* Psychology (light AND dark): subtitle uses solid dark ink instead of
+     the default rgba(white,0.7) — needed because psy's --accent-surface
+     is bright orange in both modes, and white-on-bright-orange drops to
+     3.4:1 (light) / 2.2:1 (dark). Solid --on-accent-surface is dark
+     #2E0A03 in psy → passes AA-text 4.5:1 across every gradient stop. */
+  html.theme-psychology .levelup-modal .modal-subtitle {
+    color: var(--on-accent-surface);
+  }
+  /* "מדהים!" button on the level-up modal: default is a translucent
+     white pill (works on purple/blue). Psychology needs the dark-ink
+     pairing to match the surface. Class selector avoids !important
+     over the inline style — the inline style was replaced with this
+     class in the markup below. */
+  .levelup-modal-btn {
+    background: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  html.theme-psychology .levelup-modal-btn {
+    background: rgba(46, 10, 3, 0.14);
+    color: var(--on-accent-surface);
+    border-color: rgba(46, 10, 3, 0.35);
+  }
   .level-particle {
     position: absolute;
     width: 6px;
@@ -4512,11 +4566,19 @@
     gap: 28px;
   }
   .auth-screen.active { display: flex; }
+  /* Psychology light: replace the accent gradient with a flat bright
+     --accent-surface (#F97316). The deep-orange gradient read as brown
+     because darkened orange goes muddy; a flat bright fill reads as
+     true orange, and dark ink text (see .auth-logo-text override below)
+     holds AA on it. */
+  html:not(.dark).theme-psychology .auth-screen {
+    background: var(--accent-surface);
+  }
   /* Dark: the accent-gradient reads too bright once --accent is lifted for
      button contrast. Swap to a deep bg → surface-2 climb so the auth screen
      recedes like the rest of the dark app. Logo/tagline stay white via
-     --on-accent and the semi-white rgba, both of which read fine on the
-     darkened gradient. */
+     --on-accent (auth-screen dark uses light text on dark bg, not the
+     accent-surface pairing that applies in light-mode psychology). */
   html.dark .auth-screen {
     background: linear-gradient(150deg, var(--bg) 0%, var(--surface-2) 100%);
   }
@@ -4530,10 +4592,22 @@
   }
   .auth-tagline {
     font-family: 'Nunito', sans-serif;
-    font-size: 15px;
-    color: rgba(255,255,255,0.75);
+    /* Bumped from 15px → 24px (WCAG large-text threshold) so 3:1
+       applies. Solid --on-accent (was rgba(0.75) which failed AA
+       3.5:1 on every subject) so the tagline holds contrast at any
+       accent brightness. */
+    font-size: 24px;
+    color: var(--on-accent);
     margin-top: 4px;
     letter-spacing: 0.5px;
+  }
+  /* Psychology light: dark ink for both wordmark and tagline, pairing
+     with the flat bright-orange --accent-surface. Contrast on #F97316
+     is 6.10:1 for both (passes AA text). Dark mode auth-screen uses
+     the light --on-accent above via inherited default. */
+  html:not(.dark).theme-psychology .auth-logo-text,
+  html:not(.dark).theme-psychology .auth-tagline {
+    color: var(--on-accent-surface);
   }
   .auth-card {
     background: var(--surface);
@@ -8224,7 +8298,7 @@
     <div class="modal-emoji">🏆</div>
     <div class="modal-title" id="modal-levelup-title">עלית רמה!</div>
     <div class="modal-subtitle" id="levelup-text"></div>
-    <button class="nav-btn" id="modal-amazing-btn" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)" onclick="closeLevelUp()">מדהים!</button>
+    <button class="nav-btn levelup-modal-btn" id="modal-amazing-btn" onclick="closeLevelUp()">מדהים!</button>
   </div>
 </div>
 
