@@ -139,12 +139,22 @@
     --accent-rim:       color-mix(in srgb, var(--accent) 50%, white);
     --accent-highlight: #D4BFFA;
     --accent-highlight: color-mix(in srgb, var(--accent) 30%, white);
+    /* Split accent into two roles:
+         --accent      = fills (button backgrounds, borders, gradient
+                          stops, badge backgrounds, progress-bar fills,
+                          icon shape fills)
+         --accent-text = the accent drawn AS TEXT on a light surface
+                          (color property in eyebrows, links, bold
+                          spans, headings). Needs AA text contrast.
+       Philosophy and economics keep the same value in both — their
+       accents pass AA as text on white. Psychology overrides --accent
+       to the bright decorative #E8853A and --accent-text to the
+       darker AA-safe #AD510B (see html.theme-psychology below). */
+    --accent-text: var(--accent);
     /* Large decorative surfaces (auth screen bg, level-up modal box) —
-       separated from --accent so a subject can pick a brighter surface
-       hex than the AA-text --accent. --on-accent-surface pairs the
-       text color. Defaults map to --accent / --accent-dark / --accent-hi
-       so philosophy and economics render unchanged; psychology overrides
-       to a bright #F97316-family gradient with dark ink for contrast. */
+       identical to --accent for philosophy and economics; psychology
+       overrides for a hue-family gradient stack. --on-accent-surface
+       pairs the text color. */
     --accent-surface:    var(--accent);
     --accent-surface-lo: var(--accent-dark);
     --accent-surface-hi: var(--accent-hi);
@@ -285,23 +295,28 @@
        orange-600 to hold ~5:1 AA text contrast on white, matching
        philosophy (5.0:1) and economics (5.0:1). */
     --surface: #FFFFFF;
-    /* --accent shifted from #C2410C (hsl 17.5, 88%, 40%) to #AD510B
-       (hsl 26, 88%, 36%) so it sits in the same hue family as
-       --accent-surface below. Kept saturation, dropped lightness 4pts
-       to hold AA text (5.30:1 white contrast vs previous 5.18:1).
-       Ripple: buttons, progress bars, level dots etc across the whole
-       app now warmer/more-orange — visible only in the auth screen
-       where --accent and --accent-surface co-locate. */
-    --accent: #AD510B;
+    /* --accent is the bright warm orange used for ALL fills (buttons,
+       progress bars, borders, badges, gradient stops, icon shape
+       fills). Same value as --accent-surface below because the whole
+       screen now speaks one orange, not two. White text on this fill
+       is 2.68:1 (below AA-large 3:1) — every text-on-fill path uses
+       --on-accent = #2E0A03 dark ink (6.76:1 ✓).
+
+       --accent-text is the AA-safe sibling used when the accent is
+       drawn AS TEXT on a light surface (color property, not
+       background). Hue-matched to --accent but darker so it passes
+       AA text on white (5.30:1). */
+    --accent: #E8853A;
+    --accent-text: #AD510B;
     --accent-dark: #863F09;
     --accent-muted: #E38848;
-    --accent-glow: rgba(173, 81, 11, 0.3);
-    --accent-rgb: 173, 81, 11;
+    --accent-glow: rgba(232, 133, 58, 0.3);
+    --accent-rgb: 232, 133, 58;
     --accent-tint: #FFF7ED;
     --accent-tint-strong: #FED7AA;
     --accent-soft-border: #FDBA74;
     --accent-bar-bg: #FFF7ED;
-    --purple: #AD510B;
+    --purple: #E8853A;
     --purple-light: #EA580C;
     --lilac: #FDBA74;
     --ink: #5C1F0C;
@@ -314,25 +329,25 @@
     --border-deep: #FDBA74;
     --shadow: 0 4px 20px rgba(92, 32, 6, 0.1);
     --shadow-lg: 0 8px 40px rgba(92, 32, 6, 0.15);
-    --card-front-bg: rgba(173, 81, 11, 0.06);
+    --card-front-bg: rgba(232, 133, 58, 0.06);
     --card-back-bg-start: #FFF7ED;
     --card-back-bg-end: #FED7AA;
     --card-back-text: #7C2D12;
     /* Mystery-mark gold gradient tinted 15% toward --accent. */
     --mystery-top: #FFD09B;
-    --mystery-bottom: #AD510B;
-    /* Large decorative surfaces override — warm orange at hsl(26, 79%, L)
-       chosen against philosophy purple and economics blue as a trio
-       (not judged in isolation). Saturation 79% keeps it recognisably
-       orange without the neon edge of raw Tailwind orange-500.
-       --accent (#AD510B) is at the same hue so surface and accent read
-       as one orange family. --accent-surface handles the auth-screen
-       bg and modal gradient. White text on flat --accent-surface is
-       2.68:1 (formally BELOW AA-large 3:1; text-shadow on the wordmark
-       + tagline restores practical legibility — recorded exception).
-       Dark ink #2E0A03 on the modal gradient stops is 6.76 / 5.39 /
-       9.92 (all pass AA-text 4.5:1). */
-    --accent-surface:    #E8853A;  /* hsl(26, 79%, 57%) */
+    --mystery-bottom: #E8853A;
+    /* Dark ink for text on --accent fills: buttons, badges, ribbons.
+       Passes AA text (6.76:1 on #E8853A). auth-screen wordmark +
+       tagline explicitly override back to white — see the scoped
+       rule below the .auth-tagline block. */
+    --on-accent: #2E0A03;
+    /* Large decorative surfaces (auth-screen bg, level-up modal
+       gradient) — --accent-surface stack matches --accent for the
+       flat surface; -lo and -hi step lightness for the modal
+       gradient depth. Same-hue derivation so the modal reads as one
+       orange family. Dark ink on gradient stops:
+       6.76 / 5.39 / 9.92 (all pass AA-text 4.5:1). */
+    --accent-surface:    #E8853A;  /* hsl(26, 79%, 57%) — same as --accent */
     --accent-surface-lo: #DB6E1A;  /* hsl(26, 79%, 48%) */
     --accent-surface-hi: #F1B384;  /* hsl(26, 79%, 73%) */
     --on-accent-surface: #2E0A03;
@@ -676,7 +691,7 @@
   .topbar-logo-wrap {
     font-weight: 800;
     font-size: 14px;
-    color: var(--accent);
+    color: var(--accent-text);
     justify-self: center;
   }
   .stats-subheader {
@@ -742,13 +757,13 @@
     font-family: 'Nunito', sans-serif;
     font-size: 22px;
     font-weight: 900;
-    color: var(--accent);
+    color: var(--accent-text);
     letter-spacing: -0.5px;
   }
   .topbar-signin {
     background: none;
     border: none;
-    color: var(--accent);
+    color: var(--accent-text);
     font-family: 'Nunito', sans-serif;
     font-size: 14px;
     font-weight: 700;
@@ -843,7 +858,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    color: var(--accent, #7B4FD4);
+    color: var(--accent-text, #7B4FD4);
   }
   .journey-back-btn:active { background: rgba(123, 79, 212, 0.1); }
   .journey-title {
@@ -1064,7 +1079,7 @@
   }
   .section-link {
     font-size: 13px;
-    color: var(--accent);
+    color: var(--accent-text);
     cursor: pointer;
     font-weight: 600;
   }
@@ -1105,7 +1120,7 @@
     justify-content: center;
     font-size: 22px;
     font-weight: 800;
-    color: var(--accent);
+    color: var(--accent-text);
     flex-shrink: 0;
     overflow: hidden;
   }
@@ -1117,7 +1132,7 @@
   }
   .pf-email {
     font-size: 12px;
-    color: var(--accent);
+    color: var(--accent-text);
     margin-top: 2px;
   }
   .pf-since {
@@ -1153,7 +1168,7 @@
   }
   .pf-streak-label {
     font-size: 13px;
-    color: var(--accent);
+    color: var(--accent-text);
     font-weight: 600;
     margin: 4px 0 16px;
   }
@@ -1206,7 +1221,7 @@
   }
   .pf-xp-val {
     font-size: 13px;
-    color: var(--accent);
+    color: var(--accent-text);
     font-weight: 700;
   }
   .pf-xp-track {
@@ -1278,7 +1293,7 @@
     font-family: inherit;
     text-align: start;
   }
-  .pf-settings-btn > svg:first-child { color: var(--accent); flex-shrink: 0; }
+  .pf-settings-btn > svg:first-child { color: var(--accent-text); flex-shrink: 0; }
   .pf-settings-btn > span { flex: 1; }
   /* Profile share row — same shape as .pf-settings-btn (surface card, accent
      rim, accent icon, accent-dark label) so it fits the profile's row rhythm.
@@ -1302,7 +1317,7 @@
     transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .pf-share-btn:active { transform: scale(0.98); }
-  .pf-share-btn > svg:first-child { color: var(--accent); flex-shrink: 0; }
+  .pf-share-btn > svg:first-child { color: var(--accent-text); flex-shrink: 0; }
   .pf-share-btn > span { flex: 1; }
   /* Guest "Save your progress" row — same visual shape as .pf-share-btn so
      the profile's row rhythm holds. Only rendered when currentUser is null;
@@ -1326,7 +1341,7 @@
     transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .pf-guest-signup-btn:active { transform: scale(0.98); }
-  .pf-guest-signup-btn > svg:first-child { color: var(--accent); flex-shrink: 0; }
+  .pf-guest-signup-btn > svg:first-child { color: var(--accent-text); flex-shrink: 0; }
   .pf-guest-signup-btn > span { flex: 1; }
   .pf-settings-chevron {
     color: var(--accent-muted);
@@ -1392,7 +1407,7 @@
     background: var(--accent-tint);
   }
   .pf-lang-check {
-    color: var(--accent);
+    color: var(--accent-text);
     font-size: 16px;
     font-weight: 900;
   }
@@ -1635,7 +1650,7 @@
     gap: 8px;
     padding: 16px 20px 8px;
     font-size: 13px;
-    color: var(--accent);
+    color: var(--accent-text);
     font-weight: 600;
   }
   .pantheon-section { margin-bottom: 32px; }
@@ -1819,7 +1834,7 @@
   }
   .thinker-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.25); }
   .thinker-card.locked { opacity: 0.4; filter: grayscale(1); }
-  .thinker-card.unlocked { border-color: var(--accent); border-bottom-color: var(--accent-dark); }
+  .thinker-card.unlocked { border-color: var(--accent-text); border-bottom-color: var(--accent-dark); }
   .thinker-card.new-unlock {
     animation: thinkerPop 0.6s cubic-bezier(0.34,1.56,0.64,1);
   }
@@ -1854,7 +1869,10 @@
     background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
     border-radius: 0 0 14px 14px;
   }
-  .thinker-card.painting .thinker-name { color: var(--on-accent); font-size: 12px; }
+  /* Painting card: name sits on top of the portrait image (with a dark
+     gradient overlay), not on a --accent fill. Hardcoded #FFFFFF so it
+     doesn't inherit psychology's dark-ink --on-accent override. */
+  .thinker-card.painting .thinker-name { color: #FFFFFF; font-size: 12px; }
   .thinker-card.painting .thinker-era { color: rgba(255,255,255,0.7); }
   .thinker-card.painting .thinker-card-lock {
     position: absolute;
@@ -1915,7 +1933,7 @@
   }
   .next-lesson-btn:active { transform: scale(0.97); }
   .week-row-completed { opacity: 0.75; cursor: default; }
-  .week-row-active { border-color: var(--accent); box-shadow: 0 2px 12px var(--accent-glow); }
+  .week-row-active { border-color: var(--accent-text); box-shadow: 0 2px 12px var(--accent-glow); }
   .week-row-num-completed { background: var(--accent); box-shadow: 0 2px 0 var(--ink); color: var(--on-accent); }
   .week-row-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
   .week-row-ttl { font-weight: 700; font-size: 14px; color: var(--ink); }
@@ -1953,7 +1971,11 @@
   .unlock-lock-big { width: 120px; height: 120px; filter: drop-shadow(0 0 28px rgba(255,217,130,.9)); animation: p3-pop .9s cubic-bezier(.34,1.56,.64,1) .15s both, p3-float 3s ease-in-out 1.05s infinite; z-index: 1; }
   @keyframes p3-pop { 0% { transform: scale(.2) translateY(20px) rotate(-12deg); opacity: 0; } 60% { transform: scale(1.18) translateY(-4px) rotate(3deg); opacity: 1; } 100% { transform: scale(1) translateY(0) rotate(0); opacity: 1; } }
   @keyframes p3-float { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-5px) rotate(-1.5deg); } }
-  .unlock-h3 { font-size: 24px; font-weight: 900; color: var(--on-accent); margin: 0; animation: p3-rise .6s ease-out .55s both; z-index: 1; }
+  /* Unlock modal heading: sits on the level-up celebration backdrop
+     (nearly-opaque #0F0C1C behind the chest reveal), not on a --accent
+     fill. Hardcoded #FFFFFF so it doesn't inherit psychology's
+     dark-ink --on-accent override. */
+  .unlock-h3 { font-size: 24px; font-weight: 900; color: #FFFFFF; margin: 0; animation: p3-rise .6s ease-out .55s both; z-index: 1; }
   .unlock-p { font-size: 13px; color: #FFD982; font-weight: 600; margin: 0; line-height: 1.6; animation: p3-rise .6s ease-out .7s both; z-index: 1; }
   @keyframes p3-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   .unlock-cta-btn { margin-top: 8px; background: linear-gradient(180deg, #FFD982, #F59E0B); border: 1px solid #C7892C; color: #3a2400; font-weight: 800; font-size: 15px; padding: 12px 32px; border-radius: 999px; cursor: pointer; font-family: inherit; box-shadow: 0 2px 0 #C7892C, inset 0 1px 0 rgba(255,255,255,.5); animation: p3-rise .6s ease-out .85s both, p3-cta-bob 1.8s ease-in-out 1.5s infinite; z-index: 1; }
@@ -1972,7 +1994,7 @@
     height: 44px;
     border-radius: 50%;
     background: rgba(var(--accent-rgb), 0.1);
-    color: var(--accent);
+    color: var(--accent-text);
     font-family: 'Nunito', sans-serif;
     font-weight: 900;
     font-size: 15px;
@@ -2052,7 +2074,7 @@
     transition: all 0.3s ease;
   }
   .thinker-carousel-card.unlocked img {
-    border-color: var(--accent);
+    border-color: var(--accent-text);
     box-shadow: 0 4px 20px var(--accent-glow);
   }
   /* .bonus-carousel-item, .bonus-circle{-wrapper,} and the four
@@ -2295,7 +2317,7 @@
   }
   .start-first-dialogue-eyebrow {
     font-size: calc(11px * var(--text-scale));
-    color: var(--accent);
+    color: var(--accent-text);
     text-transform: uppercase;
     letter-spacing: 1.3px;
     font-weight: 800;
@@ -2544,7 +2566,7 @@
     transition: color 0.15s;
   }
   .bottom-nav-btn.active {
-    color: var(--accent);
+    color: var(--accent-text);
   }
   .bottom-nav-btn svg .fill { display: none; }
   .bottom-nav-btn svg .stroke { display: inline; }
@@ -2561,7 +2583,7 @@
     font-family: 'Nunito', sans-serif;
     font-size: 13px;
     font-weight: 700;
-    color: var(--accent);
+    color: var(--accent-text);
     cursor: pointer;
     transition: background 0.15s, box-shadow 0.15s;
     box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.07);
@@ -2600,7 +2622,7 @@
   .day-item:hover:not(.locked) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.1); }
   .day-item.locked { opacity: 0.4; cursor: default; }
   .day-item.completed {
-    border-color: var(--accent);
+    border-color: var(--accent-text);
     border-bottom-color: var(--accent-dark);
     background: rgba(var(--accent-rgb), 0.06);
   }
@@ -2715,7 +2737,7 @@
     font-weight: 700;
     background: none;
     border: 1.5px solid rgba(var(--accent-rgb), 0.4);
-    color: var(--accent);
+    color: var(--accent-text);
     border-radius: 999px;
     cursor: pointer;
     font-family: inherit;
@@ -2737,7 +2759,7 @@
   .reader-topbar .topbar-logo-wrap {
     font-size: 14px;
     font-weight: 800;
-    color: var(--accent);
+    color: var(--accent-text);
     letter-spacing: normal;
     font-family: inherit;
   }
@@ -2805,7 +2827,7 @@
     border-radius: 50%;
     background: var(--surface);
     border: 1.5px solid var(--accent-soft-border);
-    color: var(--accent);
+    color: var(--accent-text);
     font-family: 'Nunito', sans-serif;
     font-size: 16px;
     font-weight: 800;
@@ -3019,13 +3041,13 @@
   .reader-editorial #reader-content .quiz-option:hover:not(:disabled),
   .reader-editorial #reader-content .quiz-option.selected {
     background: var(--accent-tint);
-    border-color: var(--accent);
+    border-color: var(--accent-text);
   }
   .reader-editorial #reader-content .opt-letter {
     width: 28px;
     height: 28px;
     background: var(--surface);
-    color: var(--accent);
+    color: var(--accent-text);
     border: 1.5px solid var(--accent-soft-border);
   }
   /* Correct/wrong states — chip fills to match the option border so the
@@ -3065,7 +3087,7 @@
   }
   .reader-editorial #reader-content .reflection-q::before {
     content: counter(reflection-counter, decimal-leading-zero) '.';
-    color: var(--accent);
+    color: var(--accent-text);
     font-weight: 800;
     font-size: inherit;
     margin-inline-end: 12px;
@@ -3213,7 +3235,7 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    color: var(--accent);
+    color: var(--accent-text);
     margin-bottom: 12px;
     display: flex;
     align-items: center;
@@ -3229,7 +3251,7 @@
      The SVG <symbol> definitions for ic-idea/ic-source/ic-explain/ic-depth
      use fill/stroke="currentColor" for their main purple shapes; this rule
      supplies the color from the active theme's --accent variable. */
-  .section-type-label svg { color: var(--accent); }
+  .section-type-label svg { color: var(--accent-text); }
   /* DEPRECATED (editorial rollout): centered --accent heading. Shadowed by
      .reader-editorial rules (34px, left-aligned, --ink, tighter tracking). */
   .section-heading {
@@ -3238,7 +3260,7 @@
     font-weight: 900;
     line-height: var(--lh-tight);
     margin-bottom: 14px;
-    color: var(--accent);
+    color: var(--accent-text);
     text-align: center;
   }
   /* DEPRECATED (editorial rollout): 16px weight 400 body. Shadowed by
@@ -3308,7 +3330,7 @@
     font-size: var(--fs-eyebrow);
     font-weight: 800;
     letter-spacing: 0.06em;
-    color: var(--accent);
+    color: var(--accent-text);
     text-transform: uppercase;
     font-family: 'Nunito', sans-serif;
   }
@@ -3356,11 +3378,11 @@
     min-height: 54px;
   }
   .quiz-option:hover:not(:disabled) {
-    border-color: var(--accent);
+    border-color: var(--accent-text);
     background: var(--surface-2);
   }
   .quiz-option.selected {
-    border-color: var(--accent);
+    border-color: var(--accent-text);
     background: var(--surface-2);
   }
   .quiz-option:disabled { cursor: default; pointer-events: none; }
@@ -3531,7 +3553,7 @@
   .share-modal-copied {
     display: none;
     font-size: 13px;
-    color: var(--accent);
+    color: var(--accent-text);
     margin-top: 8px;
     font-family: 'Nunito', sans-serif;
     font-weight: 700;
@@ -3577,7 +3599,7 @@
 
   .quiz-summary-score {
     font-size: 52px; font-weight: 900; font-family: 'Nunito', sans-serif;
-    color: var(--accent); margin-bottom: 4px;
+    color: var(--accent-text); margin-bottom: 4px;
   }
   .quiz-summary--perfect .quiz-summary-score {
     text-shadow: 0 0 24px var(--accent-glow), 0 0 48px var(--accent-glow);
@@ -3604,8 +3626,8 @@
     font-size: 15px; font-weight: 600; padding: 12px 20px;
     border-radius: 14px; display: inline-block; margin-top: 4px; line-height: 1.4;
   }
-  .quiz-summary--perfect .quiz-summary-msg { background: var(--surface-2); color: var(--accent); }
-  .quiz-summary--good .quiz-summary-msg { background: var(--surface-2); color: var(--accent); }
+  .quiz-summary--perfect .quiz-summary-msg { background: var(--surface-2); color: var(--accent-text); }
+  .quiz-summary--good .quiz-summary-msg { background: var(--surface-2); color: var(--accent-text); }
   .quiz-summary--review .quiz-summary-msg { color: var(--text-2); font-weight: 400; }
 
   /* Tier 3: review lesson — outlined pill button (mirrors .btn-reader-back) */
@@ -3617,7 +3639,7 @@
     background: none;
     border: 1.5px solid rgba(var(--accent-rgb), 0.4);
     border-radius: 999px;
-    color: var(--accent);
+    color: var(--accent-text);
     font-size: 14px; font-weight: 700;
     font-family: inherit;
     cursor: pointer;
@@ -3676,7 +3698,7 @@
   }
   .reflection-q::before {
     content: '✦';
-    color: var(--accent);
+    color: var(--accent-text);
     font-size: 12px;
     margin-top: 4px;
     flex-shrink: 0;
@@ -3712,7 +3734,7 @@
   }
   .nav-btn.secondary {
     background: transparent;
-    color: var(--accent);
+    color: var(--accent-text);
     border: 2px solid var(--accent);
     border-bottom: 4px solid var(--accent-dark);
   }
@@ -3818,8 +3840,8 @@
   }
   /* Theme-aware metric icon color (resolves to purple in philosophy, blue in economics, amber in psychology).
      Works for #ic-pantheon (uses currentColor); decorative icons with hardcoded fills are unaffected. */
-  #chapter-complete-overlay .metric-item .metric-icon { color: var(--accent); }
-  #chapter-complete-overlay .metric-item .metric-icon svg { color: var(--accent); }
+  #chapter-complete-overlay .metric-item .metric-icon { color: var(--accent-text); }
+  #chapter-complete-overlay .metric-item .metric-icon svg { color: var(--accent-text); }
   .modal-box {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -3895,7 +3917,7 @@
     font-family: 'Nunito', sans-serif;
     font-size: 12px;
     font-weight: 800;
-    color: var(--accent);
+    color: var(--accent-text);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 8px;
@@ -4264,7 +4286,7 @@
     font-family: 'Nunito', sans-serif;
     font-size: 13px;
     font-weight: 800;
-    color: var(--accent);
+    color: var(--accent-text);
     letter-spacing: 0.12em;
     text-transform: uppercase;
     opacity: 0.85;
@@ -4598,25 +4620,28 @@
   }
   .auth-logo-wrap { text-align: center; direction: ltr; width: 100%; }
   /* Wordmark + tagline: solid white across ALL three subjects for a
-     consistent hero. Text-shadow lifts the edges on any accent so
-     white doesn't smear into the fill. On psychology's flat #F97316
-     surface the raw contrast is only 2.78:1 (formally BELOW AA-large
-     3:1) — knowingly accepted; the shadow restores practical
-     legibility without a heavy drop-shadow look. Philosophy 5.37:1
-     and economics 5.17:1 still pass AA on their own; the same shadow
-     just gives them a subtle edge lift for consistency. */
+     consistent hero. Hardcoded #FFFFFF (not var(--on-accent)) because
+     psychology overrides --on-accent to dark ink #2E0A03 for its
+     accent-filled buttons, but the hero brand text on the bright-
+     orange auth bg stays white. Text-shadow lifts the edges so white
+     doesn't smear into the fill. On psychology's flat #E8853A the raw
+     contrast is only 2.68:1 (formally BELOW AA-large 3:1) — knowingly
+     accepted; the shadow restores practical legibility without a
+     heavy drop-shadow look. Philosophy 5.37:1 and economics 5.17:1
+     still pass AA on their own; the same shadow just gives them a
+     subtle edge lift for consistency. */
   .auth-logo-text {
     font-family: 'Nunito', sans-serif;
     font-size: 38px;
     font-weight: 900;
-    color: var(--on-accent);
+    color: #FFFFFF;
     letter-spacing: -1px;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   }
   .auth-tagline {
     font-family: 'Nunito', sans-serif;
     font-size: 15px;
-    color: var(--on-accent);
+    color: #FFFFFF;
     margin-top: 4px;
     letter-spacing: 0.5px;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
@@ -4654,7 +4679,7 @@
   }
   .auth-mode-btn.active {
     background: var(--surface);
-    color: var(--accent);
+    color: var(--accent-text);
     box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.15);
   }
   .auth-input {
@@ -4671,7 +4696,7 @@
     box-sizing: border-box;
     direction: ltr;
   }
-  .auth-input:focus { border-color: var(--accent); }
+  .auth-input:focus { border-color: var(--accent-text); }
   .auth-btn {
     width: 100%;
     border: none;
@@ -4699,7 +4724,7 @@
     color: var(--text);
     border: 1.5px solid var(--border);
   }
-  .auth-btn-social:hover { background: var(--accent-tint); border-color: var(--accent); }
+  .auth-btn-social:hover { background: var(--accent-tint); border-color: var(--accent-text); }
   .auth-btn-apple {
     background: #000;
     color: var(--on-accent);
@@ -4711,7 +4736,7 @@
   .auth-social-icon {
     font-size: 16px;
     font-weight: 900;
-    color: var(--accent);
+    color: var(--accent-text);
   }
   .auth-divider {
     display: flex;
@@ -4747,7 +4772,7 @@
     text-underline-offset: 3px;
     transition: color 0.18s;
   }
-  .auth-guest-link:hover { color: var(--on-accent); }
+  .auth-guest-link:hover { color: #FFFFFF; }
   .logout-btn {
     background: none;
     border: none;
@@ -4759,7 +4784,7 @@
     line-height: 1;
     transition: color 0.15s;
   }
-  .logout-btn:hover { color: var(--accent); }
+  .logout-btn:hover { color: var(--accent-text); }
   .lang-toggle-btn {
     background: none;
     border: 1.5px solid var(--border);
@@ -4787,7 +4812,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--accent);
+    color: var(--accent-text);
     transition: background 0.2s;
   }
   .settings-btn:hover {
@@ -4843,7 +4868,7 @@
   }
   .settings-appearance-btn.active {
     background: var(--surface);
-    color: var(--accent);
+    color: var(--accent-text);
     box-shadow: 0 1px 4px rgba(var(--accent-rgb), 0.18);
   }
   /* ═══════════════════════════════════════════════════════════
@@ -5598,7 +5623,7 @@
     gap: 12px;
   }
   .endowment-stat-icon {
-    color: var(--accent);
+    color: var(--accent-text);
     flex: 0 0 auto;
   }
   .endowment-stat-text {
@@ -6050,7 +6075,7 @@
   .learning-card-body h3 {
     font-family: 'Assistant', sans-serif;
     font-weight: 700;
-    color: var(--accent);
+    color: var(--accent-text);
     margin-bottom: 1.2rem;
   }
   .learning-card-body p {
@@ -6208,7 +6233,7 @@
   .metric-number {
     font-size: 72px;
     font-weight: 900;
-    color: var(--accent);
+    color: var(--accent-text);
     line-height: 1;
     font-family: 'DM Sans', sans-serif;
     letter-spacing: -0.03em;
@@ -6225,7 +6250,7 @@
   .dc-sparkle {
     font-size: 56px;
     line-height: 1;
-    color: var(--accent);
+    color: var(--accent-text);
     margin-bottom: 8px;
   }
   .dc-flame {
@@ -6242,7 +6267,7 @@
     font-family: 'DM Sans', sans-serif;
     letter-spacing: -0.03em;
   }
-  .dc-xp-value { color: var(--accent); }
+  .dc-xp-value { color: var(--accent-text); }
   .dc-streak-value { color: var(--accent-dark); }
   .dc-xp-label, .dc-streak-label {
     font-size: 13px;
@@ -6272,7 +6297,7 @@
   #chapter-back-home-btn {
     margin-top: 12px;
     background: transparent;
-    color: var(--accent);
+    color: var(--accent-text);
     border: none;
     font-size: 15px;
     font-weight: 600;
@@ -6296,7 +6321,7 @@
     gap: 8px;
     padding: 10px 22px;
     background: rgba(var(--accent-rgb), 0.10);
-    color: var(--accent);
+    color: var(--accent-text);
     border: 1px solid rgba(var(--accent-rgb), 0.25);
     border-radius: 50px;
     font-family: 'DM Sans', sans-serif;
@@ -6456,7 +6481,7 @@
     font-size: 16px;
     font-weight: 800;
     background: transparent;
-    color: var(--accent);
+    color: var(--accent-text);
     border: 1.5px solid var(--accent);
     border-radius: 999px;
     cursor: pointer;
@@ -6553,7 +6578,7 @@
   }
   .flip-card-back-quote {
     font-size: 13px;
-    color: var(--accent);
+    color: var(--accent-text);
     font-style: italic;
     border-top: 1px solid var(--accent-glow);
     padding-top: 12px;
@@ -6627,7 +6652,7 @@
   .cc-a-header {
     font-size: 11px;
     font-weight: 700;
-    color: var(--accent);
+    color: var(--accent-text);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     margin-bottom: 10px;
@@ -6722,7 +6747,7 @@
   .cc-a .progress .pct {
     font-size: 9px;
     font-weight: 800;
-    color: var(--accent);
+    color: var(--accent-text);
   }
   .cc-a-cta {
     position: relative;
@@ -6841,7 +6866,7 @@
     transition: border-color 300ms ease, box-shadow 300ms ease;
   }
   .level-card.expanded {
-    border-color: var(--accent);
+    border-color: var(--accent-text);
     box-shadow: 0 0 0 1px var(--accent-glow), var(--shadow);
   }
   .level-card.locked-week { opacity: 0.5; cursor: default; }
@@ -6893,7 +6918,7 @@
 
   .level-num {
     width: 38px; height: 38px; border-radius: 10px;
-    background: var(--surface-2); color: var(--accent);
+    background: var(--surface-2); color: var(--accent-text);
     display: flex; align-items: center; justify-content: center;
     font-weight: 900; font-size: 15px; flex-shrink: 0;
     font-family: 'Nunito', sans-serif;
@@ -6904,7 +6929,7 @@
   .level-card-text { flex: 1; min-width: 0; }
   .level-eyebrow {
     font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
-    color: var(--accent); text-transform: uppercase;
+    color: var(--accent-text); text-transform: uppercase;
     font-family: 'Nunito', sans-serif; margin-bottom: 2px;
   }
   .level-title { font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.3; }
@@ -6977,7 +7002,7 @@
     width: 15px; height: 15px;
     background: var(--surface); border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 9px; color: var(--accent); border: 1.5px solid var(--accent);
+    font-size: 9px; color: var(--accent-text); border: 1.5px solid var(--accent);
     animation: sparkle-pulse 1.8s ease-in-out infinite; line-height: 1;
   }
   @keyframes sparkle-pulse {
@@ -7019,7 +7044,7 @@
   .practice-card-text { flex: 1; min-width: 0; }
   .practice-card-eyebrow {
     font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
-    color: var(--accent); text-transform: uppercase;
+    color: var(--accent-text); text-transform: uppercase;
     font-family: 'Nunito', sans-serif; margin-bottom: 2px;
   }
   .practice-card-title {
@@ -7056,9 +7081,9 @@
   }
   .subj-screen { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
   .subj-header { padding: calc(52px + var(--safe-top)) 24px 20px; text-align: center; }
-  .subj-logo { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: var(--accent); margin-bottom: 20px; }
+  .subj-logo { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: var(--accent-text); margin-bottom: 20px; }
   .subj-title { font-size: 24px; font-weight: 700; color: var(--ink); margin-bottom: 8px; letter-spacing: -0.02em; }
-  .subj-subtitle { font-size: 14px; font-weight: 400; color: var(--accent); opacity: 0.65; line-height: 1.5; }
+  .subj-subtitle { font-size: 14px; font-weight: 400; color: var(--accent-text); opacity: 0.65; line-height: 1.5; }
   .subj-carousel-wrap { flex: 1; display: flex; align-items: center; min-height: 0; overflow: visible; }
   .subj-carousel {
     display: flex; overflow-x: scroll; scroll-snap-type: x mandatory;
@@ -7090,8 +7115,8 @@
     font-size: 20px; line-height: 1;
     filter: drop-shadow(0 1px 3px rgba(0,0,0,0.25));
   }
-  .subj-card-tagline { font-size: 13px; font-weight: 400; color: var(--accent); opacity: 0.7; line-height: 1.4; }
-  .subj-coming-soon { font-size: 12px; font-weight: 600; color: var(--accent); margin-top: 2px; letter-spacing: 0.01em; }
+  .subj-card-tagline { font-size: 13px; font-weight: 400; color: var(--accent-text); opacity: 0.7; line-height: 1.4; }
+  .subj-coming-soon { font-size: 12px; font-weight: 600; color: var(--accent-text); margin-top: 2px; letter-spacing: 0.01em; }
   .subj-dots { display: flex; justify-content: center; gap: 8px; padding: 12px 0 8px; }
   .subj-dot { width: 8px; height: 8px; border-radius: 4px; background: var(--border); transition: width 0.3s cubic-bezier(0.4,0,0.2,1), background 0.3s; }
   .subj-dot.subj-dot-active { width: 24px; background: var(--accent); }
@@ -7122,7 +7147,7 @@
     align-items: center; justify-content: center;
     background: none; border: none; cursor: pointer;
     padding: 10px; border-radius: 8px; box-sizing: border-box;
-    color: var(--accent);
+    color: var(--accent-text);
     -webkit-tap-highlight-color: transparent;
   }
   #drawer-toggle-btn:active { transform: scale(0.92); }
@@ -8119,7 +8144,7 @@
         <!-- Language Selector -->
         <div class="pf-lang-section">
           <button class="pf-lang-btn" id="pf-lang-btn" onclick="toggleLangDropdown()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-text)"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             <span id="pf-lang-label">שפה</span>
             <span id="pf-lang-current" style="margin-inline-end:auto;font-size:12px"></span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
@@ -8142,7 +8167,7 @@
              / System (default). Handled by setAppearance() in JS. -->
         <div class="pf-lang-section">
           <button class="pf-lang-btn" id="pf-appearance-btn" onclick="toggleAppearanceDropdown()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-text)"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             <span id="pf-appearance-label">מראה</span>
             <span id="pf-appearance-current" style="margin-inline-end:auto;font-size:12px"></span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
@@ -8166,7 +8191,7 @@
         <!-- Daily Reminder -->
         <div class="pf-reminder-section">
           <div class="pf-reminder-row">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-text);flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
             <span id="pf-reminder-label" style="flex:1">תזכורת יומית</span>
             <input type="time" id="pf-reminder-time" value="20:00" oninput="_onReminderTimeChange(event)">
             <label class="pf-reminder-toggle">
@@ -8208,14 +8233,14 @@
     <div class="reader-header-unit">
     <div class="reader-topbar">
       <button class="reader-back-btn" onclick="goBack()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform: scaleX(-1); color: var(--accent);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform: scaleX(-1); color: var(--accent-text);">
           <polyline points="9 18 15 12 9 6"/>
         </svg>
       </button>
       <button class="thinker-intro-reopen-btn" id="thinker-intro-reopen-btn" onclick="_openThinkerIntro()" aria-label="Open thinker intro"></button>
       <div class="topbar-logo-wrap"><div class="topbar-logo">Corpus</div></div>
       <button class="reader-settings-btn" onclick="toggleSettings()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-text)">
           <circle cx="12" cy="12" r="3"/>
           <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
         </svg>
