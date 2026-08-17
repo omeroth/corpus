@@ -255,36 +255,42 @@
 
   html.theme-psychology,
   #screen-subject.theme-psychology {
+    /* Orange family (not amber). Amber goes brown when deepened
+       (#F59E0B → #D97706 → #B45309) because its hue shifts toward
+       red-brown; the Tailwind orange scale stays chromatically
+       orange as it deepens. --accent is orange-700 rather than
+       orange-600 to hold ~5:1 AA text contrast on white, matching
+       philosophy (5.0:1) and economics (5.0:1). */
     --surface: #FFFFFF;
-    --accent: #B45309;
-    --accent-dark: #7C2D12;
-    --accent-muted: #B87540;
-    --accent-glow: rgba(180, 83, 9, 0.3);
-    --accent-rgb: 180, 83, 9;
-    --accent-tint: #FEF3C7;
-    --accent-tint-strong: #FCD34D;
-    --accent-soft-border: #D97706;
-    --accent-bar-bg: #FEF3C7;
-    --purple: #B45309;
-    --purple-light: #D97706;
-    --lilac: #F59E0B;
-    --ink: #5C3306;
-    --text: #7A4A06;
-    --text-2: #B08C5A;
-    --text-muted: #DFC9A0;
-    --bg: #FFF8F0;
-    --surface-2: #FCE9C8;
-    --border: #F2D9A8;
-    --border-deep: #D9B97A;
-    --shadow: 0 4px 20px rgba(92, 51, 6, 0.1);
-    --shadow-lg: 0 8px 40px rgba(92, 51, 6, 0.15);
-    --card-front-bg: rgba(180, 83, 9, 0.06);
+    --accent: #C2410C;
+    --accent-dark: #9A3412;
+    --accent-muted: #E38848;
+    --accent-glow: rgba(194, 65, 12, 0.3);
+    --accent-rgb: 194, 65, 12;
+    --accent-tint: #FFF7ED;
+    --accent-tint-strong: #FED7AA;
+    --accent-soft-border: #FDBA74;
+    --accent-bar-bg: #FFF7ED;
+    --purple: #C2410C;
+    --purple-light: #EA580C;
+    --lilac: #FDBA74;
+    --ink: #5C1F0C;
+    --text: #7C2D12;
+    --text-2: #A85832;
+    --text-muted: #E5CDAA;
+    --bg: #FFF7ED;
+    --surface-2: #FFEDD5;
+    --border: #FED7AA;
+    --border-deep: #FDBA74;
+    --shadow: 0 4px 20px rgba(92, 32, 6, 0.1);
+    --shadow-lg: 0 8px 40px rgba(92, 32, 6, 0.15);
+    --card-front-bg: rgba(194, 65, 12, 0.06);
     --card-back-bg-start: #FFF7ED;
     --card-back-bg-end: #FED7AA;
     --card-back-text: #7C2D12;
-    /* Mystery-mark gold gradient tinted 15% toward --accent (amber nuance). */
-    --mystery-top: #FDDD90;
-    --mystery-bottom: #CE7F07;
+    /* Mystery-mark gold gradient tinted 15% toward --accent. */
+    --mystery-top: #FFD09B;
+    --mystery-bottom: #C2410C;
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
@@ -383,8 +389,10 @@
 
   html.dark.theme-psychology,
   html.dark #screen-subject.theme-psychology {
-    /* Teal-tinted dark neutrals per Phase 2 brief (contrasts with amber accent
-       for a distinctive third-subject look — deep sea vs sunlit gold). */
+    /* Teal-tinted dark neutrals contrast with an orange accent
+       for a distinctive third-subject look, deep sea vs sunlit
+       orange. --accent lifted to orange-400 (was orange-600) for
+       ~7:1 contrast on dark surface. */
     --bg: #0F1A1F;
     --surface: #172A32;
     --surface-2: #1F3A45;
@@ -395,28 +403,26 @@
     --text-2: #B9CBD3;
     --text-muted: #86A0AA;
     --text-caption: var(--text-2);
-    --accent: #D97706;
-    --accent-dark: #B45309;
-    /* Phase 3a AA bump: was #B08A45 (3.9:1 vs --surface — failed AA) to
-       #C69553 (4.7:1 — passes AA for body text). */
-    --accent-muted: #C69553;
-    --accent-glow: rgba(217, 119, 6, 0.35);
-    --accent-rgb: 217, 119, 6;
-    --accent-tint: #2E2818;
-    --accent-tint-strong: #4A3E1F;
-    --accent-soft-border: #7A5F28;
+    --accent: #FB923C;
+    --accent-dark: #EA580C;
+    --accent-muted: #F97316;
+    --accent-glow: rgba(251, 146, 60, 0.35);
+    --accent-rgb: 251, 146, 60;
+    --accent-tint: #3A1F0F;
+    --accent-tint-strong: #5A2E15;
+    --accent-soft-border: #A15931;
     --accent-bar-bg: #172A32;
-    --purple: #D97706;
-    --purple-light: #F59E0B;
-    --lilac: #FBC56C;
+    --purple: #FB923C;
+    --purple-light: #FDBA74;
+    --lilac: #FED7AA;
     --shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
     --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.6);
-    --card-front-bg: rgba(217, 119, 6, 0.10);
+    --card-front-bg: rgba(251, 146, 60, 0.10);
     --card-back-bg-start: #172A32;
     --card-back-bg-end: #1F3A45;
     --card-back-text: #E8F1F5;
-    --mystery-top: #F5D890;
-    --mystery-bottom: #C88028;
+    --mystery-top: #FDBA74;
+    --mystery-bottom: #EA580C;
   }
 
   /* Status tokens (subject-agnostic) — lifted foregrounds + dark-tinted
