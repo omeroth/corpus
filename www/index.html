@@ -157,18 +157,24 @@
     --accent-surface-lo: var(--accent-dark);
     --accent-surface-hi: var(--accent-hi);
     --on-accent-surface: var(--on-accent);
-    /* Scoped border color for the two "portrait frame" surfaces —
-       the Pantheon .thinker-card.unlocked and the home
-       .thinker-carousel-card.unlocked img. Defaults to var(--accent)
-       so philosophy and economics render identically to a bare
-       var(--accent) border. Psychology overrides to a darker warm
-       orange (#AD510B) because a bright #E8853A frame around a
-       portrait dominates the image; the darker frame reads as a
-       warm ring rather than a highlight. Only these two selectors
-       reference this token — the accompanying box-shadow glow
-       stays on --accent-glow (bright), so the halo is orange even
-       when the frame is deeper. */
-    --thinker-frame: var(--accent);
+    /* Portrait-frame tokens — one fixed value per subject. The frame
+       around a thinker's portrait always speaks the THINKER's own
+       subject, never the active theme: Socrates keeps his purple
+       ring even when the user is browsing psychology. Each rendered
+       portrait carries data-subject=philosophy|economics|psychology
+       (see cardHtml, populateCarousel, _renderThinkerIntro); a
+       scoped attribute selector below sets --thinker-frame from
+       these three tokens.
+
+       Values are ~35–40% darker than each subject's --accent so the
+       ring recedes behind the portrait rather than competing with
+       the face. --thinker-frame's :root default is only a fallback
+       for cards that render without data-subject; the three real
+       surfaces always set it. */
+    --frame-philosophy: #5D3AA8;
+    --frame-economics:  #1B4BB5;
+    --frame-psychology: #AD510B;
+    --thinker-frame: var(--frame-philosophy);
     --red: #EF5350;
     --red-light: #FFEBEE;
     /* Semantic status tokens — added for dark-mode phase 1. Values match the
@@ -260,11 +266,6 @@
        which is fragile on older WKWebView versions. */
     --mystery-top: #EBD2AE;
     --mystery-bottom: #BC7425;
-    /* Portrait-frame override — matches psychology's approach of a
-       darker sibling of --accent so the ring recedes behind the
-       portrait rather than competing with it. See --thinker-frame
-       at :root for the shared rationale. */
-    --thinker-frame: #5D3AA8;
   }
 
   html.theme-economics,
@@ -299,8 +300,6 @@
     /* Mystery-mark gold gradient tinted 15% toward --accent (blue nuance). */
     --mystery-top: #DED5B2;
     --mystery-bottom: #B07628;
-    /* Portrait-frame override — see --thinker-frame at :root. */
-    --thinker-frame: #1B4BB5;
   }
 
   html.theme-psychology,
@@ -369,13 +368,6 @@
        --on-accent-surface all intentionally NOT overridden. They
        inherit the :root defaults so every text-on-accent surface
        renders white — one system, no darker sibling. */
-    /* Portrait-frame exception: only the Pantheon card border and
-       the carousel portrait border use this darker warm orange so
-       the frame doesn't overpower the portrait. Passes AA-large
-       3.83:1 on white (frame is just a border, not text). Halo/
-       glow stays on --accent-glow (bright) — see comment on
-       --thinker-frame at :root. */
-    --thinker-frame: #AD510B;
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
@@ -434,9 +426,6 @@
     /* Mystery gradient — same warm gold spec, slightly lifted for dark ground. */
     --mystery-top: #F0DAB0;
     --mystery-bottom: #C88025;
-    /* Same as light philosophy — frame is a fixed identity ring
-       regardless of theme mode. */
-    --thinker-frame: #5D3AA8;
   }
 
   html.dark.theme-economics,
@@ -473,9 +462,6 @@
     --card-back-text: #E8EDF7;
     --mystery-top: #E0D2B2;
     --mystery-bottom: #B57828;
-    /* Same as light economics — frame is a fixed identity ring
-       regardless of theme mode. */
-    --thinker-frame: #1B4BB5;
   }
 
   html.dark.theme-psychology,
@@ -517,13 +503,6 @@
     /* No overrides for --on-accent, --accent-text, --accent-badge-*,
        --on-accent-surface. Match light-psy policy: one orange family,
        white text on every accent-fill surface. */
-    /* Same portrait-frame darker orange as light psy — the frame is
-       a fixed warm ring regardless of theme mode. #AD510B on the
-       dark teal surface gives 2.83:1 fill contrast (visible but
-       intentionally subtle), and the accompanying box-shadow glow
-       (bright --accent-glow) makes it read as an outlined warm halo
-       rather than a hard border. */
-    --thinker-frame: #AD510B;
   }
 
   /* Status tokens (subject-agnostic) — lifted foregrounds + dark-tinted
@@ -1757,10 +1736,27 @@
     margin-top: 2px;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
   }
-  /* Unlocked Pantheon cards get a subject-coloured ring via
-     --thinker-frame: purple for philosophy, blue for economics,
-     brown (#AD510B override) for psychology.
+  /* Per-thinker frame colour. --thinker-frame is set on each
+     rendered portrait surface (.thinker-carousel-card,
+     .pantheon-card, .thinker-intro-portrait) from the thinker's
+     own subject via data-subject, not from the active theme. This
+     way Socrates keeps his purple ring while the user is browsing
+     psychology, and Freud stays brown in economics. Scoped to the
+     three portrait surface classes so setting data-subject
+     elsewhere (e.g. .subj-card, .levelup-overlay) doesn't
+     accidentally propagate a --thinker-frame override to unrelated
+     descendants. */
+  .thinker-carousel-card[data-subject="philosophy"],
+  .pantheon-card[data-subject="philosophy"],
+  .thinker-intro-portrait[data-subject="philosophy"] { --thinker-frame: var(--frame-philosophy); }
+  .thinker-carousel-card[data-subject="economics"],
+  .pantheon-card[data-subject="economics"],
+  .thinker-intro-portrait[data-subject="economics"]  { --thinker-frame: var(--frame-economics); }
+  .thinker-carousel-card[data-subject="psychology"],
+  .pantheon-card[data-subject="psychology"],
+  .thinker-intro-portrait[data-subject="psychology"] { --thinker-frame: var(--frame-psychology); }
 
+  /* Unlocked Pantheon card ring.
      Uses ::after (not border, outline, or box-shadow inset) because
      the pantheon-card DOM has an absolutely-positioned front face
      (.pantheon-card-front) with a full-bleed <img> inside; a
@@ -13919,6 +13915,7 @@ function populateCarousel() {
     const unlocked = state.unlockedThinkers.includes(t.id);
     const card = document.createElement('div');
     card.className = 'thinker-carousel-card ' + (unlocked ? 'unlocked' : 'locked');
+    card.dataset.subject = t.subject || 'philosophy';
     card.innerHTML = `
       <img src="${t.image}" alt="${t.name}" loading="lazy">
       <div class="thinker-carousel-name">${t.name}</div>
@@ -14102,6 +14099,7 @@ function _renderThinkerIntro(day, opts) {
     eyebrow.textContent = isEn ? 'Now featuring' : 'נדבר עכשיו על';
     if (mystery) mystery.style.display = 'none';
     portrait.style.display = '';
+    portrait.dataset.subject = t.subject || 'philosophy';
     portrait.innerHTML = t.image ? `<img src="${t.image}" alt="${t.name}">` : '';
     nameEl.style.display = '';
     nameEl.textContent = t.name;
@@ -18424,9 +18422,10 @@ function renderPantheon() {
   function cardHtml(t) {
     const isUnlocked = validUnlocked.includes(t.id);
     const displayName = t.name;
+    const subject = t.subject || 'philosophy';
     if (isUnlocked) {
       return `
-        <div class="pantheon-card" onclick="flipThinkerCard(this, '${t.id}')">
+        <div class="pantheon-card" data-subject="${subject}" onclick="flipThinkerCard(this, '${t.id}')">
           <div class="pantheon-card-inner">
             <div class="pantheon-card-front">
               <img src="${t.image}" alt="${t.name}" onerror="this.style.display='none'">
@@ -18445,7 +18444,7 @@ function renderPantheon() {
         </div>`;
     }
     return `
-      <div class="pantheon-card locked" onclick="openThinkerModal('${t.id}', {locked: true})">
+      <div class="pantheon-card locked" data-subject="${subject}" onclick="openThinkerModal('${t.id}', {locked: true})">
         <div class="pantheon-card-inner">
           <div class="pantheon-card-front">
             <img src="${t.image}" alt="${t.name}" onerror="this.style.display='none'">
