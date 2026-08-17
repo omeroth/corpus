@@ -316,10 +316,14 @@ const TEXT_ONLY_FIELDS = new Set([
   // ~500-line thinker records have short one-line quotes without
   // <strong>, so the check catches accidental additions.
   // (Adding 'quote' to this set would also flag every source section.)
-  // Quiz fields (see audit note above)
+  // Quiz question is textContent (reader line 14171) — the only
+  // genuine leak. options/optionsEn and explanation/explanationEn
+  // interpolate into innerHTML templates (line 14179 for options,
+  // 14457/14484 for explanation), so tags in them render as intended
+  // emphasis; stripping them would delete visible bold from live
+  // content. If a future refactor swaps those sinks to textContent,
+  // add the fields here and strip in one pass.
   'question', 'questionEn',
-  'options', 'optionsEn',
-  'explanation', 'explanationEn',
   // Attribution / metadata
   'attr', 'attrEn', 'emoji', 'image', 'id',
 ]);
