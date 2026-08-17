@@ -139,18 +139,16 @@
     --accent-rim:       color-mix(in srgb, var(--accent) 50%, white);
     --accent-highlight: #D4BFFA;
     --accent-highlight: color-mix(in srgb, var(--accent) 30%, white);
-    /* Split accent into two roles:
-         --accent      = fills (button backgrounds, borders, gradient
-                          stops, badge backgrounds, progress-bar fills,
-                          icon shape fills)
-         --accent-text = the accent drawn AS TEXT on a light surface
-                          (color property in eyebrows, links, bold
-                          spans, headings). Needs AA text contrast.
-       Philosophy and economics keep the same value in both — their
-       accents pass AA as text on white. Psychology overrides --accent
-       to the bright decorative #E8853A and --accent-text to the
-       darker AA-safe #AD510B (see html.theme-psychology below). */
+    /* --accent-text and --accent-badge-bg/-fg exist as tokens so a
+       future subject can decouple text/badge treatment from the base
+       accent if AA contrast needs it. All three currently default to
+       the base --accent + --on-accent pair — philosophy, economics,
+       and psychology all inherit these defaults (psychology is
+       explicitly accepting a 2.68:1 white-on-#E8853A recorded
+       exception, see html.theme-psychology below). */
     --accent-text: var(--accent);
+    --accent-badge-bg: var(--accent);
+    --accent-badge-fg: var(--on-accent);
     /* Large decorative surfaces (auth screen bg, level-up modal box) —
        identical to --accent for philosophy and economics; psychology
        overrides for a hue-family gradient stack. --on-accent-surface
@@ -295,19 +293,23 @@
        orange-600 to hold ~5:1 AA text contrast on white, matching
        philosophy (5.0:1) and economics (5.0:1). */
     --surface: #FFFFFF;
-    /* --accent is the bright warm orange used for ALL fills (buttons,
-       progress bars, borders, badges, gradient stops, icon shape
-       fills). Same value as --accent-surface below because the whole
-       screen now speaks one orange, not two. White text on this fill
-       is 2.68:1 (below AA-large 3:1) — every text-on-fill path uses
-       --on-accent = #2E0A03 dark ink (6.76:1 ✓).
+    /* Psychology speaks a single orange (#E8853A) end to end. Every
+       fill and every text usage of the accent resolves to this hex:
+       buttons, badges, borders, ribbon, lesson-path circles, chapter
+       numbers, bottom-nav icons, the Corpus wordmark on white, bold
+       spans, eyebrows, all of it. The earlier darker sibling #AD510B
+       was retired because it read as brown against the bright fill.
 
-       --accent-text is the AA-safe sibling used when the accent is
-       drawn AS TEXT on a light surface (color property, not
-       background). Hue-matched to --accent but darker so it passes
-       AA text on white (5.30:1). */
+       RECORDED CONTRAST EXCEPTION: white text on #E8853A is 2.68:1
+       and #E8853A as text on white is also 2.68:1 — both are formally
+       below WCAG AA and below AA-large 3:1. Accepted deliberately as
+       a brand decision: the alternative (darker orange for legibility)
+       reads brown, defeating the palette. A future audit should NOT
+       "fix" this by introducing a darker sibling. If contrast becomes
+       a hard requirement for a specific surface, either add a
+       shadow (as the auth wordmark does) or scope one specific
+       element, not the whole system. */
     --accent: #E8853A;
-    --accent-text: #AD510B;
     --accent-dark: #863F09;
     --accent-muted: #E38848;
     --accent-glow: rgba(232, 133, 58, 0.3);
@@ -336,21 +338,18 @@
     /* Mystery-mark gold gradient tinted 15% toward --accent. */
     --mystery-top: #FFD09B;
     --mystery-bottom: #E8853A;
-    /* Dark ink for text on --accent fills: buttons, badges, ribbons.
-       Passes AA text (6.76:1 on #E8853A). auth-screen wordmark +
-       tagline explicitly override back to white — see the scoped
-       rule below the .auth-tagline block. */
-    --on-accent: #2E0A03;
-    /* Large decorative surfaces (auth-screen bg, level-up modal
-       gradient) — --accent-surface stack matches --accent for the
-       flat surface; -lo and -hi step lightness for the modal
-       gradient depth. Same-hue derivation so the modal reads as one
-       orange family. Dark ink on gradient stops:
-       6.76 / 5.39 / 9.92 (all pass AA-text 4.5:1). */
+    /* Large decorative surfaces (level-up modal gradient) — stops
+       track the same hue with lightness stepped. Kept as a distinct
+       stack from --accent because the modal wants visible depth,
+       whereas the auth screen and every other surface just use the
+       flat --accent above. */
     --accent-surface:    #E8853A;  /* hsl(26, 79%, 57%) — same as --accent */
     --accent-surface-lo: #DB6E1A;  /* hsl(26, 79%, 48%) */
     --accent-surface-hi: #F1B384;  /* hsl(26, 79%, 73%) */
-    --on-accent-surface: #2E0A03;
+    /* --on-accent, --accent-text, --accent-badge-bg/-fg and
+       --on-accent-surface all intentionally NOT overridden. They
+       inherit the :root defaults so every text-on-accent surface
+       renders white — one system, no darker sibling. */
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
@@ -483,13 +482,9 @@
     --card-back-text: #E8F1F5;
     --mystery-top: #FDBA74;
     --mystery-bottom: #EA580C;
-    /* --accent-surface / -lo / -hi inherit from :root defaults (var(--accent)
-       etc.) which resolve to the dark-mode bright orange family here.
-       --on-accent-surface overridden to dark ink so text on the bright-orange
-       level-up modal gradient passes AA (7.6 / 4.92 / 9.3 on the three stops).
-       Auth screen in dark uses --bg → --surface-2 (dark neutrals), so its
-       text is scoped separately below and stays light. */
-    --on-accent-surface: #2E0A03;
+    /* No overrides for --on-accent, --accent-text, --accent-badge-*,
+       --on-accent-surface. Match light-psy policy: one orange family,
+       white text on every accent-fill surface. */
   }
 
   /* Status tokens (subject-agnostic) — lifted foregrounds + dark-tinted
@@ -1834,7 +1829,7 @@
   }
   .thinker-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.25); }
   .thinker-card.locked { opacity: 0.4; filter: grayscale(1); }
-  .thinker-card.unlocked { border-color: var(--accent-text); border-bottom-color: var(--accent-dark); }
+  .thinker-card.unlocked { border-color: var(--accent); border-bottom-color: var(--accent-dark); }
   .thinker-card.new-unlock {
     animation: thinkerPop 0.6s cubic-bezier(0.34,1.56,0.64,1);
   }
@@ -1912,7 +1907,7 @@
   .week-row:active { transform: scale(0.98); }
   .week-row-bonus { background: #FFFBF0; border-color: #F59E0B; }
   .week-row-locked { opacity: 0.78; cursor: default; background: #F8F5FF; border: 1.5px dashed #C9BFE0; }
-  .week-row-num { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; flex-shrink: 0; box-shadow: 0 2px 0 var(--ink); }
+  .week-row-num { width: 36px; height: 36px; border-radius: 50%; background: var(--accent-badge-bg); color: var(--accent-badge-fg); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; flex-shrink: 0; box-shadow: 0 2px 0 var(--ink); }
   .week-row-num-bonus { background: #F59E0B; box-shadow: 0 2px 0 #C7892C; color: var(--ink); }
   .week-row-num-locked { background: #C9BFE0; box-shadow: 0 2px 0 #8D7DAE; }
   .next-lesson-btn {
@@ -1933,8 +1928,8 @@
   }
   .next-lesson-btn:active { transform: scale(0.97); }
   .week-row-completed { opacity: 0.75; cursor: default; }
-  .week-row-active { border-color: var(--accent-text); box-shadow: 0 2px 12px var(--accent-glow); }
-  .week-row-num-completed { background: var(--accent); box-shadow: 0 2px 0 var(--ink); color: var(--on-accent); }
+  .week-row-active { border-color: var(--accent); box-shadow: 0 2px 12px var(--accent-glow); }
+  .week-row-num-completed { background: var(--accent-badge-bg); box-shadow: 0 2px 0 var(--ink); color: var(--accent-badge-fg); }
   .week-row-meta { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
   .week-row-ttl { font-weight: 700; font-size: 14px; color: var(--ink); }
   .week-row-sub { font-size: 11px; color: #8D7DAE; }
@@ -2074,7 +2069,7 @@
     transition: all 0.3s ease;
   }
   .thinker-carousel-card.unlocked img {
-    border-color: var(--accent-text);
+    border-color: var(--accent);
     box-shadow: 0 4px 20px var(--accent-glow);
   }
   /* .bonus-carousel-item, .bonus-circle{-wrapper,} and the four
@@ -2622,7 +2617,7 @@
   .day-item:hover:not(.locked) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.1); }
   .day-item.locked { opacity: 0.4; cursor: default; }
   .day-item.completed {
-    border-color: var(--accent-text);
+    border-color: var(--accent);
     border-bottom-color: var(--accent-dark);
     background: rgba(var(--accent-rgb), 0.06);
   }
@@ -2638,8 +2633,8 @@
     flex-shrink: 0;
   }
   .day-item.completed .day-circle {
-    background: var(--accent);
-    color: var(--on-accent);
+    background: var(--accent-badge-bg);
+    color: var(--accent-badge-fg);
     border: 2px solid var(--ink);
     font-size: 14px;
     font-weight: 900;
@@ -3041,7 +3036,7 @@
   .reader-editorial #reader-content .quiz-option:hover:not(:disabled),
   .reader-editorial #reader-content .quiz-option.selected {
     background: var(--accent-tint);
-    border-color: var(--accent-text);
+    border-color: var(--accent);
   }
   .reader-editorial #reader-content .opt-letter {
     width: 28px;
@@ -3378,11 +3373,11 @@
     min-height: 54px;
   }
   .quiz-option:hover:not(:disabled) {
-    border-color: var(--accent-text);
+    border-color: var(--accent);
     background: var(--surface-2);
   }
   .quiz-option.selected {
-    border-color: var(--accent-text);
+    border-color: var(--accent);
     background: var(--surface-2);
   }
   .quiz-option:disabled { cursor: default; pointer-events: none; }
@@ -3942,40 +3937,29 @@
   }
 
   /* ── Level up modal ── */
-  /* Gradient stops reference --accent-surface tokens so a subject can pick
-     its own hue for large decorative fills without changing the AA-tuned
-     --accent. Philosophy and economics inherit the accent family via
-     :root defaults (unchanged look); psychology overrides all three stops
-     to a bright-orange family (#F97316 → #EA580C → #FDBA74) that reads as
-     true orange in both light and dark mode. */
+  /* Gradient stops reference --accent-surface tokens. Philosophy and
+     economics inherit --accent-surface = var(--accent) etc; psychology
+     overrides to a bright-orange stack (#E8853A → #DB6E1A → #F1B384)
+     that reads as one orange family in both modes. All text on the
+     modal uses --on-accent-surface which now defaults to
+     var(--on-accent) = white across every subject (no psy override).
+     Recorded contrast exception: white on the middle stop #DB6E1A is
+     3.90:1 (passes AA-large 3:1 for the title, fails AA-text 4.5 for
+     the subtitle — matches the pre-existing philosophy/economics
+     subtitle contrast, no worse). */
   .levelup-modal .modal-box {
     background: linear-gradient(135deg, var(--accent-surface) 0%, var(--accent-surface-lo) 50%, var(--accent-surface-hi) 100%);
     border-color: rgba(var(--accent-rgb), 0.4);
   }
   .levelup-modal .modal-title { color: var(--on-accent-surface); }
   .levelup-modal .modal-subtitle { color: rgba(255,255,255,0.7); }
-  /* Psychology (light AND dark): subtitle uses solid dark ink instead of
-     the default rgba(white,0.7) — needed because psy's --accent-surface
-     is bright orange in both modes, and white-on-bright-orange drops to
-     3.4:1 (light) / 2.2:1 (dark). Solid --on-accent-surface is dark
-     #2E0A03 in psy → passes AA-text 4.5:1 across every gradient stop. */
-  html.theme-psychology .levelup-modal .modal-subtitle {
-    color: var(--on-accent-surface);
-  }
-  /* "מדהים!" button on the level-up modal: default is a translucent
-     white pill (works on purple/blue). Psychology needs the dark-ink
-     pairing to match the surface. Class selector avoids !important
-     over the inline style — the inline style was replaced with this
-     class in the markup below. */
+  /* "מדהים!" button on the level-up modal: translucent white pill,
+     white text — same treatment across every subject now that
+     psychology also uses white text on its accent fills. */
   .levelup-modal-btn {
     background: rgba(255, 255, 255, 0.15);
     color: #FFFFFF;
     border-color: rgba(255, 255, 255, 0.3);
-  }
-  html.theme-psychology .levelup-modal-btn {
-    background: rgba(46, 10, 3, 0.14);
-    color: var(--on-accent-surface);
-    border-color: rgba(46, 10, 3, 0.35);
   }
   .level-particle {
     position: absolute;
@@ -4620,13 +4604,13 @@
   }
   .auth-logo-wrap { text-align: center; direction: ltr; width: 100%; }
   /* Wordmark + tagline: solid white across ALL three subjects for a
-     consistent hero. Hardcoded #FFFFFF (not var(--on-accent)) because
-     psychology overrides --on-accent to dark ink #2E0A03 for its
-     accent-filled buttons, but the hero brand text on the bright-
-     orange auth bg stays white. Text-shadow lifts the edges so white
-     doesn't smear into the fill. On psychology's flat #E8853A the raw
-     contrast is only 2.68:1 (formally BELOW AA-large 3:1) — knowingly
-     accepted; the shadow restores practical legibility without a
+     consistent hero. Hardcoded #FFFFFF (rather than var(--on-accent))
+     so if a future subject swaps its --on-accent to a non-white ink,
+     the hero brand still renders as expected. Text-shadow lifts the
+     edges so white doesn't smear into the fill. On psychology's flat
+     #E8853A the raw contrast is only 2.68:1 (formally BELOW AA-large
+     3:1) — knowingly accepted as part of the "single orange" palette
+     decision; the shadow restores practical legibility without a
      heavy drop-shadow look. Philosophy 5.37:1 and economics 5.17:1
      still pass AA on their own; the same shadow just gives them a
      subtle edge lift for consistency. */
@@ -4696,7 +4680,7 @@
     box-sizing: border-box;
     direction: ltr;
   }
-  .auth-input:focus { border-color: var(--accent-text); }
+  .auth-input:focus { border-color: var(--accent); }
   .auth-btn {
     width: 100%;
     border: none;
@@ -4724,7 +4708,7 @@
     color: var(--text);
     border: 1.5px solid var(--border);
   }
-  .auth-btn-social:hover { background: var(--accent-tint); border-color: var(--accent-text); }
+  .auth-btn-social:hover { background: var(--accent-tint); border-color: var(--accent); }
   .auth-btn-apple {
     background: #000;
     color: var(--on-accent);
@@ -6866,14 +6850,14 @@
     transition: border-color 300ms ease, box-shadow 300ms ease;
   }
   .level-card.expanded {
-    border-color: var(--accent-text);
+    border-color: var(--accent);
     box-shadow: 0 0 0 1px var(--accent-glow), var(--shadow);
   }
   .level-card.locked-week { opacity: 0.5; cursor: default; }
   /* Completed-chapter diagonal ribbon (top-right LTR; mirrored to top-left for RTL) */
   .level-card.completed .level-num {
-    background: var(--accent);
-    color: var(--on-accent);
+    background: var(--accent-badge-bg);
+    color: var(--accent-badge-fg);
   }
   .level-card.completed::before {
     content: 'COMPLETED';
@@ -6881,8 +6865,12 @@
     top: 18px;
     right: -38px;
     width: 140px;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-    color: var(--on-accent);
+    /* Gradient uses the --accent-surface stack so both stops stay in
+       the subject's decorative-hue family. Previously used --accent
+       → --accent-dark which for psychology went bright orange → very
+       dark (#863F09) and read as brown at the dark end. */
+    background: linear-gradient(135deg, var(--accent-surface) 0%, var(--accent-surface-lo) 100%);
+    color: var(--on-accent-surface);
     font-size: 9px;
     font-weight: 700;
     letter-spacing: 1px;
@@ -6924,7 +6912,7 @@
     font-family: 'Nunito', sans-serif;
     transition: background 300ms ease, color 300ms ease;
   }
-  .level-card.expanded .level-num { background: var(--accent); color: var(--on-accent); }
+  .level-card.expanded .level-num { background: var(--accent-badge-bg); color: var(--accent-badge-fg); }
 
   .level-card-text { flex: 1; min-width: 0; }
   .level-eyebrow {
@@ -6978,12 +6966,12 @@
                 border-color 300ms ease, transform 0.12s ease;
   }
   .lesson-circle.completed {
-    background: var(--accent);
+    background: var(--accent-badge-bg);
     box-shadow: 0 2px 8px var(--accent-glow);
-    color: var(--on-accent);
+    color: var(--accent-badge-fg);
   }
   .lesson-circle.next-up {
-    background: var(--accent); color: var(--on-accent);
+    background: var(--accent-badge-bg); color: var(--accent-badge-fg);
     animation: lesson-ring-pulse 2.2s ease-in-out infinite;
   }
   .lesson-circle.locked-circle {
