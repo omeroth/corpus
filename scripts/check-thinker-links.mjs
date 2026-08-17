@@ -37,7 +37,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const INDEX_HTML = path.join(REPO_ROOT, 'index.html');
+const CONTENT_DIR = path.join(REPO_ROOT, 'content');
 const IMAGES_DIR = path.join(REPO_ROOT, 'images');
 
 // Which per-subject data constants to look for and their canonical subject
@@ -53,20 +53,13 @@ const THINKER_CONST_NAMES = ['THINKERS', 'THINKERS_EN'];
 
 // ─── Extraction ──────────────────────────────────────────────────────────
 
-const html = fs.readFileSync(INDEX_HTML, 'utf8');
-
-// Pull every inline <script> so const declarations spread across multiple
-// blocks would still all be searchable. index.html today only has two
-// inline blocks but this is safe against future refactors.
-function extractInlineScripts(source) {
-  const re = /<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g;
-  const out = [];
-  let m;
-  while ((m = re.exec(source))) out.push(m[1]);
-  return out.join('\n;\n');
-}
-
-const scriptSrc = extractInlineScripts(html);
+// The data blobs live in content/*.js as of the 2026-08-17 split. Concat
+// every .js under that dir so subject+thinker declarations across files
+// are all searchable by the same balanced-brace scan below.
+const scriptSrc = fs.readdirSync(CONTENT_DIR)
+  .filter(f => f.endsWith('.js'))
+  .map(f => fs.readFileSync(path.join(CONTENT_DIR, f), 'utf8'))
+  .join('\n;\n');
 
 // Extract a single top-level `const NAME = <literal>;` where <literal> is
 // either an object or array literal. Uses a balanced-brace scan that
