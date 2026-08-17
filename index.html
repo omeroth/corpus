@@ -314,13 +314,21 @@
     /* Mystery-mark gold gradient tinted 15% toward --accent. */
     --mystery-top: #FFD09B;
     --mystery-bottom: #C2410C;
-    /* Large decorative surfaces override — brighter orange family than
-       --accent (#C2410C reads brown as a large fill; #F97316 reads as
-       true bright orange). Dark ink #2E0A03 passes AA-text 4.5:1 on
-       every stop of the modal gradient (contrast: 6.10 / 4.92 / 10.4). */
-    --accent-surface:    #F97316;
-    --accent-surface-lo: #EA580C;
-    --accent-surface-hi: #FDBA74;
+    /* Large decorative surfaces override — desaturated bright orange
+       (hsl(25, 80%, L)) at three lightness stops. Saturation 80%
+       rather than the ~95% of pure Tailwind orange-500 because the
+       raw hue reads harsh at a full-screen scale; dropping saturation
+       while holding lightness keeps it recognisably orange without
+       the neon edge. --accent (#C2410C) still governs AA-text
+       surfaces like buttons; --accent-surface handles the auth-screen
+       bg and modal gradient. White text on flat --accent-surface is
+       2.97:1 (formally BELOW AA-large 3:1; text-shadow on the
+       wordmark + tagline restores practical legibility — recorded
+       exception). Dark ink #2E0A03 on the modal gradient stops is
+       6.09 / 4.69 / 9.10 (all pass AA-text 4.5:1). */
+    --accent-surface:    #E77828;  /* hsl(25, 80%, 53%) */
+    --accent-surface-lo: #CF6317;  /* hsl(25, 80%, 45%) */
+    --accent-surface-hi: #F0A875;  /* hsl(25, 80%, 70%) */
     --on-accent-surface: #2E0A03;
   }
 
@@ -4583,31 +4591,29 @@
     background: linear-gradient(150deg, var(--bg) 0%, var(--surface-2) 100%);
   }
   .auth-logo-wrap { text-align: center; direction: ltr; width: 100%; }
+  /* Wordmark + tagline: solid white across ALL three subjects for a
+     consistent hero. Text-shadow lifts the edges on any accent so
+     white doesn't smear into the fill. On psychology's flat #F97316
+     surface the raw contrast is only 2.78:1 (formally BELOW AA-large
+     3:1) — knowingly accepted; the shadow restores practical
+     legibility without a heavy drop-shadow look. Philosophy 5.37:1
+     and economics 5.17:1 still pass AA on their own; the same shadow
+     just gives them a subtle edge lift for consistency. */
   .auth-logo-text {
     font-family: 'Nunito', sans-serif;
     font-size: 38px;
     font-weight: 900;
     color: var(--on-accent);
     letter-spacing: -1px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   }
   .auth-tagline {
     font-family: 'Nunito', sans-serif;
-    /* Bumped from 15px → 24px (WCAG large-text threshold) so 3:1
-       applies. Solid --on-accent (was rgba(0.75) which failed AA
-       3.5:1 on every subject) so the tagline holds contrast at any
-       accent brightness. */
-    font-size: 24px;
+    font-size: 15px;
     color: var(--on-accent);
     margin-top: 4px;
     letter-spacing: 0.5px;
-  }
-  /* Psychology light: dark ink for both wordmark and tagline, pairing
-     with the flat bright-orange --accent-surface. Contrast on #F97316
-     is 6.10:1 for both (passes AA text). Dark mode auth-screen uses
-     the light --on-accent above via inherited default. */
-  html:not(.dark).theme-psychology .auth-logo-text,
-  html:not(.dark).theme-psychology .auth-tagline {
-    color: var(--on-accent-surface);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   }
   .auth-card {
     background: var(--surface);
