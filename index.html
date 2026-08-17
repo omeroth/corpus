@@ -285,16 +285,23 @@
        orange-600 to hold ~5:1 AA text contrast on white, matching
        philosophy (5.0:1) and economics (5.0:1). */
     --surface: #FFFFFF;
-    --accent: #C2410C;
-    --accent-dark: #9A3412;
+    /* --accent shifted from #C2410C (hsl 17.5, 88%, 40%) to #AD510B
+       (hsl 26, 88%, 36%) so it sits in the same hue family as
+       --accent-surface below. Kept saturation, dropped lightness 4pts
+       to hold AA text (5.30:1 white contrast vs previous 5.18:1).
+       Ripple: buttons, progress bars, level dots etc across the whole
+       app now warmer/more-orange — visible only in the auth screen
+       where --accent and --accent-surface co-locate. */
+    --accent: #AD510B;
+    --accent-dark: #863F09;
     --accent-muted: #E38848;
-    --accent-glow: rgba(194, 65, 12, 0.3);
-    --accent-rgb: 194, 65, 12;
+    --accent-glow: rgba(173, 81, 11, 0.3);
+    --accent-rgb: 173, 81, 11;
     --accent-tint: #FFF7ED;
     --accent-tint-strong: #FED7AA;
     --accent-soft-border: #FDBA74;
     --accent-bar-bg: #FFF7ED;
-    --purple: #C2410C;
+    --purple: #AD510B;
     --purple-light: #EA580C;
     --lilac: #FDBA74;
     --ink: #5C1F0C;
@@ -307,28 +314,27 @@
     --border-deep: #FDBA74;
     --shadow: 0 4px 20px rgba(92, 32, 6, 0.1);
     --shadow-lg: 0 8px 40px rgba(92, 32, 6, 0.15);
-    --card-front-bg: rgba(194, 65, 12, 0.06);
+    --card-front-bg: rgba(173, 81, 11, 0.06);
     --card-back-bg-start: #FFF7ED;
     --card-back-bg-end: #FED7AA;
     --card-back-text: #7C2D12;
     /* Mystery-mark gold gradient tinted 15% toward --accent. */
     --mystery-top: #FFD09B;
-    --mystery-bottom: #C2410C;
-    /* Large decorative surfaces override — desaturated bright orange
-       (hsl(25, 80%, L)) at three lightness stops. Saturation 80%
-       rather than the ~95% of pure Tailwind orange-500 because the
-       raw hue reads harsh at a full-screen scale; dropping saturation
-       while holding lightness keeps it recognisably orange without
-       the neon edge. --accent (#C2410C) still governs AA-text
-       surfaces like buttons; --accent-surface handles the auth-screen
+    --mystery-bottom: #AD510B;
+    /* Large decorative surfaces override — warm orange at hsl(26, 79%, L)
+       chosen against philosophy purple and economics blue as a trio
+       (not judged in isolation). Saturation 79% keeps it recognisably
+       orange without the neon edge of raw Tailwind orange-500.
+       --accent (#AD510B) is at the same hue so surface and accent read
+       as one orange family. --accent-surface handles the auth-screen
        bg and modal gradient. White text on flat --accent-surface is
-       2.97:1 (formally BELOW AA-large 3:1; text-shadow on the
-       wordmark + tagline restores practical legibility — recorded
-       exception). Dark ink #2E0A03 on the modal gradient stops is
-       6.09 / 4.69 / 9.10 (all pass AA-text 4.5:1). */
-    --accent-surface:    #E77828;  /* hsl(25, 80%, 53%) */
-    --accent-surface-lo: #CF6317;  /* hsl(25, 80%, 45%) */
-    --accent-surface-hi: #F0A875;  /* hsl(25, 80%, 70%) */
+       2.68:1 (formally BELOW AA-large 3:1; text-shadow on the wordmark
+       + tagline restores practical legibility — recorded exception).
+       Dark ink #2E0A03 on the modal gradient stops is 6.76 / 5.39 /
+       9.92 (all pass AA-text 4.5:1). */
+    --accent-surface:    #E8853A;  /* hsl(26, 79%, 57%) */
+    --accent-surface-lo: #DB6E1A;  /* hsl(26, 79%, 48%) */
+    --accent-surface-hi: #F1B384;  /* hsl(26, 79%, 73%) */
     --on-accent-surface: #2E0A03;
   }
 
