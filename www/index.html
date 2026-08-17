@@ -157,6 +157,18 @@
     --accent-surface-lo: var(--accent-dark);
     --accent-surface-hi: var(--accent-hi);
     --on-accent-surface: var(--on-accent);
+    /* Scoped border color for the two "portrait frame" surfaces —
+       the Pantheon .thinker-card.unlocked and the home
+       .thinker-carousel-card.unlocked img. Defaults to var(--accent)
+       so philosophy and economics render identically to a bare
+       var(--accent) border. Psychology overrides to a darker warm
+       orange (#AD510B) because a bright #E8853A frame around a
+       portrait dominates the image; the darker frame reads as a
+       warm ring rather than a highlight. Only these two selectors
+       reference this token — the accompanying box-shadow glow
+       stays on --accent-glow (bright), so the halo is orange even
+       when the frame is deeper. */
+    --thinker-frame: var(--accent);
     --red: #EF5350;
     --red-light: #FFEBEE;
     /* Semantic status tokens — added for dark-mode phase 1. Values match the
@@ -350,6 +362,13 @@
        --on-accent-surface all intentionally NOT overridden. They
        inherit the :root defaults so every text-on-accent surface
        renders white — one system, no darker sibling. */
+    /* Portrait-frame exception: only the Pantheon card border and
+       the carousel portrait border use this darker warm orange so
+       the frame doesn't overpower the portrait. Passes AA-large
+       3.83:1 on white (frame is just a border, not text). Halo/
+       glow stays on --accent-glow (bright) — see comment on
+       --thinker-frame at :root. */
+    --thinker-frame: #AD510B;
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
@@ -485,6 +504,13 @@
     /* No overrides for --on-accent, --accent-text, --accent-badge-*,
        --on-accent-surface. Match light-psy policy: one orange family,
        white text on every accent-fill surface. */
+    /* Same portrait-frame darker orange as light psy — the frame is
+       a fixed warm ring regardless of theme mode. #AD510B on the
+       dark teal surface gives 2.83:1 fill contrast (visible but
+       intentionally subtle), and the accompanying box-shadow glow
+       (bright --accent-glow) makes it read as an outlined warm halo
+       rather than a hard border. */
+    --thinker-frame: #AD510B;
   }
 
   /* Status tokens (subject-agnostic) — lifted foregrounds + dark-tinted
@@ -1718,6 +1744,24 @@
     margin-top: 2px;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
   }
+  /* Psychology-scoped: unlocked Pantheon cards get the same warm ring
+     as the home carousel via --thinker-frame. Not applied to
+     philosophy or economics because their Pantheon cards have never
+     had a border, and adding one would be a visual regression for
+     the "unchanged" subjects. Inset box-shadow instead of outline so
+     it follows border-radius on every browser (outline-radius has an
+     iOS<16.4 gap) and doesn't push the portrait image inward.
+     The :hover rule below re-declares the inset frame and appends
+     the lift shadow so the frame stays visible during hover;
+     without the re-declare, the base .pantheon-card:hover
+     box-shadow would overwrite it. */
+  html.theme-psychology .pantheon-card:not(.locked) {
+    box-shadow: inset 0 0 0 2px var(--thinker-frame);
+  }
+  html.theme-psychology .pantheon-card:not(.locked):hover {
+    box-shadow: inset 0 0 0 2px var(--thinker-frame),
+                0 12px 28px rgba(var(--accent-rgb), 0.25);
+  }
   .pantheon-card.locked {
     /* Locked cards now open a teaser modal via openThinkerModal(id, {locked: true}). */
     cursor: pointer;
@@ -1829,7 +1873,7 @@
   }
   .thinker-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.25); }
   .thinker-card.locked { opacity: 0.4; filter: grayscale(1); }
-  .thinker-card.unlocked { border-color: var(--accent); border-bottom-color: var(--accent-dark); }
+  .thinker-card.unlocked { border-color: var(--thinker-frame); border-bottom-color: var(--accent-dark); }
   .thinker-card.new-unlock {
     animation: thinkerPop 0.6s cubic-bezier(0.34,1.56,0.64,1);
   }
@@ -2069,7 +2113,7 @@
     transition: all 0.3s ease;
   }
   .thinker-carousel-card.unlocked img {
-    border-color: var(--accent);
+    border-color: var(--thinker-frame);
     box-shadow: 0 4px 20px var(--accent-glow);
   }
   /* .bonus-carousel-item, .bonus-circle{-wrapper,} and the four
