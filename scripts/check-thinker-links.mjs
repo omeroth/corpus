@@ -262,6 +262,113 @@ for (const id of enIndex.keys()) {
   }
 }
 
+// ─── Tag-balance check ──────────────────────────────────────────────────
+//
+// Walks every string field in every loaded const and flags:
+//   - HTML tags leaking into text-only fields (title/attr/name/etc.,
+//     rendered as textContent by the app, so raw <strong> shows as
+//     literal text). Root cause pattern: a bold-emphasis pass that
+//     wrapped a phrase happened to hit its first occurrence inside a
+//     title, not the body copy.
+//   - Malformed / unbalanced <strong> in HTML-rendering fields
+//     (content/quote/explanation/etc.): mismatched opens/closes,
+//     stray closes, missing spaces, half-tags. These render as
+//     visible garbage even if the browser tries to fix them.
+//
+// The rule: title/attr-style fields must have zero tags. HTML fields
+// must have equal open/close counts AND proper nesting (stack empties
+// at end).
+
+const TEXT_ONLY_FIELDS = new Set([
+  'title', 'titleEn', 'thinker', 'thinkerEn', 'name', 'era',
+  'attr', 'attrEn', 'subtitle', 'subtitleEn', 'emoji', 'image', 'id',
+]);
+
+// Paragraph tags are used as a separator convention (`</p><p>` between
+// paragraphs; the outer <p> is added by the renderer). They aren't real
+// markup we need to balance, so we exclude them from the stack check.
+// Same for <br> (self-closing separator).
+const IGNORE_TAGS = new Set(['p', 'br']);
+
+const TAG_RE = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)([^>]*)>/g;
+// Anything that looks like a half-tag (no closing `>` before EOL/next `<`)
+const HALF_TAG_RE = /<\/?[a-zA-Z][a-zA-Z0-9]*(?![^<]*>)/g;
+
+const tagIssues = [];
+
+function checkString(str, path, isTextOnly) {
+  if (!str) return;
+  if (isTextOnly) {
+    // Any HTML-like tag in a text-only field is a leak.
+    const anyTag = str.match(TAG_RE);
+    if (anyTag) {
+      tagIssues.push({
+        issue: 'html-in-text-field', where: path,
+        detail: anyTag.join(' ') + ' — full: ' + str.slice(0, 60),
+      });
+    }
+    return;
+  }
+  // HTML-rendering field: check balance + nesting for formatting tags
+  // (<strong>, <em>, etc). Paragraph separator tags are ignored per
+  // the IGNORE_TAGS set.
+  const stack = [];
+  let m;
+  TAG_RE.lastIndex = 0;
+  while ((m = TAG_RE.exec(str))) {
+    const [, slash, name, extra] = m;
+    const lc = name.toLowerCase();
+    if (IGNORE_TAGS.has(lc)) continue;
+    if (extra && extra.trim()) {
+      tagIssues.push({ issue: 'unexpected-attr', where: path, detail: m[0] });
+    }
+    if (slash) {
+      const top = stack.pop();
+      if (top !== lc) {
+        tagIssues.push({
+          issue: 'unmatched-close', where: path,
+          detail: `</${name}> at ${m.index}; stack top was ${top || '(empty)'}`,
+        });
+      }
+    } else {
+      stack.push(lc);
+    }
+  }
+  if (stack.length) {
+    tagIssues.push({ issue: 'unclosed', where: path, detail: 'left open: ' + stack.join(', ') });
+  }
+  const half = str.match(HALF_TAG_RE);
+  if (half) tagIssues.push({ issue: 'half-tag', where: path, detail: half.join(' ') });
+}
+
+function walk(obj, path) {
+  if (obj == null) return;
+  if (typeof obj === 'string') return;
+  if (Array.isArray(obj)) {
+    obj.forEach((v, i) => {
+      if (typeof v === 'string') checkString(v, `${path}[${i}]`, /* array elements assumed HTML-safe */ false);
+      else walk(v, `${path}[${i}]`);
+    });
+    return;
+  }
+  if (typeof obj !== 'object') return;
+  for (const k of Object.keys(obj)) {
+    const v = obj[k];
+    const nextPath = `${path}.${k}`;
+    if (typeof v === 'string') {
+      checkString(v, nextPath, TEXT_ONLY_FIELDS.has(k));
+    } else {
+      walk(v, nextPath);
+    }
+  }
+}
+
+for (const { subject, constName, data } of subjects) {
+  walk(data, `${constName} (${subject})`);
+}
+walk(thinkers.THINKERS, 'THINKERS');
+walk(thinkers.THINKERS_EN, 'THINKERS_EN');
+
 // ─── Report ──────────────────────────────────────────────────────────────
 
 function reportTable(title, rows) {
@@ -277,9 +384,10 @@ console.log(`THINKERS: ${heIndex.size}, THINKERS_EN: ${enIndex.size}, referenced
 reportTable('Days with no thinkerId (informational — reviewer eyeballs)', noThinkerRows);
 reportTable('Forward-check errors (unknown id / subject mismatch / missing portrait)', forwardIssues);
 reportTable('Cross-array consistency errors (HE ↔ EN)', arrayIssues);
+reportTable('Tag-balance errors (HTML in text-only fields / malformed / unclosed <strong>)', tagIssues);
 reportTable('Unreferenced thinkers (never appear in any dialogue — warning only)', unreferenced);
 
-const hardErrorCount = forwardIssues.length + arrayIssues.length;
+const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length;
 if (hardErrorCount > 0) {
   console.error(`\nFAIL: ${hardErrorCount} hard error(s). Also: ${noThinkerRows.length} no-thinker day(s), ${unreferenced.length} unreferenced thinker(s).`);
   process.exit(1);
