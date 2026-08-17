@@ -260,6 +260,11 @@
        which is fragile on older WKWebView versions. */
     --mystery-top: #EBD2AE;
     --mystery-bottom: #BC7425;
+    /* Portrait-frame override — matches psychology's approach of a
+       darker sibling of --accent so the ring recedes behind the
+       portrait rather than competing with it. See --thinker-frame
+       at :root for the shared rationale. */
+    --thinker-frame: #5D3AA8;
   }
 
   html.theme-economics,
@@ -294,6 +299,8 @@
     /* Mystery-mark gold gradient tinted 15% toward --accent (blue nuance). */
     --mystery-top: #DED5B2;
     --mystery-bottom: #B07628;
+    /* Portrait-frame override — see --thinker-frame at :root. */
+    --thinker-frame: #1B4BB5;
   }
 
   html.theme-psychology,
@@ -427,6 +434,9 @@
     /* Mystery gradient — same warm gold spec, slightly lifted for dark ground. */
     --mystery-top: #F0DAB0;
     --mystery-bottom: #C88025;
+    /* Same as light philosophy — frame is a fixed identity ring
+       regardless of theme mode. */
+    --thinker-frame: #5D3AA8;
   }
 
   html.dark.theme-economics,
@@ -463,6 +473,9 @@
     --card-back-text: #E8EDF7;
     --mystery-top: #E0D2B2;
     --mystery-bottom: #B57828;
+    /* Same as light economics — frame is a fixed identity ring
+       regardless of theme mode. */
+    --thinker-frame: #1B4BB5;
   }
 
   html.dark.theme-psychology,
@@ -1744,11 +1757,9 @@
     margin-top: 2px;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
   }
-  /* Psychology-scoped: unlocked Pantheon cards get the same warm ring
-     as the home carousel via --thinker-frame. Not applied to
-     philosophy or economics — their Pantheon cards have never had a
-     frame, and adding one in the "unchanged" subjects would be a
-     visual regression.
+  /* Unlocked Pantheon cards get a subject-coloured ring via
+     --thinker-frame: purple for philosophy, blue for economics,
+     brown (#AD510B override) for psychology.
 
      Uses ::after (not border, outline, or box-shadow inset) because
      the pantheon-card DOM has an absolutely-positioned front face
@@ -1761,7 +1772,7 @@
      frame stays put during the flip transform on .pantheon-card-inner
      — the ring is a persistent identity element, not part of the
      flipping face. */
-  html.theme-psychology .pantheon-card:not(.locked)::after {
+  .pantheon-card:not(.locked)::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -4398,7 +4409,7 @@
     height: 160px;
     border-radius: 50%;
     overflow: hidden;
-    border: 4px solid var(--accent);
+    border: 4px solid var(--thinker-frame);
     box-shadow: 0 8px 32px var(--accent-glow), 0 0 24px rgba(255, 217, 130, 0.35);
     animation: p3-pop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both,
                p3-float 3s ease-in-out 1s infinite;
