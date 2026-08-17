@@ -279,9 +279,49 @@ for (const id of enIndex.keys()) {
 // must have equal open/close counts AND proper nesting (stack empties
 // at end).
 
+// Fields whose values are rendered as textContent (or interpolated into
+// a JS text attribute like `alt=`) in at least one code path in
+// index.html. Any HTML in these fields renders as literal text and
+// leaks. Audit performed by grepping for each field's render sinks:
+//
+//   Quiz fields — reader uses qText.textContent = q.question (line
+//     14171), so question / questionEn leak tags. options and
+//     explanation currently interpolate into an innerHTML template in
+//     the main reader (so tags *would* render), but they're kept
+//     plain-text here for two reasons: (a) reduces XSS surface on
+//     unescaped ${text} interpolation; (b) makes future renderer
+//     refactors safe by default.
+//
+//   Thinker fields — thinker-modal uses textContent for name/era/bio/
+//     quote (lines 13931, 13941, 14648, 16187, 16201). Cards mix
+//     innerHTML and textContent, so plain-text is the safe policy.
+//
+//   Content-day / week / section titles — mixed innerHTML/textContent
+//     sinks (share cards, lesson list, section headings). Plain-text.
+//
+//   image / id / emoji / attr — never HTML.
 const TEXT_ONLY_FIELDS = new Set([
-  'title', 'titleEn', 'thinker', 'thinkerEn', 'name', 'era',
-  'attr', 'attrEn', 'subtitle', 'subtitleEn', 'emoji', 'image', 'id',
+  // section-base / day / week text fields
+  'title', 'titleEn', 'subtitle', 'subtitleEn',
+  // thinker refs on days
+  'thinker', 'thinkerEn',
+  // thinker records
+  'name', 'era', 'bio',
+  // per-record quote (not source-section quote — that's HTML-safe)
+  // Handled via array/parent context: only THINKERS/THINKERS_EN
+  // records' `quote` field is text-only. Source sections use `quote`
+  // as HTML-capable. Since walker checks by field name only, we
+  // exclude 'quote' here and let the section-source path stay HTML.
+  // Thinker cards render t.quote via textContent (16201) but our
+  // ~500-line thinker records have short one-line quotes without
+  // <strong>, so the check catches accidental additions.
+  // (Adding 'quote' to this set would also flag every source section.)
+  // Quiz fields (see audit note above)
+  'question', 'questionEn',
+  'options', 'optionsEn',
+  'explanation', 'explanationEn',
+  // Attribution / metadata
+  'attr', 'attrEn', 'emoji', 'image', 'id',
 ]);
 
 // Paragraph tags are used as a separator convention (`</p><p>` between
@@ -341,25 +381,22 @@ function checkString(str, path, isTextOnly) {
   if (half) tagIssues.push({ issue: 'half-tag', where: path, detail: half.join(' ') });
 }
 
-function walk(obj, path) {
-  if (obj == null) return;
-  if (typeof obj === 'string') return;
+function walk(obj, path, textCtx) {
+  // textCtx propagates through arrays so options[] elements inherit
+  // their parent field's text-only status (options/optionsEn are text
+  // arrays; without propagation, the string elements would default to
+  // HTML-safe and miss tag leaks).
+  if (obj == null || typeof obj === 'string') {
+    if (typeof obj === 'string') checkString(obj, path, !!textCtx);
+    return;
+  }
   if (Array.isArray(obj)) {
-    obj.forEach((v, i) => {
-      if (typeof v === 'string') checkString(v, `${path}[${i}]`, /* array elements assumed HTML-safe */ false);
-      else walk(v, `${path}[${i}]`);
-    });
+    obj.forEach((v, i) => walk(v, `${path}[${i}]`, textCtx));
     return;
   }
   if (typeof obj !== 'object') return;
   for (const k of Object.keys(obj)) {
-    const v = obj[k];
-    const nextPath = `${path}.${k}`;
-    if (typeof v === 'string') {
-      checkString(v, nextPath, TEXT_ONLY_FIELDS.has(k));
-    } else {
-      walk(v, nextPath);
-    }
+    walk(obj[k], `${path}.${k}`, TEXT_ONLY_FIELDS.has(k));
   }
 }
 
