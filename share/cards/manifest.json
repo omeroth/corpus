@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-01T06:35:13.435Z",
+  "generatedAt": "2026-08-18T05:41:06.377Z",
   "items": [
     {
       "weekId": 1,
@@ -227,7 +227,7 @@
       "subject": "philosophy",
       "lang": "he",
       "thinkerId": "kant",
-      "title": "קאנט: האם מותר ל-AI לשקר?",
+      "title": "האם מותר ל-AI לשקר",
       "card": "share/cards/he/phil-bonus1-1.png",
       "page": "d/phil-bonus1-1-he.html"
     },
@@ -237,7 +237,7 @@
       "subject": "philosophy",
       "lang": "en",
       "thinkerId": "kant",
-      "title": "Kant: Is AI Allowed to Lie?",
+      "title": "Can AI Be Allowed to Lie",
       "card": "share/cards/en/phil-bonus1-1.png",
       "page": "d/phil-bonus1-1-en.html"
     },
@@ -247,7 +247,7 @@
       "subject": "philosophy",
       "lang": "he",
       "thinkerId": "mill",
-      "title": "מיל: במי המכונה צריכה לפגוע?",
+      "title": "הרכב שמחליט מי חי",
       "card": "share/cards/he/phil-bonus1-2.png",
       "page": "d/phil-bonus1-2-he.html"
     },
@@ -257,7 +257,7 @@
       "subject": "philosophy",
       "lang": "en",
       "thinkerId": "mill",
-      "title": "Mill: The Autonomous Car and the Greatest Good",
+      "title": "The Car That Chooses",
       "card": "share/cards/en/phil-bonus1-2.png",
       "page": "d/phil-bonus1-2-en.html"
     },
@@ -267,7 +267,7 @@
       "subject": "philosophy",
       "lang": "he",
       "thinkerId": "aristotle",
-      "title": "אריסטו: כשה-AI טועה - מי אחראי?",
+      "title": "מי אשם כשהמכונה טועה",
       "card": "share/cards/he/phil-bonus1-3.png",
       "page": "d/phil-bonus1-3-he.html"
     },
@@ -277,7 +277,7 @@
       "subject": "philosophy",
       "lang": "en",
       "thinkerId": "aristotle",
-      "title": "Aristotle: AI and Responsibility",
+      "title": "Who's to Blame When AI Errs",
       "card": "share/cards/en/phil-bonus1-3.png",
       "page": "d/phil-bonus1-3-en.html"
     },
@@ -287,7 +287,7 @@
       "subject": "philosophy",
       "lang": "he",
       "thinkerId": "nietzsche",
-      "title": "ניטשה: מי מחליט מה הערכים של ה-AI?",
+      "title": "מי קובע את הערכים",
       "card": "share/cards/he/phil-bonus1-4.png",
       "page": "d/phil-bonus1-4-he.html"
     },
@@ -297,7 +297,7 @@
       "subject": "philosophy",
       "lang": "en",
       "thinkerId": "nietzsche",
-      "title": "Nietzsche: Who Decides the Values of AI?",
+      "title": "Who Sets the Values",
       "card": "share/cards/en/phil-bonus1-4.png",
       "page": "d/phil-bonus1-4-en.html"
     },
@@ -307,7 +307,7 @@
       "subject": "philosophy",
       "lang": "he",
       "thinkerId": "socrates",
-      "title": "סוקרטס: האם AI יכול לעזור לנו לחשוב?",
+      "title": "מורה או מיילד",
       "card": "share/cards/he/phil-bonus1-5.png",
       "page": "d/phil-bonus1-5-he.html"
     },
@@ -317,7 +317,7 @@
       "subject": "philosophy",
       "lang": "en",
       "thinkerId": "socrates",
-      "title": "Socrates: AI as a Teacher or a Midwife?",
+      "title": "Teacher or Midwife",
       "card": "share/cards/en/phil-bonus1-5.png",
       "page": "d/phil-bonus1-5-en.html"
     },
@@ -747,7 +747,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "smith",
-      "title": "סמית: למה הדלק התייקר עוד לפני שנגמר?",
+      "title": "הפחד שמזיז מחירים",
       "card": "share/cards/he/econ-bonusEcon1-1.png",
       "page": "d/econ-bonusEcon1-1-he.html"
     },
@@ -757,7 +757,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "smith",
-      "title": "Smith: Why did fuel get more expensive before it ran out?",
+      "title": "The Fear That Moves Prices",
       "card": "share/cards/en/econ-bonusEcon1-1.png",
       "page": "d/econ-bonusEcon1-1-en.html"
     },
@@ -767,7 +767,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "jevons",
-      "title": "ג'בונס: למה כל הנפט בעולם התייקר, כשרק חלק ממנו אוים?",
+      "title": "כשהשוליים קובעים הכל",
       "card": "share/cards/he/econ-bonusEcon1-2.png",
       "page": "d/econ-bonusEcon1-2-he.html"
     },
@@ -777,7 +777,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "jevons",
-      "title": "Jevons: Why did all the world's oil get more expensive when only part of it was threatened?",
+      "title": "When the Margin Rules",
       "card": "share/cards/en/econ-bonusEcon1-2.png",
       "page": "d/econ-bonusEcon1-2-en.html"
     },
@@ -787,7 +787,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "aquinas",
-      "title": "אקווינס: כשמחיר הדלק מזנק במלחמה, זה הוגן או ניצול?",
+      "title": "מחיר צודק או ניצול",
       "card": "share/cards/he/econ-bonusEcon1-3.png",
       "page": "d/econ-bonusEcon1-3-he.html"
     },
@@ -797,7 +797,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "aquinas",
-      "title": "Aquinas: When fuel prices spike in war, is it just or exploitation?",
+      "title": "Just Price or Exploitation",
       "card": "share/cards/en/econ-bonusEcon1-3.png",
       "page": "d/econ-bonusEcon1-3-en.html"
     },
@@ -807,7 +807,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "ricardo",
-      "title": "ריקרדו: מי התעשר מהמשבר בלי להרים אצבע?",
+      "title": "מי מתעשר מהמשבר",
       "card": "share/cards/he/econ-bonusEcon1-4.png",
       "page": "d/econ-bonusEcon1-4-he.html"
     },
@@ -817,7 +817,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "ricardo",
-      "title": "Ricardo: Who got rich from the crisis without lifting a finger?",
+      "title": "Who Profits From Crisis",
       "card": "share/cards/en/econ-bonusEcon1-4.png",
       "page": "d/econ-bonusEcon1-4-en.html"
     },
@@ -827,7 +827,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "sen",
-      "title": "סן: מי באמת שילם את מחיר המשבר?",
+      "title": "מי באמת שילם",
       "card": "share/cards/he/econ-bonusEcon1-5.png",
       "page": "d/econ-bonusEcon1-5-he.html"
     },
@@ -837,7 +837,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "sen",
-      "title": "Sen: Who really paid the price of the crisis?",
+      "title": "Who Really Paid",
       "card": "share/cards/en/econ-bonusEcon1-5.png",
       "page": "d/econ-bonusEcon1-5-en.html"
     },
