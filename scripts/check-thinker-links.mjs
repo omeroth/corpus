@@ -383,6 +383,19 @@ function checkString(str, path, isTextOnly) {
   }
   const half = str.match(HALF_TAG_RE);
   if (half) tagIssues.push({ issue: 'half-tag', where: path, detail: half.join(' ') });
+  // Literal `*` in any content string. The bold pass converts
+  // markdown `*emphasis*` to <strong>…</strong>; an orphaned `*`
+  // that survives is either a paired-marker that lost its partner
+  // (render as literal on device) or noise. Flag both. `attr` was
+  // the historical exception because economics used `*Book Title*`
+  // italics markers — retired 2026-08-19, so no field is exempt.
+  const strayStar = str.match(/\*/g);
+  if (strayStar) {
+    tagIssues.push({
+      issue: 'stray-asterisk', where: path,
+      detail: `${strayStar.length}× \`*\` in "${str.slice(0, 80)}"…`,
+    });
+  }
 }
 
 function walk(obj, path, textCtx) {
