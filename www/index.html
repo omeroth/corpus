@@ -7166,9 +7166,17 @@
   }
   .subj-screen { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
   .subj-header { padding: calc(52px + var(--safe-top)) 24px 20px; text-align: center; }
-  .subj-logo { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: var(--accent-text); margin-bottom: 20px; }
+  /* Wordmark + subtitle key off var(--accent) directly, not
+     var(--accent-text). --accent-text is defined at :root as
+     var(--accent) — and custom-property indirection resolves at
+     the DECLARING element, so --accent-text bakes in <html>'s
+     theme value once and doesn't re-evaluate when
+     #screen-subject.theme-<X> overrides --accent on scroll settle.
+     Reading --accent directly picks up the closer scope. See
+     previewSubjectTheme() + _initSubjCarousel() for the swap. */
+  .subj-logo { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: var(--accent); margin-bottom: 20px; }
   .subj-title { font-size: 24px; font-weight: 700; color: var(--ink); margin-bottom: 8px; letter-spacing: -0.02em; }
-  .subj-subtitle { font-size: 14px; font-weight: 400; color: var(--accent-text); opacity: 0.65; line-height: 1.5; }
+  .subj-subtitle { font-size: 14px; font-weight: 400; color: var(--accent); opacity: 0.65; line-height: 1.5; }
   .subj-carousel-wrap { flex: 1; display: flex; align-items: center; min-height: 0; overflow: visible; }
   .subj-carousel {
     display: flex; overflow-x: scroll; scroll-snap-type: x mandatory;
