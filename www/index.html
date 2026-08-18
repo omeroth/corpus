@@ -2027,7 +2027,15 @@
   .week-bonus-progress-warm span { background: linear-gradient(90deg, var(--accent), #F59E0B, #FFD982, #F59E0B, var(--accent)); background-size: 300% 100%; animation: p2-flow 2.4s linear infinite; }
   @keyframes p2-flow { 0% { background-position: 0 0; } 100% { background-position: -300% 0; } }
   .week-bonus-step { font-size: 10px; color: #8D7DAE; font-weight: 700; }
+  /* Bonus-unlock celebration backdrop. Two inner stops are the
+     subject-agnostic treasure gold (same language as streak /
+     mystery / week-row-bonus-unlocked); outer stop is the active
+     subject's --ink so philosophy shows purple, economics navy,
+     future subjects follow automatically. Two-declaration cascade
+     matches .level-card.bonus at line 2265 — hex fallback first
+     for pre-16.2 iOS Safari, color-mix second wins by source order. */
   .unlock-overlay-wrap { position: absolute; inset: 0; background: radial-gradient(circle at 50% 42%, rgba(255,217,130,.95) 0%, rgba(245,181,68,.82) 28%, rgba(42,18,102,.92) 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 32px; animation: p3-fade .4s ease-out both; }
+  .unlock-overlay-wrap { background: radial-gradient(circle at 50% 42%, rgba(255,217,130,.95) 0%, rgba(245,181,68,.82) 28%, color-mix(in srgb, var(--ink) 92%, transparent) 70%); }
   @keyframes p3-fade { from{opacity:0} to{opacity:1} }
   .unlock-pulse { position: absolute; border-radius: 50%; border: 2px solid #FFD982; width: 220px; height: 220px; pointer-events: none; animation: p3-ring 2s ease-out infinite; }
   .unlock-pulse.p2 { width: 320px; height: 320px; animation-delay: .5s; }
@@ -11772,17 +11780,24 @@ function loadState() {
   } catch(e) {}
   // corpus_subject is the authoritative key; always sync into state
   state.subject = localStorage.getItem('corpus_subject') || 'philosophy';
-  // Migrate state.bonusUnlockShown from legacy boolean to per-subject map.
-  //   legacy true       → { philosophy: true,  economics: false } (philosophy users keep their seen-flag)
-  //   undefined / false → { philosophy: false, economics: false }
-  //   already an object → normalize to boolean fields
+  // Migrate state.bonusUnlockShown to a per-subject map. Kept subject-
+  // agnostic so a new subject with a bonus chapter needs no code
+  // change here — the trigger site (search bonus_unlock) reads via
+  // `state.bonusUnlockShown[state.subject]`, which is falsy by default
+  // for any subject the user hasn't seen an unlock in yet.
+  //   legacy true       → { philosophy: true }  (philosophy users keep their seen-flag)
+  //   undefined / false → {}
+  //   already an object → coerce every field to boolean
   if (state.bonusUnlockShown === undefined || state.bonusUnlockShown === null) {
-    state.bonusUnlockShown = { philosophy: false, economics: false };
+    state.bonusUnlockShown = {};
   } else if (typeof state.bonusUnlockShown === 'boolean') {
-    state.bonusUnlockShown = { philosophy: state.bonusUnlockShown, economics: false };
+    state.bonusUnlockShown = { philosophy: state.bonusUnlockShown };
   } else if (typeof state.bonusUnlockShown === 'object') {
-    state.bonusUnlockShown.philosophy = !!state.bonusUnlockShown.philosophy;
-    state.bonusUnlockShown.economics = !!state.bonusUnlockShown.economics;
+    for (const k of Object.keys(state.bonusUnlockShown)) {
+      state.bonusUnlockShown[k] = !!state.bonusUnlockShown[k];
+    }
+  } else {
+    state.bonusUnlockShown = {};
   }
   // Migrate legacy chapterCompleteShown keys ({1:true, 2:true, ...}) to the
   // subject-scoped format ({philosophy-1:true, ...}). See helper for the
@@ -15078,7 +15093,14 @@ function finishDay() {
   if (_chapterQualifies) {
     _newCelebrations.push({ type: 'chapter_complete', weekId: completedWeek.id });
   }
-  if (state.currentWeek === 1 && isWeekCompleted(1) && !state.bonusUnlockShown[state.subject]) {
+  // Only fire in subjects that actually ship a bonus chapter — flagged
+  // via w.isBonus in each subject's data (philosophy.js:1026,
+  // economics.js:1216). Psychology has no bonus chapter today, and any
+  // future subject without one is handled automatically. Read from
+  // state directly instead of preallocating per subject.
+  const _hasBonusChapter = getW().some(w => w && w.isBonus);
+  const _bonusShown = (state.bonusUnlockShown || {})[state.subject];
+  if (state.currentWeek === 1 && isWeekCompleted(1) && _hasBonusChapter && !_bonusShown) {
     try { posthog.capture('bonus_unlocked', { user_id: currentUser?.id || null, subject: state.subject }); } catch(e) {}
     _newCelebrations.push({ type: 'bonus_unlock', subject: state.subject });
   }
