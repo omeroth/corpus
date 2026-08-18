@@ -7642,16 +7642,26 @@
       <path d="M32 18 L 35.2 28 L 45.6 28 L 37.2 34.2 L 40.4 44.2 L 32 38 L 23.6 44.2 L 26.8 34.2 L 18.4 28 L 28.8 28 Z" fill="#FFFFFF" stroke="#2A1266" stroke-width="1.8" stroke-linejoin="round"/>
       <path d="M50 42 L 50.8 43.6 L 52.4 44 L 50.8 44.5 L 50 46.2 L 49.2 44.5 L 47.6 44 L 49.2 43.6 Z" fill="#7B4FD4" stroke="#2A1266" stroke-width="0.6" stroke-linejoin="round"/>
     </symbol>
+    <!-- Paint driven by the ambient theme's --accent / --ink / derived
+         shading tokens so the bonus-unlock lock reads in the active
+         subject's colour (philosophy purple, economics navy, etc.).
+         Hex literal after each var() is the pre-refactor philosophy
+         value, kept as fallback for pre-16.4 iOS Safari (var() in SVG
+         paint attributes is universally supported on current WKWebView
+         but the fallback costs nothing). Treasure-gold sparkles kept
+         hardcoded — they're subject-agnostic per the treasure token
+         family (--treasure-light / --treasure-rim). Only usage site
+         is #unlock-overlay at index.html:19436. -->
     <symbol id="ic-lock-open" viewBox="0 0 64 64">
-      <path d="M23 30 V 20 Q 23 8 32 8 Q 41 8 41 20 V 22" fill="none" stroke="#2A1266" stroke-width="4.4" stroke-linecap="round"/>
-      <path d="M23 30 V 20 Q 23 8 32 8 Q 41 8 41 20 V 22" fill="none" stroke="#7B4FD4" stroke-width="2.6" stroke-linecap="round"/>
-      <path d="M24.6 26 V 20 Q 24.6 11 30 9.6" stroke="#D4BFFA" stroke-width="1" fill="none" stroke-linecap="round" opacity=".9"/>
-      <rect x="14.5" y="29.5" width="35" height="26" rx="3.4" fill="#2A1266" stroke="#2A1266" stroke-width="1.6"/>
-      <rect x="13" y="28" width="34" height="26" rx="3.6" fill="#7B4FD4" stroke="#2A1266" stroke-width="1.8"/>
-      <path d="M30 28 H 44 Q 47 28 47 31 V 51 Q 47 54 44 54 H 30 Z" fill="#5E37A8" opacity=".55"/>
-      <path d="M16 32 V 50" stroke="#D4BFFA" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".9"/>
-      <circle cx="30" cy="38" r="3.6" fill="#2A1266" stroke="#FFD982" stroke-width="1.8"/>
-      <path d="M30 40.6 L 28.4 49 L 31.6 49 Z" fill="#2A1266" stroke="#FFD982" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M23 30 V 20 Q 23 8 32 8 Q 41 8 41 20 V 22" fill="none" stroke="var(--ink, #2A1266)" stroke-width="4.4" stroke-linecap="round"/>
+      <path d="M23 30 V 20 Q 23 8 32 8 Q 41 8 41 20 V 22" fill="none" stroke="var(--accent, #7B4FD4)" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M24.6 26 V 20 Q 24.6 11 30 9.6" stroke="var(--accent-highlight, #D4BFFA)" stroke-width="1" fill="none" stroke-linecap="round" opacity=".9"/>
+      <rect x="14.5" y="29.5" width="35" height="26" rx="3.4" fill="var(--ink, #2A1266)" stroke="var(--ink, #2A1266)" stroke-width="1.6"/>
+      <rect x="13" y="28" width="34" height="26" rx="3.6" fill="var(--accent, #7B4FD4)" stroke="var(--ink, #2A1266)" stroke-width="1.8"/>
+      <path d="M30 28 H 44 Q 47 28 47 31 V 51 Q 47 54 44 54 H 30 Z" fill="var(--accent-lo, #5E37A8)" opacity=".55"/>
+      <path d="M16 32 V 50" stroke="var(--accent-highlight, #D4BFFA)" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".9"/>
+      <circle cx="30" cy="38" r="3.6" fill="var(--ink, #2A1266)" stroke="#FFD982" stroke-width="1.8"/>
+      <path d="M30 40.6 L 28.4 49 L 31.6 49 Z" fill="var(--ink, #2A1266)" stroke="#FFD982" stroke-width="1.5" stroke-linejoin="round"/>
       <circle cx="30" cy="37.4" r="1" fill="#FFD982"/>
       <path d="M54 24 L 55 26 L 57 27 L 55 28 L 54 30 L 53 28 L 51 27 L 53 26 Z" fill="#FFD982" stroke="#C7892C" stroke-width="0.6" stroke-linejoin="round"/>
       <path d="M50 16 L 50.6 17.4 L 52 18 L 50.6 18.6 L 50 20 L 49.4 18.6 L 48 18 L 49.4 17.4 Z" fill="#FFD982" stroke="#C7892C" stroke-width="0.5" stroke-linejoin="round"/>
