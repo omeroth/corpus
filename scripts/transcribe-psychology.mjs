@@ -81,17 +81,18 @@ const STRIP_JOINER = /⁠/g;
 // ─── Dialogue extraction ──────────────────────────────────────────
 
 function parseDialogues(text, lang) {
-  // Two header shapes seen across chapters:
+  // Three header shapes seen across chapters:
   //   ch1: `# פסיכולוגיה, פרק 1, דיאלוג 1 — thinker: title`  (or EN mirror)
   //   ch2: `שבוע 2: T | דיאלוג 1 — thinker: title`  (or EN mirror, casing loose)
-  // The two are tried in parallel and results merged by document order,
-  // so the same script runs unchanged against both chapters.
+  //   ch3: `פרק 3: T | דיאלוג 1 — thinker: title`  (or EN mirror; may be
+  //         wrapped in *…* asterisks from the docx bold-title style)
+  // Patterns tried in parallel and results merged by document order.
   const patterns = lang === 'he' ? [
     /#?\s*פסיכולוגיה,\s+פרק\s+(\d+),\s+דיאלוג\s+(\d+)\s+[—–]\s+([^:\n]+?)\s*:\s+([^\n]+)/g,
-    /(?:^|\n)שבוע\s+(\d+)(?:\s*:[^|]*)?\s*\|\s*דיאלוג\s+(\d+)\s+[—–]\s+([^:\n]+?)\s*:\s+([^\n]+)/g,
+    /(?:^|\n)\*?(?:שבוע|פרק)\s+(\d+)(?:\s*:[^|]*)?\s*\|\s*דיאלוג\s+(\d+)\s+[—–]\s+([^:\n]+?)\s*:\s+([^\n*]+)/g,
   ] : [
     /Psychology,\s+Chapter\s+(\d+),\s+Dialogue\s+(\d+)\s+[—–]\s+([^:\n]+?)\s*:\s+([^\n]+)/g,
-    /(?:^|\n)(?:Week|Chapter|chapter)\s+(\d+)(?:\s*:[^|]*)?\s*\|\s*Dialogue\s+(\d+)\s+[—–]\s+([^:\n]+?)\s*:\s+([^\n]+)/g,
+    /(?:^|\n)\*?(?:Week|Chapter|chapter)\s+(\d+)(?:\s*:[^|]*)?\s*\|\s*Dialogue\s+(\d+)\s+[—–]\s+([^:\n]+?)\s*:\s+([^\n*]+)/g,
   ];
 
   const matches = [];
