@@ -570,8 +570,24 @@
      are hardcoded and need the same swap. */
   html.dark .subj-cinematic-card               { border-color: rgba(245, 241, 255, 0.12); box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.5); }
   html.dark .subj-cinematic-card:hover:not(.is-selected):not(.is-locked) { border-color: rgba(245, 241, 255, 0.22); box-shadow: 0 10px 22px -8px rgba(0, 0, 0, 0.55); }
-  html.dark .subj-cinematic-thinker            { color: rgba(245, 241, 255, 0.68); }
-  html.dark .subj-cinematic-tagline            { color: rgba(245, 241, 255, 0.66); }
+  /* Dark-mode --card-accent lift — matches the theme --accent lift
+     pattern (philosophy #7B4FD4 → #9D7AE8, economics #2563EB →
+     #5B8DF0, psychology #E8853A → #FB923C). Philosophy fails AA-large
+     on the dark surface at 2.99:1 without the lift; lifted values
+     land at 4.89 / 4.94 / 7.18 on --surface #241B42. Muted alpha
+     bumped 0.65 → 0.80 so the byline + tagline hold contrast too. */
+  html.dark .subj-cinematic-card.subj-c-philosophy { --card-accent: #9D7AE8; --card-accent-rgb: 157, 122, 232;
+    --card-accent-muted: rgba(157, 122, 232, 0.80);
+    --card-accent-muted: color-mix(in srgb, var(--card-accent) 80%, transparent);
+  }
+  html.dark .subj-cinematic-card.subj-c-economics  { --card-accent: #5B8DF0; --card-accent-rgb:  91, 141, 240;
+    --card-accent-muted: rgba(91, 141, 240, 0.80);
+    --card-accent-muted: color-mix(in srgb, var(--card-accent) 80%, transparent);
+  }
+  html.dark .subj-cinematic-card.subj-c-psychology { --card-accent: #FB923C; --card-accent-rgb: 251, 146, 60;
+    --card-accent-muted: rgba(251, 146, 60, 0.80);
+    --card-accent-muted: color-mix(in srgb, var(--card-accent) 80%, transparent);
+  }
   html.dark .subj-cinematic-card.is-locked .subj-cinematic-locked-tag { color: rgba(245, 241, 255, 0.55); }
 
   /* Endowment overlay subline ("come back tomorrow…"). Source rule at
@@ -5297,13 +5313,14 @@
     transform: translate(-50%, -50%);
     z-index: 3;
   }
-  /* Card 3 — side, psychology amber, 115×162. */
+  /* Card 3 — side, psychology orange, 115×162. Was #F59E0B (Tailwind
+     amber-500), aligned to current psychology --accent #E8853A. */
   .onb-beat-fan-card-3 {
     width: 115px;
     height: 162px;
-    --card-accent: #F59E0B;
-    --card-accent-shadow: rgba(245, 158, 11, 0.30);
-    --card-accent-shadow-soft: rgba(245, 158, 11, 0.18);
+    --card-accent: #E8853A;
+    --card-accent-shadow: rgba(232, 133, 58, 0.30);
+    --card-accent-shadow-soft: rgba(232, 133, 58, 0.18);
     transform: translate(calc(-50% + 78px), -50%) rotate(14deg);
     z-index: 2;
   }
@@ -5422,8 +5439,9 @@
     --mini-shadow: rgba(37, 99, 235, 0.28);
   }
   .onb-streak-mini-3 {
-    --mini-accent: #F59E0B;
-    --mini-shadow: rgba(245, 158, 11, 0.28);
+    /* Was #F59E0B, aligned to current psychology --accent #E8853A. */
+    --mini-accent: #E8853A;
+    --mini-shadow: rgba(232, 133, 58, 0.28);
   }
   .onb-streak-mini-mystery {
     background: rgba(42, 18, 102, 0.04);
@@ -5934,10 +5952,29 @@
      current theme (the subject picker always shows all three at once).
      Scoped custom properties so both the portrait color and the
      is-selected border+shadow below use a single expression per card. */
-  .subj-cinematic-card                    { --card-accent: var(--accent); --card-accent-rgb: var(--accent-rgb); }
-  .subj-cinematic-card.subj-c-philosophy  { --card-accent: #7B4FD4; --card-accent-rgb: 123, 79, 212; }
-  .subj-cinematic-card.subj-c-economics   { --card-accent: #2563EB; --card-accent-rgb:  37, 99, 235; }
-  .subj-cinematic-card.subj-c-psychology  { --card-accent: #C2410C; --card-accent-rgb: 194, 65,  12; }
+  /* Per-card subject accent. All three subjects visible at once →
+     each card carries its own hex, so palette can't be var()'d from
+     the theme class on <html>. --card-accent-muted is the
+     hex-fallback + color-mix pair used by the byline + tagline;
+     hex sits first so pre-16.2 iOS Safari picks it up, color-mix
+     wins by source order on modern engines (same cascade the bonus
+     card tint uses — index.html:2265). */
+  .subj-cinematic-card                    { --card-accent: var(--accent); --card-accent-rgb: var(--accent-rgb);
+    --card-accent-muted: rgba(42, 18, 102, 0.65);
+    --card-accent-muted: color-mix(in srgb, var(--card-accent) 65%, transparent);
+  }
+  .subj-cinematic-card.subj-c-philosophy  { --card-accent: #7B4FD4; --card-accent-rgb: 123, 79, 212;
+    --card-accent-muted: rgba(123, 79, 212, 0.65);
+    --card-accent-muted: color-mix(in srgb, var(--card-accent) 65%, transparent);
+  }
+  .subj-cinematic-card.subj-c-economics   { --card-accent: #2563EB; --card-accent-rgb:  37, 99, 235;
+    --card-accent-muted: rgba(37, 99, 235, 0.65);
+    --card-accent-muted: color-mix(in srgb, var(--card-accent) 65%, transparent);
+  }
+  .subj-cinematic-card.subj-c-psychology  { --card-accent: #E8853A; --card-accent-rgb: 232, 133, 58;
+    --card-accent-muted: rgba(232, 133, 58, 0.65);
+    --card-accent-muted: color-mix(in srgb, var(--card-accent) 65%, transparent);
+  }
   .subj-cinematic-card .subj-cinematic-portrait { color: var(--card-accent); }
   .subj-cinematic-card .subj-cinematic-body {
     flex: 1;
@@ -5953,23 +5990,24 @@
     font-weight: 900;
     line-height: 1.15;
     letter-spacing: -0.01em;
-    color: var(--ink);
+    /* Full per-card accent so philosophy/economics/psychology names
+       read in purple/blue/orange regardless of active theme. */
+    color: var(--card-accent);
   }
   .subj-cinematic-thinker {
     font-size: calc(11px * var(--text-scale));
-    /* Was 0.5 → 3.05:1 on white (fails AA-body). Bumped to 0.65 →
-       ~4.75:1 (passes). Small uppercase + 1.3px tracking = still reads
-       as a muted eyebrow. */
-    color: rgba(42, 18, 102, 0.65);
     text-transform: uppercase;
     letter-spacing: 1.3px;
     font-weight: 700;
     margin-bottom: 2px;
+    /* Muted per-card accent (hex fallback + color-mix, see
+       .subj-cinematic-card.subj-c-* blocks above). */
+    color: var(--card-accent-muted);
   }
   .subj-cinematic-tagline {
     font-size: calc(13px * var(--text-scale));
-    color: rgba(42, 18, 102, 0.66);
     line-height: 1.4;
+    color: var(--card-accent-muted);
   }
   .subj-cinematic-card.is-selected {
     transform: scale(1.01);
@@ -7162,8 +7200,43 @@
     font-size: 20px; line-height: 1;
     filter: drop-shadow(0 1px 3px rgba(0,0,0,0.25));
   }
-  .subj-card-tagline { font-size: 13px; font-weight: 400; color: var(--accent-text); opacity: 0.7; line-height: 1.4; }
-  .subj-coming-soon { font-size: 12px; font-weight: 600; color: var(--accent-text); margin-top: 2px; letter-spacing: 0.01em; }
+  /* Per-card subject accent — mirrors .subj-cinematic-card
+     pattern so both subject-select screens use one language: each
+     subject's tagline reads in that subject's own colour, all three
+     visible at once regardless of active theme. --card-accent-muted
+     uses the same hex-fallback + color-mix cascade the bonus card
+     tint uses (index.html:2265). */
+  .subj-card[data-subject="philosophy"] { --card-accent: #7B4FD4;
+    --card-accent-muted: rgba(123, 79, 212, 0.75);
+    --card-accent-muted: color-mix(in srgb, var(--card-accent) 75%, transparent);
+  }
+  .subj-card[data-subject="economics"]  { --card-accent: #2563EB;
+    --card-accent-muted: rgba(37, 99, 235, 0.75);
+    --card-accent-muted: color-mix(in srgb, var(--card-accent) 75%, transparent);
+  }
+  .subj-card[data-subject="psychology"] { --card-accent: #E8853A;
+    --card-accent-muted: rgba(232, 133, 58, 0.75);
+    --card-accent-muted: color-mix(in srgb, var(--card-accent) 75%, transparent);
+  }
+  /* Dark-mode carousel lift — same theme-accent-dark hexes as the
+     cinematic card. The carousel runs inside the drawer post-login,
+     where the surface is the currently-active subject's dark theme
+     (#241B42 / #16233D / #172A32). All three lifted values pass
+     AA-large ≥4.4:1 on any of those surfaces. */
+  html.dark .subj-card[data-subject="philosophy"] { --card-accent: #9D7AE8;
+    --card-accent-muted: rgba(157, 122, 232, 0.85);
+    --card-accent-muted: color-mix(in srgb, var(--card-accent) 85%, transparent);
+  }
+  html.dark .subj-card[data-subject="economics"]  { --card-accent: #5B8DF0;
+    --card-accent-muted: rgba(91, 141, 240, 0.85);
+    --card-accent-muted: color-mix(in srgb, var(--card-accent) 85%, transparent);
+  }
+  html.dark .subj-card[data-subject="psychology"] { --card-accent: #FB923C;
+    --card-accent-muted: rgba(251, 146, 60, 0.85);
+    --card-accent-muted: color-mix(in srgb, var(--card-accent) 85%, transparent);
+  }
+  .subj-card-tagline { font-size: 13px; font-weight: 400; color: var(--card-accent-muted); line-height: 1.4; }
+  .subj-coming-soon { font-size: 12px; font-weight: 600; color: var(--card-accent-muted); margin-top: 2px; letter-spacing: 0.01em; }
   .subj-dots { display: flex; justify-content: center; gap: 8px; padding: 12px 0 8px; }
   .subj-dot { width: 8px; height: 8px; border-radius: 4px; background: var(--border); transition: width 0.3s cubic-bezier(0.4,0,0.2,1), background 0.3s; }
   .subj-dot.subj-dot-active { width: 24px; background: var(--accent); }
