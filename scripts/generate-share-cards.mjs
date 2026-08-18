@@ -178,11 +178,75 @@ function _registerFonts() {
 // Palettes (must stay in lockstep with the in-app _SHARE_CARD_THEMES)
 // ─────────────────────────────────────────────────────────────────────────
 
-const THEMES = {
-  philosophy: { bg: '#F0EAFC', wordmark: '#7B4FD4', name: '#3D2E66', era: '#9A85C4', question: '#4A3580' },
-  economics:  { bg: '#E8F0FC', wordmark: '#2563EB', name: '#1E3A66', era: '#7E9BC8', question: '#1D4ED8' },
-  psychology: { bg: '#FEF3D8', wordmark: '#F59E0B', name: '#5C3306', era: '#B08A45', question: '#92400E' },
-};
+// Palette derived from index.html theme blocks at build time.
+// Field mapping:
+//   bg       ← --bg
+//   wordmark ← --accent
+//   name     ← --ink
+//   era      ← --text-2
+//   question ← --accent-dark
+//   frame    ← --thinker-frame  (only used when USE_FRAME_RIM is true;
+//                                may be null on branches without the
+//                                --frame-<subject> :root tokens)
+
+function _extractThemeVars(src, subject) {
+  const anchor = `html.theme-${subject},`;
+  const start = src.indexOf(anchor);
+  if (start === -1) throw new Error(`theme block not found for ${subject}`);
+  const braceOpen = src.indexOf('{', start);
+  if (braceOpen === -1) throw new Error(`no { after ${anchor}`);
+  let depth = 0, end = braceOpen;
+  for (; end < src.length; end++) {
+    const c = src[end];
+    if (c === '{') depth++;
+    else if (c === '}') { depth--; if (depth === 0) break; }
+  }
+  const body = src.slice(braceOpen, end);
+  const vars = {};
+  const re = /--([a-z0-9-]+)\s*:\s*([^;]+);/g;
+  let m;
+  while ((m = re.exec(body))) vars[m[1]] = m[2].trim();
+  return vars;
+}
+
+function _extractRootVar(src, name) {
+  const re = new RegExp('--' + name + '\\s*:\\s*(#[0-9A-Fa-f]{3,8})');
+  const m = src.match(re);
+  return m ? m[1] : null;
+}
+
+function buildThemes() {
+  const src = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const themes = {};
+  for (const subject of ['philosophy', 'economics', 'psychology']) {
+    const v = _extractThemeVars(src, subject);
+    const frame = _extractRootVar(src, 'frame-' + subject);
+    themes[subject] = {
+      bg:       v.bg,
+      wordmark: v.accent,
+      name:     v.ink,
+      era:      v['text-2'],
+      question: v['accent-dark'],
+      frame:    frame,  // optional; may be null on branches without --frame-<subject>
+    };
+    // Only require the 5 fields we actually consume unconditionally.
+    // `frame` is optional — guarded at the call site by USE_FRAME_RIM.
+    for (const k of ['bg', 'wordmark', 'name', 'era', 'question']) {
+      if (!themes[subject][k]) throw new Error(`missing ${k} for ${subject}`);
+    }
+  }
+  return themes;
+}
+
+const THEMES = buildThemes();
+
+// When true, the portrait ring uses each subject's --thinker-frame
+// (purple / blue / brown, matching the in-app portrait frame).
+// When false, uses subject-agnostic gold — original behavior.
+// If USE_FRAME_RIM is true but a subject's --frame-<subject> token is
+// missing from :root, THEMES[subject].frame will be null and the rim
+// falls back to gold RIM.
+const USE_FRAME_RIM = false;
 
 // Slug prefix keeps philosophy 1-1 and economics 1-1 (both real, both
 // legitimate) from stomping on each other's page/card files. Kept in
@@ -283,9 +347,10 @@ async function renderCard({ thinker, dayTitle, subject, lang }) {
   ctx.arc(portraitCx, portraitCy, portraitR, 0, Math.PI * 2);
   ctx.fillStyle = PLATE;
   ctx.fill();
-  // Rim
+  // Rim — per-subject when USE_FRAME_RIM is on and the theme has a
+  // --thinker-frame value; otherwise the subject-agnostic gold RIM.
   ctx.lineWidth = 8;
-  ctx.strokeStyle = RIM;
+  ctx.strokeStyle = (USE_FRAME_RIM && theme.frame) ? theme.frame : RIM;
   ctx.stroke();
   // Portrait image
   if (thinker.image) {
