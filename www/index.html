@@ -7958,10 +7958,9 @@
             </div>
             <div class="subj-card-tagline">How the world works</div>
           </div>
-          <div class="subj-card subj-locked" data-subject="psychology" onclick="subjTap(2)">
+          <div class="subj-card" data-subject="psychology" onclick="subjTap(2)">
             <div class="subj-icon-wrap">
               <img src="assets/icons/subjects/psychology.png" alt="Psychology">
-              <div class="subj-lock-badge">🔒</div>
             </div>
             <div class="subj-card-tagline">Understand the mind</div>
           </div>
@@ -7994,14 +7993,13 @@
             <div class="subj-cinematic-tagline" id="subj-c-tag-economics">איך העולם עובד</div>
           </div>
         </button>
-        <button type="button" class="subj-cinematic-card subj-c-psychology is-locked" data-subject="psychology" onclick="subjCinematicTap('psychology')">
+        <button type="button" class="subj-cinematic-card subj-c-psychology" data-subject="psychology" onclick="subjCinematicTap('psychology')">
           <div class="subj-cinematic-portrait"><img src="./images/freud.webp" alt=""></div>
           <div class="subj-cinematic-body">
             <div class="subj-cinematic-thinker" id="subj-c-thinker-psychology">פרויד · יונג · ג'יימס</div>
             <div class="subj-cinematic-name" id="subj-c-name-psychology">פסיכולוגיה</div>
             <div class="subj-cinematic-tagline" id="subj-c-tag-psychology">להבין את הנפש</div>
           </div>
-          <span class="subj-cinematic-locked-tag" id="subj-c-locked-tag">בקרוב</span>
         </button>
         <div class="subj-cinematic-cta-holder">
           <button type="button" class="subj-cinematic-cta" id="subj-cinematic-cta" onclick="subjCinematicConfirm()">המשך</button>
@@ -17323,7 +17321,9 @@ function toggleDrawer() {
 // === End Drawer System ===
 
 // === Subject Select ===
-const LOCKED_SUBJECTS = ['psychology'];
+// BRANCH-ONLY: psychology unlocked on `psychology` branch for on-device
+// testing. Revert to ['psychology'] before merging to main.
+const LOCKED_SUBJECTS = [];
 
 // ─── Deep-link intent (?open=<slug>) ─────────────────────────────
 // Captured at initUI top, consumed after the onboarding gate resolves
