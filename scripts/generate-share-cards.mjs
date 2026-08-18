@@ -187,14 +187,79 @@ function _registerFonts() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Palettes (must stay in lockstep with the in-app _SHARE_CARD_THEMES)
+// Palettes (derived from index.html theme blocks at run time)
 // ─────────────────────────────────────────────────────────────────────────
+// The card fields map onto the app's CSS custom properties as:
+//   bg       ← --bg
+//   wordmark ← --accent
+//   name     ← --ink
+//   era      ← --text-2
+//   question ← --accent-dark
+//   frame    ← --thinker-frame  (used to be a fixed gold RIM)
+// Extracting at runtime removes the drift that made the hardcoded
+// psychology palette stale for weeks — the CSS is now the single
+// source of truth. Runs once per gen:share invocation.
 
-const THEMES = {
-  philosophy: { bg: '#F0EAFC', wordmark: '#7B4FD4', name: '#3D2E66', era: '#9A85C4', question: '#4A3580' },
-  economics:  { bg: '#E8F0FC', wordmark: '#2563EB', name: '#1E3A66', era: '#7E9BC8', question: '#1D4ED8' },
-  psychology: { bg: '#FEF3D8', wordmark: '#F59E0B', name: '#5C3306', era: '#B08A45', question: '#92400E' },
-};
+function _extractThemeVars(src, subject) {
+  // Find `html.theme-<subject>,\n  #screen-subject.theme-<subject> {`
+  // block, walk balanced braces, regex-scrape each `--name: value;`.
+  const anchor = `html.theme-${subject},`;
+  const start = src.indexOf(anchor);
+  if (start === -1) throw new Error(`theme block not found for ${subject}`);
+  const braceOpen = src.indexOf('{', start);
+  if (braceOpen === -1) throw new Error(`no { after ${anchor}`);
+  let depth = 0, end = braceOpen;
+  for (; end < src.length; end++) {
+    const c = src[end];
+    if (c === '{') depth++;
+    else if (c === '}') { depth--; if (depth === 0) break; }
+  }
+  const body = src.slice(braceOpen, end);
+  const vars = {};
+  const re = /--([a-z0-9-]+)\s*:\s*([^;]+);/g;
+  let m;
+  while ((m = re.exec(body))) vars[m[1]] = m[2].trim();
+  return vars;
+}
+
+function _extractRootVar(src, name) {
+  const re = new RegExp('--' + name + '\\s*:\\s*(#[0-9A-Fa-f]{3,8})');
+  const m = src.match(re);
+  return m ? m[1] : null;
+}
+
+function buildThemes() {
+  const src = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const themes = {};
+  for (const subject of ['philosophy', 'economics', 'psychology']) {
+    const v = _extractThemeVars(src, subject);
+    // --thinker-frame is set on :root (never on theme blocks in the
+    // current CSS) via --frame-philosophy / --frame-economics /
+    // --frame-psychology. Pull directly from :root.
+    const frame = _extractRootVar(src, 'frame-' + subject);
+    themes[subject] = {
+      bg:       v.bg,
+      wordmark: v.accent,
+      name:     v.ink,
+      era:      v['text-2'],
+      question: v['accent-dark'],
+      frame:    frame,  // used only when USE_FRAME_RIM is true
+    };
+    for (const [k, val] of Object.entries(themes[subject])) {
+      if (!val) throw new Error(`missing ${k} for ${subject}`);
+    }
+  }
+  return themes;
+}
+
+const THEMES = buildThemes();
+
+// When true, the portrait ring uses each subject's --thinker-frame
+// (purple / blue / brown, matching the in-app portrait frame).
+// When false, uses subject-agnostic gold — original behavior.
+// Toggled here rather than per-subject so the ring language stays
+// consistent across all cards.
+const USE_FRAME_RIM = false;
 
 // Slug prefix keeps philosophy 1-1 and economics 1-1 (both real, both
 // legitimate) from stomping on each other's page/card files. Kept in
@@ -204,6 +269,12 @@ const _SUBJECT_SLUG = {
   economics:  'econ',
   psychology: 'psyc',
 };
+// Landing pages for subjects in this set get `<meta name="robots"
+// content="noindex, nofollow">`. Kept during soft-launch windows so
+// crawlers don't surface dialogue titles + portraits before the
+// subject is officially open in-app. Drop the entry from this set at
+// the same time the subject launches.
+const NOINDEX_SUBJECTS = new Set(['psychology']);
 const PLATE   = '#FDFBF6';
 const RIM     = '#E5C158';
 const URL_TXT = '#B8860B';
@@ -295,9 +366,10 @@ async function renderCard({ thinker, dayTitle, subject, lang }) {
   ctx.arc(portraitCx, portraitCy, portraitR, 0, Math.PI * 2);
   ctx.fillStyle = PLATE;
   ctx.fill();
-  // Rim
+  // Rim — per-subject brown/purple/blue when USE_FRAME_RIM, else the
+  // subject-agnostic gold that has been the historical treatment.
   ctx.lineWidth = 8;
-  ctx.strokeStyle = RIM;
+  ctx.strokeStyle = USE_FRAME_RIM ? theme.frame : RIM;
   ctx.stroke();
   // Portrait image
   if (thinker.image) {
@@ -441,7 +513,8 @@ function renderPage({ weekId, dayId, thinker, dayTitle, subject, lang }) {
 <html lang="${lang}" dir="${dir}">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">${NOINDEX_SUBJECTS.has(subject) ? `
+<meta name="robots" content="noindex, nofollow">` : ''}
 <title>${escapeHtml(title)} · Corpus</title>
 <meta name="description" content="${escapeHtml(description)}">
 

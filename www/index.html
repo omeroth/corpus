@@ -15676,17 +15676,12 @@ function showSharePrompt(onDone) {
 // shareCorpusFromProfile still guard on _shareInFlight so a double-tap
 // can't stack two share sheets.
 
-// Per-theme color mapping for the generated PNG. Kept as a plain object so
-// a device in dark mode still gets a light card that reads on any social
-// feed background. Aligned with _SHARE_CARD_THEMES in
-// scripts/generate-share-cards.mjs — update in lockstep.
-const _SHARE_CARD_THEMES = {
-  philosophy: { bg: '#F0EAFC', wordmark: '#7B4FD4', name: '#3D2E66', era: '#9A85C4', question: '#4A3580' },
-  economics:  { bg: '#E8F0FC', wordmark: '#2563EB', name: '#1E3A66', era: '#7E9BC8', question: '#1D4ED8' },
-  psychology: { bg: '#FEF3D8', wordmark: '#F59E0B', name: '#5C3306', era: '#B08A45', question: '#92400E' }
-};
-const _SHARE_CARD_PLATE   = '#FDFBF6';
-const _SHARE_CARD_RIM     = '#E5C158';
+// Card-generator constants (subject-agnostic). The per-subject palette
+// now comes straight from the CSS — see _readCardTheme() in
+// generateShareCard(). Keeping PLATE + RIM inline because they are
+// generator-specific accents that don't exist in the app's --* tokens.
+const _SHARE_CARD_PLATE = '#FDFBF6';
+const _SHARE_CARD_RIM   = '#E5C158';
 
 function _subjectForThinker(thinkerId) {
   const sources = [
@@ -15752,11 +15747,37 @@ function _loadCardImage(src, timeoutMs) {
 // Renders an offscreen 1080×1350 canvas per the design brief and returns a
 // PNG blob. Throws (or the outer race times out at 2s) → caller falls back
 // to text-only share.
+// Read the current CSS theme colors for a subject and map them onto the
+// card renderer's field names. Uses getComputedStyle against a
+// temporary off-screen element that carries `theme-<subject>` so we
+// don't disturb the active app theme when the debug tool is invoked
+// on the "wrong" subject. Field mapping matches
+// scripts/generate-share-cards.mjs buildThemes():
+//   bg ← --bg, wordmark ← --accent, name ← --ink,
+//   era ← --text-2, question ← --accent-dark.
+function _readCardTheme(subject) {
+  const probe = document.createElement('div');
+  probe.className = 'theme-' + subject;
+  probe.style.cssText = 'position:absolute;left:-9999px;visibility:hidden';
+  document.body.appendChild(probe);
+  const cs = getComputedStyle(probe);
+  const pick = (v) => cs.getPropertyValue(v).trim();
+  const theme = {
+    bg:       pick('--bg'),
+    wordmark: pick('--accent'),
+    name:     pick('--ink'),
+    era:      pick('--text-2'),
+    question: pick('--accent-dark'),
+  };
+  document.body.removeChild(probe);
+  return theme;
+}
+
 async function generateShareCard(thinkerId, dayTitle, subject) {
   const W = 1080, H = 1350;
   const isEn = state.lang === 'en';
   const _subject = subject || state.subject || 'philosophy';
-  const theme = _SHARE_CARD_THEMES[_subject] || _SHARE_CARD_THEMES.philosophy;
+  const theme = _readCardTheme(_subject);
   const t = getT().find(x => x.id === thinkerId);
   if (!t) throw new Error('thinker not found');
 
