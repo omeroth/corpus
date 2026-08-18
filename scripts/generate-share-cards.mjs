@@ -112,12 +112,24 @@ function _findJsLiteral(src, prefix) {
 }
 
 function extractData() {
-  const src = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  // Post-refactor (commit fb838dd), the subject data structures moved
+  // out of index.html into content/*.js. Read each from its own file
+  // rather than a monolithic index.html slice.
+  //   content/philosophy.js  → corpusData
+  //   content/economics.js   → economicsData
+  //   content/psychology.js  → psychologyData
+  //   content/thinkers.js    → THINKERS + THINKERS_EN
+  const readFile = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
+  const philo = readFile('content/philosophy.js');
+  const econ  = readFile('content/economics.js');
+  const psy   = readFile('content/psychology.js');
+  const th    = readFile('content/thinkers.js');
   return {
-    corpusData:    _findJsLiteral(src, 'const corpusData = '),
-    economicsData: _findJsLiteral(src, 'const economicsData = '),
-    THINKERS:      _findJsLiteral(src, 'const THINKERS = '),
-    THINKERS_EN:   _findJsLiteral(src, 'const THINKERS_EN = '),
+    corpusData:      _findJsLiteral(philo, 'const corpusData = '),
+    economicsData:   _findJsLiteral(econ,  'const economicsData = '),
+    psychologyData:  _findJsLiteral(psy,   'const psychologyData = '),
+    THINKERS:        _findJsLiteral(th,    'const THINKERS = '),
+    THINKERS_EN:     _findJsLiteral(th,    'const THINKERS_EN = '),
   };
 }
 
@@ -622,11 +634,12 @@ function renderPage({ weekId, dayId, thinker, dayTitle, subject, lang }) {
 async function main() {
   _registerFonts();
 
-  const { corpusData, economicsData, THINKERS, THINKERS_EN } = extractData();
+  const { corpusData, economicsData, psychologyData, THINKERS, THINKERS_EN } = extractData();
 
   const subjects = [
-    { subject: 'philosophy', data: corpusData    },
-    { subject: 'economics',  data: economicsData },
+    { subject: 'philosophy', data: corpusData     },
+    { subject: 'economics',  data: economicsData  },
+    { subject: 'psychology', data: psychologyData },
   ];
 
   // Manifest maps (subject, weekId, dayId, lang) → generated card + page paths.

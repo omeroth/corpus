@@ -81,12 +81,24 @@ const STRIP_JOINER = /⁠/g;
 // ─── Dialogue extraction ──────────────────────────────────────────
 
 function parseDialogues(text, lang) {
-  const headerRe = lang === 'he'
-    ? /#?\s*פסיכולוגיה,\s+פרק\s+(\d+),\s+דיאלוג\s+(\d+)\s+[—–]\s+([^:\n]+?)\s*:\s+([^\n]+)/g
-    : /Psychology,\s+Chapter\s+(\d+),\s+Dialogue\s+(\d+)\s+[—–]\s+([^:\n]+?)\s*:\s+([^\n]+)/g;
+  // Two header shapes seen across chapters:
+  //   ch1: `# פסיכולוגיה, פרק 1, דיאלוג 1 — thinker: title`  (or EN mirror)
+  //   ch2: `שבוע 2: T | דיאלוג 1 — thinker: title`  (or EN mirror, casing loose)
+  // The two are tried in parallel and results merged by document order,
+  // so the same script runs unchanged against both chapters.
+  const patterns = lang === 'he' ? [
+    /#?\s*פסיכולוגיה,\s+פרק\s+(\d+),\s+דיאלוג\s+(\d+)\s+[—–]\s+([^:\n]+?)\s*:\s+([^\n]+)/g,
+    /(?:^|\n)שבוע\s+(\d+)(?:\s*:[^|]*)?\s*\|\s*דיאלוג\s+(\d+)\s+[—–]\s+([^:\n]+?)\s*:\s+([^\n]+)/g,
+  ] : [
+    /Psychology,\s+Chapter\s+(\d+),\s+Dialogue\s+(\d+)\s+[—–]\s+([^:\n]+?)\s*:\s+([^\n]+)/g,
+    /(?:^|\n)(?:Week|Chapter|chapter)\s+(\d+)(?:\s*:[^|]*)?\s*\|\s*Dialogue\s+(\d+)\s+[—–]\s+([^:\n]+?)\s*:\s+([^\n]+)/g,
+  ];
+
+  const matches = [];
+  for (const re of patterns) matches.push(...text.matchAll(re));
+  matches.sort((a, b) => a.index - b.index);
 
   const dialogues = [];
-  const matches = [...text.matchAll(headerRe)];
   for (let i = 0; i < matches.length; i++) {
     const m = matches[i];
     const start = m.index + m[0].length;
@@ -118,10 +130,19 @@ function findMarkers(body, lang) {
       positions.push({ type, idx: start });
     }
   }
-  // Quiz block: `\b` doesn't work for Hebrew word chars — match a
-  // following whitespace/end-of-string instead. Same `## ` handling.
+  // Quiz block. Two prefix shapes seen across chapters:
+  //   ch1: `## שאלות` / `## Questions`
+  //   ch2: `❓ שאלות אינטראקטיביות` / `❓ Interactive questions`
+  // Accept optional `## ` or `❓ ` (or both), then the keyword.
+  // EN also allows an optional adjective before the keyword
+  // (`Interactive questions`); HE keeps the adjective AFTER the noun
+  // so the trailing lookahead absorbs it. `\b` doesn't work for
+  // Hebrew word chars — match a following whitespace/end-of-string
+  // via lookahead instead. EN case-insensitive.
   const quizWord = lang === 'he' ? 'שאלות' : 'Questions';
-  const quizRe = new RegExp('(?:^|\\n)(?:##\\s*)?' + quizWord + '(?=\\s|$)');
+  const quizFlags = lang === 'he' ? '' : 'i';
+  const preWord = lang === 'he' ? '' : '(?:\\S+\\s+)?';
+  const quizRe = new RegExp('(?:^|\\n)(?:##\\s*)?(?:❓\\s*)?' + preWord + quizWord + '(?=\\s|$)', quizFlags);
   const qm = body.match(quizRe);
   if (qm) positions.push({ type: 'quiz-block', idx: qm.index + (body[qm.index] === '\n' ? 1 : 0) });
   positions.sort((a, b) => a.idx - b.idx);
@@ -178,13 +199,23 @@ function parseSourceSection(text) {
   text = text.replace(STRIP_JOINER, '');
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
   let quote = '', attr = '';
-  for (const l of lines) {
-    if (l.startsWith('—') || l.startsWith('–')) {
-      attr = l.replace(/^[—–]\s*/, '').trim();
-    } else if (l.startsWith('"') || l.startsWith('“')) {
-      quote = l;
+  // Two attribution formats seen across chapters:
+  //   ch1: `— Wilhelm Wundt, Principles..., 1874`  (leading em-dash)
+  //   ch2: `Sigmund Freud, "A Difficulty...", 1917` (no dash)
+  // Attribution lines are always non-quote lines that follow the quote.
+  // If any dash-prefixed line exists, prefer it (unambiguous). Else
+  // fall back to the last non-quote line as the attribution.
+  const isQuoteLine = l => l.startsWith('"') || l.startsWith('“') || l.startsWith("'");
+  const dashed = lines.find(l => l.startsWith('—') || l.startsWith('–'));
+  if (dashed) {
+    attr = dashed.replace(/^[—–]\s*/, '').trim();
+  } else {
+    for (let i = lines.length - 1; i >= 0; i--) {
+      if (!isQuoteLine(lines[i])) { attr = lines[i]; break; }
     }
   }
+  // Quote line: first line that opens with " or “
+  quote = lines.find(isQuoteLine) || '';
   // Em-dashes inside the quote get the same treatment as everywhere
   // else (author-approved: no em-dashes in emitted content).
   quote = quote.replace(/\s+[—–]\s+/g, ', ');
@@ -195,8 +226,9 @@ function parseSourceSection(text) {
 
 function parseQuizzes(chunk, lang) {
   chunk = chunk.replace(STRIP_JOINER, '');
+  // ch1 HE had `## שאלה N`; ch2 HE has bare `שאלה N`. Accept 0-3 `#`.
   const qHead = lang === 'he'
-    ? /(?:^|\n)#{2,3}?\s*שאלה\s+(\d+)/g
+    ? /(?:^|\n)#{0,3}\s*שאלה\s+(\d+)/g
     : /(?:^|\n)Question\s+(\d+)/g;
   const matches = [...chunk.matchAll(qHead)];
   return matches.map((m, i) => {
@@ -240,6 +272,19 @@ function parseQuiz(body, lang, qNum) {
       else { state.question.push(line); continue; }
     }
     if (state.phase === 'options') {
+      // Chapter 2 EN sometimes packs all options on a single line:
+      // `A. text B. text C. text`. Split at whitespace preceding
+      // the next A-D letter+dot so each option is parsed separately.
+      // Chapter 2 HE always uses one per line, so this doesn't fire
+      // there. Chapter 1 EN also one per line — no regression.
+      if (lang === 'en' && /^A\.\s+.+\s+B\.\s+/.test(line)) {
+        const parts = line.split(/\s+(?=[A-D]\.\s+)/);
+        for (const p of parts) {
+          const om = p.match(optionRe);
+          if (om) state.options[letterIdx[om[1]]] = om[2].trim();
+        }
+        continue;
+      }
       const om = line.match(optionRe);
       if (om) { state.options[letterIdx[om[1]]] = om[2].trim(); continue; }
       const cm = line.match(correctMarker);
