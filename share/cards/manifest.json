@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-18T11:20:51.707Z",
+  "generatedAt": "2026-08-18T12:10:49.658Z",
   "items": [
     {
       "weekId": 1,
@@ -1300,6 +1300,126 @@
       "title": "When You Pay for Love",
       "card": "share/cards/en/psyc-2-6.png",
       "page": "d/psyc-2-6-en.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "freud",
+      "title": "הילדות שנכתבת בנו",
+      "card": "share/cards/he/psyc-3-1.png",
+      "page": "d/psyc-3-1-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "freud",
+      "title": "The Childhood Written Into Us",
+      "card": "share/cards/en/psyc-3-1.png",
+      "page": "d/psyc-3-1-en.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "bowlby",
+      "title": "הקשר הראשון כתבנית",
+      "card": "share/cards/he/psyc-3-2.png",
+      "page": "d/psyc-3-2-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "bowlby",
+      "title": "The First Bond as Template",
+      "card": "share/cards/en/psyc-3-2.png",
+      "page": "d/psyc-3-2-en.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "winnicott",
+      "title": "האם הטובה דיה",
+      "card": "share/cards/he/psyc-3-3.png",
+      "page": "d/psyc-3-3-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "winnicott",
+      "title": "The Good-Enough Mother",
+      "card": "share/cards/en/psyc-3-3.png",
+      "page": "d/psyc-3-3-en.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "erikson",
+      "title": "העיצוב לא נגמר בילדות",
+      "card": "share/cards/he/psyc-3-4.png",
+      "page": "d/psyc-3-4-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "erikson",
+      "title": "The Shaping Does Not End",
+      "card": "share/cards/en/psyc-3-4.png",
+      "page": "d/psyc-3-4-en.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "kohut",
+      "title": "הניצוץ בעין ההורה",
+      "card": "share/cards/he/psyc-3-5.png",
+      "page": "d/psyc-3-5-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "kohut",
+      "title": "The Gleam in the Eye",
+      "card": "share/cards/en/psyc-3-5.png",
+      "page": "d/psyc-3-5-en.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "bandura",
+      "title": "למדנו מהתבוננות",
+      "card": "share/cards/he/psyc-3-6.png",
+      "page": "d/psyc-3-6-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "bandura",
+      "title": "We Learn by Watching",
+      "card": "share/cards/en/psyc-3-6.png",
+      "page": "d/psyc-3-6-en.html"
     }
   ]
 }
