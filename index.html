@@ -8746,6 +8746,70 @@ function _classifyRefreshError(err) {
   return 'network-failed';
 }
 
+// ─── Deferred server-rejected signout ─────────────────────────
+//
+// Server-rejected refresh (or a stray SIGNED_OUT) used to eject the user
+// to the auth screen immediately, even mid-dialogue. That destroyed
+// their reading session for a background auth event they had no idea
+// about. Now we defer: if the reader is open, stash a pending flag,
+// let the user finish their read, and execute the signout the next
+// time they naturally navigate away.
+//
+// Persistence: the flag is mirrored to localStorage purely for
+// telemetry enrichment. It does NOT drive UI on cold boot — a fresh
+// INITIAL_SESSION with a valid session (transient refresh blip on the
+// prior run, since resolved) clears the flag automatically. Only a
+// fresh confirmation of rejection actually ejects.
+let _pendingServerRejectedSignout = null;
+const _PENDING_SIGNOUT_KEY = 'corpus_pending_signout';
+function _writePendingSignout(info) {
+  _pendingServerRejectedSignout = info;
+  try { localStorage.setItem(_PENDING_SIGNOUT_KEY, JSON.stringify(info)); } catch(e) {}
+}
+function _clearPendingSignout() {
+  _pendingServerRejectedSignout = null;
+  try { localStorage.removeItem(_PENDING_SIGNOUT_KEY); } catch(e) {}
+}
+function _readPersistedPendingSignout() {
+  try {
+    const raw = localStorage.getItem(_PENDING_SIGNOUT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
+// Extracted from the inline server-rejected branch below so both that
+// branch and the deferred-exit path in showScreen can share one flow.
+// On cold-boot execution (persisted-only case), enriches telemetry
+// with deferral_ms so we can measure how often deferrals survive an
+// app close. Async so the sb.auth.signOut call can be awaited — its
+// storage.removeItem hits the adapter which checks _explicitSignOut,
+// and dropping the await would race the flag flip and cause the
+// adapter to suppress the wipe.
+async function _executeServerRejectedSignout(info) {
+  const persistedBefore = _readPersistedPendingSignout();
+  const enriched = Object.assign({}, info || {}, {
+    was_deferred: !!persistedBefore,
+    deferral_ms: persistedBefore && persistedBefore.when_iso
+      ? Math.max(0, Date.now() - Date.parse(persistedBefore.when_iso))
+      : null,
+  });
+  try {
+    _phCapture('reader_ejected', enriched);
+  } catch(e) {}
+  _clearPendingSignout();
+  _enteredWithExpiredToken = false;
+  _explicitSignOut = true;
+  try { await sb.auth.signOut({ scope: 'local' }); } catch(e) {}
+  _explicitSignOut = false;
+  currentUser = null;
+  appStarted = false;
+  const lang = state.lang;
+  state = defaultState();
+  state.lang = lang;
+  try { localStorage.removeItem('corpus_state'); } catch(e) {}
+  showAuthScreen({ reason: 'session_expired' });
+}
+
 async function _backgroundRefresh(refresh_token) {
   _recoveryInProgress = true;
   try {
@@ -8759,18 +8823,24 @@ async function _backgroundRefresh(refresh_token) {
     }
     const classification = _classifyRefreshError(error);
     if (classification === 'server-rejected') {
-      console.warn('[Auth] refresh server-rejected — signing out:', error && error.message);
-      _enteredWithExpiredToken = false;
-      _explicitSignOut = true;
-      try { await sb.auth.signOut({ scope: 'local' }); } catch(e) {}
-      _explicitSignOut = false;
-      currentUser = null;
-      appStarted = false;
-      const lang = state.lang;
-      state = defaultState();
-      state.lang = lang;
-      try { localStorage.removeItem('corpus_state'); } catch(e) {}
-      showAuthScreen();
+      const info = {
+        cause: 'refresh_server_rejected',
+        error_code: (error && error.code) || null,
+        error_message: (error && error.message) ? String(error.message).slice(0, 300) : null,
+      };
+      // Reader open → defer. Content is already loaded and state saves
+      // locally, so the user's dialogue can finish. The next showScreen
+      // exit from the reader flushes the deferred signout.
+      if (state && state.currentScreen === 'reader') {
+        console.warn('[Auth] refresh server-rejected mid-read — deferring signout until reader exit:', info.error_message);
+        if (!_pendingServerRejectedSignout) {
+          _writePendingSignout(Object.assign({}, info, { when_iso: new Date().toISOString() }));
+          try { _phCapture('reader_ejection_deferred', info); } catch(e) {}
+        }
+        return;
+      }
+      console.warn('[Auth] refresh server-rejected — signing out:', info.error_message);
+      await _executeServerRejectedSignout(info);
       return;
     }
     console.warn('[Auth] refresh network-failed — staying in expired-token mode:', error && error.message);
@@ -9200,18 +9270,42 @@ function openPrivacyPolicy() {
   try { window.open('https://get.corpusapp.io/privacy.html', '_blank'); } catch(e) {}
 }
 
-function showAuthScreen() {
+function showAuthScreen(opts) {
   document.getElementById('screen-auth').classList.add('active');
   document.getElementById('app').style.display = 'none';
   const nav = document.getElementById('bottom-nav');
   if (nav) nav.style.display = 'none';
+  // Keep state.currentScreen in lockstep with the visible UI. The
+  // legacy path left this stale as 'reader' when eject fired mid-read,
+  // which mispainted setAppLang (would re-render the reader behind the
+  // auth overlay) and double-fired dialogue_abandoned via
+  // visibilitychange/pagehide guards.
+  if (state) state.currentScreen = 'auth';
   _localizeAuthScreen();
+  // Optional banner for involuntary entry (deferred server-rejected
+  // signout finally executing). Uses the same #auth-error slot as
+  // form errors, softened in color to read as a status message rather
+  // than a validation error. Cleared on the next form submit /
+  // sign-in attempt.
+  const reason = opts && opts.reason;
+  const errEl = document.getElementById('auth-error');
+  if (errEl) {
+    if (reason === 'session_expired') {
+      const isEn = state && state.lang === 'en';
+      errEl.textContent = isEn ? 'Your session expired. Please sign in again.' : 'פג תוקף החיבור. נא להיכנס שוב.';
+      errEl.style.color = 'var(--text-2)';
+    } else {
+      errEl.textContent = '';
+      errEl.style.color = '';
+    }
+  }
   // Funnel: onboarding_auth_reached. Fires whenever the auth screen
   // appears, regardless of entry point. Filter in PostHog by
   // is_first_onboarding for the pure-onboarding funnel view.
   _phCapture('onboarding_auth_reached', {
     is_first_onboarding: !localStorage.getItem('corpus_onboarding_done'),
     auth_mode: authMode,
+    reason: reason || null,
   });
 }
 
@@ -12096,7 +12190,19 @@ function showScreen(id) {
   // state.completedDays[key] = true, so completion paths short-circuit
   // inside _readerFireAbandonIfNeeded.
   if (id !== 'reader' && state.currentScreen === 'reader') {
-    try { _readerFireAbandonIfNeeded(); } catch (e) {}
+    const isEjection = !!_pendingServerRejectedSignout;
+    try { _readerFireAbandonIfNeeded(isEjection ? 'auth_ejection' : 'user_nav'); } catch (e) {}
+    // Deferred server-rejected signout: user was mid-read when a
+    // background refresh confirmed the session was dead. We held the
+    // ejection until their natural exit. Fire it now — the requested
+    // navigation to `id` is discarded because the auth screen replaces
+    // the whole app view. Fire-and-forget since showScreen isn't
+    // async; the internal await on sb.auth.signOut still runs to
+    // completion before the visible auth screen renders.
+    if (isEjection) {
+      _executeServerRejectedSignout(_pendingServerRejectedSignout).catch(() => {});
+      return;
+    }
   }
   if (id !== 'reader') {
     document.getElementById('reader-content').innerHTML = '';
@@ -16441,7 +16547,7 @@ function _readerLogPageViewed(sections, currentIndex) {
 // from visibilitychange→hidden as a backup for tab close / native app
 // background. Suppresses when the dialogue has already been marked
 // complete (finishDay commits state.completedDays[key] = true).
-function _readerFireAbandonIfNeeded() {
+function _readerFireAbandonIfNeeded(reason) {
   if (!_readerAbandonPending) return;
   const wk = state.currentWeek, dy = state.currentDay;
   if (wk == null || dy == null) { _readerAbandonPending = false; return; }
@@ -16456,6 +16562,11 @@ function _readerFireAbandonIfNeeded() {
   _phCapture('dialogue_abandoned', Object.assign(_readerBaseProps(), {
     last_page_index:     _readerLastPageIndex,
     seconds_in_dialogue: seconds,
+    // Values: 'user_nav' (deliberate showScreen exit),
+    // 'auth_ejection' (deferred server-rejected signout firing),
+    // 'background' (visibilitychange→hidden), 'pagehide' (tab close).
+    // null = older callsite that hasn't been threaded yet.
+    reason: reason || null,
   }));
 }
 
@@ -18616,6 +18727,24 @@ function initUI() {
           _countedRemovalThisSession = false;
           const _wasExpiredEntry = _enteredWithExpiredToken;
           _enteredWithExpiredToken = false;
+          // A subsequent successful session-confirmed event supersedes any
+          // pending deferred signout. The earlier server-rejection was
+          // transient — cancel the ejection we were about to fire, both
+          // in-memory and any persisted copy from a prior run.
+          if (_pendingServerRejectedSignout || _readPersistedPendingSignout()) {
+            const prior = _pendingServerRejectedSignout || _readPersistedPendingSignout();
+            try {
+              _phCapture('reader_ejection_cancelled', {
+                cause: 'refresh_success',
+                event: event,
+                prior_error_code: prior && prior.error_code,
+                deferral_ms: prior && prior.when_iso
+                  ? Math.max(0, Date.now() - Date.parse(prior.when_iso))
+                  : null,
+              });
+            } catch(e) {}
+            _clearPendingSignout();
+          }
           // Post-recovery sync when any "session confirmed" event lands
           // after we entered in expired-token mode. enterApp is a no-op
           // here (appStarted is already true from the earlier stored-user
@@ -18657,6 +18786,25 @@ function initUI() {
           initialEventReceived = true;
           await _enterFromStoredOrOnboarding('INITIAL_SESSION null');
         } else if (event === 'SIGNED_OUT') {
+          // Reader open? Defer. Same principle as the _backgroundRefresh
+          // server-rejected path: don't destroy an in-progress dialogue
+          // for a background auth event. Crucially, we do NOT reset
+          // appStarted here — leaving it true keeps enterApp's early-
+          // return guard armed, so any subsequent SIGNED_IN /
+          // TOKEN_REFRESHED that races in cannot navigate the UI to
+          // home underneath the reader.
+          if (state && state.currentScreen === 'reader' && !_explicitSignOut) {
+            const info = {
+              cause: 'signed_out_event',
+              error_code: null,
+              error_message: 'gotrue SIGNED_OUT',
+            };
+            if (!_pendingServerRejectedSignout) {
+              _writePendingSignout(Object.assign({}, info, { when_iso: new Date().toISOString() }));
+              try { _phCapture('reader_ejection_deferred', info); } catch(e) {}
+            }
+            return;
+          }
           appStarted = false;
           // Break the identify binding so the post-logout session captures
           // a fresh anonymous distinct_id — otherwise the next visitor on
@@ -18691,7 +18839,7 @@ function initUI() {
           // is already false (fired here first). Completion paths are
           // still skipped inside _readerFireAbandonIfNeeded.
           if (state.currentScreen === 'reader') {
-            try { _readerFireAbandonIfNeeded(); } catch(e) {}
+            try { _readerFireAbandonIfNeeded('background'); } catch(e) {}
           }
         }
       });
@@ -18700,7 +18848,7 @@ function initUI() {
       // don't fire pagehide, so visibilitychange above carries the load.
       window.addEventListener('pagehide', () => {
         if (state.currentScreen === 'reader') {
-          try { _readerFireAbandonIfNeeded(); } catch(e) {}
+          try { _readerFireAbandonIfNeeded('pagehide'); } catch(e) {}
         }
       });
 
