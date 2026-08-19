@@ -2442,15 +2442,31 @@
 
   /* ── Psychology announcement card (home) ─────────────────────────
      One-off release card. Palette is HARD-CODED to the psychology
-     accent (#E8853A light / #FB923C dark) regardless of the user's
-     current subject theme, because the card is ANNOUNCING psychology
-     — rendering it in philosophy purple would misread. Uses locally-
-     scoped custom properties instead of var(--accent) so nested rules
-     stay consistent even if the parent theme changes. */
+     tokens regardless of the user's current subject theme, because
+     the card is ANNOUNCING psychology — rendering it in the active
+     theme's colors (philosophy purple, economics navy) misreads.
+
+     Every colour the card uses is scoped as a --psy-* custom
+     property on .psychology-announce-card. This is deliberate: CSS
+     custom properties resolve at the DECLARING element, so a bare
+     var(--ink) or var(--text-2) inside a card descendant would
+     resolve to whatever the root html.theme-* declares — leaking
+     the economics navy / philosophy purple into a psychology-branded
+     card. The .psychology-announce-card element declares --psy-ink /
+     --psy-text-2 / --psy-accent locally, and everything below uses
+     those.
+
+     CTA uses --psy-accent (#E8853A) directly rather than a darker
+     variant, honouring the psychology design system's "single orange
+     end to end" rule and its 2.68:1 brand-accepted contrast exception
+     for white-on-orange (see the html.theme-psychology CSS block
+     above). Do NOT "fix" the contrast by darkening — it turns brown
+     and defeats the palette. */
   .psychology-announce-card {
-    --psy-accent:      #E8853A;
-    --psy-accent-dark: #863F09;
-    --psy-glow:        rgba(232, 133, 58, 0.30);
+    --psy-accent: #E8853A;
+    --psy-ink:    #5C1F0C;
+    --psy-text-2: #A85832;
+    --psy-glow:   rgba(232, 133, 58, 0.30);
     position: relative;
     background: var(--surface);
     border: 1.5px solid var(--psy-accent);
@@ -2460,9 +2476,10 @@
     box-shadow: 0 6px 20px var(--psy-glow);
   }
   html.dark .psychology-announce-card {
-    --psy-accent:      #FB923C;
-    --psy-accent-dark: #EA580C;
-    --psy-glow:        rgba(251, 146, 60, 0.35);
+    --psy-accent: #FB923C;
+    --psy-ink:    #F0F8FB;
+    --psy-text-2: #B9CBD3;
+    --psy-glow:   rgba(251, 146, 60, 0.35);
   }
   .psychology-announce-dismiss {
     position: absolute;
@@ -2476,21 +2493,21 @@
     background: transparent;
     border: none;
     border-radius: 999px;
-    color: var(--text-2);
+    color: var(--psy-text-2);
     font-size: 18px;
     line-height: 1;
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .psychology-announce-dismiss:hover { background: var(--surface-2); color: var(--ink); }
+  .psychology-announce-dismiss:hover { background: var(--surface-2); color: var(--psy-ink); }
   .psychology-announce-dismiss:active { transform: scale(0.92); }
   .psychology-announce-title {
     font-family: 'Nunito', 'DM Sans', sans-serif;
     font-size: calc(22px * var(--text-scale));
     line-height: 1.25;
     font-weight: 900;
-    color: var(--ink);
+    color: var(--psy-ink);
     /* Reserve room for the × so a wrapped title doesn't collide. */
     padding-inline-end: 32px;
     margin: 0 0 10px;
@@ -2499,17 +2516,14 @@
   .psychology-announce-body {
     font-size: calc(15px * var(--text-scale));
     line-height: 1.5;
-    color: var(--ink);
+    color: var(--psy-ink);
     margin-bottom: 16px;
     text-align: start;
   }
   .psychology-announce-cta {
     display: inline-block;
     padding: 12px 24px;
-    /* --psy-accent-dark (#863F09 light / #EA580C dark) holds AA on
-       white text in both modes, mirroring .start-first-dialogue-cta's
-       accent-dark rationale. */
-    background: var(--psy-accent-dark);
+    background: var(--psy-accent);
     color: #ffffff;
     border: none;
     border-radius: 999px;
