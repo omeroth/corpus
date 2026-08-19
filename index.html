@@ -9283,57 +9283,112 @@ async function handleAuthSubmit() {
   errEl.textContent = '';
   errEl.style.color = '';
   _authInProgress = true;
+  const intent = authMode; // 'signin' | 'signup' — captured before any await
+  // Funnel: fire onboarding_auth_choice at CLICK time (moved from
+  // enterApp, where it previously fired post-success and produced
+  // count-identical events for user_logged_in / onboarding_auth_choice
+  // per method). Clicks now count intent; user_logged_in / user_signed_up
+  // count success; delta = failure + hang.
+  _phCapture('onboarding_auth_choice', { choice: intent, method: 'email' });
+  // Progress hint: after 4s swap the button label so users get feedback
+  // before the 10s hang timeout fires. Cleared in finally.
+  const hintTimer = setTimeout(() => {
+    if (btn.disabled) btn.textContent = isEn ? 'Still working…' : 'עדיין עובד…';
+  }, 4000);
+  const restoreLabel = () => {
+    btn.disabled = false;
+    btn.textContent = intent === 'signup' ? (isEn ? 'Sign Up' : 'הרשמה') : (isEn ? 'Sign In' : 'התחברות');
+  };
+  const hangMsg = isEn ? 'Sign in didn’t complete. Please try again.' : 'ההתחברות לא הושלמה. נסו שוב.';
   try {
-  if (authMode === 'signin') {
-    const { data, error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) {
-      errEl.textContent = error.message;
-      btn.disabled = false;
-      btn.textContent = isEn ? 'Sign In' : 'התחברות';
-      return;
-    }
-    appStarted = false; // allow enterApp to run
-    await enterApp(data.user);
-  } else {
-    // emailRedirectTo pins the confirmation redirect. Web builds send it back
-    // to the caller's origin (https://corpusapp.io/ on prod, http://localhost:*
-    // during local test). Capacitor native builds MUST override because
-    // window.location.origin evaluates to capacitor://localhost — a private
-    // app scheme that no external browser can open — so we hardcode the
-    // production web URL. The user completes confirmation in Safari and then
-    // returns to the app to sign in with their (now-confirmed) credentials;
-    // Universal-Link / deep-link plumbing for a seamless in-app return isn't
-    // wired up yet.
-    const _isNativeSignup = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
-    const _confirmRedirectTo = _isNativeSignup ? 'https://corpusapp.io/' : (window.location.origin + '/');
-    const { data, error } = await sb.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: _confirmRedirectTo }
-    });
-    if (error) {
-      errEl.textContent = error.message;
-      btn.disabled = false;
-      btn.textContent = isEn ? 'Sign Up' : 'הרשמה';
-      return;
-    }
-    if (data.session && data.session.user) {
-      // Auto-confirm enabled - session returned immediately, enter app directly
-      appStarted = false;
-      await enterApp(data.session.user);
-    } else if (data.user && !data.session) {
-      // Email confirmation required
-      errEl.style.color = 'var(--auth-success)';
-      errEl.textContent = 'We sent you a verification email. Click the link in the email to enter the app.';
-      btn.disabled = false;
-      btn.textContent = isEn ? 'Sign Up' : 'הרשמה';
-    } else {
-      // Fallback: try to use whatever user data came back
-      appStarted = false;
+    if (intent === 'signin') {
+      let res;
+      try {
+        res = await _authRace(sb.auth.signInWithPassword({ email, password }), 10000);
+      } catch(e) {
+        if (e === _AUTH_HANG_SENTINEL) {
+          _phCapture('auth_hang', { method: 'email', intent: 'signin', phase: 'supabase_signin', budget_ms: 10000 });
+          errEl.textContent = hangMsg;
+          restoreLabel();
+          return;
+        }
+        const info = _extractAuthError(e);
+        _phCapture('auth_failure', { method: 'email', intent: 'signin', phase: 'supabase_signin', error_code: info.code, error_message: info.message });
+        errEl.textContent = info.message;
+        restoreLabel();
+        return;
+      }
+      const { data, error } = res;
+      if (error) {
+        const info = _extractAuthError(error);
+        _phCapture('auth_failure', { method: 'email', intent: 'signin', phase: 'supabase_signin', error_code: info.code, error_message: info.message });
+        errEl.textContent = error.message;
+        restoreLabel();
+        return;
+      }
+      appStarted = false; // allow enterApp to run
       await enterApp(data.user);
+    } else {
+      // emailRedirectTo pins the confirmation redirect. Web builds send it back
+      // to the caller's origin (https://corpusapp.io/ on prod, http://localhost:*
+      // during local test). Capacitor native builds MUST override because
+      // window.location.origin evaluates to capacitor://localhost — a private
+      // app scheme that no external browser can open — so we hardcode the
+      // production web URL. The user completes confirmation in Safari and then
+      // returns to the app to sign in with their (now-confirmed) credentials;
+      // Universal-Link / deep-link plumbing for a seamless in-app return isn't
+      // wired up yet.
+      const _isNativeSignup = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+      const _confirmRedirectTo = _isNativeSignup ? 'https://corpusapp.io/' : (window.location.origin + '/');
+      let res;
+      try {
+        res = await _authRace(sb.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: _confirmRedirectTo }
+        }), 10000);
+      } catch(e) {
+        if (e === _AUTH_HANG_SENTINEL) {
+          _phCapture('auth_hang', { method: 'email', intent: 'signup', phase: 'supabase_signup', budget_ms: 10000 });
+          errEl.textContent = hangMsg;
+          restoreLabel();
+          return;
+        }
+        const info = _extractAuthError(e);
+        _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'supabase_signup', error_code: info.code, error_message: info.message });
+        errEl.textContent = info.message;
+        restoreLabel();
+        return;
+      }
+      const { data, error } = res;
+      if (error) {
+        const info = _extractAuthError(error);
+        _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'supabase_signup', error_code: info.code, error_message: info.message });
+        errEl.textContent = error.message;
+        restoreLabel();
+        return;
+      }
+      if (data.session && data.session.user) {
+        // Auto-confirm enabled - session returned immediately, enter app directly
+        appStarted = false;
+        await enterApp(data.session.user);
+      } else if (data.user && !data.session) {
+        // Email confirmation required
+        errEl.style.color = 'var(--auth-success)';
+        errEl.textContent = 'We sent you a verification email. Click the link in the email to enter the app.';
+        _phCapture('auth_email_confirmation_sent', { method: 'email' });
+        btn.disabled = false;
+        btn.textContent = isEn ? 'Sign Up' : 'הרשמה';
+      } else {
+        // Fallback: try to use whatever user data came back
+        appStarted = false;
+        await enterApp(data.user);
+      }
     }
+  } finally {
+    clearTimeout(hintTimer);
+    _authInProgress = false;
   }
-  } finally { _authInProgress = false; }
 }
 
 async function authWithGoogle() {
@@ -9347,6 +9402,29 @@ async function authWithGoogle() {
   if (errEl0) errEl0.textContent = '';
   const _isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   _authInProgress = true;
+  // Funnel: fire onboarding_auth_choice at CLICK time. OAuth uses a single
+  // "Continue with…" button regardless of new/returning, so intent defaults
+  // to 'signin'; user_signed_up (fired in enterApp) still counts the
+  // signup-vs-signin split for successful OAuth flows.
+  _phCapture('onboarding_auth_choice', { choice: 'signin', method: 'google' });
+  // Progress hint at 4s.
+  const hintTimer = setTimeout(() => {
+    if (btn && btn.disabled && gTxt) gTxt.textContent = isEn ? 'Still working…' : 'עדיין עובד…';
+  }, 4000);
+  const restoreBtn = () => {
+    if (!btn) return;
+    btn.disabled = false;
+    if (gTxt) gTxt.textContent = isEn ? 'Continue with Google' : 'המשך עם Google';
+    else btn.innerHTML = '<span class="auth-social-icon">G</span> <span id="auth-google-text">' + (isEn ? 'Continue with Google' : 'המשך עם Google') + '</span>';
+  };
+  const hangMsg = isEn ? 'Sign in didn’t complete. Please try again.' : 'ההתחברות לא הושלמה. נסו שוב.';
+  const capFail = (phase, err) => {
+    const info = _extractAuthError(err);
+    _phCapture('auth_failure', { method: 'google', intent: 'signin', phase, error_code: info.code, error_message: info.message });
+  };
+  const capHang = (phase) => {
+    _phCapture('auth_hang', { method: 'google', intent: 'signin', phase, budget_ms: 10000 });
+  };
   try {
     if (_isNative) {
       // Native iOS: native Google Sign-In via Capgo, then hand the idToken to Supabase.
@@ -9361,11 +9439,44 @@ async function authWithGoogle() {
       if (window.Capacitor.getPlatform() === 'ios') {
         loginArgs.options = { scopes: ['email', 'profile'] };
       }
-      const res = await window.Capacitor.Plugins.SocialLogin.login(loginArgs);
-      const idToken = res && res.result && res.result.idToken;
-      if (!idToken) throw new Error('No idToken from Google');
-      const { data, error } = await sb.auth.signInWithIdToken({ provider: 'google', token: idToken });
-      if (error) throw error;
+      let loginRes;
+      try {
+        loginRes = await _authRace(window.Capacitor.Plugins.SocialLogin.login(loginArgs), 10000);
+      } catch(e) {
+        if (e === _AUTH_HANG_SENTINEL) { capHang('provider_call'); const errEl = document.getElementById('auth-error'); if (errEl) errEl.textContent = hangMsg; restoreBtn(); return; }
+        capFail('provider_call', e);
+        const errEl = document.getElementById('auth-error');
+        if (errEl) errEl.textContent = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
+        restoreBtn();
+        return;
+      }
+      const idToken = loginRes && loginRes.result && loginRes.result.idToken;
+      if (!idToken) {
+        capFail('provider_call', new Error('No idToken from Google'));
+        const errEl = document.getElementById('auth-error');
+        if (errEl) errEl.textContent = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
+        restoreBtn();
+        return;
+      }
+      let exchange;
+      try {
+        exchange = await _authRace(sb.auth.signInWithIdToken({ provider: 'google', token: idToken }), 10000);
+      } catch(e) {
+        if (e === _AUTH_HANG_SENTINEL) { capHang('supabase_exchange'); const errEl = document.getElementById('auth-error'); if (errEl) errEl.textContent = hangMsg; restoreBtn(); return; }
+        capFail('supabase_exchange', e);
+        const errEl = document.getElementById('auth-error');
+        if (errEl) errEl.textContent = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
+        restoreBtn();
+        return;
+      }
+      const { data, error } = exchange;
+      if (error) {
+        capFail('supabase_exchange', error);
+        const errEl = document.getElementById('auth-error');
+        if (errEl) errEl.textContent = error.message || (isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.');
+        restoreBtn();
+        return;
+      }
       // Route through enterApp the same way handleAuthSubmit does after
       // signInWithPassword — no full-page reload. The reload existed as a
       // workaround from before the Capacitor Preferences storage adapter,
@@ -9378,25 +9489,45 @@ async function authWithGoogle() {
       appStarted = false;
       await enterApp((data && data.session && data.session.user) || (data && data.user) || null);
     } else {
-      // Web: existing OAuth redirect — unchanged.
-      const { error } = await sb.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: 'https://omeroth.github.io/corpus-app/' }
-      });
-      if (error) throw error;
+      // Web: existing OAuth redirect. If the call itself hangs before
+      // triggering navigation, the timeout below fires and we recover;
+      // once navigation starts, the page tears down and the timer is
+      // irrelevant.
+      let webRes;
+      try {
+        webRes = await _authRace(sb.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: 'https://omeroth.github.io/corpus-app/' }
+        }), 10000);
+      } catch(e) {
+        if (e === _AUTH_HANG_SENTINEL) { capHang('provider_call'); const errEl = document.getElementById('auth-error'); if (errEl) errEl.textContent = hangMsg; restoreBtn(); return; }
+        capFail('provider_call', e);
+        const errEl = document.getElementById('auth-error');
+        if (errEl) errEl.textContent = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
+        restoreBtn();
+        return;
+      }
+      if (webRes && webRes.error) {
+        capFail('provider_call', webRes.error);
+        const errEl = document.getElementById('auth-error');
+        if (errEl) errEl.textContent = webRes.error.message || (isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.');
+        restoreBtn();
+        return;
+      }
     }
   } catch(e) {
-    console.error('[Auth] Google sign-in error:', e);
+    // Belt-and-suspenders — the per-phase catches should cover everything,
+    // but any unexpected throw still lands here for capture rather than
+    // silently pinning the button.
+    console.error('[Auth] Google sign-in unexpected error:', e);
+    capFail('unknown', e);
     const errEl = document.getElementById('auth-error');
-    if (errEl) errEl.textContent = 'Sign in failed. Please try again.';
-    if (btn) {
-      btn.disabled = false;
-      // Prefer restoring via the still-in-DOM text span; fall back to the
-      // full innerHTML rebuild if the span has been removed for any reason.
-      if (gTxt) gTxt.textContent = isEn ? 'Continue with Google' : 'המשך עם Google';
-      else btn.innerHTML = '<span class="auth-social-icon">G</span> <span id="auth-google-text">' + (isEn ? 'Continue with Google' : 'המשך עם Google') + '</span>';
-    }
-  } finally { _authInProgress = false; }
+    if (errEl) errEl.textContent = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
+    restoreBtn();
+  } finally {
+    clearTimeout(hintTimer);
+    _authInProgress = false;
+  }
 }
 
 async function authWithApple() {
@@ -9407,13 +9538,45 @@ async function authWithApple() {
   const errEl = document.getElementById('auth-error'); if (errEl) errEl.textContent = '';
   const _isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   _authInProgress = true;
+  _phCapture('onboarding_auth_choice', { choice: 'signin', method: 'apple' });
+  const hintTimer = setTimeout(() => {
+    if (btn && btn.disabled && aTxt) aTxt.textContent = isEn ? 'Still working…' : 'עדיין עובד…';
+  }, 4000);
+  const restoreBtn = () => {
+    if (!btn) return;
+    btn.disabled = false;
+    if (aTxt) aTxt.textContent = isEn ? 'Continue with Apple' : 'המשך עם Apple';
+    else btn.innerHTML = '<span class="auth-social-icon"></span> <span id="auth-apple-text">' + (isEn ? 'Continue with Apple' : 'המשך עם Apple') + '</span>';
+  };
+  const hangMsg = isEn ? 'Sign in didn’t complete. Please try again.' : 'ההתחברות לא הושלמה. נסו שוב.';
+  const genericFailMsg = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
+  const capFail = (phase, err) => {
+    const info = _extractAuthError(err);
+    _phCapture('auth_failure', { method: 'apple', intent: 'signin', phase, error_code: info.code, error_message: info.message });
+  };
+  const capHang = (phase) => {
+    _phCapture('auth_hang', { method: 'apple', intent: 'signin', phase, budget_ms: 10000 });
+  };
   try {
     if (_isNative) {
-      const res = await window.Capacitor.Plugins.SocialLogin.login({ provider: 'apple', options: { scopes: ['name', 'email'] } });
-      const idToken = res && res.result && res.result.idToken;
-      if (!idToken) throw new Error('No idToken from Apple');
-      const { data, error } = await sb.auth.signInWithIdToken({ provider: 'apple', token: idToken });
-      if (error) throw error;
+      let loginRes;
+      try {
+        loginRes = await _authRace(window.Capacitor.Plugins.SocialLogin.login({ provider: 'apple', options: { scopes: ['name', 'email'] } }), 10000);
+      } catch(e) {
+        if (e === _AUTH_HANG_SENTINEL) { capHang('provider_call'); if (errEl) errEl.textContent = hangMsg; restoreBtn(); return; }
+        capFail('provider_call', e); if (errEl) errEl.textContent = genericFailMsg; restoreBtn(); return;
+      }
+      const idToken = loginRes && loginRes.result && loginRes.result.idToken;
+      if (!idToken) { capFail('provider_call', new Error('No idToken from Apple')); if (errEl) errEl.textContent = genericFailMsg; restoreBtn(); return; }
+      let exchange;
+      try {
+        exchange = await _authRace(sb.auth.signInWithIdToken({ provider: 'apple', token: idToken }), 10000);
+      } catch(e) {
+        if (e === _AUTH_HANG_SENTINEL) { capHang('supabase_exchange'); if (errEl) errEl.textContent = hangMsg; restoreBtn(); return; }
+        capFail('supabase_exchange', e); if (errEl) errEl.textContent = genericFailMsg; restoreBtn(); return;
+      }
+      const { data, error } = exchange;
+      if (error) { capFail('supabase_exchange', error); if (errEl) errEl.textContent = error.message || genericFailMsg; restoreBtn(); return; }
       // Route through enterApp the same way Google now does — see the
       // matching block in authWithGoogle for the full rationale. Session
       // is already persisted to Preferences before subscribers fire, and
@@ -9422,18 +9585,24 @@ async function authWithApple() {
       appStarted = false;
       await enterApp((data && data.session && data.session.user) || (data && data.user) || null);
     } else {
-      const { error } = await sb.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: 'https://corpusapp.io/' } });
-      if (error) throw error;
+      let webRes;
+      try {
+        webRes = await _authRace(sb.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: 'https://corpusapp.io/' } }), 10000);
+      } catch(e) {
+        if (e === _AUTH_HANG_SENTINEL) { capHang('provider_call'); if (errEl) errEl.textContent = hangMsg; restoreBtn(); return; }
+        capFail('provider_call', e); if (errEl) errEl.textContent = genericFailMsg; restoreBtn(); return;
+      }
+      if (webRes && webRes.error) { capFail('provider_call', webRes.error); if (errEl) errEl.textContent = webRes.error.message || genericFailMsg; restoreBtn(); return; }
     }
   } catch(e) {
-    console.error('[Auth] Apple sign-in error:', e);
-    if (errEl) errEl.textContent = 'Sign in failed. Please try again.';
-    if (btn) {
-      btn.disabled = false;
-      if (aTxt) aTxt.textContent = isEn ? 'Continue with Apple' : 'המשך עם Apple';
-      else btn.innerHTML = '<span class="auth-social-icon"></span> <span id="auth-apple-text">' + (isEn ? 'Continue with Apple' : 'המשך עם Apple') + '</span>';
-    }
-  } finally { _authInProgress = false; }
+    console.error('[Auth] Apple sign-in unexpected error:', e);
+    capFail('unknown', e);
+    if (errEl) errEl.textContent = genericFailMsg;
+    restoreBtn();
+  } finally {
+    clearTimeout(hintTimer);
+    _authInProgress = false;
+  }
 }
 
 let _introCarouselInited = false;
@@ -9486,6 +9655,30 @@ function _syncIntroIframeAppearance() {
 
 function _phCapture(event, props) {
   try { posthog.capture(event, props || {}); } catch(e) {}
+}
+
+// Auth-instrumentation helpers. Kept small and near _phCapture so the
+// three handlers (email / Google / Apple) share one shape for failure
+// and hang capture.
+//
+// _AUTH_HANG_SENTINEL — used to distinguish a timeout from a real
+// throw when racing an auth call against a timer.
+// _authRace(promise, ms) — Promise.race with the sentinel.
+// _extractAuthError(err) — best-effort {code, message} for capture.
+const _AUTH_HANG_SENTINEL = Symbol('auth_hang');
+async function _authRace(promise, ms) {
+  let _t;
+  const timer = new Promise((_, reject) => {
+    _t = setTimeout(() => reject(_AUTH_HANG_SENTINEL), ms);
+  });
+  try { return await Promise.race([promise, timer]); }
+  finally { clearTimeout(_t); }
+}
+function _extractAuthError(err) {
+  if (!err) return { code: null, message: 'unknown' };
+  const code = err.code || err.name || err.status || null;
+  const message = (err.message || String(err)).slice(0, 300);
+  return { code: code == null ? null : String(code), message: message };
 }
 
 function _phPlatform() {
@@ -17324,13 +17517,23 @@ async function handleEmailVerification() {
     try {
       const { data, error } = await sb.auth.getSession();
       if (data?.session?.user) {
+        // Complements auth_email_confirmation_sent: this event fires when
+        // the user actually returns after clicking the verification link,
+        // so sent→confirmed drop-off is measurable.
+        _phCapture('auth_email_confirmed', { method: 'email' });
         window.location.hash = '';
         appStarted = false;
         await enterApp(data.session.user);
         return true;
       }
+      if (error) {
+        const info = _extractAuthError(error);
+        _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'email_verification', error_code: info.code, error_message: info.message });
+      }
     } catch(e) {
       console.error('[Auth] Email verification error:', e);
+      const info = _extractAuthError(e);
+      _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'email_verification', error_code: info.code, error_message: info.message });
     }
   }
   return false;
@@ -17894,13 +18097,13 @@ async function enterApp(user) {
       const isNewUser = !!user.created_at && (Date.now() - new Date(user.created_at).getTime() < 60000);
       if (isNewUser) posthog.capture('user_signed_up', { method });
       posthog.capture('user_logged_in', { method });
-      // Funnel: onboarding_auth_choice. Signup vs signin inferred from the
-      // account-creation age window used above. method captures which
-      // provider (email/google/apple).
-      _phCapture('onboarding_auth_choice', {
-        choice: isNewUser ? 'signup' : 'signin',
-        method: method,
-      });
+      // NOTE: onboarding_auth_choice moved to click time in each handler
+      // (handleAuthSubmit / authWithGoogle / authWithApple / enterAsGuest /
+      // _enterAsGuestSilent). Previously fired here post-success, which
+      // made choice-count identical to user_logged_in-count and hid every
+      // failure from the funnel. Success events (user_logged_in /
+      // user_signed_up) remain here so the delta between choice and
+      // login now measures failures + hangs.
     } catch(e) {}
     try {
       posthog.identify(user.id, {
