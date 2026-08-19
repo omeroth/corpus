@@ -14620,7 +14620,12 @@ function populateCarousel() {
     const unlocked = state.unlockedThinkers.includes(t.id);
     const card = document.createElement('div');
     card.className = 'thinker-carousel-card ' + (unlocked ? 'unlocked' : 'locked');
-    card.dataset.subject = t.subject || 'philosophy';
+    // Frame color follows the CAROUSEL's subject, not the thinker's
+    // primary. A multi-subject thinker (Kahneman) appearing in the
+    // psychology carousel should read as psychology; in the economics
+    // carousel, as economics. Same principle as the intro-portrait
+    // fix in _renderThinkerIntro.
+    card.dataset.subject = subject;
     card.innerHTML = `
       <img src="${t.image}" alt="${t.name}" loading="lazy">
       <div class="thinker-carousel-name">${t.name}</div>
@@ -19241,10 +19246,14 @@ function renderPantheon() {
   const container = document.getElementById('pantheon-container');
   if (!container) return;
 
-  function cardHtml(t) {
+  // sectionSubject is the SUBJECTS[i].id the card is being rendered
+  // under, not the thinker's primary — a multi-subject thinker
+  // (Kahneman) appears in both the economics and psychology sections
+  // and gets each section's frame color respectively.
+  function cardHtml(t, sectionSubject) {
     const isUnlocked = validUnlocked.includes(t.id);
     const displayName = t.name;
-    const subject = t.subject || 'philosophy';
+    const subject = sectionSubject || t.subject || 'philosophy';
     if (isUnlocked) {
       return `
         <div class="pantheon-card" data-subject="${subject}" onclick="flipThinkerCard(this, '${t.id}')">
@@ -19300,7 +19309,7 @@ function renderPantheon() {
     return `
       <div class="pantheon-section">
         <div class="pantheon-section-title">${label}</div>
-        <div class="pantheon-grid">${subjectThinkers.map(cardHtml).join('')}</div>
+        <div class="pantheon-grid">${subjectThinkers.map(t => cardHtml(t, subj.id)).join('')}</div>
       </div>`;
   }).join('');
 }
