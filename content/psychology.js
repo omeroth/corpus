@@ -649,7 +649,7 @@ const psychologyData = {
           {
             type: 'depth',
             title: 'מה שרד מפרויד, ומה לא', titleEn: 'What Survived of Freud, and What Did Not',
-            content: 'כאן חשוב להיות הוגנים. חלק גדול מהתיאוריה הספציפית של פרויד לא שרד בתפיסה המדעית המקובלת. הטענה שכמעט כל דחף הוא מיני במקורו נדחתה, ורוב הכלים שלו אינם ניתנים לבדיקה אמפירית. פסיכולוגים רבים היום לא מקבלים את המנגנון שהוא הציע.</p><p>אבל התובנה המרכזית דווקא כן שרדה, ואפילו התחזקה. מחקר בן מאה שנה מראה ש<strong>רוב העיבוד במוח מתרחש מחוץ למודעות</strong>, ושאנשים מייצרים בביטחון הרבה הסברים להתנהגות שלהם גם כשההסבר שגוי לחלוטין. פרויד אולי טעה בחלק מהפרטים, אבל צדק בגדול: <strong>אנחנו לא צופים אמינים של עצמנו</strong>.</p><p>וכאן נפתח הוויכוח של השבוע. פרויד קבע שהמנוע הוא דחף שאסור לדעת עליו. תלמידו אלפרד אדלר יסכים שיש מנוע נסתר, אבל יטען ש<strong>פרויד זיהה את המנוע הלא נכון</strong>. לא מין, יאמר אדלר מחר, אלא משהו אחר לגמרי.',
+            content: 'כאן חשוב להיות הוגנים. חלק גדול מהתיאוריה הספציפית של פרויד לא שרד בתפיסה המדעית המקובלת. הטענה שכמעט כל דחף הוא מיני במקורו נדחתה, ורוב הכלים שלו אינם ניתנים לבדיקה אמפירית. פסיכולוגים רבים היום לא מקבלים את המנגנון שהוא הציע.</p><p>אבל התובנה המרכזית דווקא כן שרדה, ואפילו התחזקה. מחקר בן מאה שנה מראה ש<strong>רוב העיבוד במוח מתרחש מחוץ למודעות</strong>, ושאנשים מייצרים בביטחון הרבה הסברים להתנהגות שלהם גם כשההסבר שגוי לחלוטין. פרויד אולי טעה בחלק מהפרטים, אבל צדק בגדול: <strong>אנחנו לא צופים אמינים של עצמנו</strong>.</p><p>וכאן נפתח הוויכוח של השבוע. פרויד קבע שהמנוע הוא דחף שאסור לדעת עליו. תלמידו אלפרד אדלר יסכים שיש מנוע נסתר, אבל יטען ש<strong>פרויד זיהה את המנוע הלא נכון</strong>. לא מין, יטען אדלר בדיאלוג הבא, אלא כוח אחר לגמרי.',
             contentEn: 'Here it is important to be fair. A large part of Freud\'s specific theory did not survive in the accepted scientific view. The claim that almost every drive is sexual in origin was rejected, and most of his tools cannot be tested empirically. Many psychologists today do not accept the mechanism he proposed.</p><p>But the central insight did survive, and even grew stronger. A hundred years of research show that <strong>most of the processing in the brain takes place outside of awareness</strong>, and that people confidently produce many explanations for their behavior even when the explanation is completely wrong. Freud may have been wrong about some of the details, but he was right on the big thing: <strong>we are not reliable observers of ourselves</strong>.</p><p>And here the argument of the week opens. Freud determined that the engine is a drive one is not allowed to know about. His student Alfred Adler will agree that there is a hidden engine, but will argue that <strong>Freud identified the wrong engine</strong>. Not sex, Adler will say tomorrow, but something else entirely.',
           },
           {
@@ -737,7 +737,7 @@ const psychologyData = {
           {
             type: 'depth',
             title: 'לא מה שקרה לך, אלא לאן אתה חותר', titleEn: 'Not What Happened to You, but What You Are Striving Toward',
-            content: 'כאן ההבדל העמוק בין השניים, והוא לא רק על מין מול כוח.</p><p><strong>פרויד מסביר אותנו מאחור</strong>: מה שקרה בעבר דוחף אותנו קדימה, ואנחנו תוצאה של מה שכבר היה. <strong>אדלר הפך את החץ</strong>. הוא טען שאנחנו נמשכים מלפנים, אל מטרה. לכל אדם יש דימוי, לרוב לא מודע, של מי שהוא רוצה להיות, וכל התנהגות היא צעד לשם. <strong>לא "מה קרה לך", אלא "לאן אתה חותר"</strong>.</p><p>ויש עוד נקודה שאדלר התעקש עליה, ובלעדיה מפספסים אותו. השאיפה כלפי מעלה יכולה ללכת לשני מקומות. אפשר להרגיש גדול על ידי תרומה, כשהערך שלנו נבנה ממה שאנחנו נותנים לאחרים. ואפשר להרגיש גדול על ידי הקטנה, כשהערך נבנה מכך שמישהו אחר נמוך יותר. אותו מנוע בדיוק, שני כיוונים הפוכים. <strong>אדלר קבע שרק הראשון עובד לאורך זמן</strong>.</p><p>בדיאלוג הבא, מאסלו ייקח את התנועה הזו כלפי מעלה ויעשה לה סדר: לא דחיפה אחת, אלא סולם שלם.',
+            content: 'כאן ההבדל העמוק בין השניים, והוא לא רק על מין מול כוח.</p><p><strong>פרויד מסביר אותנו לאחור</strong>: מה שקרה בעבר דוחף אותנו קדימה, ואנחנו תוצאה של מה שכבר היה. <strong>אדלר הפך את החץ</strong>. הוא טען שאנחנו נמשכים מלפנים, אל מטרה. לכל אדם יש דימוי, לרוב לא מודע, של מי שהוא רוצה להיות, וכל התנהגות היא צעד לשם. <strong>לא "מה קרה לך", אלא "לאן אתה חותר"</strong>.</p><p>ויש עוד נקודה שאדלר התעקש עליה, ובלעדיה מפספסים אותו. השאיפה כלפי מעלה יכולה ללכת לשני מקומות. אפשר להרגיש גדול על ידי תרומה, כשהערך שלנו נבנה ממה שאנחנו נותנים לאחרים. ואפשר להרגיש גדול על ידי הקטנה, כשהערך נבנה מכך שמישהו אחר נמוך יותר. אותו מנוע בדיוק, שני כיוונים הפוכים. <strong>אדלר קבע שרק הראשון עובד לאורך זמן</strong>.</p><p>בדיאלוג הבא, מאסלו ייקח את התנועה הזו כלפי מעלה ויעשה לה סדר: לא דחיפה אחת, אלא סולם שלם.',
             contentEn: 'Here is the deep difference between the two, and it is not only about sex versus power.</p><p><strong>Freud explains us from behind</strong>: what happened in the past pushes us forward, and we are the result of what already was. <strong>Adler reversed the arrow</strong>. He argued that we are pulled from in front, toward a goal. Every person has an image, usually unconscious, of who he wants to be, and every behavior is a step toward it. <strong>Not "what happened to you", but "what are you striving toward"</strong>.</p><p>And there is another point Adler insisted on, and without it he is missed. The striving upward can go to two places. You can feel big through contribution, when our worth is built from what we give to others. And you can feel big through diminishment, when the worth is built from someone else being lower. Exactly the same engine, two opposite directions. <strong>Adler determined that only the first works over time</strong>.</p><p>In the next dialogue, Maslow will take this upward movement and put it in order: not one push, but an entire ladder.',
           },
           {
@@ -988,7 +988,7 @@ const psychologyData = {
           {
             type: 'quiz',
             title: 'שאלה 1', titleEn: 'Question 1',
-            question: '',
+            question: 'אדם משותק מרוב אפשרויות, ואז מאמץ שיטה נוקשה שמכריעה עבורו הכול, ומרגיש הקלה עצומה. לפי פרום, מה מלמדת ההקלה?',
             questionEn: 'A person is paralyzed by too many options, and then adopts a rigid method that decides everything for him, and feels enormous relief. According to Fromm, what does the relief teach?',
             options: [
               'שהשיטה נכונה עבורו, שהרי אחרת לא היה מרגיש טוב כל כך',
@@ -1142,8 +1142,8 @@ const psychologyData = {
           {
             type: 'explanation',
             title: 'המסע שעברנו', titleEn: 'The Journey We Took',
-            content: 'פרויד: <strong>דחפים שאיננו מודעים אליהם</strong>. אדלר: הרצון לא להרגיש קטנים. מאסלו: מה שחסר לנו עכשיו. פרנקל: <strong>משמעות</strong>. פרום: הבריחה מחירות. דצ\'י וראיאן: הסיבה חייבת להיות שלנו.',
-            contentEn: 'Freud: <strong>drives we are not aware of</strong>. Adler: the wish not to feel small. Maslow: what we lack now. Frankl: <strong>meaning</strong>. Fromm: the escape from freedom. Deci and Ryan: the reason has to be ours.',
+            content: 'פרויד: <strong>דחפים שאיננו מודעים אליהם</strong>. אדלר: <strong>הרצון לא להרגיש קטנים</strong>. מאסלו: <strong>מה שחסר לנו עכשיו</strong>. פרנקל: <strong>משמעות</strong>. פרום: <strong>הבריחה מחירות</strong>. דצ\'י וראיאן: <strong>הסיבה חייבת להיות שלנו</strong>.',
+            contentEn: 'Freud: <strong>drives we are not aware of</strong>. Adler: <strong>the wish not to feel small</strong>. Maslow: <strong>what we lack now</strong>. Frankl: <strong>meaning</strong>. Fromm: <strong>the escape from freedom</strong>. Deci and Ryan: <strong>the reason has to be ours</strong>.',
           },
           {
             type: 'explanation',
@@ -1223,7 +1223,7 @@ const psychologyData = {
           {
             type: 'idea',
             title: 'הילדות שנכתבת בנו', titleEn: 'The Childhood Written Into Us',
-            content: 'בפרק הקודם ראינו שפרויד (וחלק מההוגים האחרים) טען שהמנוע שמניע אותנו נסתר מאיתנו. עכשיו נשאלת השאלה הבאה: <strong>מאיפה המנוע הזה הגיע מלכתחילה?</strong> מתי בעצם הפכנו למי שאנחנו?</p><p>התשובה של פרויד הייתה רדיקלית לזמנה. ב-1905, בספר "שלוש מסות על התיאוריה של המיניות", הוא טען ש<strong>האישיות נבנית בילדות המוקדמת מאוד, הרבה לפני שיש לנו זיכרון מסודר</strong>. הילד עובר לדעתו רצף של שלבים התפתחותיים, וכל שלב מתארגן סביב מקור אחר של הנאה וקשר: הפה וההזנה בינקות, השליטה בגוף בגיל הרך, ואחר כך היחסים בתוך המשפחה.</p><p>והנקודה שהרעישה את אירופה: מה שקורה בשלבים האלה אינו מתפוגג. הוא מתקבע ומכתיב את המבוגר. <strong>בגרות, לפי פרויד, אינה יציאה מהילדות. היא הצורה שהילדות לבשה</strong>.',
+            content: 'בפרק הקודם ראינו שפרויד (וחלק מההוגים האחרים) טען שהמנוע שמניע אותנו נסתר מאיתנו. עכשיו נשאלת השאלה הבאה: <strong>מאיפה המנוע הזה הגיע מלכתחילה?</strong> מתי בעצם הפכנו למי שאנחנו?</p><p>התשובה של פרויד הייתה רדיקלית לזמנה. ב-1905, בספר "שלוש מסות על התיאוריה של המיניות", הוא טען ש<strong>האישיות נבנית בילדות המוקדמת מאוד, הרבה לפני שיש לנו זיכרון מסודר</strong>. הילד עובר לדעתו רצף של שלבים התפתחותיים, וכל שלב מתארגן סביב מקור אחר של הנאה וקשר: הפה וההזנה בינקות, השליטה בגוף בגיל הרך, ואחר כך היחסים בתוך המשפחה.</p><p>והנקודה שהרעישה את אירופה: מה שקורה בשלבים האלה אינו מתפוגג. הוא מתקבע ומעצב את המבוגר. <strong>בגרות, לפי פרויד, אינה יציאה מהילדות. היא הצורה שהילדות לבשה</strong>.',
             contentEn: 'In the previous chapter we saw that Freud (and some of the other thinkers) argued that the engine that drives us is hidden from us. Now the next question arises: <strong>where did this engine come from in the first place?</strong> When exactly did we become who we are?</p><p>Freud\'s answer was radical for its time. In 1905, in the book "Three Essays on the Theory of Sexuality", he argued that <strong>personality is built in very early childhood, long before we have organized memory</strong>. In his view the child passes through a sequence of developmental stages, and each stage is organized around a different source of pleasure and connection: the mouth and feeding in infancy, control of the body in early childhood, and afterwards the relationships within the family.</p><p>And the point that shook Europe: what happens in these stages does not fade away. It becomes fixed and dictates the adult. <strong>Adulthood, according to Freud, is not an exit from childhood. It is the form childhood took</strong>.',
           },
           {
@@ -1254,7 +1254,9 @@ const psychologyData = {
             question: 'אדם מגלה שברגעי לחץ הוא תמיד מחפש משהו לאכול או ללעוס, בלי לדעת למה. כיצד פרויד היה מסביר זאת?',
             questionEn: 'A person discovers that in moments of stress he is always looking for something to eat or chew, without knowing why. How would Freud explain this?',
             options: [
-              'זהו הרגל אקראי שנרכש בבגרות, בלי שום שורש מוקדם ב. תבנית מוקדמת שנתקעה וממשיכה לפעול אחרי שסיבתה נשכחה ג. עניין גופני בלבד, שאין לו קשר להתפתחות הנפשית שלו',
+              'זהו הרגל אקראי שנרכש בבגרות, בלי שום שורש מוקדם',
+              'תבנית מוקדמת שנתקעה וממשיכה לפעול אחרי שסיבתה נשכחה',
+              'עניין גופני בלבד, שאין לו קשר להתפתחות הנפשית שלו',
             ],
             optionsEn: [
               'This is a random habit acquired in adulthood, with no early root',
@@ -1271,7 +1273,9 @@ const psychologyData = {
             question: 'חבר אומר: "פרויד כבר לא רלוונטי, המדע דחה את השלבים שלו." מהי התשובה המדויקת?',
             questionEn: 'A friend says: "Freud is no longer relevant, science rejected his stages." What is the precise answer?',
             options: [
-              'הוא צודק לגמרי, ולא נשאר בפרויד דבר שראוי להתייחס אליו ב. הוא טועה, שכן המחקר המודרני אישש כל פרט בתיאוריה שלו ג. חלק מהפרטים אכן נדחו, אבל התובנה שהילדות מעצבת אותנו שרדה',
+              'הוא צודק לגמרי, ולא נשאר בפרויד דבר שראוי להתייחס אליו',
+              'הוא טועה, שכן המחקר המודרני אישש כל פרט בתיאוריה שלו',
+              'חלק מהפרטים אכן נדחו, אבל התובנה שהילדות מעצבת אותנו שרדה',
             ],
             optionsEn: [
               'He is entirely right, and nothing remains in Freud worth relating to',
@@ -1288,7 +1292,9 @@ const psychologyData = {
             question: 'מהי המסקנה השגויה שקל להסיק מהרעיון שהילדות מעצבת אותנו?',
             questionEn: 'What is the mistaken conclusion that is easy to draw from the idea that childhood shapes us?',
             options: [
-              'שהעבר קובע הכל, ולכן אדם אינו יכול להשתנות לעולם ב. שהילדות אינה חשובה, ורק ההווה קובע מי אנחנו היום ג. שרק זיכרונות מודעים משפיעים עלינו, ולא תבניות מוקדמות',
+              'שהעבר קובע הכל, ולכן אדם אינו יכול להשתנות לעולם',
+              'שהילדות אינה חשובה, ורק ההווה קובע מי אנחנו היום',
+              'שרק זיכרונות מודעים משפיעים עלינו, ולא תבניות מוקדמות',
             ],
             optionsEn: [
               'That the past determines everything, and therefore a person can never change',
@@ -1336,7 +1342,9 @@ const psychologyData = {
             question: 'שני אנשים מגלים שבן זוגם איחר בלי להודיע. האחד רגוע לגמרי, השני בטוח שנעזב. לפי בולבי, מהיכן ההבדל?',
             questionEn: 'Two people discover that their partner was late without letting them know. One is completely calm, the other is certain he has been abandoned. According to Bowlby, where does the difference come from?',
             options: [
-              'מהאירוע עצמו, שכנראה היה שונה במקרה אחד מהשני ב. מהמודל הפנימי שנבנה בקשרים המוקדמים של כל אחד מהם ג. מהאופי המולד, שאין לו קשר לחוויות המוקדמות בילדות',
+              'מהאירוע עצמו, שכנראה היה שונה במקרה אחד מהשני',
+              'מהמודל הפנימי שנבנה בקשרים המוקדמים של כל אחד מהם',
+              'מהאופי המולד, שאין לו קשר לחוויות המוקדמות בילדות',
             ],
             optionsEn: [
               'From the event itself, which was probably different in one case than the other',
@@ -1353,7 +1361,9 @@ const psychologyData = {
             question: 'חבר טוען: "בולבי זה עוד פרויד, השערות יפות שאי אפשר לבדוק." היכן הוא טועה?',
             questionEn: 'A friend claims: "Bowlby is just another Freud, beautiful hypotheses that cannot be tested." Where is he wrong?',
             options: [
-              'בשום מקום, גם תיאוריית ההתקשרות נותרה השערה בלתי נבדקת ב. הוא צודק חלקית, שכן רק חלק קטן מהרעיון נבדק אי פעם ג. דפוסי ההתקשרות נמדדו בניסוי "המצב הזר" ואוששו במאות מחקרים',
+              'בשום מקום, גם תיאוריית ההתקשרות נותרה השערה בלתי נבדקת',
+              'הוא צודק חלקית, שכן רק חלק קטן מהרעיון נבדק אי פעם',
+              'דפוסי ההתקשרות נמדדו בניסוי "המצב הזר" ואוששו במאות מחקרים',
             ],
             optionsEn: [
               'Nowhere, attachment theory too remained an untested hypothesis',
@@ -1370,7 +1380,9 @@ const psychologyData = {
             question: 'אדם עם דפוס התקשרות חרד מילדותו חי שנים עם בן זוג יציב ותומך. מה צפוי לפי המחקר?',
             questionEn: 'A person with an anxious attachment pattern from childhood lives for years with a stable and supportive partner. What is expected according to the research?',
             options: [
-              'דבר לא ישתנה, שכן המודל המוקדם קובע את הקשרים לתמיד ב. המודל הפנימי שלו יכול להשתנות, כי קשר אמין מאוחר יכול לשכתב אותו מחדש ג. הוא ידחה את בן הזוג בהכרח, מפני שיציבות זרה לתבנית שלו',
+              'דבר לא ישתנה, שכן המודל המוקדם קובע את הקשרים לתמיד',
+              'המודל הפנימי שלו יכול להשתנות, כי קשר אמין מאוחר יכול לשכתב אותו מחדש',
+              'הוא ידחה את בן הזוג בהכרח, מפני שיציבות זרה לתבנית שלו',
             ],
             optionsEn: [
               'Nothing will change, since the early model determines relationships forever',
@@ -1408,7 +1420,7 @@ const psychologyData = {
           },
           {
             type: 'depth',
-            title: 'שלמות אינה מטרה, נסבלות היא', titleEn: 'Perfection Is Not the Goal, Bearability Is',
+            title: 'טובה דיה, לא מושלמת', titleEn: 'Good Enough, Not Perfect',
             content: 'וכאן מגיע החידוד שהופך את הרעיון לרלוונטי לחיים בוגרים. <strong>העצמי הכוזב אינו הפרעה נדירה, הוא מוכר לכולם</strong>. זה האדם שתמיד יודע מה לומר כדי שיאהבו אותו, שקורא את החדר בשלמות, שנשאל "מה בא לך?" ומגלה שאין לו מושג. הוא למד מוקדם שהתאמה עובדת טוב יותר מספונטניות.</p><p>ויניקוט לא ראה בזה רק פגם. עצמי כוזב במידה מסוימת הוא מיומנות חברתית הכרחית. הבעיה מתחילה כשהוא תופס את מקומו של "העצמי האמיתי", ואז <strong>החיים מרגישים מוצלחים מבחוץ וריקים מבפנים</strong>.</p><p>וצריך לומר בכנות: ויניקוט הגיע מהקליניקה, לא מהמעבדה. הוא צפה באלפי תינוקות והורים, אבל לא ניסח ניסויים מבוקרים כמו איינסוורת\'. עם זאת, המושג "טובה דיה" הפך לאחד המשפיעים ביותר על הורות מודרנית, בדיוק מפני שהוא הפוך לאינטואיציה: <strong>מי שמנסה להיות הורה מושלם עלול למנוע מהילד את החיכוך שבונה אותו</strong>.</p><p>ומכאן לדיאלוג הבא. פרויד, בולבי, איינסוורת\' וויניקוט התמקדו בשנים הראשונות. אריק אריקסון, לעומתם, יטען שהעיצוב אינו נעצר שם אלא נמשך כל החיים, ושלכל שלב בחיים יש משימה משלו.',
             contentEn: 'And here comes the refinement that makes the idea relevant to adult life. <strong>The false self is not a rare disorder, it is familiar to everyone</strong>. It is the person who always knows what to say so that he will be liked, who reads the room perfectly, who is asked "what do you feel like?" and discovers he has no idea. He learned early that adaptation works better than spontaneity.</p><p>Winnicott did not see this only as a flaw. A false self to a certain degree is a necessary social skill. The problem begins when it takes the place of "the true self", and then <strong>life feels successful from the outside and empty from within</strong>.</p><p>And it must be said honestly: Winnicott came from the clinic, not from the laboratory. He observed thousands of infants and parents, but did not formulate controlled experiments like Ainsworth. Even so, the concept "good enough" became one of the most influential on modern parenting, precisely because it is counterintuitive: <strong>someone who tries to be a perfect parent may deprive the child of the friction that builds him</strong>.</p><p>And from here to the next dialogue. Freud, Bowlby, Ainsworth and Winnicott focused on the first years. Erik Erikson, by contrast, will argue that the shaping does not stop there but continues throughout life, and that every stage in life has a task of its own.',
           },
@@ -1418,7 +1430,9 @@ const psychologyData = {
             question: 'הורה מתאמץ להיענות לתינוקו באופן מיידי ומושלם בכל פעם. לפי ויניקוט, מה הבעיה?',
             questionEn: 'A parent makes an effort to respond to his infant immediately and perfectly every time. According to Winnicott, what is the problem?',
             options: [
-              'אין שום בעיה, זו בדיוק ההורות שוויניקוט המליץ עליה ב. הילד לא יחווה את הפער שדרכו הוא מגלה שהעולם נפרד ממנו ג. ההורה יתעייף, וזו הסיבה היחידה שוויניקוט התנגד לכך',
+              'אין שום בעיה, זו בדיוק ההורות שוויניקוט המליץ עליה',
+              'הילד לא יחווה את הפער שדרכו הוא מגלה שהעולם נפרד ממנו',
+              'ההורה יתעייף, וזו הסיבה היחידה שוויניקוט התנגד לכך',
             ],
             optionsEn: [
               'There is no problem at all, this is exactly the parenting Winnicott recommended',
@@ -1435,7 +1449,9 @@ const psychologyData = {
             question: 'אדם מצליח בעבודתו ואהוב על כולם, אך כשנשאל מה הוא רוצה, אין לו תשובה. כיצד ויניקוט היה מתאר זאת?',
             questionEn: 'A person succeeds in his work and is loved by everyone, but when asked what he wants, he has no answer. How would Winnicott describe this?',
             options: [
-              'עצמי כוזב שתפס את מקומו של מה שעולה בו מבפנים ב. חוסר עניין טבעי בחיים, שאינו קשור להתפתחות מוקדמת ג. סימן לבריאות נפשית, שהרי הוא מסתדר היטב עם כולם',
+              'עצמי כוזב שתפס את מקומו של מה שעולה בו מבפנים',
+              'חוסר עניין טבעי בחיים, שאינו קשור להתפתחות מוקדמת',
+              'סימן לבריאות נפשית, שהרי הוא מסתדר היטב עם כולם',
             ],
             optionsEn: [
               'A false self that has taken the place of what arises in him from within',
@@ -1452,7 +1468,9 @@ const psychologyData = {
             question: 'מה ההבדל בין ויניקוט לבין בולבי מבחינת סוג הראיות שעליהן נשענו?',
             questionEn: 'What is the difference between Winnicott and Bowlby in terms of the kind of evidence they relied on?',
             options: [
-              'אין הבדל, שניהם ביססו את עבודתם על ניסויים מבוקרים ב. בולבי הסתמך על קליניקה בלבד, וויניקוט על ניסויים בשטח ג. ויניקוט נשען על תצפית קלינית, ובולבי נבדק גם בניסוי מדיד',
+              'אין הבדל, שניהם ביססו את עבודתם על ניסויים מבוקרים',
+              'בולבי הסתמך על קליניקה בלבד, וויניקוט על ניסויים בשטח',
+              'ויניקוט נשען על תצפית קלינית, ובולבי נבדק גם בניסוי מדיד',
             ],
             optionsEn: [
               'There is no difference, both based their work on controlled experiments',
@@ -1469,7 +1487,7 @@ const psychologyData = {
           {
             type: 'idea',
             title: 'העיצוב לא נגמר בילדות', titleEn: 'The Shaping Does Not End',
-            content: 'שלושת ההוגים עד כה הביטו בשנים הראשונות. אריק אריקסון, פסיכואנליטיקאי יליד גרמניה שהיגר לארצות הברית, טען טענה שחלקה על מורו פרויד: <strong>ההתפתחות אינה נעצרת בילדות. היא נמשכת עד היום האחרון</strong>.</p><p>אריקסון תיאר <strong>שמונה שלבים לאורך החיים</strong>, ובכל שלב יש משימה משימה התפתחותית אחרת. לא משימה שאדם בוחר, אלא כזו שהחיים מציבים בפניו בגיל הזה. בכל שלב נפתח מתח בין שני קטבים, ומה שקורה שם מעצב את מי שנהיה בהמשך.</p><p>ויש כאן שינוי עמוק מפרויד. פרויד תיאר התפתחות פסיכו-מינית, שמונעת מדחפים פנימיים. אריקסון תיאר <strong>התפתחות פסיכו-חברתית</strong>: מה שמעצב אותנו הוא המפגש בין הפנים לבין מה שהחברה דורשת מאיתנו בכל גיל. הוא גם זה שטבע את הביטוי <strong>"משבר זהות"</strong>.',
+            content: 'שלושת ההוגים עד כה הביטו בשנים הראשונות. אריק אריקסון, פסיכואנליטיקאי יליד גרמניה שהיגר לארצות הברית, טען טענה שחלקה על מורו פרויד: <strong>ההתפתחות אינה נעצרת בילדות. היא נמשכת עד היום האחרון</strong>.</p><p>אריקסון תיאר <strong>שמונה שלבים לאורך החיים</strong>, ובכל שלב יש משימה התפתחותית אחרת. לא משימה שאדם בוחר, אלא כזו שהחיים מציבים בפניו בגיל הזה. בכל שלב נפתח מתח בין שני קטבים, ומה שקורה שם מעצב את מי שנהיה בהמשך.</p><p>ויש כאן שינוי עמוק מפרויד. פרויד תיאר התפתחות פסיכו-מינית, שמונעת מדחפים פנימיים. אריקסון תיאר <strong>התפתחות פסיכו-חברתית</strong>: מה שמעצב אותנו הוא המפגש בין הפנים לבין מה שהחברה דורשת מאיתנו בכל גיל. הוא גם זה שטבע את הביטוי <strong>"משבר זהות"</strong>.',
             contentEn: 'The three thinkers so far looked at the first years. Erik Erikson, a German-born psychoanalyst who emigrated to the United States, made a claim that differed from that of his teacher Freud: <strong>development does not stop in childhood. It continues until the last day</strong>.</p><p>Erikson described <strong>eight stages across life</strong>, and in each stage there is a different developmental task. Not a task a person chooses, but one that life places before him at that age. In every stage a tension opens between two poles, and what happens there shapes who we become later on.</p><p>And there is a deep change here from Freud. Freud described psychosexual development, driven by internal drives. Erikson described <strong>psychosocial development</strong>: what shapes us is the encounter between the inside and what society demands of us at each age. He is also the one who coined the expression <strong>"identity crisis"</strong>.',
           },
           {
@@ -1500,7 +1518,9 @@ const psychologyData = {
             question: 'אדם בן חמישים מרגיש לפתע צורך להדריך צעירים ולהשאיר משהו אחריו. לפי אריקסון, מה קורה כאן?',
             questionEn: 'A fifty-year-old man suddenly feels a need to mentor young people and to leave something behind him. According to Erikson, what is happening here?',
             options: [
-              'משבר אקראי שאין לו קשר לשלב שבו הוא נמצא בחייו ב. המשימה של אמצע החיים, יצירתיות מול קיפאון, נפתחה אצלו ג. חזרה לשלב הילדות, שכן ההתפתחות מסתיימת בגיל ההתבגרות',
+              'משבר אקראי שאין לו קשר לשלב שבו הוא נמצא בחייו',
+              'המשימה של אמצע החיים, יצירתיות מול קיפאון, נפתחה אצלו',
+              'חזרה לשלב הילדות, שכן ההתפתחות מסתיימת בגיל ההתבגרות',
             ],
             optionsEn: [
               'A random crisis that has no connection to the stage he is in in his life',
@@ -1517,7 +1537,9 @@ const psychologyData = {
             question: 'במה חולק אריקסון על פרויד באופן המשמעותי ביותר?',
             questionEn: 'In what way did Erikson differ from Freud most significantly?',
             options: [
-              'הוא טען שהילדות אינה משפיעה כלל על מי שאנחנו כמבוגרים ב. הוא טען שההתפתחות נמשכת כל החיים ולא נעצרת בהתבגרות ג. הוא טען שרק דחפים פנימיים מעצבים אותנו, ולא החברה',
+              'הוא טען שהילדות אינה משפיעה כלל על מי שאנחנו כמבוגרים',
+              'הוא טען שההתפתחות נמשכת כל החיים ולא נעצרת בהתבגרות',
+              'הוא טען שרק דחפים פנימיים מעצבים אותנו, ולא החברה',
             ],
             optionsEn: [
               'He argued that childhood has no influence at all on who we are as adults',
@@ -1534,7 +1556,9 @@ const psychologyData = {
             question: 'אדם שלא גיבש זהות בגיל ההתבגרות מגיע לגיל ארבעים ומרגיש שהשאלה "מי אני" חוזרת בעוצמה. מה זה מלמד?',
             questionEn: 'A person who did not form an identity in adolescence reaches the age of forty and feels the question "who am I" returning with intensity. What does this teach?',
             options: [
-              'שהשלבים הם מבחן חד פעמי, ומי שנכשל בו נשאר עם התוצאה ב. שהשאלה הזו שייכת רק לגיל ההתבגרות ואינה יכולה לחזור ג. שמשימה שלא נפתרה בזמנה שבה מאוחר יותר, לעיתים ביתר עוצמה',
+              'שהשלבים הם מבחן חד פעמי, ומי שנכשל בו נשאר עם התוצאה',
+              'שהשאלה הזו שייכת רק לגיל ההתבגרות ואינה יכולה לחזור',
+              'שמשימה שלא נפתרה בזמנה שבה מאוחר יותר, לעיתים ביתר עוצמה',
             ],
             optionsEn: [
               'That the stages are a one-time test, and whoever fails it is stuck with the result',
@@ -1551,7 +1575,7 @@ const psychologyData = {
           {
             type: 'idea',
             title: 'הניצוץ בעין ההורה', titleEn: 'The Gleam in the Eye',
-            content: 'אריקסון אמר שלכל גיל יש משימה. היינץ קוהוט, פסיכואנליטיקאי יליד וינה שפעל בשיקגו, שאל שאלה אחרת: <strong>מי מאשר לנו שאנחנו בכלל קיימים?</strong></p><p>התשובה שלו התחילה במחלוקת עם פרויד. פרויד ראה בנרקיסיזם שלב מוקדם שיש לצאת ממנו, ובמקרים קשים גם פתולוגיה. קוהוט טען את ההפך: <strong>הצורך שיראו אותנו ויתפעלו מאיתנו אינו פגם אופי, הוא צורך התפתחותי בסיסי</strong>, כמו מזון או שינה.</p><p>הילד, לדבריו, זקוק ל<strong>שיקוף</strong>: לפנים של מבוגר שנדלקות כשהוא מופיע. לא למחמאות, אלא לכך שמישהו רואה אותו ומגיב. מהשיקוף הזה נבנה בהדרגה עצמי מלוכד, תחושה יציבה של "אני מישהו, ויש לי ערך".</p><p>וקוהוט הוסיף מושג שמסביר את זה: <strong>"זולתעצמי</strong>. אלו אנשים שממלאים בשבילנו תפקיד שאיננו יכולים למלא לבד, ולכן הם מרגישים כמו חלק מאיתנו.',
+            content: 'אריקסון אמר שלכל גיל יש משימה. היינץ קוהוט, פסיכואנליטיקאי יליד וינה שפעל בשיקגו, שאל שאלה אחרת: <strong>מי מאשר לנו שאנחנו בכלל קיימים?</strong></p><p>התשובה שלו התחילה במחלוקת עם פרויד. פרויד ראה בנרקיסיזם שלב מוקדם שיש לצאת ממנו, ובמקרים קשים גם פתולוגיה. קוהוט טען את ההפך: <strong>הצורך שיראו אותנו ויתפעלו מאיתנו אינו פגם אופי, הוא צורך התפתחותי בסיסי</strong>, כמו מזון או שינה.</p><p>הילד, לדבריו, זקוק ל<strong>שיקוף</strong>: לפנים של מבוגר שנדלקות כשהוא מופיע. לא למחמאות, אלא לכך שמישהו רואה אותו ומגיב. מהשיקוף הזה נבנה בהדרגה עצמי מלוכד, תחושה יציבה של "אני מישהו, ויש לי ערך".</p><p>וקוהוט הוסיף מושג שמסביר את זה: <strong>"זולת עצמי"</strong>. אלו אנשים שממלאים בשבילנו תפקיד שאיננו יכולים למלא לבד, ולכן הם מרגישים כמו חלק מאיתנו.',
             contentEn: 'Erikson said that every age has a task. Heinz Kohut, a Vienna-born psychoanalyst who worked in Chicago, asked a different question: <strong>who confirms for us that we exist at all?</strong></p><p>His answer began with a disagreement with Freud. Freud saw narcissism as an early stage one must leave behind, and in severe cases also as pathology. Kohut argued the opposite: <strong>the need to be seen and admired is not a character flaw, it is a basic developmental need</strong>, like food or sleep.</p><p>The child, in his words, needs <strong>mirroring</strong>: the face of an adult that lights up when he appears. Not compliments, but the fact that someone sees him and responds. From this mirroring a cohesive self is gradually built, a stable sense of "I am someone, and I have worth".</p><p>And Kohut added a concept that explains this: <strong>"selfobject"</strong>. These are people who fill for us a role we cannot fill alone, and therefore they feel like a part of us.',
           },
           {
@@ -1573,7 +1597,7 @@ const psychologyData = {
           {
             type: 'depth',
             title: 'לא נרקיסיזם, אלא צורך התפתחותי', titleEn: 'Not Narcissism, but a Developmental Need',
-            content: 'לקוהוט יש כאן טענה שמערערת אידיאל מוכר. אנחנו רגילים לחשוב שבגרות פירושה עצמאות מלאה, שאדם בוגר אינו זקוק לאישור מאחרים. קוהוט חלק על כך: <strong>לעולם איננו מפסיקים להזדקק לזולתעצמי</strong>. מה שמשתנה עם הבגרות אינו הצורך, אלא הצורה שלו. ילד זקוק לפנים שנדלקות, מבוגר זקוק לחבר שמבין, לשותף שמעריך, לקהילה שרואה בו חלק. <strong>הבשלות אינה היעדר הצורך, אלא דרכים בוגרות יותר למלא אותו</strong>.</p><p>מכאן גם הפכה אמפתיה אצל קוהוט מגישה נעימה לכלי עבודה ממש בטיפול: הדרך להבין אדם היא להיכנס לחוויה שלו לאורך זמן, לא לפרש אותה מבחוץ.</p><p>וצריך את הסייג הרגיל. קוהוט נשען על עבודה קלינית, לא על ניסויים, ותורת העצמי שלו קשה למדידה. יש גם ביקורת על כך שהיא מקלה מדי עם נרקיסיזם. עם זאת, המחקר על היענות מכווננת בין הורה לתינוק, שכן נמדד, מוצא בדיוק את מה שקוהוט תיאר: <strong>לא כמות תשומת הלב היא שקובעת, אלא האם התגובה מדויקת למה שהילד חווה</strong>.</p><p>ומכאן לדיאלוג הבא. קוהוט אמר שאנחנו זקוקים למישהו שיראה אותנו. אלברט בנדורה יטען שאנחנו גם לומדים מאחרים בדרך פשוטה הרבה יותר: פשוט בכך שאנחנו מסתכלים עליהם.',
+            content: 'לקוהוט יש כאן טענה שמערערת אידיאל מוכר. אנחנו רגילים לחשוב שבגרות פירושה עצמאות מלאה, שאדם בוגר אינו זקוק לאישור מאחרים. קוהוט חלק על כך: <strong>לעולם איננו מפסיקים להזדקק לזולת עצמי</strong>. מה שמשתנה עם הבגרות אינו הצורך, אלא הצורה שלו. ילד זקוק לפנים שנדלקות, מבוגר זקוק לחבר שמבין, לשותף שמעריך, לקהילה שרואה בו חלק. <strong>הבשלות אינה היעדר הצורך, אלא דרכים בוגרות יותר למלא אותו</strong>.</p><p>מכאן גם הפכה אמפתיה אצל קוהוט מגישה נעימה לכלי עבודה ממש בטיפול: הדרך להבין אדם היא להיכנס לחוויה שלו לאורך זמן, לא לפרש אותה מבחוץ.</p><p>וצריך את הסייג הרגיל. קוהוט נשען על עבודה קלינית, לא על ניסויים, ותורת העצמי שלו קשה למדידה. יש גם ביקורת על כך שהיא מקלה מדי עם נרקיסיזם. עם זאת, המחקר על היענות מכווננת בין הורה לתינוק, שכן נמדד, מוצא בדיוק את מה שקוהוט תיאר: <strong>לא כמות תשומת הלב היא שקובעת, אלא האם התגובה מדויקת למה שהילד חווה</strong>.</p><p>ומכאן לדיאלוג הבא. קוהוט אמר שאנחנו זקוקים למישהו שיראה אותנו. אלברט בנדורה יטען שאנחנו גם לומדים מאחרים בדרך פשוטה הרבה יותר: פשוט בכך שאנחנו מסתכלים עליהם.',
             contentEn: 'Kohut has a claim here that unsettles a familiar ideal. We are used to thinking that maturity means complete independence, that a mature person does not need approval from others. Kohut disagreed: <strong>we never stop needing selfobjects</strong>. What changes with maturity is not the need, but its form. A child needs a face that lights up, an adult needs a friend who understands, a partner who appreciates, a community that sees him as part of it. <strong>Maturity is not the absence of the need, but more mature ways of filling it</strong>.</p><p>From here empathy also became for Kohut, from a pleasant attitude, an actual working tool in therapy: the way to understand a person is to enter his experience over time, not to interpret it from outside.</p><p>And the usual caveat is needed. Kohut relied on clinical work, not on experiments, and his self psychology is difficult to measure. There is also criticism that it is too lenient with narcissism. Even so, the research on attuned responsiveness between parent and infant, which was measured, finds exactly what Kohut described: <strong>it is not the quantity of attention that matters, but whether the response is accurate to what the child is experiencing</strong>.</p><p>And from here to the next dialogue. Kohut said that we need someone to see us. Albert Bandura will argue that we also learn from others in a far simpler way: simply by looking at them.',
           },
           {
@@ -1582,7 +1606,9 @@ const psychologyData = {
             question: 'אדם משיג הישג גדול, אך התחושה נשארת ריקה עד שהוא מספר על כך לחבר טוב. כיצד קוהוט היה מסביר זאת?',
             questionEn: 'A person achieves something great, but the feeling stays empty until he tells a good friend about it. How would Kohut explain this?',
             options: [
-              'יהירות, שכן אדם בוגר אמור להסתפק בהערכה עצמית בלבד ב. החבר מתפקד כזולתעצמי בשביל האדם. באמצעות החבר ההישג נעשה ממשי עבור האדם ג. חוסר ביטחון חריג, שמעיד על בעיה נפשית הדורשת טיפול',
+              'יהירות, שכן אדם בוגר אמור להסתפק בהערכה עצמית בלבד',
+              'החבר מתפקד כזולת עצמי בשביל האדם. באמצעות החבר ההישג נעשה ממשי עבור האדם',
+              'חוסר ביטחון חריג, שמעיד על בעיה נפשית הדורשת טיפול',
             ],
             optionsEn: [
               'Arrogance, since a mature person should be satisfied with self-esteem alone',
@@ -1599,7 +1625,9 @@ const psychologyData = {
             question: 'חבר אומר: "אדם בוגר באמת לא צריך אישור מאף אחד." כיצד קוהוט היה חולק על כך?',
             questionEn: 'A friend says: "A truly mature person does not need approval from anyone." How would Kohut disagree?',
             options: [
-              'הוא היה מסכים, שהרי בגרות מוגדרת כעצמאות רגשית מלאה ב. הוא היה טוען שרק ילדים זקוקים לכך, ומבוגרים מפסיקים לגמרי ג. הצורך אינו נעלם עם הבגרות, אלא לובש צורות בוגרות יותר',
+              'הוא היה מסכים, שהרי בגרות מוגדרת כעצמאות רגשית מלאה',
+              'הוא היה טוען שרק ילדים זקוקים לכך, ומבוגרים מפסיקים לגמרי',
+              'הצורך אינו נעלם עם הבגרות, אלא לובש צורות בוגרות יותר',
             ],
             optionsEn: [
               'He would agree, since maturity is defined as complete emotional independence',
@@ -1616,7 +1644,9 @@ const psychologyData = {
             question: 'הורה מרעיף שבחים על ילדו כל היום, אך אינו קשוב למה שהילד באמת מרגיש. לפי קוהוט והמחקר על היענות מכווננת, מה יקרה?',
             questionEn: 'A parent showers his child with praise all day, but is not attentive to what the child actually feels. According to Kohut and the research on attuned responsiveness, what will happen?',
             options: [
-              'הילד יגדל עם עצמי יציב, שכן כמות השבחים היא שקובעת ב. השיקוף יחמיץ, מפני שהתגובה אינה תואמת את חווייתו של הילד ג. שום השפעה, כי שיקוף נוגע רק לתינוקות ולא לילדים גדולים',
+              'הילד יגדל עם עצמי יציב, שכן כמות השבחים היא שקובעת',
+              'השיקוף יחמיץ, מפני שהתגובה אינה תואמת את חווייתו של הילד',
+              'שום השפעה, כי שיקוף נוגע רק לתינוקות ולא לילדים גדולים',
             ],
             optionsEn: [
               'The child will grow up with a stable self, since it is the quantity of praise that matters',
@@ -1664,7 +1694,9 @@ const psychologyData = {
             question: 'ילד שמעולם לא לימדו אותו כיצד מתנהגים בוויכוח מתחיל להרים את הקול ולצאת מהחדר, בדיוק כמו הורהו. מה מסביר זאת לפי בנדורה?',
             questionEn: 'A child who was never taught how to behave in an argument begins to raise his voice and leave the room, exactly like his parent. What explains this according to Bandura?',
             options: [
-              'דחף תוקפני פנימי שהתעורר בו בגיל הזה מסיבות ביולוגיות ב. למידה תצפיתית, שכן הוא רכש את הדפוס מעצם ההתבוננות ג. תגמול שקיבל על ההתנהגות, שבלעדיו לא היה לומד אותה כלל',
+              'דחף תוקפני פנימי שהתעורר בו בגיל הזה מסיבות ביולוגיות',
+              'למידה תצפיתית, שכן הוא רכש את הדפוס מעצם ההתבוננות',
+              'תגמול שקיבל על ההתנהגות, שבלעדיו לא היה לומד אותה כלל',
             ],
             optionsEn: [
               'An internal aggressive drive that awoke in him at this age for biological reasons',
@@ -1681,7 +1713,9 @@ const psychologyData = {
             question: 'שני נערים צופים באותו סרטון של ספורטאי מצליח. אחד מתחיל להתאמן, השני אדיש. לפי בנדורה, מה עשוי להסביר את ההבדל?',
             questionEn: 'Two boys watch the same video of a successful athlete. One starts training, the other is indifferent. According to Bandura, what might explain the difference?',
             options: [
-              'הראשון תוגמל על צפייה בסרטון, ולכן פעל בעקבותיו ב. אין הסבר, שכן למידה תצפיתית פועלת באופן זהה על כולם ג. הראשון תופס את המודל כדומה לו, ולכן גדלה אמונתו שגם הוא מסוגל',
+              'הראשון תוגמל על צפייה בסרטון, ולכן פעל בעקבותיו',
+              'אין הסבר, שכן למידה תצפיתית פועלת באופן זהה על כולם',
+              'הראשון תופס את המודל כדומה לו, ולכן גדלה אמונתו שגם הוא מסוגל',
             ],
             optionsEn: [
               'The first was rewarded for watching the video, and therefore acted on it',
@@ -1698,7 +1732,9 @@ const psychologyData = {
             question: 'אדם חושש שהוא בסך הכל תוצר של מה שעבר עליו. כיצד היה בנדורה משיב לו?',
             questionEn: 'A person fears that he is nothing more than a product of what he has been through. How would Bandura answer him?',
             options: [
-              'הוא צודק, שהרי הסביבה מעצבת את האדם בכיוון אחד בלבד ב. ההשפעה הדדית, ואדם גם בוחר לאיזו סביבה יחשוף את עצמו ג. הסביבה כלל אינה משפיעה, ולכן החשש שלו מיותר לחלוטין',
+              'הוא צודק, שהרי הסביבה מעצבת את האדם בכיוון אחד בלבד',
+              'ההשפעה הדדית, ואדם גם בוחר לאיזו סביבה יחשוף את עצמו',
+              'הסביבה כלל אינה משפיעה, ולכן החשש שלו מיותר לחלוטין',
             ],
             optionsEn: [
               'He is right, since the environment shapes the person in one direction only',
@@ -1721,8 +1757,8 @@ const psychologyData = {
           {
             type: 'explanation',
             title: 'המסע שעברנו', titleEn: 'The Journey We Took',
-            content: 'פרויד: <strong>הילדות חותמת אותנו לפני הזיכרון</strong>. בולבי: הקשר הראשון הופך לתבנית. ויניקוט: כישלון במידה הנכונה בונה. אריקסון: העיצוב לא נעצר. קוהוט: צריך שיראו אותנו. בנדורה: <strong>אנחנו גם בוחרים</strong>.',
-            contentEn: 'Freud: <strong>childhood seals us before memory</strong>. Bowlby: the first bond becomes a template. Winnicott: failure in the right degree builds. Erikson: the shaping does not stop. Kohut: we need to be seen. Bandura: <strong>we also choose</strong>.',
+            content: 'פרויד: <strong>הילדות חותמת אותנו לפני הזיכרון</strong>. בולבי: <strong>הקשר הראשון הופך לתבנית</strong>. ויניקוט: <strong>כישלון במידה הנכונה בונה</strong>. אריקסון: <strong>העיצוב לא נעצר</strong>. קוהוט: <strong>צריך שיראו אותנו</strong>. בנדורה: <strong>אנחנו גם בוחרים</strong>.',
+            contentEn: 'Freud: <strong>childhood seals us before memory</strong>. Bowlby: <strong>the first bond becomes a template</strong>. Winnicott: <strong>failure in the right degree builds</strong>. Erikson: <strong>the shaping does not stop</strong>. Kohut: <strong>we need to be seen</strong>. Bandura: <strong>we also choose</strong>.',
           },
           {
             type: 'explanation',
@@ -1742,7 +1778,9 @@ const psychologyData = {
             question: 'אדם טוען: "הכל הוכרע אצלי בילדות, אין טעם לנסות להשתנות." אילו שניים מהוגי הפרק יחלקו עליו בחריפות רבה ביותר?',
             questionEn: 'A person claims: "Everything was decided for me in childhood, there is no point in trying to change." Which two of the chapter\'s thinkers would disagree with him most sharply?',
             options: [
-              'פרויד ובולבי, שכן שניהם קבעו שהתבניות המוקדמות סופיות ב. אריקסון ובנדורה, שהראו שההתפתחות נמשכת ושאנחנו בוחרים ג. ויניקוט וקוהוט, שטענו שרק הורות מושלמת מאפשרת שינוי',
+              'פרויד ובולבי, שכן שניהם קבעו שהתבניות המוקדמות סופיות',
+              'אריקסון ובנדורה, שהראו שההתפתחות נמשכת ושאנחנו בוחרים',
+              'ויניקוט וקוהוט, שטענו שרק הורות מושלמת מאפשרת שינוי',
             ],
             optionsEn: [
               'Freud and Bowlby, since both determined that early patterns are final',
@@ -1759,7 +1797,9 @@ const psychologyData = {
             question: 'הורה מנסה להיות מושלם ולהיענות לילדו תמיד ומיד. מה יאמרו על כך ויניקוט ובולבי?',
             questionEn: 'A parent tries to be perfect and to respond to his child always and immediately. What would Winnicott and Bowlby say about this?',
             options: [
-              'שניהם יתנגדו, שכן לדעת שניהם ילד אינו זקוק כלל להיענות ב. שניהם יברכו, כי היענות מלאה ומיידית היא היעד ההורי הנכון ג. בולבי יבקש קשר אמין, וויניקוט יוסיף שכישלון מדוד דווקא בונה',
+              'שניהם יתנגדו, שכן לדעת שניהם ילד אינו זקוק כלל להיענות',
+              'שניהם יברכו, כי היענות מלאה ומיידית היא היעד ההורי הנכון',
+              'בולבי יבקש קשר אמין, וויניקוט יוסיף שכישלון מדוד דווקא בונה',
             ],
             optionsEn: [
               'Both would object, since in the view of both a child does not need responsiveness at all',
@@ -1776,7 +1816,9 @@ const psychologyData = {
             question: 'מה ההבדל המרכזי בסוג הראיות שעליהן נשענו בנדורה מצד אחד, וויניקוט וקוהוט מצד שני?',
             questionEn: 'What is the central difference in the kind of evidence relied on by Bandura on one side, and Winnicott and Kohut on the other?',
             options: [
-              'אין הבדל, שכן שלושתם עבדו בשיטות מחקר זהות לחלוטין ב. בנדורה נשען על ניסוי מבוקר, והשניים על תצפית קלינית ג. בנדורה עבד בקליניקה, ואילו השניים ערכו ניסויים בשטח',
+              'אין הבדל, שכן שלושתם עבדו בשיטות מחקר זהות לחלוטין',
+              'בנדורה נשען על ניסוי מבוקר, והשניים על תצפית קלינית',
+              'בנדורה עבד בקליניקה, ואילו השניים ערכו ניסויים בשטח',
             ],
             optionsEn: [
               'There is no difference, since all three worked with entirely identical research methods',
@@ -2343,8 +2385,8 @@ const psychologyData = {
           {
             type: 'explanation',
             title: 'המסע שעברנו', titleEn: 'The Journey We Took',
-            content: 'פרויד: <strong>חוזרים על מה שלא עובד דרך הזיכרון</strong>. קליין: נושאים בפנים דמויות שלמות. אנה פרויד: <strong>ההגנה שהצילה היא שתוקעת</strong>. בק: הדפוס יושב במחשבה. ון דר קולק: יש דפוסים שהם בגוף, לא במחשבה. כהנמן: <strong>הרוב מוכרע לפני שמספיקים לחשוב</strong>.',
-            contentEn: 'Freud: <strong>we repeat what does not work through memory</strong>. Klein: we carry whole figures inside. Anna Freud: <strong>the defense that saved is the one that gets us stuck</strong>. Beck: the pattern sits in the thought. Van der Kolk: there are patterns that are in the body, not in thought. Kahneman: <strong>most of it is decided before we manage to think</strong>.',
+            content: 'פרויד: <strong>חוזרים על מה שלא עובד דרך הזיכרון</strong>. קליין: <strong>נושאים בפנים דמויות שלמות</strong>. אנה פרויד: <strong>ההגנה שהצילה היא שתוקעת</strong>. בק: <strong>הדפוס יושב במחשבה</strong>. ון דר קולק: <strong>יש דפוסים שהם בגוף, לא במחשבה</strong>. כהנמן: <strong>הרוב מוכרע לפני שמספיקים לחשוב</strong>.',
+            contentEn: 'Freud: <strong>we repeat what does not work through memory</strong>. Klein: <strong>we carry whole figures inside</strong>. Anna Freud: <strong>the defense that saved is the one that gets us stuck</strong>. Beck: <strong>the pattern sits in the thought</strong>. Van der Kolk: <strong>there are patterns that are in the body, not in thought</strong>. Kahneman: <strong>most of it is decided before we manage to think</strong>.',
           },
           {
             type: 'explanation',

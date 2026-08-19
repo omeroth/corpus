@@ -245,6 +245,78 @@ for (const { subject, data } of subjects) {
   }
 }
 
+// ─── Quiz option shape check ─────────────────────────────────────────────
+//
+// Catches two shapes that render as broken quizzes without producing any
+// runtime error, both of which shipped in psychology chapter 3 before this
+// check existed:
+//
+//   1. Packed options: a single string holding all three answers with the
+//      option letters inline (e.g. `'text A ב. text B ג. text C'`). The
+//      renderer iterates options[] and creates one button per element, so a
+//      packed size-1 array renders as one giant button with A/B/C letters
+//      as content instead of chip labels. Caused by the psychology-ch3
+//      transcribe pass predating the HE-option-splitter preprocessor.
+//
+//   2. HE/EN length mismatch: options.length !== optionsEn.length. Renderer
+//      picks by state.lang so one language would silently show the wrong
+//      button count. Any legitimate dialogue always mirrors 1:1.
+//
+// Both are hard errors — they mask as garbled UI on device, not as
+// runtime exceptions, so nothing else in the pipeline surfaces them.
+
+const HE_OPT_MARKER = /\s[בגד]\.\s/;    // ` ב. ` embedded in HE prose
+const EN_OPT_MARKER = /\s[B-D]\.\s/;    // ` B. ` embedded in EN prose
+const quizIssues = [];
+
+function walkQuizzes(day, dayLabel) {
+  const sections = Array.isArray(day.sections) ? day.sections : [];
+  sections.forEach((sec, idx) => {
+    if (!sec || sec.type !== 'quiz') return;
+    const where = `${dayLabel}, section ${idx} (${sec.title || sec.titleEn || 'quiz'})`;
+    const he = Array.isArray(sec.options) ? sec.options : [];
+    const en = Array.isArray(sec.optionsEn) ? sec.optionsEn : [];
+    if (he.length !== en.length) {
+      quizIssues.push({
+        issue: 'options length mismatch', where,
+        detail: `options=${he.length}, optionsEn=${en.length}`,
+      });
+    }
+    he.forEach((s, i) => {
+      if (typeof s === 'string' && HE_OPT_MARKER.test(s)) {
+        quizIssues.push({
+          issue: 'HE option contains letter marker', where,
+          detail: `[${i}] "${s.slice(0, 100)}"…`,
+        });
+      }
+    });
+    en.forEach((s, i) => {
+      if (typeof s === 'string' && EN_OPT_MARKER.test(s)) {
+        quizIssues.push({
+          issue: 'EN option contains letter marker', where,
+          detail: `[${i}] "${s.slice(0, 100)}"…`,
+        });
+      }
+    });
+    if (he.length < 2 || en.length < 2) {
+      quizIssues.push({
+        issue: 'quiz has fewer than 2 options', where,
+        detail: `options=${he.length}, optionsEn=${en.length}`,
+      });
+    }
+  });
+}
+
+for (const { subject, data } of subjects) {
+  for (const week of data.weeks) {
+    if (!week || !Array.isArray(week.days)) continue;
+    for (const day of week.days) {
+      if (!day) continue;
+      walkQuizzes(day, `${subject}: chapter ${week.id}, day ${day.id}`);
+    }
+  }
+}
+
 // ─── Reverse check: thinker → dialogue ───────────────────────────────────
 
 const unreferenced = [];
@@ -454,9 +526,10 @@ reportTable('Days with no thinkerId (informational — reviewer eyeballs)', noTh
 reportTable('Forward-check errors (unknown id / subject mismatch / missing portrait)', forwardIssues);
 reportTable('Cross-array consistency errors (HE ↔ EN)', arrayIssues);
 reportTable('Tag-balance errors (HTML in text-only fields / malformed / unclosed <strong>)', tagIssues);
+reportTable('Quiz option shape errors (packed / length mismatch / too few)', quizIssues);
 reportTable('Unreferenced thinkers (never appear in any dialogue — warning only)', unreferenced);
 
-const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length;
+const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length;
 if (hardErrorCount > 0) {
   console.error(`\nFAIL: ${hardErrorCount} hard error(s). Also: ${noThinkerRows.length} no-thinker day(s), ${unreferenced.length} unreferenced thinker(s).`);
   process.exit(1);

@@ -14810,7 +14810,14 @@ function _renderThinkerIntro(day, opts) {
     eyebrow.textContent = isEn ? 'Now featuring' : 'נדבר עכשיו על';
     if (mystery) mystery.style.display = 'none';
     portrait.style.display = '';
-    portrait.dataset.subject = t.subject || 'philosophy';
+    // Frame color follows the CURRENT dialogue's subject, not the thinker's
+    // primary. A multi-subject thinker (Kahneman: primary economics,
+    // subjects=['economics','psychology']) opened from a psychology
+    // dialogue should read as psychology here — same principle as the
+    // multi-subject filter in populateCarousel / renderPantheon.
+    // state.subject is authoritative at reader time; t.subject is the
+    // fallback for the (very unlikely) case where it's unset.
+    portrait.dataset.subject = state.subject || t.subject || 'philosophy';
     portrait.innerHTML = t.image ? `<img src="${t.image}" alt="${t.name}">` : '';
     nameEl.style.display = '';
     nameEl.textContent = t.name;
