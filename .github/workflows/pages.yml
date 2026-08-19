@@ -45,6 +45,7 @@ jobs:
           cp version.json          _deploy/
           cp -r assets             _deploy/
           cp -r images             _deploy/
+          cp -r content            _deploy/
           # Share cards + dialogue landing pages (Part 2 of the share-cards
           # refactor). Generated locally via `npm run gen:share` and committed
           # to the repo so the runner doesn't need node-canvas + TTFs.

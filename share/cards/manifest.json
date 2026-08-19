@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-18T11:36:12.752Z",
+  "generatedAt": "2026-08-19T18:43:28.031Z",
   "items": [
     {
       "weekId": 1,
@@ -1060,6 +1060,486 @@
       "title": "Human Capabilities",
       "card": "share/cards/en/econ-4-6.png",
       "page": "d/econ-4-6-en.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "wundt",
+      "title": "הנפש נכנסת למעבדה",
+      "card": "share/cards/he/psyc-1-1.png",
+      "page": "d/psyc-1-1-he.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "wundt",
+      "title": "The Mind Enters the Lab",
+      "card": "share/cards/en/psyc-1-1.png",
+      "page": "d/psyc-1-1-en.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "james",
+      "title": "זרם התודעה",
+      "card": "share/cards/he/psyc-1-2.png",
+      "page": "d/psyc-1-2-he.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "james",
+      "title": "The Stream of Consciousness",
+      "card": "share/cards/en/psyc-1-2.png",
+      "page": "d/psyc-1-2-en.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "freud",
+      "title": "הקרחון הנפשי",
+      "card": "share/cards/he/psyc-1-3.png",
+      "page": "d/psyc-1-3-he.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "freud",
+      "title": "The Mental Iceberg",
+      "card": "share/cards/en/psyc-1-3.png",
+      "page": "d/psyc-1-3-en.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "jung",
+      "title": "הלא-מודע המשותף",
+      "card": "share/cards/he/psyc-1-4.png",
+      "page": "d/psyc-1-4-he.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "jung",
+      "title": "The Shared Unconscious",
+      "card": "share/cards/en/psyc-1-4.png",
+      "page": "d/psyc-1-4-en.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "skinner",
+      "title": "לא הנפש, ההתנהגות",
+      "card": "share/cards/he/psyc-1-5.png",
+      "page": "d/psyc-1-5-he.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "skinner",
+      "title": "Not the Mind, the Behavior",
+      "card": "share/cards/en/psyc-1-5.png",
+      "page": "d/psyc-1-5-en.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "rogers",
+      "title": "לכל אדם חוכמה משלו",
+      "card": "share/cards/he/psyc-1-6.png",
+      "page": "d/psyc-1-6-he.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "rogers",
+      "title": "Every Person's Own Wisdom",
+      "card": "share/cards/en/psyc-1-6.png",
+      "page": "d/psyc-1-6-en.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "freud",
+      "title": "התירוץ קודם לסיבה",
+      "card": "share/cards/he/psyc-2-1.png",
+      "page": "d/psyc-2-1-he.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "freud",
+      "title": "The Excuse Comes First",
+      "card": "share/cards/en/psyc-2-1.png",
+      "page": "d/psyc-2-1-en.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "adler",
+      "title": "הרצון לא להרגיש קטנים",
+      "card": "share/cards/he/psyc-2-2.png",
+      "page": "d/psyc-2-2-he.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "adler",
+      "title": "The Wish Not to Feel Small",
+      "card": "share/cards/en/psyc-2-2.png",
+      "page": "d/psyc-2-2-en.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "maslow",
+      "title": "מה שחסר לך, לא מה שיש לך",
+      "card": "share/cards/he/psyc-2-3.png",
+      "page": "d/psyc-2-3-he.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "maslow",
+      "title": "What You Lack, Not What You Have",
+      "card": "share/cards/en/psyc-2-3.png",
+      "page": "d/psyc-2-3-en.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "frankl",
+      "title": "המנוע שנותר במחנה",
+      "card": "share/cards/he/psyc-2-4.png",
+      "page": "d/psyc-2-4-he.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "frankl",
+      "title": "The Engine That Remained",
+      "card": "share/cards/en/psyc-2-4.png",
+      "page": "d/psyc-2-4-en.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "fromm",
+      "title": "הבריחה מחירות",
+      "card": "share/cards/he/psyc-2-5.png",
+      "page": "d/psyc-2-5-he.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "fromm",
+      "title": "The Escape from Freedom",
+      "card": "share/cards/en/psyc-2-5.png",
+      "page": "d/psyc-2-5-en.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "deci",
+      "title": "כשמשלמים על אהבה",
+      "card": "share/cards/he/psyc-2-6.png",
+      "page": "d/psyc-2-6-he.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "deci",
+      "title": "When You Pay for Love",
+      "card": "share/cards/en/psyc-2-6.png",
+      "page": "d/psyc-2-6-en.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "freud",
+      "title": "הילדות שנכתבת בנו",
+      "card": "share/cards/he/psyc-3-1.png",
+      "page": "d/psyc-3-1-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "freud",
+      "title": "The Childhood Written Into Us",
+      "card": "share/cards/en/psyc-3-1.png",
+      "page": "d/psyc-3-1-en.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "bowlby",
+      "title": "הקשר הראשון כתבנית",
+      "card": "share/cards/he/psyc-3-2.png",
+      "page": "d/psyc-3-2-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "bowlby",
+      "title": "The First Bond as Template",
+      "card": "share/cards/en/psyc-3-2.png",
+      "page": "d/psyc-3-2-en.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "winnicott",
+      "title": "האם הטובה דיה",
+      "card": "share/cards/he/psyc-3-3.png",
+      "page": "d/psyc-3-3-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "winnicott",
+      "title": "The Good-Enough Mother",
+      "card": "share/cards/en/psyc-3-3.png",
+      "page": "d/psyc-3-3-en.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "erikson",
+      "title": "העיצוב לא נגמר בילדות",
+      "card": "share/cards/he/psyc-3-4.png",
+      "page": "d/psyc-3-4-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "erikson",
+      "title": "The Shaping Does Not End",
+      "card": "share/cards/en/psyc-3-4.png",
+      "page": "d/psyc-3-4-en.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "kohut",
+      "title": "הניצוץ בעין ההורה",
+      "card": "share/cards/he/psyc-3-5.png",
+      "page": "d/psyc-3-5-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "kohut",
+      "title": "The Gleam in the Eye",
+      "card": "share/cards/en/psyc-3-5.png",
+      "page": "d/psyc-3-5-en.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "bandura",
+      "title": "למדנו מהתבוננות",
+      "card": "share/cards/he/psyc-3-6.png",
+      "page": "d/psyc-3-6-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "bandura",
+      "title": "We Learn by Watching",
+      "card": "share/cards/en/psyc-3-6.png",
+      "page": "d/psyc-3-6-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "freud",
+      "title": "למה אנחנו חוזרים בדיוק על מה שפגע בנו?",
+      "card": "share/cards/he/psyc-4-1.png",
+      "page": "d/psyc-4-1-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "freud",
+      "title": "Why do we repeat exactly what hurt us?",
+      "card": "share/cards/en/psyc-4-1.png",
+      "page": "d/psyc-4-1-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "klein",
+      "title": "מה אם אנחנו נושאים את האנשים מהעבר בתוכנו?",
+      "card": "share/cards/he/psyc-4-2.png",
+      "page": "d/psyc-4-2-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "klein",
+      "title": "What if we carry the people from our past inside us?",
+      "card": "share/cards/en/psyc-4-2.png",
+      "page": "d/psyc-4-2-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "anna-freud",
+      "title": "מה אם ההגנות שלנו הן בעצם מה שתוקע אותנו?",
+      "card": "share/cards/he/psyc-4-3.png",
+      "page": "d/psyc-4-3-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "anna-freud",
+      "title": "What if our defenses are actually what keeps us stuck?",
+      "card": "share/cards/en/psyc-4-3.png",
+      "page": "d/psyc-4-3-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "beck",
+      "title": "מה אם הדפוס אינו רגש אלא משפט שאנחנו אומרים לעצמנו?",
+      "card": "share/cards/he/psyc-4-4.png",
+      "page": "d/psyc-4-4-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "beck",
+      "title": "What if the pattern is not an emotion but a sentence we tell ourselves?",
+      "card": "share/cards/en/psyc-4-4.png",
+      "page": "d/psyc-4-4-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "van-der-kolk",
+      "title": "מה אם יש דפוסים שלא יושבים במחשבה?",
+      "card": "share/cards/he/psyc-4-5.png",
+      "page": "d/psyc-4-5-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "van-der-kolk",
+      "title": "What if there are patterns that do not sit in thought?",
+      "card": "share/cards/en/psyc-4-5.png",
+      "page": "d/psyc-4-5-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "kahneman",
+      "title": "מה אם רוב מה שאנחנו עושים הוכרע לפני שחשבנו?",
+      "card": "share/cards/he/psyc-4-6.png",
+      "page": "d/psyc-4-6-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "kahneman",
+      "title": "What if most of what we do was decided before we thought?",
+      "card": "share/cards/en/psyc-4-6.png",
+      "page": "d/psyc-4-6-en.html"
     }
   ]
 }

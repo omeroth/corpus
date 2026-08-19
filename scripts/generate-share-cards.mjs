@@ -112,12 +112,24 @@ function _findJsLiteral(src, prefix) {
 }
 
 function extractData() {
-  const src = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  // Post-refactor (commit fb838dd), the subject data structures moved
+  // out of index.html into content/*.js. Read each from its own file
+  // rather than a monolithic index.html slice.
+  //   content/philosophy.js  → corpusData
+  //   content/economics.js   → economicsData
+  //   content/psychology.js  → psychologyData
+  //   content/thinkers.js    → THINKERS + THINKERS_EN
+  const readFile = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
+  const philo = readFile('content/philosophy.js');
+  const econ  = readFile('content/economics.js');
+  const psy   = readFile('content/psychology.js');
+  const th    = readFile('content/thinkers.js');
   return {
-    corpusData:    _findJsLiteral(src, 'const corpusData = '),
-    economicsData: _findJsLiteral(src, 'const economicsData = '),
-    THINKERS:      _findJsLiteral(src, 'const THINKERS = '),
-    THINKERS_EN:   _findJsLiteral(src, 'const THINKERS_EN = '),
+    corpusData:      _findJsLiteral(philo, 'const corpusData = '),
+    economicsData:   _findJsLiteral(econ,  'const economicsData = '),
+    psychologyData:  _findJsLiteral(psy,   'const psychologyData = '),
+    THINKERS:        _findJsLiteral(th,    'const THINKERS = '),
+    THINKERS_EN:     _findJsLiteral(th,    'const THINKERS_EN = '),
   };
 }
 
@@ -175,8 +187,18 @@ function _registerFonts() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Palettes (must stay in lockstep with the in-app _SHARE_CARD_THEMES)
+// Palettes (derived from index.html theme blocks at run time)
 // ─────────────────────────────────────────────────────────────────────────
+// The card fields map onto the app's CSS custom properties as:
+//   bg       ← --bg
+//   wordmark ← --accent
+//   name     ← --ink
+//   era      ← --text-2
+//   question ← --accent-dark
+//   frame    ← --thinker-frame  (used to be a fixed gold RIM)
+// Extracting at runtime removes the drift that made the hardcoded
+// psychology palette stale for weeks — the CSS is now the single
+// source of truth. Runs once per gen:share invocation.
 
 // Palette derived from index.html theme blocks at build time.
 // Field mapping:
@@ -190,6 +212,8 @@ function _registerFonts() {
 //                                --frame-<subject> :root tokens)
 
 function _extractThemeVars(src, subject) {
+  // Find `html.theme-<subject>,\n  #screen-subject.theme-<subject> {`
+  // block, walk balanced braces, regex-scrape each `--name: value;`.
   const anchor = `html.theme-${subject},`;
   const start = src.indexOf(anchor);
   if (start === -1) throw new Error(`theme block not found for ${subject}`);
@@ -220,6 +244,9 @@ function buildThemes() {
   const themes = {};
   for (const subject of ['philosophy', 'economics', 'psychology']) {
     const v = _extractThemeVars(src, subject);
+    // --thinker-frame is set on :root (never on theme blocks in the
+    // current CSS) via --frame-philosophy / --frame-economics /
+    // --frame-psychology. Pull directly from :root.
     const frame = _extractRootVar(src, 'frame-' + subject);
     themes[subject] = {
       bg:       v.bg,
@@ -256,6 +283,12 @@ const _SUBJECT_SLUG = {
   economics:  'econ',
   psychology: 'psyc',
 };
+// Landing pages for subjects in this set get `<meta name="robots"
+// content="noindex, nofollow">`. Kept during soft-launch windows so
+// crawlers don't surface dialogue titles + portraits before the
+// subject is officially open in-app. Drop the entry from this set at
+// the same time the subject launches.
+const NOINDEX_SUBJECTS = new Set(['psychology']);
 const PLATE   = '#FDFBF6';
 const RIM     = '#E5C158';
 const URL_TXT = '#B8860B';
@@ -352,10 +385,15 @@ async function renderCard({ thinker, dayTitle, subject, lang }) {
   ctx.lineWidth = 8;
   ctx.strokeStyle = (USE_FRAME_RIM && theme.frame) ? theme.frame : RIM;
   ctx.stroke();
-  // Portrait image
-  if (thinker.image) {
+  // Portrait image. Per-subject override via thinker.images[subject]
+  // for multi-subject thinkers (Kahneman); falls through to
+  // thinker.image otherwise. Same resolver semantics as
+  // _thinkerImage in index.html.
+  const _portraitPath = (thinker.images && thinker.images[subject])
+    || thinker.image;
+  if (_portraitPath) {
     try {
-      const imgPath = thinker.image.replace(/^\.\//, '');
+      const imgPath = _portraitPath.replace(/^\.\//, '');
       const abs = path.join(ROOT, imgPath);
       const img = await loadImage(abs);
       ctx.save();
@@ -494,7 +532,8 @@ function renderPage({ weekId, dayId, thinker, dayTitle, subject, lang }) {
 <html lang="${lang}" dir="${dir}">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">${NOINDEX_SUBJECTS.has(subject) ? `
+<meta name="robots" content="noindex, nofollow">` : ''}
 <title>${escapeHtml(title)} · Corpus</title>
 <meta name="description" content="${escapeHtml(description)}">
 
@@ -687,11 +726,12 @@ function renderPage({ weekId, dayId, thinker, dayTitle, subject, lang }) {
 async function main() {
   _registerFonts();
 
-  const { corpusData, economicsData, THINKERS, THINKERS_EN } = extractData();
+  const { corpusData, economicsData, psychologyData, THINKERS, THINKERS_EN } = extractData();
 
   const subjects = [
-    { subject: 'philosophy', data: corpusData    },
-    { subject: 'economics',  data: economicsData },
+    { subject: 'philosophy', data: corpusData     },
+    { subject: 'economics',  data: economicsData  },
+    { subject: 'psychology', data: psychologyData },
   ];
 
   // Manifest maps (subject, weekId, dayId, lang) → generated card + page paths.
