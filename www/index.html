@@ -8991,6 +8991,10 @@ async function _enterFromStoredOrOnboarding(reason) {
     return true;
   }
   console.log('[Auth] ' + reason + ' — no stored session, entering onboarding');
+  // Guest confirmed. Flip _authKnown so the topbar's sign-in
+  // affordance resolves out of its "prior-session" default now that
+  // we actually know.
+  _markAuthResolved();
   startNewUserOnboarding();
   rescheduleReminderFromToday();
   // Guest / no-stored-session users are eligible for the announcement
@@ -9088,6 +9092,37 @@ if (!window._supabaseClient) {
 const sb = window._supabaseClient;
 
 let currentUser = null;
+
+// True once auth resolution completes for this session — any of:
+// enterApp fires (signed-in confirmed), _enterFromStoredOrOnboarding
+// resolves as no-stored (guest confirmed), or gotrue's INITIAL_SESSION
+// arrives with a null session (also guest). While false, the topbar
+// sign-in affordance uses state.userEmail as a synchronous prior to
+// avoid the "התחברות flashes then disappears" bug for signed-in users
+// — see the topbar block in renderHome.
+let _authKnown = false;
+// Boot timestamp captured at initApp start — used to report
+// auth_resolution latency to PostHog.
+let _authInitStartMs = null;
+function _markAuthResolved() {
+  if (_authKnown) return;
+  _authKnown = true;
+  try {
+    _phCapture('auth_resolution', {
+      resolution_ms: _authInitStartMs
+        ? Math.max(0, Math.round(performance.now() - _authInitStartMs))
+        : null,
+      is_signed_in:  !!currentUser,
+      had_prior:     !!(state && state.userEmail),
+      platform:      _phPlatform(),
+    });
+  } catch(e) {}
+  // Nudge renderHome so the topbar affordance re-evaluates now that
+  // we've flipped from "prior" to "known".
+  if (state && state.currentScreen === 'home') {
+    try { renderHome(); } catch(e) {}
+  }
+}
 
 // Set true for the duration of any interactive sign-in (email, Google, Apple).
 // The visibilitychange / appStateChange resume listeners consult this so a
@@ -14184,11 +14219,32 @@ function renderHome() {
     if (topbarIcon) { topbarIcon.src = subjIconSrc; topbarIcon.alt = subjName; }
   } catch(e) {}
 
-  // Guest "Sign in" affordance in topbar
+  // Guest "Sign in" affordance in topbar.
+  //
+  // Visibility decision has three inputs so a signed-in returning user
+  // doesn't see the button flash for the ~150-400ms of native boot
+  // recovery, AND a genuine guest sees the button immediately without
+  // waiting for _authKnown to flip:
+  //   1. currentUser truthy → hide (signed in this session)
+  //   2. _authKnown && !currentUser → show (recovery resolved as guest)
+  //   3. otherwise use state.userEmail as a synchronous prior:
+  //      - truthy → hide (was signed in as of last save; recovery in
+  //                       flight, assume they'll be signed in again)
+  //      - falsy  → show (no prior sign-in; guest, no reason to wait)
+  //
+  // state.userEmail is set in enterApp and cleared on every signout
+  // path (authLogout, deleteAccount, _executeServerRejectedSignout all
+  // reset state = defaultState() → userEmail: ''). loadState populates
+  // it before this renderHome runs.
   try {
     const signinBtn = document.getElementById('topbar-signin-btn');
     if (signinBtn) {
-      signinBtn.style.display = currentUser ? 'none' : 'inline-flex';
+      let showSignin;
+      if (currentUser)                  showSignin = false;
+      else if (_authKnown)              showSignin = true;
+      else if (state && state.userEmail) showSignin = false;
+      else                              showSignin = true;
+      signinBtn.style.display = showSignin ? 'inline-flex' : 'none';
       signinBtn.textContent = state.lang === 'en' ? 'Sign in' : 'התחברות';
     }
   } catch(e) {}
@@ -18596,6 +18652,10 @@ async function enterApp(user) {
       console.error('[Auth] enterApp saveState failed:', e);
     }
   }
+  // Auth is confirmed at this point (we have a real user object).
+  // Flip _authKnown before the home render so the topbar's decision
+  // sees the fresh state.
+  _markAuthResolved();
   hideAuthScreen();
   _homeExpandedWeekId = undefined;
   renderHome();
@@ -18927,6 +18987,7 @@ function initUI() {
   (async function initApp() {
     try {
       console.log('[Auth] initApp started');
+      _authInitStartMs = performance.now();
 
       // Native Google Sign-In (Capgo plugin). No-op on web.
       const _isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
