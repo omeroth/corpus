@@ -2440,6 +2440,89 @@
   .start-first-dialogue-cta:hover { filter: brightness(0.92); }
   .start-first-dialogue-cta:active { transform: scale(0.97); }
 
+  /* ── Psychology announcement card (home) ─────────────────────────
+     One-off release card. Palette is HARD-CODED to the psychology
+     accent (#E8853A light / #FB923C dark) regardless of the user's
+     current subject theme, because the card is ANNOUNCING psychology
+     — rendering it in philosophy purple would misread. Uses locally-
+     scoped custom properties instead of var(--accent) so nested rules
+     stay consistent even if the parent theme changes. */
+  .psychology-announce-card {
+    --psy-accent:      #E8853A;
+    --psy-accent-dark: #863F09;
+    --psy-glow:        rgba(232, 133, 58, 0.30);
+    position: relative;
+    background: var(--surface);
+    border: 1.5px solid var(--psy-accent);
+    border-radius: 20px;
+    padding: 20px 22px 22px;
+    margin: 12px 16px 16px;
+    box-shadow: 0 6px 20px var(--psy-glow);
+  }
+  html.dark .psychology-announce-card {
+    --psy-accent:      #FB923C;
+    --psy-accent-dark: #EA580C;
+    --psy-glow:        rgba(251, 146, 60, 0.35);
+  }
+  .psychology-announce-dismiss {
+    position: absolute;
+    top: 10px;
+    inset-inline-end: 10px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    color: var(--text-2);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .psychology-announce-dismiss:hover { background: var(--surface-2); color: var(--ink); }
+  .psychology-announce-dismiss:active { transform: scale(0.92); }
+  .psychology-announce-title {
+    font-family: 'Nunito', 'DM Sans', sans-serif;
+    font-size: calc(22px * var(--text-scale));
+    line-height: 1.25;
+    font-weight: 900;
+    color: var(--ink);
+    /* Reserve room for the × so a wrapped title doesn't collide. */
+    padding-inline-end: 32px;
+    margin: 0 0 10px;
+    text-align: start;
+  }
+  .psychology-announce-body {
+    font-size: calc(15px * var(--text-scale));
+    line-height: 1.5;
+    color: var(--ink);
+    margin-bottom: 16px;
+    text-align: start;
+  }
+  .psychology-announce-cta {
+    display: inline-block;
+    padding: 12px 24px;
+    /* --psy-accent-dark (#863F09 light / #EA580C dark) holds AA on
+       white text in both modes, mirroring .start-first-dialogue-cta's
+       accent-dark rationale. */
+    background: var(--psy-accent-dark);
+    color: #ffffff;
+    border: none;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: calc(15px * var(--text-scale));
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .psychology-announce-cta:hover { filter: brightness(0.92); }
+  .psychology-announce-cta:active { transform: scale(0.97); }
+
   /* ── Streak repair modal ── */
   .streak-repair-box {
     padding: 28px 24px 24px;
@@ -8128,6 +8211,13 @@
       <!-- Streak repair card — filled by renderStreakRepairCard when eligible. -->
       <div id="streak-repair-card-holder" style="display:none"></div>
 
+      <!-- Psychology-release announcement card — filled by
+           renderPsychologyAnnounceCard. Sits below streak-repair
+           (which is time-sensitive) and above the level cards.
+           Guarded on onboarding-done + first-dialogue-completed +
+           not-visited + not-dismissed. -->
+      <div id="psychology-announce-card-holder" style="display:none"></div>
+
       <!-- Legacy hero card (kept for compat; never rendered) -->
       <div id="hero-continue-card-wrap" style="display:none"></div>
 
@@ -8882,12 +8972,17 @@ async function _enterFromStoredOrOnboarding(reason) {
     _enteredWithExpiredToken = true;
     await enterApp(stored.user);
     rescheduleReminderFromToday();
+    try { _schedulePsychologyAnnouncement(); } catch (e) {}
     _backgroundRefresh(stored.refresh_token);
     return true;
   }
   console.log('[Auth] ' + reason + ' — no stored session, entering onboarding');
   startNewUserOnboarding();
   rescheduleReminderFromToday();
+  // Guest / no-stored-session users are eligible for the announcement
+  // too if they're past first-dialogue-done. The schedule's own guards
+  // filter fresh-install users out.
+  try { _schedulePsychologyAnnouncement(); } catch (e) {}
   return false;
 }
 
@@ -12933,6 +13028,180 @@ function openStartFirstDialogue() {
   }
 }
 
+// === Psychology announcement (home card + notification) ===
+// One-off release announcement for psychology chapter 1+. Card lives
+// at the top of home; notification fires once, 20:30 local, the first
+// evening after first-open-post-release. Both use state.hintsSeen
+// entries so dismissal / visited-state sync across devices via the
+// existing union-merge sync path.
+//
+// Hint ids used:
+//   'psychology_visited'                — set when user opens psychology
+//                                         (via setSubject or openReader).
+//                                         Suppresses card forever.
+//   'psychology_announce_dismissed'     — user tapped ×. Suppresses card
+//                                         forever, cancels pending notif.
+//   'psychology_announce_notif_scheduled' — set once per install after
+//                                           the local notif is queued so
+//                                           subsequent boots don't
+//                                           re-schedule.
+const ANNOUNCE_NOTIF_PSYCHOLOGY = 9001;
+
+function renderPsychologyAnnounceCard() {
+  const holder = document.getElementById('psychology-announce-card-holder');
+  if (!holder) return;
+  const done       = !!localStorage.getItem('corpus_onboarding_done');
+  const firstDone  = !!localStorage.getItem('corpus_first_dialogue_completed_at');
+  const seen       = Array.isArray(state.hintsSeen) ? state.hintsSeen : [];
+  const dismissed  = seen.includes('psychology_announce_dismissed');
+  const visited    = seen.includes('psychology_visited') || state.subject === 'psychology';
+  if (!done || !firstDone || dismissed || visited) {
+    holder.innerHTML = ''; holder.style.display = 'none';
+    return;
+  }
+  const isEn = state.lang === 'en';
+  // Fire announce_shown once per session per install — repeated
+  // renderHome calls (subject switch, back-from-reader) shouldn't
+  // inflate the count. Matches the _startCardSeenThisSession pattern.
+  window._psyAnnounceShownThisSession = window._psyAnnounceShownThisSession || false;
+  if (!window._psyAnnounceShownThisSession) {
+    window._psyAnnounceShownThisSession = true;
+    try {
+      _phCapture('psychology_announce_shown', {
+        subject: state.subject || null,
+        lang:    state.lang || null,
+      });
+    } catch (e) {}
+  }
+  const title = isEn ? 'What makes us do what we do?' : 'מה גורם לנו לעשות את מה שאנחנו עושים?';
+  const body  = isEn
+    ? 'Psychology has joined Corpus: 28 dialogues, from Freud and Jung to Kahneman.'
+    : 'פסיכולוגיה הצטרפה לקורפוס: 28 דיאלוגים, מפרויד ויונג ועד קאהנמן.';
+  const cta   = isEn ? 'Open the new subject' : 'לתחום החדש';
+  const dismissAria = isEn ? 'Dismiss' : 'סגור';
+  holder.innerHTML =
+    '<div class="psychology-announce-card" role="region" aria-label="' + title + '">' +
+      '<button class="psychology-announce-dismiss" aria-label="' + dismissAria + '" onclick="dismissPsychologyAnnouncement()">×</button>' +
+      '<h2 class="psychology-announce-title">' + title + '</h2>' +
+      '<div class="psychology-announce-body">' + body + '</div>' +
+      '<button class="psychology-announce-cta" onclick="openPsychologyFromAnnouncement()">' + cta + '</button>' +
+    '</div>';
+  holder.style.display = '';
+}
+
+function openPsychologyFromAnnouncement() {
+  try {
+    _phCapture('psychology_announce_tapped', {
+      subject: state.subject || null,
+      lang:    state.lang || null,
+    });
+  } catch (e) {}
+  // Cancel any pending notification — engaging with the card means we
+  // don't need to nudge them again.
+  try { _cancelPsychologyAnnouncementNotif(); } catch (e) {}
+  // setSubject records psychology_visited via its own hook (below),
+  // so the card guard flips on the next renderHome.
+  try { setSubject('psychology'); } catch (e) {}
+  renderHome();
+}
+
+function dismissPsychologyAnnouncement() {
+  try {
+    _phCapture('psychology_announce_dismissed', {
+      subject: state.subject || null,
+      lang:    state.lang || null,
+    });
+  } catch (e) {}
+  state.hintsSeen = Array.isArray(state.hintsSeen) ? state.hintsSeen : [];
+  if (!state.hintsSeen.includes('psychology_announce_dismissed')) {
+    state.hintsSeen.push('psychology_announce_dismissed');
+  }
+  try { saveState(); } catch (e) {}
+  // Cancel the pending notification — user opted out on this surface.
+  try { _cancelPsychologyAnnouncementNotif(); } catch (e) {}
+  renderPsychologyAnnounceCard();
+}
+
+// Records the psychology_visited hint the first time the user actually
+// discovers psychology, via either the subject-drawer tap OR opening a
+// psychology dialogue directly (deep-link etc). Called from both
+// setSubject and openReader. Idempotent — pushes at most once.
+function _recordPsychologyVisitedIfNew() {
+  state.hintsSeen = Array.isArray(state.hintsSeen) ? state.hintsSeen : [];
+  if (state.hintsSeen.includes('psychology_visited')) return;
+  state.hintsSeen.push('psychology_visited');
+  try { saveState(); } catch (e) {}
+}
+
+async function _cancelPsychologyAnnouncementNotif() {
+  if (!_isNotifPluginAvailable()) return;
+  try {
+    await window.Capacitor.Plugins.LocalNotifications.cancel({
+      notifications: [{ id: ANNOUNCE_NOTIF_PSYCHOLOGY }],
+    });
+  } catch (e) {}
+}
+
+// Schedules the one-off announcement notification for 20:30 local time
+// on the first evening after first-open-post-release. Guarded by a
+// hintSeen so subsequent boots don't re-schedule.
+//
+// Reach: native + notification-permission-granted + user opens the app
+// at least once between release and their scheduled fire time. Web
+// users and no-permission users get no notification (they see the home
+// card instead). Timing (20:30) is deliberately 30min after the
+// default 20:00 daily reminder to avoid OS grouping.
+async function _schedulePsychologyAnnouncement() {
+  if (!_isNotifPluginAvailable()) return;
+  const seen = Array.isArray(state.hintsSeen) ? state.hintsSeen : [];
+  if (seen.includes('psychology_announce_notif_scheduled')) return;
+  if (seen.includes('psychology_announce_dismissed')) return;
+  if (seen.includes('psychology_visited') || state.subject === 'psychology') return;
+  // Only schedule for users who've completed onboarding + one dialogue —
+  // matches the card's audience so we don't nudge users who wouldn't
+  // see the card either.
+  if (!localStorage.getItem('corpus_onboarding_done')) return;
+  if (!localStorage.getItem('corpus_first_dialogue_completed_at')) return;
+  const perm = await _checkNotifPermission();
+  if (perm !== 'granted') return;
+  // Fire at 20:30 local. If it's already past 20:30 today, fire
+  // tomorrow. Never fire in the past.
+  const fire = new Date();
+  fire.setHours(20, 30, 0, 0);
+  if (fire.getTime() <= Date.now()) {
+    fire.setDate(fire.getDate() + 1);
+  }
+  const isEn = (state.lang || 'en') === 'en';
+  const title = isEn ? 'A new subject in Corpus 🎉' : 'תחום חדש בקורפוס 🎉';
+  const body  = isEn
+    ? 'Psychology is here. Freud, Jung, Skinner and Kahneman are waiting.'
+    : 'פסיכולוגיה כאן. פרויד, יונג, סקינר וקאהנמן מחכים לכם.';
+  try {
+    await window.Capacitor.Plugins.LocalNotifications.schedule({
+      notifications: [{
+        id: ANNOUNCE_NOTIF_PSYCHOLOGY,
+        title: title,
+        body: body,
+        schedule: { at: fire, allowWhileIdle: true },
+      }],
+    });
+    state.hintsSeen = seen;
+    if (!state.hintsSeen.includes('psychology_announce_notif_scheduled')) {
+      state.hintsSeen.push('psychology_announce_notif_scheduled');
+    }
+    try { saveState(); } catch (e) {}
+    try {
+      _phCapture('psychology_announce_notification_scheduled', {
+        fire_at_iso:     fire.toISOString(),
+        native_platform: _phPlatform(),
+      });
+    } catch (e) {}
+    console.log('[Announce] psychology notification scheduled for', fire.toISOString());
+  } catch (e) {
+    console.error('[Announce] psychology notification schedule failed:', e);
+  }
+}
+
 function renderStreakRepairCard() {
   const holder = document.getElementById('streak-repair-card-holder');
   if (!holder) return;
@@ -13866,6 +14135,10 @@ function renderHome() {
   // safe to call unconditionally — it clears the holder if the user isn't
   // eligible or has dismissed it this session.
   try { renderStreakRepairCard(); } catch (e) {}
+  // Psychology-release announcement card: safe to call unconditionally —
+  // guards inside clear the holder for users who've already dismissed,
+  // visited psychology, or aren't past the first-dialogue milestone.
+  try { renderPsychologyAnnounceCard(); } catch (e) {}
   // Dir + toggle label
   document.documentElement.dir = state.lang === 'en' ? 'ltr' : 'rtl';
   document.documentElement.lang = state.lang;
@@ -14416,6 +14689,12 @@ function openReader(weekId, dayId, opts) {
     return;
   }
   try { posthog.capture('lesson_started', { chapter: weekId, day: dayId }); } catch(e) {}
+  // Suppress the psychology-release card once the user has opened any
+  // psychology dialogue by any path (including deep-link that bypasses
+  // setSubject).
+  if (state.subject === 'psychology') {
+    try { _recordPsychologyVisitedIfNew(); } catch (e) {}
+  }
   // Funnel: first_dialogue_opened. Once per install (gated by
   // corpus_first_dialogue_opened_at). Monotonic timestamp, never cleared.
   if (!localStorage.getItem('corpus_first_dialogue_opened_at')) {
@@ -17993,6 +18272,11 @@ function setSubject(value) {
   localStorage.setItem('corpus_subject', value);
   applyTheme(value);
   _homeExpandedWeekId = undefined; // reset so new subject auto-selects active chapter
+  // Suppress the psychology-release card once the user has actually
+  // switched to psychology by any path. See renderPsychologyAnnounceCard.
+  if (value === 'psychology') {
+    try { _recordPsychologyVisitedIfNew(); } catch (e) {}
+  }
 }
 
 function _subjGetIdx() {
@@ -18681,6 +18965,11 @@ function initUI() {
         if (_isNotifPluginAvailable()) {
           try {
             window.Capacitor.Plugins.LocalNotifications.addListener('localNotificationReceived', (n) => {
+              try {
+                if (n && n.id === ANNOUNCE_NOTIF_PSYCHOLOGY) {
+                  _phCapture('psychology_announce_notification_delivered', { body: n.body || null });
+                }
+              } catch(e) {}
               try { showStreakToast((n && n.body) || 'Corpus'); } catch(e) {}
             });
             // The user actually tapped a scheduled notification and returned
@@ -18696,6 +18985,13 @@ function initUI() {
                   action_id:         (evt && evt.actionId) || 'tap',
                   body:              n.body || null,
                 });
+                // Psychology announcement notif: log a distinct event and
+                // just resume to home. Per spec, don't auto-switch subject
+                // — user sees the home card and decides. Home render
+                // already happens as part of the app resume path.
+                if (n.id === ANNOUNCE_NOTIF_PSYCHOLOGY) {
+                  _phCapture('psychology_announce_notification_opened', { body: n.body || null });
+                }
               } catch(e) {}
             });
             console.log('[Reminder] foreground presentation listener installed');
@@ -18778,6 +19074,11 @@ function initUI() {
           await enterApp(session.user);
           // Reschedule daily reminder now that state.dailyReminder is loaded.
           rescheduleReminderFromToday();
+          // One-off psychology-release announcement notification.
+          // Safe to call unconditionally — guards inside skip if
+          // already-scheduled / already-visited / already-dismissed /
+          // permission not granted / not-yet-eligible.
+          try { _schedulePsychologyAnnouncement(); } catch (e) {}
         } else if (event === 'INITIAL_SESSION' && !session) {
           // Guarded so the eager boot check and the timeout fallback can
           // pre-empt this branch when gotrue is slow / stuck. Whichever
