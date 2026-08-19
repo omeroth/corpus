@@ -12084,6 +12084,22 @@ function getW() {
 function getT() { return state.lang === 'en' ? THINKERS_EN : THINKERS; }
 function getLvls() { return state.lang === 'en' ? LEVELS_EN : LEVELS; }
 
+// Resolve a thinker's portrait for the given rendering-context subject.
+// A multi-subject thinker (Kahneman) declares images: { economics: …,
+// psychology: … } alongside the primary `image` fallback. Single-subject
+// thinkers never declare images[]; the fallback is used for everything.
+//
+// Every t.image read site in index.html and generate-share-cards.mjs
+// calls this with the site's known subject — the pantheon section's
+// subject, the carousel's subject, the reader's state.subject, etc.
+// See the audit in the Kahneman multi-subject commit message for the
+// full callsite list.
+function _thinkerImage(t, subject) {
+  if (!t) return '';
+  if (t.images && subject && t.images[subject]) return t.images[subject];
+  return t.image || '';
+}
+
 // Single source of truth for the app's default state shape. Called on cold
 // boot (initial declaration), from loadState() to hydrate defaults for any
 // keys the persisted blob is missing, and from every reset path (authLogout
@@ -14209,10 +14225,13 @@ function renderHome() {
       try {
         const unlocked = state.unlockedThinkers.includes(t.id);
         const card = document.createElement('div');
-        if (t.image) {
+        // Library modal is a global list (no per-section render), so
+        // each thinker uses their primary — fall through to t.image.
+        const imgUrl = _thinkerImage(t, null);
+        if (imgUrl) {
           card.className = 'thinker-card painting ' + (unlocked ? 'unlocked' : 'locked');
           card.innerHTML = `
-            <div class="thinker-painting-bg" style="background-image:url('${t.image}')"></div>
+            <div class="thinker-painting-bg" style="background-image:url('${imgUrl}')"></div>
             <div class="thinker-painting-overlay">
               <div class="thinker-name">${t.name}</div>
               <div class="thinker-era">${t.era}</div>
@@ -14627,7 +14646,7 @@ function populateCarousel() {
     // fix in _renderThinkerIntro.
     card.dataset.subject = subject;
     card.innerHTML = `
-      <img src="${t.image}" alt="${t.name}" loading="lazy">
+      <img src="${_thinkerImage(t, subject)}" alt="${t.name}" loading="lazy">
       <div class="thinker-carousel-name">${t.name}</div>
     `;
     // Both variants clickable — locked opens the teaser modal, unlocked opens the full view.
@@ -14823,7 +14842,8 @@ function _renderThinkerIntro(day, opts) {
     // state.subject is authoritative at reader time; t.subject is the
     // fallback for the (very unlikely) case where it's unset.
     portrait.dataset.subject = state.subject || t.subject || 'philosophy';
-    portrait.innerHTML = t.image ? `<img src="${t.image}" alt="${t.name}">` : '';
+    const _introImg = _thinkerImage(t, state.subject);
+    portrait.innerHTML = _introImg ? `<img src="${_introImg}" alt="${t.name}">` : '';
     nameEl.style.display = '';
     nameEl.textContent = t.name;
   } else {
@@ -14915,8 +14935,9 @@ function _updateThinkerIntroReopenBtn(day) {
   }
   const t = getT().find(x => x.id === day.thinkerId);
   const isUnlocked = !!(t && state.unlockedThinkers && state.unlockedThinkers.includes(t.id));
-  if (isUnlocked && t && t.image) {
-    btn.innerHTML = `<div class="rt-portrait"><img src="${t.image}" alt="${t.name}"></div>`;
+  const _topbarImg = t ? _thinkerImage(t, state.subject) : '';
+  if (isUnlocked && t && _topbarImg) {
+    btn.innerHTML = `<div class="rt-portrait"><img src="${_topbarImg}" alt="${t.name}"></div>`;
   } else {
     btn.innerHTML = `<div class="rt-mystery"><svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-mystery-q"/></svg></div>`;
   }
@@ -15530,8 +15551,12 @@ function showThinkerCardScreen(thinker, chapter, day) {
   // Populate thinker data
   const portrait = document.getElementById('unlock-portrait');
   const front = card.querySelector('.flip-card-front');
-  if (thinker.image) {
-    front.style.backgroundImage = `url("${thinker.image}")`;
+  // End-of-dialogue unlock reveal. The user just completed a
+  // dialogue in state.subject, so that's the correct portrait
+  // context for a multi-subject thinker.
+  const _unlockImg = _thinkerImage(thinker, state.subject);
+  if (_unlockImg) {
+    front.style.backgroundImage = `url("${_unlockImg}")`;
     front.style.backgroundSize = 'contain';
     front.style.backgroundPosition = 'center';
     front.style.backgroundRepeat = 'no-repeat';
@@ -16032,7 +16057,7 @@ function _renderGuestFirstCompletionStats(trigger, isEn) {
       const _tid = _dy.thinkerId;
       if (_tid) {
         const _t = (getT ? getT().find(x => x.id === _tid) : null);
-        if (_t && _t.image) _thinkerImg = _t.image;
+        if (_t) _thinkerImg = _thinkerImage(_t, state.subject);
       }
     }
   } catch (e) {}
@@ -16544,9 +16569,10 @@ async function generateShareCard(thinkerId, dayTitle, subject) {
   ctx.lineWidth = 8;
   ctx.strokeStyle = _SHARE_CARD_RIM;
   ctx.stroke();
-  if (t.image) {
+  const _shareImg = _thinkerImage(t, subject);
+  if (_shareImg) {
     try {
-      const img = await _loadCardImage(t.image, 1500);
+      const img = await _loadCardImage(_shareImg, 1500);
       ctx.save();
       const innerR = portraitR - 6;
       ctx.beginPath();
@@ -17088,12 +17114,17 @@ function _chapterForThinker(thinkerId) {
 // hidden, and a small "Unlocks in Chapter X" line renders under the bio via
 // #thinker-modal-lock-line. All other paths (options omitted / options.locked
 // falsy) render the full unlocked variant exactly as before.
+// options.subject → per-subject portrait resolution for multi-subject
+// thinkers. Pantheon callsites pass the section's subject; carousel /
+// library callers omit (default: state.subject) because their surface
+// is single-subject.
 function openThinkerModal(id, options) {
   const t = getT().find(x => x.id === id);
   if (!t) return;
   const opts = options || {};
   const locked = !!opts.locked;
   const isEn = state.lang === 'en';
+  const contextSubject = opts.subject || state.subject;
   try { posthog.capture('thinker_card_opened', { thinker: t.id, locked: locked }); } catch(e) {}
 
   const modalBox = document.querySelector('#modal-thinker .modal-box');
@@ -17142,16 +17173,19 @@ function openThinkerModal(id, options) {
     emojiEl.textContent = '';
     emojiEl.style.display = 'none';
     modalBox.classList.remove('has-portrait');
-  } else if (t.image) {
-    portrait.innerHTML = `<img class="thinker-modal-portrait-full" src="${t.image}" alt="${t.name}">`;
-    emojiEl.textContent = '';
-    emojiEl.style.display = 'none';
-    modalBox.classList.add('has-portrait');
   } else {
-    portrait.innerHTML = '';
-    emojiEl.textContent = t.emoji;
-    emojiEl.style.display = '';
-    modalBox.classList.remove('has-portrait');
+    const _modalImg = _thinkerImage(t, contextSubject);
+    if (_modalImg) {
+      portrait.innerHTML = `<img class="thinker-modal-portrait-full" src="${_modalImg}" alt="${t.name}">`;
+      emojiEl.textContent = '';
+      emojiEl.style.display = 'none';
+      modalBox.classList.add('has-portrait');
+    } else {
+      portrait.innerHTML = '';
+      emojiEl.textContent = t.emoji;
+      emojiEl.style.display = '';
+      modalBox.classList.remove('has-portrait');
+    }
   }
   document.getElementById('modal-thinker').classList.add('active');
   // Lock body scroll so the home/pantheon list underneath can't be
@@ -19254,12 +19288,13 @@ function renderPantheon() {
     const isUnlocked = validUnlocked.includes(t.id);
     const displayName = t.name;
     const subject = sectionSubject || t.subject || 'philosophy';
+    const imgUrl = _thinkerImage(t, subject);
     if (isUnlocked) {
       return `
         <div class="pantheon-card" data-subject="${subject}" onclick="flipThinkerCard(this, '${t.id}')">
           <div class="pantheon-card-inner">
             <div class="pantheon-card-front">
-              <img src="${t.image}" alt="${t.name}" onerror="this.style.display='none'">
+              <img src="${imgUrl}" alt="${t.name}" onerror="this.style.display='none'">
               <div class="pantheon-card-overlay"></div>
               <div class="pantheon-card-info">
                 <div class="pantheon-card-name">${displayName}</div>
@@ -19275,10 +19310,10 @@ function renderPantheon() {
         </div>`;
     }
     return `
-      <div class="pantheon-card locked" data-subject="${subject}" onclick="openThinkerModal('${t.id}', {locked: true})">
+      <div class="pantheon-card locked" data-subject="${subject}" onclick="openThinkerModal('${t.id}', {locked: true, subject: '${subject}'})">
         <div class="pantheon-card-inner">
           <div class="pantheon-card-front">
-            <img src="${t.image}" alt="${t.name}" onerror="this.style.display='none'">
+            <img src="${imgUrl}" alt="${t.name}" onerror="this.style.display='none'">
             <div class="pantheon-card-overlay"></div>
             <div class="pantheon-lock-icon"><svg viewBox="0 0 64 64" width="28" height="28"><use href="#ic-lock"/></svg></div>
           </div>

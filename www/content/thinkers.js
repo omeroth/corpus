@@ -482,7 +482,17 @@ const THINKERS = [
     name: 'דניאל קהנמן',
     era: '1934–2024',
     emoji: '🧠',
-    image: './images/kahneman.webp',
+    // Per-subject portraits: `image` is the fallback (used when the
+    // rendering context's subject has no entry in `images[]`). Every
+    // Kahneman-facing surface knows its subject and resolves via
+    // _thinkerImage(t, subject) — see index.html and
+    // generate-share-cards.mjs. Files deliberately suffixed so no
+    // filename carries implicit-subject meaning.
+    image: './images/kahneman-econ.webp',
+    images: {
+      economics:  './images/kahneman-econ.webp',
+      psychology: './images/kahneman-psy.webp',
+    },
     subject: 'economics',
     // Kahneman was a psychologist by training whose Nobel was in economics.
     // Primary bucket is economics (his Nobel context, frame color); the
@@ -595,7 +605,7 @@ const THINKERS_EN = [
   { id:'sen', name:'Amartya Sen', era:'1933–', emoji:'🌍', image:'./images/sen.webp', subject:'economics', bio:'The Indian economist and Nobel laureate who argued that real development is not GDP growth but the expansion of people\'s capabilities.', quote:'"Development is freedom."' },
   { id:'jevons', name:'William Stanley Jevons', era:'1835–1882', emoji:'💎', image:'./images/jevons.webp', subject:'economics', bio:'The English economist who discovered "marginal utility" - that value comes not from labor, but from the desire for the next unit.', quote:'"Value is a subjective relation that a person attributes to a thing."' },
   { id:'marshall', name:'Alfred Marshall', era:'1842–1924', emoji:'✂️', image:'./images/marshall.webp', subject:'economics', bio:'The British economist who united supply and demand into one diagram - and laid the foundation for modern economics.', quote:'"We might as well dispute whether it is the upper or the under blade of a pair of scissors that cuts a piece of paper. But it is clear that both blades are needed."' },
-  { id:'kahneman', name:'Daniel Kahneman', era:'1934–2024', emoji:'🧠', image:'./images/kahneman.webp', subject:'economics', subjects:['economics','psychology'], bio:'The Israeli-American psychologist who won the Nobel Prize in Economics in 2002 for revealing the cognitive biases that influence economic decisions.', quote:'"A loss of $100 is felt about twice as strongly as a gain of $100."' },
+  { id:'kahneman', name:'Daniel Kahneman', era:'1934–2024', emoji:'🧠', image:'./images/kahneman-econ.webp', images:{ economics:'./images/kahneman-econ.webp', psychology:'./images/kahneman-psy.webp' }, subject:'economics', subjects:['economics','psychology'], bio:'The Israeli-American psychologist who won the Nobel Prize in Economics in 2002 for revealing the cognitive biases that influence economic decisions.', quote:'"A loss of $100 is felt about twice as strongly as a gain of $100."' },
   { id:'ricardo', name:'David Ricardo', era:'1772–1823', emoji:'🌾', image:'./images/ricardo.webp', subject:'economics', bio:'The British economist who formulated the law of diminishing marginal returns and the theory of income distribution between classes.', quote:'"As more and more labor is added to the same quantity of land - the additional unit of labor will add less production than the previous one."' },
   { id:'piketty', name:'Thomas Piketty', era:'1971–', emoji:'📊', image:'./images/piketty.webp', subject:'economics', bio:'The French economist who measured capital over 300 years, and discovered the formula r > g - the rate of return on capital is always greater than the rate of growth.', quote:'"When the rate of return on capital significantly exceeds the growth rate of the economy - inherited wealth grows faster than the entire economy."' },
   { id:'aquinas', name:'Thomas Aquinas', era:'1225–1274', emoji:'✝️', image:'./images/aquinas.webp', subject:'economics', bio:'A Dominican friar and medieval philosopher who formulated the idea of "the just price," and declared that not everything legal in the market is just.', quote:'"To sell something for more than its real value is a sin, even if no law forbids it."' },

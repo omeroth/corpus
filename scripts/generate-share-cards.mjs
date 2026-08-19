@@ -371,10 +371,15 @@ async function renderCard({ thinker, dayTitle, subject, lang }) {
   ctx.lineWidth = 8;
   ctx.strokeStyle = USE_FRAME_RIM ? theme.frame : RIM;
   ctx.stroke();
-  // Portrait image
-  if (thinker.image) {
+  // Portrait image. Per-subject override via thinker.images[subject]
+  // for multi-subject thinkers (Kahneman); falls through to
+  // thinker.image otherwise. Same resolver semantics as
+  // _thinkerImage in index.html.
+  const _portraitPath = (thinker.images && thinker.images[subject])
+    || thinker.image;
+  if (_portraitPath) {
     try {
-      const imgPath = thinker.image.replace(/^\.\//, '');
+      const imgPath = _portraitPath.replace(/^\.\//, '');
       const abs = path.join(ROOT, imgPath);
       const img = await loadImage(abs);
       ctx.save();

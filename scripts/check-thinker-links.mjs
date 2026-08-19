@@ -229,9 +229,19 @@ for (const { subject, data } of subjects) {
 
       // Portrait presence — check both HE and EN records since either could
       // point at a missing file. Same file usually shared across languages.
+      // Also checks every entry in a per-subject t.images{} map for
+      // multi-subject thinkers (Kahneman etc).
       const imgs = new Set();
-      if (he && he.image) imgs.add(he.image);
-      if (en && en.image) imgs.add(en.image);
+      const collect = (rec) => {
+        if (!rec) return;
+        if (rec.image) imgs.add(rec.image);
+        if (rec.images && typeof rec.images === 'object') {
+          for (const p of Object.values(rec.images)) {
+            if (typeof p === 'string' && p) imgs.add(p);
+          }
+        }
+      };
+      collect(he); collect(en);
       for (const imgPath of imgs) {
         const filename = imgPath.replace(/^\.?\/?images\//, '');
         if (!imageFiles.has(filename)) {

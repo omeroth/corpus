@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-18T12:10:49.658Z",
+  "generatedAt": "2026-08-19T17:32:26.262Z",
   "items": [
     {
       "weekId": 1,
@@ -1420,6 +1420,126 @@
       "title": "We Learn by Watching",
       "card": "share/cards/en/psyc-3-6.png",
       "page": "d/psyc-3-6-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "freud",
+      "title": "למה אנחנו חוזרים בדיוק על מה שפגע בנו?",
+      "card": "share/cards/he/psyc-4-1.png",
+      "page": "d/psyc-4-1-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "freud",
+      "title": "Why do we repeat exactly what hurt us?",
+      "card": "share/cards/en/psyc-4-1.png",
+      "page": "d/psyc-4-1-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "klein",
+      "title": "מה אם אנחנו נושאים את האנשים מהעבר בתוכנו?",
+      "card": "share/cards/he/psyc-4-2.png",
+      "page": "d/psyc-4-2-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "klein",
+      "title": "What if we carry the people from our past inside us?",
+      "card": "share/cards/en/psyc-4-2.png",
+      "page": "d/psyc-4-2-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "anna-freud",
+      "title": "מה אם ההגנות שלנו הן בעצם מה שתוקע אותנו?",
+      "card": "share/cards/he/psyc-4-3.png",
+      "page": "d/psyc-4-3-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "anna-freud",
+      "title": "What if our defenses are actually what keeps us stuck?",
+      "card": "share/cards/en/psyc-4-3.png",
+      "page": "d/psyc-4-3-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "beck",
+      "title": "מה אם הדפוס אינו רגש אלא משפט שאנחנו אומרים לעצמנו?",
+      "card": "share/cards/he/psyc-4-4.png",
+      "page": "d/psyc-4-4-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "beck",
+      "title": "What if the pattern is not an emotion but a sentence we tell ourselves?",
+      "card": "share/cards/en/psyc-4-4.png",
+      "page": "d/psyc-4-4-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "van-der-kolk",
+      "title": "מה אם יש דפוסים שלא יושבים במחשבה?",
+      "card": "share/cards/he/psyc-4-5.png",
+      "page": "d/psyc-4-5-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "van-der-kolk",
+      "title": "What if there are patterns that do not sit in thought?",
+      "card": "share/cards/en/psyc-4-5.png",
+      "page": "d/psyc-4-5-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "kahneman",
+      "title": "מה אם רוב מה שאנחנו עושים הוכרע לפני שחשבנו?",
+      "card": "share/cards/he/psyc-4-6.png",
+      "page": "d/psyc-4-6-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "kahneman",
+      "title": "What if most of what we do was decided before we thought?",
+      "card": "share/cards/en/psyc-4-6.png",
+      "page": "d/psyc-4-6-en.html"
     }
   ]
 }
