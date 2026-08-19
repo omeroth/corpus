@@ -15571,9 +15571,14 @@ function _showDcStats(titleText, subtitleText, xpAmount, streakCount, onContinue
   const next = getNextLessonInfo();
 
   // Wrap the continue handlers so any pending celebration overlays play
-  // BEFORE the Thinker Card / Back-to-Home / Next-Dialogue action fires.
-  // Stats Reveal stays at t=0 as today; the user taps continue → queue
-  // drains → the original fn runs from _onCelebrationQueueEmpty.
+  // BEFORE the Back-to-Home / Next-Dialogue action fires.
+  //
+  // Thinker-card path is an exception: showThinkerCardScreen runs DIRECTLY
+  // on tap (no queue drain) so the promised payoff of "הוגה חדש מחכה"
+  // appears immediately. Milestone celebrations (endowment / level_up /
+  // chapter_complete / bonus_unlock / goal_met) then drain from the thinker
+  // card's OWN Next Dialogue and Back to Home buttons — wired inside
+  // showThinkerCardScreen. Caller flags this path via onContinue.thinker=true.
   if (next.hasNext && onContinue.fn === closeCompleteModal) {
     continueBtn.textContent = isEn ? 'Next Dialogue' : 'הדיאלוג הבא';
     continueBtn.onclick = _wrapWithQueuePlay(goToNextLesson);
@@ -15582,7 +15587,11 @@ function _showDcStats(titleText, subtitleText, xpAmount, streakCount, onContinue
     backHomeBtn.style.display = '';
   } else {
     continueBtn.textContent = onContinue.label;
-    continueBtn.onclick = _wrapWithQueuePlay(onContinue.fn);
+    // Thinker-card path: unwrapped. The thinker card's own buttons
+    // (Next Dialogue / Back to Home) wrap the queue drain instead.
+    continueBtn.onclick = onContinue.thinker
+      ? onContinue.fn
+      : _wrapWithQueuePlay(onContinue.fn);
     backHomeBtn.style.display = 'none';
   }
 
@@ -15630,17 +15639,46 @@ function showThinkerCardScreen(thinker, chapter, day) {
   document.getElementById('dc-thinker-title').textContent =
     isEn ? 'A new thinker joins the pantheon' : 'הוגה חדש מצטרף לפנתאון';
 
-  // Setup action buttons
+  // Setup action buttons. Both wrap the queue drain so milestone
+  // celebrations (endowment / level_up / chapter_complete / bonus_unlock /
+  // goal_met) that were queued in finishDay play AFTER the user leaves
+  // the thinker card — the tap on "הוגה חדש מחכה" reveals the thinker
+  // immediately (no queue drain) and the celebrations wait for the exit.
+  //
+  // Back-to-Home path additionally strips goal_met from the drain before
+  // playing to shave one beat off the worst-case chain
+  // (queue-drain + closeCompleteModal's signup/share/streak chain +
+  // bonus-coach could stack up to 9 modals in a row on the last day of a
+  // chapter that also crosses a level and hits the daily goal).
+  // goal_met is the lowest-value skip: state.xp already received the
+  // bonus inside _maybeMarkGoalMet, so dropping the modal is cosmetic.
   const nextInfo = getNextLessonInfo();
   const nextBtn = document.getElementById('modal-next-btn');
   if (nextInfo.hasNext) {
     nextBtn.textContent = isEn ? 'Next Dialogue' : 'הדיאלוג הבא';
-    nextBtn.onclick = goToNextLesson;
+    nextBtn.onclick = _wrapWithQueuePlay(goToNextLesson);
     nextBtn.style.display = '';
   } else {
     nextBtn.style.display = 'none';
   }
-  document.getElementById('modal-continue-btn').textContent = isEn ? 'Back to Home' : 'חזרה לבית';
+  const backBtn = document.getElementById('modal-continue-btn');
+  backBtn.textContent = isEn ? 'Back to Home' : 'חזרה לבית';
+  // Filter goal_met out of the queue BEFORE the drain reads it (the
+  // wrapper snapshots the queue at tap time). Falls through to the
+  // standard _wrapWithQueuePlay(closeCompleteModal) chain — which
+  // itself runs the closeCompleteModal signup/share/streak prompts
+  // after the drain empties.
+  const _wrappedClose = _wrapWithQueuePlay(closeCompleteModal);
+  backBtn.onclick = function() {
+    if (Array.isArray(state.pendingCelebrations)) {
+      const before = state.pendingCelebrations.length;
+      state.pendingCelebrations = state.pendingCelebrations.filter(c => c && c.type !== 'goal_met');
+      if (state.pendingCelebrations.length !== before) {
+        try { saveStateLocal(); } catch(e) {}
+      }
+    }
+    return _wrappedClose.apply(this, arguments);
+  };
 
   // Re-activate modal-complete. Under the celebration-queue flow
   // (introduced in 9228d92), _wrapWithQueuePlay removes .active from
@@ -15844,7 +15882,7 @@ function finishDay() {
     dayXpEarned,
     state.correctInRow,
     showThinker
-      ? { label: isEn ? 'A new thinker awaits →' : 'הוגה חדש מחכה ←', fn: () => showThinkerCardScreen(thinker, chapter, day) }
+      ? { label: isEn ? 'A new thinker awaits →' : 'הוגה חדש מחכה ←', fn: () => showThinkerCardScreen(thinker, chapter, day), thinker: true }
       : { label: isEn ? 'Back to Home' : 'חזרה לבית', fn: closeCompleteModal }
   );
 }
