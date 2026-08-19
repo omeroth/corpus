@@ -315,6 +315,47 @@ const THINKERS = [
     bio: 'פסיכולוג קנדי-אמריקאי מסטנפורד. הראה שאדם לומד לא רק מהתנאה, אלא בעיקר מהתבוננות באחרים. ניסוי הבובה "בובו" ב-1961 הוכיח שילדים מחקים אלימות שראו אצל מבוגר. הציע את הדגם השלישי אחרי פרויד וסקינר: לא דחפים, לא חיזוקים, אלא למידה חברתית.',
     quote: '"הלמידה הייתה מפרכת, שלא לומר מסוכנת, לו היו בני אדם נאלצים להסתמך רק על תוצאות מעשיהם שלהם. למרבה המזל, רוב ההתנהגות האנושית נלמדת בהתבוננות, דרך מודלים."',
   },
+  // Psychology chapter 4 — "Why are we locked into patterns?"
+  {
+    id: 'klein',
+    name: 'מלאני קליין',
+    era: '1882–1960',
+    emoji: '🪆',
+    image: './images/klein.webp',
+    subject: 'psychology',
+    bio: 'פסיכואנליטיקאית ילידת וינה שפעלה בלונדון. חלוצת הפסיכואנליזה של ילדים דרך משחק. פיתחה את תיאוריית יחסי אובייקט: אנחנו סופגים לתוכנו דמויות של האנשים החשובים בחיינו, והן ממשיכות לפעול בפנים גם עשרות שנים אחרי.',
+    quote: '"תודה קשורה קשר הדוק לאמון בדמויות טובות. דרך תהליכי ההשלכה וההפנמה, דרך עושר פנימי שניתן החוצה ומופנם בחזרה, מתרחשים העשרה והעמקה של האני."',
+  },
+  {
+    id: 'anna-freud',
+    name: 'אנה פרויד',
+    era: '1895–1982',
+    emoji: '🛡️',
+    image: './images/anna-freud.webp',
+    subject: 'psychology',
+    bio: 'פסיכואנליטיקאית ילידת וינה, בתו הצעירה של זיגמונד פרויד ופסיכואנליטיקאית בזכות עצמה. הפנתה את הזרקור מהדחפים אל האני, ומיפתה מערכת שלמה של מנגנוני הגנה, אסטרטגיות אוטומטיות שהנפש מפעילה כדי להרחיק חרדה.',
+    quote: '"ספר זה עוסק בבעיה אחת: הדרכים והאמצעים שבהם האני מרחיק מעליו אי-נעימות וחרדה, ומפעיל שליטה על התנהגות אימפולסיבית, על רגשות ועל דחפים."',
+  },
+  {
+    id: 'beck',
+    name: 'אהרון בק',
+    era: '1921–2021',
+    emoji: '💭',
+    image: './images/beck.webp',
+    subject: 'psychology',
+    bio: 'פסיכיאטר אמריקאי שהוכשר כפסיכואנליטיקאי וגילה בקליניקה תופעה חדשה: בין האירוע לרגש עוברת מחשבה מהירה, כמעט בלתי מורגשת. פיתח את הטיפול הקוגניטיבי (CBT), שהפך לטיפול הנחקר ביותר בעולם על דיכאון וחרדה, והציב את הפסיכותרפיה על בסיס אמפירי.',
+    quote: '"הטיפול הקוגניטיבי מבקש להקל על מצוקות נפשיות באמצעות תיקון תפיסות שגויות ואותות פנימיים. תיקון אמונות שגויות מפחית תגובות מוגזמות."',
+  },
+  {
+    id: 'van-der-kolk',
+    name: 'בסל ון דר קולק',
+    era: '1943–',
+    emoji: '🫀',
+    image: './images/van-der-kolk.webp',
+    subject: 'psychology',
+    bio: 'פסיכיאטר וחוקר טראומה הולנדי-אמריקאי. הראה שטראומה אינה רק זיכרון של אירוע, אלא חותם שהיא מותירה על הגוף ועל מערכת האזעקה שלו. ספרו "נרשם בגוף" הפך לרב-מכר עצום, ובד בבד גם שנוי במחלוקת בקהילה המדעית.',
+    quote: '"טראומה אינה רק אירוע שהתרחש בעבר. היא גם החותם שהותירה החוויה על הנפש, על המוח ועל הגוף. לחותם הזה יש השלכות מתמשכות על האופן שבו האורגניזם מצליח לשרוד בהווה."',
+  },
   // Economics thinkers
   {
     id: 'mill-econ',
@@ -443,6 +484,11 @@ const THINKERS = [
     emoji: '🧠',
     image: './images/kahneman.webp',
     subject: 'economics',
+    // Kahneman was a psychologist by training whose Nobel was in economics.
+    // Primary bucket is economics (his Nobel context, frame color); the
+    // subjects[] array lets dialogues in either bucket reference him without
+    // tripping the validator's single-subject mismatch check.
+    subjects: ['economics', 'psychology'],
     bio: 'הפסיכולוג הישראלי-אמריקאי שזכה בפרס נובל לכלכלה ב-2002 על הצגת ההטיות הקוגניטיביות שמשפיעות על החלטות כלכליות.',
     quote: '"הפסד של 100 דולר מורגש בערך פי שניים יותר מרווח של 100 דולר."',
   },
@@ -549,7 +595,7 @@ const THINKERS_EN = [
   { id:'sen', name:'Amartya Sen', era:'1933–', emoji:'🌍', image:'./images/sen.webp', subject:'economics', bio:'The Indian economist and Nobel laureate who argued that real development is not GDP growth but the expansion of people\'s capabilities.', quote:'"Development is freedom."' },
   { id:'jevons', name:'William Stanley Jevons', era:'1835–1882', emoji:'💎', image:'./images/jevons.webp', subject:'economics', bio:'The English economist who discovered "marginal utility" - that value comes not from labor, but from the desire for the next unit.', quote:'"Value is a subjective relation that a person attributes to a thing."' },
   { id:'marshall', name:'Alfred Marshall', era:'1842–1924', emoji:'✂️', image:'./images/marshall.webp', subject:'economics', bio:'The British economist who united supply and demand into one diagram - and laid the foundation for modern economics.', quote:'"We might as well dispute whether it is the upper or the under blade of a pair of scissors that cuts a piece of paper. But it is clear that both blades are needed."' },
-  { id:'kahneman', name:'Daniel Kahneman', era:'1934–2024', emoji:'🧠', image:'./images/kahneman.webp', subject:'economics', bio:'The Israeli-American psychologist who won the Nobel Prize in Economics in 2002 for revealing the cognitive biases that influence economic decisions.', quote:'"A loss of $100 is felt about twice as strongly as a gain of $100."' },
+  { id:'kahneman', name:'Daniel Kahneman', era:'1934–2024', emoji:'🧠', image:'./images/kahneman.webp', subject:'economics', subjects:['economics','psychology'], bio:'The Israeli-American psychologist who won the Nobel Prize in Economics in 2002 for revealing the cognitive biases that influence economic decisions.', quote:'"A loss of $100 is felt about twice as strongly as a gain of $100."' },
   { id:'ricardo', name:'David Ricardo', era:'1772–1823', emoji:'🌾', image:'./images/ricardo.webp', subject:'economics', bio:'The British economist who formulated the law of diminishing marginal returns and the theory of income distribution between classes.', quote:'"As more and more labor is added to the same quantity of land - the additional unit of labor will add less production than the previous one."' },
   { id:'piketty', name:'Thomas Piketty', era:'1971–', emoji:'📊', image:'./images/piketty.webp', subject:'economics', bio:'The French economist who measured capital over 300 years, and discovered the formula r > g - the rate of return on capital is always greater than the rate of growth.', quote:'"When the rate of return on capital significantly exceeds the growth rate of the economy - inherited wealth grows faster than the entire economy."' },
   { id:'aquinas', name:'Thomas Aquinas', era:'1225–1274', emoji:'✝️', image:'./images/aquinas.webp', subject:'economics', bio:'A Dominican friar and medieval philosopher who formulated the idea of "the just price," and declared that not everything legal in the market is just.', quote:'"To sell something for more than its real value is a sin, even if no law forbids it."' },
@@ -576,4 +622,9 @@ const THINKERS_EN = [
   { id:'erikson',   name:'Erik Erikson',      era:'1902–1994', emoji:'🪜', image:'./images/erikson.webp',   subject:'psychology', bio:'A German-American developmental psychologist. Extended Freud in one decisive direction: psychological shaping does not end in childhood. Proposed eight life stages, from birth to old age, each carrying a crisis to resolve. Whoever does not resolve a crisis carries it forward.',                                                                                                                                    quote:'"Healthy children will not fear life if their elders have integrity enough not to fear death."' },
   { id:'kohut',     name:'Heinz Kohut',       era:'1913–1981', emoji:'👁️', image:'./images/kohut.webp',     subject:'psychology', bio:'An American psychoanalyst born in Vienna, founder of self psychology. Argued that the self is not built from internal validation but from being seen in another person\'s eyes. "The gleam in the parent\'s eye" is the basic condition for developing a sense of worth.',                                                                                                                                               quote:'"The gleam in the mother\'s eye, which mirrors the child\'s exhibitionistic display."' },
   { id:'bandura',   name:'Albert Bandura',    era:'1925–2021', emoji:'🎭', image:'./images/bandura.webp',   subject:'psychology', bio:'A Canadian-American psychologist at Stanford. Showed that a person learns not only through conditioning, but mainly through observing others. The 1961 Bobo doll experiment proved that children imitate the violence they saw in an adult. Proposed the third model after Freud and Skinner: not drives, not reinforcements, but social learning.',                                                                     quote:'"Learning would be exceedingly laborious, not to mention hazardous, if people had to rely solely on the effects of their own actions to inform them what to do. Fortunately, most human behavior is learned observationally through modeling."' },
+  // Psychology chapter 4 — "Why are we locked into patterns?"
+  { id:'klein',        name:'Melanie Klein',        era:'1882–1960', emoji:'🪆', image:'./images/klein.webp',        subject:'psychology', bio:'A Vienna-born, London-based psychoanalyst. Pioneer of child psychoanalysis through play. Developed object relations theory: we absorb inside us figures of the important people in our lives, and they continue to operate within us for decades after.',                                                                                                                                                                                     quote:'"Gratitude is closely bound up with trust in good figures. Through processes of projection and introjection, through inner wealth given out and taken back in, an enrichment and deepening of the ego takes place."' },
+  { id:'anna-freud',   name:'Anna Freud',           era:'1895–1982', emoji:'🛡️', image:'./images/anna-freud.webp',   subject:'psychology', bio:'A Vienna-born psychoanalyst, Sigmund Freud\'s youngest daughter and a psychoanalyst in her own right. Turned the spotlight from the drives to the ego, and mapped an entire system of defense mechanisms, automatic strategies the mind activates in order to keep anxiety at a distance.',                                                                                                                                                     quote:'"This book is concerned with one problem only: the ways and means by which the ego wards off unpleasure and anxiety, and exercises control over impulsive behavior, affects and instinctive urges."' },
+  { id:'beck',         name:'Aaron Beck',           era:'1921–2021', emoji:'💭', image:'./images/beck.webp',         subject:'psychology', bio:'An American psychiatrist trained as a psychoanalyst who discovered in the clinic a new phenomenon: between the event and the emotion passes a fast thought, almost imperceptible. Developed cognitive therapy (CBT), which became the most-researched treatment for depression and anxiety, and placed psychotherapy on an empirical footing.',                                                                                              quote:'"Cognitive therapy seeks to alleviate psychological stresses by correcting faulty conceptions and self-signals. By correcting erroneous beliefs we can lower excessive reactions."' },
+  { id:'van-der-kolk', name:'Bessel van der Kolk',  era:'1943–',     emoji:'🫀', image:'./images/van-der-kolk.webp', subject:'psychology', bio:'A Dutch-American psychiatrist and trauma researcher. Showed that trauma is not only a memory of an event, but an imprint it leaves on the body and on its alarm system. His book "The Body Keeps the Score" became an enormous bestseller, and at the same time also controversial in the scientific community.',                                                                                                                             quote:'"Trauma is not just an event that took place sometime in the past; it is also the imprint left by that experience on mind, brain, and body. This imprint has ongoing consequences for how the human organism manages to survive in the present."' },
 ];

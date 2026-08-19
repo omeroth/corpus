@@ -156,6 +156,19 @@ function effectiveSubject(thinker) {
   return thinker && thinker.subject ? thinker.subject : 'philosophy';
 }
 
+// A thinker's full subject set. Primary `subject` (or the philosophy
+// default) is always included; `subjects[]` extends membership so a
+// dialogue in a secondary subject can reference the thinker without
+// tripping the subject-mismatch check. Runtime bucketing (pantheon
+// section, frame color, share-card palette) still uses `subject` alone
+// — see index.html:14197 / 18804 and generate-share-cards.mjs.
+function effectiveSubjects(thinker) {
+  const primary = effectiveSubject(thinker);
+  const extras = Array.isArray(thinker && thinker.subjects) ? thinker.subjects : [];
+  const set = new Set([primary, ...extras]);
+  return [...set];
+}
+
 // ─── Forward check: dialogue → thinker ───────────────────────────────────
 
 const forwardIssues = [];   // hard errors — bad thinkerId, subject mismatch, missing portrait
@@ -201,13 +214,15 @@ for (const { subject, data } of subjects) {
       if (!en) forwardIssues.push({ issue: 'EN thinker missing', where: dayLabel, thinkerId: tid, detail: 'exists in THINKERS only' });
 
       // Subject-match check (only meaningful when both arrays have the record).
+      // Uses effectiveSubjects so a thinker with subjects=['economics','psychology']
+      // can legitimately appear in dialogues of either subject.
       for (const [langLabel, rec] of [['HE', he], ['EN', en]]) {
         if (!rec) continue;
-        const ts = effectiveSubject(rec);
-        if (ts !== subject) {
+        const subs = effectiveSubjects(rec);
+        if (!subs.includes(subject)) {
           forwardIssues.push({
             issue: 'subject mismatch', where: dayLabel, thinkerId: tid,
-            detail: `${langLabel} thinker.subject=${JSON.stringify(rec.subject || '(unset → philosophy)')}, dialogue subject=${subject}`,
+            detail: `${langLabel} thinker subjects=${JSON.stringify(subs)}, dialogue subject=${subject}`,
           });
         }
       }

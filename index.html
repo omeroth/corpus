@@ -14187,14 +14187,29 @@ const CAROUSEL_ORDER = {
     'spinoza', 'berkeley', 'bostrom',
   ],
   economics: ['samuelson', 'smith', 'marx', 'keynes', 'friedman', 'sen', 'jevons', 'marshall', 'kahneman', 'ricardo', 'piketty', 'aquinas', 'pareto', 'rawls', 'nozick', 'hayek', 'locke', 'mill-econ', 'walras', 'sandel'],
-  psychology: []
+  psychology: [
+    // Ch1: What is the mind?
+    'wundt', 'james', 'freud', 'jung', 'skinner', 'rogers',
+    // Ch2: What drives us?
+    'adler', 'maslow', 'frankl', 'fromm', 'deci',
+    // Ch3: Where does who I am come from?
+    'bowlby', 'winnicott', 'erikson', 'kohut', 'bandura',
+    // Ch4: Why are we locked into patterns?
+    'klein', 'anna-freud', 'beck', 'van-der-kolk', 'kahneman',
+  ],
 };
 
 function populateCarousel() {
   const carousel = document.getElementById('thinker-carousel');
   if (!carousel) return;
   const subject = state.subject || 'philosophy';
-  const allThinkers = getT().filter(t => t && t.image && (t.subject === subject || (!t.subject && subject === 'philosophy')));
+  // Multi-subject: t.subjects[] extends membership beyond the primary
+  // t.subject bucket. See thinkers.js note on Kahneman for the pattern.
+  const allThinkers = getT().filter(t => t && t.image && (
+    t.subject === subject ||
+    (Array.isArray(t.subjects) && t.subjects.includes(subject)) ||
+    (!t.subject && !t.subjects && subject === 'philosophy')
+  ));
   const order = CAROUSEL_ORDER[subject] || [];
   const thinkers = order.length
     ? order.map(id => allThinkers.find(t => t.id === id)).filter(Boolean)
@@ -18801,7 +18816,12 @@ function renderPantheon() {
   // subjects don't render an empty header.
   container.innerHTML = SUBJECTS.map(subj => {
     const order = CAROUSEL_ORDER[subj.id] || [];
-    const pool = allThinkers.filter(t => (t.subject || 'philosophy') === subj.id);
+    // Multi-subject: t.subjects[] extends membership beyond primary
+    // t.subject bucket. See thinkers.js note on Kahneman.
+    const pool = allThinkers.filter(t =>
+      (t.subject || 'philosophy') === subj.id ||
+      (Array.isArray(t.subjects) && t.subjects.includes(subj.id))
+    );
     const subjectThinkers = order.length
       ? order.map(id => pool.find(t => t.id === id)).filter(Boolean)
       : pool;
