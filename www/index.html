@@ -5850,6 +5850,34 @@
     letter-spacing: 0.4px;
   }
 
+  /* Achievement ribbons — compact pill row on the dc-stats screen.
+     Renders items absorbed from the celebration queue instead of
+     firing a full-screen overlay each (see finishDay + _showDcStats
+     for the absorb-vs-overlay rules). Stacks vertically, small
+     spacing, subject-accent-tinted. */
+  .dc-ribbons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .dc-ribbon {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--accent-tint);
+    border: 1px solid var(--accent-soft-border);
+    color: var(--ink);
+    font-family: 'Nunito', 'DM Sans', sans-serif;
+    font-size: calc(13px * var(--text-scale));
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
   /* ── Loss-framed guest-signup nudge — bright purple ──
      Modal shell overrides the base .modal-box to a white center → soft
      purple edge. Ink text; stat rows become soft tinted tiles; the third
@@ -8533,6 +8561,16 @@
           <div class="metric-label" id="metric-streak-days-label">ימים רצופים</div>
         </div>
       </div>
+      <!-- Achievement ribbons — populated by _showDcStats from the
+           ribbons arg computed in finishDay. Renders items that would
+           otherwise have been full-screen overlays but are absorbed
+           here to keep the completion chain short. Sees:
+             - "Welcome" (endowment, first completion ever, once/install)
+             - "Level N" (level_up when it lost the queue-winner cap)
+             - "Chapter N complete" (chapter_complete when it lost the cap)
+             - "Daily goal met" (goal_met, always ribbon, never overlay)
+           Hidden when no ribbons apply. -->
+      <div class="dc-ribbons" id="dc-ribbons" style="display:none"></div>
       <!-- Partway-progress line for the two-dialogue goal on the 1st
            completion of the day. Populated by _showDcStats + hidden by
            default. -->
@@ -13889,11 +13927,13 @@ function _onCelebrationQueueEmpty() {
   // prompt chain can pick a trigger derived from what actually played.
   _lastPlayedCelebrations = played;
 
-  // Bonus-card highlight (was in closeUnlockOverlay) — only if bonus_unlock
-  // actually played this session.
-  if (played.some(p => p.type === 'bonus_unlock')) {
-    _highlightBonusCardOnHome();
-  }
+  // Bonus-card coach mark used to fire here when bonus_unlock played,
+  // but the padlock overlay itself is already the announcement — a
+  // spotlight on the home card in the same breath was redundant and
+  // added one more beat to a chain we're trying to shorten. Bonus
+  // card is discoverable in the chapter list. _highlightBonusCardOnHome
+  // and _showBonusUnlockCoachMark stay defined for a future opt-in
+  // reintroduction; no callers remain.
 
   // Guest-signup dispatch USED to live here. It was moved into
   // closeCompleteModal's runSignup so all guest prompts fire through
@@ -15525,7 +15565,7 @@ function goToNextLesson() {
   });
 }
 
-function _showDcStats(titleText, subtitleText, xpAmount, streakCount, onContinue) {
+function _showDcStats(titleText, subtitleText, xpAmount, streakCount, onContinue, ribbons) {
   const isEn = state.lang === 'en';
   document.getElementById('complete-title').textContent = titleText;
   document.getElementById('complete-subtitle').textContent = subtitleText;
@@ -15546,6 +15586,37 @@ function _showDcStats(titleText, subtitleText, xpAmount, streakCount, onContinue
 
   const xpEl = document.getElementById('complete-xp');
   xpEl.textContent = '+0';
+
+  // Achievement ribbons — render pills for absorbed celebration
+  // items (see finishDay). Order matches the natural progression:
+  // welcome → level → chapter → goal.
+  const _ribHolder = document.getElementById('dc-ribbons');
+  if (_ribHolder) {
+    _ribHolder.innerHTML = '';
+    const _items = [];
+    if (ribbons && ribbons.welcome) {
+      _items.push(isEn ? 'Welcome to Corpus ✨' : 'ברוכים הבאים לקורפוס ✨');
+    }
+    if (ribbons && ribbons.levelUp) {
+      _items.push(isEn ? '🎉 Level ' + ribbons.levelUp : '🎉 שלב ' + ribbons.levelUp);
+    }
+    if (ribbons && ribbons.chapterComplete) {
+      _items.push(isEn
+        ? '📚 Chapter ' + ribbons.chapterComplete + ' complete'
+        : '📚 פרק ' + ribbons.chapterComplete + ' הושלם');
+    }
+    if (ribbons && ribbons.goalMet) {
+      _items.push(isEn ? '🎯 Daily goal met' : '🎯 המטרה היומית הושגה');
+    }
+    if (_items.length) {
+      _ribHolder.innerHTML = _items
+        .map(t => '<div class="dc-ribbon">' + t + '</div>')
+        .join('');
+      _ribHolder.style.display = '';
+    } else {
+      _ribHolder.style.display = 'none';
+    }
+  }
 
   // Partway-progress line (Item 6): show "1 of 2 today" on the 1st
   // completion of the day when the user's goal is 'two'. Hidden for
@@ -15639,19 +15710,14 @@ function showThinkerCardScreen(thinker, chapter, day) {
   document.getElementById('dc-thinker-title').textContent =
     isEn ? 'A new thinker joins the pantheon' : 'הוגה חדש מצטרף לפנתאון';
 
-  // Setup action buttons. Both wrap the queue drain so milestone
-  // celebrations (endowment / level_up / chapter_complete / bonus_unlock /
-  // goal_met) that were queued in finishDay play AFTER the user leaves
-  // the thinker card — the tap on "הוגה חדש מחכה" reveals the thinker
-  // immediately (no queue drain) and the celebrations wait for the exit.
-  //
-  // Back-to-Home path additionally strips goal_met from the drain before
-  // playing to shave one beat off the worst-case chain
-  // (queue-drain + closeCompleteModal's signup/share/streak chain +
-  // bonus-coach could stack up to 9 modals in a row on the last day of a
-  // chapter that also crosses a level and hits the daily goal).
-  // goal_met is the lowest-value skip: state.xp already received the
-  // bonus inside _maybeMarkGoalMet, so dropping the modal is cosmetic.
+  // Setup action buttons. Both wrap the queue drain so the winning
+  // milestone celebration queued in finishDay (bonus_unlock OR
+  // chapter_complete OR level_up — at most one, chosen by priority)
+  // plays AFTER the user leaves the thinker card. The tap on
+  // "הוגה חדש מחכה" reveals the thinker immediately.
+  // endowment + goal_met are absorbed as ribbons on dc-stats (see
+  // finishDay); they are never enqueued so there's no need to filter
+  // them here.
   const nextInfo = getNextLessonInfo();
   const nextBtn = document.getElementById('modal-next-btn');
   if (nextInfo.hasNext) {
@@ -15663,22 +15729,7 @@ function showThinkerCardScreen(thinker, chapter, day) {
   }
   const backBtn = document.getElementById('modal-continue-btn');
   backBtn.textContent = isEn ? 'Back to Home' : 'חזרה לבית';
-  // Filter goal_met out of the queue BEFORE the drain reads it (the
-  // wrapper snapshots the queue at tap time). Falls through to the
-  // standard _wrapWithQueuePlay(closeCompleteModal) chain — which
-  // itself runs the closeCompleteModal signup/share/streak prompts
-  // after the drain empties.
-  const _wrappedClose = _wrapWithQueuePlay(closeCompleteModal);
-  backBtn.onclick = function() {
-    if (Array.isArray(state.pendingCelebrations)) {
-      const before = state.pendingCelebrations.length;
-      state.pendingCelebrations = state.pendingCelebrations.filter(c => c && c.type !== 'goal_met');
-      if (state.pendingCelebrations.length !== before) {
-        try { saveStateLocal(); } catch(e) {}
-      }
-    }
-    return _wrappedClose.apply(this, arguments);
-  };
+  backBtn.onclick = _wrapWithQueuePlay(closeCompleteModal);
 
   // Re-activate modal-complete. Under the celebration-queue flow
   // (introduced in 9228d92), _wrapWithQueuePlay removes .active from
@@ -15747,7 +15798,8 @@ function finishDay() {
       isEn ? (day.titleEn || day.title) : day.title,
       0,
       state.correctInRow,
-      { label: isEn ? 'Back to Home' : 'חזרה לבית', fn: closeCompleteModal }
+      { label: isEn ? 'Back to Home' : 'חזרה לבית', fn: closeCompleteModal },
+      null  // no ribbons on the already-completed replay path
     );
     return;
   }
@@ -15809,68 +15861,88 @@ function finishDay() {
     });
   }
 
-  // Build the celebration queue for this completion. Gate conditions are
-  // evaluated NOW, but lifetime flags are NOT touched here — each overlay's
-  // own show function (or dismiss handler, for bonus_unlock) flips its flag
-  // when the user actually sees it. Persisting the queue via saveStateLocal
-  // means a mid-queue app close resumes cleanly on next entry (see
-  // _resumeCelebrationsIfPending).
+  // Celebrations after a completion. Two-part strategy:
   //
-  // Order: endowment (day-1 only) → level_up → chapter_complete → bonus_unlock.
-  // Endowment goes FIRST so a fresh user sees it as the payoff of their first
-  // completion, before any other celebration. Gated by _endowmentEligible so it
-  // fires exactly once per install (state.endowmentShownAt).
-  const _newCelebrations = [];
-  const _dayXpForEndowment = state.readerXP;
-  const _dialogueTitleForEndowment = state.lang === 'en' ? (day.titleEn || day.title) : day.title;
-  if (_endowmentEligible()) {
-    _newCelebrations.push({
-      type: 'endowment',
-      xp: _dayXpForEndowment,
-      dialogueTitle: _dialogueTitleForEndowment,
-    });
-  }
-  if (newLevel > prevLevel) {
-    _newCelebrations.push({ type: 'level_up', levelIndex: newLevel - 1 });
-  }
+  // 1. QUEUE WINNER — at most ONE overlay enters state.pendingCelebrations
+  //    per completion, chosen by priority:
+  //      bonus_unlock  (rarest, once per subject)
+  //     > chapter_complete (once per chapter)
+  //     > level_up
+  //
+  //    The losers among level_up / chapter_complete are demoted to ribbons
+  //    on the dc-stats screen so nothing is silently dropped.
+  //
+  // 2. RIBBONS on dc-stats — welcome (endowment, first-completion-only),
+  //    level_up (if demoted), chapter_complete (if demoted), goal_met
+  //    (always absorbed, never a full-screen overlay).
+  //
+  // Previously all five could enqueue as separate full-screen overlays,
+  // stacking up to 5 modals in front of the thinker card + prompt chain +
+  // coach mark for a max of 9 uninterrupted beats on Back to Home. New
+  // ceiling is: dc-stats (with ribbons) → thinker card → 1 overlay → 1
+  // prompt → home = 4 modals + home. See _showDcStats for the ribbon
+  // renderer and closeCompleteModal for the prompt-chain cap.
+  //
+  // The queue is persisted so a mid-queue app close resumes cleanly on
+  // next entry via _resumeCelebrationsIfPending.
+
+  const _levelCrossed = newLevel > prevLevel ? newLevel : null;
+
   const currentWeekId = state.currentWeek;
   const completedWeek = getW().find(w => w.id === currentWeekId);
-  const _chapterQualifies = completedWeek && completedWeek.days && completedWeek.days.length > 0 &&
-      completedWeek.days.every(d => state.completedDays[dayKey(completedWeek.id, d.id)]) &&
-      !(state.chapterCompleteShown && state.chapterCompleteShown[chapterCompleteKey(state.subject, completedWeek.id)]);
-  if (_chapterQualifies) {
-    _newCelebrations.push({ type: 'chapter_complete', weekId: completedWeek.id });
-  }
-  // Only fire in subjects that actually ship a bonus chapter — flagged
-  // via w.isBonus in each subject's data (philosophy.js:1026,
-  // economics.js:1216). Psychology has no bonus chapter today, and any
-  // future subject without one is handled automatically. Read from
-  // state directly instead of preallocating per subject.
+  const _chapterQualifies = completedWeek && completedWeek.days
+      && completedWeek.days.length > 0
+      && completedWeek.days.every(d => state.completedDays[dayKey(completedWeek.id, d.id)])
+      && !(state.chapterCompleteShown && state.chapterCompleteShown[chapterCompleteKey(state.subject, completedWeek.id)]);
+  const _chapterNum = _chapterQualifies ? completedWeek.id : null;
+
   const _hasBonusChapter = getW().some(w => w && w.isBonus);
   const _bonusShown = (state.bonusUnlockShown || {})[state.subject];
-  if (state.currentWeek === 1 && isWeekCompleted(1) && _hasBonusChapter && !_bonusShown) {
-    try { posthog.capture('bonus_unlocked', { user_id: currentUser?.id || null, subject: state.subject }); } catch(e) {}
-    _newCelebrations.push({ type: 'bonus_unlock', subject: state.subject });
+  const _bonusUnlockDue = state.currentWeek === 1 && isWeekCompleted(1)
+      && _hasBonusChapter && !_bonusShown;
+  if (_bonusUnlockDue) {
+    try { posthog.capture('bonus_unlocked', {
+      user_id: currentUser?.id || null, subject: state.subject }); } catch(e) {}
   }
-  // Goal-met (Item 6): count today's completion, then check whether we
-  // just crossed the user's daily goal threshold. Enqueued LAST so it
-  // plays after level/chapter/bonus. Grants +10 XP through the normal
-  // pipeline (state.xp already touched inside _maybeMarkGoalMet).
+
+  // Goal-met + endowment: state side effects fire unconditionally
+  // (XP bonus, one-shot flag). Presentation is a ribbon; no overlay.
   const _countToday = _bumpTodayCompletionCount();
   const _goalMet = _maybeMarkGoalMet(_countToday);
-  if (_goalMet) {
-    _newCelebrations.push({
-      type: 'goal_met',
-      goal: _goalMet.goal,
-      count: _goalMet.count,
-      target: _goalMet.target,
-      bonusXp: _goalMet.bonusXp,
-    });
+  const _endowmentDue = _endowmentEligible();
+  if (_endowmentDue) {
+    try { state.endowmentShownAt = new Date().toISOString(); } catch(e) {}
+  }
+
+  // Queue winner selection.
+  let _queueWinnerType = null;
+  const _newCelebrations = [];
+  if (_bonusUnlockDue) {
+    _newCelebrations.push({ type: 'bonus_unlock', subject: state.subject });
+    _queueWinnerType = 'bonus_unlock';
+  } else if (_chapterQualifies) {
+    _newCelebrations.push({ type: 'chapter_complete', weekId: completedWeek.id });
+    _queueWinnerType = 'chapter_complete';
+  } else if (_levelCrossed) {
+    _newCelebrations.push({ type: 'level_up', levelIndex: newLevel - 1 });
+    _queueWinnerType = 'level_up';
   }
   if (_newCelebrations.length) {
     state.pendingCelebrations = (state.pendingCelebrations || []).concat(_newCelebrations);
-    saveStateLocal();
   }
+  // Persist state after the endowmentShownAt + goal-met writes above.
+  saveStateLocal();
+
+  // Ribbons for dc-stats: absorbed items (endowment + goal_met) always
+  // ribbon if applicable; demoted milestone items ribbon when they lost
+  // the queue-winner cap. bonus_unlock is never demoted (always wins if
+  // eligible → always overlay, never ribbon).
+  const _dcRibbons = {
+    welcome:         _endowmentDue,
+    levelUp:         (_levelCrossed && _queueWinnerType !== 'level_up') ? _levelCrossed : null,
+    chapterComplete: (_chapterNum   && _queueWinnerType !== 'chapter_complete') ? _chapterNum : null,
+    goalMet:         !!_goalMet,
+  };
 
   const thinker = getT().find(t => t.id === thinkerId);
   const showThinker = !!(thinker && isNewThinker);
@@ -15883,7 +15955,8 @@ function finishDay() {
     state.correctInRow,
     showThinker
       ? { label: isEn ? 'A new thinker awaits →' : 'הוגה חדש מחכה ←', fn: () => showThinkerCardScreen(thinker, chapter, day), thinker: true }
-      : { label: isEn ? 'Back to Home' : 'חזרה לבית', fn: closeCompleteModal }
+      : { label: isEn ? 'Back to Home' : 'חזרה לבית', fn: closeCompleteModal },
+    _dcRibbons
   );
 }
 
@@ -16014,40 +16087,37 @@ function closeCompleteModal(opts) {
     continuation();
   };
 
-  const runStreak = () => {
-    if (_streakDue) {
-      // Fires the callback either after the streak modal closes, or immediately
-      // if the cadence gate blocks (e.g. signup already stamped lastShownDate
-      // today, so streak silently no-ops and we fall through to continuation).
-      maybeShowGuestPrompt(runContinuation, 'streak_milestone');
-    } else {
-      runContinuation();
-    }
-  };
-
-  const runShare = () => {
-    if (shouldShowShare) {
-      // 400ms breather so the just-closed signup modal has time to visually
-      // dismiss before the share modal appears.
-      setTimeout(() => showSharePrompt(runStreak), 400);
-    } else {
-      runStreak();
-    }
-  };
-
-  const runSignup = () => {
+  // Prompt cap: fire at most ONE modal per exit. Priority
+  //   signup > share > streak_milestone
+  // The signup ask is highest-value (converts guests). Share is next
+  // (drives growth). Streak is a nudge. Skipped prompts naturally
+  // re-evaluate on the next Back-to-Home — their gates are cadence-
+  // based, not fire-once-forever, so nothing is permanently dropped.
+  //
+  // Prior design fired all three serially, stacking up to 3 modal
+  // asks in a row. Capping to one is what brings the worst-case
+  // dc → home chain down to ~3 overlays + prompt + home.
+  const runFirstEligibleThenContinue = () => {
     if (_promptTrigger) {
-      maybeShowGuestPrompt(runShare, _promptTrigger);
-    } else {
-      runShare();
+      maybeShowGuestPrompt(runContinuation, _promptTrigger);
+      return;
     }
+    if (shouldShowShare) {
+      setTimeout(() => showSharePrompt(runContinuation), 400);
+      return;
+    }
+    if (_streakDue) {
+      maybeShowGuestPrompt(runContinuation, 'streak_milestone');
+      return;
+    }
+    runContinuation();
   };
 
   // Consume the played-celebration snapshot so a subsequent direct call
   // (queue empty path) doesn't inherit stale data from a previous drain.
   _lastPlayedCelebrations = [];
 
-  runSignup();
+  runFirstEligibleThenContinue();
 }
 
 // Gates the guest sign-in prompt so it can fire at multiple milestones (first
