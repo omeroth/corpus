@@ -6016,43 +6016,53 @@
     opacity: 1;
   }
 
+  /* Subject-select cinematic (onboarding path).
+     Split into an outer non-scrolling frame + a scrollable card region
+     + a non-scrolling CTA footer. This decouples the CTA's visibility
+     from any flex-overflow behavior in the scroll region, so the
+     button is guaranteed reachable on any WebView going back to
+     Android 4.4. Prior design relied on `justify-content: safe center`
+     (Chromium 93+) with `overflow-y: auto` as fallback — on older
+     Samsung WebView installs the `safe center` fallback silently
+     reverts to plain `center` and older Chromium flex+overflow bugs
+     could leave the container non-scrollable, clipping the CTA under
+     the gesture-nav inset.
+     Uses only Flexbox Level 1 primitives (flex, flex-shrink,
+     overflow-y, min-height, padding) — no engine-dependent features. */
   .subj-cinematic {
     display: none;
     flex-direction: column;
-    gap: 14px;
-    padding: 12px 20px calc(24px + var(--safe-bottom));
+    padding: 0;
     max-width: 480px;
     width: 100%;
-    margin-inline: auto;
+    /* Explicit L/R rather than margin-inline: auto (Chromium 87+)
+       so centering works on older WebView. */
+    margin-left: auto;
+    margin-right: auto;
     flex: 1;
-    /* min-height: 0 lets this flex child SHRINK to its allocation.
-       Without it, the default min-height:auto makes the container
-       grow to its content size, which then overflows .subj-screen's
-       overflow:hidden and clips the CTA (and part of the last card)
-       off the bottom on Android devices with a tall gesture-nav
-       inset + a short viewport (Samsung mid-range, 3-button nav,
-       any device with OS font scale > 1.0, any Android landscape).
-       overflow-y: auto ensures the CTA stays reachable via scroll
-       even when content genuinely doesn't fit the allocation. */
+    min-height: 0;
+    overflow: hidden;
+  }
+  /* Scrollable middle region — holds the three subject cards. Uses
+     overflow-y: auto so cards scroll independently of the CTA. */
+  .subj-cinematic-cards {
+    flex: 1;
     min-height: 0;
     overflow-y: auto;
-    justify-content: center;
+    padding: 12px 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    -webkit-overflow-scrolling: touch;
   }
-  /* Match the 1.1.4 dc-screen fix pattern (f726331): `safe center`
-     falls back to flex-start when content would overflow, so the
-     first card is never pushed above the header edge. Gated by
-     @supports so older WebViews without the `safe` keyword keep the
-     plain `center` rule (the overflow-y: auto above still makes the
-     CTA reachable there). */
-  @supports (justify-content: safe center) {
-    .subj-cinematic { justify-content: safe center; }
+  /* CTA footer — non-scrolling sibling of the card region. Always
+     renders at its natural size; safe-bottom padding keeps the button
+     clear of the Android gesture-nav / iOS home indicator. */
+  .subj-cinematic-cta-holder {
+    flex-shrink: 0;
+    padding: 12px 20px calc(24px + var(--safe-bottom));
   }
-  /* Defensive: never let the CTA holder collapse to zero if the flex
-     layout squeezes on a tiny landscape viewport. Cards + holder are
-     both scroll-inside content; holder must always render at its
-     natural size so the button is tappable when scrolled to. */
-  .subj-cinematic-cta-holder { flex-shrink: 0; }
-  .subj-cinematic-card       { flex-shrink: 0; }
+  .subj-cinematic-card { flex-shrink: 0; }
   /* Subject-select cinematic cards — bright variant. White card face,
      subject-colored keyline border, soft accent shadow. Horizontal
      layout: portrait fills the start edge (full card height), info
@@ -6189,10 +6199,9 @@
     font-weight: 700;
   }
   /* Cinematic subject-select CTA — filled in previewed subject accent.
-     Falls back to --accent (currently-themed subject). */
-  .subj-cinematic-cta-holder {
-    padding-top: 12px;
-  }
+     Falls back to --accent (currently-themed subject). Holder padding
+     is set by the .subj-cinematic-cta-holder rule earlier in the block
+     (safe-bottom-aware). */
   .subj-cinematic-cta {
     width: 100%;
     background: var(--accent, #7B4FD4);
@@ -7319,7 +7328,14 @@
      viewport via transform-based animation). */
   body.on-subject-screen:not(.drawer-open) #screen-subject.active {
     position: fixed;
-    inset: 0;
+    /* Explicit top/right/bottom/left rather than `inset: 0` shorthand
+       (Chromium 87+). Older WebView drops the whole `inset` declaration,
+       which without explicit T/R/B/L would leave the fixed element
+       sized to its natural content rather than filling the viewport —
+       breaking the subject-select layout entirely on old builds. */
+    top: 0; right: 0; bottom: 0; left: 0;
+    /* 100dvh is Chromium 108+; harmless if dropped since T/R/B/L=0
+       already fills the fixed positioning container. */
     height: 100dvh;
     z-index: 20;
   }
@@ -8227,30 +8243,41 @@
            handler as the carousel path, so selection logic and storage
            stay identical. -->
       <div class="subj-cinematic" id="subj-cinematic">
-        <button type="button" class="subj-cinematic-card subj-c-philosophy is-selected" data-subject="philosophy" onclick="subjCinematicTap('philosophy')">
-          <div class="subj-cinematic-portrait"><img src="./images/plato.webp" alt=""></div>
-          <div class="subj-cinematic-body">
-            <div class="subj-cinematic-thinker" id="subj-c-thinker-philosophy">אפלטון · סוקרטס · אריסטו</div>
-            <div class="subj-cinematic-name" id="subj-c-name-philosophy">פילוסופיה</div>
-            <div class="subj-cinematic-tagline" id="subj-c-tag-philosophy">חוכמה ליום-יום</div>
-          </div>
-        </button>
-        <button type="button" class="subj-cinematic-card subj-c-economics" data-subject="economics" onclick="subjCinematicTap('economics')">
-          <div class="subj-cinematic-portrait"><img src="./images/smith.webp" alt=""></div>
-          <div class="subj-cinematic-body">
-            <div class="subj-cinematic-thinker" id="subj-c-thinker-economics">סמית' · מרקס · קיינס</div>
-            <div class="subj-cinematic-name" id="subj-c-name-economics">כלכלה</div>
-            <div class="subj-cinematic-tagline" id="subj-c-tag-economics">איך העולם עובד</div>
-          </div>
-        </button>
-        <button type="button" class="subj-cinematic-card subj-c-psychology" data-subject="psychology" onclick="subjCinematicTap('psychology')">
-          <div class="subj-cinematic-portrait"><img src="./images/freud.webp" alt=""></div>
-          <div class="subj-cinematic-body">
-            <div class="subj-cinematic-thinker" id="subj-c-thinker-psychology">פרויד · יונג · ג'יימס</div>
-            <div class="subj-cinematic-name" id="subj-c-name-psychology">פסיכולוגיה</div>
-            <div class="subj-cinematic-tagline" id="subj-c-tag-psychology">להבין את הנפש</div>
-          </div>
-        </button>
+        <!-- Scrollable card region. Wraps the three subject cards so
+             they can scroll independently of the CTA on short viewports.
+             The CTA sits OUTSIDE this container as a non-scrolling
+             sibling, guaranteed reachable on any WebView. Prior design
+             put all four inside a single flex column with
+             `justify-content: safe center`; that pattern relies on
+             Chromium 93+ and the fallback (plain `center`) leaves the
+             CTA clipped under the bottom nav on older Samsung WebView
+             builds. -->
+        <div class="subj-cinematic-cards">
+          <button type="button" class="subj-cinematic-card subj-c-philosophy is-selected" data-subject="philosophy" onclick="subjCinematicTap('philosophy')">
+            <div class="subj-cinematic-portrait"><img src="./images/plato.webp" alt=""></div>
+            <div class="subj-cinematic-body">
+              <div class="subj-cinematic-thinker" id="subj-c-thinker-philosophy">אפלטון · סוקרטס · אריסטו</div>
+              <div class="subj-cinematic-name" id="subj-c-name-philosophy">פילוסופיה</div>
+              <div class="subj-cinematic-tagline" id="subj-c-tag-philosophy">חוכמה ליום-יום</div>
+            </div>
+          </button>
+          <button type="button" class="subj-cinematic-card subj-c-economics" data-subject="economics" onclick="subjCinematicTap('economics')">
+            <div class="subj-cinematic-portrait"><img src="./images/smith.webp" alt=""></div>
+            <div class="subj-cinematic-body">
+              <div class="subj-cinematic-thinker" id="subj-c-thinker-economics">סמית' · מרקס · קיינס</div>
+              <div class="subj-cinematic-name" id="subj-c-name-economics">כלכלה</div>
+              <div class="subj-cinematic-tagline" id="subj-c-tag-economics">איך העולם עובד</div>
+            </div>
+          </button>
+          <button type="button" class="subj-cinematic-card subj-c-psychology" data-subject="psychology" onclick="subjCinematicTap('psychology')">
+            <div class="subj-cinematic-portrait"><img src="./images/freud.webp" alt=""></div>
+            <div class="subj-cinematic-body">
+              <div class="subj-cinematic-thinker" id="subj-c-thinker-psychology">פרויד · יונג · ג'יימס</div>
+              <div class="subj-cinematic-name" id="subj-c-name-psychology">פסיכולוגיה</div>
+              <div class="subj-cinematic-tagline" id="subj-c-tag-psychology">להבין את הנפש</div>
+            </div>
+          </button>
+        </div>
         <div class="subj-cinematic-cta-holder">
           <button type="button" class="subj-cinematic-cta" id="subj-cinematic-cta" onclick="subjCinematicConfirm()">המשך</button>
         </div>
@@ -8788,7 +8815,7 @@ if (typeof corpusData === 'undefined' || typeof economicsData === 'undefined'
 // App Store release. The iOS-only update-banner checkForUpdate() compares
 // this against corpusapp.io/version.json to decide whether to prompt the
 // user to grab the newest App Store build.
-const APP_VERSION = '1.2.2';
+const APP_VERSION = '1.2.3';
 
 const SUPABASE_URL = 'https://xcoikjoatcrjqxzykwlt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjb2lram9hdGNyanF4enlrd2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjc5NjYsImV4cCI6MjA4OTcwMzk2Nn0.5EhOsN9M4_kLYoRKO97dPGof8RN7PteXQrtKyx4CcKI';
