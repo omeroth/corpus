@@ -6025,8 +6025,34 @@
     width: 100%;
     margin-inline: auto;
     flex: 1;
+    /* min-height: 0 lets this flex child SHRINK to its allocation.
+       Without it, the default min-height:auto makes the container
+       grow to its content size, which then overflows .subj-screen's
+       overflow:hidden and clips the CTA (and part of the last card)
+       off the bottom on Android devices with a tall gesture-nav
+       inset + a short viewport (Samsung mid-range, 3-button nav,
+       any device with OS font scale > 1.0, any Android landscape).
+       overflow-y: auto ensures the CTA stays reachable via scroll
+       even when content genuinely doesn't fit the allocation. */
+    min-height: 0;
+    overflow-y: auto;
     justify-content: center;
   }
+  /* Match the 1.1.4 dc-screen fix pattern (f726331): `safe center`
+     falls back to flex-start when content would overflow, so the
+     first card is never pushed above the header edge. Gated by
+     @supports so older WebViews without the `safe` keyword keep the
+     plain `center` rule (the overflow-y: auto above still makes the
+     CTA reachable there). */
+  @supports (justify-content: safe center) {
+    .subj-cinematic { justify-content: safe center; }
+  }
+  /* Defensive: never let the CTA holder collapse to zero if the flex
+     layout squeezes on a tiny landscape viewport. Cards + holder are
+     both scroll-inside content; holder must always render at its
+     natural size so the button is tappable when scrolled to. */
+  .subj-cinematic-cta-holder { flex-shrink: 0; }
+  .subj-cinematic-card       { flex-shrink: 0; }
   /* Subject-select cinematic cards — bright variant. White card face,
      subject-colored keyline border, soft accent shadow. Horizontal
      layout: portrait fills the start edge (full card height), info
