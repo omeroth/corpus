@@ -8843,10 +8843,17 @@ async function _readStoredSession() {
   try {
     const p = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Preferences;
     if (!p) return null;
-    const { keys } = await p.keys();
+    // 5s timebox on each Preferences bridge call. Android encrypted
+    // SharedPreferences cold reads can be slow, and a hung native
+    // bridge would otherwise block the entire eager IIFE (and by
+    // extension auth resolution + first paint completion signals)
+    // indefinitely. If either read times out, treat as no stored
+    // session — the caller routes to onboarding, gotrue's own async
+    // path may still recover the session later via SIGNED_IN.
+    const { keys } = await _timeboxed(p.keys(), 5000, 'Preferences.keys (stored session)');
     const authKey = keys && keys.find(k => _AUTH_TOKEN_KEY_RE.test(k));
     if (!authKey) return null;
-    const { value } = await p.get({ key: authKey });
+    const { value } = await _timeboxed(p.get({ key: authKey }), 5000, 'Preferences.get (stored session)');
     if (!value) return null;
     const parsed = JSON.parse(value);
     // supabase-js has stored sessions flat and wrapped across versions;
@@ -9703,6 +9710,12 @@ async function authWithGoogle() {
   };
   try {
     if (_isNative) {
+      // Wait for the deferred SocialLogin.initialize kicked off in initApp.
+      // On a fast tap during boot, this may briefly block (up to the 5s
+      // timebox on the initialize call itself); on a normal tap it
+      // resolves immediately. Guarded so the auth flow can't run before
+      // the plugin is registered.
+      try { if (_socialLoginReady) await _socialLoginReady; } catch(e) {}
       // Native iOS: native Google Sign-In via Capgo, then hand the idToken to Supabase.
       // Log out of the plugin's cached Google session first so the account
       // picker always appears (otherwise iOS silently reuses the last account).
@@ -9835,6 +9848,9 @@ async function authWithApple() {
   };
   try {
     if (_isNative) {
+      // Same defer guard as authWithGoogle. See that function's
+      // comment for the rationale.
+      try { if (_socialLoginReady) await _socialLoginReady; } catch(e) {}
       let loginRes;
       try {
         loginRes = await _authRace(window.Capacitor.Plugins.SocialLogin.login({ provider: 'apple', options: { scopes: ['name', 'email'] } }), 10000);
@@ -10405,15 +10421,31 @@ function startNewUserOnboarding() {
   // Fresh install path — beat is now the first paint of the redesigned
   // onboarding (see showBeat / _onbApplyLangToWelcome).
   _enterAsGuestSilent();
+  // Bounce-back guard: if initUI already dispatched to an onboarding
+  // screen synchronously (fresh install / partial-onboarding returning
+  // user), the user may have already advanced past that screen while
+  // initApp's async chain was completing. Re-calling show*() here would
+  // bump them BACK to the earlier screen. corpus_intro_done doesn't
+  // flip until the welcome CTA is tapped, so this race exists for
+  // beat → streak → welcome transitions on any platform where initApp
+  // is slower than the user's first tap (Android, primarily).
+  // _enterAsGuestSilent still fires above for analytics parity.
+  if (_onboardingBooted) {
+    console.log('[Onboarding] startNewUserOnboarding: initUI already booted onboarding, skipping screen dispatch');
+    return;
+  }
   if (!localStorage.getItem('corpus_intro_done')) {
+    _onboardingBooted = true;
     showBeat();
     return;
   }
   if (!localStorage.getItem('corpus_subject')) {
+    _onboardingBooted = true;
     showSubjectSelect();
     return;
   }
   if (!localStorage.getItem('corpus_daily_goal_set')) {
+    _onboardingBooted = true;
     showGoalScreen();
     return;
   }
@@ -12237,7 +12269,22 @@ function defaultState() {
     // Guest sign-in prompt cadence. Local-only (never uploaded to Supabase — gated by guest mode).
     // shownTriggers: per-trigger lifetime flag so first_completion / bonus_unlock
     // fire at most once each. Cadence (lastShownDate, dismissCount) still applies on top.
-    guestPrompt: { totalShown: 0, lastShownDate: '', dismissCount: 0, permanentlyDismissed: false, shownTriggers: {} },
+    // lastDismissedAt: ISO date. Drives the cooldown ladder in _shouldShowGuestPrompt —
+    //   {1: 7, 2: 21, 3: 45, 4: 90} days between dismisses; permanent kill at ≥5.
+    // firstCompletionShownAt / firstCompletionShownAtCount: date + completion-count
+    //   at fire time. Enables the first_completion_rearmed trigger — a returning
+    //   guest who dismissed at first_completion and later did +10 more dialogues,
+    //   30+ days later, gets a fresh "You have something here" prompt with the
+    //   updated stat reel.
+    // returnEngagementShownAt: ISO date. Drives the return_engagement trigger —
+    //   fires when a returning guest (≥14 days since prior active) completes a
+    //   dialogue. Re-arms after 90 days.
+    guestPrompt: {
+      totalShown: 0, lastShownDate: '', dismissCount: 0, permanentlyDismissed: false, shownTriggers: {},
+      lastDismissedAt: '',
+      firstCompletionShownAt: '', firstCompletionShownAtCount: 0,
+      returnEngagementShownAt: '',
+    },
     settingsExpanded: false,   // Profile → Settings collapsible; persisted with the rest of state.
     isPaid: false,   // manual flag for now; later driven by subscription
     subject: 'philosophy',
@@ -12326,7 +12373,12 @@ function loadState() {
   // Also migrate from the legacy single-shot guestSignupPromptShown boolean so a returning
   // guest who already saw the v1 prompt counts as totalShown=1 (and won't immediately re-prompt today).
   state.guestPrompt = Object.assign(
-    { totalShown: 0, lastShownDate: '', dismissCount: 0, permanentlyDismissed: false, shownTriggers: {} },
+    {
+      totalShown: 0, lastShownDate: '', dismissCount: 0, permanentlyDismissed: false, shownTriggers: {},
+      lastDismissedAt: '',
+      firstCompletionShownAt: '', firstCompletionShownAtCount: 0,
+      returnEngagementShownAt: '',
+    },
     state.guestPrompt || {}
   );
   // Defensive: persisted blobs from before shownTriggers existed will have it as
@@ -16004,12 +16056,46 @@ function closeCompleteModal(opts) {
   // in priority order (rarest / highest-value first) so exactly one
   // signup modal ever opens per completion, and its runShare callback
   // runs after IT dismisses (never on top of it).
+  //
+  // Priority (specific > generic):
+  //   bonus_unlock            once/subject — rarest
+  //   chapter_complete        once per chapter completion
+  //   level_up                once per level crossing
+  //   return_engagement       returning guest (≥14d absence)
+  //   first_completion        fresh guest, first dialogue
+  //   first_completion_rearmed  returning re-engaged guest whose
+  //                             first_completion fired ≥30d ago
+  //                             AND accumulated +10 completions since
+  const _todayIso = new Date().toISOString().split('T')[0];
+  const _priorActive = !currentUser ? _priorActiveDate(_todayIso) : null;
+  const _daysSincePriorActive = _priorActive ? _daysBetween(_priorActive, _todayIso) : 0;
+  const _fcShownAt = (state.guestPrompt && state.guestPrompt.firstCompletionShownAt) || '';
+  const _fcShownCount = (state.guestPrompt && state.guestPrompt.firstCompletionShownAtCount) || 0;
+  const _fcAge = _fcShownAt ? _daysBetween(_fcShownAt, _todayIso) : 0;
+  const _reShownAt = (state.guestPrompt && state.guestPrompt.returnEngagementShownAt) || '';
+  const _reAge = _reShownAt ? _daysBetween(_reShownAt, _todayIso) : Infinity;
   const _promptTrigger = (() => {
     if (currentUser) return null;
     if (_hasBonusUnlock && !_shown.bonus_unlock) return 'bonus_unlock';
     if (_hasChapterComplete) return 'chapter_complete';
     if (_hasLevelUp)         return 'level_up';
+    // Return-engagement: real absence (≥14d) AND either not-yet-shown
+    // OR shown-long-ago (≥90d). Runs above first_completion so a
+    // returning guest gets the "welcome back" copy, not the generic
+    // "you have something here."
+    if (_priorActive && _daysSincePriorActive >= 14
+        && (!_reShownAt || _reAge >= 90)) {
+      return 'return_engagement';
+    }
     if (isFirstGuestCompletion) return 'first_completion';
+    // Re-arm the first_completion prompt for a re-engaged guest.
+    // Gates: original fired ≥30 days ago AND +10 more completions
+    // since (so a user who bounces back the next day doesn't re-see it).
+    if (_shown.first_completion && _fcShownAt
+        && _fcAge >= 30
+        && _guestCompletionCount >= _fcShownCount + 10) {
+      return 'first_completion_rearmed';
+    }
     return null;
   })();
 
@@ -16154,16 +16240,67 @@ function _shouldShowGuestPrompt() {
   // reads on `.permanentlyDismissed` to throw. Both literals now include the
   // key, but this guard makes any future reset path crash-proof too.
   if (!state.guestPrompt) {
-    state.guestPrompt = { totalShown: 0, lastShownDate: '', dismissCount: 0, permanentlyDismissed: false, shownTriggers: {} };
+    state.guestPrompt = {
+      totalShown: 0, lastShownDate: '', dismissCount: 0, permanentlyDismissed: false, shownTriggers: {},
+      lastDismissedAt: '',
+      firstCompletionShownAt: '', firstCompletionShownAtCount: 0,
+      returnEngagementShownAt: '',
+    };
   }
   if (!state.guestPrompt.shownTriggers || typeof state.guestPrompt.shownTriggers !== 'object') {
     state.guestPrompt.shownTriggers = {};
   }
   if (state.guestPrompt.permanentlyDismissed) return false;
-  if (state.guestPrompt.dismissCount >= 3) return false;
+  // Cooldown ladder: after each dismiss, block prompts for D days per
+  // DISMISS_COOLDOWN_DAYS. Permanent kill only after 5 dismisses (was 3).
+  // Rationale: three strikes over any timespan (previous rule) killed the
+  // whole prompt system after 3 legitimate "not right now" dismisses, even
+  // years apart. Ladder gives an engaged guest room to be re-asked at
+  // subsequent high-motivation moments without pestering.
+  if (state.guestPrompt.dismissCount >= 5) return false;
   const today = new Date().toISOString().split('T')[0];
+  const cooldownDays = GUEST_PROMPT_DISMISS_COOLDOWN[state.guestPrompt.dismissCount] || 0;
+  if (cooldownDays && state.guestPrompt.lastDismissedAt) {
+    const daysSince = _daysBetween(state.guestPrompt.lastDismissedAt, today);
+    if (daysSince < cooldownDays) return false;
+  }
   if (state.guestPrompt.lastShownDate === today) return false;
   return true;
+}
+
+// Cooldown ladder — days to wait after the Nth dismiss before ANY guest
+// prompt can fire again. Keyed by dismissCount (i.e. cooldownDays[1] is
+// the wait after the first dismiss). After 5 dismisses total,
+// _shouldShowGuestPrompt returns false unconditionally.
+// Persistent-dismisser cadence: prompts land on day 0, 7, 28, 73, 163
+// before permanent kill (~5.4 months of lifespan).
+const GUEST_PROMPT_DISMISS_COOLDOWN = { 1: 7, 2: 21, 3: 45, 4: 90 };
+
+// Days between two ISO date strings (YYYY-MM-DD). Positive when `to` is
+// later than `from`. Local-day math — matches _streakDay's date-string
+// semantics elsewhere in the app.
+function _daysBetween(fromIso, toIso) {
+  if (!fromIso || !toIso) return 0;
+  const a = new Date(fromIso + 'T00:00:00');
+  const b = new Date(toIso + 'T00:00:00');
+  if (isNaN(a.getTime()) || isNaN(b.getTime())) return 0;
+  return Math.round((b.getTime() - a.getTime()) / 86400000);
+}
+
+// Latest activeDates entry strictly less than today. Returns null if
+// none. Used to compute "days since prior active" for the
+// return_engagement trigger — measures the gap between the user's
+// prior active day and today's completion, so we know they came back
+// after a real absence.
+function _priorActiveDate(todayIso) {
+  const dates = Array.isArray(state.activeDates) ? state.activeDates : [];
+  let prior = null;
+  for (const d of dates) {
+    if (typeof d !== 'string') continue;
+    if (d >= todayIso) continue;
+    if (!prior || d > prior) prior = d;
+  }
+  return prior;
 }
 
 // Use this from any milestone hook — it respects the gate and calls back the
@@ -16195,7 +16332,11 @@ let _currentGuestTrigger = null;
 function _renderGuestFirstCompletionStats(trigger, isEn) {
   const holder = document.getElementById('guest-signup-stats');
   if (!holder) return;
-  if (trigger !== 'first_completion') {
+  // Both first_completion (fresh) and first_completion_rearmed
+  // (returning re-engaged guest) get the loss-framed stat reel. The
+  // rearmed variant benefits MORE from the reel — bigger numbers land
+  // harder than they did the first time.
+  if (trigger !== 'first_completion' && trigger !== 'first_completion_rearmed') {
     holder.style.display = 'none';
     holder.innerHTML = '';
     return;
@@ -16226,10 +16367,10 @@ function _renderGuestFirstCompletionStats(trigger, isEn) {
     }
   } catch (e) {}
   const thinkerTxt = _thinkerName
-    ? (isEn ? 'You met ' + _thinkerName : 'פגשת את ' + _thinkerName)
+    ? (isEn ? 'You met ' + _thinkerName : 'פגשתם את ' + _thinkerName)
     : (isEn
         ? (_completionCount === 1 ? '1 dialogue completed' : _completionCount + ' dialogues completed')
-        : (_completionCount === 1 ? 'דיאלוג אחד שסיימת' : _completionCount + ' דיאלוגים שסיימת'));
+        : (_completionCount === 1 ? 'דיאלוג אחד שסיימתם' : _completionCount + ' דיאלוגים שסיימתם'));
   const portraitInner = _thinkerImg
     ? '<img src="' + _thinkerImg + '" alt="">'
     : '<svg viewBox="0 0 64 64" width="24" height="24"><use href="#ic-pantheon"/></svg>';
@@ -16262,11 +16403,29 @@ function showGuestSignupPrompt(originalFn, trigger) {
   const today = new Date().toISOString().split('T')[0];
   state.guestPrompt.totalShown += 1;
   state.guestPrompt.lastShownDate = today;
-  // Per-trigger lifetime flag — first_completion / third_completion consult this
+  // Per-trigger lifetime flag — first_completion / bonus_unlock consult this
   // to guarantee at-most-once fire even when their >= count conditions stay
   // true across many subsequent closes.
   if (!state.guestPrompt.shownTriggers) state.guestPrompt.shownTriggers = {};
   state.guestPrompt.shownTriggers[trigger || 'unknown'] = true;
+  // Cadence state for the new trigger paths:
+  //   - first_completion (fresh OR rearmed) stamps firstCompletionShownAt
+  //     + firstCompletionShownAtCount so the re-arm check restarts its
+  //     30-day / +10-completions window every time it fires.
+  //   - return_engagement stamps returnEngagementShownAt so its re-arm
+  //     check (90 days) has a baseline.
+  const _completionCountForStamp = Object.keys(state.completedDays || {})
+    .filter(k => !k.endsWith('-0')).length;
+  if (trigger === 'first_completion' || trigger === 'first_completion_rearmed') {
+    state.guestPrompt.firstCompletionShownAt = today;
+    state.guestPrompt.firstCompletionShownAtCount = _completionCountForStamp;
+    // Also stamp the base first_completion flag — a rearmed fire counts
+    // as "user was prompted about first_completion" for the re-arm gate.
+    state.guestPrompt.shownTriggers.first_completion = true;
+  }
+  if (trigger === 'return_engagement') {
+    state.guestPrompt.returnEngagementShownAt = today;
+  }
   state.guestSignupPromptShown = true; // legacy back-compat
   saveStateLocal();
   const _guestModal = document.getElementById('modal-guest-signup');
@@ -16296,49 +16455,58 @@ function showGuestSignupPrompt(originalFn, trigger) {
   } catch (e) {}
 
   const TITLES = {
-    level_up:         { en: 'Level up!',                he: 'עלית רמה!' },
-    streak_milestone: { en: `${_streak}-day streak!`,   he: `רצף של ${_streak} ימים!` },
-    first_completion: { en: 'All of this lives only here', he: 'כל זה קיים רק כאן' },
-    chapter_complete: { en: 'Chapter complete!',        he: 'סיימת פרק!' },
-    bonus_unlock:     { en: 'Well done!',               he: 'כל הכבוד!' },
-    profile:          { en: 'Save your progress',       he: 'שמור על ההתקדמות שלך' },
-    _default:         { en: 'Save your progress',       he: 'שמור על ההתקדמות' },
+    level_up:                 { en: 'Level up!',                    he: 'עליתם רמה!' },
+    streak_milestone:         { en: `${_streak}-day streak!`,       he: `רצף של ${_streak} ימים!` },
+    first_completion:         { en: 'You have something here',      he: 'יש לכם כאן משהו' },
+    first_completion_rearmed: { en: 'You have something here',      he: 'יש לכם כאן משהו' },
+    return_engagement:        { en: 'Good to see you back',         he: 'טוב לראות אתכם שוב' },
+    chapter_complete:         { en: 'Chapter complete!',            he: 'סיימתם פרק!' },
+    bonus_unlock:             { en: 'Well done!',                   he: 'כל הכבוד!' },
+    profile:                  { en: 'Save your progress',           he: 'שמרו על ההתקדמות שלכם' },
+    _default:                 { en: 'Save your progress',           he: 'שמרו על ההתקדמות' },
   };
-  // Hebrew is consistently SINGULAR (2nd-person masculine) across every
-  // trigger — matching the singular imperative used elsewhere in the app
-  // (הרשמה עם אימייל, אולי אחר כך). No plural verb forms (התחברו/סיימתם/
-  // אתם/אל תאבדו/פגשתם) should appear anywhere in this map.
+  // Hebrew is consistently PLURAL (2nd-person, gender-neutral) across
+  // every trigger — matching the app-wide policy that addresses both
+  // masculine and feminine readers via the plural form (התחברו/סיימתם/
+  // אתם/שלכם). No 2nd-person masculine-singular verb forms (התחבר/
+  // סיימת/אתה/שלך/פגשת) should appear anywhere in this map or in the
+  // stat reel in _renderGuestFirstCompletionStats.
   const BODIES = {
     level_up: {
       en: `You reached Level ${_level}${_lvlSuffix}. Sign in so you never lose it.`,
-      he: `הגעת לרמה ${_level}${_lvlSuffix}. התחבר כדי לא לאבד אותה.`,
+      he: `הגעתם לרמה ${_level}${_lvlSuffix}. התחברו כדי לא לאבד אותה.`,
     },
     streak_milestone: {
       en: `You're on a ${_streak}-day streak. Sign in so you don't lose it.`,
-      he: `אתה על רצף של ${_streak} ימים. התחבר כדי לא לאבד אותו.`,
+      he: `אתם על רצף של ${_streak} ימים. התחברו כדי לא לאבד אותו.`,
     },
     first_completion: {
-      // Cinematic loss-framed prompt — no "sign in" imperative in the
-      // body; the stat list (rendered by _renderGuestFirstCompletionStats)
-      // does the emotional work, primary CTA below finishes the ask.
-      en: 'Without an account, your progress stays on this device only.',
-      he: 'בלי חשבון, ההתקדמות נשארת במכשיר הזה בלבד.',
+      en: 'Sign in so your progress doesn\'t get lost.',
+      he: 'התחברו כדי שההתקדמות שלכם לא תלך לאיבוד.',
+    },
+    first_completion_rearmed: {
+      en: 'Sign in so your progress doesn\'t get lost.',
+      he: 'התחברו כדי שההתקדמות שלכם לא תלך לאיבוד.',
+    },
+    return_engagement: {
+      en: 'Sign in so your progress doesn\'t get lost.',
+      he: 'התחברו כדי שההתקדמות שלכם לא תלך לאיבוד.',
     },
     chapter_complete: {
       en: "You finished a whole chapter. Sign in so you don't lose your progress.",
-      he: 'סיימת פרק שלם. התחבר כדי לא לאבד את ההתקדמות שלך.',
+      he: 'סיימתם פרק שלם. התחברו כדי לא לאבד את ההתקדמות שלכם.',
     },
     bonus_unlock: {
       en: "You've unlocked the bonus chapter. Sign in to keep it.",
-      he: 'פתחת את פרק הבונוס. התחבר כדי לשמור עליו.',
+      he: 'פתחתם את פרק הבונוס. התחברו כדי לשמור עליו.',
     },
     profile: {
       en: 'Sign in to save your XP, streak, and unlocked thinkers.',
-      he: 'התחבר כדי לשמור את ה-XP, הרצף וההוגים שפתחת.',
+      he: 'התחברו כדי לשמור את ה-XP, הרצף וההוגים שפתחתם.',
     },
     _default: {
       en: 'Sign in to save your progress.',
-      he: 'התחבר כדי לשמור על ההתקדמות שלך.',
+      he: 'התחברו כדי לשמור על ההתקדמות שלכם.',
     },
   };
   const titles = TITLES[trigger] || TITLES._default;
@@ -16355,7 +16523,7 @@ function showGuestSignupPrompt(originalFn, trigger) {
   // email" label. Distinguishing on trigger keeps the cinematic loss-
   // framing focused while leaving level_up / streak_milestone / etc.
   // callsites unaffected.
-  if (emailBtn) emailBtn.textContent = (trigger === 'first_completion')
+  if (emailBtn) emailBtn.textContent = (trigger === 'first_completion' || trigger === 'first_completion_rearmed')
     ? (isEn ? 'Save your progress' : 'לשמור את ההתקדמות')
     : (isEn ? 'Sign up with email' : 'הרשמה עם אימייל');
   const skip = document.getElementById('guest-signup-skip');
@@ -16373,6 +16541,10 @@ function showGuestSignupPrompt(originalFn, trigger) {
       posthog.capture('guest_prompt_shown', Object.assign({
         trigger: _currentGuestTrigger,
         total_shown: state.guestPrompt.totalShown,
+        // How many dismisses this user has already logged BEFORE this
+        // fire. Enables the "do 1×/2×-dismissers convert on a later
+        // prompt?" analysis without joining events.
+        dismiss_count: state.guestPrompt.dismissCount || 0,
       }, _shareEventProps()));
     } catch(e) {}
   }
@@ -16396,6 +16568,10 @@ function closeGuestSignupPrompt() {
 // through closeGuestSignupPrompt() WITHOUT counting against the user).
 function dismissGuestSignupPrompt() {
   state.guestPrompt.dismissCount += 1;
+  // Stamp for the cooldown ladder in _shouldShowGuestPrompt. The next
+  // eligible fire is gated on daysSince(lastDismissedAt) >= cooldown
+  // for the current dismissCount.
+  state.guestPrompt.lastDismissedAt = new Date().toISOString().split('T')[0];
   saveStateLocal();
   try {
     posthog.capture('guest_prompt_dismissed', Object.assign({
@@ -18724,6 +18900,26 @@ async function _timeboxed(promise, ms, label) {
   finally { clearTimeout(_t); }
 }
 
+// Bounce-back guard for the onboarding flow.
+// initUI runs synchronously and may dispatch to any of the onboarding
+// screens (beat / streak / welcome / subject / goal). initApp runs
+// async and, when it completes and finds no stored session, calls
+// startNewUserOnboarding — which decides which onboarding screen to
+// show based on localStorage flags. Those flags aren't stamped until
+// welcome CTA (corpus_intro_done) and goal CTA (corpus_onboarding_done),
+// so a user who has already tapped past beat but not yet reached the
+// welcome CTA can be bumped BACK to beat by the async completion.
+// This flag says "initUI already put me in the onboarding flow, don't
+// override the visible state." startNewUserOnboarding respects it by
+// firing the guest-analytics side effect and returning without a
+// screen change.
+let _onboardingBooted = false;
+
+// Deferred SocialLogin.initialize handle. Awaited by authWithGoogle /
+// authWithApple so a fast tap before the plugin finishes still works,
+// but not on the boot critical path.
+let _socialLoginReady = null;
+
 let appStarted = false;
 async function enterApp(user) {
   if (appStarted) return;
@@ -18733,19 +18929,25 @@ async function enterApp(user) {
   if (user && user.email === 'roth.omer@gmail.com') {
     try { posthog.opt_out_capturing(); } catch(e) {}
   }
-  // 8s budget per Supabase call. Each is best-effort background sync —
-  // the entry-critical state (session, subject, local progress) is
-  // already available before enterApp runs, so a timed-out call must
-  // NOT block the UI transition to home.
+  // Run the two Supabase reads IN PARALLEL under a shared 10s ceiling.
+  // Prior design ran them sequentially at 8s each = up to 16s on the
+  // critical path when both hit their timeouts (real users saw
+  // auth_resolution of 17-18s on slow-network Android as a result).
+  // Both endpoints are independent (user_progress vs subscriptions),
+  // so parallelizing halves the worst case. Each promise carries its
+  // own .catch so one failure doesn't reject the Promise.all — the
+  // outer _timeboxed only fires if BOTH are still pending at 10s.
   try {
-    await _timeboxed(loadProgressFromSupabase(), 8000, 'loadProgressFromSupabase');
+    await _timeboxed(
+      Promise.all([
+        loadProgressFromSupabase().catch(e => { console.error('[Auth] loadProgressFromSupabase failed:', e); }),
+        loadSubscription().catch(e => { console.error('[Auth] loadSubscription failed:', e); }),
+      ]),
+      10000,
+      'loadProgress + loadSubscription (parallel)'
+    );
   } catch(e) {
-    console.error('[Auth] loadProgressFromSupabase failed:', e);
-  }
-  try {
-    await _timeboxed(loadSubscription(), 8000, 'loadSubscription');
-  } catch(e) {
-    console.error('[Auth] loadSubscription failed:', e);
+    console.error('[Auth] parallel Supabase reads timed out:', e);
   }
   if (user) {
     try {
@@ -19089,12 +19291,15 @@ function initUI() {
     });
     if (!_hasIntro && !_hasOnbDone && _completedCount === 0) {
       console.log('[Onboarding] Fresh install → showBeat()');
+      _onboardingBooted = true;
       showBeat();
     } else if (_hasIntro && !localStorage.getItem('corpus_subject')) {
       console.log('[Onboarding] Welcome done, no subject → subject select');
+      _onboardingBooted = true;
       showSubjectSelect();
     } else if (_hasIntro && localStorage.getItem('corpus_subject') && !localStorage.getItem('corpus_daily_goal_set')) {
       console.log('[Onboarding] Welcome + subject done, no goal → goal screen');
+      _onboardingBooted = true;
       showGoalScreen();
     } else {
       console.log('[Onboarding] Existing user → home');
@@ -19131,7 +19336,12 @@ function initUI() {
         // does this natively via viewport-fit=cover + Info.plist).
         if (window.Capacitor.getPlatform() === 'android' && window.Capacitor.Plugins.EdgeToEdge) {
           try {
-            await window.Capacitor.Plugins.EdgeToEdge.enable();
+            // 5s timebox — plugin bridge calls have no inherent ceiling.
+            // If enable() hangs (bad Play Services / plugin version drift),
+            // the boot flow proceeds without edge-to-edge rather than
+            // waiting forever. Safe: the CSS env(safe-area-inset-*)
+            // fallback keeps chrome positioned even without our vars.
+            await _timeboxed(window.Capacitor.Plugins.EdgeToEdge.enable(), 5000, 'EdgeToEdge.enable');
             console.log('[EdgeToEdge] enabled (Android)');
             // The plugin's enable() sizes the WebView edge-to-edge but does NOT
             // populate CSS env(safe-area-inset-*) in Capacitor's Android WebView.
@@ -19141,7 +19351,7 @@ function initUI() {
             // iOS (no var set) falls through to its native env() — identical behavior.
             const _applyAndroidInsets = async () => {
               try {
-                const insets = await window.Capacitor.Plugins.EdgeToEdge.getInsets();
+                const insets = await _timeboxed(window.Capacitor.Plugins.EdgeToEdge.getInsets(), 5000, 'EdgeToEdge.getInsets');
                 const dpr = window.devicePixelRatio || 1;
                 const t = (insets.top    || 0) / dpr;
                 const b = (insets.bottom || 0) / dpr;
@@ -19190,7 +19400,22 @@ function initUI() {
             console.error('[EdgeToEdge] enable failed:', e);
           }
         }
-        try {
+        // SocialLogin.initialize used to be awaited HERE, on the boot
+        // critical path. On Android, the Capgo plugin binds to Google
+        // Play Services during initialize, which can take 1-2s on
+        // cold boot (and much longer if Play Services is misbehaving).
+        // It's only needed when the user actually taps a Google or
+        // Apple button — so we now kick it off as fire-and-forget and
+        // stash the promise on _socialLoginReady. authWithGoogle /
+        // authWithApple await this promise before calling login(),
+        // so a fast tap either waits briefly (if init is still
+        // in-flight) or proceeds immediately (if init has settled).
+        // Apple-button visibility on Android must still happen sync so
+        // the button doesn't briefly appear during init.
+        if (window.Capacitor.getPlatform() === 'android') {
+          document.querySelectorAll('.auth-btn-apple').forEach(b => b.style.display = 'none');
+        }
+        _socialLoginReady = (async () => {
           const socialConfig = {
             google: {
               iOSClientId: '1010803138404-cs8f3t5vvcqjv0rgldlpm25o07sir1i7.apps.googleusercontent.com',
@@ -19198,20 +19423,16 @@ function initUI() {
               mode: 'online'
             }
           };
-          // Apple native sign-in is iOS-only. The Capgo plugin's Android path rejects
-          // the apple block unless redirectUrl is set (requires server-side OAuth
-          // callback infra). Omitting apple on Android until that's stood up.
           if (window.Capacitor.getPlatform() === 'ios') {
             socialConfig.apple = { scopes: ['name', 'email'] };
-          } else if (window.Capacitor.getPlatform() === 'android') {
-            // Hide Apple sign-in buttons on Android since the flow isn't wired up.
-            document.querySelectorAll('.auth-btn-apple').forEach(b => b.style.display = 'none');
           }
-          await window.Capacitor.Plugins.SocialLogin.initialize(socialConfig);
-          console.log('[Auth] SocialLogin initialized (native)');
-        } catch(e) {
-          console.error('[Auth] SocialLogin init failed:', e);
-        }
+          try {
+            await _timeboxed(window.Capacitor.Plugins.SocialLogin.initialize(socialConfig), 5000, 'SocialLogin.initialize');
+            console.log('[Auth] SocialLogin initialized (native)');
+          } catch(e) {
+            console.error('[Auth] SocialLogin init failed:', e);
+          }
+        })();
 
         // Foreground-presentation for the daily reminder: if the notification
         // fires while the app is visible, iOS's default behavior is to swallow
