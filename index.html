@@ -8815,7 +8815,7 @@ if (typeof corpusData === 'undefined' || typeof economicsData === 'undefined'
 // App Store release. The iOS-only update-banner checkForUpdate() compares
 // this against corpusapp.io/version.json to decide whether to prompt the
 // user to grab the newest App Store build.
-const APP_VERSION = '1.2.3';
+const APP_VERSION = '1.2.4';
 
 const SUPABASE_URL = 'https://xcoikjoatcrjqxzykwlt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjb2lram9hdGNyanF4enlrd2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjc5NjYsImV4cCI6MjA4OTcwMzk2Nn0.5EhOsN9M4_kLYoRKO97dPGof8RN7PteXQrtKyx4CcKI';
@@ -19045,6 +19045,38 @@ async function enterApp(user) {
   // Flip _authKnown before the home render so the topbar's decision
   // sees the fresh state.
   _markAuthResolved();
+
+  // Reader-and-friends defer-zone: if the user has navigated to any
+  // screen other than 'auth' (or the initial empty state) during the
+  // ~2s eager session-recovery window, DO NOT yank them to home.
+  // enterApp's tail block below is the "arrived from auth screen"
+  // transition — appropriate when the user was on auth, wrong when
+  // they've already navigated into a dialogue, opened the subject
+  // drawer, are mid-onboarding, etc. All the enterApp side effects
+  // above this point (currentUser set, progress load, subscription
+  // load, saveState, identify, telemetry) still run — only the UI
+  // transition is skipped. Prior behavior ejected the user back to
+  // home mid-dialogue whenever this race hit; more reachable after
+  // the 1787efd SocialLogin.initialize deferral widened the race
+  // window on Android.
+  const _uiCurScreen = (state && state.currentScreen) || '';
+  const _uiOnAuthOrUnset = !_uiCurScreen || _uiCurScreen === 'auth';
+  if (!_uiOnAuthOrUnset) {
+    try {
+      _phCapture('reader_ejection_blocked', {
+        current_screen: _uiCurScreen,
+        // Everything the tail block WOULD have done, so we can measure
+        // any regression from side-effects the user missed.
+        deferred_goal_picker: !!(localStorage.getItem('corpus_onboarding_done')
+                                 && !localStorage.getItem('corpus_daily_goal_set')),
+        deferred_intro: !localStorage.getItem('corpus_intro_done'),
+        deferred_subject_select: !localStorage.getItem('corpus_subject'),
+      });
+    } catch(e) {}
+    console.log('[Auth] enterApp: user is on', _uiCurScreen, '- skipping UI tail (would have ejected to home)');
+    return;
+  }
+
   hideAuthScreen();
   _homeExpandedWeekId = undefined;
   renderHome();
