@@ -6267,7 +6267,12 @@
      be forgiving. */
   .onboarding-skip-link {
     background: transparent;
-    color: rgba(255, 255, 255, 0.72);
+    /* var(--text-2) is the app's secondary-text token: muted in both
+       light and dark modes, contrast against var(--surface) which the
+       card uses as its background. Prior color rgba(255,255,255,0.72)
+       was carried over from the old scrim-mounted skip button and
+       rendered white-on-white on the card. */
+    color: var(--text-2);
     border: none;
     padding: 0 20px;
     min-height: 44px;
@@ -8828,7 +8833,7 @@ if (typeof corpusData === 'undefined' || typeof economicsData === 'undefined'
 // App Store release. The iOS-only update-banner checkForUpdate() compares
 // this against corpusapp.io/version.json to decide whether to prompt the
 // user to grab the newest App Store build.
-const APP_VERSION = '1.2.5';
+const APP_VERSION = '1.2.6';
 
 const SUPABASE_URL = 'https://xcoikjoatcrjqxzykwlt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjb2lram9hdGNyanF4enlrd2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjc5NjYsImV4cCI6MjA4OTcwMzk2Nn0.5EhOsN9M4_kLYoRKO97dPGof8RN7PteXQrtKyx4CcKI';
