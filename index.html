@@ -8938,7 +8938,7 @@ if (typeof corpusData === 'undefined' || typeof economicsData === 'undefined'
 // App Store release. The iOS-only update-banner checkForUpdate() compares
 // this against corpusapp.io/version.json to decide whether to prompt the
 // user to grab the newest App Store build.
-const APP_VERSION = '1.2.8';
+const APP_VERSION = '1.2.9';
 
 const SUPABASE_URL = 'https://xcoikjoatcrjqxzykwlt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjb2lram9hdGNyanF4enlrd2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjc5NjYsImV4cCI6MjA4OTcwMzk2Nn0.5EhOsN9M4_kLYoRKO97dPGof8RN7PteXQrtKyx4CcKI';
@@ -17769,32 +17769,47 @@ function shareThinker(thinkerId, subject) {
 // the JS side of this doesn't change — only _initScreenshotDetection
 // gets the second registration call.
 //
-// Fires ONLY on the two thinker surfaces where we have something
-// concrete to hand over: the Pantheon detail modal (unlocked) and the
-// post-dialogue thinker-card screen (dc-thinker-screen). Reader is
-// deliberately excluded — a URL to the passage is a downgrade from
-// the screenshot the user just took. Pantheon grid is deliberately
-// excluded — nothing specific to hand over.
+// **Fires everywhere in the app except auth + onboarding.** On
+// detection, the app CAPTURES ITS OWN CURRENT VIEW via
+// @capawesome/capacitor-screenshot (WKWebView.takeSnapshot on iOS,
+// pixel-perfect), stamps a small Corpus wordmark in the bottom-right
+// corner, then shows the prompt with that captured File as the share
+// payload. Tap "Share" → navigator.share({ files:[File], text, url }).
+//
+// The capture runs BEFORE the prompt is painted, so the prompt itself
+// is never in the shared image. If capture fails (network / plugin
+// unavailable) we silently no-op — better than a prompt with nothing
+// to share.
+//
+// iOS doesn't hand us the actual screenshot the user took (the OS
+// keeps it in its own protected pipeline), and reading the photo
+// library requires an invasive permission. Capturing our own view at
+// the moment of detection matches what the user sees on screen and
+// requires no extra permission — the WebView captures itself.
+//
+// Every guard exit console.logs its reason so the next "why didn't it
+// fire?" investigation is one console-open away, and window-scoped
+// _screenshotResetAll() flushes both in-memory session state and
+// localStorage kills for dev-tool testing.
 
 // Session state — reset on foreground return after >5min in background.
-let _screenshotSessionFires        = 0;
-let _screenshotSessionKilled       = false;   // set true on any dismiss
-let _screenshotLastPromptScreenKey = null;    // per-instance dedupe
-let _screenshotLastHiddenAt        = 0;
-const _SCREENSHOT_SESSION_CAP      = 5;
+let _screenshotSessionFires   = 0;
+let _screenshotSessionKilled  = false;   // set true on any dismiss
+let _screenshotLastHiddenAt   = 0;
+const _SCREENSHOT_SESSION_CAP = 5;
 const _SCREENSHOT_LIFETIME_DISMISS_KILL = 8;
 
-// Modal thinker tracking — set by openThinkerModal so the router can
-// find which thinker + subject the user is currently viewing. Cleared
-// implicitly by _screenshotCurrentKey checking the modal's .active class
-// before reading these vars.
-let _modalThinkerId       = null;
-let _modalThinkerSubject  = null;
+// Modal thinker tracking — set by openThinkerModal, consumed by the
+// permanent shareThinker button on that modal. The capture-and-share
+// screenshot pipeline no longer reads these (it captures pixels
+// wherever the user is), but the shareThinker button still needs
+// the id + subject to build the /t/ URL.
+let _modalThinkerId      = null;
+let _modalThinkerSubject = null;
 
-// Prompt-invocation state (which offer, action callback, auto-timer).
-let _screenshotPromptTimer     = null;
-let _screenshotPromptOnAct     = null;
-let _screenshotPromptOfferKind = null;
+// Prompt-invocation state (action callback, auto-timer).
+let _screenshotPromptTimer = null;
+let _screenshotPromptOnAct = null;
 
 function _sharePlatform() {
   const c = window.Capacitor;
@@ -17818,99 +17833,216 @@ function _screenshotResetLifetimeDismiss() {
   try { localStorage.setItem('corpus_screenshot_dismiss_count', '0'); } catch(e) {}
 }
 
-// Router: what surface are we on RIGHT NOW, and does it have an offer?
-// Returns a stable per-instance key so the same modal opening produces
-// the same key on repeat screenshots (dedupe). Returns null when no
-// offer applies.
-function _screenshotCurrentKey() {
-  const modal = document.getElementById('modal-thinker');
-  if (modal && modal.classList.contains('active') && _modalThinkerId) {
-    const box = modal.querySelector('.modal-box');
-    if (box && box.classList.contains('locked')) return null;   // no offer for the locked teaser
-    return 'thinker-modal:' + _modalThinkerId + (_modalThinkerSubject ? ':' + _modalThinkerSubject : '');
-  }
-  const dcThinker = document.getElementById('dc-thinker-screen');
-  if (dcThinker && dcThinker.style.display !== 'none') {
-    return 'dc-thinker:' + state.currentWeek + '-' + state.currentDay;
-  }
-  return null;
+// Full reset — in-memory session state + localStorage kills. Window-
+// exposed so a dev-tool session can un-wedge itself with one line:
+//   > _screenshotResetAll()
+// Not called anywhere in the app itself; module-level state re-
+// initializes naturally on app load, and localStorage kills persist
+// only across sessions by design.
+function _screenshotResetAll() {
+  _screenshotSessionFires  = 0;
+  _screenshotSessionKilled = false;
+  _screenshotLastHiddenAt  = 0;
+  try { localStorage.removeItem('corpus_screenshot_prompt_disabled'); } catch(e) {}
+  try { localStorage.removeItem('corpus_screenshot_dismiss_count');   } catch(e) {}
+  console.log('[screenshot] state fully reset — in-memory counters cleared, localStorage kills removed');
+}
+try { window._screenshotResetAll = _screenshotResetAll; } catch(e) {}
+
+// Exclusion check: is the current context one where we should NOT
+// capture-and-offer? Auth screen (user hasn't opted in), any onboarding
+// beat, walkthrough overlay. Everywhere else the app captures whatever
+// the user is looking at.
+function _screenshotContextExcluded() {
+  const screen = state.currentScreen;
+  if (screen === 'auth') return true;
+  if (document.documentElement.classList.contains('walkthrough-active')) return true;
+  if (document.querySelector('.onb-screen.onb-active')) return true;
+  return false;
 }
 
-function _onScreenshotDetected() {
-  const platform = _sharePlatform();
-  const key = _screenshotCurrentKey();
-  const hasOffer = !!key;
-  try { posthog.capture('screenshot_detected', { platform, screen: key || 'other', has_offer: hasOffer }); } catch(e) {}
-  if (!hasOffer) return;
+// Stamp a small "Corpus" wordmark in the bottom-right corner of the
+// captured pixels. Scale is proportional to image width so it renders
+// consistently across iPhone SE (~750px) through Pro Max (~1290px).
+// Deliberately small and cornered — the user is sharing their own
+// screen with a friend, not posting an advert. rgba(0,0,0,0.5) backing
+// pill + white text reads on any background the screenshot throws at us.
+function _stampWordmarkOnCapture(sourceImg) {
+  const cnv = document.createElement('canvas');
+  cnv.width = sourceImg.width;
+  cnv.height = sourceImg.height;
+  const ctx = cnv.getContext('2d');
+  ctx.drawImage(sourceImg, 0, 0);
 
+  const scale = cnv.width / 1080;   // baseline sizing against 1080-wide capture
+  const wmSize = Math.round(30 * scale);
+  const padX   = Math.round(18 * scale);
+  const padY   = Math.round(10 * scale);
+  const margin = Math.round(40 * scale);   // safe from home-indicator strip
+
+  ctx.font = `${wmSize}px "Nunito Black", "Nunito", sans-serif`;
+  const text = 'Corpus';
+  const textW = ctx.measureText(text).width;
+  const pillW = textW + padX * 2;
+  const pillH = wmSize + padY * 2;
+  const pillX = cnv.width  - pillW - margin;
+  const pillY = cnv.height - pillH - margin;
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+  _roundRectFillPath(ctx, pillX, pillY, pillW, pillH, pillH / 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.letterSpacing = `${-1 * scale}px`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, pillX + pillW / 2, pillY + pillH / 2 + (2 * scale));
+  ctx.letterSpacing = '0px';
+
+  return cnv;
+}
+
+// Rounded-rect path helper used only by the wordmark stamp (kept local
+// so it doesn't collide with the generator's _roundRect if that ever
+// gets pulled in).
+function _roundRectFillPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+// Capture the current WebView pixels via @capawesome/capacitor-screenshot,
+// stamp the wordmark, return a File ready for navigator.share.
+// The native plugin returns { uri } — a file:// path on iOS/Android or
+// a data: URI on Web. Capacitor.convertFileSrc turns the file:// path
+// into something WKWebView can fetch. Loads into an <img>, draws onto
+// canvas with the wordmark, exports as PNG.
+async function _captureAndStampView() {
+  const Screenshot = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Screenshot;
+  if (!Screenshot || typeof Screenshot.take !== 'function') {
+    throw new Error('Screenshot plugin unavailable');
+  }
+  const result = await Screenshot.take();
+  const rawUri = result && result.uri;
+  if (!rawUri) throw new Error('Screenshot.take() returned no uri');
+  const src = (rawUri.startsWith('data:'))
+    ? rawUri
+    : (window.Capacitor && window.Capacitor.convertFileSrc ? window.Capacitor.convertFileSrc(rawUri) : rawUri);
+
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload  = () => resolve(i);
+    i.onerror = () => reject(new Error('capture image failed to load: ' + src.slice(0, 60)));
+    i.src = src;
+  });
+  const stamped = _stampWordmarkOnCapture(img);
+  const blob = await new Promise((resolve, reject) => {
+    stamped.toBlob(b => b ? resolve(b) : reject(new Error('toBlob returned null')), 'image/png');
+  });
+  return new File([blob], 'corpus-share.png', { type: 'image/png' });
+}
+
+// Detection → capture → prompt. Capture happens BEFORE the prompt is
+// painted, so the prompt itself is never in the shared image. Guards
+// (lifetime kill / session kill / session cap) fire before capture to
+// avoid wasted work.
+async function _onScreenshotDetected() {
+  const platform = _sharePlatform();
+  console.log('[screenshot] detected — platform=', platform);
+  console.log('[screenshot]   state — sessionFires=', _screenshotSessionFires, '/', _SCREENSHOT_SESSION_CAP,
+              'sessionKilled=', _screenshotSessionKilled,
+              'lifetimeKilled=', _screenshotIsLifetimeKilled(),
+              'dismissCount=', localStorage.getItem('corpus_screenshot_dismiss_count'),
+              'excludedContext=', _screenshotContextExcluded());
+  try { posthog.capture('screenshot_detected', { platform, screen: state.currentScreen || 'unknown' }); } catch(e) {}
+
+  if (_screenshotContextExcluded()) {
+    console.log('[screenshot] SKIP: excluded context (auth/onboarding/walkthrough)');
+    return;
+  }
   if (_screenshotIsLifetimeKilled()) {
-    try { posthog.capture('screenshot_prompt_suppressed', { platform, screen: key, reason: 'lifetime_kill' }); } catch(e) {}
+    console.log('[screenshot] SKIP: lifetime kill');
+    try { posthog.capture('screenshot_prompt_suppressed', { platform, reason: 'lifetime_kill' }); } catch(e) {}
     return;
   }
   if (_screenshotSessionKilled) {
-    try { posthog.capture('screenshot_prompt_suppressed', { platform, screen: key, reason: 'dismissed_this_session' }); } catch(e) {}
+    console.log('[screenshot] SKIP: session killed by prior dismiss');
+    try { posthog.capture('screenshot_prompt_suppressed', { platform, reason: 'dismissed_this_session' }); } catch(e) {}
     return;
   }
   if (_screenshotSessionFires >= _SCREENSHOT_SESSION_CAP) {
-    try { posthog.capture('screenshot_prompt_suppressed', { platform, screen: key, reason: 'session_cap' }); } catch(e) {}
+    console.log('[screenshot] SKIP: session cap reached');
+    try { posthog.capture('screenshot_prompt_suppressed', { platform, reason: 'session_cap' }); } catch(e) {}
     return;
   }
-  if (_screenshotLastPromptScreenKey === key) {
-    try { posthog.capture('screenshot_prompt_suppressed', { platform, screen: key, reason: 'already_shown_for_instance' }); } catch(e) {}
-    return;
+
+  let file;
+  try {
+    file = await _captureAndStampView();
+  } catch (e) {
+    console.log('[screenshot] capture failed:', e && e.message);
+    try { posthog.capture('screenshot_capture_failed', { platform, error: String(e && e.message) }); } catch(_) {}
+    return;   // silent no-op if capture failed; better than a prompt with no image
   }
-  _showScreenshotPrompt(key);
+  console.log('[screenshot] captured + stamped → showing prompt');
+  _showScreenshotPrompt(file);
 }
 
-function _showScreenshotPrompt(key) {
+// Prompt takes the captured File; the router / per-screen offer logic
+// is gone. Same UI as before (bottom pill, 7s auto-dismiss, X to
+// dismiss). Tap Share → navigator.share with the file, text, and URL.
+function _showScreenshotPrompt(file) {
   const isEn = state.lang === 'en';
   const el   = document.getElementById('screenshot-prompt');
   const txt  = document.getElementById('screenshot-prompt-text');
   const act  = document.getElementById('screenshot-prompt-action');
-  if (!el || !txt || !act) return;
-
-  // Resolve the action callback + offer kind from the key. Only
-  // thinker-* keys reach this point; router returns null for others.
-  let onAct, offerKind;
-  if (key.startsWith('thinker-modal:')) {
-    const tid = _modalThinkerId, subj = _modalThinkerSubject;
-    onAct = () => shareThinker(tid, subj);
-    offerKind = 'thinker_modal';
-  } else if (key.startsWith('dc-thinker:')) {
-    onAct = () => shareThinker();
-    offerKind = 'dc_thinker';
-  } else {
+  if (!el || !txt || !act) {
+    console.log('[screenshot] show: DOM element missing (el=', !!el, ' txt=', !!txt, ' act=', !!act, ')');
     return;
   }
 
-  txt.textContent = isEn ? 'Send this card through Corpus?' : 'לשתף את הכרטיס דרך Corpus?';
-  act.textContent = isEn ? 'Share'                          : 'שיתוף';
+  txt.textContent = isEn ? 'Share this?' : 'לשתף את זה?';
+  act.textContent = isEn ? 'Share'       : 'שיתוף';
 
-  _screenshotPromptOnAct     = onAct;
-  _screenshotPromptOfferKind = offerKind;
-  _screenshotLastPromptScreenKey = key;
+  const shareText = isEn
+    ? "History's biggest ideas, five minutes a day."
+    : 'הרעיונות הגדולים בהיסטוריה, חמש דקות ביום.';
+  const shareUrl  = 'https://corpusapp.io';
+
+  _screenshotPromptOnAct = async () => {
+    try { posthog.capture('screenshot_prompt_acted', { platform: _sharePlatform() }); } catch(e) {}
+    _screenshotResetLifetimeDismiss();   // action = happy signal, unstick lifetime counter
+    // Share the captured File. Fallback cascade lives in _shareWithFileFallback,
+    // already handled the file→url→clipboard case for shareThinker.
+    await _shareWithFileFallback({
+      file, text: shareText, url: shareUrl,
+      source: 'screenshot_prompt',
+    });
+  };
   _screenshotSessionFires++;
 
   el.style.display = '';
-  // Two-rAF so display flip commits before the .visible class kicks the
-  // opacity transition (otherwise the pill pops in without animating).
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('visible')));
 
   clearTimeout(_screenshotPromptTimer);
   _screenshotPromptTimer = setTimeout(() => _hideScreenshotPrompt('auto'), 7000);
 
-  try { posthog.capture('screenshot_prompt_shown', { platform: _sharePlatform(), screen: key, offer_kind: offerKind }); } catch(e) {}
+  console.log('[screenshot] shown');
+  try { posthog.capture('screenshot_prompt_shown', { platform: _sharePlatform() }); } catch(e) {}
 }
 
 function _screenshotPromptAct() {
-  const key       = _screenshotLastPromptScreenKey;
-  const offerKind = _screenshotPromptOfferKind;
-  const onAct     = _screenshotPromptOnAct;
-  try { posthog.capture('screenshot_prompt_acted', { platform: _sharePlatform(), screen: key, offer_kind: offerKind }); } catch(e) {}
-  // Successful action resets the lifetime-dismiss counter — a user
-  // engaging with the prompt is a happy signal, not one that should
-  // count toward a permanent kill.
-  _screenshotResetLifetimeDismiss();
+  const onAct = _screenshotPromptOnAct;
+  // Telemetry + lifetime-counter reset now happen INSIDE the onAct
+  // callback (see _showScreenshotPrompt) so we don't double-fire them.
   _hideScreenshotPrompt('acted');
   if (onAct) onAct();
 }
@@ -17927,16 +18059,13 @@ function _hideScreenshotPrompt(method) {
   if (method === 'x' || method === 'auto') {
     try { posthog.capture('screenshot_prompt_dismissed', {
       platform: _sharePlatform(),
-      screen:   _screenshotLastPromptScreenKey,
-      offer_kind: _screenshotPromptOfferKind,
       method,
     }); } catch(e) {}
     // Rest of session — no re-fire until foreground return.
     _screenshotSessionKilled = true;
     _screenshotBumpLifetimeDismiss();
   }
-  _screenshotPromptOnAct     = null;
-  _screenshotPromptOfferKind = null;
+  _screenshotPromptOnAct = null;
 }
 
 // Wire the prompt's buttons once. Called from _initScreenshotDetection
@@ -17960,9 +18089,8 @@ async function _initScreenshotDetection() {
       _screenshotLastHiddenAt = Date.now();
     } else if (document.visibilityState === 'visible') {
       if (_screenshotLastHiddenAt && (Date.now() - _screenshotLastHiddenAt) > 5 * 60 * 1000) {
-        _screenshotSessionFires        = 0;
-        _screenshotSessionKilled       = false;
-        _screenshotLastPromptScreenKey = null;
+        _screenshotSessionFires  = 0;
+        _screenshotSessionKilled = false;
       }
     }
   });
