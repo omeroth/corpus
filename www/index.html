@@ -6253,29 +6253,35 @@
      still visually points at the card center. Default 0px = arrow at
      tooltip's horizontal center (unchanged behavior when no clamp). */
   .bonus-tooltip.tail-top::before { border-bottom-color: #D4AF37; left: calc(50% + var(--tail-offset, 0px)); }
-  .onboarding-next-btn { display: block; margin-top: 10px; background: var(--accent); color: var(--on-accent); border: none; border-radius: 50px; padding: 8px 20px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; }
+  /* Action row inside the coach-mark card — vertical stack of the
+     primary Next button and the secondary Skip link. Margin-top
+     replicates the standalone Next button's previous spacing above
+     the bubble. */
+  .onboarding-actions { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; }
+  .onboarding-next-btn { display: block; background: var(--accent); color: var(--on-accent); border: none; border-radius: 50px; padding: 8px 20px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; }
   .onboarding-dots-float { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 1002; display: flex; gap: 8px; align-items: center; }
-  /* Skip button — fixed at the top-end (RTL-aware via inset-inline-end),
-     visible on every walkthrough screen including the greeting. Above
-     the canvas + owl float so it always receives its own taps. */
-  .walkthrough-skip-btn {
-    position: fixed;
-    top: 12px;
-    inset-inline-end: 12px;
-    z-index: 1003;
-    background: rgba(255, 255, 255, 0.14);
-    color: #FFFFFF;
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    border-radius: 999px;
-    padding: 8px 16px;
+  /* Skip — secondary text-link style beneath Next. Visually small
+     (12px muted white) so Next stays the primary affordance, but the
+     tap surface is min-height 44px per Apple HIG / Material guidance.
+     A user reaching for Skip is typically frustrated; the target must
+     be forgiving. */
+  .onboarding-skip-link {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.72);
+    border: none;
+    padding: 0 20px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-family: inherit;
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
+    align-self: center;
     -webkit-tap-highlight-color: transparent;
-    pointer-events: auto;
   }
-  .walkthrough-skip-btn:active { transform: scale(0.96); }
+  .onboarding-skip-link:active { opacity: 0.55; }
   /* Start-first-dialogue card must not sit behind the walkthrough
      overlay — the walkthrough IS the first-time entry point. Hidden
      via CSS while the overlay is up; re-shown on skip/bail via a
@@ -8152,9 +8158,16 @@
   </div>
   <div class="onboarding-speech" id="onboarding-speech">
     <div id="onboarding-bubble"></div>
-    <button class="onboarding-next-btn" id="onboarding-btn"></button>
+    <div class="onboarding-actions">
+      <button class="onboarding-next-btn" id="onboarding-btn"></button>
+      <!-- Skip moved from a fixed top-right position (which landed
+           under iPhone status-bar icons — safe-inset was hard-coded to
+           12px) into the coach-mark card as a secondary action. id +
+           onclick preserved so _walkthroughSkip / walkthrough_skipped
+           telemetry unchanged. -->
+      <button class="onboarding-skip-link" id="walkthrough-skip" onclick="_walkthroughSkip()"></button>
+    </div>
   </div>
-  <button class="walkthrough-skip-btn" id="walkthrough-skip" onclick="_walkthroughSkip()"></button>
   <div class="onboarding-dots-float" id="onboarding-dots"></div>
 </div>
 <div id="screen-auth" class="auth-screen">
@@ -8815,7 +8828,7 @@ if (typeof corpusData === 'undefined' || typeof economicsData === 'undefined'
 // App Store release. The iOS-only update-banner checkForUpdate() compares
 // this against corpusapp.io/version.json to decide whether to prompt the
 // user to grab the newest App Store build.
-const APP_VERSION = '1.2.4';
+const APP_VERSION = '1.2.5';
 
 const SUPABASE_URL = 'https://xcoikjoatcrjqxzykwlt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjb2lram9hdGNyanF4enlrd2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjc5NjYsImV4cCI6MjA4OTcwMzk2Nn0.5EhOsN9M4_kLYoRKO97dPGof8RN7PteXQrtKyx4CcKI';
