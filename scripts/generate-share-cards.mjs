@@ -64,6 +64,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const OUT_CARDS = path.join(ROOT, 'share', 'cards');
 const OUT_PAGES = path.join(ROOT, 'd');
+// Thinker share cards + landing pages live in parallel to dialogue cards.
+// Same generator, different asset trees so a thinker page and a dialogue
+// page never share a slug. Landing paths: /t/{id}[-{subject}]-{lang}.html.
+const OUT_THINKERS       = path.join(ROOT, 'share', 'thinkers');
+const OUT_THINKER_PAGES  = path.join(ROOT, 't');
 const SITE_URL = 'https://corpusapp.io';
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -250,6 +255,15 @@ function buildThemes() {
     const frame = _extractRootVar(src, 'frame-' + subject);
     themes[subject] = {
       bg:       v.bg,
+      surface2: v['surface-2'] || v.bg,   // fall back to bg if unset
+      // `accent-tint-strong` is the subject's medium-saturation tint —
+      // philosophy #D8C4FF (deep lavender), economics #BFDBFE (deep pale
+      // blue), psychology #FED7AA (warm peach). Higher chroma than
+      // surface-2, which matters because JPEG's chroma subsampling
+      // strips the near-neutral surface-2 blue to gray. accent-tint-strong
+      // survives JPEG cleanly and gives the portrait a warmer, more
+      // clearly subject-identified surface.
+      accentTintStrong: v['accent-tint-strong'] || v['surface-2'] || v.bg,
       wordmark: v.accent,
       name:     v.ink,
       era:      v['text-2'],
@@ -258,6 +272,7 @@ function buildThemes() {
     };
     // Only require the 5 fields we actually consume unconditionally.
     // `frame` is optional — guarded at the call site by USE_FRAME_RIM.
+    // `surface2` is optional (falls back to bg above).
     for (const k of ['bg', 'wordmark', 'name', 'era', 'question']) {
       if (!themes[subject][k]) throw new Error(`missing ${k} for ${subject}`);
     }
@@ -497,6 +512,302 @@ async function renderCard({ thinker, dayTitle, subject, lang }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// Thinker card renderers — collectible-illustration hero
+// ─────────────────────────────────────────────────────────────────────────
+// The collectible IS the illustration (bust + bookshelves + book titles
+// are baked into the artwork). Two variants:
+//
+//   • LANDSCAPE 1200×630 — for the /t/ page's og:image. WhatsApp/iMessage/
+//     Twitter unfurls need 1.91:1 landscape. Composition: pantheon-style
+//     illustration panel on one side (rounded rectangle, 2px subject-
+//     colored frame, dark-gradient name/era at bottom — matches what the
+//     user unlocks in-app), Corpus wordmark + tagline + URL on the other.
+//
+//   • PORTRAIT 1080×1920 — attached as a file to the native share sheet.
+//     9:16 for Instagram Story / WhatsApp Status. Native art aspect
+//     (670×1200 = 0.558) is almost exactly 9:16 (0.5625) — the art
+//     was practically drawn for this format. Composition: illustration
+//     fills the canvas edge-to-edge, small Corpus wordmark on a subtle
+//     pill top-center, name/era bottom overlay. Frame around the whole
+//     thing. Deliberately minimal chrome — the user is showing off, not
+//     advertising, and heavy branding is what stops them posting it.
+
+async function _loadThinkerPortrait(thinker, subject) {
+  const rel = (thinker.images && thinker.images[subject]) || thinker.image;
+  if (!rel) return null;
+  // Prefer the higher-resolution PNG in images.original-backup/ when it
+  // exists — the shipped webp is a downscaled export (670×1200) intended
+  // for the in-app grid; the originals are up to 1536×2752 for some
+  // philosophy / economics thinkers, dramatically sharper at portrait-
+  // card size. Psychology thinkers aren't in the backup and fall back
+  // to the shipped webp. Multi-subject variants (kahneman-econ.webp,
+  // kahneman-psy.webp) also have no per-variant backup and fall back.
+  const basename = path.basename(rel, path.extname(rel));
+  const backupAbs = path.join(ROOT, 'images.original-backup', basename + '.png');
+  if (fs.existsSync(backupAbs)) {
+    try { return await loadImage(backupAbs); } catch (e) { /* fall through */ }
+  }
+  const abs = path.join(ROOT, rel.replace(/^\.\//, ''));
+  try {
+    return await loadImage(abs);
+  } catch (e) {
+    return null;
+  }
+}
+
+// Single-source-of-truth aspect fitter: given the source image dims and
+// a target HEIGHT, return { w, h } where h == target and w is derived
+// from the source aspect ratio. The card renderers never set both card
+// dimensions independently — one of the two ALWAYS comes from this
+// helper — so the destination box is aspect-locked to the source and
+// can't drift out of sync when the layout is tweaked.
+function _cardBoxFromHeight(srcW, srcH, targetH) {
+  const w = Math.round(targetH * (srcW / srcH));
+  return { w, h: targetH };
+}
+
+// Rounded rectangle path — used for both the pantheon-style illustration
+// panel and the portrait card's outer frame. Node canvas doesn't ship
+// with roundRect on every backend version, so we polyfill via arcs.
+function _roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+// Draw the collectible illustration inside a rounded-rectangle panel,
+// then paint the subject-colored frame stroke on top. Shared by both
+// landscape and portrait renderers.
+//
+// The illustrations themselves already carry ornate frames, book titles,
+// AND baked-in name/era banners at the bottom (visible on every card:
+// "SOCRATES / ANCIENT GREEK PHILOSOPHER", "MELANIE KLEIN / PIONEER OF
+// CHILD ANALYSIS", etc). We deliberately do NOT overlay our own name or
+// gradient here — anything we add competes with the artist's engraved
+// banner and looks like a bug. The subject-colored stroke is the only
+// chrome, a subtle nod to the app's Pantheon frame color.
+//
+// Fit strategy is CONTAIN (min scale + centered), not cover: cropping
+// even a few pixels at the edges chops the ornament that makes the card
+// worth sharing. The letterbox on the short axis is a couple of pixels
+// on the portrait canvas and zero on the landscape panel (native aspect
+// matches). Letterbox area is left as whatever the caller already painted
+// underneath (subject bg on portrait, subject bg on landscape).
+function _drawCollectiblePanel(ctx, img, thinker, subject, x, y, w, h, opts) {
+  const theme = THEMES[subject] || THEMES.philosophy;
+  const frameColor = theme.frame || RIM;
+  const radius = opts.radius;
+  const frameWidth = opts.frameWidth;
+
+  ctx.save();
+  _roundRect(ctx, x, y, w, h, radius);
+  ctx.clip();
+
+  if (img) {
+    const iw = img.width, ih = img.height;
+    const scale = Math.min(w / iw, h / ih);
+    const dw = iw * scale, dh = ih * scale;
+    const dx = x + (w - dw) / 2;
+    const dy = y + (h - dh) / 2;
+    ctx.drawImage(img, dx, dy, dw, dh);
+  } else {
+    // Fallback for a thinker with no shipped illustration — never
+    // hit in production but keeps the generator resilient.
+    ctx.fillStyle = PLATE;
+    ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = theme.wordmark;
+    ctx.font = `800 ${Math.round(h * 0.4)}px Rubik, sans-serif`;
+    const prevAlign = ctx.textAlign, prevBaseline = ctx.textBaseline;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText((thinker.name || '?').slice(0, 1), x + w / 2, y + h / 2);
+    ctx.textAlign = prevAlign;
+    ctx.textBaseline = prevBaseline;
+  }
+
+  ctx.restore();
+
+  // Frame stroke — drawn AFTER the clip is released so it sits cleanly
+  // on the panel edge without being clipped in half. Skipped when
+  // frameWidth is 0/falsy: portrait cards drop the stroke because the
+  // illustration's own ornate frame is already dominant and a second
+  // rectangle fights it visually.
+  if (frameWidth > 0) {
+    ctx.beginPath();
+    _roundRect(ctx, x, y, w, h, radius);
+    ctx.lineWidth = frameWidth;
+    ctx.strokeStyle = frameColor;
+    ctx.stroke();
+  }
+}
+
+async function renderThinkerCardLandscape({ thinker, subject, lang }) {
+  const W = 1200, H = 630;
+  const isEn = lang === 'en';
+  const theme = THEMES[subject] || THEMES.philosophy;
+  const canvas = createCanvas(W, H);
+  const ctx = canvas.getContext('2d');
+  ctx.textBaseline = 'top';
+
+  ctx.fillStyle = theme.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Pantheon panel — respect native 670×1200 art aspect (0.558). Panel
+  // height fills all but 20px vertical margin; width follows aspect.
+  const panelH = 590;
+  const panelW = Math.round(panelH * (670 / 1200));  // ≈ 329
+  const OUTER = 40;
+  const panelY = Math.round((H - panelH) / 2);
+  const panelX = isEn ? (W - OUTER - panelW) : OUTER;
+
+  const img = await _loadThinkerPortrait(thinker, subject);
+  _drawCollectiblePanel(ctx, img, thinker, subject, panelX, panelY, panelW, panelH, {
+    radius:     18,
+    frameWidth: 3,
+  });
+
+  // Text column — opposite side.
+  const colX = isEn ? OUTER : (W - OUTER);
+  ctx.textAlign = isEn ? 'left' : 'right';
+  let y = 70;
+
+  // Wordmark — same treatment as dialogue card so brand feels consistent
+  // across the two share flavours.
+  ctx.font = '50px "Nunito Black", Rubik, sans-serif';
+  ctx.fillStyle = theme.wordmark;
+  ctx.letterSpacing = '-1.32px';
+  ctx.fillText('Corpus', colX, y);
+  ctx.letterSpacing = '0px';
+  y += 96;
+
+  // Tagline — fixed marketing line, subject-agnostic. The share COPY
+  // carries the per-subject hook ("one of history's great philosophers");
+  // the card stays quiet.
+  const tagline = isEn
+    ? '5 minutes a day with\nhistory’s greatest minds'
+    : '5 דקות ביום עם\nגדולי ההוגים';
+  ctx.fillStyle = theme.question;
+  ctx.font = '700 34px Rubik, sans-serif';
+  const lineHeight = 44;
+  for (const line of tagline.split('\n')) {
+    ctx.fillText(!isEn ? (RLM + line + RLM) : line, colX, y);
+    y += lineHeight;
+  }
+  y += 20;
+
+  // Divider
+  const divW = 80;
+  const divY = y;
+  const divX = isEn ? colX : (colX - divW);
+  ctx.strokeStyle = RIM;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(divX, divY);
+  ctx.lineTo(divX + divW, divY);
+  ctx.stroke();
+
+  ctx.fillStyle = URL_TXT;
+  ctx.font = '700 22px Rubik, sans-serif';
+  ctx.fillText('corpusapp.io', colX, H - 60);
+
+  return canvas.toBuffer('image/png');
+}
+
+async function renderThinkerCardPortrait({ thinker, subject, lang }) {
+  // 810×1440 = ¾ of 1080×1920 (Instagram Story native). Story platforms
+  // recompress + upscale on upload, so the extra 33% pixels weren't
+  // buying perceptual fidelity — shipping smaller halves per-share
+  // download cost (~360KB → ~180KB after pngquant) with no visible
+  // loss at either share-thumbnail or full-story-viewing scale.
+  const W = 810, H = 1440;
+  void lang;  // portrait card is symmetric — no LTR/RTL branching needed
+  const theme = THEMES[subject] || THEMES.philosophy;
+  const canvas = createCanvas(W, H);
+  const ctx = canvas.getContext('2d');
+  ctx.textBaseline = 'top';
+
+  // Flat subject-tinted surface. Uses `accent-tint-strong` (not
+  // surface-2 or bg): the softer tokens are 95%+ luminance with tiny
+  // chroma deltas that JPEG's chroma subsampling strips entirely,
+  // making the bg render as neutral gray. accent-tint-strong is deep
+  // enough per subject (philosophy #D8C4FF, economics #BFDBFE,
+  // psychology #FED7AA) to keep its color through JPEG AND read as
+  // a warm, clearly subject-identified surface — which is what the
+  // user asked for after the previous white bg felt sterile.
+  ctx.fillStyle = theme.accentTintStrong || theme.surface2 || theme.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Card height first, width derived from source aspect via the
+  // single-source-of-truth helper. Never set both dims independently:
+  // if the layout budget changes, only `cardH` moves; `cardW` follows.
+  // 915 = 1220 × 0.75, preserves 63.5% of canvas height for the card
+  // when we shrunk the canvas from 1920 → 1440.
+  const cardH = 915;
+  const img = await _loadThinkerPortrait(thinker, subject);
+  const srcW = (img && img.width)  || 670;
+  const srcH = (img && img.height) || 1200;
+  const { w: cardW } = _cardBoxFromHeight(srcW, srcH, cardH);
+  const cardX = Math.round((W - cardW) / 2);
+
+  // Type sizes + gaps scale ¾ from the 1080×1920 layout in lockstep with
+  // the canvas so the wordmark still reads as attribution (not an ad)
+  // and the URL stays a discreet discoverability hint.
+  const wmSize      = 39;   // 52 × 0.75
+  const urlSize     = 17;   // 22 × 0.75, rounded up
+  const wmToUrlGap  = 18;   // 24 × 0.75
+  const cardToWmGap = 72;   // 96 × 0.75
+
+  // Vertically center the whole (card + gap + wm + gap + url) stack so
+  // top and bottom margins match. Card is small enough that this leaves
+  // ~180px above and ~180px below, real breathing room on both edges.
+  const compoundH = cardH + cardToWmGap + wmSize + wmToUrlGap + urlSize;
+  const topPad    = Math.round((H - compoundH) / 2);
+  const cardY     = topPad;
+
+  // No frame stroke — illustration already has an ornate frame drawn in.
+  _drawCollectiblePanel(ctx, img, thinker, subject, cardX, cardY, cardW, cardH, {
+    radius:     18,
+    frameWidth: 0,
+  });
+
+  // Wordmark
+  ctx.font = `${wmSize}px "Nunito Black", Rubik, sans-serif`;
+  ctx.letterSpacing = '-1.4px';
+  ctx.fillStyle = theme.wordmark;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  const wmY = cardY + cardH + cardToWmGap;
+  ctx.fillText('Corpus', W / 2, wmY);
+  ctx.letterSpacing = '0px';
+
+  // corpusapp.io — subject ink instead of the landscape footer's gold.
+  // Gold reads well on the landscape's plain-white bg but nearly
+  // disappears on the portrait's tinted surface (pale blue for
+  // economics, warm peach for psychology, etc.). Ink is the app's
+  // primary text token — always high-contrast against surface.
+  ctx.font = `700 ${urlSize}px Rubik, sans-serif`;
+  ctx.fillStyle = theme.name;
+  ctx.fillText('corpusapp.io', W / 2, wmY + wmSize + wmToUrlGap);
+
+  // PNG output — @napi-rs/canvas's JPEG encoder ships a broken YCbCr
+  // conversion that systematically shifts colours on encode (verified:
+  // rgb(37,42,86) navy → rgb(61,50,118) purple, ~30-unit deltas per
+  // channel, unchanged at q=1.0 so it's not a quality issue). Every
+  // other card in this generator outputs PNG for the same reason. File
+  // size climbs from ~30KB JPEG to ~200KB PNG post-pngquant — worth it
+  // for a share card where colour fidelity IS the point.
+  return canvas.toBuffer('image/png');
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // HTML page renderer — one landing page per dialogue × language
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -720,6 +1031,204 @@ function renderPage({ weekId, dayId, thinker, dayTitle, subject, lang }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// Thinker landing page renderer — /t/{id}[-{subject}]-{lang}.html
+// ─────────────────────────────────────────────────────────────────────────
+// Structurally identical to renderPage: same layout, same redirect + beacon
+// script, same OG/Twitter card meta. Deltas: /t/ path, description names
+// the person (not a dialogue), landing-page telemetry carries thinker_id
+// instead of dialogue_id.
+
+function renderThinkerPage({ thinker, subject, lang, hasSubjectSuffix }) {
+  const isEn = lang === 'en';
+  const dir = isEn ? 'ltr' : 'rtl';
+  const theme = THEMES[subject] || THEMES.philosophy;
+  const stem = hasSubjectSuffix ? `${thinker.id}-${subject}` : thinker.id;
+  const cardUrl = `${SITE_URL}/share/thinkers/${lang}/${stem}.png`;
+  const pageUrl = `${SITE_URL}/t/${stem}-${lang}.html`;
+  const title = thinker.name;
+  const description = isEn
+    ? `${thinker.name} on Corpus — ${thinker.era}. 5 minutes a day with history's greatest minds.`
+    : `${thinker.name} ב-Corpus — ${thinker.era}. 5 דקות ביום עם גדולי ההוגים.`;
+  const IOS_URL     = 'https://apps.apple.com/app/id6781227385';
+  const ANDROID_URL = 'https://play.google.com/store/apps/details?id=com.corpusapp.corpus';
+  const DESKTOP_URL = 'https://corpusapp.io';
+  const redirectingText = isEn ? 'Opening Corpus…' : 'פותח את Corpus…';
+  const manualCTA       = isEn ? 'Open Corpus'    : 'פתח את Corpus';
+  return `<!doctype html>
+<html lang="${lang}" dir="${dir}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">${NOINDEX_SUBJECTS.has(subject) ? `
+<meta name="robots" content="noindex, nofollow">` : ''}
+<title>${escapeHtml(title)} · Corpus</title>
+<meta name="description" content="${escapeHtml(description)}">
+
+<meta property="og:type" content="profile">
+<meta property="og:title" content="${escapeHtml(title)}">
+<meta property="og:description" content="${escapeHtml(description)}">
+<meta property="og:image" content="${cardUrl}">
+<meta property="og:image:secure_url" content="${cardUrl}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="${pageUrl}">
+<meta property="og:site_name" content="Corpus">
+<meta property="og:locale" content="${isEn ? 'en_US' : 'he_IL'}">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${escapeHtml(title)}">
+<meta name="twitter:description" content="${escapeHtml(description)}">
+<meta name="twitter:image" content="${cardUrl}">
+
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Rubik:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:      ${theme.bg};
+    --plate:   ${PLATE};
+    --rim:     ${RIM};
+    --wordmark: ${theme.wordmark};
+    --name:    ${theme.name};
+    --era:     ${theme.era};
+    --question: ${theme.question};
+    --url:     ${URL_TXT};
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--name);
+    font-family: 'Rubik', sans-serif;
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    text-align: center;
+  }
+  .wordmark {
+    font-family: 'Nunito', 'Rubik', sans-serif;
+    font-weight: 900;
+    font-size: 26px;
+    color: var(--wordmark);
+    letter-spacing: -0.7px;
+    margin-bottom: 32px;
+  }
+  .card {
+    display: block;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto 32px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  }
+  .redirecting {
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--name);
+    margin-bottom: 20px;
+    opacity: 0.75;
+  }
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 16px;
+    text-decoration: none;
+    background: var(--wordmark);
+    color: #FFFFFF;
+    transition: transform .15s;
+  }
+  .cta:active { transform: scale(.97); }
+  .url {
+    display: block;
+    margin-top: 32px;
+    color: var(--url);
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="wordmark">Corpus</div>
+  <img class="card" src="${cardUrl}" alt="${escapeHtml(thinker.name)}" width="1200" height="630">
+  <p class="redirecting">${escapeHtml(redirectingText)}</p>
+  <a class="cta" id="manual" href="${IOS_URL}">${escapeHtml(manualCTA)}</a>
+  <a class="url" href="${SITE_URL}">corpusapp.io</a>
+</main>
+<script>
+  (function () {
+    var POSTHOG_KEY = 'phc_vUupVqSRdBay7mQ4Aswudhu8mFHnych6PKNRpP6BHoS4';
+    var POSTHOG_URL = 'https://us.i.posthog.com/i/v0/e/';
+    var distinctId = (window.crypto && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : ('anon-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+
+    var ua = navigator.userAgent || '';
+    var isIOS     = /iPhone|iPad|iPod/i.test(ua);
+    var isAndroid = /Android/i.test(ua);
+    var target     = ${JSON.stringify(DESKTOP_URL)};
+    var targetKind = 'desktop';
+    if (isIOS)          { target = ${JSON.stringify(IOS_URL)};     targetKind = 'ios'; }
+    else if (isAndroid) { target = ${JSON.stringify(ANDROID_URL)}; targetKind = 'android'; }
+
+    var baseProps = {
+      thinker_id: ${JSON.stringify(thinker.id)},
+      subject:    ${JSON.stringify(subject || 'philosophy')},
+      lang:       ${JSON.stringify(lang)},
+      target:     targetKind,
+      referrer:   document.referrer || null,
+      $process_person_profile: false
+    };
+
+    function beacon(event, extraProps) {
+      var props = extraProps ? Object.assign({}, baseProps, extraProps) : baseProps;
+      var payload = {
+        api_key:     POSTHOG_KEY,
+        event:       event,
+        distinct_id: distinctId,
+        properties:  props,
+        timestamp:   new Date().toISOString()
+      };
+      try {
+        var blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
+        navigator.sendBeacon(POSTHOG_URL, blob);
+      } catch (e) { /* never block the redirect on capture failure */ }
+    }
+
+    beacon('thinker_landing_page_view');
+
+    var manual = document.getElementById('manual');
+    if (manual) {
+      manual.href = target;
+      manual.addEventListener('click', function () {
+        beacon('thinker_landing_cta_click');
+      });
+    }
+
+    setTimeout(function () { location.replace(target); }, 250);
+  })();
+</script>
+</body>
+</html>
+`;
+}
+
+// Which subject(s) a thinker belongs to, in priority order for image /
+// theme selection. Default is philosophy — matches the in-app default
+// when `subject` is unset. Multi-subject thinkers (Kahneman) list all.
+function _subjectsForThinker(t) {
+  if (Array.isArray(t.subjects) && t.subjects.length) return t.subjects;
+  if (t.subject) return [t.subject];
+  return ['philosophy'];
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // Main
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -809,6 +1318,69 @@ async function main() {
   console.log(`[gen:share] pages → ${path.relative(ROOT, OUT_PAGES)}`);
   console.log(`[gen:share] manifest → ${path.relative(ROOT, path.join(OUT_CARDS, 'manifest.json'))}`);
 
+  // ─── Thinker cards + pages (parallel to dialogues; one variant per
+  // subject a thinker belongs to, both languages). Multi-subject thinkers
+  // (Kahneman) produce per-subject file variants so the portrait override
+  // and theme match the sharing context.
+  const thinkerManifest = { generatedAt: new Date().toISOString(), items: [] };
+  for (const lang of ['he', 'en']) {
+    const list = (lang === 'en') ? THINKERS_EN : THINKERS;
+    for (const t of list) {
+      if (!t || !t.id) continue;
+      // Every thinker with an illustration gets a card. Quote is no
+      // longer the hero — the collectible artwork is — so an unset
+      // quote is not a skip reason.
+      if (!t.image && !(t.images && Object.keys(t.images).length)) continue;
+      const subs = _subjectsForThinker(t);
+      const hasSubjectSuffix = subs.length > 1;
+      for (const subject of subs) {
+        const stem = hasSubjectSuffix ? `${t.id}-${subject}` : t.id;
+        if (CANVAS_ENABLED) {
+          // Landscape 1200×630 → og:image for the /t/ page.
+          const landDir  = path.join(OUT_THINKERS, lang);
+          const landFile = path.join(landDir, `${stem}.png`);
+          fs.mkdirSync(landDir, { recursive: true });
+          const landBuf = await renderThinkerCardLandscape({ thinker: t, subject, lang });
+          fs.writeFileSync(landFile, landBuf);
+          // Portrait 1080×1920 → native share-sheet file attachment. PNG
+          // (not JPEG) — see the encoder-bug comment inside
+          // renderThinkerCardPortrait. Kept in a `portrait/`
+          // subdirectory so a directory listing tells the two variants
+          // apart at a glance; pngquant compresses it in the post-pass.
+          const portDir  = path.join(OUT_THINKERS, 'portrait', lang);
+          const portFile = path.join(portDir, `${stem}.png`);
+          fs.mkdirSync(portDir, { recursive: true });
+          const portBuf = await renderThinkerCardPortrait({ thinker: t, subject, lang });
+          fs.writeFileSync(portFile, portBuf);
+        }
+        fs.mkdirSync(OUT_THINKER_PAGES, { recursive: true });
+        const pageFile = path.join(OUT_THINKER_PAGES, `${stem}-${lang}.html`);
+        fs.writeFileSync(pageFile, renderThinkerPage({
+          thinker: t, subject, lang, hasSubjectSuffix,
+        }));
+        thinkerManifest.items.push({
+          thinkerId: t.id,
+          subject,
+          lang,
+          name: t.name,
+          era:  t.era,
+          cardLandscape: `share/thinkers/${lang}/${stem}.png`,
+          cardPortrait:  `share/thinkers/portrait/${lang}/${stem}.png`,
+          page:          `t/${stem}-${lang}.html`,
+        });
+      }
+    }
+  }
+  fs.mkdirSync(OUT_THINKERS, { recursive: true });
+  fs.writeFileSync(
+    path.join(OUT_THINKERS, 'manifest.json'),
+    JSON.stringify(thinkerManifest, null, 2) + '\n'
+  );
+  console.log(`[gen:share] wrote ${thinkerManifest.items.length} thinker pages` +
+              (CANVAS_ENABLED ? ` + ${thinkerManifest.items.length * 2} thinker cards (landscape + portrait)` : ''));
+  console.log(`[gen:share] thinker cards → ${path.relative(ROOT, OUT_THINKERS)}`);
+  console.log(`[gen:share] thinker pages → ${path.relative(ROOT, OUT_THINKER_PAGES)}`);
+
   // Post-pass: pngquant compression. Cards render at ~200–330KB uncompressed;
   // quantizing to 70–90% quality drops that to ~50–100KB with no visible loss,
   // which keeps every card under the ~300KB WhatsApp/Twitter OG-image soft cap.
@@ -825,20 +1397,38 @@ function _compressCards() {
     console.warn('[gen:share] pngquant-bin not installed — skipping compression.');
     return;
   }
+  // Recursive PNG walker — cards live at OUT_CARDS/{lang}/*.png and
+  // OUT_THINKERS/{lang}/*.png plus OUT_THINKERS/portrait/{lang}/*.png,
+  // so a flat one-level scan misses the portrait sibling.
   const pngs = [];
-  for (const lang of fs.readdirSync(OUT_CARDS)) {
-    const dir = path.join(OUT_CARDS, lang);
-    if (!fs.statSync(dir).isDirectory()) continue;
-    for (const f of fs.readdirSync(dir)) {
-      if (f.endsWith('.png')) pngs.push(path.join(dir, f));
+  const walk = (dir) => {
+    if (!fs.existsSync(dir)) return;
+    for (const entry of fs.readdirSync(dir)) {
+      const full = path.join(dir, entry);
+      const stat = fs.statSync(full);
+      if (stat.isDirectory()) walk(full);
+      else if (entry.endsWith('.png')) pngs.push(full);
     }
-  }
+  };
+  walk(OUT_CARDS);
+  walk(OUT_THINKERS);
   if (!pngs.length) return;
   const before = pngs.reduce((a, p) => a + fs.statSync(p).size, 0);
-  const args = ['--quality=70-90', '--strip', '--force', '--skip-if-larger', '--output'];
-  for (const p of pngs) {
-    spawnSync(pngquantBin, [...args, p, p], { stdio: 'ignore' });
-  }
+  // Two quality tiers. Portrait share cards get 60-80 (more aggressive)
+  // because they'll be recompressed by Instagram / WhatsApp on upload
+  // AND downloaded on every tap-to-share — so mobile data cost matters
+  // more than lossless fidelity. Landscape / dialogue cards get 70-90
+  // (the traditional quality) because they're the /d/ + /t/ og:image
+  // that a viewer sees inline in the link preview at full resolution.
+  const isPortrait = (p) => p.includes(path.sep + 'portrait' + path.sep);
+  const compress = (files, quality) => {
+    const args = ['--quality=' + quality, '--strip', '--force', '--skip-if-larger', '--output'];
+    for (const p of files) {
+      spawnSync(pngquantBin, [...args, p, p], { stdio: 'ignore' });
+    }
+  };
+  compress(pngs.filter(p => !isPortrait(p)), '70-90');
+  compress(pngs.filter(p =>  isPortrait(p)), '60-80');
   const after  = pngs.reduce((a, p) => a + fs.statSync(p).size, 0);
   const savedKB = Math.round((before - after) / 1024);
   console.log(`[gen:share] compressed ${pngs.length} cards → ${Math.round(after / 1024)}KB total (−${savedKB}KB)`);

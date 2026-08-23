@@ -1,0 +1,1165 @@
+{
+  "generatedAt": "2026-08-23T19:52:05.607Z",
+  "items": [
+    {
+      "thinkerId": "socrates",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "סוקרטס",
+      "era": "470–399 לפנה\"ס",
+      "cardLandscape": "share/thinkers/he/socrates.png",
+      "cardPortrait": "share/thinkers/portrait/he/socrates.png",
+      "page": "t/socrates-he.html"
+    },
+    {
+      "thinkerId": "plato",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "אפלטון",
+      "era": "428–348 לפנה\"ס",
+      "cardLandscape": "share/thinkers/he/plato.png",
+      "cardPortrait": "share/thinkers/portrait/he/plato.png",
+      "page": "t/plato-he.html"
+    },
+    {
+      "thinkerId": "russell",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "ברטרנד ראסל",
+      "era": "1872–1970",
+      "cardLandscape": "share/thinkers/he/russell.png",
+      "cardPortrait": "share/thinkers/portrait/he/russell.png",
+      "page": "t/russell-he.html"
+    },
+    {
+      "thinkerId": "wittgenstein",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "ויטגנשטיין",
+      "era": "1889–1951",
+      "cardLandscape": "share/thinkers/he/wittgenstein.png",
+      "cardPortrait": "share/thinkers/portrait/he/wittgenstein.png",
+      "page": "t/wittgenstein-he.html"
+    },
+    {
+      "thinkerId": "aurelius",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "מרקוס אורליוס",
+      "era": "121–180 לספירה",
+      "cardLandscape": "share/thinkers/he/aurelius.png",
+      "cardPortrait": "share/thinkers/portrait/he/aurelius.png",
+      "page": "t/aurelius-he.html"
+    },
+    {
+      "thinkerId": "aristotle",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "אריסטו",
+      "era": "384–322 לפנה\"ס",
+      "cardLandscape": "share/thinkers/he/aristotle.png",
+      "cardPortrait": "share/thinkers/portrait/he/aristotle.png",
+      "page": "t/aristotle-he.html"
+    },
+    {
+      "thinkerId": "descartes",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "דקארט",
+      "era": "1596–1650",
+      "cardLandscape": "share/thinkers/he/descartes.png",
+      "cardPortrait": "share/thinkers/portrait/he/descartes.png",
+      "page": "t/descartes-he.html"
+    },
+    {
+      "thinkerId": "kant",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "עמנואל קאנט",
+      "era": "1724–1804",
+      "cardLandscape": "share/thinkers/he/kant.png",
+      "cardPortrait": "share/thinkers/portrait/he/kant.png",
+      "page": "t/kant-he.html"
+    },
+    {
+      "thinkerId": "mill",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "ג'ון סטיוארט מיל",
+      "era": "1806–1873",
+      "cardLandscape": "share/thinkers/he/mill.png",
+      "cardPortrait": "share/thinkers/portrait/he/mill.png",
+      "page": "t/mill-he.html"
+    },
+    {
+      "thinkerId": "nietzsche",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "פרידריך ניטשה",
+      "era": "1844–1900",
+      "cardLandscape": "share/thinkers/he/nietzsche.png",
+      "cardPortrait": "share/thinkers/portrait/he/nietzsche.png",
+      "page": "t/nietzsche-he.html"
+    },
+    {
+      "thinkerId": "hume",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "דייוויד יום",
+      "era": "–1776",
+      "cardLandscape": "share/thinkers/he/hume.png",
+      "cardPortrait": "share/thinkers/portrait/he/hume.png",
+      "page": "t/hume-he.html"
+    },
+    {
+      "thinkerId": "gettier",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "אדמונד גטייה",
+      "era": "1927–2021",
+      "cardLandscape": "share/thinkers/he/gettier.png",
+      "cardPortrait": "share/thinkers/portrait/he/gettier.png",
+      "page": "t/gettier-he.html"
+    },
+    {
+      "thinkerId": "popper",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "קרל פופר",
+      "era": "1902–1994",
+      "cardLandscape": "share/thinkers/he/popper.png",
+      "cardPortrait": "share/thinkers/portrait/he/popper.png",
+      "page": "t/popper-he.html"
+    },
+    {
+      "thinkerId": "spinoza",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "ברוך שפינוזה",
+      "era": "1632–1677",
+      "cardLandscape": "share/thinkers/he/spinoza.png",
+      "cardPortrait": "share/thinkers/portrait/he/spinoza.png",
+      "page": "t/spinoza-he.html"
+    },
+    {
+      "thinkerId": "berkeley",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "ג'ורג' ברקלי",
+      "era": "1685–1753",
+      "cardLandscape": "share/thinkers/he/berkeley.png",
+      "cardPortrait": "share/thinkers/portrait/he/berkeley.png",
+      "page": "t/berkeley-he.html"
+    },
+    {
+      "thinkerId": "bostrom",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "ניק בוסטרום",
+      "era": "1973–",
+      "cardLandscape": "share/thinkers/he/bostrom.png",
+      "cardPortrait": "share/thinkers/portrait/he/bostrom.png",
+      "page": "t/bostrom-he.html"
+    },
+    {
+      "thinkerId": "thomson",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "ג'ודית ג'רביס תומסון",
+      "era": "1929–2020",
+      "cardLandscape": "share/thinkers/he/thomson.png",
+      "cardPortrait": "share/thinkers/portrait/he/thomson.png",
+      "page": "t/thomson-he.html"
+    },
+    {
+      "thinkerId": "wundt",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "וילהלם וונדט",
+      "era": "1832–1920",
+      "cardLandscape": "share/thinkers/he/wundt.png",
+      "cardPortrait": "share/thinkers/portrait/he/wundt.png",
+      "page": "t/wundt-he.html"
+    },
+    {
+      "thinkerId": "james",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "ויליאם ג'יימס",
+      "era": "1842–1910",
+      "cardLandscape": "share/thinkers/he/james.png",
+      "cardPortrait": "share/thinkers/portrait/he/james.png",
+      "page": "t/james-he.html"
+    },
+    {
+      "thinkerId": "freud",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "זיגמונד פרויד",
+      "era": "1856–1939",
+      "cardLandscape": "share/thinkers/he/freud.png",
+      "cardPortrait": "share/thinkers/portrait/he/freud.png",
+      "page": "t/freud-he.html"
+    },
+    {
+      "thinkerId": "jung",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "קרל גוסטב יונג",
+      "era": "1875–1961",
+      "cardLandscape": "share/thinkers/he/jung.png",
+      "cardPortrait": "share/thinkers/portrait/he/jung.png",
+      "page": "t/jung-he.html"
+    },
+    {
+      "thinkerId": "skinner",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "ב.פ. סקינר",
+      "era": "1904–1990",
+      "cardLandscape": "share/thinkers/he/skinner.png",
+      "cardPortrait": "share/thinkers/portrait/he/skinner.png",
+      "page": "t/skinner-he.html"
+    },
+    {
+      "thinkerId": "rogers",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "קרל רוג'רס",
+      "era": "1902–1987",
+      "cardLandscape": "share/thinkers/he/rogers.png",
+      "cardPortrait": "share/thinkers/portrait/he/rogers.png",
+      "page": "t/rogers-he.html"
+    },
+    {
+      "thinkerId": "adler",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "אלפרד אדלר",
+      "era": "1870–1937",
+      "cardLandscape": "share/thinkers/he/adler.png",
+      "cardPortrait": "share/thinkers/portrait/he/adler.png",
+      "page": "t/adler-he.html"
+    },
+    {
+      "thinkerId": "maslow",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "אברהם מאסלו",
+      "era": "1908–1970",
+      "cardLandscape": "share/thinkers/he/maslow.png",
+      "cardPortrait": "share/thinkers/portrait/he/maslow.png",
+      "page": "t/maslow-he.html"
+    },
+    {
+      "thinkerId": "frankl",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "ויקטור פרנקל",
+      "era": "1905–1997",
+      "cardLandscape": "share/thinkers/he/frankl.png",
+      "cardPortrait": "share/thinkers/portrait/he/frankl.png",
+      "page": "t/frankl-he.html"
+    },
+    {
+      "thinkerId": "fromm",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "אריך פרום",
+      "era": "1900–1980",
+      "cardLandscape": "share/thinkers/he/fromm.png",
+      "cardPortrait": "share/thinkers/portrait/he/fromm.png",
+      "page": "t/fromm-he.html"
+    },
+    {
+      "thinkerId": "deci",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "אדוארד דצ'י",
+      "era": "1942–",
+      "cardLandscape": "share/thinkers/he/deci.png",
+      "cardPortrait": "share/thinkers/portrait/he/deci.png",
+      "page": "t/deci-he.html"
+    },
+    {
+      "thinkerId": "bowlby",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "ג'ון בולבי",
+      "era": "1907–1990",
+      "cardLandscape": "share/thinkers/he/bowlby.png",
+      "cardPortrait": "share/thinkers/portrait/he/bowlby.png",
+      "page": "t/bowlby-he.html"
+    },
+    {
+      "thinkerId": "winnicott",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "דונלד ויניקוט",
+      "era": "1896–1971",
+      "cardLandscape": "share/thinkers/he/winnicott.png",
+      "cardPortrait": "share/thinkers/portrait/he/winnicott.png",
+      "page": "t/winnicott-he.html"
+    },
+    {
+      "thinkerId": "erikson",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "אריק אריקסון",
+      "era": "1902–1994",
+      "cardLandscape": "share/thinkers/he/erikson.png",
+      "cardPortrait": "share/thinkers/portrait/he/erikson.png",
+      "page": "t/erikson-he.html"
+    },
+    {
+      "thinkerId": "kohut",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "היינץ קוהוט",
+      "era": "1913–1981",
+      "cardLandscape": "share/thinkers/he/kohut.png",
+      "cardPortrait": "share/thinkers/portrait/he/kohut.png",
+      "page": "t/kohut-he.html"
+    },
+    {
+      "thinkerId": "bandura",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "אלברט בנדורה",
+      "era": "1925–2021",
+      "cardLandscape": "share/thinkers/he/bandura.png",
+      "cardPortrait": "share/thinkers/portrait/he/bandura.png",
+      "page": "t/bandura-he.html"
+    },
+    {
+      "thinkerId": "klein",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "מלאני קליין",
+      "era": "1882–1960",
+      "cardLandscape": "share/thinkers/he/klein.png",
+      "cardPortrait": "share/thinkers/portrait/he/klein.png",
+      "page": "t/klein-he.html"
+    },
+    {
+      "thinkerId": "anna-freud",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "אנה פרויד",
+      "era": "1895–1982",
+      "cardLandscape": "share/thinkers/he/anna-freud.png",
+      "cardPortrait": "share/thinkers/portrait/he/anna-freud.png",
+      "page": "t/anna-freud-he.html"
+    },
+    {
+      "thinkerId": "beck",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "אהרון בק",
+      "era": "1921–2021",
+      "cardLandscape": "share/thinkers/he/beck.png",
+      "cardPortrait": "share/thinkers/portrait/he/beck.png",
+      "page": "t/beck-he.html"
+    },
+    {
+      "thinkerId": "van-der-kolk",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "בסל ון דר קולק",
+      "era": "1943–",
+      "cardLandscape": "share/thinkers/he/van-der-kolk.png",
+      "cardPortrait": "share/thinkers/portrait/he/van-der-kolk.png",
+      "page": "t/van-der-kolk-he.html"
+    },
+    {
+      "thinkerId": "mill-econ",
+      "subject": "economics",
+      "lang": "he",
+      "name": "ג'ון סטיוארט מיל",
+      "era": "1806–1873",
+      "cardLandscape": "share/thinkers/he/mill-econ.png",
+      "cardPortrait": "share/thinkers/portrait/he/mill-econ.png",
+      "page": "t/mill-econ-he.html"
+    },
+    {
+      "thinkerId": "smith",
+      "subject": "economics",
+      "lang": "he",
+      "name": "אדם סמית",
+      "era": "1723–1790",
+      "cardLandscape": "share/thinkers/he/smith.png",
+      "cardPortrait": "share/thinkers/portrait/he/smith.png",
+      "page": "t/smith-he.html"
+    },
+    {
+      "thinkerId": "locke",
+      "subject": "economics",
+      "lang": "he",
+      "name": "ג'ון לוק",
+      "era": "1632–1704",
+      "cardLandscape": "share/thinkers/he/locke.png",
+      "cardPortrait": "share/thinkers/portrait/he/locke.png",
+      "page": "t/locke-he.html"
+    },
+    {
+      "thinkerId": "samuelson",
+      "subject": "economics",
+      "lang": "he",
+      "name": "פול סמואלסון",
+      "era": "1915–2009",
+      "cardLandscape": "share/thinkers/he/samuelson.png",
+      "cardPortrait": "share/thinkers/portrait/he/samuelson.png",
+      "page": "t/samuelson-he.html"
+    },
+    {
+      "thinkerId": "marx",
+      "subject": "economics",
+      "lang": "he",
+      "name": "קרל מרקס",
+      "era": "1818–1883",
+      "cardLandscape": "share/thinkers/he/marx.png",
+      "cardPortrait": "share/thinkers/portrait/he/marx.png",
+      "page": "t/marx-he.html"
+    },
+    {
+      "thinkerId": "walras",
+      "subject": "economics",
+      "lang": "he",
+      "name": "לאון וולראס",
+      "era": "1834–1910",
+      "cardLandscape": "share/thinkers/he/walras.png",
+      "cardPortrait": "share/thinkers/portrait/he/walras.png",
+      "page": "t/walras-he.html"
+    },
+    {
+      "thinkerId": "sandel",
+      "subject": "economics",
+      "lang": "he",
+      "name": "מייקל סנדל",
+      "era": "1953–",
+      "cardLandscape": "share/thinkers/he/sandel.png",
+      "cardPortrait": "share/thinkers/portrait/he/sandel.png",
+      "page": "t/sandel-he.html"
+    },
+    {
+      "thinkerId": "keynes",
+      "subject": "economics",
+      "lang": "he",
+      "name": "ג'ון מיינרד קיינס",
+      "era": "1883–1946",
+      "cardLandscape": "share/thinkers/he/keynes.png",
+      "cardPortrait": "share/thinkers/portrait/he/keynes.png",
+      "page": "t/keynes-he.html"
+    },
+    {
+      "thinkerId": "friedman",
+      "subject": "economics",
+      "lang": "he",
+      "name": "מילטון פרידמן",
+      "era": "1912–2006",
+      "cardLandscape": "share/thinkers/he/friedman.png",
+      "cardPortrait": "share/thinkers/portrait/he/friedman.png",
+      "page": "t/friedman-he.html"
+    },
+    {
+      "thinkerId": "sen",
+      "subject": "economics",
+      "lang": "he",
+      "name": "אמרטיה סן",
+      "era": "1933–",
+      "cardLandscape": "share/thinkers/he/sen.png",
+      "cardPortrait": "share/thinkers/portrait/he/sen.png",
+      "page": "t/sen-he.html"
+    },
+    {
+      "thinkerId": "jevons",
+      "subject": "economics",
+      "lang": "he",
+      "name": "ויליאם סטנלי ג'בונס",
+      "era": "1835–1882",
+      "cardLandscape": "share/thinkers/he/jevons.png",
+      "cardPortrait": "share/thinkers/portrait/he/jevons.png",
+      "page": "t/jevons-he.html"
+    },
+    {
+      "thinkerId": "marshall",
+      "subject": "economics",
+      "lang": "he",
+      "name": "אלפרד מרשל",
+      "era": "1842–1924",
+      "cardLandscape": "share/thinkers/he/marshall.png",
+      "cardPortrait": "share/thinkers/portrait/he/marshall.png",
+      "page": "t/marshall-he.html"
+    },
+    {
+      "thinkerId": "kahneman",
+      "subject": "economics",
+      "lang": "he",
+      "name": "דניאל קהנמן",
+      "era": "1934–2024",
+      "cardLandscape": "share/thinkers/he/kahneman-economics.png",
+      "cardPortrait": "share/thinkers/portrait/he/kahneman-economics.png",
+      "page": "t/kahneman-economics-he.html"
+    },
+    {
+      "thinkerId": "kahneman",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "דניאל קהנמן",
+      "era": "1934–2024",
+      "cardLandscape": "share/thinkers/he/kahneman-psychology.png",
+      "cardPortrait": "share/thinkers/portrait/he/kahneman-psychology.png",
+      "page": "t/kahneman-psychology-he.html"
+    },
+    {
+      "thinkerId": "ricardo",
+      "subject": "economics",
+      "lang": "he",
+      "name": "דייוויד ריקרדו",
+      "era": "1772–1823",
+      "cardLandscape": "share/thinkers/he/ricardo.png",
+      "cardPortrait": "share/thinkers/portrait/he/ricardo.png",
+      "page": "t/ricardo-he.html"
+    },
+    {
+      "thinkerId": "piketty",
+      "subject": "economics",
+      "lang": "he",
+      "name": "תומאס פיקטי",
+      "era": "1971–",
+      "cardLandscape": "share/thinkers/he/piketty.png",
+      "cardPortrait": "share/thinkers/portrait/he/piketty.png",
+      "page": "t/piketty-he.html"
+    },
+    {
+      "thinkerId": "aquinas",
+      "subject": "economics",
+      "lang": "he",
+      "name": "תומאס אקווינס",
+      "era": "1225–1274",
+      "cardLandscape": "share/thinkers/he/aquinas.png",
+      "cardPortrait": "share/thinkers/portrait/he/aquinas.png",
+      "page": "t/aquinas-he.html"
+    },
+    {
+      "thinkerId": "pareto",
+      "subject": "economics",
+      "lang": "he",
+      "name": "וילפרדו פארטו",
+      "era": "1848–1923",
+      "cardLandscape": "share/thinkers/he/pareto.png",
+      "cardPortrait": "share/thinkers/portrait/he/pareto.png",
+      "page": "t/pareto-he.html"
+    },
+    {
+      "thinkerId": "rawls",
+      "subject": "economics",
+      "lang": "he",
+      "name": "ג'ון רולס",
+      "era": "1921–2002",
+      "cardLandscape": "share/thinkers/he/rawls.png",
+      "cardPortrait": "share/thinkers/portrait/he/rawls.png",
+      "page": "t/rawls-he.html"
+    },
+    {
+      "thinkerId": "nozick",
+      "subject": "economics",
+      "lang": "he",
+      "name": "רוברט נוזיק",
+      "era": "1938–2002",
+      "cardLandscape": "share/thinkers/he/nozick.png",
+      "cardPortrait": "share/thinkers/portrait/he/nozick.png",
+      "page": "t/nozick-he.html"
+    },
+    {
+      "thinkerId": "hayek",
+      "subject": "economics",
+      "lang": "he",
+      "name": "פרידריך הייק",
+      "era": "1899–1992",
+      "cardLandscape": "share/thinkers/he/hayek.png",
+      "cardPortrait": "share/thinkers/portrait/he/hayek.png",
+      "page": "t/hayek-he.html"
+    },
+    {
+      "thinkerId": "socrates",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Socrates",
+      "era": "470–399 BCE",
+      "cardLandscape": "share/thinkers/en/socrates.png",
+      "cardPortrait": "share/thinkers/portrait/en/socrates.png",
+      "page": "t/socrates-en.html"
+    },
+    {
+      "thinkerId": "plato",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Plato",
+      "era": "428–348 BCE",
+      "cardLandscape": "share/thinkers/en/plato.png",
+      "cardPortrait": "share/thinkers/portrait/en/plato.png",
+      "page": "t/plato-en.html"
+    },
+    {
+      "thinkerId": "russell",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Bertrand Russell",
+      "era": "1872–1970",
+      "cardLandscape": "share/thinkers/en/russell.png",
+      "cardPortrait": "share/thinkers/portrait/en/russell.png",
+      "page": "t/russell-en.html"
+    },
+    {
+      "thinkerId": "wittgenstein",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Wittgenstein",
+      "era": "1889–1951",
+      "cardLandscape": "share/thinkers/en/wittgenstein.png",
+      "cardPortrait": "share/thinkers/portrait/en/wittgenstein.png",
+      "page": "t/wittgenstein-en.html"
+    },
+    {
+      "thinkerId": "aurelius",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Marcus Aurelius",
+      "era": "121–180 CE",
+      "cardLandscape": "share/thinkers/en/aurelius.png",
+      "cardPortrait": "share/thinkers/portrait/en/aurelius.png",
+      "page": "t/aurelius-en.html"
+    },
+    {
+      "thinkerId": "aristotle",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Aristotle",
+      "era": "384–322 BCE",
+      "cardLandscape": "share/thinkers/en/aristotle.png",
+      "cardPortrait": "share/thinkers/portrait/en/aristotle.png",
+      "page": "t/aristotle-en.html"
+    },
+    {
+      "thinkerId": "descartes",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Descartes",
+      "era": "1596–1650",
+      "cardLandscape": "share/thinkers/en/descartes.png",
+      "cardPortrait": "share/thinkers/portrait/en/descartes.png",
+      "page": "t/descartes-en.html"
+    },
+    {
+      "thinkerId": "kant",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Immanuel Kant",
+      "era": "1724–1804",
+      "cardLandscape": "share/thinkers/en/kant.png",
+      "cardPortrait": "share/thinkers/portrait/en/kant.png",
+      "page": "t/kant-en.html"
+    },
+    {
+      "thinkerId": "mill",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "John Stuart Mill",
+      "era": "1806–1873",
+      "cardLandscape": "share/thinkers/en/mill.png",
+      "cardPortrait": "share/thinkers/portrait/en/mill.png",
+      "page": "t/mill-en.html"
+    },
+    {
+      "thinkerId": "nietzsche",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Friedrich Nietzsche",
+      "era": "1844–1900",
+      "cardLandscape": "share/thinkers/en/nietzsche.png",
+      "cardPortrait": "share/thinkers/portrait/en/nietzsche.png",
+      "page": "t/nietzsche-en.html"
+    },
+    {
+      "thinkerId": "hume",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "David Hume",
+      "era": "1711–1776",
+      "cardLandscape": "share/thinkers/en/hume.png",
+      "cardPortrait": "share/thinkers/portrait/en/hume.png",
+      "page": "t/hume-en.html"
+    },
+    {
+      "thinkerId": "gettier",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Edmund Gettier",
+      "era": "1927–2021",
+      "cardLandscape": "share/thinkers/en/gettier.png",
+      "cardPortrait": "share/thinkers/portrait/en/gettier.png",
+      "page": "t/gettier-en.html"
+    },
+    {
+      "thinkerId": "popper",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Karl Popper",
+      "era": "1902–1994",
+      "cardLandscape": "share/thinkers/en/popper.png",
+      "cardPortrait": "share/thinkers/portrait/en/popper.png",
+      "page": "t/popper-en.html"
+    },
+    {
+      "thinkerId": "spinoza",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Baruch Spinoza",
+      "era": "1632–1677",
+      "cardLandscape": "share/thinkers/en/spinoza.png",
+      "cardPortrait": "share/thinkers/portrait/en/spinoza.png",
+      "page": "t/spinoza-en.html"
+    },
+    {
+      "thinkerId": "berkeley",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "George Berkeley",
+      "era": "1685–1753",
+      "cardLandscape": "share/thinkers/en/berkeley.png",
+      "cardPortrait": "share/thinkers/portrait/en/berkeley.png",
+      "page": "t/berkeley-en.html"
+    },
+    {
+      "thinkerId": "thomson",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Judith Jarvis Thomson",
+      "era": "1929–2020",
+      "cardLandscape": "share/thinkers/en/thomson.png",
+      "cardPortrait": "share/thinkers/portrait/en/thomson.png",
+      "page": "t/thomson-en.html"
+    },
+    {
+      "thinkerId": "bostrom",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Nick Bostrom",
+      "era": "1973–",
+      "cardLandscape": "share/thinkers/en/bostrom.png",
+      "cardPortrait": "share/thinkers/portrait/en/bostrom.png",
+      "page": "t/bostrom-en.html"
+    },
+    {
+      "thinkerId": "mill-econ",
+      "subject": "economics",
+      "lang": "en",
+      "name": "John Stuart Mill",
+      "era": "1806–1873",
+      "cardLandscape": "share/thinkers/en/mill-econ.png",
+      "cardPortrait": "share/thinkers/portrait/en/mill-econ.png",
+      "page": "t/mill-econ-en.html"
+    },
+    {
+      "thinkerId": "smith",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Adam Smith",
+      "era": "1723–1790",
+      "cardLandscape": "share/thinkers/en/smith.png",
+      "cardPortrait": "share/thinkers/portrait/en/smith.png",
+      "page": "t/smith-en.html"
+    },
+    {
+      "thinkerId": "locke",
+      "subject": "economics",
+      "lang": "en",
+      "name": "John Locke",
+      "era": "1632–1704",
+      "cardLandscape": "share/thinkers/en/locke.png",
+      "cardPortrait": "share/thinkers/portrait/en/locke.png",
+      "page": "t/locke-en.html"
+    },
+    {
+      "thinkerId": "samuelson",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Paul Samuelson",
+      "era": "1915–2009",
+      "cardLandscape": "share/thinkers/en/samuelson.png",
+      "cardPortrait": "share/thinkers/portrait/en/samuelson.png",
+      "page": "t/samuelson-en.html"
+    },
+    {
+      "thinkerId": "marx",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Karl Marx",
+      "era": "1818–1883",
+      "cardLandscape": "share/thinkers/en/marx.png",
+      "cardPortrait": "share/thinkers/portrait/en/marx.png",
+      "page": "t/marx-en.html"
+    },
+    {
+      "thinkerId": "walras",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Léon Walras",
+      "era": "1834–1910",
+      "cardLandscape": "share/thinkers/en/walras.png",
+      "cardPortrait": "share/thinkers/portrait/en/walras.png",
+      "page": "t/walras-en.html"
+    },
+    {
+      "thinkerId": "sandel",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Michael Sandel",
+      "era": "1953–",
+      "cardLandscape": "share/thinkers/en/sandel.png",
+      "cardPortrait": "share/thinkers/portrait/en/sandel.png",
+      "page": "t/sandel-en.html"
+    },
+    {
+      "thinkerId": "keynes",
+      "subject": "economics",
+      "lang": "en",
+      "name": "John Maynard Keynes",
+      "era": "1883–1946",
+      "cardLandscape": "share/thinkers/en/keynes.png",
+      "cardPortrait": "share/thinkers/portrait/en/keynes.png",
+      "page": "t/keynes-en.html"
+    },
+    {
+      "thinkerId": "friedman",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Milton Friedman",
+      "era": "1912–2006",
+      "cardLandscape": "share/thinkers/en/friedman.png",
+      "cardPortrait": "share/thinkers/portrait/en/friedman.png",
+      "page": "t/friedman-en.html"
+    },
+    {
+      "thinkerId": "sen",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Amartya Sen",
+      "era": "1933–",
+      "cardLandscape": "share/thinkers/en/sen.png",
+      "cardPortrait": "share/thinkers/portrait/en/sen.png",
+      "page": "t/sen-en.html"
+    },
+    {
+      "thinkerId": "jevons",
+      "subject": "economics",
+      "lang": "en",
+      "name": "William Stanley Jevons",
+      "era": "1835–1882",
+      "cardLandscape": "share/thinkers/en/jevons.png",
+      "cardPortrait": "share/thinkers/portrait/en/jevons.png",
+      "page": "t/jevons-en.html"
+    },
+    {
+      "thinkerId": "marshall",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Alfred Marshall",
+      "era": "1842–1924",
+      "cardLandscape": "share/thinkers/en/marshall.png",
+      "cardPortrait": "share/thinkers/portrait/en/marshall.png",
+      "page": "t/marshall-en.html"
+    },
+    {
+      "thinkerId": "kahneman",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Daniel Kahneman",
+      "era": "1934–2024",
+      "cardLandscape": "share/thinkers/en/kahneman-economics.png",
+      "cardPortrait": "share/thinkers/portrait/en/kahneman-economics.png",
+      "page": "t/kahneman-economics-en.html"
+    },
+    {
+      "thinkerId": "kahneman",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Daniel Kahneman",
+      "era": "1934–2024",
+      "cardLandscape": "share/thinkers/en/kahneman-psychology.png",
+      "cardPortrait": "share/thinkers/portrait/en/kahneman-psychology.png",
+      "page": "t/kahneman-psychology-en.html"
+    },
+    {
+      "thinkerId": "ricardo",
+      "subject": "economics",
+      "lang": "en",
+      "name": "David Ricardo",
+      "era": "1772–1823",
+      "cardLandscape": "share/thinkers/en/ricardo.png",
+      "cardPortrait": "share/thinkers/portrait/en/ricardo.png",
+      "page": "t/ricardo-en.html"
+    },
+    {
+      "thinkerId": "piketty",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Thomas Piketty",
+      "era": "1971–",
+      "cardLandscape": "share/thinkers/en/piketty.png",
+      "cardPortrait": "share/thinkers/portrait/en/piketty.png",
+      "page": "t/piketty-en.html"
+    },
+    {
+      "thinkerId": "aquinas",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Thomas Aquinas",
+      "era": "1225–1274",
+      "cardLandscape": "share/thinkers/en/aquinas.png",
+      "cardPortrait": "share/thinkers/portrait/en/aquinas.png",
+      "page": "t/aquinas-en.html"
+    },
+    {
+      "thinkerId": "pareto",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Vilfredo Pareto",
+      "era": "1848–1923",
+      "cardLandscape": "share/thinkers/en/pareto.png",
+      "cardPortrait": "share/thinkers/portrait/en/pareto.png",
+      "page": "t/pareto-en.html"
+    },
+    {
+      "thinkerId": "rawls",
+      "subject": "economics",
+      "lang": "en",
+      "name": "John Rawls",
+      "era": "1921–2002",
+      "cardLandscape": "share/thinkers/en/rawls.png",
+      "cardPortrait": "share/thinkers/portrait/en/rawls.png",
+      "page": "t/rawls-en.html"
+    },
+    {
+      "thinkerId": "nozick",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Robert Nozick",
+      "era": "1938–2002",
+      "cardLandscape": "share/thinkers/en/nozick.png",
+      "cardPortrait": "share/thinkers/portrait/en/nozick.png",
+      "page": "t/nozick-en.html"
+    },
+    {
+      "thinkerId": "hayek",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Friedrich Hayek",
+      "era": "1899–1992",
+      "cardLandscape": "share/thinkers/en/hayek.png",
+      "cardPortrait": "share/thinkers/portrait/en/hayek.png",
+      "page": "t/hayek-en.html"
+    },
+    {
+      "thinkerId": "wundt",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Wilhelm Wundt",
+      "era": "1832–1920",
+      "cardLandscape": "share/thinkers/en/wundt.png",
+      "cardPortrait": "share/thinkers/portrait/en/wundt.png",
+      "page": "t/wundt-en.html"
+    },
+    {
+      "thinkerId": "james",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "William James",
+      "era": "1842–1910",
+      "cardLandscape": "share/thinkers/en/james.png",
+      "cardPortrait": "share/thinkers/portrait/en/james.png",
+      "page": "t/james-en.html"
+    },
+    {
+      "thinkerId": "freud",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Sigmund Freud",
+      "era": "1856–1939",
+      "cardLandscape": "share/thinkers/en/freud.png",
+      "cardPortrait": "share/thinkers/portrait/en/freud.png",
+      "page": "t/freud-en.html"
+    },
+    {
+      "thinkerId": "jung",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Carl Gustav Jung",
+      "era": "1875–1961",
+      "cardLandscape": "share/thinkers/en/jung.png",
+      "cardPortrait": "share/thinkers/portrait/en/jung.png",
+      "page": "t/jung-en.html"
+    },
+    {
+      "thinkerId": "skinner",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "B. F. Skinner",
+      "era": "1904–1990",
+      "cardLandscape": "share/thinkers/en/skinner.png",
+      "cardPortrait": "share/thinkers/portrait/en/skinner.png",
+      "page": "t/skinner-en.html"
+    },
+    {
+      "thinkerId": "rogers",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Carl Rogers",
+      "era": "1902–1987",
+      "cardLandscape": "share/thinkers/en/rogers.png",
+      "cardPortrait": "share/thinkers/portrait/en/rogers.png",
+      "page": "t/rogers-en.html"
+    },
+    {
+      "thinkerId": "adler",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Alfred Adler",
+      "era": "1870–1937",
+      "cardLandscape": "share/thinkers/en/adler.png",
+      "cardPortrait": "share/thinkers/portrait/en/adler.png",
+      "page": "t/adler-en.html"
+    },
+    {
+      "thinkerId": "maslow",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Abraham Maslow",
+      "era": "1908–1970",
+      "cardLandscape": "share/thinkers/en/maslow.png",
+      "cardPortrait": "share/thinkers/portrait/en/maslow.png",
+      "page": "t/maslow-en.html"
+    },
+    {
+      "thinkerId": "frankl",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Viktor Frankl",
+      "era": "1905–1997",
+      "cardLandscape": "share/thinkers/en/frankl.png",
+      "cardPortrait": "share/thinkers/portrait/en/frankl.png",
+      "page": "t/frankl-en.html"
+    },
+    {
+      "thinkerId": "fromm",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Erich Fromm",
+      "era": "1900–1980",
+      "cardLandscape": "share/thinkers/en/fromm.png",
+      "cardPortrait": "share/thinkers/portrait/en/fromm.png",
+      "page": "t/fromm-en.html"
+    },
+    {
+      "thinkerId": "deci",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Edward Deci",
+      "era": "1942–",
+      "cardLandscape": "share/thinkers/en/deci.png",
+      "cardPortrait": "share/thinkers/portrait/en/deci.png",
+      "page": "t/deci-en.html"
+    },
+    {
+      "thinkerId": "bowlby",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "John Bowlby",
+      "era": "1907–1990",
+      "cardLandscape": "share/thinkers/en/bowlby.png",
+      "cardPortrait": "share/thinkers/portrait/en/bowlby.png",
+      "page": "t/bowlby-en.html"
+    },
+    {
+      "thinkerId": "winnicott",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "D. W. Winnicott",
+      "era": "1896–1971",
+      "cardLandscape": "share/thinkers/en/winnicott.png",
+      "cardPortrait": "share/thinkers/portrait/en/winnicott.png",
+      "page": "t/winnicott-en.html"
+    },
+    {
+      "thinkerId": "erikson",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Erik Erikson",
+      "era": "1902–1994",
+      "cardLandscape": "share/thinkers/en/erikson.png",
+      "cardPortrait": "share/thinkers/portrait/en/erikson.png",
+      "page": "t/erikson-en.html"
+    },
+    {
+      "thinkerId": "kohut",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Heinz Kohut",
+      "era": "1913–1981",
+      "cardLandscape": "share/thinkers/en/kohut.png",
+      "cardPortrait": "share/thinkers/portrait/en/kohut.png",
+      "page": "t/kohut-en.html"
+    },
+    {
+      "thinkerId": "bandura",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Albert Bandura",
+      "era": "1925–2021",
+      "cardLandscape": "share/thinkers/en/bandura.png",
+      "cardPortrait": "share/thinkers/portrait/en/bandura.png",
+      "page": "t/bandura-en.html"
+    },
+    {
+      "thinkerId": "klein",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Melanie Klein",
+      "era": "1882–1960",
+      "cardLandscape": "share/thinkers/en/klein.png",
+      "cardPortrait": "share/thinkers/portrait/en/klein.png",
+      "page": "t/klein-en.html"
+    },
+    {
+      "thinkerId": "anna-freud",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Anna Freud",
+      "era": "1895–1982",
+      "cardLandscape": "share/thinkers/en/anna-freud.png",
+      "cardPortrait": "share/thinkers/portrait/en/anna-freud.png",
+      "page": "t/anna-freud-en.html"
+    },
+    {
+      "thinkerId": "beck",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Aaron Beck",
+      "era": "1921–2021",
+      "cardLandscape": "share/thinkers/en/beck.png",
+      "cardPortrait": "share/thinkers/portrait/en/beck.png",
+      "page": "t/beck-en.html"
+    },
+    {
+      "thinkerId": "van-der-kolk",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Bessel van der Kolk",
+      "era": "1943–",
+      "cardLandscape": "share/thinkers/en/van-der-kolk.png",
+      "cardPortrait": "share/thinkers/portrait/en/van-der-kolk.png",
+      "page": "t/van-der-kolk-en.html"
+    }
+  ]
+}

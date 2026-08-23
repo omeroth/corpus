@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>עמנואל קאנט · Corpus</title>
+<meta name="description" content="עמנואל קאנט ב-Corpus — 1724–1804. 5 דקות ביום עם גדולי ההוגים.">
+
+<meta property="og:type" content="profile">
+<meta property="og:title" content="עמנואל קאנט">
+<meta property="og:description" content="עמנואל קאנט ב-Corpus — 1724–1804. 5 דקות ביום עם גדולי ההוגים.">
+<meta property="og:image" content="https://corpusapp.io/share/thinkers/he/kant.png">
+<meta property="og:image:secure_url" content="https://corpusapp.io/share/thinkers/he/kant.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://corpusapp.io/t/kant-he.html">
+<meta property="og:site_name" content="Corpus">
+<meta property="og:locale" content="he_IL">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="עמנואל קאנט">
+<meta name="twitter:description" content="עמנואל קאנט ב-Corpus — 1724–1804. 5 דקות ביום עם גדולי ההוגים.">
+<meta name="twitter:image" content="https://corpusapp.io/share/thinkers/he/kant.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Rubik:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:      #F8F5FF;
+    --plate:   #FDFBF6;
+    --rim:     #E5C158;
+    --wordmark: #7B4FD4;
+    --name:    #2A1266;
+    --era:     #9A80C4;
+    --question: #5A35A8;
+    --url:     #B8860B;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--name);
+    font-family: 'Rubik', sans-serif;
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    text-align: center;
+  }
+  .wordmark {
+    font-family: 'Nunito', 'Rubik', sans-serif;
+    font-weight: 900;
+    font-size: 26px;
+    color: var(--wordmark);
+    letter-spacing: -0.7px;
+    margin-bottom: 32px;
+  }
+  .card {
+    display: block;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto 32px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  }
+  .redirecting {
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--name);
+    margin-bottom: 20px;
+    opacity: 0.75;
+  }
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 16px;
+    text-decoration: none;
+    background: var(--wordmark);
+    color: #FFFFFF;
+    transition: transform .15s;
+  }
+  .cta:active { transform: scale(.97); }
+  .url {
+    display: block;
+    margin-top: 32px;
+    color: var(--url);
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="wordmark">Corpus</div>
+  <img class="card" src="https://corpusapp.io/share/thinkers/he/kant.png" alt="עמנואל קאנט" width="1200" height="630">
+  <p class="redirecting">פותח את Corpus…</p>
+  <a class="cta" id="manual" href="https://apps.apple.com/app/id6781227385">פתח את Corpus</a>
+  <a class="url" href="https://corpusapp.io">corpusapp.io</a>
+</main>
+<script>
+  (function () {
+    var POSTHOG_KEY = 'phc_vUupVqSRdBay7mQ4Aswudhu8mFHnych6PKNRpP6BHoS4';
+    var POSTHOG_URL = 'https://us.i.posthog.com/i/v0/e/';
+    var distinctId = (window.crypto && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : ('anon-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+
+    var ua = navigator.userAgent || '';
+    var isIOS     = /iPhone|iPad|iPod/i.test(ua);
+    var isAndroid = /Android/i.test(ua);
+    var target     = "https://corpusapp.io";
+    var targetKind = 'desktop';
+    if (isIOS)          { target = "https://apps.apple.com/app/id6781227385";     targetKind = 'ios'; }
+    else if (isAndroid) { target = "https://play.google.com/store/apps/details?id=com.corpusapp.corpus"; targetKind = 'android'; }
+
+    var baseProps = {
+      thinker_id: "kant",
+      subject:    "philosophy",
+      lang:       "he",
+      target:     targetKind,
+      referrer:   document.referrer || null,
+      $process_person_profile: false
+    };
+
+    function beacon(event, extraProps) {
+      var props = extraProps ? Object.assign({}, baseProps, extraProps) : baseProps;
+      var payload = {
+        api_key:     POSTHOG_KEY,
+        event:       event,
+        distinct_id: distinctId,
+        properties:  props,
+        timestamp:   new Date().toISOString()
+      };
+      try {
+        var blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
+        navigator.sendBeacon(POSTHOG_URL, blob);
+      } catch (e) { /* never block the redirect on capture failure */ }
+    }
+
+    beacon('thinker_landing_page_view');
+
+    var manual = document.getElementById('manual');
+    if (manual) {
+      manual.href = target;
+      manual.addEventListener('click', function () {
+        beacon('thinker_landing_cta_click');
+      });
+    }
+
+    setTimeout(function () { location.replace(target); }, 250);
+  })();
+</script>
+</body>
+</html>

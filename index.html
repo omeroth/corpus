@@ -4389,6 +4389,78 @@
     box-shadow: 0 2px 0 0 var(--accent-dark);
   }
 
+  /* ── Screenshot-detected prompt (iOS-only surface) ── */
+  .screenshot-prompt {
+    position: fixed;
+    left: 50%;
+    /* Bottom-anchored above the bottom nav on nav-visible screens
+       (home, pantheon, profile all keep the nav) and above just the
+       safe-area on reader / dc-thinker (no nav). The offer only
+       fires on dc-thinker-screen right now, where nav is hidden, so
+       72px is the wrong assumption most of the time — 24px + safe
+       is the right default. */
+    bottom: calc(24px + var(--safe-bottom, 0px));
+    transform: translate(-50%, 20px);
+    opacity: 0;
+    z-index: 300;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 12px 10px 20px;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border-deep, var(--border));
+    border-radius: 999px;
+    /* Stronger shadow than a normal toast: the pill sits over the
+       dc-thinker-screen's pale-tinted --bg (philosophy #F8F5FF etc.)
+       where a subtle shadow would let it blend in. Enough elevation
+       to read clearly on any light surface, still soft enough not to
+       feel modal-heavy. */
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.20), 0 2px 6px rgba(0, 0, 0, 0.08);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .screenshot-prompt.visible { opacity: 1; transform: translate(-50%, 0); }
+  .screenshot-prompt-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .screenshot-prompt-action {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 16px;
+    background: var(--accent);
+    color: var(--on-accent);
+    border: none;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter 0.15s;
+  }
+  .screenshot-prompt-action:active { filter: brightness(0.9); }
+  .screenshot-prompt-dismiss {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0;
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .screenshot-prompt-dismiss:active { opacity: 0.6; }
+
   /* ── Streak indicator ── */
   .streak-toast {
     position: fixed;
@@ -6590,6 +6662,13 @@
   .dc-share-btn:hover { filter: brightness(1.05); }
   .dc-share-btn:active { transform: scale(0.94); }
   .dc-share-btn svg { flex-shrink: 0; }
+  /* Thinker-card share sits inside `.dc-actions` alongside the full-
+     width primary buttons; align-self centers it so it doesn't try to
+     stretch to the container width like next-lesson-btn / btn-back-home. */
+  .dc-share-thinker-btn { align-self: center; margin-top: 4px; }
+  /* Pantheon modal share button — same visual as dc-share-btn but
+     shifted onto its own row above the close button, centered. */
+  .thinker-modal-share-btn { margin-top: 12px; align-self: center; }
   /* Thinker screen */
   .dc-thinker-screen {
     justify-content: flex-start;
@@ -8674,6 +8753,17 @@
     <div class="dc-actions">
       <button class="next-lesson-btn" id="modal-next-btn" style="display:none"></button>
       <button class="btn-back-home" id="modal-continue-btn" onclick="closeCompleteModal()"></button>
+      <!-- Secondary "Share the card" action. Attaches the pre-rendered
+           810×1440 portrait PNG to the OS share sheet with a text +
+           /t/<stem> URL caption; falls back to URL-only if the
+           platform can't handle files. See _shareWithFileFallback. -->
+      <button class="dc-share-btn dc-share-thinker-btn" id="dc-share-thinker-btn" onclick="shareThinker()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        <span id="dc-share-thinker-btn-label"></span>
+      </button>
     </div>
   </div>
 </div>
@@ -8703,6 +8793,17 @@
     <!-- Secondary "Unlocks in Chapter X" line — only shown in the locked-teaser variant. -->
     <div class="thinker-detail-lock-line" id="thinker-modal-lock-line" style="display:none"></div>
     <div class="thinker-detail-quote" id="thinker-modal-quote"></div>
+    <!-- Share button — shown only in the unlocked variant (openThinkerModal
+         toggles display + wires onclick with the correct thinker id +
+         context subject). Same pill styling as the dialogue-completion
+         share; attaches the portrait via _shareWithFileFallback. -->
+    <button class="dc-share-btn thinker-modal-share-btn" id="thinker-modal-share-btn" style="display:none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+      <span id="thinker-modal-share-btn-label"></span>
+    </button>
     <button class="nav-btn" id="modal-close-btn" onclick="closeThinkerModal()" style="margin-top:8px">סגור</button>
   </div>
 </div>
@@ -8719,6 +8820,18 @@
 
 <!-- Streak repair modal — content rendered dynamically by _renderRepairQuestion / _showRepairResult. -->
 <div class="modal-overlay" id="modal-streak-repair"></div>
+
+<!-- Screenshot-detected prompt — bottom pill, text only, dismissible.
+     Fires ONLY on the two thinker surfaces (modal + dc-thinker-screen),
+     iOS-only (see _initScreenshotDetection comment for why). Do not
+     add a thumbnail — deliberately text-only so it's light and the
+     user doesn't feel caught. Auto-dismiss at 7s; any dismiss kills
+     the prompt for the rest of the session. -->
+<div id="screenshot-prompt" class="screenshot-prompt" style="display:none" role="status" aria-live="polite">
+  <span class="screenshot-prompt-text" id="screenshot-prompt-text"></span>
+  <button class="screenshot-prompt-action" id="screenshot-prompt-action" type="button"></button>
+  <button class="screenshot-prompt-dismiss" id="screenshot-prompt-dismiss" type="button" aria-label="Dismiss">×</button>
+</div>
 
 <!-- Share prompt overlay -->
 <div class="modal-overlay" id="modal-share">
@@ -8825,7 +8938,7 @@ if (typeof corpusData === 'undefined' || typeof economicsData === 'undefined'
 // App Store release. The iOS-only update-banner checkForUpdate() compares
 // this against corpusapp.io/version.json to decide whether to prompt the
 // user to grab the newest App Store build.
-const APP_VERSION = '1.2.7';
+const APP_VERSION = '1.2.8';
 
 const SUPABASE_URL = 'https://xcoikjoatcrjqxzykwlt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjb2lram9hdGNyanF4enlrd2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjc5NjYsImV4cCI6MjA4OTcwMzk2Nn0.5EhOsN9M4_kLYoRKO97dPGof8RN7PteXQrtKyx4CcKI';
@@ -15824,6 +15937,12 @@ function showThinkerCardScreen(thinker, chapter, day) {
   document.getElementById('thinker-unlock-box').classList.remove('flipped');
   document.getElementById('dc-thinker-title').textContent =
     isEn ? 'A new thinker joins the pantheon' : 'הוגה חדש מצטרף לפנתאון';
+  // Share-thinker button label (bilingual). The onclick is bound in HTML
+  // and reads state.currentWeek/Day to resolve the thinker at tap time.
+  const shareBtnLabel = document.getElementById('dc-share-thinker-btn-label');
+  if (shareBtnLabel) {
+    shareBtnLabel.textContent = isEn ? 'Share this card' : 'שתפו את הכרטיס';
+  }
 
   // Setup action buttons. Both wrap the queue drain so the winning
   // milestone celebration queued in finishDay (bonus_unlock OR
@@ -16817,24 +16936,43 @@ function showSharePrompt(onDone) {
 // ═══════════════════════════════════════════════════════════════════════
 // Share card generator + share entry points
 // ═══════════════════════════════════════════════════════════════════════
-// Landing-page share flow. The completion Share button hands the OS share
-// sheet a text + URL only — no file attachment. The URL points at the
-// build-generated /d/<slug>-<w>-<d>-<lang>.html landing page (see
-// scripts/generate-share-cards.mjs), which carries the OG image and
-// redirects human visitors to the store. WhatsApp/Twitter/etc render the
-// card via OG tags; the client tap redirect handles the store handoff.
-// This intentionally moves away from navigator.share({ files }): sharing a
-// File turns WhatsApp into an image-editor picker and drops the caption
-// URL, breaking the preview flow we want.
+// There are TWO share flows, deliberately DIFFERENT — do not unify them.
+//
+// 1. DIALOGUE share (shareCompletion, shareCorpusFromProfile) —
+//    URL + text ONLY. No file attachment. URL points at the build-
+//    generated /d/<slug>-<w>-<d>-<lang>.html landing page (see
+//    scripts/generate-share-cards.mjs), which carries the OG image and
+//    redirects human visitors to the store.
+//    Intent: convince the recipient to install. The OG-unfurl preview
+//    in WhatsApp/Twitter/etc IS the payload. Attaching a file breaks
+//    that flow — WhatsApp treats a File as the primary attachment,
+//    turns into an image-editor picker, and drops the URL caption, so
+//    the recipient sees a picture with no way to install.
+//
+// 2. THINKER-CARD share (shareThinker) — FILE + text + URL, with a
+//    URL-only fallback if the platform can't attach files. URL still
+//    points at a build-generated landing page (/t/<stem>-<lang>.html),
+//    file is the pre-rendered 810×1440 portrait PNG at
+//    share/thinkers/portrait/<lang>/<stem>.png.
+//    Intent: the user is showing off a collectible they earned —
+//    Instagram Story, WhatsApp Status, similar. Those destinations
+//    reject text-only or turn the URL preview into a small thumbnail;
+//    what they want IS the picture full-bleed. WhatsApp's image-editor
+//    step and dropped URL are the acceptable cost. Chat destinations
+//    that DO accept text keep the URL in the caption so the recipient
+//    can still install.
+//
+// _shareWithFileFallback is the shared plumbing that handles the file →
+// URL → clipboard cascade with per-step AbortError detection so a user
+// cancel is respected and doesn't retry.
 //
 // Profile share (shareCorpusFromProfile) still uses getShareUrl() — the
 // direct App Store / marketing site link — because there's no dialogue
 // context to land on.
 //
 // generateShareCard() remains in the file for _debugShareCard (dev tool);
-// no user-facing surface calls it any more. Reentrancy: shareCompletion +
-// shareCorpusFromProfile still guard on _shareInFlight so a double-tap
-// can't stack two share sheets.
+// no user-facing surface calls it any more. Reentrancy: every entry point
+// guards on _shareInFlight so a double-tap can't stack two share sheets.
 
 // Card-generator constants (subject-agnostic). The per-subject palette
 // now comes straight from the CSS — see _readCardTheme() in
@@ -17463,6 +17601,383 @@ function shareCorpusFromProfile() {
   });
 }
 
+// ─── Thinker-card share (see comment block at top of section) ────────
+// Per-subject one-line hook used inside the share caption. Same three
+// lines the landscape / portrait generators would compose if they
+// were text-driven; centralized here so the copy is authored in one
+// place.
+const _THINKER_HOOKS = {
+  philosophy: { en: "one of history's great philosophers", he: 'אחד מגדולי הפילוסופיה' },
+  economics:  { en: 'one of the great economic minds',    he: 'אחד מגדולי הכלכלה' },
+  psychology: { en: 'a leading voice in psychology',       he: 'מהוגי הפסיכולוגיה' },
+};
+
+// Thinker → card stem. Multi-subject thinkers (currently only Kahneman)
+// have per-subject file variants (kahneman-economics, kahneman-psychology)
+// so the collectible portrait + landing page match the sharing context.
+// Single-subject thinkers use just the id. Kept in lockstep with
+// _subjectsForThinker + the file-emission loop in generate-share-cards.mjs.
+function _thinkerCardStem(thinker, subject) {
+  const subs = Array.isArray(thinker.subjects) && thinker.subjects.length
+    ? thinker.subjects
+    : [thinker.subject || 'philosophy'];
+  return subs.length > 1 ? `${thinker.id}-${subject}` : thinker.id;
+}
+
+// Fetch the pre-rendered portrait as a File. Absolute corpusapp.io URL
+// works from BOTH web (same-origin, no CORS) and native (Capacitor —
+// share/ isn't in www/ bundle, so the app pulls it from prod). Same
+// origin as the /version.json check, no new hosts. May throw if the
+// file is missing or the network is offline; caller catches and falls
+// through to URL-only.
+async function _thinkerPortraitFile(thinker, subject, lang) {
+  const stem = _thinkerCardStem(thinker, subject);
+  const url = `https://corpusapp.io/share/thinkers/portrait/${lang}/${stem}.png`;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`portrait fetch ${resp.status} for ${url}`);
+  const blob = await resp.blob();
+  return new File([blob], `${stem}.png`, { type: 'image/png' });
+}
+
+// Cascade: file+text+url → text+url → clipboard, with per-step
+// AbortError so a user cancel is respected (never auto-retries after
+// the OS sheet closes). Telemetry marks each branch and reason.
+async function _shareWithFileFallback({ file, text, url, source, extraProps }) {
+  const baseProps = Object.assign({ source }, _shareEventProps(), extraProps || {});
+  try { posthog.capture('share_initiated', Object.assign({ method: file ? 'file' : 'url' }, baseProps)); } catch(e) {}
+
+  const canFiles = !!(navigator.canShare && file && navigator.canShare({ files: [file] }));
+  if (canFiles) {
+    try {
+      await navigator.share({ files: [file], text, url });
+      try { posthog.capture('share_completed', Object.assign({ method: 'file' }, baseProps)); } catch(e) {}
+      return 'file';
+    } catch (err) {
+      if (err && err.name === 'AbortError') {
+        try { posthog.capture('share_cancelled', Object.assign({ method: 'file', reason: 'user_cancel' }, baseProps)); } catch(e) {}
+        return 'cancelled';
+      }
+      try { posthog.capture('share_file_failed', Object.assign({ method: 'file', reason: String((err && err.name) || 'unknown'), error: String((err && err.message) || '') }, baseProps)); } catch(e) {}
+      // Continue to URL fallback — real failure, not user cancel.
+    }
+  }
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'Corpus', text, url });
+      try { posthog.capture('share_completed', Object.assign({ method: 'url' }, baseProps)); } catch(e) {}
+      return 'url';
+    } catch (err) {
+      if (err && err.name === 'AbortError') {
+        try { posthog.capture('share_cancelled', Object.assign({ method: 'url', reason: 'user_cancel' }, baseProps)); } catch(e) {}
+        return 'cancelled';
+      }
+      try { posthog.capture('share_url_failed', Object.assign({ method: 'url', reason: String((err && err.name) || 'unknown') }, baseProps)); } catch(e) {}
+      // Continue to clipboard fallback.
+    }
+  }
+
+  const full = text + ' ' + url;
+  try {
+    await navigator.clipboard.writeText(full);
+    try { posthog.capture('share_completed', Object.assign({ method: 'clipboard' }, baseProps)); } catch(e) {}
+    try {
+      const msg = state.lang === 'en' ? 'Link copied!' : 'הקישור הועתק';
+      showStreakToast(msg);
+    } catch(e) {}
+    return 'clipboard';
+  } catch (err) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = full;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+      try { posthog.capture('share_completed', Object.assign({ method: 'clipboard' }, baseProps)); } catch(e) {}
+      return 'clipboard';
+    } catch (_) {
+      try { posthog.capture('share_cancelled', Object.assign({ method: 'clipboard', reason: 'copy_failed' }, baseProps)); } catch(e) {}
+      return 'cancelled';
+    }
+  }
+}
+
+// Public entry. Both arguments optional: with no args, resolves the
+// current dialogue's thinker + state.subject (flip-card path). With
+// explicit args, uses them (Pantheon-modal path where a user can
+// share any unlocked thinker regardless of what they're studying).
+function shareThinker(thinkerId, subject) {
+  _withShareGuard(async () => {
+    let tid = thinkerId;
+    if (!tid) {
+      const chapter = getW().find(w => w.id === state.currentWeek);
+      const day = chapter ? chapter.days.find(d => d.id === state.currentDay) : null;
+      tid = day && day.thinkerId;
+    }
+    if (!tid) return;
+    const thinker = getT().find(x => x.id === tid);
+    if (!thinker) return;
+
+    const isEn = state.lang === 'en';
+    const lang = isEn ? 'en' : 'he';
+    const subj = subject || _subjectForThinker(tid) || state.subject || 'philosophy';
+    const hookMap = _THINKER_HOOKS[subj] || _THINKER_HOOKS.philosophy;
+    const hook = hookMap[isEn ? 'en' : 'he'];
+    const text = isEn
+      ? `Meet ${thinker.name} on Corpus — ${hook}.\nCome say hi:`
+      : `היכרות עם ${thinker.name} ב-Corpus — ${hook}.\nבוא תכיר:`;
+    const stem = _thinkerCardStem(thinker, subj);
+    const url  = `https://corpusapp.io/t/${stem}-${lang}.html`;
+
+    let file = null;
+    try {
+      file = await _thinkerPortraitFile(thinker, subj, lang);
+    } catch (e) {
+      // Portrait fetch failed (offline, missing, whatever). Not fatal —
+      // _shareWithFileFallback will jump straight to URL-only.
+      console.warn('[shareThinker] portrait fetch failed', e);
+    }
+    await _shareWithFileFallback({
+      file, text, url,
+      source: 'thinker_card',
+      extraProps: { thinker_id: tid, share_subject: subj, share_lang: lang },
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Screenshot detection — iOS only, opportunistic prompt
+// ═══════════════════════════════════════════════════════════════════════
+//
+// **This is iOS-only by necessity.** @capacitor-community/privacy-screen
+// v8's `screenshotTaken` event fires on iOS only — the plugin has zero
+// Android implementation (grep for notifyListeners / registerScreenCapture
+// / DETECT_SCREEN_CAPTURE in node_modules/…/privacy-screen/android/src —
+// no hits). Android 14 does expose a public API for this
+// (Activity.registerScreenCaptureCallback + DETECT_SCREEN_CAPTURE
+// permission), but no reliable Capacitor plugin ships that as of Aug
+// 2026. The prior candidate (@rdlabo/…) uses MediaStore observers and
+// forces a scary READ_MEDIA_IMAGES prompt.
+//
+// So: iOS users get the feature (100% coverage since iOS 7). Android
+// users get nothing — silent no-op, no error, no missing permission,
+// no OS-visible difference from the app they have now. Every event
+// carries `platform` so the Android zero shows as intentional in
+// PostHog, not a bug someone chases later.
+//
+// If a real Android detector ever ships or we build a custom plugin,
+// the JS side of this doesn't change — only _initScreenshotDetection
+// gets the second registration call.
+//
+// Fires ONLY on the two thinker surfaces where we have something
+// concrete to hand over: the Pantheon detail modal (unlocked) and the
+// post-dialogue thinker-card screen (dc-thinker-screen). Reader is
+// deliberately excluded — a URL to the passage is a downgrade from
+// the screenshot the user just took. Pantheon grid is deliberately
+// excluded — nothing specific to hand over.
+
+// Session state — reset on foreground return after >5min in background.
+let _screenshotSessionFires        = 0;
+let _screenshotSessionKilled       = false;   // set true on any dismiss
+let _screenshotLastPromptScreenKey = null;    // per-instance dedupe
+let _screenshotLastHiddenAt        = 0;
+const _SCREENSHOT_SESSION_CAP      = 5;
+const _SCREENSHOT_LIFETIME_DISMISS_KILL = 8;
+
+// Modal thinker tracking — set by openThinkerModal so the router can
+// find which thinker + subject the user is currently viewing. Cleared
+// implicitly by _screenshotCurrentKey checking the modal's .active class
+// before reading these vars.
+let _modalThinkerId       = null;
+let _modalThinkerSubject  = null;
+
+// Prompt-invocation state (which offer, action callback, auto-timer).
+let _screenshotPromptTimer     = null;
+let _screenshotPromptOnAct     = null;
+let _screenshotPromptOfferKind = null;
+
+function _sharePlatform() {
+  const c = window.Capacitor;
+  return (c && c.getPlatform) ? c.getPlatform() : 'web';
+}
+
+function _screenshotIsLifetimeKilled() {
+  try { return localStorage.getItem('corpus_screenshot_prompt_disabled') === '1'; } catch(e) { return false; }
+}
+function _screenshotBumpLifetimeDismiss() {
+  try {
+    const cur = parseInt(localStorage.getItem('corpus_screenshot_dismiss_count') || '0', 10) || 0;
+    const next = cur + 1;
+    localStorage.setItem('corpus_screenshot_dismiss_count', String(next));
+    if (next >= _SCREENSHOT_LIFETIME_DISMISS_KILL) {
+      localStorage.setItem('corpus_screenshot_prompt_disabled', '1');
+    }
+  } catch(e) {}
+}
+function _screenshotResetLifetimeDismiss() {
+  try { localStorage.setItem('corpus_screenshot_dismiss_count', '0'); } catch(e) {}
+}
+
+// Router: what surface are we on RIGHT NOW, and does it have an offer?
+// Returns a stable per-instance key so the same modal opening produces
+// the same key on repeat screenshots (dedupe). Returns null when no
+// offer applies.
+function _screenshotCurrentKey() {
+  const modal = document.getElementById('modal-thinker');
+  if (modal && modal.classList.contains('active') && _modalThinkerId) {
+    const box = modal.querySelector('.modal-box');
+    if (box && box.classList.contains('locked')) return null;   // no offer for the locked teaser
+    return 'thinker-modal:' + _modalThinkerId + (_modalThinkerSubject ? ':' + _modalThinkerSubject : '');
+  }
+  const dcThinker = document.getElementById('dc-thinker-screen');
+  if (dcThinker && dcThinker.style.display !== 'none') {
+    return 'dc-thinker:' + state.currentWeek + '-' + state.currentDay;
+  }
+  return null;
+}
+
+function _onScreenshotDetected() {
+  const platform = _sharePlatform();
+  const key = _screenshotCurrentKey();
+  const hasOffer = !!key;
+  try { posthog.capture('screenshot_detected', { platform, screen: key || 'other', has_offer: hasOffer }); } catch(e) {}
+  if (!hasOffer) return;
+
+  if (_screenshotIsLifetimeKilled()) {
+    try { posthog.capture('screenshot_prompt_suppressed', { platform, screen: key, reason: 'lifetime_kill' }); } catch(e) {}
+    return;
+  }
+  if (_screenshotSessionKilled) {
+    try { posthog.capture('screenshot_prompt_suppressed', { platform, screen: key, reason: 'dismissed_this_session' }); } catch(e) {}
+    return;
+  }
+  if (_screenshotSessionFires >= _SCREENSHOT_SESSION_CAP) {
+    try { posthog.capture('screenshot_prompt_suppressed', { platform, screen: key, reason: 'session_cap' }); } catch(e) {}
+    return;
+  }
+  if (_screenshotLastPromptScreenKey === key) {
+    try { posthog.capture('screenshot_prompt_suppressed', { platform, screen: key, reason: 'already_shown_for_instance' }); } catch(e) {}
+    return;
+  }
+  _showScreenshotPrompt(key);
+}
+
+function _showScreenshotPrompt(key) {
+  const isEn = state.lang === 'en';
+  const el   = document.getElementById('screenshot-prompt');
+  const txt  = document.getElementById('screenshot-prompt-text');
+  const act  = document.getElementById('screenshot-prompt-action');
+  if (!el || !txt || !act) return;
+
+  // Resolve the action callback + offer kind from the key. Only
+  // thinker-* keys reach this point; router returns null for others.
+  let onAct, offerKind;
+  if (key.startsWith('thinker-modal:')) {
+    const tid = _modalThinkerId, subj = _modalThinkerSubject;
+    onAct = () => shareThinker(tid, subj);
+    offerKind = 'thinker_modal';
+  } else if (key.startsWith('dc-thinker:')) {
+    onAct = () => shareThinker();
+    offerKind = 'dc_thinker';
+  } else {
+    return;
+  }
+
+  txt.textContent = isEn ? 'Send this card through Corpus?' : 'לשתף את הכרטיס דרך Corpus?';
+  act.textContent = isEn ? 'Share'                          : 'שיתוף';
+
+  _screenshotPromptOnAct     = onAct;
+  _screenshotPromptOfferKind = offerKind;
+  _screenshotLastPromptScreenKey = key;
+  _screenshotSessionFires++;
+
+  el.style.display = '';
+  // Two-rAF so display flip commits before the .visible class kicks the
+  // opacity transition (otherwise the pill pops in without animating).
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('visible')));
+
+  clearTimeout(_screenshotPromptTimer);
+  _screenshotPromptTimer = setTimeout(() => _hideScreenshotPrompt('auto'), 7000);
+
+  try { posthog.capture('screenshot_prompt_shown', { platform: _sharePlatform(), screen: key, offer_kind: offerKind }); } catch(e) {}
+}
+
+function _screenshotPromptAct() {
+  const key       = _screenshotLastPromptScreenKey;
+  const offerKind = _screenshotPromptOfferKind;
+  const onAct     = _screenshotPromptOnAct;
+  try { posthog.capture('screenshot_prompt_acted', { platform: _sharePlatform(), screen: key, offer_kind: offerKind }); } catch(e) {}
+  // Successful action resets the lifetime-dismiss counter — a user
+  // engaging with the prompt is a happy signal, not one that should
+  // count toward a permanent kill.
+  _screenshotResetLifetimeDismiss();
+  _hideScreenshotPrompt('acted');
+  if (onAct) onAct();
+}
+
+function _hideScreenshotPrompt(method) {
+  clearTimeout(_screenshotPromptTimer);
+  _screenshotPromptTimer = null;
+  const el = document.getElementById('screenshot-prompt');
+  if (!el) return;
+  el.classList.remove('visible');
+  // Match the 250ms transition before removing from layout.
+  setTimeout(() => { if (!el.classList.contains('visible')) el.style.display = 'none'; }, 300);
+
+  if (method === 'x' || method === 'auto') {
+    try { posthog.capture('screenshot_prompt_dismissed', {
+      platform: _sharePlatform(),
+      screen:   _screenshotLastPromptScreenKey,
+      offer_kind: _screenshotPromptOfferKind,
+      method,
+    }); } catch(e) {}
+    // Rest of session — no re-fire until foreground return.
+    _screenshotSessionKilled = true;
+    _screenshotBumpLifetimeDismiss();
+  }
+  _screenshotPromptOnAct     = null;
+  _screenshotPromptOfferKind = null;
+}
+
+// Wire the prompt's buttons once. Called from _initScreenshotDetection
+// (which runs at DOMContentLoaded), so the elements exist.
+function _wireScreenshotPromptButtons() {
+  const act = document.getElementById('screenshot-prompt-action');
+  const dis = document.getElementById('screenshot-prompt-dismiss');
+  if (act) act.addEventListener('click', _screenshotPromptAct);
+  if (dis) dis.addEventListener('click', () => _hideScreenshotPrompt('x'));
+}
+
+// Register the Capacitor listener + wire session-reset on foreground.
+async function _initScreenshotDetection() {
+  _wireScreenshotPromptButtons();
+
+  // Session reset when the app comes back after >5min hidden. Fresh
+  // session = fresh caps (5-per-session, session-kill, per-instance
+  // dedupe). Lifetime kill persists across sessions via localStorage.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      _screenshotLastHiddenAt = Date.now();
+    } else if (document.visibilityState === 'visible') {
+      if (_screenshotLastHiddenAt && (Date.now() - _screenshotLastHiddenAt) > 5 * 60 * 1000) {
+        _screenshotSessionFires        = 0;
+        _screenshotSessionKilled       = false;
+        _screenshotLastPromptScreenKey = null;
+      }
+    }
+  });
+
+  // Plugin registration. `screenshotTaken` fires on iOS only — see
+  // the section comment above for why Android is a silent no-op.
+  const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PrivacyScreen;
+  if (!P || typeof P.addListener !== 'function') return;
+  try {
+    await P.addListener('screenshotTaken', _onScreenshotDetected);
+  } catch (e) {
+    console.warn('[screenshot] listener registration failed', e);
+  }
+}
+
 async function doShare() {
   // Share-prompt tap — funnel step "shared" from the one-time popup. Also
   // routed through _shareCorpus so the standard share_initiated /
@@ -17616,6 +18131,34 @@ function openThinkerModal(id, options) {
       modalBox.classList.remove('has-portrait');
     }
   }
+  // Share button: unlocked only. Bind onclick with the resolved thinker
+  // id + context subject so multi-subject cards (Kahneman) attach the
+  // right per-subject portrait variant.
+  const shareBtn = document.getElementById('thinker-modal-share-btn');
+  const shareLbl = document.getElementById('thinker-modal-share-btn-label');
+  if (shareBtn && shareLbl) {
+    if (locked) {
+      shareBtn.style.display = 'none';
+      shareBtn.onclick = null;
+    } else {
+      shareBtn.style.display = '';
+      shareLbl.textContent = isEn ? 'Share this card' : 'שתפו את הכרטיס';
+      shareBtn.onclick = () => shareThinker(t.id, contextSubject);
+    }
+  }
+
+  // Track for the screenshot-detection router: it needs to know which
+  // thinker + subject the user is currently viewing so a screenshot on
+  // the modal offers the right per-subject portrait variant. Only set
+  // for the unlocked variant — the locked teaser gets no share offer.
+  if (locked) {
+    _modalThinkerId = null;
+    _modalThinkerSubject = null;
+  } else {
+    _modalThinkerId = t.id;
+    _modalThinkerSubject = contextSubject;
+  }
+
   document.getElementById('modal-thinker').classList.add('active');
   // Lock body scroll so the home/pantheon list underneath can't be
   // scrolled through the modal backdrop on iOS.
@@ -17625,6 +18168,10 @@ function openThinkerModal(id, options) {
 function closeThinkerModal() {
   document.getElementById('modal-thinker').classList.remove('active');
   document.body.style.overflow = '';
+  // Clear screenshot-router state so a subsequent screenshot on a
+  // different screen doesn't pick up stale modal context.
+  _modalThinkerId = null;
+  _modalThinkerSubject = null;
 }
 
 // Close modal on overlay click
@@ -20262,6 +20809,13 @@ function showJourneyToast(text) {
 document.addEventListener('DOMContentLoaded', () => {
   const backBtn = document.getElementById('journey-back-btn');
   if (backBtn) backBtn.addEventListener('click', closeLevelJourney);
+});
+
+// Screenshot-detection listener + prompt wiring. iOS-only in practice
+// (see comment on _initScreenshotDetection). No harm running on web /
+// Android — the plugin registration silently no-ops when absent.
+document.addEventListener('DOMContentLoaded', () => {
+  _initScreenshotDetection();
 });
 
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
