@@ -54,6 +54,9 @@ jobs:
           # break in that transitional window.
           if [ -d share ]; then cp -r share _deploy/; fi
           if [ -d d ];     then cp -r d     _deploy/; fi
+          # Thinker landing pages (/t/marx-en.html etc). Committed under t/
+          # by the thinker-share-card generator; served at corpusapp.io/t/*.
+          if [ -d t ];     then cp -r t     _deploy/; fi
           # Static assets referenced by Loops re-engagement emails (bonus
           # unlocked art, etc). Not consumed by the app itself.
           if [ -d email ]; then cp -r email _deploy/; fi
