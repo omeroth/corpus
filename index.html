@@ -4402,7 +4402,13 @@
     bottom: calc(24px + var(--safe-bottom, 0px));
     transform: translate(-50%, 20px);
     opacity: 0;
-    z-index: 300;
+    /* Must sit above every full-viewport overlay the app can stack in
+       front of the current screen — thinker-intro (400), thinker modal,
+       bonus dialogue picker — so the user always sees the offer for the
+       pixels they just captured. Bottom-nav is 200, drawers/modals are
+       under 500, so 500 clears all of them without competing with the
+       walkthrough spotlight (which is excluded from capture anyway). */
+    z-index: 500;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -4430,20 +4436,45 @@
     text-overflow: ellipsis;
   }
   .screenshot-prompt-action {
+    /* Bolder than the previous version — this is now the primary CTA on
+       the pill (matching Duolingo/IG style share prompts), not a
+       secondary token. Bigger tap target, subject accent background
+       with subtle shadow to lift it off the pill's own bg. */
     display: inline-flex;
     align-items: center;
-    padding: 6px 16px;
+    padding: 10px 22px;
+    min-height: 40px;
     background: var(--accent);
     color: var(--on-accent);
     border: none;
     border-radius: 999px;
     font-family: inherit;
-    font-size: 13.5px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
     cursor: pointer;
-    transition: filter 0.15s;
+    box-shadow: 0 3px 10px rgba(var(--accent-rgb, 123,79,212), 0.35);
+    transition: filter 0.15s, transform 0.15s;
   }
-  .screenshot-prompt-action:active { filter: brightness(0.9); }
+  .screenshot-prompt-action:hover  { filter: brightness(1.04); }
+  .screenshot-prompt-action:active { filter: brightness(0.92); transform: scale(0.96); }
+  /* Instagram Stories one-tap. Square icon-only button, gradient IG
+     glyph — visible only when the app is installed (JS toggles display). */
+  .screenshot-prompt-ig {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s;
+  }
+  .screenshot-prompt-ig:active { transform: scale(0.9); }
   .screenshot-prompt-dismiss {
     display: inline-flex;
     align-items: center;
@@ -8829,6 +8860,24 @@
      the prompt for the rest of the session. -->
 <div id="screenshot-prompt" class="screenshot-prompt" style="display:none" role="status" aria-live="polite">
   <span class="screenshot-prompt-text" id="screenshot-prompt-text"></span>
+  <!-- Instagram Stories one-tap. Hidden by default; wired only when
+       InstagramShare.isInstalled() returns true (see
+       _refreshInstagramButtonAvailability). -->
+  <button class="screenshot-prompt-ig" id="screenshot-prompt-ig" type="button" style="display:none" aria-label="Share to Instagram Story">
+    <!-- Instagram gradient camera glyph, simplified -->
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="ig-grad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#F58529"/>
+          <stop offset=".5" stop-color="#DD2A7B"/>
+          <stop offset="1" stop-color="#8134AF"/>
+        </linearGradient>
+      </defs>
+      <rect x="2" y="2" width="20" height="20" rx="5" fill="url(#ig-grad)"/>
+      <circle cx="12" cy="12" r="4.5" fill="none" stroke="#fff" stroke-width="1.8"/>
+      <circle cx="17.2" cy="6.8" r="1.1" fill="#fff"/>
+    </svg>
+  </button>
   <button class="screenshot-prompt-action" id="screenshot-prompt-action" type="button"></button>
   <button class="screenshot-prompt-dismiss" id="screenshot-prompt-dismiss" type="button" aria-label="Dismiss">×</button>
 </div>
@@ -8938,7 +8987,7 @@ if (typeof corpusData === 'undefined' || typeof economicsData === 'undefined'
 // App Store release. The iOS-only update-banner checkForUpdate() compares
 // this against corpusapp.io/version.json to decide whether to prompt the
 // user to grab the newest App Store build.
-const APP_VERSION = '1.2.9';
+const APP_VERSION = '1.3.0';
 
 const SUPABASE_URL = 'https://xcoikjoatcrjqxzykwlt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjb2lram9hdGNyanF4enlrd2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjc5NjYsImV4cCI6MjA4OTcwMzk2Nn0.5EhOsN9M4_kLYoRKO97dPGof8RN7PteXQrtKyx4CcKI';
@@ -17792,17 +17841,13 @@ function shareThinker(thinkerId, subject) {
 // the moment of detection matches what the user sees on screen and
 // requires no extra permission — the WebView captures itself.
 //
-// Every guard exit console.logs its reason so the next "why didn't it
-// fire?" investigation is one console-open away, and window-scoped
-// _screenshotResetAll() flushes both in-memory session state and
-// localStorage kills for dev-tool testing.
-
-// Session state — reset on foreground return after >5min in background.
-let _screenshotSessionFires   = 0;
-let _screenshotSessionKilled  = false;   // set true on any dismiss
-let _screenshotLastHiddenAt   = 0;
-const _SCREENSHOT_SESSION_CAP = 5;
-const _SCREENSHOT_LIFETIME_DISMISS_KILL = 8;
+// No caps. The prompt fires on every screenshot, always. Every guard
+// we tried (session cap, lifetime kill, session-kill-on-dismiss) turned
+// out to feel like a bug in practice. Analytics stay so we can see in
+// posthog whether users are actually being nagged in the wild; if the
+// data shows they are, we'll add a cap back with real numbers to point
+// at instead of guessing. The remaining SKIP is _screenshotContextExcluded
+// (auth / onboarding / walkthrough), which console.logs its reason.
 
 // Modal thinker tracking — set by openThinkerModal, consumed by the
 // permanent shareThinker button on that modal. The capture-and-share
@@ -17812,47 +17857,15 @@ const _SCREENSHOT_LIFETIME_DISMISS_KILL = 8;
 let _modalThinkerId      = null;
 let _modalThinkerSubject = null;
 
-// Prompt-invocation state (action callback, auto-timer).
+// Prompt-invocation state (action callback, auto-timer, current file).
 let _screenshotPromptTimer = null;
 let _screenshotPromptOnAct = null;
+let _screenshotPromptFile  = null;   // held so the IG tap handler can read it
 
 function _sharePlatform() {
   const c = window.Capacitor;
   return (c && c.getPlatform) ? c.getPlatform() : 'web';
 }
-
-function _screenshotIsLifetimeKilled() {
-  try { return localStorage.getItem('corpus_screenshot_prompt_disabled') === '1'; } catch(e) { return false; }
-}
-function _screenshotBumpLifetimeDismiss() {
-  try {
-    const cur = parseInt(localStorage.getItem('corpus_screenshot_dismiss_count') || '0', 10) || 0;
-    const next = cur + 1;
-    localStorage.setItem('corpus_screenshot_dismiss_count', String(next));
-    if (next >= _SCREENSHOT_LIFETIME_DISMISS_KILL) {
-      localStorage.setItem('corpus_screenshot_prompt_disabled', '1');
-    }
-  } catch(e) {}
-}
-function _screenshotResetLifetimeDismiss() {
-  try { localStorage.setItem('corpus_screenshot_dismiss_count', '0'); } catch(e) {}
-}
-
-// Full reset — in-memory session state + localStorage kills. Window-
-// exposed so a dev-tool session can un-wedge itself with one line:
-//   > _screenshotResetAll()
-// Not called anywhere in the app itself; module-level state re-
-// initializes naturally on app load, and localStorage kills persist
-// only across sessions by design.
-function _screenshotResetAll() {
-  _screenshotSessionFires  = 0;
-  _screenshotSessionKilled = false;
-  _screenshotLastHiddenAt  = 0;
-  try { localStorage.removeItem('corpus_screenshot_prompt_disabled'); } catch(e) {}
-  try { localStorage.removeItem('corpus_screenshot_dismiss_count');   } catch(e) {}
-  console.log('[screenshot] state fully reset — in-memory counters cleared, localStorage kills removed');
-}
-try { window._screenshotResetAll = _screenshotResetAll; } catch(e) {}
 
 // Exclusion check: is the current context one where we should NOT
 // capture-and-offer? Auth screen (user hasn't opted in), any onboarding
@@ -17867,31 +17880,29 @@ function _screenshotContextExcluded() {
 }
 
 // Stamp a small "Corpus" wordmark in the bottom-right corner of the
-// captured pixels. Scale is proportional to image width so it renders
-// consistently across iPhone SE (~750px) through Pro Max (~1290px).
-// Deliberately small and cornered — the user is sharing their own
-// screen with a friend, not posting an advert. rgba(0,0,0,0.5) backing
-// pill + white text reads on any background the screenshot throws at us.
-function _stampWordmarkOnCapture(sourceImg) {
-  const cnv = document.createElement('canvas');
-  cnv.width = sourceImg.width;
-  cnv.height = sourceImg.height;
-  const ctx = cnv.getContext('2d');
-  ctx.drawImage(sourceImg, 0, 0);
-
-  const scale = cnv.width / 1080;   // baseline sizing against 1080-wide capture
+// captured pixels. Scale is proportional to canvas width so it renders
+// consistently across the range of downscaled targets. Deliberately
+// small and cornered — the user is sharing their own screen with a
+// friend, not posting an advert. rgba(0,0,0,0.5) backing pill + white
+// text reads on any background the screenshot throws at us.
+//
+// Takes an existing ctx + dims (rather than creating its own canvas)
+// so the downscale + stamp happen in one drawImage → stamp pass; no
+// intermediate full-size canvas.
+function _stampWordmarkOnCanvas(ctx, w, h) {
+  const scale = w / 1080;
   const wmSize = Math.round(30 * scale);
   const padX   = Math.round(18 * scale);
   const padY   = Math.round(10 * scale);
-  const margin = Math.round(40 * scale);   // safe from home-indicator strip
+  const margin = Math.round(40 * scale);
 
   ctx.font = `${wmSize}px "Nunito Black", "Nunito", sans-serif`;
   const text = 'Corpus';
   const textW = ctx.measureText(text).width;
   const pillW = textW + padX * 2;
   const pillH = wmSize + padY * 2;
-  const pillX = cnv.width  - pillW - margin;
-  const pillY = cnv.height - pillH - margin;
+  const pillX = w - pillW - margin;
+  const pillY = h - pillH - margin;
 
   ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
   _roundRectFillPath(ctx, pillX, pillY, pillW, pillH, pillH / 2);
@@ -17903,8 +17914,6 @@ function _stampWordmarkOnCapture(sourceImg) {
   ctx.textBaseline = 'middle';
   ctx.fillText(text, pillX + pillW / 2, pillY + pillH / 2 + (2 * scale));
   ctx.letterSpacing = '0px';
-
-  return cnv;
 }
 
 // Rounded-rect path helper used only by the wordmark stamp (kept local
@@ -17930,13 +17939,24 @@ function _roundRectFillPath(ctx, x, y, w, h, r) {
 // a data: URI on Web. Capacitor.convertFileSrc turns the file:// path
 // into something WKWebView can fetch. Loads into an <img>, draws onto
 // canvas with the wordmark, exports as PNG.
+// Max width for the downscaled+encoded share image. 1080 = Instagram
+// Story native; anything wider is wasted bytes since every social
+// destination recompresses to ≤1080 on upload anyway. Combined with
+// JPEG output, gets a Pro Max capture from ~3.8MB PNG to ~250-500KB
+// JPEG with no perceptible loss on any recipient device.
+const _SCREENSHOT_MAX_WIDTH   = 1080;
+const _SCREENSHOT_JPEG_QUALITY = 0.9;
+
 async function _captureAndStampView() {
+  const t0 = Date.now();
+  console.log('[screenshot] capture:take → calling Screenshot.take()');
   const Screenshot = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Screenshot;
   if (!Screenshot || typeof Screenshot.take !== 'function') {
     throw new Error('Screenshot plugin unavailable');
   }
   const result = await Screenshot.take();
   const rawUri = result && result.uri;
+  console.log('[screenshot] capture:take done in', (Date.now() - t0) + 'ms', '— uri prefix=', rawUri ? rawUri.slice(0, 30) : '(null)');
   if (!rawUri) throw new Error('Screenshot.take() returned no uri');
   const src = (rawUri.startsWith('data:'))
     ? rawUri
@@ -17948,11 +17968,30 @@ async function _captureAndStampView() {
     i.onerror = () => reject(new Error('capture image failed to load: ' + src.slice(0, 60)));
     i.src = src;
   });
-  const stamped = _stampWordmarkOnCapture(img);
+  console.log('[screenshot] capture:img loaded', img.width, 'x', img.height);
+
+  // Downscale + stamp in one pass into a right-sized canvas. Stamping
+  // scales proportional to canvas width (see _stampWordmarkOnCapture),
+  // so the wordmark stays visually consistent across native captures
+  // that come in at anything from 750px (SE) to 1290px (Pro Max) wide.
+  const scale = img.width > _SCREENSHOT_MAX_WIDTH ? _SCREENSHOT_MAX_WIDTH / img.width : 1;
+  const outW = Math.round(img.width  * scale);
+  const outH = Math.round(img.height * scale);
+  const cnv = document.createElement('canvas');
+  cnv.width  = outW;
+  cnv.height = outH;
+  const ctx = cnv.getContext('2d');
+  ctx.drawImage(img, 0, 0, outW, outH);
+  _stampWordmarkOnCanvas(ctx, outW, outH);
+
   const blob = await new Promise((resolve, reject) => {
-    stamped.toBlob(b => b ? resolve(b) : reject(new Error('toBlob returned null')), 'image/png');
+    cnv.toBlob(b => b ? resolve(b) : reject(new Error('toBlob returned null')), 'image/jpeg', _SCREENSHOT_JPEG_QUALITY);
   });
-  return new File([blob], 'corpus-share.png', { type: 'image/png' });
+  console.log('[screenshot] capture:complete', (Date.now() - t0) + 'ms',
+              'input=', img.width + 'x' + img.height,
+              'output=', outW + 'x' + outH,
+              'blob=', blob.size, 'bytes (' + Math.round(blob.size / 1024) + 'KB)');
+  return new File([blob], 'corpus-share.jpg', { type: 'image/jpeg' });
 }
 
 // Detection → capture → prompt. Capture happens BEFORE the prompt is
@@ -17961,31 +18000,15 @@ async function _captureAndStampView() {
 // avoid wasted work.
 async function _onScreenshotDetected() {
   const platform = _sharePlatform();
-  console.log('[screenshot] detected — platform=', platform);
-  console.log('[screenshot]   state — sessionFires=', _screenshotSessionFires, '/', _SCREENSHOT_SESSION_CAP,
-              'sessionKilled=', _screenshotSessionKilled,
-              'lifetimeKilled=', _screenshotIsLifetimeKilled(),
-              'dismissCount=', localStorage.getItem('corpus_screenshot_dismiss_count'),
+  console.log('[screenshot] EVENT FIRED at', new Date().toISOString(),
+              '— platform=', platform,
+              'screen=', state.currentScreen,
               'excludedContext=', _screenshotContextExcluded());
   try { posthog.capture('screenshot_detected', { platform, screen: state.currentScreen || 'unknown' }); } catch(e) {}
 
   if (_screenshotContextExcluded()) {
     console.log('[screenshot] SKIP: excluded context (auth/onboarding/walkthrough)');
-    return;
-  }
-  if (_screenshotIsLifetimeKilled()) {
-    console.log('[screenshot] SKIP: lifetime kill');
-    try { posthog.capture('screenshot_prompt_suppressed', { platform, reason: 'lifetime_kill' }); } catch(e) {}
-    return;
-  }
-  if (_screenshotSessionKilled) {
-    console.log('[screenshot] SKIP: session killed by prior dismiss');
-    try { posthog.capture('screenshot_prompt_suppressed', { platform, reason: 'dismissed_this_session' }); } catch(e) {}
-    return;
-  }
-  if (_screenshotSessionFires >= _SCREENSHOT_SESSION_CAP) {
-    console.log('[screenshot] SKIP: session cap reached');
-    try { posthog.capture('screenshot_prompt_suppressed', { platform, reason: 'session_cap' }); } catch(e) {}
+    try { posthog.capture('screenshot_prompt_suppressed', { platform, reason: 'excluded_context' }); } catch(e) {}
     return;
   }
 
@@ -18022,17 +18045,25 @@ function _showScreenshotPrompt(file) {
     : 'הרעיונות הגדולים בהיסטוריה, חמש דקות ביום.';
   const shareUrl  = 'https://corpusapp.io';
 
+  // Hold the file at module scope so the IG tap handler can read it
+  // without dragging it through another closure.
+  _screenshotPromptFile = file;
+
+  // IG button visibility: only if the plugin is available AND Instagram
+  // is installed on this device. Probed once at init; safe to just read
+  // the cached flag here.
+  const igBtn = document.getElementById('screenshot-prompt-ig');
+  if (igBtn) igBtn.style.display = _instagramInstalled ? '' : 'none';
+
   _screenshotPromptOnAct = async () => {
-    try { posthog.capture('screenshot_prompt_acted', { platform: _sharePlatform() }); } catch(e) {}
-    _screenshotResetLifetimeDismiss();   // action = happy signal, unstick lifetime counter
-    // Share the captured File. Fallback cascade lives in _shareWithFileFallback,
-    // already handled the file→url→clipboard case for shareThinker.
+    try { posthog.capture('screenshot_prompt_acted', { platform: _sharePlatform(), destination: 'os_sheet' }); } catch(e) {}
+    // Share the captured File via OS sheet. Fallback cascade lives in
+    // _shareWithFileFallback (file → url → clipboard).
     await _shareWithFileFallback({
       file, text: shareText, url: shareUrl,
       source: 'screenshot_prompt',
     });
   };
-  _screenshotSessionFires++;
 
   el.style.display = '';
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('visible')));
@@ -18045,9 +18076,9 @@ function _showScreenshotPrompt(file) {
 }
 
 function _screenshotPromptAct() {
+  console.log('[screenshot] act tapped — onAct=', typeof _screenshotPromptOnAct);
   const onAct = _screenshotPromptOnAct;
-  // Telemetry + lifetime-counter reset now happen INSIDE the onAct
-  // callback (see _showScreenshotPrompt) so we don't double-fire them.
+  // Telemetry lives inside the onAct callback (see _showScreenshotPrompt).
   _hideScreenshotPrompt('acted');
   if (onAct) onAct();
 }
@@ -18061,16 +18092,15 @@ function _hideScreenshotPrompt(method) {
   // Match the 250ms transition before removing from layout.
   setTimeout(() => { if (!el.classList.contains('visible')) el.style.display = 'none'; }, 300);
 
-  if (method === 'x' || method === 'auto') {
-    try { posthog.capture('screenshot_prompt_dismissed', {
-      platform: _sharePlatform(),
-      method,
-    }); } catch(e) {}
-    // Rest of session — no re-fire until foreground return.
-    _screenshotSessionKilled = true;
-    _screenshotBumpLifetimeDismiss();
+  // Analytics only — no state changes. Both auto-hide and explicit ×
+  // just close this prompt; the next screenshot re-fires.
+  if (method === 'x') {
+    try { posthog.capture('screenshot_prompt_dismissed', { platform: _sharePlatform(), method }); } catch(e) {}
+  } else if (method === 'auto') {
+    try { posthog.capture('screenshot_prompt_auto_hidden', { platform: _sharePlatform() }); } catch(e) {}
   }
   _screenshotPromptOnAct = null;
+  _screenshotPromptFile  = null;
 }
 
 // Wire the prompt's buttons once. Called from _initScreenshotDetection
@@ -18078,37 +18108,163 @@ function _hideScreenshotPrompt(method) {
 function _wireScreenshotPromptButtons() {
   const act = document.getElementById('screenshot-prompt-action');
   const dis = document.getElementById('screenshot-prompt-dismiss');
+  const ig  = document.getElementById('screenshot-prompt-ig');
   if (act) act.addEventListener('click', _screenshotPromptAct);
   if (dis) dis.addEventListener('click', () => _hideScreenshotPrompt('x'));
+  if (ig)  ig.addEventListener('click', _screenshotPromptInstagramTap);
+}
+
+// Cached Instagram availability. Probed once on plugin registration
+// (see _initScreenshotDetection) — canOpenURL doesn't change during
+// a session outside of app install/uninstall, so re-probing on every
+// prompt would be wasted work.
+let _instagramInstalled = false;
+
+async function _refreshInstagramAvailability() {
+  const IG = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CorpusInstagramShare;
+  if (!IG || typeof IG.isInstalled !== 'function') {
+    _instagramInstalled = false;
+    console.log('[screenshot] CorpusInstagramShare plugin unavailable — IG button will not appear');
+    return;
+  }
+  try {
+    const res = await IG.isInstalled();
+    _instagramInstalled = !!(res && res.installed);
+    console.log('[screenshot] Instagram installed=', _instagramInstalled);
+  } catch (e) {
+    _instagramInstalled = false;
+    console.warn('[screenshot] Instagram install probe failed', e);
+  }
+}
+
+// Instagram-Stories tap on the prompt. Fires shareToStory via the
+// native plugin, closes the pill on success. Falls through to the
+// normal Share (OS sheet) on failure so the user still gets somewhere.
+async function _screenshotPromptInstagramTap() {
+  const file = _screenshotPromptFile;
+  if (!file) return;
+  console.log('[screenshot] instagram tap');
+  try { posthog.capture('screenshot_prompt_acted', { platform: _sharePlatform(), destination: 'instagram_story' }); } catch(e) {}
+  const IG = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CorpusInstagramShare;
+  if (!IG || typeof IG.shareToStory !== 'function') {
+    console.log('[screenshot] IG plugin gone at tap time — falling back to OS sheet');
+    _screenshotPromptAct();
+    return;
+  }
+  try {
+    const imageBase64 = await _fileToBase64(file);
+    await IG.shareToStory({ imageBase64 });
+    _hideScreenshotPrompt('acted');
+  } catch (e) {
+    console.warn('[screenshot] IG share failed, falling back to OS sheet:', e && e.message);
+    try { posthog.capture('screenshot_ig_share_failed', { platform: _sharePlatform(), error: String(e && e.message) }); } catch(_) {}
+    // Don't call _screenshotPromptAct (which double-fires the analytics);
+    // hide the pill and open the OS share sheet directly with the same file.
+    _hideScreenshotPrompt('acted');
+    _shareWithFileFallback({
+      file,
+      text: state.lang === 'en'
+        ? "History's biggest ideas, five minutes a day."
+        : 'הרעיונות הגדולים בהיסטוריה, חמש דקות ביום.',
+      url: 'https://corpusapp.io',
+      source: 'screenshot_prompt_ig_fallback',
+    });
+  }
+}
+
+// File → base64 string (no data: prefix) for the native plugin bridge.
+async function _fileToBase64(file) {
+  return await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const s = String(reader.result || '');
+      const comma = s.indexOf(',');
+      resolve(comma >= 0 ? s.slice(comma + 1) : s);
+    };
+    reader.onerror = () => reject(new Error('FileReader failed'));
+    reader.readAsDataURL(file);
+  });
+}
+
+// Handle to the current listener so we can drop + re-add it. Two
+// triggers cause re-registration:
+//   1. Capacitor App plugin's appStateChange (isActive: true) — the
+//      primary signal. Native-lifecycle-driven, catches share-sheet
+//      round-trips even when the WebView's visibilitychange doesn't.
+//   2. document.visibilitychange (visible) — fallback belt-and-
+//      suspenders for anything the App plugin missed.
+let _screenshotListenerHandle = null;
+
+async function _registerScreenshotListener(source) {
+  const t0 = Date.now();
+  const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PrivacyScreen;
+  if (!P || typeof P.addListener !== 'function') {
+    console.log('[screenshot] register(' + (source || 'init') + ') — plugin unavailable');
+    return;
+  }
+  // Drop the previous handle. The Promise from addListener resolves with
+  // a handle regardless of whether the underlying native subscription
+  // stayed alive, so a fresh drop+add is the only way to be sure. iOS
+  // dedupes internally in some cases, so a stale + fresh together can
+  // result in NEITHER firing — remove first is mandatory.
+  if (_screenshotListenerHandle) {
+    try { await _screenshotListenerHandle.remove(); } catch(e) {}
+    _screenshotListenerHandle = null;
+  }
+  try {
+    _screenshotListenerHandle = await P.addListener('screenshotTaken', _onScreenshotDetected);
+    console.log('[screenshot] register(' + (source || 'init') + ') ok at',
+                new Date().toISOString(), '—', (Date.now() - t0) + 'ms');
+  } catch (e) {
+    console.warn('[screenshot] register(' + (source || 'init') + ') FAILED', e);
+  }
 }
 
 // Register the Capacitor listener + wire session-reset on foreground.
 async function _initScreenshotDetection() {
   _wireScreenshotPromptButtons();
 
-  // Session reset when the app comes back after >5min hidden. Fresh
-  // session = fresh caps (5-per-session, session-kill, per-instance
-  // dedupe). Lifetime kill persists across sessions via localStorage.
+  // One-shot cleanup for testers/users who installed an earlier build
+  // that used these keys to lifetime-silence the prompt (removed in the
+  // "no caps" change). removeItem is idempotent, so re-running on every
+  // launch after cleanup is a cheap no-op — no need for a "did I run"
+  // sentinel. Delete this block once we're confident no live install
+  // still carries the old flag (few releases from now).
+  try { localStorage.removeItem('corpus_screenshot_prompt_disabled'); } catch(e) {}
+  try { localStorage.removeItem('corpus_screenshot_dismiss_count');   } catch(e) {}
+
+  // PRIMARY re-register trigger: Capacitor App plugin's appStateChange.
+  // Fires on the native lifecycle (UIApplicationDidBecomeActive) —
+  // catches ALL foreground returns including the OS share sheet round
+  // trip, control center dropdowns, Face ID prompts, incoming calls.
+  // visibilitychange (below) has gaps on these transitions.
+  try {
+    const App = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+    if (App && typeof App.addListener === 'function') {
+      await App.addListener('appStateChange', ({ isActive }) => {
+        console.log('[screenshot] appStateChange isActive=', isActive);
+        if (isActive) _registerScreenshotListener('appStateChange');
+      });
+    }
+  } catch (e) {
+    console.warn('[screenshot] App.appStateChange listener failed', e);
+  }
+
+  // FALLBACK re-register trigger: visibilitychange. Belt-and-suspenders
+  // for anything the appStateChange primary missed.
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'hidden') {
-      _screenshotLastHiddenAt = Date.now();
-    } else if (document.visibilityState === 'visible') {
-      if (_screenshotLastHiddenAt && (Date.now() - _screenshotLastHiddenAt) > 5 * 60 * 1000) {
-        _screenshotSessionFires  = 0;
-        _screenshotSessionKilled = false;
-      }
+    if (document.visibilityState === 'visible') {
+      _registerScreenshotListener('visibilitychange');
     }
   });
 
-  // Plugin registration. `screenshotTaken` fires on iOS only — see
-  // the section comment above for why Android is a silent no-op.
-  const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PrivacyScreen;
-  if (!P || typeof P.addListener !== 'function') return;
-  try {
-    await P.addListener('screenshotTaken', _onScreenshotDetected);
-  } catch (e) {
-    console.warn('[screenshot] listener registration failed', e);
-  }
+  await _registerScreenshotListener('init');
+  // Probe Instagram installation once — canOpenURL doesn't change during
+  // a session outside install/uninstall, and IG install rarely toggles
+  // mid-session. If the user installs IG while the app is open, the button
+  // won't appear until next launch — an acceptable tradeoff vs paying the
+  // probe cost on every prompt.
+  await _refreshInstagramAvailability();
 }
 
 async function doShare() {

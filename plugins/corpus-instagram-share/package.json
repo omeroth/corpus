@@ -1,0 +1,20 @@
+{
+  "name": "corpus-instagram-share",
+  "version": "1.0.0",
+  "description": "Repo-local Capacitor plugin: one-tap share to Instagram Stories via URL scheme + pasteboard sticker (iOS only). Consumed from index.html via window.Capacitor.Plugins.CorpusInstagramShare — no JS wrapper build needed.",
+  "files": [
+    "ios/Sources",
+    "Package.swift"
+  ],
+  "capacitor": {
+    "ios": {
+      "src": "ios"
+    }
+  },
+  "keywords": ["capacitor", "plugin", "instagram", "stories", "share"],
+  "author": "Corpus",
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "@capacitor/core": "^8.0.0"
+  }
+}

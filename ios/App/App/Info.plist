@@ -38,6 +38,16 @@
 	     compliance question at every submission. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- LSApplicationQueriesSchemes: iOS 9+ requires apps to declare
+	     which URL schemes they will query via canOpenURL. Instagram
+	     Stories one-tap share (see CorpusInstagramSharePlugin) probes
+	     this scheme to decide whether to show the IG button. Without
+	     the declaration, canOpenURL returns false even when Instagram
+	     is installed, and the button would never appear. -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>instagram-stories</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
