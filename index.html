@@ -8480,7 +8480,7 @@
         <line x1="12" y1="7" x2="12" y2="13"/>
         <line x1="9" y1="10" x2="15" y2="10"/>
       </svg>
-      <span id="pf-guest-signup-label">שמור על ההתקדמות שלך ←</span>
+      <span id="pf-guest-signup-label">שמרו על ההתקדמות שלכם ←</span>
     </button>
 
     <!-- Profile Card -->
@@ -16239,15 +16239,19 @@ function closeCompleteModal(opts) {
   // signup modal ever opens per completion, and its runShare callback
   // runs after IT dismisses (never on top of it).
   //
-  // Priority (specific > generic):
-  //   bonus_unlock            once/subject — rarest
-  //   chapter_complete        once per chapter completion
-  //   level_up                once per level crossing
-  //   return_engagement       returning guest (≥14d absence)
-  //   first_completion        fresh guest, first dialogue
+  // Priority (rarer / more specific > more common). Order matters: the
+  // FIRST match wins, so put narrower-window triggers above broader ones.
+  //   bonus_unlock              once/subject — rarest
+  //   chapter_complete          once per chapter completion
+  //   level_up                  once per level crossing
+  //   first_completion          fresh guest, first dialogue — once ever
   //   first_completion_rearmed  returning re-engaged guest whose
   //                             first_completion fired ≥30d ago
   //                             AND accumulated +10 completions since
+  //   return_engagement         LAST — fires whenever a guest returns
+  //                             after ≥14d absence (90d re-arm), so it's
+  //                             the least selective and needs to yield
+  //                             to any rarer trigger that's also due
   const _todayIso = new Date().toISOString().split('T')[0];
   const _priorActive = !currentUser ? _priorActiveDate(_todayIso) : null;
   const _daysSincePriorActive = _priorActive ? _daysBetween(_priorActive, _todayIso) : 0;
@@ -16261,14 +16265,6 @@ function closeCompleteModal(opts) {
     if (_hasBonusUnlock && !_shown.bonus_unlock) return 'bonus_unlock';
     if (_hasChapterComplete) return 'chapter_complete';
     if (_hasLevelUp)         return 'level_up';
-    // Return-engagement: real absence (≥14d) AND either not-yet-shown
-    // OR shown-long-ago (≥90d). Runs above first_completion so a
-    // returning guest gets the "welcome back" copy, not the generic
-    // "you have something here."
-    if (_priorActive && _daysSincePriorActive >= 14
-        && (!_reShownAt || _reAge >= 90)) {
-      return 'return_engagement';
-    }
     if (isFirstGuestCompletion) return 'first_completion';
     // Re-arm the first_completion prompt for a re-engaged guest.
     // Gates: original fired ≥30 days ago AND +10 more completions
@@ -16277,6 +16273,15 @@ function closeCompleteModal(opts) {
         && _fcAge >= 30
         && _guestCompletionCount >= _fcShownCount + 10) {
       return 'first_completion_rearmed';
+    }
+    // Return-engagement: real absence (≥14d) AND either not-yet-shown
+    // OR shown-long-ago (≥90d). Runs LAST — a returning guest who's
+    // also eligible for first_completion or first_completion_rearmed
+    // should get the loss-framed variant (stat reel + "you have
+    // something here"), which converts harder than "welcome back."
+    if (_priorActive && _daysSincePriorActive >= 14
+        && (!_reShownAt || _reAge >= 90)) {
+      return 'return_engagement';
     }
     return null;
   })();
@@ -20590,7 +20595,7 @@ function renderProfile() {
     guestSignupBtn.style.display = currentUser ? 'none' : 'flex';
     const guestSignupLabel = document.getElementById('pf-guest-signup-label');
     if (guestSignupLabel) {
-      guestSignupLabel.textContent = isEn ? 'Save your progress →' : 'שמור על ההתקדמות שלך ←';
+      guestSignupLabel.textContent = isEn ? 'Save your progress →' : 'שמרו על ההתקדמות שלכם ←';
     }
   }
 
