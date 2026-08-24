@@ -16,6 +16,11 @@
       "splashFullScreen": true,
       "splashImmersive": true,
       "showSpinner": false
+    },
+    "PrivacyScreen": {
+      "_comment": "BOTH FLAGS MUST STAY FALSE. This plugin's iOS defaults are aggressive and hostile to OAuth: (1) preventScreenshots=true reparents the mainWindow's CALayer inside a hidden UITextField with isSecureTextEntry, an invasive window-tree manipulation; (2) enable=true presents an opaque privacyViewController over the current VC on willResignActive and dismisses it on didBecomeActive. Together they broke Google Sign-In — the ASWebAuthenticationSession presentation chain got orphaned during the OAuth round-trip and the JS promise never settled. We ONLY use this plugin for the screenshotTaken notification (see _registerScreenshotListener in index.html), which fires regardless of these flags because its NotificationCenter observer is registered unconditionally in PrivacyScreenPlugin.load(). If you're tempted to flip either flag on, replace this plugin with a bare AppDelegate observer for UIApplicationUserDidTakeScreenshotNotification first.",
+      "enable": false,
+      "preventScreenshots": false
     }
   }
 }
