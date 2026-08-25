@@ -9554,6 +9554,18 @@ async function syncProgressToSupabase() {
     }, { onConflict: 'user_id' });
     if (error) _reportSyncFailure('daily_goal', error);
   } catch(e) { _reportSyncFailure('daily_goal', e); }
+  try {
+    // NPS cadence state — single-object jsonb column added in migration
+    // 20260825120000_nps.sql. Shape: { lastShownAt, submittedAt }. Server
+    // row is a backup for reinstalls / cross-device sign-ins; local reads
+    // are authoritative on-device. Separate upsert so a missing column
+    // doesn't break base sync.
+    const { error } = await sb.from('user_progress').upsert({
+      user_id: currentUser.id,
+      nps_state: state.npsState || {},
+    }, { onConflict: 'user_id' });
+    if (error) _reportSyncFailure('nps_state', error);
+  } catch(e) { _reportSyncFailure('nps_state', e); }
 }
 
 async function loadProgressFromSupabase() {
@@ -9578,6 +9590,10 @@ async function loadProgressFromSupabase() {
     //   daily_goal_history     : union by setAt (dated-array)
     //   completions_by_day     : max per key (per-day monotonic counter)
     //   goal_met_history       : union by metAt (dated-array)
+    //   nps_state              : field-wise prefer-newer — lastShownAt takes
+    //                            max(local, server), submittedAt takes the
+    //                            first non-empty value (permanent kill flag,
+    //                            local wins if both have it)
     //   onboarding_done        : OR (server true → local true; false leaves alone)
     //   appearance             : PREFER LOCAL — server row is a backup for
     //                            reinstalls, not an override. On the current
@@ -9679,6 +9695,19 @@ async function loadProgressFromSupabase() {
       if (typeof h !== 'string') return;
       if (!state.hintsSeen.includes(h)) state.hintsSeen.push(h);
     });
+    // NPS cadence merge. lastShownAt takes the max so cross-device shows
+    // can't re-open the 90-day window prematurely. submittedAt is a
+    // permanent kill — once set anywhere, it stays set; local wins if
+    // both have it (submission is irreversible, so the earliest we know
+    // about is the true one).
+    state.npsState = state.npsState || { lastShownAt: '', submittedAt: '' };
+    const _srvNps = data.nps_state || {};
+    if (_srvNps.lastShownAt && (!state.npsState.lastShownAt || _srvNps.lastShownAt > state.npsState.lastShownAt)) {
+      state.npsState.lastShownAt = _srvNps.lastShownAt;
+    }
+    if (_srvNps.submittedAt && !state.npsState.submittedAt) {
+      state.npsState.submittedAt = _srvNps.submittedAt;
+    }
     migrateCompletedDaysKeys();
     saveStateLocal();
   } catch(e) {
@@ -12550,6 +12579,11 @@ function defaultState() {
       firstCompletionShownAt: '', firstCompletionShownAtCount: 0,
       returnEngagementShownAt: '',
     },
+    // NPS survey cadence. Both fields are ISO date strings ('YYYY-MM-DD') or
+    // empty. lastShownAt gates the 90-day window between prompts; submittedAt
+    // is a permanent kill — once nonempty, the modal never fires again for
+    // this user. Synced to user_progress.nps_state (migration 20260825120000).
+    npsState: { lastShownAt: '', submittedAt: '' },
     settingsExpanded: false,   // Profile → Settings collapsible; persisted with the rest of state.
     isPaid: false,   // manual flag for now; later driven by subscription
     subject: 'philosophy',
@@ -12656,6 +12690,14 @@ function loadState() {
   // existing users). Corrupt shapes get reset to empty rather than crashing
   // the queue player.
   if (!Array.isArray(state.pendingCelebrations)) state.pendingCelebrations = [];
+  // Normalize state.npsState for users whose persisted state predates this
+  // field. Object.assign hydrates missing keys to defaults without clobbering
+  // an already-populated field (a user who's mid-90-day-window keeps their
+  // lastShownAt).
+  state.npsState = Object.assign(
+    { lastShownAt: '', submittedAt: '' },
+    state.npsState || {}
+  );
   if (state.guestSignupPromptShown) {
     // Ensure totalShown reflects "they've seen the welcome prompt before" so
     // first_completion doesn't re-fire. Leave lastShownDate EMPTY — the legacy
