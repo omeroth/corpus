@@ -13106,6 +13106,16 @@ function migrateCompletedDaysKeys() {
 // audit for the flagged trade-off on the profile week row for completions
 // between 00:00 and 03:00 local (activity checkmark lands on the prior
 // calendar day — consistent with the grace intent).
+// IMPORTANT — the 3AM grace here is a WALLCLOCK semantic. It answers
+// "what streak day should NOW count as?" for a real-time completion,
+// deliberately rolling a 00:00–02:59 local completion back to the prior
+// day. It is NOT calendar arithmetic. Do NOT call _streakDay to compute
+// "the day before this named day" or "the day after this named day" —
+// the constructed Date will land at local midnight, trip the getHours()<3
+// check, and come back off by one. That mistake previously broke every
+// consecutive-day comparison in the walker and in updateDailyStreak, and
+// silently reset users' streaks. Use _streakDayBefore / _streakDayAfter
+// for calendar arithmetic; they format directly and skip the grace.
 function _streakDay(dateObj) {
   const d = dateObj ? new Date(dateObj) : new Date();
   if (d.getHours() < 3) d.setDate(d.getDate() - 1);
@@ -13115,17 +13125,20 @@ function _streakDay(dateObj) {
   return `${y}-${m}-${day}`;
 }
 
-// Yesterday's streak day, computed from a given date. Used for
-// consecutive-day comparisons.
+// Calendar-arithmetic helpers. Pure YYYY-MM-DD math: the day before /
+// after the named day, regardless of what time it is now. Formats the
+// constructed local-time Date directly, bypassing _streakDay so the
+// wallclock grace above cannot corrupt the result (see the warning
+// on _streakDay for the failure mode this avoids).
 function _streakDayBefore(dateStr) {
   const [y, m, d] = dateStr.split('-').map(Number);
   const prev = new Date(y, m - 1, d - 1);
-  return _streakDay(prev);
+  return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}-${String(prev.getDate()).padStart(2, '0')}`;
 }
 function _streakDayAfter(dateStr) {
   const [y, m, d] = dateStr.split('-').map(Number);
   const next = new Date(y, m - 1, d + 1);
-  return _streakDay(next);
+  return `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}-${String(next.getDate()).padStart(2, '0')}`;
 }
 
 // Detects a break in the streak and records it into state.streakBreaks.
