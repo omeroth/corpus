@@ -9412,10 +9412,12 @@ function _createSupabaseAuthStorage() {
   const _P = window.Capacitor.Plugins.Preferences;
   return {
     async getItem(key) {
+      const _t0 = performance.now();
       try {
         const r = await _P.get({ key });
+        _bridgeStatsRecord(key, 'get', performance.now() - _t0);
         if (r && r.value != null) return r.value;
-      } catch(e) {}
+      } catch(e) { _bridgeStatsRecord(key, 'get', performance.now() - _t0); }
       // One-shot migration: existing signed-in users have their token in
       // localStorage from before this adapter shipped. If native is empty
       // but localStorage has the key, adopt it and promote it into native
@@ -9424,14 +9426,18 @@ function _createSupabaseAuthStorage() {
       try {
         const legacy = window.localStorage.getItem(key);
         if (legacy != null) {
+          const _tMig = performance.now();
           try { await _P.set({ key, value: legacy }); } catch(e) {}
+          _bridgeStatsRecord(key, 'set', performance.now() - _tMig);
           return legacy;
         }
       } catch(e) {}
       return null;
     },
     async setItem(key, value) {
+      const _t0 = performance.now();
       try { await _P.set({ key, value }); } catch(e) {}
+      _bridgeStatsRecord(key, 'set', performance.now() - _t0);
       // Mirror to localStorage as belt-and-suspenders: if the Preferences
       // call fails mid-session (plugin gone, disk pressure), the WebView
       // still has a copy for the remainder of this run. Harmless if native
@@ -9458,11 +9464,43 @@ function _createSupabaseAuthStorage() {
         console.warn('[Auth] auth-token removal suppression limit reached — allowing removal');
         await _resetSuppressedCount();
       }
+      const _t0 = performance.now();
       try { await _P.remove({ key }); } catch(e) {}
+      _bridgeStatsRecord(key, 'remove', performance.now() - _t0);
       try { window.localStorage.removeItem(key); } catch(e) {}
     },
   };
 }
+
+// Per-key bridge-call counter for the auth-storage adapter above.
+// Every getItem/setItem/removeItem records (op, elapsed) here so we can
+// answer "how many times does gotrue actually hit the native bridge for
+// the same key during a single boot?" — which is the working theory for
+// the 18324ms parallel-read stall (token valid, Supabase fast, so the
+// bottleneck must be the JS→native round-trip cost across many reads).
+// Dumped automatically at end of enterApp; window._dumpBridgeStats()
+// exposed for on-demand inspection.
+const _bridgeStats = {};
+function _bridgeStatsRecord(key, op, elapsed) {
+  const s = _bridgeStats[key] = _bridgeStats[key] || {
+    getCount: 0, getMs: 0, setCount: 0, setMs: 0, removeCount: 0, removeMs: 0
+  };
+  if (op === 'get')    { s.getCount++;    s.getMs    += elapsed; }
+  else if (op === 'set')    { s.setCount++;    s.setMs    += elapsed; }
+  else if (op === 'remove') { s.removeCount++; s.removeMs += elapsed; }
+}
+function _dumpBridgeStats(label) {
+  const tag = label ? '[Bridge] ' + label : '[Bridge]';
+  const keys = Object.keys(_bridgeStats);
+  if (!keys.length) { console.log(tag, 'no bridge activity recorded yet'); return; }
+  for (const key of keys) {
+    const s = _bridgeStats[key];
+    console.log(tag, key, '— get:', s.getCount, '(' + Math.round(s.getMs) + 'ms)',
+      'set:', s.setCount, '(' + Math.round(s.setMs) + 'ms)',
+      'remove:', s.removeCount, '(' + Math.round(s.removeMs) + 'ms)');
+  }
+}
+try { window._dumpBridgeStats = _dumpBridgeStats; } catch(e) {}
 
 if (!window._supabaseClient) {
   window._supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -20261,6 +20299,12 @@ async function enterApp(user) {
       try { saveStateLocal(); } catch(e) {}
     }
   }
+  // Diagnostic dump: how many times did gotrue hit the native storage
+  // bridge during boot, and how much wall time did it cost? Testing the
+  // theory that the storage adapter (uncached, every getItem is a
+  // JS→native round-trip) is what serializes the parallel reads at
+  // 18s+. Also exposed as window._dumpBridgeStats() for on-demand.
+  try { _dumpBridgeStats('boot'); } catch(e) {}
   // Auth is confirmed at this point (we have a real user object).
   // Flip _authKnown before the home render so the topbar's decision
   // sees the fresh state.
