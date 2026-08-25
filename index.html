@@ -5040,6 +5040,38 @@
     transition: color 0.18s;
   }
   .auth-guest-link:hover { color: #FFFFFF; }
+  /* Loading strip that fades in at 2.5s post-tap if enterApp's Supabase
+     reads are still pending — turns a silent 10-second stall into a
+     visible "we're working, just slow" signal. Fixed-position bottom
+     pill so it can't be pushed off-screen by a soft keyboard or safe-
+     area quirks. Styled softer than the primary CTAs so it reads as
+     status rather than an action. */
+  .auth-loading-strip {
+    position: fixed;
+    bottom: calc(24px + var(--safe-bottom, 0px));
+    left: 50%;
+    transform: translate(-50%, 20px);
+    opacity: 0;
+    z-index: 300;
+    padding: 10px 18px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #FFFFFF;
+    border-radius: 999px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    transition: opacity 300ms ease, transform 300ms ease;
+    pointer-events: none;
+    display: none;
+    white-space: nowrap;
+    max-width: calc(100vw - 32px);
+  }
+  .auth-loading-strip.visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    display: block;
+  }
   .logout-btn {
     background: none;
     border: none;
@@ -8301,6 +8333,12 @@
 
   </div>
   <button class="auth-guest-link" onclick="enterAsGuest()">Continue as guest →</button>
+  <!-- Loading strip — fades in at 2.5s if enterApp's parallel Supabase reads
+       are still in flight, so a slow launch reads as slow rather than broken.
+       Auto-hides with the parent when the auth screen goes display:none on
+       transition to home. Copy is set from JS in enterApp so language state
+       is already resolved by the time it renders. -->
+  <div class="auth-loading-strip" id="auth-loading-strip"></div>
 </div>
 
 <div id="app">
@@ -9446,8 +9484,24 @@ function _reportSyncFailure(field, err) {
   } catch(e) {}
 }
 
+// Session-scoped flag: was loadProgressFromSupabase's pull actually
+// completed successfully this session? Set true at the end of the try
+// block in that function; reset to false at the top of enterApp so each
+// auth flow starts fresh. syncProgressToSupabase gates every push on
+// this flag — pushing local state after a failed pull would ship
+// potentially-stale data and clobber whatever the merge never got to
+// read (max/union merges are fine, but a stale-low state.streak or a
+// smaller state.activeDates array becomes the new server truth on the
+// next successful pull elsewhere). Better to sync nothing than to sync
+// something that might have destroyed real data.
+let _progressLoaded = false;
+
 async function syncProgressToSupabase() {
   if (!currentUser) return;
+  if (!_progressLoaded) {
+    console.warn('[Sync] progress push BLOCKED — pull did not complete this session, refusing to push potentially-stale local state');
+    return;
+  }
   try {
     const completedDaysArr = Object.keys(state.completedDays);
     // last_active_at + last_subject are the re-engagement signals the
@@ -9604,9 +9658,19 @@ async function loadProgressFromSupabase() {
     //                            would fight the local schedule.
     // The reads for the two "prefer local" fields are intentionally omitted
     // here even though the columns now exist (added in migration 20260708090000).
+    const _fetchT0 = performance.now();
     const { data } = await sb.from('user_progress')
       .select('*').eq('user_id', currentUser.id).maybeSingle();
-    if (!data) return;
+    const _fetchMs = Math.round(performance.now() - _fetchT0);
+    const _payloadBytes = data ? JSON.stringify(data).length : 0;
+    console.log('[Sync] user_progress fetch:', _fetchMs, 'ms — payload:', _payloadBytes, 'bytes');
+    if (!data) {
+      // Fresh signup, no server row yet — read completed successfully,
+      // just nothing to merge. Flip the flag so the initial push isn't
+      // blocked by the guard.
+      _progressLoaded = true;
+      return;
+    }
     state.xp = Math.max(state.xp, data.xp || 0);
     state.streak = Math.max(state.streak, data.streak || 0);
     (data.completed_days || []).forEach(k => { state.completedDays[k] = true; });
@@ -9710,6 +9774,10 @@ async function loadProgressFromSupabase() {
     }
     migrateCompletedDaysKeys();
     saveStateLocal();
+    // All merges ran to completion — mark this session as safe to push.
+    // Placed as the LAST statement so a throw in any merge above leaves
+    // the flag false and the guard blocks the subsequent push.
+    _progressLoaded = true;
   } catch(e) {
     _reportSyncFailure('load', e);
   }
@@ -9724,8 +9792,10 @@ async function loadSubscription() {
     // every app open — visible in the console but functionally correct
     // because the catch below fails safe. Switching to maybeSingle removes
     // the noise without changing behavior.
+    const _fetchT0 = performance.now();
     const { data } = await sb.from('subscriptions')
       .select('*').eq('user_id', currentUser.id).maybeSingle();
+    console.log('[Sync] subscriptions fetch:', Math.round(performance.now() - _fetchT0), 'ms — data:', !!data);
     if (!data || !data.current_period_end) {
       state.isPaid = false;   // no subscription = free user
       saveStateLocal();
@@ -19928,6 +19998,27 @@ async function _timeboxed(promise, ms, label) {
   finally { clearTimeout(_t); }
 }
 
+// Per-load timing + status wrapper. Wraps an async fn so its start/end
+// (or failure) is logged with wall time. Returned status object gets
+// mutated so callers can audit pending-vs-settled on timeout — the
+// outer Promise.race that wraps parallel loads only tells us "at least
+// one didn't settle in time," not which one, so we need per-promise
+// state to diagnose.
+async function _timedLoad(label, fn, status) {
+  const t0 = performance.now();
+  console.log('[Auth]', label, 'started');
+  try {
+    const r = await fn();
+    if (status) status.state = 'ok';
+    console.log('[Auth]', label, 'ok after', Math.round(performance.now() - t0), 'ms');
+    return r;
+  } catch (e) {
+    if (status) status.state = 'error:' + ((e && e.message) || 'unknown');
+    console.log('[Auth]', label, 'FAILED after', Math.round(performance.now() - t0), 'ms:', e && e.message);
+    throw e;
+  }
+}
+
 // Bounce-back guard for the onboarding flow.
 // initUI runs synchronously and may dispatch to any of the onboarding
 // screens (beat / streak / welcome / subject / goal). initApp runs
@@ -19953,6 +20044,11 @@ async function enterApp(user) {
   if (appStarted) return;
   appStarted = true;
   currentUser = user;
+  // Reset per-session pull-completed flag. Set true inside
+  // loadProgressFromSupabase's try block only if all merges finished.
+  // syncProgressToSupabase gates every push on this — see the guard at
+  // the top of that function for why.
+  _progressLoaded = false;
   console.log('[Auth] Entering app as:', user ? user.email : 'guest');
   if (user && user.email === 'roth.omer@gmail.com') {
     try { posthog.opt_out_capturing(); } catch(e) {}
@@ -19965,17 +20061,52 @@ async function enterApp(user) {
   // so parallelizing halves the worst case. Each promise carries its
   // own .catch so one failure doesn't reject the Promise.all — the
   // outer _timeboxed only fires if BOTH are still pending at 10s.
+  //
+  // Per-load status objects let us audit which promise was still
+  // pending when the outer timer fires ("both pending" points at
+  // upstream auth-token refresh contention; "one pending" points at
+  // a real per-endpoint stall).
+  const _progressStatus = { state: 'pending' };
+  const _subscriptionStatus = { state: 'pending' };
+  const _parallelT0 = performance.now();
+  // Delayed loading feedback — if the parallel reads take >2.5s, fade
+  // in the strip so the user knows the app is working, not broken.
+  // A fast launch (< 2.5s) never fires the timer, so the strip is
+  // invisible in the healthy case. Copy is set from JS so state.lang
+  // is already resolved by the time it renders. Strip auto-hides with
+  // the auth screen when we transition to home.
+  const _loadingStripEl = document.getElementById('auth-loading-strip');
+  const _loadingStripTimer = setTimeout(() => {
+    if (_loadingStripEl) {
+      _loadingStripEl.textContent = state.lang === 'en'
+        ? 'Loading your progress'
+        : 'טוענים את ההתקדמות שלכם';
+      _loadingStripEl.classList.add('visible');
+    }
+  }, 2500);
   try {
     await _timeboxed(
       Promise.all([
-        loadProgressFromSupabase().catch(e => { console.error('[Auth] loadProgressFromSupabase failed:', e); }),
-        loadSubscription().catch(e => { console.error('[Auth] loadSubscription failed:', e); }),
+        _timedLoad('loadProgressFromSupabase', () => loadProgressFromSupabase(), _progressStatus)
+          .catch(e => { console.error('[Auth] loadProgressFromSupabase failed:', e); }),
+        _timedLoad('loadSubscription', () => loadSubscription(), _subscriptionStatus)
+          .catch(e => { console.error('[Auth] loadSubscription failed:', e); }),
       ]),
       10000,
       'loadProgress + loadSubscription (parallel)'
     );
+    console.log('[Auth] parallel reads settled in', Math.round(performance.now() - _parallelT0), 'ms — progress:', _progressStatus.state, 'subscription:', _subscriptionStatus.state);
   } catch(e) {
-    console.error('[Auth] parallel Supabase reads timed out:', e);
+    console.error('[Auth] parallel Supabase reads timed out after',
+      Math.round(performance.now() - _parallelT0), 'ms — progress:', _progressStatus.state,
+      'subscription:', _subscriptionStatus.state);
+  } finally {
+    // Cancel the strip's fade-in if it never appeared; hide it if it
+    // did. Auth screen will hide with home transition below anyway,
+    // but explicit removal keeps the strip out of the DOM for the
+    // brief window between here and the transition.
+    clearTimeout(_loadingStripTimer);
+    if (_loadingStripEl) _loadingStripEl.classList.remove('visible');
   }
   if (user) {
     try {
@@ -20005,15 +20136,27 @@ async function enterApp(user) {
   if (user) {
     state.userEmail = user.email || '';
     state.userMeta = user.user_metadata || {};
-    // saveState() itself is synchronous (writes localStorage + kicks
-    // off syncProgressToSupabase as a fire-and-forget), so it cannot
-    // hang today. Wrap it defensively anyway so a future refactor that
-    // turns it async can't strand the UI transition, and mirror the
-    // timeout budget used above for consistency.
-    try {
-      await _timeboxed(saveState(), 8000, 'enterApp saveState');
-    } catch(e) {
-      console.error('[Auth] enterApp saveState failed:', e);
+    // Guard: if the pull didn't complete (timeout, network hang,
+    // token-refresh stall), skip syncProgressToSupabase entirely for
+    // this session. The push would ship potentially-stale local state
+    // and can clobber server data the merge never got to read (e.g.
+    // state.streak mirrored from a low local dailyStreak). Save local
+    // so userEmail/userMeta persist to localStorage, but don't touch
+    // the server. The _progressLoaded guard at the top of
+    // syncProgressToSupabase enforces the same rule for every downstream
+    // save in this session (finishDay, etc).
+    if (_progressLoaded) {
+      const _saveT0 = performance.now();
+      console.log('[Auth] enterApp saveState starting');
+      try {
+        await _timeboxed(saveState(), 8000, 'enterApp saveState');
+        console.log('[Auth] enterApp saveState ok after', Math.round(performance.now() - _saveT0), 'ms');
+      } catch(e) {
+        console.error('[Auth] enterApp saveState failed after', Math.round(performance.now() - _saveT0), 'ms:', e);
+      }
+    } else {
+      console.warn('[Auth] enterApp saveState SKIPPED — pull did not complete; local-only save to persist user metadata');
+      try { saveStateLocal(); } catch(e) {}
     }
   }
   // Auth is confirmed at this point (we have a real user object).
