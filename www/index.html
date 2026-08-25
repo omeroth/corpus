@@ -16939,14 +16939,22 @@ function closeCompleteModal(opts) {
   // maybeShowGuestPrompt (once-per-day) prevents overlap with the signup.
   const _streakDue = [3, 7, 30].includes(state.dailyStreak);
 
-  // NPS eligibility: chapter-complete AND cadence gate in _shouldShowNPS
-  // passes (90d since last score OR 30d since last no-score dismissal,
-  // and never after Send). Open to guests too — writes go via device_id
-  // when currentUser is null. Priority ordering below deliberately
-  // demotes NPS below signup for guests so we don't give away the
-  // conversion moment; for signed-in users (no signup gate) NPS takes
-  // the top slot as originally designed.
-  const _npsDue = _hasChapterComplete && _shouldShowNPS();
+  // NPS eligibility: (chapter-complete OR catch-up) AND cadence gate in
+  // _shouldShowNPS passes (90d since last score OR 30d since last
+  // no-score dismissal, and never after Send). Open to guests too —
+  // writes go via device_id when currentUser is null. Priority ordering
+  // below deliberately demotes NPS below signup for guests so we don't
+  // give away the conversion moment; for signed-in users (no signup
+  // gate) NPS takes the top slot as originally designed.
+  //
+  // Catch-up path: users who completed chapters BEFORE NPS shipped get
+  // their first fire on the next non-Day-0 dialogue completion. Day 0
+  // (thinker-card intro) is filtered out — too lightweight a moment
+  // for a feedback prompt, and _isNPSCatchupEligible already requires
+  // real chapter progress. After the first fire, cadence gate takes
+  // over from that lastShownAt stamp.
+  const _npsCatchupDue = state.currentDay !== 0 && _isNPSCatchupEligible();
+  const _npsDue = _shouldShowNPS() && (_hasChapterComplete || _npsCatchupDue);
 
   const anyPromptDue = _npsDue || !!_promptTrigger || shouldShowShare || _streakDue;
 
@@ -17514,6 +17522,40 @@ function _getDeviceId() {
   } catch(e) {
     return null;
   }
+}
+
+// True if the user has finished at least one full chapter in any subject
+// (all days of any week in state.completedDays). Backs the one-time
+// catch-up gate below: users who completed chapters BEFORE NPS shipped
+// shouldn't have to wait for their next chapter boundary to be asked.
+// Reuses the same day-key convention as isWeekCompleted (~14612) so a
+// week counts as complete iff every day.id in its config is stored.
+function _hasCompletedAnyChapter() {
+  const sources = [
+    { subject: 'philosophy', data: (typeof corpusData     !== 'undefined') ? corpusData     : null },
+    { subject: 'economics',  data: (typeof economicsData  !== 'undefined') ? economicsData  : null },
+    { subject: 'psychology', data: (typeof psychologyData !== 'undefined') ? psychologyData : null },
+  ];
+  for (const src of sources) {
+    if (!src.data || !Array.isArray(src.data.weeks)) continue;
+    for (const week of src.data.weeks) {
+      if (!week || !Array.isArray(week.days) || week.days.length === 0) continue;
+      if (week.days.every(d => state.completedDays[dayKey(week.id, d.id, src.subject)])) return true;
+    }
+  }
+  return false;
+}
+
+// One-time catch-up gate for existing users. Fires the FIRST NPS ask
+// on the next non-Day-0 dialogue completion (Day 0 = thinker-card intro,
+// too lightweight a moment) for anyone who's already completed a
+// chapter but has never seen NPS. After they've been shown even once
+// (lastShownAt set OR submittedAt set), this returns false and the
+// normal chapter-complete-only path takes over.
+function _isNPSCatchupEligible() {
+  const s = state.npsState || {};
+  if (s.lastShownAt || s.submittedAt) return false;
+  return _hasCompletedAnyChapter();
 }
 
 // Continuation callback + score-picked-this-session flag; consumed by
