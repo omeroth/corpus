@@ -6111,6 +6111,142 @@
     color: rgba(42, 18, 102, 0.55);
   }
 
+  /* ── NPS survey modal ──
+     Chapter-completion feedback prompt for signed-in users, gated by
+     cadence (see _shouldShowNPS). Three-view flow inside one box:
+     score picker → branch-specific text form → optional 9-10 App Store
+     CTA. Styled from the guest-signup base tokens for consistency. */
+  #modal-nps .modal-box {
+    background-color: var(--surface);
+    background-image:
+      radial-gradient(circle at 50% 22%, var(--surface) 0%, rgba(123, 79, 212, 0.10) 100%);
+    border: 1px solid rgba(123, 79, 212, 0.20);
+    color: var(--ink);
+    box-shadow: 0 30px 80px -20px rgba(123, 79, 212, 0.24);
+    padding: 28px 22px 22px;
+    max-width: 420px;
+    position: relative;
+  }
+  .nps-dismiss {
+    position: absolute;
+    top: 6px;
+    inset-inline-end: 8px;
+    background: none;
+    border: none;
+    color: rgba(42, 18, 102, 0.45);
+    font-size: 22px;
+    line-height: 1;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: color 0.15s, transform 0.1s;
+  }
+  .nps-dismiss:hover { color: var(--ink); }
+  .nps-dismiss:active { transform: scale(0.9); }
+  .nps-question {
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(19px * var(--text-scale));
+    font-weight: 800;
+    line-height: 1.3;
+    text-align: center;
+    margin: 6px 4px 18px;
+  }
+  .nps-scale {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    padding: 4px 0;
+    /* Horizontal scroll safety on very narrow phones — 11 buttons fit
+       comfortably at 320px+, but scroll rather than clip if squeezed. */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nps-score-btn {
+    flex: 1 0 auto;
+    min-width: 30px;
+    padding: 10px 0;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid rgba(123, 79, 212, 0.28);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.1s;
+  }
+  .nps-score-btn:hover  { background: rgba(123, 79, 212, 0.08); border-color: var(--accent); }
+  .nps-score-btn:active { transform: scale(0.94); }
+  .nps-your-score {
+    text-align: center;
+    color: var(--text-2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .nps-branch-prompt {
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(17px * var(--text-scale));
+    font-weight: 700;
+    line-height: 1.35;
+    text-align: center;
+    margin: 4px 4px 14px;
+  }
+  .nps-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid rgba(123, 79, 212, 0.22);
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.4;
+    resize: vertical;
+    min-height: 90px;
+  }
+  .nps-textarea:focus { outline: none; border-color: var(--accent); }
+  #nps-send-btn { margin-top: 12px; }
+  #nps-store-btn { margin-top: 8px; }
+  .nps-thanks {
+    color: var(--ink);
+    font-family: 'Nunito', sans-serif;
+    font-size: calc(18px * var(--text-scale));
+    font-weight: 700;
+    line-height: 1.35;
+    text-align: center;
+    margin: 6px 4px 12px;
+  }
+  #nps-skip, #nps-store-skip {
+    color: rgba(42, 18, 102, 0.55);
+    margin-top: 4px;
+  }
+  html.dark #modal-nps .modal-box {
+    background-color: var(--surface);
+    background-image:
+      radial-gradient(circle at 50% 22%, var(--surface) 0%, rgba(123, 79, 212, 0.18) 100%);
+    color: var(--text);
+  }
+  html.dark #modal-nps .nps-question,
+  html.dark #modal-nps .nps-branch-prompt,
+  html.dark #modal-nps .nps-thanks { color: var(--text); }
+  html.dark .nps-dismiss { color: rgba(245, 241, 255, 0.55); }
+  html.dark .nps-your-score { color: rgba(245, 241, 255, 0.68); }
+  html.dark .nps-score-btn {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  html.dark .nps-textarea {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  html.dark #nps-skip, html.dark #nps-store-skip { color: rgba(245, 241, 255, 0.55); }
+
   /* ── Subject select — bright cinematic vertical stack ──
      Shown for new-user onboarding (body has on-subject-screen but NOT
      drawer-open). Bright base (white + soft purple edge), three portrait
@@ -8949,6 +9085,36 @@
   </div>
 </div>
 
+<!-- NPS survey modal. Fires only after a chapter-complete celebration for
+     signed-in users, gated by cadence in _shouldShowNPS. Three views inside
+     the same modal-box: score picker, text form, and a post-submit CTA that
+     appears only for 9-10 promoters pointing at the App Store link. Copy
+     set from JS so state.lang is resolved at render. See showNPSModal. -->
+<div class="modal-overlay" id="modal-nps">
+  <div class="modal-box nps-box">
+    <button class="nps-dismiss" id="nps-dismiss" type="button" aria-label="Dismiss">×</button>
+    <!-- View A: score picker -->
+    <div class="nps-view" id="nps-view-score">
+      <div class="nps-question" id="nps-question"></div>
+      <div class="nps-scale" id="nps-scale"></div>
+    </div>
+    <!-- View B: branch text form (shown after score tap) -->
+    <div class="nps-view" id="nps-view-text" style="display:none">
+      <div class="nps-your-score" id="nps-your-score"></div>
+      <div class="nps-branch-prompt" id="nps-branch-prompt"></div>
+      <textarea class="nps-textarea" id="nps-textarea" rows="4"></textarea>
+      <button class="nav-btn" id="nps-send-btn" type="button" onclick="_npsSend()"></button>
+      <button type="button" class="share-modal-skip" id="nps-skip" onclick="_npsDismiss('skip')"></button>
+    </div>
+    <!-- View C: post-submit CTA for 9-10 branch only -->
+    <div class="nps-view" id="nps-view-store" style="display:none">
+      <div class="nps-thanks" id="nps-thanks"></div>
+      <button class="nav-btn" id="nps-store-btn" type="button" onclick="_npsOpenStore()"></button>
+      <button type="button" class="share-modal-skip" id="nps-store-skip" onclick="_npsDismiss('store-skip')"></button>
+    </div>
+  </div>
+</div>
+
 <!-- Thinker intro overlay — auto-shown by _showThinkerIntroIfNeeded on fresh
      entry to an uncompleted lesson whose day has a thinkerId, and reopenable
      any time via the reader-topbar reopen button (_openThinkerIntro).
@@ -9909,15 +10075,18 @@ async function loadProgressFromSupabase() {
       if (typeof h !== 'string') return;
       if (!state.hintsSeen.includes(h)) state.hintsSeen.push(h);
     });
-    // NPS cadence merge. lastShownAt takes the max so cross-device shows
-    // can't re-open the 90-day window prematurely. submittedAt is a
-    // permanent kill — once set anywhere, it stays set; local wins if
-    // both have it (submission is irreversible, so the earliest we know
-    // about is the true one).
-    state.npsState = state.npsState || { lastShownAt: '', submittedAt: '' };
+    // NPS cadence merge. lastShownAt and lastScoredAt take the max so
+    // cross-device shows can't re-open a window prematurely. submittedAt
+    // is a permanent kill — once set anywhere, it stays set; local wins
+    // if both have it (submission is irreversible, so the earliest we
+    // know about is the true one).
+    state.npsState = state.npsState || { lastShownAt: '', lastScoredAt: '', submittedAt: '' };
     const _srvNps = data.nps_state || {};
     if (_srvNps.lastShownAt && (!state.npsState.lastShownAt || _srvNps.lastShownAt > state.npsState.lastShownAt)) {
       state.npsState.lastShownAt = _srvNps.lastShownAt;
+    }
+    if (_srvNps.lastScoredAt && (!state.npsState.lastScoredAt || _srvNps.lastScoredAt > state.npsState.lastScoredAt)) {
+      state.npsState.lastScoredAt = _srvNps.lastScoredAt;
     }
     if (_srvNps.submittedAt && !state.npsState.submittedAt) {
       state.npsState.submittedAt = _srvNps.submittedAt;
@@ -12799,11 +12968,18 @@ function defaultState() {
       firstCompletionShownAt: '', firstCompletionShownAtCount: 0,
       returnEngagementShownAt: '',
     },
-    // NPS survey cadence. Both fields are ISO date strings ('YYYY-MM-DD') or
-    // empty. lastShownAt gates the 90-day window between prompts; submittedAt
-    // is a permanent kill — once nonempty, the modal never fires again for
-    // this user. Synced to user_progress.nps_state (migration 20260825120000).
-    npsState: { lastShownAt: '', submittedAt: '' },
+    // NPS survey cadence. All fields ISO date strings ('YYYY-MM-DD') or empty.
+    //   lastShownAt   — stamped on every modal open (including X'd immediately)
+    //   lastScoredAt  — stamped when the user actually picks a 0-10 score,
+    //                   regardless of whether they Send text afterwards
+    //   submittedAt   — stamped on Send. Permanent kill: once nonempty, modal
+    //                   never fires again for this user.
+    // Cadence rule: 90-day cooldown from lastScoredAt (real engagement) OR
+    // 30-day cooldown from lastShownAt if no score was ever picked (they may
+    // have just been mid-something — shorter penalty for no-engagement
+    // dismissals). See _shouldShowNPS. Synced to user_progress.nps_state
+    // (migration 20260825120000).
+    npsState: { lastShownAt: '', lastScoredAt: '', submittedAt: '' },
     settingsExpanded: false,   // Profile → Settings collapsible; persisted with the rest of state.
     isPaid: false,   // manual flag for now; later driven by subscription
     subject: 'philosophy',
@@ -12915,7 +13091,7 @@ function loadState() {
   // an already-populated field (a user who's mid-90-day-window keeps their
   // lastShownAt).
   state.npsState = Object.assign(
-    { lastShownAt: '', submittedAt: '' },
+    { lastShownAt: '', lastScoredAt: '', submittedAt: '' },
     state.npsState || {}
   );
   if (state.guestSignupPromptShown) {
@@ -16756,7 +16932,14 @@ function closeCompleteModal(opts) {
   // maybeShowGuestPrompt (once-per-day) prevents overlap with the signup.
   const _streakDue = [3, 7, 30].includes(state.dailyStreak);
 
-  const anyPromptDue = !!_promptTrigger || shouldShowShare || _streakDue;
+  // NPS eligibility: signed-in user finishing a chapter AND cadence gate
+  // in _shouldShowNPS passes (90d since last score OR 30d since last
+  // no-score dismissal, and never after Send). Takes top slot in the
+  // priority chain — rarest fire (max once per 90d, once ever if
+  // submitted) and the chapter-complete moment is the ideal ask.
+  const _npsDue = !!currentUser && _hasChapterComplete && _shouldShowNPS();
+
+  const anyPromptDue = _npsDue || !!_promptTrigger || shouldShowShare || _streakDue;
 
   if (!anyPromptDue) {
     // Nothing to show — continuation handles navigation. On Back to Home this
@@ -16783,16 +16966,24 @@ function closeCompleteModal(opts) {
   };
 
   // Prompt cap: fire at most ONE modal per exit. Priority
-  //   signup > share > streak_milestone
-  // The signup ask is highest-value (converts guests). Share is next
-  // (drives growth). Streak is a nudge. Skipped prompts naturally
-  // re-evaluate on the next Back-to-Home — their gates are cadence-
-  // based, not fire-once-forever, so nothing is permanently dropped.
+  //   nps > signup > share > streak_milestone
+  // NPS wins when due because it's the rarest fire (max once/90d, once
+  // ever on submit) AND chapter-complete is its only trigger — miss it
+  // and the user waits 90 days for another eligible moment. Signup
+  // (guest-only anyway; the _npsDue guard requires currentUser so they
+  // can't collide) is second, then share, then streak. Skipped prompts
+  // naturally re-evaluate on the next Back-to-Home — their gates are
+  // cadence-based, not fire-once-forever, so nothing is permanently
+  // dropped.
   //
   // Prior design fired all three serially, stacking up to 3 modal
   // asks in a row. Capping to one is what brings the worst-case
   // dc → home chain down to ~3 overlays + prompt + home.
   const runFirstEligibleThenContinue = () => {
+    if (_npsDue) {
+      showNPSModal(runContinuation);
+      return;
+    }
     if (_promptTrigger) {
       maybeShowGuestPrompt(runContinuation, _promptTrigger);
       return;
@@ -17231,6 +17422,267 @@ function _shareModalTap(kind) {
   if (kind === 'share') { doShare(); }
   else if (kind === 'skip') { skipShare(); }
 }
+
+// ═══════════════════════════════════════════════════════════
+// NPS SURVEY
+// ═══════════════════════════════════════════════════════════
+// Chapter-complete signed-in feedback prompt. Fires at most once per
+// 90 days if the user actually scored a prior prompt, or once per 30
+// days if they X'd out without scoring (they may have just been mid-
+// something — shorter penalty for no-engagement dismissals). Once the
+// user Sends (with any score), the modal never fires again for that
+// account. Guest users never see NPS — signup wins for them via the
+// existing priority chain.
+
+const _NPS_STORE_URL_IOS = 'https://apps.apple.com/app/id6781227385';
+const _NPS_STORE_URL_ANDROID = 'https://play.google.com/store/apps/details?id=com.corpusapp.corpus';
+
+// Days-between helper — same shape as _daysBetween in the guest-prompt
+// cadence, duplicated locally so this section is self-contained.
+function _npsDaysBetween(fromIso, toIso) {
+  if (!fromIso || !toIso) return 0;
+  const a = new Date(fromIso + 'T00:00:00');
+  const b = new Date(toIso + 'T00:00:00');
+  if (isNaN(a.getTime()) || isNaN(b.getTime())) return 0;
+  return Math.round((b.getTime() - a.getTime()) / 86400000);
+}
+
+function _npsBranchFor(score) {
+  if (score <= 6) return 'detractor';
+  if (score <= 8) return 'passive';
+  return 'promoter';
+}
+
+// Cadence gate. Chapter-complete gate lives at the call site so this
+// function stays reusable if we ever want a manual "give feedback"
+// entry from the profile screen.
+function _shouldShowNPS() {
+  if (!currentUser) return false;
+  const s = state.npsState || {};
+  if (s.submittedAt) return false;
+  const today = new Date().toISOString().split('T')[0];
+  // If they scored a prior prompt: 90-day cooldown from that score.
+  if (s.lastScoredAt) {
+    if (_npsDaysBetween(s.lastScoredAt, today) < 90) return false;
+  } else if (s.lastShownAt) {
+    // Shown but no score ever picked: 30-day shorter cooldown.
+    if (_npsDaysBetween(s.lastShownAt, today) < 30) return false;
+  }
+  return true;
+}
+
+// Continuation callback + score-picked-this-session flag; consumed by
+// dismiss/send paths to run the post-prompt continuation exactly once.
+let _npsPendingContinuation = null;
+let _npsCurrentScore = null;
+// Debug mode — set by window._debugShowNPS to bypass state stamps,
+// posthog events, and the Supabase write so a dev can preview the UI
+// without polluting analytics or DB. Reset when the modal closes.
+let _npsDebugMode = false;
+
+function showNPSModal(callback) {
+  _npsPendingContinuation = callback || null;
+  _npsCurrentScore = null;
+  const modal = document.getElementById('modal-nps');
+  if (!modal) { if (_npsPendingContinuation) _npsPendingContinuation(); return; }
+  const isEn = state.lang === 'en';
+
+  // Reset views to View A (score picker).
+  document.getElementById('nps-view-score').style.display = '';
+  document.getElementById('nps-view-text').style.display  = 'none';
+  document.getElementById('nps-view-store').style.display = 'none';
+  document.getElementById('nps-textarea').value = '';
+
+  // Question copy.
+  document.getElementById('nps-question').textContent = isEn
+    ? 'How likely are you to recommend Corpus to a friend?'
+    : 'עד כמה תמליצו על קורפוס לחבר?';
+
+  // Build the 0-10 score buttons. Rebuilt on every open to avoid state
+  // leaking between opens (e.g. an old handler with a stale score).
+  const scale = document.getElementById('nps-scale');
+  scale.innerHTML = '';
+  for (let n = 0; n <= 10; n++) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'nps-score-btn';
+    b.textContent = String(n);
+    b.setAttribute('aria-label', String(n));
+    b.addEventListener('click', () => _npsScoreTap(n));
+    scale.appendChild(b);
+  }
+
+  // Wire dismiss.
+  const dis = document.getElementById('nps-dismiss');
+  if (dis) dis.onclick = () => _npsDismiss('x');
+
+  // Stamp lastShownAt on open (unless debug mode). Cadence starts
+  // ticking from now even if the user X's immediately — the shorter
+  // 30-day no-score cooldown handles the "they just dismissed" case.
+  if (!_npsDebugMode) {
+    const today = new Date().toISOString().split('T')[0];
+    state.npsState = state.npsState || { lastShownAt: '', lastScoredAt: '', submittedAt: '' };
+    const priorShown = state.npsState.lastShownAt;
+    state.npsState.lastShownAt = today;
+    try { saveState(); } catch(e) {}
+    try {
+      posthog.capture('nps_shown', {
+        chapter_week_id: state.currentWeek || null,
+        subject: state.subject || null,
+        days_since_last_shown: priorShown ? _npsDaysBetween(priorShown, today) : null,
+      });
+    } catch(e) {}
+  }
+
+  modal.classList.add('active');
+}
+
+function _npsScoreTap(score) {
+  _npsCurrentScore = score;
+  const isEn = state.lang === 'en';
+
+  if (!_npsDebugMode) {
+    const today = new Date().toISOString().split('T')[0];
+    state.npsState = state.npsState || { lastShownAt: '', lastScoredAt: '', submittedAt: '' };
+    state.npsState.lastScoredAt = today;
+    try { saveState(); } catch(e) {}
+    try {
+      posthog.capture('nps_scored', { score: score, branch: _npsBranchFor(score) });
+    } catch(e) {}
+  }
+
+  // Switch to View B.
+  document.getElementById('nps-view-score').style.display = 'none';
+  document.getElementById('nps-view-text').style.display  = '';
+
+  const branch = _npsBranchFor(score);
+  const prompts = {
+    detractor: { en: 'What could be better?',                    he: 'מה אפשר לשפר?' },
+    passive:   { en: "What's the one thing we should improve?",  he: 'מה הדבר האחד שכדאי לנו לשפר?' },
+    promoter:  { en: 'What would you tell a friend about Corpus?', he: 'מה הייתם מספרים על קורפוס לחבר?' },
+  }[branch];
+
+  document.getElementById('nps-your-score').textContent =
+    (isEn ? 'You scored: ' : 'הציון שנתתם: ') + score + '/10';
+  document.getElementById('nps-branch-prompt').textContent = isEn ? prompts.en : prompts.he;
+  document.getElementById('nps-send-btn').textContent = isEn ? 'Send' : 'שליחה';
+  document.getElementById('nps-skip').textContent    = isEn ? 'Skip'  : 'דילוג';
+
+  // Autofocus the textarea after the view transition renders — small
+  // rAF gap so iOS doesn't miss the focus on a display: none → block
+  // swap in the same tick.
+  requestAnimationFrame(() => {
+    const ta = document.getElementById('nps-textarea');
+    if (ta) { try { ta.focus(); } catch(e) {} }
+  });
+}
+
+async function _npsSend() {
+  const score   = _npsCurrentScore;
+  const comment = (document.getElementById('nps-textarea').value || '').trim();
+  const branch  = _npsBranchFor(score);
+  const isEn    = state.lang === 'en';
+
+  if (!_npsDebugMode) {
+    // Supabase insert. Errors caught + logged; a lost row is
+    // acceptable because posthog nps_scored captured the score value
+    // already. RLS on nps_responses locks the row to auth.uid() so
+    // no cross-user leak is possible.
+    try {
+      const { error } = await sb.from('nps_responses').insert({
+        user_id: currentUser.id,
+        score: score,
+        comment: comment || null,
+        chapter_week_id: state.currentWeek || null,
+        subject: state.subject || null,
+      });
+      if (error) console.warn('[NPS] insert failed:', error.message);
+    } catch (e) {
+      console.warn('[NPS] insert exception:', e && e.message);
+    }
+    // Permanent kill: submittedAt stamped. Modal never fires again.
+    const today = new Date().toISOString().split('T')[0];
+    state.npsState = state.npsState || { lastShownAt: '', lastScoredAt: '', submittedAt: '' };
+    state.npsState.submittedAt = today;
+    try { saveState(); } catch(e) {}
+    try {
+      posthog.capture('nps_submitted', {
+        score: score,
+        branch: branch,
+        text_length: comment.length,
+        review_prompt_fired: false,   // commit 3 will flip this for promoters
+      });
+      posthog.people.set({ nps_score: score });
+    } catch(e) {}
+  }
+
+  // 9-10 promoters get the App Store CTA. 0-8 close and continue.
+  if (branch === 'promoter') {
+    document.getElementById('nps-view-text').style.display  = 'none';
+    document.getElementById('nps-view-store').style.display = '';
+    document.getElementById('nps-thanks').textContent = isEn
+      ? 'Thanks. Would you rate Corpus on the App Store?'
+      : 'תודה. רוצים לדרג את קורפוס באפ סטור?';
+    document.getElementById('nps-store-btn').textContent   = isEn ? 'Rate Corpus →' : 'לדירוג קורפוס ←';
+    document.getElementById('nps-store-skip').textContent  = isEn ? 'Not now'       : 'לא עכשיו';
+  } else {
+    _closeNPSModal();
+    _runNPSContinuation();
+  }
+}
+
+function _npsOpenStore() {
+  const url = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'android')
+    ? _NPS_STORE_URL_ANDROID
+    : _NPS_STORE_URL_IOS;
+  try { window.open(url, '_blank'); } catch(e) {}
+  _closeNPSModal();
+  _runNPSContinuation();
+}
+
+function _npsDismiss(kind) {
+  // kind: 'x' | 'skip' | 'store-skip'
+  if (!_npsDebugMode) {
+    try {
+      posthog.capture('nps_dismissed', {
+        score_selected: _npsCurrentScore,
+        had_text: !!(document.getElementById('nps-textarea').value || '').trim(),
+        kind: kind,
+      });
+    } catch(e) {}
+  }
+  _closeNPSModal();
+  _runNPSContinuation();
+}
+
+function _closeNPSModal() {
+  const modal = document.getElementById('modal-nps');
+  if (modal) modal.classList.remove('active');
+  _npsCurrentScore = null;
+  _npsDebugMode = false;
+}
+
+function _runNPSContinuation() {
+  const fn = _npsPendingContinuation;
+  _npsPendingContinuation = null;
+  if (typeof fn === 'function') fn();
+}
+
+// Console debug entry — opens the modal in the current language with
+// NO state stamps, NO posthog events, NO Supabase write. Analytics
+// stay clean; DB stays clean. Also exposes _debugResetNPS to clear
+// cadence state so the normal gate re-opens after a real submission.
+try {
+  window._debugShowNPS = function() {
+    _npsDebugMode = true;
+    showNPSModal(() => { console.log('[NPS-debug] modal closed'); });
+  };
+  window._debugResetNPS = function() {
+    state.npsState = { lastShownAt: '', lastScoredAt: '', submittedAt: '' };
+    try { saveState(); } catch(e) {}
+    console.log('[NPS-debug] npsState cleared');
+  };
+} catch(e) {}
 
 function showLogoutConfirm() {
   document.getElementById('modal-logout-confirm').classList.add('active');
