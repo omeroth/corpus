@@ -6116,13 +6116,16 @@
      cadence (see _shouldShowNPS). Three-view flow inside one box:
      score picker → branch-specific text form → optional 9-10 App Store
      CTA. Styled from the guest-signup base tokens for consistency. */
+  /* All accent tints below use rgba(var(--accent-rgb), N) so the modal
+     picks up the active subject's colour — philosophy purple, economics
+     blue, psychology orange — rather than hardcoding philosophy hex. */
   #modal-nps .modal-box {
     background-color: var(--surface);
     background-image:
-      radial-gradient(circle at 50% 22%, var(--surface) 0%, rgba(123, 79, 212, 0.10) 100%);
-    border: 1px solid rgba(123, 79, 212, 0.20);
+      radial-gradient(circle at 50% 22%, var(--surface) 0%, rgba(var(--accent-rgb), 0.10) 100%);
+    border: 1px solid rgba(var(--accent-rgb), 0.20);
     color: var(--ink);
-    box-shadow: 0 30px 80px -20px rgba(123, 79, 212, 0.24);
+    box-shadow: 0 30px 80px -20px rgba(var(--accent-rgb), 0.24);
     padding: 28px 22px 22px;
     max-width: 420px;
     position: relative;
@@ -6133,7 +6136,7 @@
     inset-inline-end: 8px;
     background: none;
     border: none;
-    color: rgba(42, 18, 102, 0.45);
+    color: var(--text-2);
     font-size: 22px;
     line-height: 1;
     padding: 6px 10px;
@@ -6167,7 +6170,7 @@
     padding: 10px 0;
     background: var(--surface);
     color: var(--ink);
-    border: 1px solid rgba(123, 79, 212, 0.28);
+    border: 1px solid rgba(var(--accent-rgb), 0.28);
     border-radius: 8px;
     font-family: 'DM Sans', sans-serif;
     font-size: 14px;
@@ -6177,7 +6180,7 @@
     transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.1s;
     box-sizing: border-box;
   }
-  .nps-score-btn:hover  { background: rgba(123, 79, 212, 0.08); border-color: var(--accent); }
+  .nps-score-btn:hover  { background: rgba(var(--accent-rgb), 0.08); border-color: var(--accent); }
   .nps-score-btn:active { transform: scale(0.94); }
   .nps-your-score {
     text-align: center;
@@ -6202,7 +6205,7 @@
     padding: 12px 14px;
     background: var(--surface);
     color: var(--ink);
-    border: 1px solid rgba(123, 79, 212, 0.22);
+    border: 1px solid rgba(var(--accent-rgb), 0.22);
     border-radius: 12px;
     font-family: 'DM Sans', sans-serif;
     font-size: 15px;
@@ -6223,20 +6226,23 @@
     margin: 6px 4px 12px;
   }
   #nps-skip, #nps-store-skip {
-    color: rgba(42, 18, 102, 0.55);
+    color: var(--text-2);
     margin-top: 4px;
   }
+  /* Dark-mode overrides. Accent tint is stronger in dark to survive
+     the darker surface; text colors flip via --text/--text-2 tokens
+     which are already subject-themed, so no per-subject dark rules
+     needed. Score/textarea backgrounds stay white-based rgba because
+     they're neutral chrome, not brand-tinted surfaces. */
   html.dark #modal-nps .modal-box {
     background-color: var(--surface);
     background-image:
-      radial-gradient(circle at 50% 22%, var(--surface) 0%, rgba(123, 79, 212, 0.18) 100%);
+      radial-gradient(circle at 50% 22%, var(--surface) 0%, rgba(var(--accent-rgb), 0.18) 100%);
     color: var(--text);
   }
   html.dark #modal-nps .nps-question,
   html.dark #modal-nps .nps-branch-prompt,
   html.dark #modal-nps .nps-thanks { color: var(--text); }
-  html.dark .nps-dismiss { color: rgba(245, 241, 255, 0.55); }
-  html.dark .nps-your-score { color: rgba(245, 241, 255, 0.68); }
   html.dark .nps-score-btn {
     background: rgba(255, 255, 255, 0.04);
     color: var(--text);
@@ -6247,7 +6253,6 @@
     color: var(--text);
     border-color: rgba(255, 255, 255, 0.16);
   }
-  html.dark #nps-skip, html.dark #nps-store-skip { color: rgba(245, 241, 255, 0.55); }
 
   /* ── Subject select — bright cinematic vertical stack ──
      Shown for new-user onboarding (body has on-subject-screen but NOT
