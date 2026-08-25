@@ -9102,6 +9102,68 @@ async function _resetSuppressedCount() {
 // sign the user out after the fact; anything network-shaped keeps them in
 // and arms a listener that retries when connectivity returns.
 
+// Diagnostic: parse the stored access token's exp claim and log whether
+// it's still valid at boot. Doesn't gate anything; result lands in the
+// console next to the other [Auth] boot lines. Reads Preferences the
+// same way _readStoredSession does but pulls the access_token (which
+// that function drops). Fully guarded — a corrupt or missing token
+// logs a diagnostic message and moves on.
+async function _diagLogStoredTokenAge() {
+  try {
+    const p = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Preferences;
+    if (!p) { console.log('[Auth-diag] no Preferences plugin — web/dev context'); return; }
+    const { keys } = await _timeboxed(p.keys(), 5000, 'Preferences.keys (diag)');
+    const authKey = keys && keys.find(k => _AUTH_TOKEN_KEY_RE.test(k));
+    if (!authKey) { console.log('[Auth-diag] no stored session at boot'); return; }
+    const { value } = await _timeboxed(p.get({ key: authKey }), 5000, 'Preferences.get (diag)');
+    if (!value) { console.log('[Auth-diag] stored key present but value empty'); return; }
+    const parsed = JSON.parse(value);
+    const session = (parsed && parsed.currentSession) || parsed;
+    const at = session && session.access_token;
+    if (!at) { console.log('[Auth-diag] stored session has no access_token'); return; }
+    const parts = at.split('.');
+    if (parts.length < 2) { console.log('[Auth-diag] access token malformed'); return; }
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    const expMs = payload.exp * 1000;
+    const ageMs = Date.now() - expMs;
+    if (ageMs < 0) {
+      console.log('[Auth-diag] stored access token VALID — expires in', Math.round(-ageMs / 1000), 's');
+    } else {
+      console.log('[Auth-diag] stored access token EXPIRED', Math.round(ageMs / 60000), 'minutes ago — refresh required on first authed call');
+    }
+  } catch(e) {
+    console.log('[Auth-diag] token expiry check failed:', e && e.message);
+  }
+}
+
+// Diagnostic: independent probe of Supabase's auth server. Runs
+// unauthenticated (no bearer, just anon key). Fast response means the
+// service is up; slow means auth-side latency. Compares against
+// _diagProbeRestHealth to isolate auth-only slowness.
+async function _diagProbeAuthHealth() {
+  const t0 = performance.now();
+  try {
+    const r = await fetch(SUPABASE_URL + '/auth/v1/health', { headers: { apikey: SUPABASE_ANON_KEY } });
+    console.log('[Auth-diag] auth/v1/health probe:', Math.round(performance.now() - t0), 'ms, status:', r.status);
+  } catch(e) {
+    console.log('[Auth-diag] auth/v1/health probe FAILED after', Math.round(performance.now() - t0), 'ms:', e && e.message);
+  }
+}
+
+// Diagnostic: independent probe of Supabase's REST endpoint (which our
+// reads go to). If this is fast but auth is slow, the stall is entirely
+// on the auth side, not the REST side. Uses the anon key so no auth
+// dependency.
+async function _diagProbeRestHealth() {
+  const t0 = performance.now();
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/', { headers: { apikey: SUPABASE_ANON_KEY } });
+    console.log('[Auth-diag] rest/v1 probe:', Math.round(performance.now() - t0), 'ms, status:', r.status);
+  } catch(e) {
+    console.log('[Auth-diag] rest/v1 probe FAILED after', Math.round(performance.now() - t0), 'ms:', e && e.message);
+  }
+}
+
 async function _readStoredSession() {
   try {
     const p = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Preferences;
@@ -9224,15 +9286,27 @@ async function _executeServerRejectedSignout(info) {
 
 async function _backgroundRefresh(refresh_token) {
   _recoveryInProgress = true;
+  const _bgT0 = performance.now();
+  // Diagnostic marker: this manual refresh call can race with gotrue's
+  // own on-demand refresh (triggered when the first authed sb.from() call
+  // sees an expired access_token). Both hit /auth/v1/token with the same
+  // single-use refresh_token; the loser gets "Invalid Refresh Token:
+  // Already Used" and gotrue retries with backoff, which is the leading
+  // theory for the 18s parallel-read stall. Start/end timing + full
+  // error surface below makes the race visible in the console.
+  console.log('[Auth] _backgroundRefresh STARTED at t=', Math.round(performance.now()), 'ms');
   try {
     const { data, error } = await sb.auth.refreshSession({ refresh_token });
+    const _bgMs = Math.round(performance.now() - _bgT0);
     if (data && data.session) {
       // Success — gotrue's own TOKEN_REFRESHED event fires and the
       // onAuthStateChange handler resets the expired-token flags and
       // triggers a post-recovery sync.
-      console.log('[Auth] background refresh succeeded');
+      console.log('[Auth] _backgroundRefresh SUCCEEDED after', _bgMs, 'ms — new access_token issued');
       return;
     }
+    console.log('[Auth] _backgroundRefresh returned NO SESSION after', _bgMs, 'ms — error:',
+      error && error.message, '— code:', error && error.code, '— status:', error && error.status);
     const classification = _classifyRefreshError(error);
     if (classification === 'server-rejected') {
       const info = {
@@ -9258,9 +9332,12 @@ async function _backgroundRefresh(refresh_token) {
     console.warn('[Auth] refresh network-failed — staying in expired-token mode:', error && error.message);
     _armReconnectListener();
   } catch(e) {
-    console.warn('[Auth] background refresh errored — treating as network-failed:', e && e.message);
+    console.warn('[Auth] _backgroundRefresh THREW after', Math.round(performance.now() - _bgT0), 'ms — message:',
+      e && e.message, '— treating as network-failed');
     _armReconnectListener();
   } finally {
+    console.log('[Auth] _backgroundRefresh finished at t=', Math.round(performance.now()), 'ms (total:',
+      Math.round(performance.now() - _bgT0), 'ms)');
     _recoveryInProgress = false;
   }
 }
@@ -20084,6 +20161,31 @@ async function enterApp(user) {
       _loadingStripEl.classList.add('visible');
     }
   }, 2500);
+  // Diagnostic: explicit getSession() BEFORE the parallel reads. gotrue
+  // refreshes the token here if it's expired; doing it explicitly
+  // serializes the refresh into ONE visible, timeable step instead of
+  // both parallel reads racing to trigger it implicitly (which is the
+  // shape of the 18s stall observed on device). Also isolates
+  // refresh time from query time in the console. Diagnostic-only in
+  // this commit — behavior downstream (Promise.all reads) is
+  // unchanged.
+  const _sessT0 = performance.now();
+  console.log('[Auth] pre-read getSession starting at t=', Math.round(performance.now()), 'ms');
+  try {
+    const { data: _sd, error: _se } = await _timeboxed(sb.auth.getSession(), 12000, 'getSession pre-read');
+    const _sessMs = Math.round(performance.now() - _sessT0);
+    const _sess = _sd && _sd.session;
+    if (_sess && _sess.expires_at) {
+      const _secLeft = Math.round(_sess.expires_at - Date.now() / 1000);
+      console.log('[Auth] pre-read getSession ok after', _sessMs, 'ms — access_token present, expires in', _secLeft, 's');
+    } else if (_sess) {
+      console.log('[Auth] pre-read getSession ok after', _sessMs, 'ms — session present but no expires_at');
+    } else {
+      console.log('[Auth] pre-read getSession ok after', _sessMs, 'ms — NO SESSION', _se ? ('error: ' + _se.message) : '');
+    }
+  } catch(e) {
+    console.log('[Auth] pre-read getSession FAILED after', Math.round(performance.now() - _sessT0), 'ms:', e && e.message);
+  }
   try {
     await _timeboxed(
       Promise.all([
@@ -20530,6 +20632,16 @@ function initUI() {
     try {
       console.log('[Auth] initApp started');
       _authInitStartMs = performance.now();
+
+      // Diagnostics: stored-token expiry + auth/rest health probes.
+      // All fire-and-forget so they don't gate boot; results land in
+      // console as they resolve. Present to help diagnose the 18s
+      // parallel-read stall observed after PrivacyScreen fix — theory
+      // is token-refresh contention on boot when the stored access
+      // token has expired.
+      try { _diagLogStoredTokenAge(); } catch(e) {}
+      try { _diagProbeAuthHealth(); } catch(e) {}
+      try { _diagProbeRestHealth(); } catch(e) {}
 
       // Native Google Sign-In (Capgo plugin). No-op on web.
       const _isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
