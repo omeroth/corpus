@@ -9104,7 +9104,7 @@
     <div class="nps-view" id="nps-view-text" style="display:none">
       <div class="nps-your-score" id="nps-your-score"></div>
       <div class="nps-branch-prompt" id="nps-branch-prompt"></div>
-      <textarea class="nps-textarea" id="nps-textarea" rows="4"></textarea>
+      <textarea class="nps-textarea" id="nps-textarea" rows="4" maxlength="2000"></textarea>
       <button class="nav-btn" id="nps-send-btn" type="button" onclick="_npsSend()"></button>
       <button type="button" class="share-modal-skip" id="nps-skip" onclick="_npsDismiss('skip')"></button>
     </div>
@@ -16934,12 +16934,14 @@ function closeCompleteModal(opts) {
   // maybeShowGuestPrompt (once-per-day) prevents overlap with the signup.
   const _streakDue = [3, 7, 30].includes(state.dailyStreak);
 
-  // NPS eligibility: signed-in user finishing a chapter AND cadence gate
-  // in _shouldShowNPS passes (90d since last score OR 30d since last
-  // no-score dismissal, and never after Send). Takes top slot in the
-  // priority chain — rarest fire (max once per 90d, once ever if
-  // submitted) and the chapter-complete moment is the ideal ask.
-  const _npsDue = !!currentUser && _hasChapterComplete && _shouldShowNPS();
+  // NPS eligibility: chapter-complete AND cadence gate in _shouldShowNPS
+  // passes (90d since last score OR 30d since last no-score dismissal,
+  // and never after Send). Open to guests too — writes go via device_id
+  // when currentUser is null. Priority ordering below deliberately
+  // demotes NPS below signup for guests so we don't give away the
+  // conversion moment; for signed-in users (no signup gate) NPS takes
+  // the top slot as originally designed.
+  const _npsDue = _hasChapterComplete && _shouldShowNPS();
 
   const anyPromptDue = _npsDue || !!_promptTrigger || shouldShowShare || _streakDue;
 
@@ -16967,27 +16969,33 @@ function closeCompleteModal(opts) {
     continuation();
   };
 
-  // Prompt cap: fire at most ONE modal per exit. Priority
-  //   nps > signup > share > streak_milestone
-  // NPS wins when due because it's the rarest fire (max once/90d, once
-  // ever on submit) AND chapter-complete is its only trigger — miss it
-  // and the user waits 90 days for another eligible moment. Signup
-  // (guest-only anyway; the _npsDue guard requires currentUser so they
-  // can't collide) is second, then share, then streak. Skipped prompts
-  // naturally re-evaluate on the next Back-to-Home — their gates are
-  // cadence-based, not fire-once-forever, so nothing is permanently
-  // dropped.
+  // Prompt cap: fire at most ONE modal per exit. Priority differs
+  // by auth state so the signup conversion moment stays protected:
+  //   guest:      signup > nps > share > streak_milestone
+  //   signed-in:  nps    > share > streak_milestone   (no signup gate)
   //
-  // Prior design fired all three serially, stacking up to 3 modal
-  // asks in a row. Capping to one is what brings the worst-case
-  // dc → home chain down to ~3 overlays + prompt + home.
+  // Signup wins over NPS for guests because signup is the conversion
+  // mechanism — giving away its chapter-complete slot to a survey
+  // undercuts the whole point. Guests will still see NPS whenever
+  // signup isn't due (cooldown ladder, permanentlyDismissed, etc.),
+  // which the cadence gates make common. For signed-in users no
+  // signup exists so NPS wins as originally spec'd.
+  //
+  // Skipped prompts naturally re-evaluate on the next Back-to-Home —
+  // their gates are cadence-based, not fire-once-forever, so nothing
+  // is permanently dropped. Prior design fired all serially, stacking
+  // up to 3 modal asks in a row. Capping to one is what brings the
+  // worst-case dc → home chain down to ~3 overlays + prompt + home.
   const runFirstEligibleThenContinue = () => {
-    if (_npsDue) {
-      showNPSModal(runContinuation);
+    if (_promptTrigger) {
+      // guest-signup path. Runs first for guests only (_promptTrigger
+      // is null for signed-in users because _shouldShowGuestPrompt
+      // returns false when currentUser is set).
+      maybeShowGuestPrompt(runContinuation, _promptTrigger);
       return;
     }
-    if (_promptTrigger) {
-      maybeShowGuestPrompt(runContinuation, _promptTrigger);
+    if (_npsDue) {
+      showNPSModal(runContinuation);
       return;
     }
     if (shouldShowShare) {
@@ -17457,9 +17465,12 @@ function _npsBranchFor(score) {
 
 // Cadence gate. Chapter-complete gate lives at the call site so this
 // function stays reusable if we ever want a manual "give feedback"
-// entry from the profile screen.
+// entry from the profile screen. Guests welcome — Send writes with
+// device_id when currentUser is null (RLS 'insert anon nps' policy,
+// migration 20260826120000). Priority ordering at the trigger site
+// still lets guest-signup win over NPS for guests specifically so
+// conversion doesn't lose its chapter-complete slot.
 function _shouldShowNPS() {
-  if (!currentUser) return false;
   const s = state.npsState || {};
   if (s.submittedAt) return false;
   const today = new Date().toISOString().split('T')[0];
@@ -17471,6 +17482,33 @@ function _shouldShowNPS() {
     if (_npsDaysBetween(s.lastShownAt, today) < 30) return false;
   }
   return true;
+}
+
+// Stable per-install identifier for guest NPS writes. PostHog's
+// distinct_id already persists across sessions and is used for event
+// identity, so reusing it means one less local field to manage.
+// Falls back to a generated + localStorage-persisted UUID when
+// PostHog isn't available (opted out, plugin missing, dev context).
+function _getDeviceId() {
+  try {
+    if (window.posthog && typeof posthog.get_distinct_id === 'function') {
+      const pd = posthog.get_distinct_id();
+      if (pd) return String(pd);
+    }
+  } catch(e) {}
+  try {
+    let id = localStorage.getItem('corpus_device_id');
+    if (id) return id;
+    id = (window.crypto && crypto.randomUUID && crypto.randomUUID()) ||
+         ('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+           const r = Math.random() * 16 | 0;
+           return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+         }));
+    localStorage.setItem('corpus_device_id', id);
+    return id;
+  } catch(e) {
+    return null;
+  }
 }
 
 // Continuation callback + score-picked-this-session flag; consumed by
@@ -17532,6 +17570,7 @@ function showNPSModal(callback) {
         chapter_week_id: state.currentWeek || null,
         subject: state.subject || null,
         days_since_last_shown: priorShown ? _npsDaysBetween(priorShown, today) : null,
+        is_guest: !currentUser,
       });
     } catch(e) {}
   }
@@ -17549,7 +17588,7 @@ function _npsScoreTap(score) {
     state.npsState.lastScoredAt = today;
     try { saveState(); } catch(e) {}
     try {
-      posthog.capture('nps_scored', { score: score, branch: _npsBranchFor(score) });
+      posthog.capture('nps_scored', { score: score, branch: _npsBranchFor(score), is_guest: !currentUser });
     } catch(e) {}
   }
 
@@ -17581,23 +17620,29 @@ function _npsScoreTap(score) {
 
 async function _npsSend() {
   const score   = _npsCurrentScore;
-  const comment = (document.getElementById('nps-textarea').value || '').trim();
+  // Cap to 2000 chars client-side — matches the DB check constraint
+  // (nps_responses_comment_length_ck) added in the guest-open migration,
+  // so an over-long paste doesn't produce an insert error at the wire.
+  // The textarea also has a maxlength attribute for the same reason.
+  const comment = (document.getElementById('nps-textarea').value || '').trim().slice(0, 2000);
   const branch  = _npsBranchFor(score);
   const isEn    = state.lang === 'en';
 
   if (!_npsDebugMode) {
-    // Supabase insert. Errors caught + logged; a lost row is
-    // acceptable because posthog nps_scored captured the score value
-    // already. RLS on nps_responses locks the row to auth.uid() so
-    // no cross-user leak is possible.
+    // Supabase insert. Signed-in users write user_id (existing 'insert
+    // own nps' policy); guests write device_id (new 'insert anon nps'
+    // policy from migration 20260826120000). identity_present check
+    // constraint enforces one-or-the-other.
+    const identity = currentUser
+      ? { user_id: currentUser.id, device_id: null }
+      : { user_id: null, device_id: _getDeviceId() };
     try {
-      const { error } = await sb.from('nps_responses').insert({
-        user_id: currentUser.id,
+      const { error } = await sb.from('nps_responses').insert(Object.assign({
         score: score,
         comment: comment || null,
         chapter_week_id: state.currentWeek || null,
         subject: state.subject || null,
-      });
+      }, identity));
       if (error) console.warn('[NPS] insert failed:', error.message);
     } catch (e) {
       console.warn('[NPS] insert exception:', e && e.message);
@@ -17613,6 +17658,7 @@ async function _npsSend() {
         branch: branch,
         text_length: comment.length,
         review_prompt_fired: false,   // commit 3 will flip this for promoters
+        is_guest: !currentUser,
       });
       posthog.people.set({ nps_score: score });
     } catch(e) {}
@@ -17650,6 +17696,7 @@ function _npsDismiss(kind) {
         score_selected: _npsCurrentScore,
         had_text: !!(document.getElementById('nps-textarea').value || '').trim(),
         kind: kind,
+        is_guest: !currentUser,
       });
     } catch(e) {}
   }
@@ -17678,6 +17725,15 @@ try {
   window._debugShowNPS = function() {
     _npsDebugMode = true;
     showNPSModal(() => { console.log('[NPS-debug] modal closed'); });
+  };
+  window._debugShowNPSLive = function() {
+    // Real path — state stamps, posthog events, Supabase write on Send.
+    // Bypasses the cadence gate (calls showNPSModal directly), but
+    // otherwise indistinguishable from a natural chapter-complete fire.
+    // submittedAt permanently kills future prompts — call
+    // _debugResetNPS() to re-test. Guest test: sign out first;
+    // insert routes via device_id per the anon RLS policy.
+    showNPSModal(() => { console.log('[NPS-live] modal closed'); });
   };
   window._debugResetNPS = function() {
     state.npsState = { lastShownAt: '', lastScoredAt: '', submittedAt: '' };
