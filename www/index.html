@@ -9029,6 +9029,38 @@ const APP_VERSION = '1.3.1';
 
 const SUPABASE_URL = 'https://xcoikjoatcrjqxzykwlt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjb2lram9hdGNyanF4enlrd2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjc5NjYsImV4cCI6MjA4OTcwMzk2Nn0.5EhOsN9M4_kLYoRKO97dPGof8RN7PteXQrtKyx4CcKI';
+
+// Diagnostic: wrap window.fetch to log per-request start/end/duration.
+// Placed at top of the main script so every subsequent fetch is
+// instrumented — supabase-js, posthog, our health probes, everything.
+// URLs sanitized to origin+path (query stripped) so tokens or ids in
+// query params don't land in the console log. Testing whether fetches
+// leave the device promptly (fast END = network fine) vs whether their
+// .then callbacks are delayed because the main thread is starved by
+// notification-scheduling bridge callbacks (fast END + delayed
+// _timedLoad = main-thread contention).
+(function _instrumentFetch() {
+  if (window._origFetchInstalled) return;
+  window._origFetchInstalled = true;
+  const _origFetch = window.fetch.bind(window);
+  window.fetch = function(input, init) {
+    const rawUrl = typeof input === 'string' ? input : (input && input.url) || 'unknown';
+    let short = rawUrl;
+    try { const u = new URL(rawUrl); short = u.origin + u.pathname; } catch(e) {}
+    const method = (init && init.method) || (input && input.method) || 'GET';
+    const t0 = performance.now();
+    console.log('[Fetch]', method, 'START at t=', Math.round(t0), 'ms —', short);
+    return _origFetch(input, init).then(r => {
+      console.log('[Fetch]', method, 'END at t=', Math.round(performance.now()), 'ms (dur=',
+        Math.round(performance.now() - t0), 'ms) status:', r.status, '—', short);
+      return r;
+    }, e => {
+      console.log('[Fetch]', method, 'ERR at t=', Math.round(performance.now()), 'ms (dur=',
+        Math.round(performance.now() - t0), 'ms) —', short, ':', e && e.message);
+      throw e;
+    });
+  };
+})();
 // Auth-token removal guard. gotrue-js calls storage.removeItem() on the
 // primary sb-*-auth-token key when it decides a refresh is terminal. On
 // Android cold-boot the network may not be attached yet, and a transient
@@ -9369,7 +9401,10 @@ async function _enterFromStoredOrOnboarding(reason) {
   if (stored) {
     console.log('[Auth] ' + reason + ' — entering with stored session; refreshing in background');
     _enteredWithExpiredToken = true;
+    const _eagerEnterT0 = performance.now();
+    console.log('[Auth] eager path calling enterApp at t=', Math.round(_eagerEnterT0), 'ms');
     await enterApp(stored.user);
+    console.log('[Auth] eager path enterApp returned after', Math.round(performance.now() - _eagerEnterT0), 'ms — kicking off reschedule + backgroundRefresh at t=', Math.round(performance.now()), 'ms');
     rescheduleReminderFromToday();
     try { _schedulePsychologyAnnouncement(); } catch (e) {}
     _backgroundRefresh(stored.refresh_token);
@@ -14272,14 +14307,25 @@ function _reminderFireDateFor(dayOffset, timeHHMM) {
 // need to explicitly cancel-then-schedule for each.
 async function _reconcileReminders(opts) {
   if (!_isNotifPluginAvailable()) return;
+  const _reconT0 = performance.now();
+  console.log('[Reminder] reconcile STARTED at t=', Math.round(_reconT0), 'ms');
+  let _cancelCount = 0, _cancelMs = 0, _scheduleCount = 0, _scheduleMs = 0;
   const r = state.dailyReminder || {};
   if (!r.enabled) { await _cancelAllReminders(); return; }
+  const _permT0 = performance.now();
   const perm = await _checkNotifPermission();
+  console.log('[Reminder] checkPermissions took', Math.round(performance.now() - _permT0), 'ms →', perm);
   if (perm !== 'granted') { await _cancelAllReminders(); return; }
   // Kill the legacy daily-repeat id once, defensively. On first reconcile
   // after upgrading from the old scheduler, this removes the unconditional
   // 19:00-repeats-forever notif from the pending list.
-  await _cancelReminderId(REMINDER_NOTIF_ID);
+  {
+    const _t = performance.now();
+    await _cancelReminderId(REMINDER_NOTIF_ID);
+    const dur = performance.now() - _t;
+    _cancelCount++; _cancelMs += dur;
+    console.log('[Reminder] cancel legacy id', REMINDER_NOTIF_ID, 'took', Math.round(dur), 'ms');
+  }
   const windowDays = (opts && opts.windowDays) || REMINDER_WINDOW_DAYS;
   const lang = state.lang || 'en';
   const activeDates = new Set(state.activeDates || []);
@@ -14291,19 +14337,32 @@ async function _reconcileReminders(opts) {
     const completed = activeDates.has(streakDayFor);
     const alreadyPast = fireDate.getTime() <= now.getTime();
     if (completed || alreadyPast) {
+      const _t = performance.now();
       await _cancelReminderId(id);
+      const dur = performance.now() - _t;
+      _cancelCount++; _cancelMs += dur;
+      console.log('[Reminder] cancel id', id, 'took', Math.round(dur), 'ms');
       continue;
     }
     const body = _reminderCopy(lang).body;
+    const _t = performance.now();
     await _scheduleOneEvening(fireDate, id, body);
+    const dur = performance.now() - _t;
+    _scheduleCount++; _scheduleMs += dur;
+    console.log('[Reminder] schedule id', id, 'took', Math.round(dur), 'ms');
   }
   // Debug: report pending count on native for troubleshooting silent
   // schedule failures. Cheap; only runs on native.
   try {
+    const _pT = performance.now();
     const pending = await window.Capacitor.Plugins.LocalNotifications.getPending();
-    console.log('[Reminder] reconciled; pending ids:',
+    console.log('[Reminder] getPending took', Math.round(performance.now() - _pT), 'ms — ids:',
       (pending && pending.notifications || []).map(n => n.id));
   } catch(e) {}
+  console.log('[Reminder] reconcile DONE at t=', Math.round(performance.now()), 'ms',
+    '(total:', Math.round(performance.now() - _reconT0), 'ms,',
+    'cancels:', _cancelCount, '/', Math.round(_cancelMs), 'ms,',
+    'schedules:', _scheduleCount, '/', Math.round(_scheduleMs), 'ms)');
 }
 
 // Kept name so existing callers (initApp, visibilitychange→visible) don't
@@ -20906,7 +20965,11 @@ function initUI() {
               });
             } catch(e) {}
           }
+          const _oscEnterT0 = performance.now();
+          console.log('[Auth] onAuthStateChange handler calling enterApp at t=', Math.round(_oscEnterT0), 'ms');
           await enterApp(session.user);
+          const _oscEnterMs = Math.round(performance.now() - _oscEnterT0);
+          console.log('[Auth] onAuthStateChange enterApp returned after', _oscEnterMs, 'ms — kicking off reschedule at t=', Math.round(performance.now()), 'ms');
           // Reschedule daily reminder now that state.dailyReminder is loaded.
           rescheduleReminderFromToday();
           // One-off psychology-release announcement notification.
