@@ -9521,13 +9521,21 @@ async function syncProgressToSupabase() {
     }
   } catch(e) { _reportSyncFailure('lang', e); }
   try {
-    // Streak-repair state: dated-array fields. Server columns added in
-    // migration 20260721210000_streak_repair.sql. Separate upsert so a
-    // missing column doesn't break base sync.
+    // Streak state: repair audit trail (dated-array fields, migration
+    // 20260721210000) + activeDates (jsonb string array, migration
+    // 20260824210000). activeDates is the source of truth for the streak
+    // counter; putting it on the server is what fixes cross-device sign-in
+    // and reinstall-wipe cases. Separate upsert so a missing column on an
+    // un-migrated database doesn't break base sync.
+    //
+    // Write-path-only in this commit: the read side (union-merge on pull,
+    // completionsByDay backfill, post-merge recalculateStreak) ships in a
+    // follow-up so a regression here can be isolated to the write.
     const { error } = await sb.from('user_progress').upsert({
       user_id: currentUser.id,
       streak_breaks:  state.streakBreaks  || [],
       streak_repairs: state.streakRepairs || [],
+      active_dates:   state.activeDates   || [],
     }, { onConflict: 'user_id' });
     if (error) _reportSyncFailure('streak_repair', error);
   } catch(e) { _reportSyncFailure('streak_repair', e); }
@@ -13170,12 +13178,24 @@ function _isStreakRepairable() {
   return null;
 }
 
+// Single source of truth for writing the streak counter. Mirrors the
+// value into state.streak so the Supabase sync payload (which reads
+// state.streak in syncProgressToSupabase) carries a real number.
+// Before this helper nothing wrote state.streak locally, so the
+// `streak` column on user_progress was fed by an unwritten field —
+// effectively dead. Loops re-engagement and downstream analytics
+// consume that column, so the fix is to populate it, not remove it.
+function _setDailyStreak(n) {
+  state.dailyStreak = n;
+  state.streak = n;
+}
+
 function updateDailyStreak() {
   const today = _streakDay();
   const lastDate = state.lastActiveDate;
 
   if (!lastDate) {
-    state.dailyStreak = 1;
+    _setDailyStreak(1);
   } else if (lastDate === today) {
     if (!state.activeDates) state.activeDates = [];
     if (!state.activeDates.includes(today)) state.activeDates.push(today);
@@ -13188,7 +13208,7 @@ function updateDailyStreak() {
       // streak. Uses streakHistory[lastDate] for the prior streak value.
       _detectAndRecordBreak();
     }
-    state.dailyStreak = (lastDate === yesterdayStr) ? ((state.dailyStreak || 0) + 1) : 1;
+    _setDailyStreak((lastDate === yesterdayStr) ? ((state.dailyStreak || 0) + 1) : 1);
   }
 
   state.lastActiveDate = today;
@@ -13206,7 +13226,7 @@ function updateDailyStreak() {
 function recalculateStreak() {
   const activeDates = (state.activeDates || []).slice().sort();
   if (activeDates.length === 0) {
-    state.dailyStreak = 0;
+    _setDailyStreak(0);
     saveStateLocal();
     return;
   }
@@ -13221,13 +13241,13 @@ function recalculateStreak() {
       if (activeDates[i] === expectedPrev) streak++;
       else break;
     }
-    state.dailyStreak = streak;
+    _setDailyStreak(streak);
   } else {
     // Streak resets on init because activeDates.last is too old. Record the
     // break so the repair card can surface it if it's within the 48h window.
     state.lastActiveDate = lastActive;
     _detectAndRecordBreak();
-    state.dailyStreak = 0;
+    _setDailyStreak(0);
   }
   state.lastActiveDate = lastActive;
   saveStateLocal();
@@ -13704,7 +13724,7 @@ function _finalizeRepair() {
     if (!state.activeDates.includes(today)) state.activeDates.push(today);
     state.lastActiveDate = today;
     // Prior streak + 1 for today's completion of the repair itself.
-    state.dailyStreak = (info && info.priorStreak ? info.priorStreak : 0) + 1;
+    _setDailyStreak((info && info.priorStreak ? info.priorStreak : 0) + 1);
     state.streakHistory = state.streakHistory || {};
     state.streakHistory[today] = state.dailyStreak;
     saveStateLocal();
