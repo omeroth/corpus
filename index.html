@@ -20935,20 +20935,6 @@ function initUI() {
             } catch(e) {}
             _clearPendingSignout();
           }
-          // Post-recovery sync when any "session confirmed" event lands
-          // after we entered in expired-token mode. enterApp is a no-op
-          // here (appStarted is already true from the earlier stored-user
-          // entry), so manually kick off the loads that were skipped:
-          // server state merge (union/max only — cannot destroy local
-          // progress) and a push of anything the user completed while
-          // offline. Widened from the previous TOKEN_REFRESHED-only check
-          // because the fallback / eager-check paths can enter with the
-          // expired flag set and then have gotrue's own INITIAL_SESSION or
-          // SIGNED_IN emission arrive as the first success signal.
-          if (_wasExpiredEntry) {
-            try { loadProgressFromSupabase(); } catch(e) {}
-            try { syncProgressToSupabase(); } catch(e) {}
-          }
           // PostHog identify. Uses session.user.id (Supabase UUID) as the
           // stable distinct_id so any anonymous pre-login activity captured
           // against the auto-generated distinct_id gets merged into the
@@ -20956,7 +20942,8 @@ function initUI() {
           // record. Only fires on SIGNED_IN / INITIAL_SESSION (the two
           // "session confirmed" events) — TOKEN_REFRESHED is a silent
           // session extension where the user was already identified on the
-          // earlier SIGNED_IN or INITIAL_SESSION fire.
+          // earlier SIGNED_IN or INITIAL_SESSION fire. Non-sb, safe to
+          // keep inside the callback.
           if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session.user) {
             try {
               posthog.identify(session.user.id, {
@@ -20965,25 +20952,56 @@ function initUI() {
               });
             } catch(e) {}
           }
-          const _oscEnterT0 = performance.now();
-          console.log('[Auth] onAuthStateChange handler calling enterApp at t=', Math.round(_oscEnterT0), 'ms');
-          await enterApp(session.user);
-          const _oscEnterMs = Math.round(performance.now() - _oscEnterT0);
-          console.log('[Auth] onAuthStateChange enterApp returned after', _oscEnterMs, 'ms — kicking off reschedule at t=', Math.round(performance.now()), 'ms');
-          // Reschedule daily reminder now that state.dailyReminder is loaded.
-          rescheduleReminderFromToday();
-          // One-off psychology-release announcement notification.
-          // Safe to call unconditionally — guards inside skip if
-          // already-scheduled / already-visited / already-dismissed /
-          // permission not granted / not-yet-eligible.
-          try { _schedulePsychologyAnnouncement(); } catch (e) {}
+          // CRITICAL: every Supabase call below must run OUTSIDE the
+          // onAuthStateChange callback. supabase-js holds its auth lock
+          // for the duration of the callback's returned promise — any
+          // sb.auth.* or sb.from() call inside deadlocks on the lock the
+          // callback itself holds. Documented in supabase-js as
+          // "never call Supabase functions inside the auth state change
+          // callback." This was the root cause of the 18324ms parallel-
+          // read stall: enterApp -> sb.auth.getSession() hung until its
+          // 12s internal timeout, then fetches queued behind more waits,
+          // then finally ran in ~400ms once the lock was released.
+          //
+          // setTimeout(0) schedules a macrotask that runs AFTER the
+          // callback's promise resolves and the lock is released. Note
+          // this changes the ORDER guarantees around the handler:
+          // enterApp no longer completes before the handler returns, so
+          // any code path elsewhere that assumes "onAuthStateChange
+          // resolved => user is fully loaded" would be wrong. Nothing
+          // in the current codebase relies on that ordering — the
+          // handler was already fire-and-forget from gotrue's side.
+          //
+          // Deferred body:
+          //   - post-recovery loads (were _wasExpiredEntry-gated)
+          //   - enterApp (parallel reads + saveState)
+          //   - reschedule reminders (needs state.dailyReminder loaded)
+          //   - schedule psychology announcement (needs state loaded)
+          const _deferSess = session.user;
+          const _deferWasExpired = _wasExpiredEntry;
+          setTimeout(async () => {
+            const _oscEnterT0 = performance.now();
+            console.log('[Auth] deferred handler body starting at t=', Math.round(_oscEnterT0), 'ms — lock should be released');
+            if (_deferWasExpired) {
+              try { loadProgressFromSupabase(); } catch(e) {}
+              try { syncProgressToSupabase(); } catch(e) {}
+            }
+            await enterApp(_deferSess);
+            console.log('[Auth] deferred enterApp returned after', Math.round(performance.now() - _oscEnterT0), 'ms — kicking off reschedule at t=', Math.round(performance.now()), 'ms');
+            rescheduleReminderFromToday();
+            try { _schedulePsychologyAnnouncement(); } catch (e) {}
+          }, 0);
         } else if (event === 'INITIAL_SESSION' && !session) {
           // Guarded so the eager boot check and the timeout fallback can
           // pre-empt this branch when gotrue is slow / stuck. Whichever
           // path runs first flips initialEventReceived.
           if (initialEventReceived) return;
           initialEventReceived = true;
-          await _enterFromStoredOrOnboarding('INITIAL_SESSION null');
+          // Same deadlock avoidance as the session-confirmed branch above.
+          // _enterFromStoredOrOnboarding calls enterApp on the stored-
+          // session path, which touches sb — must run outside this
+          // callback so the auth lock is released first.
+          setTimeout(() => { _enterFromStoredOrOnboarding('INITIAL_SESSION null'); }, 0);
         } else if (event === 'SIGNED_OUT') {
           // Reader open? Defer. Same principle as the _backgroundRefresh
           // server-rejected path: don't destroy an in-progress dialogue
