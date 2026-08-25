@@ -17498,7 +17498,7 @@ function showNPSModal(callback) {
   // Question copy.
   document.getElementById('nps-question').textContent = isEn
     ? 'How likely are you to recommend Corpus to a friend?'
-    : 'עד כמה תמליצו על קורפוס לחבר?';
+    : 'מה הסיכוי שתמליצו על קורפוס לחבר?';
 
   // Build the 0-10 score buttons. Rebuilt on every open to avoid state
   // leaking between opens (e.g. an old handler with a stale score).
@@ -17560,8 +17560,8 @@ function _npsScoreTap(score) {
   const branch = _npsBranchFor(score);
   const prompts = {
     detractor: { en: 'What could be better?',                    he: 'מה אפשר לשפר?' },
-    passive:   { en: "What's the one thing we should improve?",  he: 'מה הדבר האחד שכדאי לנו לשפר?' },
-    promoter:  { en: 'What would you tell a friend about Corpus?', he: 'מה הייתם מספרים על קורפוס לחבר?' },
+    passive:   { en: "What's the one thing we should improve?",  he: 'מה הדבר האחד שכדאי שנשפר?' },
+    promoter:  { en: 'What would you tell a friend about us?',    he: 'מה תספרו עלינו לחבר?' },
   }[branch];
 
   document.getElementById('nps-your-score').textContent =
