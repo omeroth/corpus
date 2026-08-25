@@ -6152,28 +6152,30 @@
     margin: 6px 4px 18px;
   }
   .nps-scale {
-    display: flex;
-    justify-content: space-between;
+    /* Grid with 11 equal columns that fit the container width. minmax(0, 1fr)
+       lets each column shrink below its content's natural size so no button
+       overflows on narrow phones. Prior flex + overflow-x:auto approach hid
+       9 and 10 off-screen with no visual scroll affordance — the promoter
+       branch was silently unreachable. */
+    display: grid;
+    grid-template-columns: repeat(11, minmax(0, 1fr));
     gap: 4px;
     padding: 4px 0;
-    /* Horizontal scroll safety on very narrow phones — 11 buttons fit
-       comfortably at 320px+, but scroll rather than clip if squeezed. */
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
   }
   .nps-score-btn {
-    flex: 1 0 auto;
-    min-width: 30px;
+    min-width: 0;   /* let the grid track shrink below content width */
     padding: 10px 0;
     background: var(--surface);
     color: var(--ink);
     border: 1px solid rgba(123, 79, 212, 0.28);
-    border-radius: 10px;
+    border-radius: 8px;
     font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
+    text-align: center;
     cursor: pointer;
     transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.1s;
+    box-sizing: border-box;
   }
   .nps-score-btn:hover  { background: rgba(123, 79, 212, 0.08); border-color: var(--accent); }
   .nps-score-btn:active { transform: scale(0.94); }
