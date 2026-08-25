@@ -9566,6 +9566,15 @@ async function loadProgressFromSupabase() {
     //   chapter_complete_shown : union
     //   streak_breaks          : union by brokenAt (dated-array)
     //   streak_repairs         : union by date string (dated-array)
+    //   active_dates           : union by date string (dated-array).
+    //                            Also back-filled from completions_by_day
+    //                            keys — every day the user completed a
+    //                            dialogue is by definition an activeDate,
+    //                            and completions_by_day has been synced
+    //                            since migration 20260723180000, so this
+    //                            recovers ~1mo of history for users whose
+    //                            local activeDates was wiped or never
+    //                            synced (pre-active_dates column).
     //   daily_goal_history     : union by setAt (dated-array)
     //   completions_by_day     : max per key (per-day monotonic counter)
     //   goal_met_history       : union by metAt (dated-array)
@@ -9640,6 +9649,29 @@ async function loadProgressFromSupabase() {
         state.goalMetHistory.push({ metAt: g.metAt, goal: g.goal, count: g.count || 0, bonusXp: g.bonusXp || 0 });
       }
     });
+    // activeDates: union-merge from the active_dates column, then back-
+    // fill any missing days from completionsByDay keys (same _streakDay()
+    // convention, so safe to union). Recovery path — a user whose local
+    // activeDates was wiped (cross-device sign-in, iOS WKWebView storage
+    // eviction, reinstall on a path that dropped localStorage) gets their
+    // history restored from the server. Users active since the
+    // completions_by_day migration (2026-07-23) recover fully; users with
+    // pre-cutoff activity keep whatever's still in their local array
+    // (union preserves it) but pre-cutoff days that survived nowhere are
+    // gone.
+    state.activeDates = state.activeDates || [];
+    (data.active_dates || []).forEach(d => {
+      if (typeof d !== 'string') return;
+      if (!state.activeDates.includes(d)) state.activeDates.push(d);
+    });
+    Object.keys(state.completionsByDay || {}).forEach(day => {
+      if (!state.activeDates.includes(day)) state.activeDates.push(day);
+    });
+    // Recompute dailyStreak from the freshly-enriched array. The intact-
+    // chain guard inside recalculateStreak takes the max of persisted vs
+    // derived, so a legitimately-alive streak isn't lowered by this
+    // second pass — but a truly-broken chain still resets to 0.
+    try { recalculateStreak(); } catch(e) { console.warn('[streak] post-merge recalc failed', e); }
     // Home hints seen — flat string array, union-dedup by id. Same
     // shape as streakRepairs (dates); the id string IS the dedup key.
     state.hintsSeen = state.hintsSeen || [];
@@ -13232,13 +13264,31 @@ function updateDailyStreak() {
   saveStateLocal();
 }
 
-// Repairs state.dailyStreak from state.activeDates (runs once on app load).
-// activeDates may contain a mix of legacy UTC-derived dates (pre-grace) and
-// new local-with-grace dates; the chain walker only cares about consecutive
-// N/N-1 pairs, so mixed origins compose correctly going forward.
+// Re-derives state.dailyStreak from state.activeDates. Runs at app init
+// (initUI) and again inside loadProgressFromSupabase after the cloud pull
+// enriches activeDates, so a fresh sign-in on a new device recomputes
+// against the just-restored data.
+//
+// Overwrite policy: max-with-persisted ONLY when the chain is intact
+// (last active is today or yesterday). If the chain is broken (last
+// active is older than yesterday), the derived value wins outright —
+// otherwise a user with a 30-day streak who missed a week would open
+// the app, see max(30, 0) = 30, and only find out on their next
+// completion that it had actually reset. The max exists to protect
+// against a pre-pull recalc lowering an alive streak before the cloud
+// data lands, not to preserve stale-high counters after a real break.
+//
+// activeDates may contain a mix of legacy UTC-derived dates (pre-grace)
+// and new local-with-grace dates. The union-merge + completionsByDay
+// backfill in loadProgressFromSupabase largely absorbs legacy gaps by
+// filling in the missing local-with-grace neighbors, so the consecutive-
+// day walker below composes correctly for post-recovery arrays.
 function recalculateStreak() {
   const activeDates = (state.activeDates || []).slice().sort();
   if (activeDates.length === 0) {
+    // No evidence of activity — derived wins. In practice dailyStreak
+    // is co-persisted with activeDates in the same localStorage blob,
+    // so a wipe empties both together and this branch is a no-op.
     _setDailyStreak(0);
     saveStateLocal();
     return;
@@ -13248,16 +13298,20 @@ function recalculateStreak() {
   const lastActive = activeDates[activeDates.length - 1];
 
   if (lastActive === today || lastActive === yesterdayStr) {
+    // Chain intact — walk backward, take max with the persisted counter
+    // so a pre-pull recalc can't lower a legitimately-alive streak.
     let streak = 1;
     for (let i = activeDates.length - 2; i >= 0; i--) {
       const expectedPrev = _streakDayBefore(activeDates[i + 1]);
       if (activeDates[i] === expectedPrev) streak++;
       else break;
     }
-    _setDailyStreak(streak);
+    _setDailyStreak(Math.max(state.dailyStreak || 0, streak));
   } else {
-    // Streak resets on init because activeDates.last is too old. Record the
-    // break so the repair card can surface it if it's within the 48h window.
+    // Chain broken — derived (0) wins outright. Do NOT max here: a
+    // stale-high persisted counter must not survive a real streak
+    // break. Record the break so the repair card can surface it if
+    // it's within the 48h window.
     state.lastActiveDate = lastActive;
     _detectAndRecordBreak();
     _setDailyStreak(0);
