@@ -622,7 +622,8 @@
   html.dark .onb-progress[data-step="2"] .onb-pill:nth-child(-n+1),
   html.dark .onb-progress[data-step="3"] .onb-pill:nth-child(-n+2),
   html.dark .onb-progress[data-step="4"] .onb-pill:nth-child(-n+3),
-  html.dark .onb-progress[data-step="5"] .onb-pill:nth-child(-n+4) { background: rgba(245, 241, 255, 0.42); }
+  html.dark .onb-progress[data-step="5"] .onb-pill:nth-child(-n+4),
+  html.dark .onb-progress[data-step="6"] .onb-pill:nth-child(-n+5) { background: rgba(245, 241, 255, 0.42); }
 
   /* Walkthrough progress dot ACTIVE state. Source at 5962 uses
      var(--surface) which flips dark → dark dot on dark backdrop is
@@ -5309,14 +5310,16 @@
   .onb-progress[data-step="2"] .onb-pill:nth-child(-n+1),
   .onb-progress[data-step="3"] .onb-pill:nth-child(-n+2),
   .onb-progress[data-step="4"] .onb-pill:nth-child(-n+3),
-  .onb-progress[data-step="5"] .onb-pill:nth-child(-n+4) {
+  .onb-progress[data-step="5"] .onb-pill:nth-child(-n+4),
+  .onb-progress[data-step="6"] .onb-pill:nth-child(-n+5) {
     background: rgba(42, 18, 102, 0.42);
   }
   .onb-progress[data-step="1"] .onb-pill:nth-child(1),
   .onb-progress[data-step="2"] .onb-pill:nth-child(2),
   .onb-progress[data-step="3"] .onb-pill:nth-child(3),
   .onb-progress[data-step="4"] .onb-pill:nth-child(4),
-  .onb-progress[data-step="5"] .onb-pill:nth-child(5) {
+  .onb-progress[data-step="5"] .onb-pill:nth-child(5),
+  .onb-progress[data-step="6"] .onb-pill:nth-child(6) {
     background: var(--onb-accent, #7B4FD4);
     width: 32px;
   }
@@ -5742,6 +5745,71 @@
     flex-direction: column;
     gap: 12px;
   }
+
+  /* ── Onboarding v2 scaffolding ──
+     Minimal layout for the intro screens (welcome / problem / solution)
+     shipped in commit A. Later commits add slider, multi-select-card,
+     text-input, and mirror-pill primitives on top of the same
+     .onb-screen.onb-v2 base. Reuses .onb-cta-holder, .nav-btn, and
+     .onb-progress from v1.
+     Direction A visual layer: soft radial gradient behind the content,
+     accent-colored key phrase in each headline (via .onb-v2-em), and
+     slightly wider vertical rhythm than the v1 heads. */
+  .onb-screen.onb-v2 {
+    background:
+      radial-gradient(circle at 50% 32%, var(--surface) 0%, rgba(var(--accent-rgb), 0.08) 100%),
+      var(--surface);
+  }
+  .onb-screen.onb-v2 .onb-v2-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 24px 8px;
+    max-width: 440px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .onb-screen.onb-v2 .onb-v2-copy {
+    text-align: center;
+  }
+  .onb-screen.onb-v2 .onb-v2-head {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: calc(34px * var(--text-scale));
+    line-height: 1.15;
+    color: var(--ink);
+    margin: 0 0 18px;
+    letter-spacing: -0.01em;
+  }
+  .onb-screen.onb-v2 .onb-v2-em {
+    /* Key-phrase accent. Same weight as the head so it reads as
+       continuous type with a color shift, not a highlight label. */
+    color: var(--accent);
+  }
+  .onb-screen.onb-v2 .onb-v2-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: calc(16px * var(--text-scale));
+    line-height: 1.45;
+    color: var(--text-2);
+    margin: 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-wordmark {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    /* Wordmark reads as brand, not headline — slightly larger than head,
+       accent-tinted. Letter-spacing tightens so "Corpus" / "קורפוס" hold
+       together as a mark. */
+    font-size: calc(48px * var(--text-scale));
+    line-height: 1;
+    color: var(--accent);
+    margin: 12px 0 0;
+    letter-spacing: -0.02em;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-head { color: var(--text); }
+  html.dark .onb-screen.onb-v2 .onb-v2-sub  { color: var(--text-2); }
   .onb-goal-card {
     display: flex;
     align-items: center;
@@ -9794,6 +9862,17 @@ async function syncProgressToSupabase() {
     }, { onConflict: 'user_id' });
     if (error) _reportSyncFailure('nps_state', error);
   } catch(e) { _reportSyncFailure('nps_state', e); }
+  try {
+    // Onboarding v2 answers — single-object jsonb column added in
+    // migration 20260826150000. Priming-only capture; not read at
+    // runtime for gating. Separate upsert so a missing column doesn't
+    // break base sync.
+    const { error } = await sb.from('user_progress').upsert({
+      user_id: currentUser.id,
+      onboarding_answers: state.onbAnswers || {},
+    }, { onConflict: 'user_id' });
+    if (error) _reportSyncFailure('onboarding_answers', error);
+  } catch(e) { _reportSyncFailure('onboarding_answers', e); }
 }
 
 async function loadProgressFromSupabase() {
@@ -9822,6 +9901,9 @@ async function loadProgressFromSupabase() {
     //                            max(local, server), submittedAt takes the
     //                            first non-empty value (permanent kill flag,
     //                            local wins if both have it)
+    //   onboarding_answers     : field-wise prefer-client-non-empty. Server
+    //                            row is a backup; if the client already has
+    //                            an answer, keep it. Server fills in blanks.
     //   onboarding_done        : OR (server true → local true; false leaves alone)
     //   appearance             : PREFER LOCAL — server row is a backup for
     //                            reinstalls, not an override. On the current
@@ -9949,6 +10031,25 @@ async function loadProgressFromSupabase() {
     if (_srvNps.submittedAt && !state.npsState.submittedAt) {
       state.npsState.submittedAt = _srvNps.submittedAt;
     }
+    // Onboarding answers merge — field-wise, prefer client non-empty.
+    // Server row is a backup for reinstalls; the client's live answers
+    // (or lack of them) are authoritative.
+    state.onbAnswers = state.onbAnswers || {
+      name: '', age: null, phoneHours: null, q1: [], q2: [], q3: '',
+      readingFreq: null, commitment: '', completedAt: ''
+    };
+    const _srvOnb = data.onboarding_answers || {};
+    ['name', 'q3', 'commitment', 'completedAt'].forEach(k => {
+      if (_srvOnb[k] && !state.onbAnswers[k]) state.onbAnswers[k] = _srvOnb[k];
+    });
+    ['age', 'phoneHours', 'readingFreq'].forEach(k => {
+      if (typeof _srvOnb[k] === 'number' && state.onbAnswers[k] == null) state.onbAnswers[k] = _srvOnb[k];
+    });
+    ['q1', 'q2'].forEach(k => {
+      if (Array.isArray(_srvOnb[k]) && _srvOnb[k].length && !state.onbAnswers[k].length) {
+        state.onbAnswers[k] = _srvOnb[k].slice();
+      }
+    });
     migrateCompletedDaysKeys();
     saveStateLocal();
     // All merges ran to completion — mark this session as safe to push.
@@ -10597,87 +10698,202 @@ function _onbShowScreen(screenId) {
   if (target) { target.style.display = 'flex'; target.classList.add('onb-active'); }
 }
 
-// Cinematic redesign: owl mascot removed from welcome. Kept the stub so
-// any residual caller no-ops safely.
-function _onbMountWelcomeOwl() {}
+// ═══════════════════════════════════════════════════════════
+// ONBOARDING v2 — growth-funnel flow
+// ═══════════════════════════════════════════════════════════
+// 19-screen flow replaces the v1 beat/streak/welcome/subject/goal
+// cascade. Step cursor persisted in localStorage; resume-on-quit
+// lands the user at their last step. State captured in
+// state.onbAnswers; synced to user_progress.onboarding_answers
+// (migration 20260826150000).
+//
+// Phases (progress-pill grouping):
+//   1. Welcome (steps 1-3)      welcome → problem → solution
+//   2. About you (steps 4-6)    name → age → phone hours
+//   3. Reveal (steps 7-8)       shock number → plan intro
+//   4. Choices (steps 9-13)     subject → Q1 → Q2 → Q3 → Q4
+//   5. First step (steps 14-17) mirror → first dialogue → streak → review
+//   6. Commit (steps 18-19)     journey → commitment
+//
+// Commit A ships steps 1-3 only. Steps 4-19 land in later commits.
+// While the flow is incomplete, an early-completion path fires after
+// step 3: sets corpus_onboarding_done, defaults subject to philosophy,
+// lands on home. Later commits extend the ladder step by step.
 
-// Single language-apply for the intro flow. Toggle lives on the beat
-// screen (first paint), so this updates copy on the three intro screens
-// (beat / streak / welcome) up front — subsequent screens (subject/goal)
-// run their own _onbApplyLangTo* helpers when they're shown. Hebrew is
-// singular 2nd person throughout (דיברת / שלך) — unvocalized past-tense
-// singular is already gender-neutral in writing.
-function _onbApplyLangToWelcome(lang) {
+const _ONB_TOTAL_STEPS = 19;
+// Which phase (1..6) each step belongs to. Drives the 6-pill progress.
+const _ONB_STEP_TO_PHASE = {
+  1: 1, 2: 1, 3: 1,
+  4: 2, 5: 2, 6: 2,
+  7: 3, 8: 3,
+  9: 4, 10: 4, 11: 4, 12: 4, 13: 4,
+  14: 5, 15: 5, 16: 5, 17: 5,
+  18: 6, 19: 6,
+};
+// DOM ids in step order. Steps not yet built map to null; _onbShowStep
+// treats a null slot as "not implemented yet, jump to completion" so
+// commit A can ship without HTML for steps 4-19.
+const _ONB_STEP_TO_ID = {
+  1: 'onb-v2-welcome',
+  2: 'onb-v2-problem',
+  3: 'onb-v2-solution',
+  4: null, 5: null, 6: null, 7: null, 8: null,
+  9: null, 10: null, 11: null, 12: null, 13: null,
+  14: null, 15: null, 16: null, 17: null,
+  18: null, 19: null,
+};
+
+// Bilingual copy map for the intro screens (1-3). Later commits will
+// extend this per-screen. Kept as a single map so the language-toggle
+// on step 1 can re-render every visible screen without hunting through
+// individual per-screen appliers.
+const _ONB_COPY = {
+  welcome: {
+    head:     { en: 'Welcome', he: 'ברוכים הבאים' },
+    wordmark: { en: 'Corpus',  he: 'קורפוס' },
+    cta:      { en: 'Continue', he: 'המשך' },
+  },
+  // Problem + solution heads include a <span class="onb-v2-em"> around
+  // the key phrase for accent color. Renderer uses innerHTML for these
+  // (not textContent) — see _onbApplyLang.
+  problem: {
+    head: {
+      en: 'Do you consume a lot but <span class="onb-v2-em">understand little</span>?',
+      he: 'צורכים הרבה ומבינים <span class="onb-v2-em">מעט</span>?',
+    },
+    cta: { en: 'Continue', he: 'המשך' },
+  },
+  solution: {
+    head: {
+      en: 'Corpus turns five minutes a day into ideas that <span class="onb-v2-em">stay with you</span>.',
+      he: 'קורפוס הופך חמש דקות ביום לרעיונות ש<span class="onb-v2-em">נשארים</span>.',
+    },
+    cta: { en: 'Continue', he: 'המשך' },
+  },
+};
+
+function _onbApplyLang(lang) {
   const isEn = lang === 'en';
-  // Screen 1 — Beat (big statement, purple, toggle host)
-  const bHead = document.getElementById('onb-beat-head');
-  const bSub  = document.getElementById('onb-beat-sub');
-  const bCta  = document.getElementById('onb-beat-cta');
-  if (bHead) bHead.textContent = isEn ? "Five minutes a day with history's greatest minds" : 'חמש דקות ביום עם ההוגים הגדולים';
-  if (bSub)  bSub.textContent  = isEn ? 'Philosophy, economics, psychology. Short dialogue, one idea, straight from the source.' : 'פילוסופיה, כלכלה ופסיכולוגיה. דיאלוג קצר, רעיון אחד, ישר מהמקור.';
-  if (bCta)  bCta.textContent  = isEn ? "Let's start" : 'מתחילים';
-  const fanNames = isEn ? ['Kant', 'Marx', 'Freud'] : ['קאנט', 'מרקס', 'פרויד'];
-  ['onb-beat-fan-name-1', 'onb-beat-fan-name-2', 'onb-beat-fan-name-3'].forEach((id, i) => {
+  const setText = (id, group, key) => {
     const el = document.getElementById(id);
-    if (el) el.textContent = fanNames[i];
-  });
-  // Screen 2 — Streak beat (amber, restored)
-  const sHead = document.getElementById('onb-streak-head');
-  const sSub  = document.getElementById('onb-streak-sub');
-  const sCap  = document.getElementById('onb-streak-caption');
-  const sCta  = document.getElementById('onb-streak-cta');
-  if (sHead) sHead.textContent = isEn ? 'Every day adds to the streak' : 'כל יום מוסיף לרצף';
-  if (sSub)  sSub.textContent  = isEn ? 'One dialogue a day keeps the flame lit. Every thinker you meet joins your collection.' : 'דיאלוג ביום מדליק את הלהבה. כל הוגה שפגשת נשמר באוסף שלך.';
-  if (sCap)  sCap.textContent  = isEn ? 'Your collection grows as you read' : 'האוסף שלך נבנה תוך כדי קריאה';
-  if (sCta)  sCta.textContent  = isEn ? 'Continue' : 'המשך';
-  // Screen 3 — Welcome (Socrates, purple)
-  const wHead = document.getElementById('onb-welcome-head');
-  const wSub  = document.getElementById('onb-welcome-sub');
-  const wCta  = document.getElementById('onb-welcome-cta');
-  if (wHead) wHead.textContent = isEn ? 'When did you last talk to Socrates?' : 'מתי בפעם האחרונה דיברת עם סוקרטס?';
-  // Socrates-specific era number (2,400 years). If this hero ever swaps to
-  // another thinker, this string must swap too — hence the explicit hook.
-  if (wSub)  wSub.textContent  = isEn ? 'Not a summary, not a commentary. What was written 2,400 years ago, in today\'s language.' : 'לא סיכום ולא פרשנות. מה שנכתב לפני 2,400 שנה, בשפה של היום.';
-  if (wCta)  wCta.textContent  = isEn ? 'Continue' : 'המשך';
-  const heroName = document.getElementById('onb-hero-card-name');
-  if (heroName) heroName.textContent = isEn ? 'Socrates' : 'סוקרטס';
-  // Toggle indicator + button active state (toggle host: beat screen).
-  document.querySelectorAll('#onboarding-beat .onb-lang-btn').forEach(btn => {
+    if (el && _ONB_COPY[group] && _ONB_COPY[group][key]) {
+      el.textContent = isEn ? _ONB_COPY[group][key].en : _ONB_COPY[group][key].he;
+    }
+  };
+  // Heads for problem + solution use innerHTML because their copy
+  // contains a <span class="onb-v2-em"> for the accent-tinted key
+  // phrase. Kept as a distinct setter so the ordinary textContent path
+  // isn't the vector for stray markup elsewhere (copy map is the only
+  // source of these strings; RTL/LTR handled by outer document dir).
+  const setHTML = (id, group, key) => {
+    const el = document.getElementById(id);
+    if (el && _ONB_COPY[group] && _ONB_COPY[group][key]) {
+      el.innerHTML = isEn ? _ONB_COPY[group][key].en : _ONB_COPY[group][key].he;
+    }
+  };
+  setText('onb-v2-welcome-head',     'welcome', 'head');
+  setText('onb-v2-welcome-wordmark', 'welcome', 'wordmark');
+  setText('onb-v2-welcome-cta',      'welcome', 'cta');
+  setHTML('onb-v2-problem-head', 'problem', 'head');
+  setText('onb-v2-problem-cta',  'problem', 'cta');
+  setHTML('onb-v2-solution-head','solution','head');
+  setText('onb-v2-solution-cta', 'solution', 'cta');
+  // Lang toggle indicator on screen 1
+  document.querySelectorAll('#onb-v2-welcome .onb-lang-btn').forEach(btn => {
     btn.classList.toggle('is-active', btn.dataset.lang === lang);
   });
-  // Container is dir="ltr" pinned so the two buttons never physically swap;
-  // only .is-en on the indicator transitions.
-  const indicator = document.getElementById('onb-lang-indicator');
+  const indicator = document.getElementById('onb-v2-lang-indicator');
   if (indicator) indicator.classList.toggle('is-en', isEn);
   document.documentElement.dir = isEn ? 'ltr' : 'rtl';
   document.documentElement.lang = lang;
 }
 
-function _onbSetWelcomeLang(lang) {
+// Called from the lang buttons on screen 1. Persists the pick and
+// re-renders every onboarding screen so subsequent taps land in the
+// chosen language.
+function _onbSetLang(lang) {
   state.lang = lang;
-  try { localStorage.setItem('corpus_lang', lang); } catch (e) {}
-  _onbApplyLangToWelcome(lang);
+  try { localStorage.setItem('corpus_lang', lang); } catch(e) {}
+  _onbApplyLang(lang);
 }
 
-function _onbApplyLangToGoal(lang) {
-  const isEn = lang === 'en';
-  const map = {
-    'onb-goal-head':  { en: 'How much time each day?', he: 'כמה זמן ביום?' },
-    'onb-goal-sub':   { en: 'Your streak builds from this. You can change it anytime.', he: 'הרצף שלך נבנה מזה. אפשר לשנות בכל רגע.' },
-    'onb-goal-t1':    { en: 'One dialogue a day', he: 'דיאלוג אחד ביום' },
-    'onb-goal-h1':    { en: 'A daily rhythm, about five minutes', he: 'קצב יומיומי, בערך חמש דקות' },
-    'onb-goal-t2':    { en: 'Two dialogues', he: 'שני דיאלוגים' },
-    'onb-goal-h2':    { en: 'Go a little deeper, about ten minutes', he: 'לצלול פנימה, בערך עשר דקות' },
-    'onb-goal-t3':    { en: 'My own pace', he: 'הקצב שלי' },
-    'onb-goal-h3':    { en: 'No pressure, learn when it fits', he: 'בלי לחץ, ללמוד כשמתאים' },
-  };
-  Object.keys(map).forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = map[id][lang] || map[id].he;
+// Show step N. Applies current language, sets the 6-pill progress to
+// the appropriate phase, and toggles the .onb-active class on the
+// step's DOM node. If the step's DOM id is null (later-commit
+// placeholder), falls through to completion so commit A doesn't wedge
+// a user on a missing screen.
+function _onbShowStep(n) {
+  if (n < 1 || n > _ONB_TOTAL_STEPS) { _onbComplete(); return; }
+  const id = _ONB_STEP_TO_ID[n];
+  if (!id) {
+    // Not-yet-built step — early completion for commit-A cadence.
+    _onbComplete();
+    return;
+  }
+  const lang = state.lang || localStorage.getItem('corpus_lang') || 'he';
+  state.lang = lang;
+  _onbApplyLang(lang);
+  // Hide every onb-v2 screen, then show the target one.
+  document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
+    s.style.display = 'none';
+    s.classList.remove('onb-active');
   });
-  const cta = document.getElementById('onb-goal-cta');
-  if (cta) cta.textContent = isEn ? 'To your first dialogue →' : 'לדיאלוג הראשון ←';
+  const el = document.getElementById(id);
+  if (!el) { _onbComplete(); return; }
+  el.style.display = 'flex';
+  el.classList.add('onb-active');
+  // Update progress: which phase is this step in.
+  const phase = _ONB_STEP_TO_PHASE[n] || 1;
+  document.querySelectorAll('.onb-v2 .onb-progress').forEach(p => {
+    p.setAttribute('data-step', String(phase));
+  });
+  try { localStorage.setItem('corpus_onboarding_step', String(n)); } catch(e) {}
+  try { _phCapture('onboarding_step_shown', { step: n, phase: phase }); } catch(e) {}
 }
+
+// Move from step `from` to step `to`, optionally merging a patch of
+// answers into state.onbAnswers before saving. `to` may exceed
+// _ONB_TOTAL_STEPS to trigger completion.
+function _onbAdvanceStep(from, to, patch) {
+  if (patch && typeof patch === 'object') {
+    Object.assign(state.onbAnswers, patch);
+    try { saveStateLocal(); } catch(e) {}
+    try { saveState(); } catch(e) {}
+  }
+  if (to > _ONB_TOTAL_STEPS) { _onbComplete(); return; }
+  _onbShowStep(to);
+}
+
+// Mark onboarding done and land on home. Sets defaults for anything
+// the user hasn't picked yet (subject defaults to philosophy from
+// defaultState). Also suppresses the v1 walkthrough — the v2 flow
+// educates enough that coach marks would be redundant.
+function _onbComplete() {
+  const today = _streakDay();
+  state.onbAnswers = state.onbAnswers || {};
+  state.onbAnswers.completedAt = today;
+  try { saveState(); } catch(e) {}
+  try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
+  try { localStorage.setItem('corpus_walkthrough_done', '1'); } catch(e) {}
+  try { localStorage.removeItem('corpus_onboarding_step'); } catch(e) {}
+  try { _phCapture('onboarding_completed', { platform: _phPlatform(), lang: state.lang || 'he' }); } catch(e) {}
+  document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
+    s.style.display = 'none';
+    s.classList.remove('onb-active');
+  });
+  renderHome();
+  showScreen('home');
+}
+
+// Screen 1 (welcome) CTA — advance to screen 2.
+function _onbV2CtaWelcome() { _onbAdvanceStep(1, 2); }
+// Screen 2 (problem) CTA — advance to screen 3.
+function _onbV2CtaProblem() { _onbAdvanceStep(2, 3); }
+// Screen 3 (solution) CTA — advance to step 4. Commit A has no step 4
+// yet, so this triggers _onbComplete via the null-slot path in
+// _onbShowStep. Later commits ship step 4 and this becomes a normal
+// advance.
+function _onbV2CtaSolution() { _onbAdvanceStep(3, 4); }
 
 // Silent guest entry: mirrors enterAsGuest but skips hideAuthScreen (the
 // auth screen isn't up in the new flow). Guest = null currentUser, no
@@ -10693,118 +10909,6 @@ function _enterAsGuestSilent() {
   if (localStorage.getItem('corpus_auth_choice_fired')) return;
   try { localStorage.setItem('corpus_auth_choice_fired', '1'); } catch(e) {}
   _phCapture('onboarding_auth_choice', { choice: 'guest', method: null });
-}
-
-// First-paint of the redesigned onboarding. Beat screen (three-card fan)
-// hosts the language toggle and fires onboarding_started. Kept the 'beat'
-// PostHog prop for funnel comparability against the baseline; the retired
-// 'how'/'what' distinction is now a constant 'cinematic'.
-function showBeat() {
-  console.log('[Onboarding] showBeat() called');
-  const lang = state.lang || localStorage.getItem('corpus_lang') || 'he';
-  state.lang = lang;
-  _onbApplyLangToWelcome(lang);
-  _onbShowScreen('onboarding-beat');
-  console.log('[Onboarding] beat display:', document.getElementById('onboarding-beat').style.display);
-  _phCapture('onboarding_beat_shown', {
-    beat: 'cinematic',
-    platform: _phPlatform(),
-    lang: lang,
-    is_redesign: true,
-  });
-  // Funnel: fire onboarding_started here (beat is now the first paint) so
-  // the redesign cohort is measurable against the baseline. Gated per the
-  // existing rule so a re-enter never double-counts.
-  if (!localStorage.getItem('corpus_onboarding_started_at')) {
-    _getOrSetOnboardingStart();
-    _phCapture('onboarding_started', {
-      platform: _phPlatform(),
-      lang: lang,
-      is_redesign: true,
-    });
-  }
-}
-
-// _onbFinishBeat — beat is screen 1. CTA "מתחילים"/"Let's start"
-// advances to the streak beat (screen 2). Intro-done flag is set at
-// welcome CTA (screen 3), so re-entering before welcome still resurfaces
-// all three intro screens.
-function _onbFinishBeat() {
-  _phCapture('onboarding_beat_cta', { beat: 'cinematic', lang: state.lang || 'he' });
-  showStreakBeat();
-}
-
-// Streak beat (Screen 2) — restored beat between the big statement and
-// the Socrates hero. Amber-tinted; the visual seed of the streak. Kept
-// under a distinct PostHog event so the redesign cohort's funnel drop
-// between beat and welcome is measurable independently.
-function showStreakBeat() {
-  console.log('[Onboarding] showStreakBeat() called');
-  const lang = state.lang || localStorage.getItem('corpus_lang') || 'he';
-  state.lang = lang;
-  _onbApplyLangToWelcome(lang);
-  _onbShowScreen('onboarding-streak');
-  _phCapture('onboarding_streak_shown', {
-    platform: _phPlatform(),
-    lang: lang,
-    is_redesign: true,
-  });
-}
-
-function _onbFinishStreakBeat() {
-  _phCapture('onboarding_streak_cta', { lang: state.lang || 'he' });
-  showWelcomeScreen();
-}
-
-// Welcome — now screen 2. Language toggle no longer here; label picked on
-// beat already applied via _onbApplyLangToWelcome. Fires the welcome_shown
-// event kept from the baseline funnel.
-function showWelcomeScreen() {
-  console.log('[Onboarding] showWelcomeScreen() called');
-  _onbMountWelcomeOwl();
-  const lang = state.lang || localStorage.getItem('corpus_lang') || 'he';
-  state.lang = lang;
-  _onbApplyLangToWelcome(lang);
-  _onbShowScreen('onboarding-welcome');
-  console.log('[Onboarding] welcome display:', document.getElementById('onboarding-welcome').style.display);
-  _phCapture('onboarding_welcome_shown', {
-    platform: _phPlatform(),
-    lang: lang,
-    is_redesign: true,
-  });
-}
-
-// _onbFinishWelcome — welcome is now screen 2. CTA "המשך"/"Continue"
-// commits corpus_intro_done and advances to subject-select (or straight
-// to goal if a subject is already picked from an interrupted prior run).
-function _onbFinishWelcome() {
-  const lang = state.lang || 'he';
-  _phCapture('onboarding_welcome_cta', { lang_picked: lang });
-  try { localStorage.setItem('corpus_intro_done', '1'); } catch (e) {}
-  const el = document.getElementById('onboarding-welcome');
-  if (el) { el.style.display = 'none'; el.classList.remove('onb-active'); }
-  // Deep-link arrivals skip subject-select entirely: the incoming URL
-  // has already expressed subject intent (economics). Set the subject
-  // here so the goal + reader steps operate on the correct chapter set,
-  // then advance straight to the goal picker (4-of-4 in the shortened
-  // pill row set up in initUI).
-  if (_pendingDeepLink === 'bonus-econ') {
-    try { setSubject('economics'); } catch (e) {}
-    showGoalScreen();
-    return;
-  }
-  if (!localStorage.getItem('corpus_subject')) {
-    showSubjectSelect();
-  } else {
-    showGoalScreen();
-  }
-}
-
-// Called from subjConfirm's continuation on new-flow path — inserted into
-// subjConfirm below so the existing subject-select screen slots in
-// unchanged and hands off to the goal screen next.
-function _onbAfterSubjectPickForNewUser() {
-  showGoalScreen();
 }
 
 // Cinematic subject-select — vertical stack tap → set active card and
@@ -10858,140 +10962,45 @@ function _applyCinematicSubjectCopy() {
   if (cta) cta.textContent = isEn ? 'Continue' : 'המשך';
 }
 
-let _onbSelectedGoal = null;
-function showGoalScreen() {
-  _onbSelectedGoal = null;
-  const cta = document.getElementById('onb-goal-cta');
-  if (cta) cta.disabled = true;
-  document.querySelectorAll('#onboarding-goal .onb-goal-card').forEach(c => c.classList.remove('is-selected'));
-  const lang = state.lang || 'he';
-  _onbApplyLangToGoal(lang);
-  _onbShowScreen('onboarding-goal');
-}
-
-function _onbSelectGoal(value) {
-  _onbSelectedGoal = value;
-  document.querySelectorAll('#onboarding-goal .onb-goal-card').forEach(c => {
-    c.classList.toggle('is-selected', c.dataset.goal === value);
-  });
-  const cta = document.getElementById('onb-goal-cta');
-  if (cta) cta.disabled = false;
-}
-
-function _onbFinishGoal() {
-  if (!_onbSelectedGoal) return;
-  const goal = _onbSelectedGoal;
-  const today = _streakDay();
-  state.dailyGoalHistory = state.dailyGoalHistory || [];
-  // Union-dedup by setAt: same-day re-pick overwrites the entry rather than
-  // stacking duplicates. Older days preserved.
-  const existingIdx = state.dailyGoalHistory.findIndex(g => g && g.setAt === today);
-  if (existingIdx >= 0) {
-    state.dailyGoalHistory[existingIdx] = { setAt: today, value: goal };
-  } else {
-    state.dailyGoalHistory.push({ setAt: today, value: goal });
-  }
-  try { localStorage.setItem('corpus_daily_goal_set', '1'); } catch (e) {}
-  saveStateLocal();
-  try { saveState(); } catch (e) {}
-  _phCapture('onboarding_goal_selected', {
-    goal: goal,
-    is_existing_user: !!localStorage.getItem('corpus_onboarding_done'),
-  });
-  const goalEl = document.getElementById('onboarding-goal');
-  if (goalEl) { goalEl.style.display = 'none'; goalEl.classList.remove('onb-active'); }
-  // Mark tour-era flag as done for parity with existing-user semantics —
-  // this is the "user finished onboarding" gate that other code respects.
-  try { localStorage.setItem('corpus_onboarding_done', '1'); } catch (e) {}
-  try { saveState(); } catch (e) {}
-  // Deep-link arrivals route to the intended chapter instead of week 1
-  // day 1. If the promo window closed between click and now (fresh users
-  // can spend minutes in the flow), the consumer no-ops and we fall
-  // through to home — no error, no misleading first-dialogue open.
-  if (_pendingDeepLink) {
-    if (_consumePendingDeepLink()) return;
-    renderHome();
-    showScreen('home');
-    return;
-  }
-  // Land on home so the owl-guided walkthrough gets to fire before the
-  // reader ever opens. rAF defers the eligibility check + startup until
-  // home has painted and the spotlight targets have real bounding rects.
-  renderHome();
-  showScreen('home');
-  requestAnimationFrame(() => {
-    try { _walkthroughStartIfEligible(); } catch (e) {}
-  });
-}
-
-// Fresh-install entry: welcome → subject → goal → reader. Called from
-// initApp when there's no session AND onboarding hasn't been done AND
-// the user has no local progress (guest with completedDays counts as
-// "already using the app"; bypass).
+// Async entry from initApp when no session found. Sibling to the
+// synchronous initUI dispatch: initUI already runs the same step-cursor
+// check and may have dispatched a screen; this function is the fallback
+// for platforms where initApp's async chain wins the race. Guarded by
+// _onboardingBooted so we never re-dispatch on top of the visible
+// screen (Android WebView race — user may have already tapped past
+// step 1 by the time initApp resolves).
 function startNewUserOnboarding() {
   const _localCompletionCount = Object.keys(state.completedDays || {})
     .filter(k => !k.endsWith('-0')).length;
-  const _existingUser = !!localStorage.getItem('corpus_onboarding_done') || _localCompletionCount > 0;
+  const _hasOnbDone = !!localStorage.getItem('corpus_onboarding_done');
+  const _resumeStep = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
   console.log('[Onboarding] startNewUserOnboarding:', {
     localCompletionCount: _localCompletionCount,
-    existingUser: _existingUser,
-    hasIntro: !!localStorage.getItem('corpus_intro_done'),
-    hasSubject: !!localStorage.getItem('corpus_subject'),
-    hasGoal: !!localStorage.getItem('corpus_daily_goal_set'),
+    hasOnbDone: _hasOnbDone,
+    resumeStep: _resumeStep,
+    booted: _onboardingBooted,
   });
-  // Guest with a session but partway through onboarding (e.g. finished
-  // welcome, closed the app before subject) — resume from the missing step.
-  if (_existingUser) {
-    // Existing user path: needs the one-time goal picker if they haven't
-    // set it yet, otherwise straight to home.
+  // Existing user or already-done onboarding → home. Silent guest entry
+  // so the onboarding_auth_choice event fires (once-per-install gated
+  // inside _enterAsGuestSilent).
+  if (_hasOnbDone || _localCompletionCount > 0) {
     _enterAsGuestSilent();
-    // If initUI's synchronous deep-link consume already routed us into a
-    // specific chapter reader, don't override with home. Without this
-    // guard the async initApp path clobbers the reader that just opened.
     if (state.currentScreen !== 'reader') {
       renderHome();
       showScreen('home');
     }
-    if (!localStorage.getItem('corpus_daily_goal_set')) {
-      // Defer goal picker so home renders behind it (visual continuity
-      // when the user dismisses). Small delay lets the home paint settle.
-      setTimeout(showGoalScreen, 400);
-    }
     return;
   }
-  // Fresh install path — beat is now the first paint of the redesigned
-  // onboarding (see showBeat / _onbApplyLangToWelcome).
   _enterAsGuestSilent();
-  // Bounce-back guard: if initUI already dispatched to an onboarding
-  // screen synchronously (fresh install / partial-onboarding returning
-  // user), the user may have already advanced past that screen while
-  // initApp's async chain was completing. Re-calling show*() here would
-  // bump them BACK to the earlier screen. corpus_intro_done doesn't
-  // flip until the welcome CTA is tapped, so this race exists for
-  // beat → streak → welcome transitions on any platform where initApp
-  // is slower than the user's first tap (Android, primarily).
-  // _enterAsGuestSilent still fires above for analytics parity.
+  // Fresh install / partial onboarding. If initUI already dispatched a
+  // screen synchronously, don't re-dispatch — the user may have advanced
+  // past it while initApp was resolving.
   if (_onboardingBooted) {
-    console.log('[Onboarding] startNewUserOnboarding: initUI already booted onboarding, skipping screen dispatch');
+    console.log('[Onboarding] initUI already booted, skipping');
     return;
   }
-  if (!localStorage.getItem('corpus_intro_done')) {
-    _onboardingBooted = true;
-    showBeat();
-    return;
-  }
-  if (!localStorage.getItem('corpus_subject')) {
-    _onboardingBooted = true;
-    showSubjectSelect();
-    return;
-  }
-  if (!localStorage.getItem('corpus_daily_goal_set')) {
-    _onboardingBooted = true;
-    showGoalScreen();
-    return;
-  }
-  renderHome();
-  showScreen('home');
+  _onboardingBooted = true;
+  _onbShowStep(_resumeStep >= 1 && _resumeStep <= _ONB_TOTAL_STEPS ? _resumeStep : 1);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -12826,6 +12835,22 @@ function defaultState() {
       firstCompletionShownAt: '', firstCompletionShownAtCount: 0,
       returnEngagementShownAt: '',
     },
+    // Onboarding v2 answers. Populated by the growth-funnel onboarding flow
+    // and synced to user_progress.onboarding_answers (migration
+    // 20260826150000). Priming-only today: captured for later analysis,
+    // not read at runtime for gating. Merged field-wise on pull, prefer-
+    // client-non-empty. See _onbAdvanceStep for the write pattern.
+    onbAnswers: {
+      name: '',
+      age: null,
+      phoneHours: null,
+      q1: [],              // multi-select ids (stable), up to 3
+      q2: [],              // multi-select ids (stable), up to 3
+      q3: '',              // single-choice id: 'daily' | 'few-week' | 'finish' | 'longest-streak'
+      readingFreq: null,   // slider position, 0..5
+      commitment: '',      // ordered-ladder id: 'curious' | 'trying' | 'committed' | 'all-in'
+      completedAt: '',     // ISO date on final commit
+    },
     // NPS survey cadence. All fields ISO date strings ('YYYY-MM-DD') or empty.
     //   lastShownAt   — stamped on every modal open (including X'd immediately)
     //   lastScoredAt  — stamped when the user actually picks a 0-10 score,
@@ -12952,6 +12977,17 @@ function loadState() {
     { lastShownAt: '', lastScoredAt: '', submittedAt: '' },
     state.npsState || {}
   );
+  // Normalize state.onbAnswers for users whose persisted state predates
+  // the v2 onboarding rebuild. Missing keys hydrated to defaults; any
+  // in-flight answers preserved. Array fields defensively re-arrayed
+  // if a corrupt persist wrote them as something else.
+  state.onbAnswers = Object.assign(
+    { name: '', age: null, phoneHours: null, q1: [], q2: [], q3: '',
+      readingFreq: null, commitment: '', completedAt: '' },
+    state.onbAnswers || {}
+  );
+  if (!Array.isArray(state.onbAnswers.q1)) state.onbAnswers.q1 = [];
+  if (!Array.isArray(state.onbAnswers.q2)) state.onbAnswers.q2 = [];
   if (state.guestSignupPromptShown) {
     // Ensure totalShown reflects "they've seen the welcome prompt before" so
     // first_completion doesn't re-fire. Leave lastShownDate EMPTY — the legacy
@@ -20453,18 +20489,13 @@ function subjConfirm() {
       closeDrawer(() => { renderHome(); });
     } else {
       // First-time subject-select mode. New-flow users (welcome-seen but no
-      // goal set yet) advance to the daily-goal screen; already-onboarded
-      // users returning through the subject picker just land on home.
+      // Subject-select is no longer an onboarding step in v2 — it's used
+      // solely for later subject switching via the drawer. Post-tap: back
+      // to home, no goal-picker chaining.
       document.body.classList.remove('on-subject-screen');
-      const _newFlow = !!localStorage.getItem('corpus_intro_done')
-        && !localStorage.getItem('corpus_daily_goal_set');
-      if (_newFlow) {
-        showGoalScreen();
-      } else {
-        showScreen('home');
-        renderHome();
-        animateScreen(document.getElementById('screen-home'), 'anim-fade');
-      }
+      showScreen('home');
+      renderHome();
+      animateScreen(document.getElementById('screen-home'), 'anim-fade');
     }
   }, 450);
 }
@@ -20760,19 +20791,13 @@ async function enterApp(user) {
   // Resume any celebration queue persisted from a prior session that
   // closed mid-play. Session-guarded so this fires at most once per open.
   try { _resumeCelebrationsIfPending(); } catch(e) {}
-  // Onboarding redesign: signed-in users who haven't set a daily goal
-  // yet get the one-time picker after home renders. Fresh signup users
-  // go through the new flow entirely (via startNewUserOnboarding on the
-  // no-session path); this branch covers returning users mid-migration.
-  if (localStorage.getItem('corpus_onboarding_done') && !localStorage.getItem('corpus_daily_goal_set')) {
-    setTimeout(showGoalScreen, 400);
-    return;
-  }
-  // Existing behavior: no-intro-done users see the intro; that path used
-  // to open the iframe carousel and now falls through to the welcome
-  // screen via startNewUserOnboarding's flag chain. Preserved as a guard
-  // for any never-migrated signed-in user.
-  if (!localStorage.getItem('corpus_intro_done')) {
+  // Onboarding v2: the post-signup goal-picker chain is gone. v2 sets
+  // the daily goal inline (step 12 / Q3) so no separate migration prompt
+  // is needed for users who complete v2. Users on the old flow who
+  // finished onboarding but never reached the old goal picker keep the
+  // default reminder settings — they can adjust in Profile if desired.
+  if (!localStorage.getItem('corpus_onboarding_step') &&
+      !localStorage.getItem('corpus_onboarding_done')) {
     startNewUserOnboarding();
     return;
   }
@@ -21031,37 +21056,42 @@ function initUI() {
     document.documentElement.dir = state.lang === 'en' ? 'ltr' : 'rtl';
     document.documentElement.lang = state.lang;
     // Onboarding gate — runs synchronously in initUI BEFORE any home render.
-    // Decoupled from Supabase auth resolution: fresh users see the welcome
-    // screen immediately, regardless of whether Supabase's INITIAL_SESSION
-    // ever fires (incognito third-party-cookie blocking, CDN failures, etc).
+    // Decoupled from Supabase auth resolution: fresh users see the first
+    // onboarding screen immediately, regardless of whether Supabase's
+    // INITIAL_SESSION ever fires (incognito third-party-cookie blocking,
+    // CDN failures, etc).
     //
-    // Gate criteria:
-    //   - No completed dialogues locally (state.completedDays empty)
-    //   - No corpus_onboarding_done flag
-    //   - No corpus_intro_done flag
-    // ANY of these being false → returning user → render home instead.
-    // Note: signed-in returning users may hit this and go straight to home
-    // — enterApp still fires later and handles goal-migration for them.
+    // v2 gate is a step-cursor rewrite of the old flag cascade
+    // (corpus_intro_done → corpus_subject → corpus_daily_goal_set).
+    // Instead, corpus_onboarding_step holds the CURRENT step 1..N,
+    // written by _onbAdvanceStep on every screen transition. Resume
+    // lands the user back at that step; if invalid, restart at 1.
+    //
+    //   corpus_onboarding_done set     → home
+    //   corpus_onboarding_step present → onboarding at that step
+    //   completedDays already exists   → treat as existing user, home
+    //                                    (safety net for pre-v2 upgraders)
+    //   otherwise fresh install        → onboarding at step 1
     const _completedCount = Object.keys(state.completedDays || {}).length;
-    const _hasIntro = !!localStorage.getItem('corpus_intro_done');
     const _hasOnbDone = !!localStorage.getItem('corpus_onboarding_done');
+    const _resumeStep = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
     console.log('[Onboarding] initUI gate:', {
       completedCount: _completedCount,
-      hasIntro: _hasIntro,
       hasOnbDone: _hasOnbDone,
+      resumeStep: _resumeStep,
     });
-    if (!_hasIntro && !_hasOnbDone && _completedCount === 0) {
-      console.log('[Onboarding] Fresh install → showBeat()');
+    if (_hasOnbDone) {
+      console.log('[Onboarding] Onboarding done → home');
+      renderHome();
+      showScreen('home');
+    } else if (_resumeStep >= 1 && _resumeStep <= _ONB_TOTAL_STEPS) {
+      console.log('[Onboarding] Resume onboarding at step', _resumeStep);
       _onboardingBooted = true;
-      showBeat();
-    } else if (_hasIntro && !localStorage.getItem('corpus_subject')) {
-      console.log('[Onboarding] Welcome done, no subject → subject select');
+      _onbShowStep(_resumeStep);
+    } else if (_completedCount === 0) {
+      console.log('[Onboarding] Fresh install → onboarding step 1');
       _onboardingBooted = true;
-      showSubjectSelect();
-    } else if (_hasIntro && localStorage.getItem('corpus_subject') && !localStorage.getItem('corpus_daily_goal_set')) {
-      console.log('[Onboarding] Welcome + subject done, no goal → goal screen');
-      _onboardingBooted = true;
-      showGoalScreen();
+      _onbShowStep(1);
     } else {
       console.log('[Onboarding] Existing user → home');
       renderHome();
@@ -22187,147 +22217,65 @@ document.addEventListener('DOMContentLoaded', function() {
   </button>
 </nav>
 
-<!-- NEW ONBOARDING — Beat + Streak + Welcome + Subject + Daily Goal.
-     Replaces the deprecated Onboarding_new.html iframe carousel + spotlight
-     tour. Fresh users flow:
-       beat → streak → welcome → subject → goal → openReader(1,1).
-     Progress pill row on each inline screen reflects the 5-step position.
-     Existing-user gates preserved (see startNewUserOnboarding / initApp). -->
-<!-- Screen 1: Beat (bright philosophy purple). Three-card fan hero.
-     Language toggle lives here — first paint — and controls copy on all
-     downstream screens through _onbApplyLangToWelcome. -->
-<div id="onboarding-beat" class="onb-screen onb-bg-philosophy" style="display:none">
-  <div class="onb-welcome-lang" id="onb-welcome-lang" dir="ltr">
-    <span class="onb-lang-indicator" id="onb-lang-indicator"></span>
-    <button type="button" class="onb-lang-btn" data-lang="he" onclick="_onbSetWelcomeLang('he')">עברית</button>
-    <button type="button" class="onb-lang-btn" data-lang="en" onclick="_onbSetWelcomeLang('en')">English</button>
+<!-- ONBOARDING v2 — growth-funnel flow.
+     19-step ladder with a step cursor persisted to corpus_onboarding_step.
+     Commit A ships steps 1-3 (welcome, problem, solution). Steps 4-19
+     land in later commits; the null-slot fallback in _onbShowStep runs
+     an early-completion path until they exist. See the ONBOARDING v2
+     header in the main script for the phase model, resume semantics,
+     and delivery plan. -->
+
+<!-- Step 1 — Welcome. Hosts the language toggle; every downstream
+     screen re-renders through _onbApplyLang whenever the toggle
+     switches. Copy anchored on the Corpus mark rather than a specific
+     thinker so this screen doesn't lock us into a single hero image. -->
+<div id="onb-v2-welcome" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-welcome-lang" dir="ltr">
+    <span class="onb-lang-indicator" id="onb-v2-lang-indicator"></span>
+    <button type="button" class="onb-lang-btn" data-lang="he" onclick="_onbSetLang('he')">עברית</button>
+    <button type="button" class="onb-lang-btn" data-lang="en" onclick="_onbSetLang('en')">English</button>
   </div>
   <div class="onb-progress" aria-hidden="true" data-step="1">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
-  <div class="onb-beat-inner">
-    <div class="onb-beat-fan" aria-hidden="true">
-      <div class="onb-beat-fan-glow onb-beat-fan-glow-1"></div>
-      <div class="onb-beat-fan-glow onb-beat-fan-glow-2 subj-economics"></div>
-      <div class="onb-beat-fan-glow onb-beat-fan-glow-3"></div>
-      <div class="onb-beat-fan-card onb-beat-fan-card-1">
-        <img src="./images/kant.webp" alt="">
-        <div class="onb-beat-fan-scroll"><div class="onb-beat-fan-name" id="onb-beat-fan-name-1">קאנט</div></div>
-      </div>
-      <div class="onb-beat-fan-card onb-beat-fan-card-2">
-        <img src="./images/marx.webp" alt="">
-        <div class="onb-beat-fan-scroll"><div class="onb-beat-fan-name" id="onb-beat-fan-name-2">מרקס</div></div>
-      </div>
-      <div class="onb-beat-fan-card onb-beat-fan-card-3">
-        <img src="./images/freud.webp" alt="">
-        <div class="onb-beat-fan-scroll"><div class="onb-beat-fan-name" id="onb-beat-fan-name-3">פרויד</div></div>
-      </div>
-    </div>
-    <div class="onb-beat-copy">
-      <h1 class="onb-beat-head" id="onb-beat-head">חמש דקות ביום עם ההוגים הגדולים</h1>
-      <p class="onb-beat-sub" id="onb-beat-sub">פילוסופיה, כלכלה ופסיכולוגיה. דיאלוג קצר, רעיון אחד, ישר מהמקור.</p>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-welcome-head"></h1>
+      <div class="onb-v2-wordmark" id="onb-v2-welcome-wordmark"></div>
     </div>
   </div>
   <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-beat-cta" onclick="_onbFinishBeat()">מתחילים</button>
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-welcome-cta" onclick="_onbV2CtaWelcome()"></button>
   </div>
 </div>
 
-<!-- Screen 2: Streak beat (bright amber). Restored. Large flame hero,
-     collection preview row (3 subject-tinted mini-cards + 1 mystery),
-     caption. Copy set in showStreakBeat via _onbApplyLangToWelcome. -->
-<div id="onboarding-streak" class="onb-screen onb-bg-flame" style="display:none">
-  <div class="onb-progress" aria-hidden="true" data-step="2">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+<!-- Step 2 — Problem. Confrontation-lite; sets up the reframe on step 3. -->
+<div id="onb-v2-problem" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="1">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
-  <div class="onb-streak-inner">
-    <div class="onb-streak-hero" aria-hidden="true">
-      <svg viewBox="0 0 64 64" width="78" height="78"><use href="#icon-streak"/></svg>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-problem-head"></h1>
     </div>
-    <div class="onb-streak-copy">
-      <h1 class="onb-streak-head" id="onb-streak-head">כל יום מוסיף לרצף</h1>
-      <p class="onb-streak-sub" id="onb-streak-sub">דיאלוג ביום מדליק את הלהבה. כל הוגה שפגשת נשמר באוסף שלך.</p>
-    </div>
-    <div class="onb-streak-row" aria-hidden="true">
-      <div class="onb-streak-mini onb-streak-mini-1"><img src="./images/plato.webp" alt=""></div>
-      <div class="onb-streak-mini onb-streak-mini-2"><img src="./images/smith.webp" alt=""></div>
-      <div class="onb-streak-mini onb-streak-mini-3"><img src="./images/james.webp" alt=""></div>
-      <div class="onb-streak-mini onb-streak-mini-mystery">?</div>
-    </div>
-    <div class="onb-streak-caption" id="onb-streak-caption">האוסף שלך נבנה תוך כדי קריאה</div>
   </div>
   <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-streak-cta" onclick="_onbFinishStreakBeat()">המשך</button>
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-problem-cta" onclick="_onbV2CtaProblem()"></button>
   </div>
 </div>
 
-<!-- Screen 3: Welcome (philosophy purple tint). Socrates hero card as
-     the human anchor after the streak beat. Language toggle is on the
-     beat (screen 1), not here. -->
-<div id="onboarding-welcome" class="onb-screen onb-bg-philosophy" style="display:none">
-  <div class="onb-progress" aria-hidden="true" data-step="3">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+<!-- Step 3 — Solution. Reframe against step 2. Anchor line, no subtitle. -->
+<div id="onb-v2-solution" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="1">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
-  <div class="onb-welcome-inner">
-    <div class="onb-hero-card" aria-hidden="true">
-      <img src="./images/socrates.webp" alt="">
-      <div class="onb-hero-card-scroll">
-        <div class="onb-hero-card-name" id="onb-hero-card-name">סוקרטס</div>
-        <div class="onb-hero-card-era">470–399 BCE</div>
-      </div>
-    </div>
-    <div class="onb-welcome-copy">
-      <h1 class="onb-welcome-head" id="onb-welcome-head">מתי בפעם האחרונה דיברת עם סוקרטס?</h1>
-      <p class="onb-welcome-sub" id="onb-welcome-sub">לא סיכום ולא פרשנות. מה שנכתב לפני 2,400 שנה, בשפה של היום.</p>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-solution-head"></h1>
     </div>
   </div>
   <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-welcome-cta" onclick="_onbFinishWelcome()">המשך</button>
-  </div>
-</div>
-
-<!-- Daily-goal picker. Slotted between subject-select and the first
-     dialogue. Three cards (fan-adjacent, not literal fan): one dialogue,
-     two dialogues, own pace. Choice recorded as a dated array entry in
-     state.dailyGoalHistory. -->
-<div id="onboarding-goal" class="onb-screen onb-bg-brand" style="display:none">
-  <div class="onb-progress" aria-hidden="true" data-step="5">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
-  </div>
-  <div class="onb-goal-inner">
-    <div class="onb-goal-copy">
-      <h1 class="onb-goal-head" id="onb-goal-head">כמה זמן ביום?</h1>
-      <p class="onb-goal-sub" id="onb-goal-sub">הרצף שלך נבנה מזה. אפשר לשנות בכל רגע.</p>
-    </div>
-    <div class="onb-goal-options" id="onb-goal-options">
-      <button type="button" class="onb-goal-card" data-goal="one" onclick="_onbSelectGoal('one')">
-        <span class="onb-goal-icon"><svg viewBox="0 0 64 64" width="34" height="34"><use href="#icon-streak"/></svg></span>
-        <span class="onb-goal-text">
-          <span class="onb-goal-title" id="onb-goal-t1">דיאלוג אחד ביום</span>
-          <span class="onb-goal-hint" id="onb-goal-h1">קצב יומיומי, בערך חמש דקות</span>
-        </span>
-      </button>
-      <button type="button" class="onb-goal-card" data-goal="two" onclick="_onbSelectGoal('two')">
-        <span class="onb-goal-icon onb-goal-icon-double">
-          <svg viewBox="0 0 64 64" width="30" height="30"><use href="#icon-streak"/></svg>
-          <svg viewBox="0 0 64 64" width="30" height="30"><use href="#icon-streak"/></svg>
-        </span>
-        <span class="onb-goal-text">
-          <span class="onb-goal-title" id="onb-goal-t2">שני דיאלוגים</span>
-          <span class="onb-goal-hint" id="onb-goal-h2">לצלול פנימה, בערך עשר דקות</span>
-        </span>
-      </button>
-      <button type="button" class="onb-goal-card" data-goal="own_pace" onclick="_onbSelectGoal('own_pace')">
-        <span class="onb-goal-icon"><svg viewBox="0 0 64 64" width="34" height="34"><use href="#icon-level"/></svg></span>
-        <span class="onb-goal-text">
-          <span class="onb-goal-title" id="onb-goal-t3">הקצב שלי</span>
-          <span class="onb-goal-hint" id="onb-goal-h3">בלי לחץ, ללמוד כשמתאים</span>
-        </span>
-      </button>
-    </div>
-  </div>
-  <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-goal-cta" disabled onclick="_onbFinishGoal()">לדיאלוג הראשון ←</button>
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-solution-cta" onclick="_onbV2CtaSolution()"></button>
   </div>
 </div>
 
