@@ -10954,13 +10954,11 @@ const _ONB_COPY = {
     cta:       { en: 'Continue',                    he: 'המשך' },
   },
   shock: {
-    // Small eyebrow above the arithmetic — visible use of the captured
-    // age. Rendered in _onbV2PrepareShock; hidden if age is missing.
-    // Math + punch lines are computed at render time from
-    // state.onbAnswers.phoneHours (see prepare fn); only eyebrow +
-    // cta are static here.
-    eyebrow: { en: 'You\'re {age}.', he: 'אתם בני {age}.' },
-    cta:     { en: 'Continue',       he: 'המשך' },
+    // Age is folded into the punchline via a small forward projection
+    // to the next round age (see _onbV2PrepareShock for the formula).
+    // Math and punch computed at render time from age + phoneHours;
+    // only cta is static here.
+    cta: { en: 'Continue', he: 'המשך' },
   },
   plan: {
     head: {
@@ -11232,40 +11230,43 @@ function _onbV2PrepareHours() {
 function _onbV2PrepareShock() {
   const hours = state.onbAnswers.phoneHours || 4;
   const age   = state.onbAnswers.age;
-  const hoursPerYear = hours * 365;
-  // Floor rather than round — "full days" reads more honestly as a
-  // conservative count (you have to complete a day for it to be full).
-  const days = Math.floor(hoursPerYear / 24);
-  const isEn = state.lang === 'en';
-  const eyebrow = document.getElementById('onb-v2-shock-eyebrow');
-  const math    = document.getElementById('onb-v2-shock-math');
-  const punch   = document.getElementById('onb-v2-shock-punch');
-  const yearStr = hoursPerYear.toLocaleString('en-US');
-  // Age eyebrow — small visible use of the captured age. Hidden if
-  // age wasn't captured (defensive; the flow requires it now).
-  if (eyebrow) {
-    if (age != null && _ONB_COPY.shock && _ONB_COPY.shock.eyebrow) {
-      const tmpl = isEn ? _ONB_COPY.shock.eyebrow.en : _ONB_COPY.shock.eyebrow.he;
-      eyebrow.textContent = tmpl.replace('{age}', age);
-      eyebrow.style.display = '';
-    } else {
-      eyebrow.style.display = 'none';
-    }
-  }
+  const isEn  = state.lang === 'en';
+  const math  = document.getElementById('onb-v2-shock-math');
+  const punch = document.getElementById('onb-v2-shock-punch');
+  // Annual days spent on the phone at the picked rate. Floor rather
+  // than round — "full days" reads more honestly as a conservative
+  // count (you have to complete a day for it to be full).
+  const annualDays = Math.floor((hours * 365) / 24);
+  // Next round age at least 5 years out, capped at 100. Formula picks
+  // the smallest multiple of 5 that's ≥ age + 4, so age 27 lands at
+  // 35 (8 yrs), 33 at 40 (7 yrs), 45 at 50 (5 yrs). Always meaningful
+  // years, always a milestone-shaped number the user recognizes.
+  const milestoneRaw = Math.ceil(((age || 30) + 4) / 5) * 5;
+  const milestone = Math.min(100, milestoneRaw);
+  const yearsUntil = Math.max(1, milestone - (age || 30));
+  const cumulativeDays = annualDays * yearsUntil;
+  // Math line — establishes the annual DAYS rate so the punch reads
+  // as multi-year cumulative without a numeric jump the user has to
+  // bridge.
   if (math) {
     if (isEn) {
       const daily = hours === 1 ? '1 hour a day' : hours + ' hours a day';
-      math.textContent = daily + ' is ' + yearStr + ' hours a year.';
+      const daysStr = annualDays === 1 ? '1 day a year' : annualDays + ' days a year';
+      math.textContent = daily + ', ' + daysStr + '.';
     } else {
       const daily = hours === 1 ? 'שעה ביום' : hours + ' שעות ביום';
-      math.textContent = daily + ' זה ' + yearStr + ' שעות בשנה.';
+      const daysStr = annualDays === 1 ? 'יום אחד בשנה' : annualDays + ' ימים בשנה';
+      math.textContent = daily + ', ' + daysStr + '.';
     }
   }
+  // Punch — projection to next milestone, cumulative days accented.
   if (punch) {
     if (isEn) {
-      punch.innerHTML = 'That\'s <span class="onb-v2-em">' + days + ' full days</span>.';
+      punch.innerHTML = 'By ' + milestone + ', that\'s <span class="onb-v2-em">' +
+        cumulativeDays + ' full days</span>.';
     } else {
-      punch.innerHTML = 'זה <span class="onb-v2-em">' + days + ' ימים שלמים</span>.';
+      punch.innerHTML = 'עד גיל ' + milestone + ', זה <span class="onb-v2-em">' +
+        cumulativeDays + ' ימים שלמים</span>.';
     }
   }
 }
@@ -22734,19 +22735,19 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 7 — Shock number. Display-only; no input. Three-line composition:
-     small age eyebrow ("You're {age}.") anchors the personal frame,
-     honest arithmetic ("N hours a day is M hours a year") shows the
-     working, punchline below with days accented ("That's D full days").
-     All three rendered in _onbV2PrepareShock from state.onbAnswers.age
-     + phoneHours. -->
+<!-- Step 7 — Shock number. Display-only; no input. Two-line composition:
+     annual math sets the rate ("N hours a day, M days a year"),
+     punchline projects forward to a round-age milestone with
+     cumulative days accented ("By {milestone}, that's D full days").
+     Both rendered in _onbV2PrepareShock from state.onbAnswers.age +
+     phoneHours. Age is load-bearing on the projection, not just
+     displayed. -->
 <div id="onb-v2-shock" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="3">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy onb-v2-shock">
-      <p class="onb-v2-greeting" id="onb-v2-shock-eyebrow" style="display:none"></p>
       <p class="onb-v2-shock-math" id="onb-v2-shock-math"></p>
       <h1 class="onb-v2-head" id="onb-v2-shock-punch"></h1>
     </div>
