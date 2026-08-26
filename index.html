@@ -5790,14 +5790,19 @@
     color: var(--accent);
   }
   .onb-screen.onb-v2 .onb-v2-sub {
-    font-family: 'DM Sans', sans-serif;
-    font-size: calc(18px * var(--text-scale));
-    line-height: 1.45;
-    color: var(--text-2);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: calc(22px * var(--text-scale));
+    line-height: 1.35;
+    color: var(--ink);
     margin: 0;
   }
-  html.dark .onb-screen.onb-v2 .onb-v2-head { color: var(--text); }
-  html.dark .onb-screen.onb-v2 .onb-v2-sub  { color: var(--text-2); }
+  html.dark .onb-screen.onb-v2 .onb-v2-head,
+  html.dark .onb-screen.onb-v2 .onb-v2-sub,
+  html.dark .onb-screen.onb-v2 .onb-v2-greeting,
+  html.dark .onb-screen.onb-v2 .onb-v2-shock-math,
+  html.dark .onb-screen.onb-v2 .onb-v2-slider-value-unit,
+  html.dark .onb-screen.onb-v2 .onb-v2-slider-scale { color: var(--text); }
 
   /* ── Onboarding v2 primitives ──
      Text input / number input / slider — built once, reused across
@@ -5848,11 +5853,12 @@
   }
 
   .onb-screen.onb-v2 .onb-v2-greeting {
-    font-family: 'DM Sans', sans-serif;
-    font-size: calc(20px * var(--text-scale));
-    color: var(--text-2);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: calc(22px * var(--text-scale));
+    color: var(--ink);
     margin: 0 0 12px;
-    line-height: 1.4;
+    line-height: 1.35;
   }
 
   /* Slider — first slider in the app. Track + custom thumb, both webkit
@@ -5880,10 +5886,10 @@
     gap: 8px;
   }
   .onb-screen.onb-v2 .onb-v2-slider-value-unit {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
     font-size: calc(22px * var(--text-scale));
-    font-weight: 500;
-    color: var(--text-2);
+    color: var(--ink);
     letter-spacing: 0;
   }
   .onb-screen.onb-v2 .onb-v2-slider {
@@ -5925,9 +5931,10 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    font-family: 'DM Sans', sans-serif;
-    font-size: calc(14px * var(--text-scale));
-    color: var(--text-muted);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: calc(16px * var(--text-scale));
+    color: var(--ink);
     padding: 0 4px;
   }
 
@@ -5938,11 +5945,12 @@
     margin: 0 auto;
   }
   .onb-screen.onb-v2 .onb-v2-shock-math {
-    font-family: 'DM Sans', sans-serif;
-    font-size: calc(20px * var(--text-scale));
-    color: var(--text-2);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: calc(22px * var(--text-scale));
+    color: var(--ink);
     margin: 0 0 24px;
-    line-height: 1.5;
+    line-height: 1.4;
   }
   .onb-goal-card {
     display: flex;
