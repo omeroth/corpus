@@ -10184,7 +10184,7 @@ async function loadProgressFromSupabase() {
     ['name', 'q3', 'commitment', 'completedAt'].forEach(k => {
       if (_srvOnb[k] && !state.onbAnswers[k]) state.onbAnswers[k] = _srvOnb[k];
     });
-    ['phoneHours', 'readingFreq'].forEach(k => {
+    ['age', 'phoneHours', 'readingFreq'].forEach(k => {
       if (typeof _srvOnb[k] === 'number' && state.onbAnswers[k] == null) state.onbAnswers[k] = _srvOnb[k];
     });
     ['q1', 'q2'].forEach(k => {
@@ -10843,35 +10843,43 @@ function _onbShowScreen(screenId) {
 // ═══════════════════════════════════════════════════════════
 // ONBOARDING v2 — growth-funnel flow
 // ═══════════════════════════════════════════════════════════
-// 18-screen flow replaces the v1 beat/streak/welcome/subject/goal
+// 19-screen flow replaces the v1 beat/streak/welcome/subject/goal
 // cascade. Step cursor persisted in localStorage; resume-on-quit
 // lands the user at their last step. State captured in
 // state.onbAnswers; synced to user_progress.onboarding_answers
 // (migration 20260826150000).
 //
 // Phases (progress-pill grouping):
-//   1. Welcome (steps 1-3)      welcome → problem → solution
-//   2. About you (steps 4-5)    name → phone hours
-//   3. Reveal (steps 6-7)       shock number → plan intro
-//   4. Choices (steps 8-12)     subject → Q1 → Q2 → Q3 → Q4
-//   5. First step (steps 13-16) mirror → first dialogue → streak → review
-//   6. Commit (steps 17-18)     journey → commitment
+//   1. Welcome (steps 1-3)       welcome → problem → solution
+//   2. About you (steps 4-6)     name → age → phone hours
+//   3. Reveal (steps 7-8)        shock number → plan intro
+//   4. Choices (steps 9-13)      subject → Q1 → Q2 → Q3 → Q4
+//   5. First step (steps 14-17)  mirror → first dialogue → streak → review
+//   6. Commit (steps 18-19)      journey → commitment
 //
-// Commit A shipped steps 1-3. Commit B extends to step 7. Steps 8-18
-// land in later commits. While the flow is incomplete, an early-
-// completion path fires when _onbShowStep hits a null-slot step:
-// sets corpus_onboarding_done, defaults subject to philosophy, lands
-// on home. Later commits extend the ladder step by step.
+// Commit A shipped 1-3. Commit B extended to step 7 (as 7 in this
+// numbering — was step 7 there too before age was re-added, then
+// dropped, then re-added; shock is now step 7 with age in the middle).
+// Steps 9-19 land in later commits. While the flow is incomplete,
+// an early-completion path fires when _onbShowStep hits a null-slot
+// step: sets corpus_onboarding_done, defaults subject to philosophy,
+// lands on home. Later commits extend the ladder step by step.
+//
+// Age (step 5): the user's age is used visibly rather than only
+// stored. Shock screen (step 7) opens with "You're {age}." as a
+// small eyebrow above the arithmetic — personalizes the punchline
+// without projecting across a lifetime. Later screens (mirror,
+// step 14) will reference it too when they ship.
 
-const _ONB_TOTAL_STEPS = 18;
+const _ONB_TOTAL_STEPS = 19;
 // Which phase (1..6) each step belongs to. Drives the 6-pill progress.
 const _ONB_STEP_TO_PHASE = {
-  1: 1, 2: 1, 3: 1,           // welcome / problem / solution
-  4: 2, 5: 2,                 // name / phone hours
-  6: 3, 7: 3,                 // shock / plan intro
-  8: 4, 9: 4, 10: 4, 11: 4, 12: 4,   // subject / Q1 / Q2 / Q3 / Q4
-  13: 5, 14: 5, 15: 5, 16: 5,        // mirror / first dialogue / streak / review
-  17: 6, 18: 6,               // journey / commit
+  1: 1, 2: 1, 3: 1,                  // welcome / problem / solution
+  4: 2, 5: 2, 6: 2,                  // name / age / phone hours
+  7: 3, 8: 3,                        // shock / plan intro
+  9: 4, 10: 4, 11: 4, 12: 4, 13: 4,  // subject / Q1 / Q2 / Q3 / Q4
+  14: 5, 15: 5, 16: 5, 17: 5,        // mirror / first dialogue / streak / review
+  18: 6, 19: 6,                      // journey / commit
 };
 // DOM ids in step order. Steps not yet built map to null; _onbShowStep
 // treats a null slot as "not implemented yet, jump to completion" so a
@@ -10881,12 +10889,13 @@ const _ONB_STEP_TO_ID = {
   2: 'onb-v2-problem',
   3: 'onb-v2-solution',
   4: 'onb-v2-name',
-  5: 'onb-v2-hours',
-  6: 'onb-v2-shock',
-  7: 'onb-v2-plan',
-  8: null, 9: null, 10: null, 11: null, 12: null,
-  13: null, 14: null, 15: null, 16: null,
-  17: null, 18: null,
+  5: 'onb-v2-age',
+  6: 'onb-v2-hours',
+  7: 'onb-v2-shock',
+  8: 'onb-v2-plan',
+  9: null, 10: null, 11: null, 12: null, 13: null,
+  14: null, 15: null, 16: null, 17: null,
+  18: null, 19: null,
 };
 
 // Bilingual copy map for the intro screens (1-3). Later commits will
@@ -10927,12 +10936,15 @@ const _ONB_COPY = {
     placeholder: { en: 'Your name',                he: 'השם שלכם' },
     cta:         { en: 'Continue',                 he: 'המשך' },
   },
+  age: {
+    // Greeting sits above the head — first personal-address moment
+    // after name capture. Interpolated in _onbV2PrepareAge.
+    greeting:    { en: 'Nice to meet you, {name}.', he: 'נעים להכיר, {name}.' },
+    head:        { en: 'How old are you?',          he: 'בני כמה אתם?' },
+    placeholder: { en: 'Age',                       he: 'גיל' },
+    cta:         { en: 'Continue',                  he: 'המשך' },
+  },
   hours: {
-    // Optional greeting rendered above head when a name was captured
-    // on step 4. Prepared in _onbV2PrepareHours with the name
-    // interpolated. Moved here from the retired age screen so the
-    // "Nice to meet you" touch survives.
-    greeting:  { en: 'Nice to meet you, {name}.', he: 'נעים להכיר, {name}.' },
     head:      { en: 'How many hours a day are you on your phone?',
                  he: 'כמה שעות ביום אתם על הטלפון?' },
     // Singular/plural unit for the slider's live-value display.
@@ -10942,9 +10954,13 @@ const _ONB_COPY = {
     cta:       { en: 'Continue',                    he: 'המשך' },
   },
   shock: {
-    // Both lines computed at render time from state.onbAnswers.phoneHours
-    // in _onbV2PrepareShock. Only the CTA is static.
-    cta: { en: 'Continue', he: 'המשך' },
+    // Small eyebrow above the arithmetic — visible use of the captured
+    // age. Rendered in _onbV2PrepareShock; hidden if age is missing.
+    // Math + punch lines are computed at render time from
+    // state.onbAnswers.phoneHours (see prepare fn); only eyebrow +
+    // cta are static here.
+    eyebrow: { en: 'You\'re {age}.', he: 'אתם בני {age}.' },
+    cta:     { en: 'Continue',       he: 'המשך' },
   },
   plan: {
     head: {
@@ -10980,6 +10996,8 @@ function _onbApplyLang(lang) {
   setText('onb-v2-solution-cta',  'solution', 'cta');
   setHTML('onb-v2-name-head',     'name',     'head');
   setText('onb-v2-name-cta',      'name',     'cta');
+  setHTML('onb-v2-age-head',      'age',      'head');
+  setText('onb-v2-age-cta',       'age',      'cta');
   setHTML('onb-v2-hours-head',    'hours',    'head');
   setText('onb-v2-hours-cta',     'hours',    'cta');
   setText('onb-v2-shock-cta',     'shock',    'cta');
@@ -10993,6 +11011,7 @@ function _onbApplyLang(lang) {
     }
   };
   setPlaceholder('onb-v2-name-input', 'name');
+  setPlaceholder('onb-v2-age-input',  'age');
   // Lang toggle indicator on screen 1
   document.querySelectorAll('#onb-v2-welcome .onb-lang-btn').forEach(btn => {
     btn.classList.toggle('is-active', btn.dataset.lang === lang);
@@ -11103,20 +11122,30 @@ function _onbV2CtaName() {
   _onbAdvanceStep(4, 5, { name: name });
 }
 
-// Screen 5 (phone hours slider) — always has a value, no disabled state.
+// Screen 5 (age) — validate 13..120 and advance. CTA is otherwise
+// disabled by the input listener wired in _onbV2PrepareAge.
+function _onbV2CtaAge() {
+  const el = document.getElementById('onb-v2-age-input');
+  const val = parseInt((el && el.value) || '', 10);
+  if (!(val >= 13 && val <= 120)) return;
+  state.userAge = val;
+  _onbAdvanceStep(5, 6, { age: val });
+}
+
+// Screen 6 (phone hours slider) — always has a value, no disabled state.
 function _onbV2CtaHours() {
   const el = document.getElementById('onb-v2-hours-input');
   const val = parseInt((el && el.value) || '4', 10) || 4;
-  _onbAdvanceStep(5, 6, { phoneHours: val });
+  _onbAdvanceStep(6, 7, { phoneHours: val });
 }
 
-// Screen 6 (shock number) — display-only; advance on tap.
-function _onbV2CtaShock() { _onbAdvanceStep(6, 7); }
+// Screen 7 (shock number) — display-only; advance on tap.
+function _onbV2CtaShock() { _onbAdvanceStep(7, 8); }
 
-// Screen 7 (plan intro) — display-only; advance to step 8 (subject
+// Screen 8 (plan intro) — display-only; advance to step 9 (subject
 // picker, ships in commit C). Until then the null-slot path in
 // _onbShowStep runs _onbComplete instead.
-function _onbV2CtaPlan() { _onbAdvanceStep(7, 8); }
+function _onbV2CtaPlan() { _onbAdvanceStep(8, 9); }
 
 // Screen prepare hooks — invoked from _onbShowStep once the target
 // screen is visible. Handle dynamic content (age greeting with the
@@ -11142,24 +11171,46 @@ function _onbV2PrepareName() {
   requestAnimationFrame(() => { try { input.focus(); } catch(e) {} });
 }
 
-function _onbV2PrepareHours() {
-  const input   = document.getElementById('onb-v2-hours-input');
-  const display = document.getElementById('onb-v2-hours-value');
-  const greet   = document.getElementById('onb-v2-hours-greeting');
-  if (!input || !display) return;
+function _onbV2PrepareAge() {
+  const input = document.getElementById('onb-v2-age-input');
+  const cta   = document.getElementById('onb-v2-age-cta');
+  const greet = document.getElementById('onb-v2-age-greeting');
   const isEn = state.lang === 'en';
   const name = state.onbAnswers.name;
-  // Greeting from the retired age screen — now lives above the hours
-  // question so the "Nice to meet you" touch survives dropping age.
+  // Greeting above head — first personal-address moment after the
+  // name is captured. Hidden if resume-mid-flow user landed here
+  // without a name.
   if (greet) {
-    if (name && _ONB_COPY.hours && _ONB_COPY.hours.greeting) {
-      const tmpl = isEn ? _ONB_COPY.hours.greeting.en : _ONB_COPY.hours.greeting.he;
+    if (name && _ONB_COPY.age && _ONB_COPY.age.greeting) {
+      const tmpl = isEn ? _ONB_COPY.age.greeting.en : _ONB_COPY.age.greeting.he;
       greet.textContent = tmpl.replace('{name}', name);
       greet.style.display = '';
     } else {
       greet.style.display = 'none';
     }
   }
+  if (!input || !cta) return;
+  input.value = state.onbAnswers.age != null ? String(state.onbAnswers.age) : '';
+  const cur = parseInt(input.value, 10);
+  cta.disabled = !(cur >= 13 && cur <= 120);
+  if (!input.dataset.wired) {
+    input.dataset.wired = '1';
+    input.addEventListener('input', function() {
+      const v = parseInt(this.value, 10);
+      cta.disabled = !(v >= 13 && v <= 120);
+    });
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !cta.disabled) { e.preventDefault(); _onbV2CtaAge(); }
+    });
+  }
+  requestAnimationFrame(() => { try { input.focus(); } catch(e) {} });
+}
+
+function _onbV2PrepareHours() {
+  const input   = document.getElementById('onb-v2-hours-input');
+  const display = document.getElementById('onb-v2-hours-value');
+  if (!input || !display) return;
+  const isEn = state.lang === 'en';
   const initial = state.onbAnswers.phoneHours || 4;
   const renderValue = (val) => {
     const unit = val === 1
@@ -11180,14 +11231,27 @@ function _onbV2PrepareHours() {
 
 function _onbV2PrepareShock() {
   const hours = state.onbAnswers.phoneHours || 4;
+  const age   = state.onbAnswers.age;
   const hoursPerYear = hours * 365;
   // Floor rather than round — "full days" reads more honestly as a
   // conservative count (you have to complete a day for it to be full).
   const days = Math.floor(hoursPerYear / 24);
   const isEn = state.lang === 'en';
-  const math  = document.getElementById('onb-v2-shock-math');
-  const punch = document.getElementById('onb-v2-shock-punch');
+  const eyebrow = document.getElementById('onb-v2-shock-eyebrow');
+  const math    = document.getElementById('onb-v2-shock-math');
+  const punch   = document.getElementById('onb-v2-shock-punch');
   const yearStr = hoursPerYear.toLocaleString('en-US');
+  // Age eyebrow — small visible use of the captured age. Hidden if
+  // age wasn't captured (defensive; the flow requires it now).
+  if (eyebrow) {
+    if (age != null && _ONB_COPY.shock && _ONB_COPY.shock.eyebrow) {
+      const tmpl = isEn ? _ONB_COPY.shock.eyebrow.en : _ONB_COPY.shock.eyebrow.he;
+      eyebrow.textContent = tmpl.replace('{age}', age);
+      eyebrow.style.display = '';
+    } else {
+      eyebrow.style.display = 'none';
+    }
+  }
   if (math) {
     if (isEn) {
       const daily = hours === 1 ? '1 hour a day' : hours + ' hours a day';
@@ -11208,11 +11272,12 @@ function _onbV2PrepareShock() {
 
 // Map from step number → prepare hook. Consumed by _onbShowStep.
 // Only steps with dynamic content need entries; static-copy screens
-// (1, 2, 3, 7) rely on _onbApplyLang alone.
+// (1, 2, 3, 8) rely on _onbApplyLang alone.
 const _ONB_STEP_HOOKS = {
   4: _onbV2PrepareName,
-  5: _onbV2PrepareHours,
-  6: _onbV2PrepareShock,
+  5: _onbV2PrepareAge,
+  6: _onbV2PrepareHours,
+  7: _onbV2PrepareShock,
 };
 
 // Silent guest entry: mirrors enterAsGuest but skips hideAuthScreen (the
@@ -13162,6 +13227,7 @@ function defaultState() {
     // client-non-empty. See _onbAdvanceStep for the write pattern.
     onbAnswers: {
       name: '',
+      age: null,
       phoneHours: null,
       q1: [],              // multi-select ids (stable), up to 3
       q2: [],              // multi-select ids (stable), up to 3
@@ -13301,18 +13367,12 @@ function loadState() {
   // in-flight answers preserved. Array fields defensively re-arrayed
   // if a corrupt persist wrote them as something else.
   state.onbAnswers = Object.assign(
-    { name: '', phoneHours: null, q1: [], q2: [], q3: '',
+    { name: '', age: null, phoneHours: null, q1: [], q2: [], q3: '',
       readingFreq: null, commitment: '', completedAt: '' },
     state.onbAnswers || {}
   );
   if (!Array.isArray(state.onbAnswers.q1)) state.onbAnswers.q1 = [];
   if (!Array.isArray(state.onbAnswers.q2)) state.onbAnswers.q2 = [];
-  // Age was collected in early builds of onboarding v2 for a lifetime-
-  // projection screen (screen 5) that was later replaced with an honest
-  // annual figure. Delete on load so no persisted install continues to
-  // hold the field. One-shot cleanup; delete this block a few releases
-  // after commit B has aged out.
-  if ('age' in state.onbAnswers) delete state.onbAnswers.age;
   if (state.guestSignupPromptShown) {
     // Ensure totalShown reflects "they've seen the welcome prompt before" so
     // first_completion doesn't re-fire. Leave lastShownDate EMPTY — the legacy
@@ -22624,18 +22684,39 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 5 — Phone hours. Range slider 1..12 with live value display
+<!-- Step 5 — Age. Numeric keypad on iOS via inputmode + type=number.
+     Optional greeting line above the head interpolates the captured
+     name from step 4. Validation: 13..120; CTA disabled otherwise.
+     Age is used visibly on the shock screen (step 7) as an eyebrow. -->
+<div id="onb-v2-age" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="2">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <p class="onb-v2-greeting" id="onb-v2-age-greeting" style="display:none"></p>
+      <h1 class="onb-v2-head" id="onb-v2-age-head"></h1>
+      <div class="onb-v2-field">
+        <input class="onb-v2-input onb-v2-input-num" type="number"
+               inputmode="numeric" pattern="[0-9]*" id="onb-v2-age-input"
+               min="13" max="120" aria-label="Age">
+      </div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-age-cta" onclick="_onbV2CtaAge()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 6 — Phone hours. Range slider 1..12 with live value display
      above the track. First slider in the app — component styling in
-     .onb-v2-slider* CSS is reused by step 12 (reading frequency).
-     Optional greeting above the head interpolates the captured name
-     from step 4 ("Nice to meet you, {name}."). -->
+     .onb-v2-slider* CSS is reused by step 13 (reading frequency). -->
 <div id="onb-v2-hours" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="2">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
-      <p class="onb-v2-greeting" id="onb-v2-hours-greeting" style="display:none"></p>
       <h1 class="onb-v2-head" id="onb-v2-hours-head"></h1>
       <div class="onb-v2-slider-wrap">
         <div class="onb-v2-slider-value" id="onb-v2-hours-value" aria-live="polite"></div>
@@ -22653,17 +22734,19 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 6 — Shock number. Display-only; no input. Two-line composition:
-     honest arithmetic on top ("N hours a day is M hours a year") in
-     muted secondary text, punchline below with days accented ("That's
-     D full days"). Content rendered in _onbV2PrepareShock from
-     state.onbAnswers.phoneHours. -->
+<!-- Step 7 — Shock number. Display-only; no input. Three-line composition:
+     small age eyebrow ("You're {age}.") anchors the personal frame,
+     honest arithmetic ("N hours a day is M hours a year") shows the
+     working, punchline below with days accented ("That's D full days").
+     All three rendered in _onbV2PrepareShock from state.onbAnswers.age
+     + phoneHours. -->
 <div id="onb-v2-shock" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="3">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy onb-v2-shock">
+      <p class="onb-v2-greeting" id="onb-v2-shock-eyebrow" style="display:none"></p>
       <p class="onb-v2-shock-math" id="onb-v2-shock-math"></p>
       <h1 class="onb-v2-head" id="onb-v2-shock-punch"></h1>
     </div>
@@ -22673,7 +22756,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 7 — Plan intro. Reframe from the shock: five minutes a day IS
+<!-- Step 8 — Plan intro. Reframe from the shock: five minutes a day IS
      the plan. Accent phrase is "five minutes a day" / "חמש דקות ביום". -->
 <div id="onb-v2-plan" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="3">
