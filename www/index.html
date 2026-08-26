@@ -5952,6 +5952,160 @@
     margin: 0 0 24px;
     line-height: 1.4;
   }
+
+  /* ── Multi-select / single-select card component ──
+     Base card shape shared by subject picker (step 9), Q1 (10),
+     Q2 (11), and Q3 (12). Selected state uses accent border + tinted
+     background. Q3 renders the same cards as Q1/Q2 (radio behavior
+     handled in the JS layer). */
+  .onb-screen.onb-v2 .onb-v2-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 380px;
+    margin: 20px auto 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-card {
+    padding: 14px 18px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1.5px solid rgba(var(--accent-rgb), 0.18);
+    border-radius: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: calc(17px * var(--text-scale));
+    text-align: start;
+    line-height: 1.35;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .onb-screen.onb-v2 .onb-v2-card:hover  { border-color: rgba(var(--accent-rgb), 0.32); }
+  .onb-screen.onb-v2 .onb-v2-card:active { transform: scale(0.98); }
+  .onb-screen.onb-v2 .onb-v2-card.is-selected {
+    background: rgba(var(--accent-rgb), 0.10);
+    border-color: var(--accent);
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-card {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-card.is-selected {
+    background: rgba(var(--accent-rgb), 0.18);
+    border-color: var(--accent);
+  }
+
+  /* Subject-card variant: adds portrait + tag under the name. Layout
+     is a horizontal flex; the base padding/border rules from .onb-v2-card
+     still apply. */
+  .onb-screen.onb-v2 .onb-v2-subj-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .onb-screen.onb-v2 .onb-v2-subj-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(var(--accent-rgb), 0.10);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .onb-screen.onb-v2 .onb-v2-subj-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .onb-screen.onb-v2 .onb-v2-subj-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-subj-name {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: calc(18px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .onb-screen.onb-v2 .onb-v2-subj-tag {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;
+    font-size: calc(14px * var(--text-scale));
+    color: var(--ink);
+    opacity: 0.7;
+    line-height: 1.3;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-subj-name,
+  html.dark .onb-screen.onb-v2 .onb-v2-subj-tag { color: var(--text); }
+
+  /* Hint line below the head on multi-select questions (Q1, Q2). */
+  .onb-screen.onb-v2 .onb-v2-hint {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;
+    font-size: calc(15px * var(--text-scale));
+    color: var(--ink);
+    opacity: 0.6;
+    margin: -8px 0 4px;
+    text-align: center;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-hint { color: var(--text); }
+
+  /* Mirror list — bulleted recap on step 14. Each item is a full
+     sentence in the promoted body-copy style. Accent dot at start
+     of each row anchors the list without cluttering it. */
+  .onb-screen.onb-v2 .onb-v2-mirror-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 380px;
+    margin-inline: auto;
+  }
+  .onb-screen.onb-v2 .onb-v2-mirror-item {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: calc(19px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.4;
+    padding-inline-start: 18px;
+    position: relative;
+    text-align: start;
+  }
+  .onb-screen.onb-v2 .onb-v2-mirror-item::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0.65em;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-mirror-item { color: var(--text); }
+
+  /* Progress-pill active fill on v2 uses the current subject accent
+     (not the hardcoded philosophy fallback used by legacy v1 progress).
+     Steps 1-8 all render as philosophy pre-subject-pick; from step 9
+     onward the theme flips and pills follow. */
+  .onb-screen.onb-v2 .onb-progress[data-step="1"] .onb-pill:nth-child(1),
+  .onb-screen.onb-v2 .onb-progress[data-step="2"] .onb-pill:nth-child(2),
+  .onb-screen.onb-v2 .onb-progress[data-step="3"] .onb-pill:nth-child(3),
+  .onb-screen.onb-v2 .onb-progress[data-step="4"] .onb-pill:nth-child(4),
+  .onb-screen.onb-v2 .onb-progress[data-step="5"] .onb-pill:nth-child(5),
+  .onb-screen.onb-v2 .onb-progress[data-step="6"] .onb-pill:nth-child(6) {
+    background: var(--accent);
+  }
+
   .onb-goal-card {
     display: flex;
     align-items: center;
@@ -10893,8 +11047,13 @@ const _ONB_STEP_TO_ID = {
   6: 'onb-v2-hours',
   7: 'onb-v2-shock',
   8: 'onb-v2-plan',
-  9: null, 10: null, 11: null, 12: null, 13: null,
-  14: null, 15: null, 16: null, 17: null,
+  9: 'onb-v2-subject',
+  10: 'onb-v2-q1',
+  11: 'onb-v2-q2',
+  12: 'onb-v2-q3',
+  13: 'onb-v2-q4',
+  14: 'onb-v2-mirror',
+  15: null, 16: null, 17: null,
   18: null, 19: null,
 };
 
@@ -10967,6 +11126,138 @@ const _ONB_COPY = {
     },
     cta: { en: 'Continue', he: 'המשך' },
   },
+  subject: {
+    head: { en: 'Where would you like to start?', he: 'מאיפה תרצו להתחיל?' },
+    cta:  { en: 'Continue',                       he: 'המשך' },
+    // Subject names + taglines. Names are already Latin/Hebrew per
+    // existing app copy; taglines pulled from _applyCinematicSubjectCopy
+    // (the v1 subject-select) for consistency.
+    philosophy: {
+      name: { en: 'Philosophy',          he: 'פילוסופיה' },
+      tag:  { en: 'Wisdom for the everyday', he: 'חוכמה ליום-יום' },
+    },
+    economics: {
+      name: { en: 'Economics',           he: 'כלכלה' },
+      tag:  { en: 'How the world works', he: 'איך העולם עובד' },
+    },
+    psychology: {
+      name: { en: 'Psychology',          he: 'פסיכולוגיה' },
+      tag:  { en: 'Understand the mind', he: 'להבין את הנפש' },
+    },
+  },
+  q1: {
+    head: { en: 'What do you want to get out of Corpus?', he: 'מה תרצו להוציא מ-Corpus?' },
+    hint: { en: 'Pick up to 3',                           he: 'בחרו עד שלוש' },
+    cta:  { en: 'Continue',                               he: 'המשך' },
+    // Options — stable ids for analytics; text is what the user sees on
+    // the picker; mirror is a shorter phrase for the recap on step 14.
+    options: [
+      { id: 'understand-ideas',
+        text:   { en: 'Understand ideas that shaped the world',   he: 'להבין רעיונות שעיצבו את העולם' },
+        mirror: { en: 'ideas that shaped the world',              he: 'רעיונות שעיצבו את העולם' } },
+      { id: 'worth-reading',
+        text:   { en: 'Something worth reading instead of scrolling', he: 'משהו ששווה לקרוא במקום לגלול' },
+        mirror: { en: 'something worth reading',                    he: 'משהו ששווה לקרוא' } },
+      { id: 'hold-own',
+        text:   { en: 'Hold my own in a real conversation',       he: 'לעמוד על שלי בשיחה אמיתית' },
+        mirror: { en: 'holding your own in a real conversation',  he: 'לעמוד על שלכם בשיחה' } },
+      { id: 'read-thinkers',
+        text:   { en: 'Finally read the thinkers I\'ve heard about', he: 'סוף סוף לקרוא את ההוגים ששמעתי עליהם' },
+        mirror: { en: 'the thinkers you\'ve heard about',           he: 'ההוגים ששמעתם עליהם' } },
+      { id: 'build-habit',
+        text:   { en: 'Build a habit that actually sticks',       he: 'לבנות הרגל שבאמת נדבק' },
+        mirror: { en: 'a habit that sticks',                      he: 'הרגל שנדבק' } },
+      { id: 'think-clearly',
+        text:   { en: 'Think more clearly about my own life',     he: 'לחשוב בצלילות יותר על החיים שלי' },
+        mirror: { en: 'clarity about your life',                  he: 'צלילות על החיים שלכם' } },
+    ],
+  },
+  q2: {
+    head: { en: 'Thinking bigger, what does a well-read life look like to you?',
+            he: 'במבט רחב יותר, איך נראים לכם חיים של אדם קורא?' },
+    hint: { en: 'Pick up to 3', he: 'בחרו עד שלוש' },
+    cta:  { en: 'Continue',     he: 'המשך' },
+    options: [
+      { id: 'own-ideas',
+        text:   { en: 'Having ideas of my own, not borrowed ones',
+                  he: 'להיות עם רעיונות משלי, לא שאולים' },
+        mirror: { en: 'ideas of your own',
+                  he: 'רעיונות משלכם' } },
+      { id: 'explain-clearly',
+        text:   { en: 'Explaining things clearly to other people',
+                  he: 'להסביר דברים בצלילות לאנשים אחרים' },
+        mirror: { en: 'explaining things clearly',
+                  he: 'להסביר דברים בצלילות' } },
+      { id: 'know-opinions',
+        text:   { en: 'Knowing where my opinions come from',
+                  he: 'לדעת מאיפה באות הדעות שלי' },
+        mirror: { en: 'knowing where your opinions come from',
+                  he: 'לדעת מאיפה באות הדעות שלכם' } },
+      { id: 'finish-hard',
+        text:   { en: 'Reading things that are hard and finishing them',
+                  he: 'לקרוא דברים קשים ולסיים אותם' },
+        mirror: { en: 'finishing hard books',
+                  he: 'לסיים ספרים קשים' } },
+      { id: 'news-underneath',
+        text:   { en: 'Understanding the news underneath the headlines',
+                  he: 'להבין את החדשות מתחת לכותרות' },
+        mirror: { en: 'the news underneath the headlines',
+                  he: 'החדשות מתחת לכותרות' } },
+    ],
+  },
+  q3: {
+    head: { en: "What's your goal?", he: 'מה המטרה שלכם?' },
+    cta:  { en: 'Continue',           he: 'המשך' },
+    // Single choice. The picked id also drives state.dailyGoalHistory
+    // (see _onbV2CtaQ3) — mirror-form used verbatim in the recap on
+    // step 14 as "Your goal: {mirror}".
+    options: [
+      { id: 'daily',
+        text:   { en: 'Five minutes a day, every day', he: 'חמש דקות ביום, כל יום' },
+        mirror: { en: 'five minutes a day, every day', he: 'חמש דקות ביום, כל יום' } },
+      { id: 'few-week',
+        text:   { en: 'A few times a week',            he: 'כמה פעמים בשבוע' },
+        mirror: { en: 'a few times a week',            he: 'כמה פעמים בשבוע' } },
+      { id: 'finish',
+        text:   { en: 'Finish a whole subject',        he: 'לסיים תחום שלם' },
+        mirror: { en: 'finish a whole subject',        he: 'לסיים תחום שלם' } },
+      { id: 'longest-streak',
+        text:   { en: 'Build the longest streak I can', he: 'לבנות את הרצף הכי ארוך שאפשר' },
+        mirror: { en: 'the longest streak you can',    he: 'הרצף הכי ארוך שאפשר' } },
+    ],
+  },
+  q4: {
+    head: { en: "Be honest, how often do you read something worthwhile?",
+            he: 'בכנות, כמה פעמים אתם קוראים משהו שווה?' },
+    cta:  { en: 'Continue', he: 'המשך' },
+    // Discrete 5-point Likert (0..4). Endpoints rendered as scale
+    // labels under the track; the value display above shows the
+    // active label.
+    labels: [
+      { en: 'Never',      he: 'אף פעם' },       // 0
+      { en: 'Rarely',     he: 'לעיתים רחוקות' }, // 1
+      { en: 'Sometimes',  he: 'לפעמים' },       // 2
+      { en: 'Often',      he: 'הרבה' },         // 3
+      { en: 'Every day',  he: 'כל יום' },       // 4
+    ],
+  },
+  mirror: {
+    head: { en: "Here's what we heard.",
+            he: 'זה מה ששמענו.' },
+    cta:  { en: "Let's start", he: 'בואו נתחיל' },
+    // Line templates — {age}, {hours}, {subject}, {q1List}, {q2List}, {q3}
+    // interpolated at render time in _onbV2PrepareMirror.
+    line_personal: { en: "You're {age}, {hours} hours a day on your phone.",
+                     he: 'אתם בני {age}, {hours} שעות ביום על הטלפון.' },
+    line_subject:  { en: 'Starting with {subject}.',
+                     he: 'מתחילים עם {subject}.' },
+    line_q1:       { en: 'You want: {q1List}.',
+                     he: 'אתם רוצים: {q1List}.' },
+    line_q2:       { en: 'A well-read life, to you: {q2List}.',
+                     he: 'חיים של אדם קורא בעיניכם: {q2List}.' },
+    line_q3:       { en: 'Your goal: {q3}.',
+                     he: 'המטרה שלכם: {q3}.' },
+  },
 };
 
 function _onbApplyLang(lang) {
@@ -11001,6 +11292,19 @@ function _onbApplyLang(lang) {
   setText('onb-v2-shock-cta',     'shock',    'cta');
   setHTML('onb-v2-plan-head',     'plan',     'head');
   setText('onb-v2-plan-cta',      'plan',     'cta');
+  setText('onb-v2-subject-head',  'subject',  'head');
+  setText('onb-v2-subject-cta',   'subject',  'cta');
+  setText('onb-v2-q1-head',       'q1',       'head');
+  setText('onb-v2-q1-hint',       'q1',       'hint');
+  setText('onb-v2-q1-cta',        'q1',       'cta');
+  setText('onb-v2-q2-head',       'q2',       'head');
+  setText('onb-v2-q2-hint',       'q2',       'hint');
+  setText('onb-v2-q2-cta',        'q2',       'cta');
+  setText('onb-v2-q3-head',       'q3',       'head');
+  setText('onb-v2-q3-cta',        'q3',       'cta');
+  setText('onb-v2-q4-head',       'q4',       'head');
+  setText('onb-v2-q4-cta',        'q4',       'cta');
+  setText('onb-v2-mirror-cta',    'mirror',   'cta');
   // Text/number input placeholders (slider has none).
   const setPlaceholder = (id, group) => {
     const el = document.getElementById(id);
@@ -11140,10 +11444,102 @@ function _onbV2CtaHours() {
 // Screen 7 (shock number) — display-only; advance on tap.
 function _onbV2CtaShock() { _onbAdvanceStep(7, 8); }
 
-// Screen 8 (plan intro) — display-only; advance to step 9 (subject
-// picker, ships in commit C). Until then the null-slot path in
-// _onbShowStep runs _onbComplete instead.
+// Screen 8 (plan intro) — display-only; advance to subject picker.
 function _onbV2CtaPlan() { _onbAdvanceStep(8, 9); }
+
+// Screen 9 (subject picker) — single selection required; CTA disabled
+// otherwise (set in _onbV2PrepareSubject).
+let _onbV2SubjectPick = null;
+function _onbV2SubjectTap(subjectId) {
+  _onbV2SubjectPick = subjectId;
+  document.querySelectorAll('#onb-v2-subject .onb-v2-subj-card').forEach(c => {
+    c.classList.toggle('is-selected', c.dataset.subject === subjectId);
+  });
+  const cta = document.getElementById('onb-v2-subject-cta');
+  if (cta) cta.disabled = false;
+  // Live preview of subject theme so the accent picker + downstream
+  // screens pick up the chosen color as soon as they tap.
+  try { previewSubjectTheme(subjectId); } catch(e) {}
+}
+function _onbV2CtaSubject() {
+  if (!_onbV2SubjectPick) return;
+  try { setSubject(_onbV2SubjectPick); } catch(e) {}
+  _onbAdvanceStep(9, 10);
+}
+
+// Screens 10, 11 (Q1, Q2) — multi-select up to 3. Selections stored
+// as arrays of stable ids in state.onbAnswers.q1 / .q2. Tap toggles;
+// if at cap, additional selections are ignored (no shake feedback for
+// now — could add later if reviews call it out).
+function _onbV2MselTap(question, optionId) {
+  const arr = state.onbAnswers[question] || [];
+  const idx = arr.indexOf(optionId);
+  if (idx >= 0) {
+    arr.splice(idx, 1);
+  } else if (arr.length < 3) {
+    arr.push(optionId);
+  } else {
+    return; // at cap
+  }
+  state.onbAnswers[question] = arr;
+  // Reflect in DOM: mark selected cards, enable CTA if any picks.
+  document.querySelectorAll('#onb-v2-' + question + ' .onb-v2-card').forEach(c => {
+    c.classList.toggle('is-selected', arr.indexOf(c.dataset.option) >= 0);
+  });
+  const cta = document.getElementById('onb-v2-' + question + '-cta');
+  if (cta) cta.disabled = arr.length === 0;
+}
+function _onbV2CtaQ1() {
+  if (!state.onbAnswers.q1 || !state.onbAnswers.q1.length) return;
+  _onbAdvanceStep(10, 11);
+}
+function _onbV2CtaQ2() {
+  if (!state.onbAnswers.q2 || !state.onbAnswers.q2.length) return;
+  _onbAdvanceStep(11, 12);
+}
+
+// Screen 12 (Q3) — single choice + sets daily goal via the existing
+// dailyGoalHistory machinery. Writing the goal here lets the app's
+// scheduling / reminder logic pick up the intent without waiting for
+// a separate migration prompt (removed in commit A).
+let _onbV2Q3Pick = null;
+function _onbV2Q3Tap(optionId) {
+  _onbV2Q3Pick = optionId;
+  state.onbAnswers.q3 = optionId;
+  document.querySelectorAll('#onb-v2-q3 .onb-v2-card').forEach(c => {
+    c.classList.toggle('is-selected', c.dataset.option === optionId);
+  });
+  const cta = document.getElementById('onb-v2-q3-cta');
+  if (cta) cta.disabled = false;
+}
+function _onbV2CtaQ3() {
+  const pick = _onbV2Q3Pick || state.onbAnswers.q3;
+  if (!pick) return;
+  const today = _streakDay();
+  state.dailyGoalHistory = state.dailyGoalHistory || [];
+  const existingIdx = state.dailyGoalHistory.findIndex(g => g && g.setAt === today);
+  if (existingIdx >= 0) {
+    state.dailyGoalHistory[existingIdx] = { setAt: today, value: pick };
+  } else {
+    state.dailyGoalHistory.push({ setAt: today, value: pick });
+  }
+  try { localStorage.setItem('corpus_daily_goal_set', '1'); } catch(e) {}
+  _onbAdvanceStep(12, 13, { q3: pick });
+}
+
+// Screen 13 (Q4 slider) — 0..4 Likert. Always has a value (default 2
+// = "Sometimes"), so no disabled state.
+function _onbV2CtaQ4() {
+  const el = document.getElementById('onb-v2-q4-input');
+  const val = parseInt((el && el.value) || '2', 10);
+  const clamped = Math.max(0, Math.min(4, isNaN(val) ? 2 : val));
+  _onbAdvanceStep(13, 14, { readingFreq: clamped });
+}
+
+// Screen 14 (mirror) — display-only; advance to step 15 (first
+// dialogue, later commit). Until then the null-slot in _onbShowStep
+// runs _onbComplete.
+function _onbV2CtaMirror() { _onbAdvanceStep(14, 15); }
 
 // Screen prepare hooks — invoked from _onbShowStep once the target
 // screen is visible. Handle dynamic content (age greeting with the
@@ -11271,14 +11667,205 @@ function _onbV2PrepareShock() {
   }
 }
 
+// Screen 9 — subject picker. Renders the 3 cards from _ONB_COPY.subject,
+// with a live-preview theme swap on tap so downstream v2 screens pick
+// up the chosen accent before the final setSubject commit.
+function _onbV2PrepareSubject() {
+  const list = document.getElementById('onb-v2-subject-cards');
+  const cta  = document.getElementById('onb-v2-subject-cta');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+  const cur  = state.subject || 'philosophy';
+  _onbV2SubjectPick = cur;
+  // Render fresh each time so a re-show doesn't accumulate handlers.
+  list.innerHTML = '';
+  // Icon path matches the existing SUBJECTS array (~21222) —
+  // philosophy has a "-icon" suffix, the others don't. Kept identical
+  // to the v1 subject-select image references so we don't touch
+  // /assets/icons/subjects/ files.
+  const iconFor = { philosophy: 'philosophy-icon', economics: 'economics', psychology: 'psychology' };
+  ['philosophy', 'economics', 'psychology'].forEach(subj => {
+    const cfg = _ONB_COPY.subject[subj];
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'onb-v2-card onb-v2-subj-card';
+    card.dataset.subject = subj;
+    if (subj === cur) card.classList.add('is-selected');
+    card.innerHTML =
+      '<span class="onb-v2-subj-icon"><img src="assets/icons/subjects/' + iconFor[subj] + '.png" alt=""></span>' +
+      '<span class="onb-v2-subj-text">' +
+        '<span class="onb-v2-subj-name">' + (isEn ? cfg.name.en : cfg.name.he) + '</span>' +
+        '<span class="onb-v2-subj-tag">'  + (isEn ? cfg.tag.en  : cfg.tag.he)  + '</span>' +
+      '</span>';
+    card.onclick = () => _onbV2SubjectTap(subj);
+    list.appendChild(card);
+  });
+  if (cta) cta.disabled = !_onbV2SubjectPick;
+}
+
+// Screens 10, 11 — Q1 / Q2 multi-select. Renders option cards from
+// _ONB_COPY[question].options. Re-rendered on each show so lang
+// switches and re-visits pick up correct copy.
+function _onbV2PrepareMsel(question) {
+  const list = document.getElementById('onb-v2-' + question + '-cards');
+  const cta  = document.getElementById('onb-v2-' + question + '-cta');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+  const picks = state.onbAnswers[question] || [];
+  const options = (_ONB_COPY[question] && _ONB_COPY[question].options) || [];
+  list.innerHTML = '';
+  options.forEach(opt => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'onb-v2-card onb-v2-msel-card';
+    card.dataset.option = opt.id;
+    if (picks.indexOf(opt.id) >= 0) card.classList.add('is-selected');
+    card.textContent = isEn ? opt.text.en : opt.text.he;
+    card.onclick = () => _onbV2MselTap(question, opt.id);
+    list.appendChild(card);
+  });
+  if (cta) cta.disabled = picks.length === 0;
+}
+function _onbV2PrepareQ1() { _onbV2PrepareMsel('q1'); }
+function _onbV2PrepareQ2() { _onbV2PrepareMsel('q2'); }
+
+// Screen 12 — Q3 single choice.
+function _onbV2PrepareQ3() {
+  const list = document.getElementById('onb-v2-q3-cards');
+  const cta  = document.getElementById('onb-v2-q3-cta');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+  const pick = state.onbAnswers.q3 || '';
+  _onbV2Q3Pick = pick || null;
+  const options = _ONB_COPY.q3.options;
+  list.innerHTML = '';
+  options.forEach(opt => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'onb-v2-card';
+    card.dataset.option = opt.id;
+    if (opt.id === pick) card.classList.add('is-selected');
+    card.textContent = isEn ? opt.text.en : opt.text.he;
+    card.onclick = () => _onbV2Q3Tap(opt.id);
+    list.appendChild(card);
+  });
+  if (cta) cta.disabled = !pick;
+}
+
+// Screen 13 — Q4 slider. Live label updates as the user drags.
+function _onbV2PrepareQ4() {
+  const input   = document.getElementById('onb-v2-q4-input');
+  const display = document.getElementById('onb-v2-q4-value');
+  const scaleL  = document.getElementById('onb-v2-q4-scale-left');
+  const scaleR  = document.getElementById('onb-v2-q4-scale-right');
+  if (!input || !display) return;
+  const isEn = state.lang === 'en';
+  const labels = _ONB_COPY.q4.labels;
+  const initial = state.onbAnswers.readingFreq != null ? state.onbAnswers.readingFreq : 2;
+  input.value = String(initial);
+  const renderValue = (val) => {
+    const idx = Math.max(0, Math.min(4, val));
+    display.textContent = isEn ? labels[idx].en : labels[idx].he;
+  };
+  if (scaleL) scaleL.textContent = isEn ? labels[0].en : labels[0].he;
+  if (scaleR) scaleR.textContent = isEn ? labels[4].en : labels[4].he;
+  renderValue(initial);
+  if (!input.dataset.wired) {
+    input.dataset.wired = '1';
+    input.addEventListener('input', function() {
+      renderValue(parseInt(this.value, 10) || 0);
+    });
+  }
+}
+
+// Screen 14 — mirror. Reflects the user's picks back.
+// Lines use age, hours, subject, Q1 picks, Q2 picks, Q3 pick. Q4
+// (frequency) is captured to state for analysis but not surfaced —
+// 5 lines is the ceiling before the mirror starts to feel like a
+// receipt.
+function _onbV2PrepareMirror() {
+  const isEn = state.lang === 'en';
+  const head = document.getElementById('onb-v2-mirror-head');
+  const list = document.getElementById('onb-v2-mirror-list');
+  if (!head || !list) return;
+  const a = state.onbAnswers || {};
+  head.textContent = isEn ? _ONB_COPY.mirror.head.en : _ONB_COPY.mirror.head.he;
+
+  const lines = [];
+  // Personal — age + hours if both captured
+  if (a.age != null && a.phoneHours != null) {
+    const t = isEn ? _ONB_COPY.mirror.line_personal.en : _ONB_COPY.mirror.line_personal.he;
+    lines.push(t.replace('{age}', a.age).replace('{hours}', a.phoneHours));
+  }
+  // Subject
+  if (state.subject) {
+    const sub = _ONB_COPY.subject[state.subject];
+    const subjName = sub ? (isEn ? sub.name.en : sub.name.he) : state.subject;
+    const t = isEn ? _ONB_COPY.mirror.line_subject.en : _ONB_COPY.mirror.line_subject.he;
+    lines.push(t.replace('{subject}', subjName));
+  }
+  // Q1 picks (up to 3, joined comma-and)
+  if (Array.isArray(a.q1) && a.q1.length) {
+    const opts = _ONB_COPY.q1.options.filter(o => a.q1.indexOf(o.id) >= 0);
+    const phrases = opts.map(o => isEn ? o.mirror.en : o.mirror.he);
+    const joined = _onbV2JoinList(phrases, isEn);
+    const t = isEn ? _ONB_COPY.mirror.line_q1.en : _ONB_COPY.mirror.line_q1.he;
+    lines.push(t.replace('{q1List}', joined));
+  }
+  // Q2 picks (up to 3, joined comma-and)
+  if (Array.isArray(a.q2) && a.q2.length) {
+    const opts = _ONB_COPY.q2.options.filter(o => a.q2.indexOf(o.id) >= 0);
+    const phrases = opts.map(o => isEn ? o.mirror.en : o.mirror.he);
+    const joined = _onbV2JoinList(phrases, isEn);
+    const t = isEn ? _ONB_COPY.mirror.line_q2.en : _ONB_COPY.mirror.line_q2.he;
+    lines.push(t.replace('{q2List}', joined));
+  }
+  // Q3 goal
+  if (a.q3) {
+    const opt = _ONB_COPY.q3.options.find(o => o.id === a.q3);
+    if (opt) {
+      const goalStr = isEn ? opt.mirror.en : opt.mirror.he;
+      const t = isEn ? _ONB_COPY.mirror.line_q3.en : _ONB_COPY.mirror.line_q3.he;
+      lines.push(t.replace('{q3}', goalStr));
+    }
+  }
+  list.innerHTML = '';
+  lines.forEach(text => {
+    const li = document.createElement('li');
+    li.className = 'onb-v2-mirror-item';
+    li.textContent = text;
+    list.appendChild(li);
+  });
+}
+
+// Join a list of phrases with Oxford-comma-and (EN) or Hebrew ", ו" (HE).
+function _onbV2JoinList(phrases, isEn) {
+  if (!phrases.length) return '';
+  if (phrases.length === 1) return phrases[0];
+  if (isEn) {
+    if (phrases.length === 2) return phrases[0] + ' and ' + phrases[1];
+    return phrases.slice(0, -1).join(', ') + ', and ' + phrases[phrases.length - 1];
+  } else {
+    // Hebrew: "A, B ו-C" (no comma before ו). For 2 items: "A ו-B".
+    if (phrases.length === 2) return phrases[0] + ' ו' + phrases[1];
+    return phrases.slice(0, -1).join(', ') + ' ו' + phrases[phrases.length - 1];
+  }
+}
+
 // Map from step number → prepare hook. Consumed by _onbShowStep.
 // Only steps with dynamic content need entries; static-copy screens
 // (1, 2, 3, 8) rely on _onbApplyLang alone.
 const _ONB_STEP_HOOKS = {
-  4: _onbV2PrepareName,
-  5: _onbV2PrepareAge,
-  6: _onbV2PrepareHours,
-  7: _onbV2PrepareShock,
+  4:  _onbV2PrepareName,
+  5:  _onbV2PrepareAge,
+  6:  _onbV2PrepareHours,
+  7:  _onbV2PrepareShock,
+  9:  _onbV2PrepareSubject,
+  10: _onbV2PrepareQ1,
+  11: _onbV2PrepareQ2,
+  12: _onbV2PrepareQ3,
+  13: _onbV2PrepareQ4,
+  14: _onbV2PrepareMirror,
 };
 
 // Silent guest entry: mirrors enterAsGuest but skips hideAuthScreen (the
@@ -22770,6 +23357,124 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <div class="onb-cta-holder">
     <button type="button" class="nav-btn onb-cta" id="onb-v2-plan-cta" onclick="_onbV2CtaPlan()"></button>
+  </div>
+</div>
+
+<!-- Step 9 — Subject picker. Three cards rendered dynamically by
+     _onbV2PrepareSubject from _ONB_COPY.subject. Tap sets a live
+     preview via previewSubjectTheme; CTA commits via setSubject
+     which flips the app-wide theme for every downstream v2 screen. -->
+<div id="onb-v2-subject" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="4">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-subject-head"></h1>
+      <div class="onb-v2-cards" id="onb-v2-subject-cards"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-subject-cta" onclick="_onbV2CtaSubject()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 10 — Q1 multi-select. Cards rendered by _onbV2PrepareQ1
+     from _ONB_COPY.q1.options. Hint reminds "pick up to 3"; CTA
+     disabled until at least one pick, tap caps at 3. -->
+<div id="onb-v2-q1" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="4">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-q1-head"></h1>
+      <p class="onb-v2-hint" id="onb-v2-q1-hint"></p>
+      <div class="onb-v2-cards" id="onb-v2-q1-cards"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-q1-cta" onclick="_onbV2CtaQ1()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 11 — Q2 multi-select. Same component + shape as Q1. -->
+<div id="onb-v2-q2" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="4">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-q2-head"></h1>
+      <p class="onb-v2-hint" id="onb-v2-q2-hint"></p>
+      <div class="onb-v2-cards" id="onb-v2-q2-cards"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-q2-cta" onclick="_onbV2CtaQ2()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 12 — Q3 single choice. Also sets state.dailyGoalHistory (see
+     _onbV2CtaQ3) so the daily-goal reminder machinery picks up the
+     intent without a separate migration prompt. -->
+<div id="onb-v2-q3" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="4">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-q3-head"></h1>
+      <div class="onb-v2-cards" id="onb-v2-q3-cards"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-q3-cta" onclick="_onbV2CtaQ3()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 13 — Q4 slider. 5-point Likert 0..4 (never / rarely /
+     sometimes / often / every day). Live label updates via the
+     .onb-v2-slider-value display. Slider primitive reused from
+     step 6. -->
+<div id="onb-v2-q4" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="4">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-q4-head"></h1>
+      <div class="onb-v2-slider-wrap">
+        <div class="onb-v2-slider-value" id="onb-v2-q4-value" aria-live="polite"></div>
+        <input type="range" class="onb-v2-slider" id="onb-v2-q4-input"
+               min="0" max="4" step="1" value="2"
+               aria-label="Reading frequency">
+        <div class="onb-v2-slider-scale" aria-hidden="true">
+          <span id="onb-v2-q4-scale-left"></span><span id="onb-v2-q4-scale-right"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-q4-cta" onclick="_onbV2CtaQ4()"></button>
+  </div>
+</div>
+
+<!-- Step 14 — Mirror. Reflects the user's picks back. Head + list
+     rendered dynamically in _onbV2PrepareMirror from state.onbAnswers
+     and state.subject. -->
+<div id="onb-v2-mirror" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="5">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-mirror-head"></h1>
+      <ul class="onb-v2-mirror-list" id="onb-v2-mirror-list"></ul>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-mirror-cta" onclick="_onbV2CtaMirror()"></button>
   </div>
 </div>
 
