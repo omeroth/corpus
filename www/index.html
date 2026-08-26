@@ -5796,18 +5796,6 @@
     color: var(--text-2);
     margin: 0;
   }
-  .onb-screen.onb-v2 .onb-v2-wordmark {
-    font-family: 'Nunito', sans-serif;
-    font-weight: 900;
-    /* Wordmark reads as brand, not headline — slightly larger than head,
-       accent-tinted. Letter-spacing tightens so "Corpus" / "קורפוס" hold
-       together as a mark. */
-    font-size: calc(48px * var(--text-scale));
-    line-height: 1;
-    color: var(--accent);
-    margin: 12px 0 0;
-    letter-spacing: -0.02em;
-  }
   html.dark .onb-screen.onb-v2 .onb-v2-head { color: var(--text); }
   html.dark .onb-screen.onb-v2 .onb-v2-sub  { color: var(--text-2); }
   .onb-goal-card {
@@ -10748,25 +10736,31 @@ const _ONB_STEP_TO_ID = {
 // on step 1 can re-render every visible screen without hunting through
 // individual per-screen appliers.
 const _ONB_COPY = {
+  // All three heads carry <span class="onb-v2-em"> around the accent
+  // phrase. Renderer uses innerHTML for every head, textContent for
+  // the CTAs (copy map is the only source of markup).
+  //
+  // Brand rule: the word "Corpus" is always Latin script, even in
+  // Hebrew copy. Same for every onboarding v2 surface, downstream and
+  // upstream of these three screens.
   welcome: {
-    head:     { en: 'Welcome', he: 'ברוכים הבאים' },
-    wordmark: { en: 'Corpus',  he: 'קורפוס' },
-    cta:      { en: 'Continue', he: 'המשך' },
+    head: {
+      en: 'Welcome to <span class="onb-v2-em">Corpus</span>',
+      he: 'ברוכים הבאים ל-<span class="onb-v2-em">Corpus</span>',
+    },
+    cta: { en: 'Continue', he: 'המשך' },
   },
-  // Problem + solution heads include a <span class="onb-v2-em"> around
-  // the key phrase for accent color. Renderer uses innerHTML for these
-  // (not textContent) — see _onbApplyLang.
   problem: {
     head: {
       en: 'Do you consume a lot but <span class="onb-v2-em">understand little</span>?',
-      he: 'צורכים הרבה ומבינים <span class="onb-v2-em">מעט</span>?',
+      he: 'צורכים המון תוכן כל יום ו<span class="onb-v2-em">נשארים עם מעט</span>?',
     },
     cta: { en: 'Continue', he: 'המשך' },
   },
   solution: {
     head: {
-      en: 'Corpus turns five minutes a day into ideas that <span class="onb-v2-em">stay with you</span>.',
-      he: 'קורפוס הופך חמש דקות ביום לרעיונות ש<span class="onb-v2-em">נשארים</span>.',
+      en: '<span class="onb-v2-em">Corpus</span> turns five minutes a day into ideas that <span class="onb-v2-em">stay with you</span>.',
+      he: '<span class="onb-v2-em">Corpus</span> הופך חמש דקות ביום לרעיונות ש<span class="onb-v2-em">נשארים אתכם</span>',
     },
     cta: { en: 'Continue', he: 'המשך' },
   },
@@ -10780,24 +10774,21 @@ function _onbApplyLang(lang) {
       el.textContent = isEn ? _ONB_COPY[group][key].en : _ONB_COPY[group][key].he;
     }
   };
-  // Heads for problem + solution use innerHTML because their copy
-  // contains a <span class="onb-v2-em"> for the accent-tinted key
-  // phrase. Kept as a distinct setter so the ordinary textContent path
-  // isn't the vector for stray markup elsewhere (copy map is the only
-  // source of these strings; RTL/LTR handled by outer document dir).
+  // All three heads carry a <span class="onb-v2-em"> for the accent
+  // phrase, so use innerHTML. CTAs stay textContent — copy map is the
+  // only vector for markup, and CTAs never carry any.
   const setHTML = (id, group, key) => {
     const el = document.getElementById(id);
     if (el && _ONB_COPY[group] && _ONB_COPY[group][key]) {
       el.innerHTML = isEn ? _ONB_COPY[group][key].en : _ONB_COPY[group][key].he;
     }
   };
-  setText('onb-v2-welcome-head',     'welcome', 'head');
-  setText('onb-v2-welcome-wordmark', 'welcome', 'wordmark');
-  setText('onb-v2-welcome-cta',      'welcome', 'cta');
-  setHTML('onb-v2-problem-head', 'problem', 'head');
-  setText('onb-v2-problem-cta',  'problem', 'cta');
-  setHTML('onb-v2-solution-head','solution','head');
-  setText('onb-v2-solution-cta', 'solution', 'cta');
+  setHTML('onb-v2-welcome-head',  'welcome',  'head');
+  setText('onb-v2-welcome-cta',   'welcome',  'cta');
+  setHTML('onb-v2-problem-head',  'problem',  'head');
+  setText('onb-v2-problem-cta',   'problem',  'cta');
+  setHTML('onb-v2-solution-head', 'solution', 'head');
+  setText('onb-v2-solution-cta',  'solution', 'cta');
   // Lang toggle indicator on screen 1
   document.querySelectorAll('#onb-v2-welcome .onb-lang-btn').forEach(btn => {
     btn.classList.toggle('is-active', btn.dataset.lang === lang);
@@ -22241,7 +22232,6 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
       <h1 class="onb-v2-head" id="onb-v2-welcome-head"></h1>
-      <div class="onb-v2-wordmark" id="onb-v2-welcome-wordmark"></div>
     </div>
   </div>
   <div class="onb-cta-holder">
