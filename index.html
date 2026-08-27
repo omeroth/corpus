@@ -6000,52 +6000,6 @@
   /* Subject-card variant: adds portrait + tag under the name. Layout
      is a horizontal flex; the base padding/border rules from .onb-v2-card
      still apply. */
-  .onb-screen.onb-v2 .onb-v2-subj-card {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  .onb-screen.onb-v2 .onb-v2-subj-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: 12px;
-    overflow: hidden;
-    background: rgba(var(--accent-rgb), 0.10);
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .onb-screen.onb-v2 .onb-v2-subj-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .onb-screen.onb-v2 .onb-v2-subj-text {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-  }
-  .onb-screen.onb-v2 .onb-v2-subj-name {
-    font-family: 'Nunito', sans-serif;
-    font-weight: 800;
-    font-size: calc(18px * var(--text-scale));
-    color: var(--ink);
-    line-height: 1.2;
-  }
-  .onb-screen.onb-v2 .onb-v2-subj-tag {
-    font-family: 'Nunito', sans-serif;
-    font-weight: 500;
-    font-size: calc(14px * var(--text-scale));
-    color: var(--ink);
-    opacity: 0.7;
-    line-height: 1.3;
-  }
-  html.dark .onb-screen.onb-v2 .onb-v2-subj-name,
-  html.dark .onb-screen.onb-v2 .onb-v2-subj-tag { color: var(--text); }
-
   /* Hint line below the head on multi-select questions (Q1, Q2). */
   .onb-screen.onb-v2 .onb-v2-hint {
     font-family: 'Nunito', sans-serif;
@@ -11031,8 +10985,8 @@ const _ONB_STEP_TO_PHASE = {
   1: 1, 2: 1, 3: 1,                  // welcome / problem / solution
   4: 2, 5: 2, 6: 2,                  // name / age / phone hours
   7: 3, 8: 3,                        // shock / plan intro
-  9: 4, 10: 4, 11: 4, 12: 4, 13: 4,  // subject / Q1 / Q2 / Q3 / Q4
-  14: 5, 15: 5, 16: 5, 17: 5,        // mirror / first dialogue / streak / review
+  9: 4, 10: 4, 11: 4, 12: 4,         // subject / Q1 / Q2 / Q3
+  13: 5, 14: 5, 15: 5, 16: 5, 17: 5, // mirror / Q4 / first dialogue / streak / review
   18: 6, 19: 6,                      // journey / commit
 };
 // DOM ids in step order. Steps not yet built map to null; _onbShowStep
@@ -11051,8 +11005,8 @@ const _ONB_STEP_TO_ID = {
   10: 'onb-v2-q1',
   11: 'onb-v2-q2',
   12: 'onb-v2-q3',
-  13: 'onb-v2-q4',
-  14: 'onb-v2-mirror',
+  13: 'onb-v2-mirror',
+  14: 'onb-v2-q4',
   15: null, 16: null, 17: null,
   18: null, 19: null,
 };
@@ -11072,40 +11026,40 @@ const _ONB_COPY = {
   welcome: {
     head: {
       en: 'Welcome to <span class="onb-v2-em">Corpus</span>',
-      he: 'ברוכים הבאים ל-<span class="onb-v2-em">Corpus</span>',
+      he: 'ברוך הבא ל-<span class="onb-v2-em">Corpus</span>',
     },
     cta: { en: 'Continue', he: 'המשך' },
   },
   problem: {
     head: {
       en: 'Do you consume a lot but <span class="onb-v2-em">understand little</span>?',
-      he: 'צורכים המון תוכן כל יום ו<span class="onb-v2-em">נשארים עם מעט</span>?',
+      he: 'צורך המון תוכן כל יום ו<span class="onb-v2-em">נשאר עם מעט</span>?',
     },
     cta: { en: 'Continue', he: 'המשך' },
   },
   solution: {
     head: {
       en: '<span class="onb-v2-em">Corpus</span> turns five minutes a day into ideas that <span class="onb-v2-em">stay with you</span>.',
-      he: '<span class="onb-v2-em">Corpus</span> הופך חמש דקות ביום לרעיונות ש<span class="onb-v2-em">נשארים אתכם</span>',
+      he: '<span class="onb-v2-em">Corpus</span> הופך חמש דקות ביום לרעיונות ש<span class="onb-v2-em">נשארים אתך</span>',
     },
     cta: { en: 'Continue', he: 'המשך' },
   },
   name: {
-    head:        { en: 'What should we call you?', he: 'איך נקרא לכם?' },
-    placeholder: { en: 'Your name',                he: 'השם שלכם' },
+    head:        { en: 'What should we call you?', he: 'איך לקרוא לך?' },
+    placeholder: { en: 'Your name',                he: 'השם שלך' },
     cta:         { en: 'Continue',                 he: 'המשך' },
   },
   age: {
     // Greeting sits above the head — first personal-address moment
     // after name capture. Interpolated in _onbV2PrepareAge.
     greeting:    { en: 'Nice to meet you, {name}.', he: 'נעים להכיר, {name}.' },
-    head:        { en: 'How old are you?',          he: 'בני כמה אתם?' },
+    head:        { en: 'How old are you?',          he: 'בן כמה אתה?' },
     placeholder: { en: 'Age',                       he: 'גיל' },
     cta:         { en: 'Continue',                  he: 'המשך' },
   },
   hours: {
     head:      { en: 'How many hours a day are you on your phone?',
-                 he: 'כמה שעות ביום אתם על הטלפון?' },
+                 he: 'כמה שעות ביום אתה על הטלפון?' },
     // Singular/plural unit for the slider's live-value display.
     // Hebrew uses "שעה" for 1, "שעות" for 2+; English "hour" vs "hours".
     unit_one:  { en: 'hour',                        he: 'שעה' },
@@ -11122,114 +11076,123 @@ const _ONB_COPY = {
   plan: {
     head: {
       en: 'You have <span class="onb-v2-em">five minutes a day</span>. Let\'s build your plan.',
-      he: 'יש לכם <span class="onb-v2-em">חמש דקות ביום</span>. בואו נבנה תוכנית.',
+      he: 'יש לך <span class="onb-v2-em">חמש דקות ביום</span>. בוא נבנה תוכנית.',
     },
     cta: { en: 'Continue', he: 'המשך' },
   },
   subject: {
-    head: { en: 'Where would you like to start?', he: 'מאיפה תרצו להתחיל?' },
+    head: { en: 'Where would you like to start?', he: 'מאיפה תרצה להתחיל?' },
     cta:  { en: 'Continue',                       he: 'המשך' },
-    // Subject names + taglines. Names are already Latin/Hebrew per
-    // existing app copy; taglines pulled from _applyCinematicSubjectCopy
-    // (the v1 subject-select) for consistency.
+    // Subject names, taglines, and thinker bylines. Names + taglines
+    // + bylines match the v1 cinematic subject-select (see
+    // _applyCinematicSubjectCopy) so the two selectors share the same
+    // recognizable per-subject signature.
     philosophy: {
-      name: { en: 'Philosophy',          he: 'פילוסופיה' },
-      tag:  { en: 'Wisdom for the everyday', he: 'חוכמה ליום-יום' },
+      name:   { en: 'Philosophy',          he: 'פילוסופיה' },
+      tag:    { en: 'Wisdom for the everyday', he: 'חוכמה ליום-יום' },
+      byline: { en: 'Plato · Socrates · Aristotle', he: 'אפלטון · סוקרטס · אריסטו' },
     },
     economics: {
-      name: { en: 'Economics',           he: 'כלכלה' },
-      tag:  { en: 'How the world works', he: 'איך העולם עובד' },
+      name:   { en: 'Economics',           he: 'כלכלה' },
+      tag:    { en: 'How the world works', he: 'איך העולם עובד' },
+      byline: { en: 'Smith · Marx · Keynes', he: "סמית' · מרקס · קיינס" },
     },
     psychology: {
-      name: { en: 'Psychology',          he: 'פסיכולוגיה' },
-      tag:  { en: 'Understand the mind', he: 'להבין את הנפש' },
+      name:   { en: 'Psychology',          he: 'פסיכולוגיה' },
+      tag:    { en: 'Understand the mind', he: 'להבין את הנפש' },
+      byline: { en: 'Freud · Jung · James', he: "פרויד · יונג · ג'יימס" },
     },
   },
   q1: {
-    head: { en: 'What do you want to get out of Corpus?', he: 'מה תרצו להוציא מ-Corpus?' },
-    hint: { en: 'Pick up to 3',                           he: 'בחרו עד שלוש' },
+    head: { en: 'What do you want to get out of Corpus?', he: 'מה תרצה להוציא מ-Corpus?' },
+    hint: { en: 'Pick up to 3',                           he: 'בחר עד שלוש' },
     cta:  { en: 'Continue',                               he: 'המשך' },
     // Options — stable ids for analytics; text is what the user sees on
-    // the picker; mirror is a shorter phrase for the recap on step 14.
+    // the picker (emoji-prefixed on both langs); mirror is a shorter
+    // phrase without the emoji for the recap on step 13.
     options: [
       { id: 'understand-ideas',
-        text:   { en: 'Understand ideas that shaped the world',   he: 'להבין רעיונות שעיצבו את העולם' },
-        mirror: { en: 'ideas that shaped the world',              he: 'רעיונות שעיצבו את העולם' } },
+        text:   { en: '🧠 Understand ideas that shaped the world',   he: '🧠 להבין רעיונות שעיצבו את העולם' },
+        mirror: { en: 'ideas that shaped the world',                 he: 'רעיונות שעיצבו את העולם' } },
       { id: 'worth-reading',
-        text:   { en: 'Something worth reading instead of scrolling', he: 'משהו ששווה לקרוא במקום לגלול' },
-        mirror: { en: 'something worth reading',                    he: 'משהו ששווה לקרוא' } },
+        text:   { en: '📵 Something worth reading instead of scrolling', he: '📵 משהו ששווה לקרוא במקום לגלול' },
+        mirror: { en: 'something worth reading',                        he: 'משהו ששווה לקרוא' } },
       { id: 'hold-own',
-        text:   { en: 'Hold my own in a real conversation',       he: 'לעמוד על שלי בשיחה אמיתית' },
-        mirror: { en: 'holding your own in a real conversation',  he: 'לעמוד על שלכם בשיחה' } },
+        text:   { en: '💬 Hold my own in a real conversation',       he: '💬 לעמוד על שלי בשיחה אמיתית' },
+        mirror: { en: 'holding your own in a real conversation',     he: 'לעמוד על שלך בשיחה' } },
       { id: 'read-thinkers',
-        text:   { en: 'Finally read the thinkers I\'ve heard about', he: 'סוף סוף לקרוא את ההוגים ששמעתי עליהם' },
-        mirror: { en: 'the thinkers you\'ve heard about',           he: 'ההוגים ששמעתם עליהם' } },
+        text:   { en: '📚 Finally read the thinkers I\'ve heard about', he: '📚 סוף סוף לקרוא את ההוגים ששמעתי עליהם' },
+        mirror: { en: 'the thinkers you\'ve heard about',              he: 'ההוגים ששמעת עליהם' } },
       { id: 'build-habit',
-        text:   { en: 'Build a habit that actually sticks',       he: 'לבנות הרגל שבאמת נדבק' },
-        mirror: { en: 'a habit that sticks',                      he: 'הרגל שנדבק' } },
+        text:   { en: '🔥 Build a habit that actually sticks',       he: '🔥 לבנות הרגל שבאמת נשאר' },
+        mirror: { en: 'a habit that sticks',                         he: 'הרגל שנשאר' } },
       { id: 'think-clearly',
-        text:   { en: 'Think more clearly about my own life',     he: 'לחשוב בצלילות יותר על החיים שלי' },
-        mirror: { en: 'clarity about your life',                  he: 'צלילות על החיים שלכם' } },
+        text:   { en: '🔍 Think more clearly about my own life',     he: '🔍 לחשוב בצלילות על החיים שלי' },
+        mirror: { en: 'clarity about your life',                     he: 'צלילות על החיים שלך' } },
     ],
   },
   q2: {
     head: { en: 'Thinking bigger, what does a well-read life look like to you?',
-            he: 'במבט רחב יותר, איך נראים לכם חיים של אדם קורא?' },
-    hint: { en: 'Pick up to 3', he: 'בחרו עד שלוש' },
+            he: 'במבט רחב יותר, איך נראים לך חיים של אדם קורא?' },
+    hint: { en: 'Pick up to 3', he: 'בחר עד שלוש' },
     cta:  { en: 'Continue',     he: 'המשך' },
     options: [
       { id: 'own-ideas',
-        text:   { en: 'Having ideas of my own, not borrowed ones',
-                  he: 'להיות עם רעיונות משלי, לא שאולים' },
+        text:   { en: '💡 Having ideas of my own, not borrowed ones',
+                  he: '💡 רעיונות משלי, ולא של אחרים' },
         mirror: { en: 'ideas of your own',
-                  he: 'רעיונות משלכם' } },
+                  he: 'רעיונות משלך' } },
       { id: 'explain-clearly',
-        text:   { en: 'Explaining things clearly to other people',
-                  he: 'להסביר דברים בצלילות לאנשים אחרים' },
+        text:   { en: '🗣️ Explaining things clearly to other people',
+                  he: '🗣️ להסביר דברים בבהירות לאנשים אחרים' },
         mirror: { en: 'explaining things clearly',
-                  he: 'להסביר דברים בצלילות' } },
+                  he: 'להסביר דברים בבהירות' } },
       { id: 'know-opinions',
-        text:   { en: 'Knowing where my opinions come from',
-                  he: 'לדעת מאיפה באות הדעות שלי' },
+        text:   { en: '🧭 Knowing where my opinions come from',
+                  he: '🧭 לדעת מאיפה באות הדעות שלי' },
         mirror: { en: 'knowing where your opinions come from',
-                  he: 'לדעת מאיפה באות הדעות שלכם' } },
+                  he: 'לדעת מאיפה באות הדעות שלך' } },
       { id: 'finish-hard',
-        text:   { en: 'Reading things that are hard and finishing them',
-                  he: 'לקרוא דברים קשים ולסיים אותם' },
+        text:   { en: '📖 Reading things that are hard and finishing them',
+                  he: '📖 לקרוא דברים קשים ולסיים אותם' },
         mirror: { en: 'finishing hard books',
                   he: 'לסיים ספרים קשים' } },
       { id: 'news-underneath',
-        text:   { en: 'Understanding the news underneath the headlines',
-                  he: 'להבין את החדשות מתחת לכותרות' },
+        text:   { en: '🌍 Understanding the news underneath the headlines',
+                  he: '🌍 להבין את החדשות מתחת לכותרות' },
         mirror: { en: 'the news underneath the headlines',
                   he: 'החדשות מתחת לכותרות' } },
     ],
   },
   q3: {
-    head: { en: "What's your goal?", he: 'מה המטרה שלכם?' },
+    head: { en: "What's your goal?", he: 'מה המטרה שלך?' },
     cta:  { en: 'Continue',           he: 'המשך' },
     // Single choice. The picked id also drives state.dailyGoalHistory
     // (see _onbV2CtaQ3) — mirror-form used verbatim in the recap on
-    // step 14 as "Your goal: {mirror}".
+    // step 13 as "Your goal: {mirror}".
     options: [
       { id: 'daily',
-        text:   { en: 'Five minutes a day, every day', he: 'חמש דקות ביום, כל יום' },
-        mirror: { en: 'five minutes a day, every day', he: 'חמש דקות ביום, כל יום' } },
+        text:   { en: '⚡ Five minutes a day, every day', he: '⚡ חמש דקות ביום, כל יום' },
+        mirror: { en: 'five minutes a day, every day',    he: 'חמש דקות ביום, כל יום' } },
       { id: 'few-week',
-        text:   { en: 'A few times a week',            he: 'כמה פעמים בשבוע' },
-        mirror: { en: 'a few times a week',            he: 'כמה פעמים בשבוע' } },
+        text:   { en: '📅 A few times a week',            he: '📅 כמה פעמים בשבוע' },
+        mirror: { en: 'a few times a week',               he: 'כמה פעמים בשבוע' } },
       { id: 'finish',
-        text:   { en: 'Finish a whole subject',        he: 'לסיים תחום שלם' },
-        mirror: { en: 'finish a whole subject',        he: 'לסיים תחום שלם' } },
+        text:   { en: '🏛️ Finish a whole subject',        he: '🏛️ לסיים תחום שלם' },
+        mirror: { en: 'finish a whole subject',           he: 'לסיים תחום שלם' } },
       { id: 'longest-streak',
-        text:   { en: 'Build the longest streak I can', he: 'לבנות את הרצף הכי ארוך שאפשר' },
-        mirror: { en: 'the longest streak you can',    he: 'הרצף הכי ארוך שאפשר' } },
+        text:   { en: '🔥 Build the longest streak I can', he: '🔥 לבנות את הרצף הכי ארוך שאפשר' },
+        mirror: { en: 'the longest streak you can',        he: 'הרצף הכי ארוך שאפשר' } },
     ],
   },
   q4: {
-    head: { en: "Be honest, how often do you read something worthwhile?",
-            he: 'בכנות, כמה פעמים אתם קוראים משהו שווה?' },
-    cta:  { en: 'Continue', he: 'המשך' },
+    head: { en: "Be honest, how often do you read something worth your time?",
+            he: 'בכנות, כמה פעמים אתה קורא משהו ששווה את הזמן שלך?' },
+    // Q4 is now the terminal onboarding step (after the mirror). CTA
+    // reads as commitment, not continuation — advancing lands the user
+    // on the home screen (steps 15-19 null-slot short-circuit to
+    // _onbComplete).
+    cta:  { en: "Let's start", he: 'בוא נתחיל' },
     // Discrete 5-point Likert (0..4). Endpoints rendered as scale
     // labels under the track; the value display above shows the
     // active label.
@@ -11243,20 +11206,20 @@ const _ONB_COPY = {
   },
   mirror: {
     head: { en: "Here's what we heard.",
-            he: 'זה מה ששמענו.' },
-    cta:  { en: "Let's start", he: 'בואו נתחיל' },
-    // Line templates — {age}, {hours}, {subject}, {q1List}, {q2List}, {q3}
-    // interpolated at render time in _onbV2PrepareMirror.
-    line_personal: { en: "You're {age}, {hours} hours a day on your phone.",
-                     he: 'אתם בני {age}, {hours} שעות ביום על הטלפון.' },
-    line_subject:  { en: 'Starting with {subject}.',
-                     he: 'מתחילים עם {subject}.' },
+            he: 'זה מה ששמענו' },
+    // Mirror is no longer the terminal step — CTA advances to Q4
+    // (honesty check). The commit-to-app moment is on Q4.
+    cta:  { en: 'Continue', he: 'המשך' },
+    // Line templates — {q1List}, {q2List}, {q3} interpolated at render
+    // time in _onbV2PrepareMirror. Personal + subject lines were dropped
+    // to keep the mirror a clean three-line recap of what the user
+    // *chose*, not what we know about them.
     line_q1:       { en: 'You want: {q1List}.',
-                     he: 'אתם רוצים: {q1List}.' },
+                     he: 'אתה רוצה: {q1List}.' },
     line_q2:       { en: 'A well-read life, to you: {q2List}.',
-                     he: 'חיים של אדם קורא בעיניכם: {q2List}.' },
+                     he: 'חיים של אדם קורא בעיניך: {q2List}.' },
     line_q3:       { en: 'Your goal: {q3}.',
-                     he: 'המטרה שלכם: {q3}.' },
+                     he: 'המטרה שלך: {q3}.' },
   },
 };
 
@@ -11452,7 +11415,7 @@ function _onbV2CtaPlan() { _onbAdvanceStep(8, 9); }
 let _onbV2SubjectPick = null;
 function _onbV2SubjectTap(subjectId) {
   _onbV2SubjectPick = subjectId;
-  document.querySelectorAll('#onb-v2-subject .onb-v2-subj-card').forEach(c => {
+  document.querySelectorAll('#onb-v2-subject .subj-cinematic-card').forEach(c => {
     c.classList.toggle('is-selected', c.dataset.subject === subjectId);
   });
   const cta = document.getElementById('onb-v2-subject-cta');
@@ -11527,19 +11490,20 @@ function _onbV2CtaQ3() {
   _onbAdvanceStep(12, 13, { q3: pick });
 }
 
-// Screen 13 (Q4 slider) — 0..4 Likert. Always has a value (default 2
-// = "Sometimes"), so no disabled state.
+// Screen 13 (mirror) — display-only; advance to step 14 (Q4). The
+// mirror is a recap of the user's own picks, then Q4 is one final
+// honest-check question before commit.
+function _onbV2CtaMirror() { _onbAdvanceStep(13, 14); }
+
+// Screen 14 (Q4 slider) — terminal step in the current ladder. 0..4
+// Likert (default 2 = "Sometimes"). Advancing runs the null-slot
+// fallback in _onbShowStep and lands the user on the home screen.
 function _onbV2CtaQ4() {
   const el = document.getElementById('onb-v2-q4-input');
   const val = parseInt((el && el.value) || '2', 10);
   const clamped = Math.max(0, Math.min(4, isNaN(val) ? 2 : val));
-  _onbAdvanceStep(13, 14, { readingFreq: clamped });
+  _onbAdvanceStep(14, 15, { readingFreq: clamped });
 }
-
-// Screen 14 (mirror) — display-only; advance to step 15 (first
-// dialogue, later commit). Until then the null-slot in _onbShowStep
-// runs _onbComplete.
-function _onbV2CtaMirror() { _onbAdvanceStep(14, 15); }
 
 // Screen prepare hooks — invoked from _onbShowStep once the target
 // screen is visible. Handle dynamic content (age greeting with the
@@ -11667,9 +11631,11 @@ function _onbV2PrepareShock() {
   }
 }
 
-// Screen 9 — subject picker. Renders the 3 cards from _ONB_COPY.subject,
-// with a live-preview theme swap on tap so downstream v2 screens pick
-// up the chosen accent before the final setSubject commit.
+// Screen 9 — subject picker. Renders the 3 thinker cards using the
+// v1 cinematic card visual (portrait + byline + name + tagline), so
+// the two subject selectors share the same recognizable per-subject
+// signature. Live-previews the subject theme on tap so downstream v2
+// screens pick up the chosen accent before the final setSubject commit.
 function _onbV2PrepareSubject() {
   const list = document.getElementById('onb-v2-subject-cards');
   const cta  = document.getElementById('onb-v2-subject-cta');
@@ -11679,24 +11645,25 @@ function _onbV2PrepareSubject() {
   _onbV2SubjectPick = cur;
   // Render fresh each time so a re-show doesn't accumulate handlers.
   list.innerHTML = '';
-  // Icon path matches the existing SUBJECTS array (~21222) —
-  // philosophy has a "-icon" suffix, the others don't. Kept identical
-  // to the v1 subject-select image references so we don't touch
-  // /assets/icons/subjects/ files.
-  const iconFor = { philosophy: 'philosophy-icon', economics: 'economics', psychology: 'psychology' };
+  // Signature thinker portrait per subject — same webp assets the v1
+  // cinematic selector uses (./images/*.webp). Socrates stands in for
+  // Plato on philosophy here — closer to the founding "examined life"
+  // beat that opens onboarding.
+  const portraitFor = { philosophy: 'socrates', economics: 'smith', psychology: 'freud' };
   ['philosophy', 'economics', 'psychology'].forEach(subj => {
     const cfg = _ONB_COPY.subject[subj];
     const card = document.createElement('button');
     card.type = 'button';
-    card.className = 'onb-v2-card onb-v2-subj-card';
+    card.className = 'subj-cinematic-card subj-c-' + subj;
     card.dataset.subject = subj;
     if (subj === cur) card.classList.add('is-selected');
     card.innerHTML =
-      '<span class="onb-v2-subj-icon"><img src="assets/icons/subjects/' + iconFor[subj] + '.png" alt=""></span>' +
-      '<span class="onb-v2-subj-text">' +
-        '<span class="onb-v2-subj-name">' + (isEn ? cfg.name.en : cfg.name.he) + '</span>' +
-        '<span class="onb-v2-subj-tag">'  + (isEn ? cfg.tag.en  : cfg.tag.he)  + '</span>' +
-      '</span>';
+      '<div class="subj-cinematic-portrait"><img src="./images/' + portraitFor[subj] + '.webp" alt=""></div>' +
+      '<div class="subj-cinematic-body">' +
+        '<div class="subj-cinematic-thinker">' + (isEn ? cfg.byline.en : cfg.byline.he) + '</div>' +
+        '<div class="subj-cinematic-name">'    + (isEn ? cfg.name.en   : cfg.name.he)   + '</div>' +
+        '<div class="subj-cinematic-tagline">' + (isEn ? cfg.tag.en    : cfg.tag.he)    + '</div>' +
+      '</div>';
     card.onclick = () => _onbV2SubjectTap(subj);
     list.appendChild(card);
   });
@@ -11778,11 +11745,12 @@ function _onbV2PrepareQ4() {
   }
 }
 
-// Screen 14 — mirror. Reflects the user's picks back.
-// Lines use age, hours, subject, Q1 picks, Q2 picks, Q3 pick. Q4
-// (frequency) is captured to state for analysis but not surfaced —
-// 5 lines is the ceiling before the mirror starts to feel like a
-// receipt.
+// Mirror screen — reflects the user's picks back as a clean 3-line
+// recap of Q1 (what they want) + Q2 (well-read-life) + Q3 (goal).
+// Personal (age + hours) and subject lines were intentionally dropped
+// so the mirror reads as "what you chose," not "what we know about
+// you." Q4 (frequency) is asked AFTER the mirror, so it doesn't
+// appear here either.
 function _onbV2PrepareMirror() {
   const isEn = state.lang === 'en';
   const head = document.getElementById('onb-v2-mirror-head');
@@ -11792,18 +11760,6 @@ function _onbV2PrepareMirror() {
   head.textContent = isEn ? _ONB_COPY.mirror.head.en : _ONB_COPY.mirror.head.he;
 
   const lines = [];
-  // Personal — age + hours if both captured
-  if (a.age != null && a.phoneHours != null) {
-    const t = isEn ? _ONB_COPY.mirror.line_personal.en : _ONB_COPY.mirror.line_personal.he;
-    lines.push(t.replace('{age}', a.age).replace('{hours}', a.phoneHours));
-  }
-  // Subject
-  if (state.subject) {
-    const sub = _ONB_COPY.subject[state.subject];
-    const subjName = sub ? (isEn ? sub.name.en : sub.name.he) : state.subject;
-    const t = isEn ? _ONB_COPY.mirror.line_subject.en : _ONB_COPY.mirror.line_subject.he;
-    lines.push(t.replace('{subject}', subjName));
-  }
   // Q1 picks (up to 3, joined comma-and)
   if (Array.isArray(a.q1) && a.q1.length) {
     const opts = _ONB_COPY.q1.options.filter(o => a.q1.indexOf(o.id) >= 0);
@@ -11864,8 +11820,8 @@ const _ONB_STEP_HOOKS = {
   10: _onbV2PrepareQ1,
   11: _onbV2PrepareQ2,
   12: _onbV2PrepareQ3,
-  13: _onbV2PrepareQ4,
-  14: _onbV2PrepareMirror,
+  13: _onbV2PrepareMirror,
+  14: _onbV2PrepareQ4,
 };
 
 // Silent guest entry: mirrors enterAsGuest but skips hideAuthScreen (the
@@ -23438,7 +23394,7 @@ document.addEventListener('DOMContentLoaded', function() {
      .onb-v2-slider-value display. Slider primitive reused from
      step 6. -->
 <div id="onb-v2-q4" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
-  <div class="onb-progress" aria-hidden="true" data-step="4">
+  <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
