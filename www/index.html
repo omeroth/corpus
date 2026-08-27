@@ -6146,43 +6146,159 @@
   }
   html.dark .onb-screen.onb-v2 .onb-v2-skip { color: var(--text); }
 
-  /* Step 18 — journey beats. Stacked list with an accent divider
-     underneath each row so the rhythm reads as a set of promises,
-     not a bulleted list. Footer line sits below in the muted body
-     style. */
-  .onb-screen.onb-v2 .onb-v2-journey-beats {
-    list-style: none;
-    padding: 0;
-    margin: 24px auto 20px;
+  /* Step 18 — journey. Top card projects the 30-day future; two
+     feature blocks below explain how. Accent-bordered card carries
+     the promise; feature blocks below sit in the neutral surface
+     card style so the visual weight flows top→bottom from projection
+     to mechanism. */
+  .onb-screen.onb-v2 .onb-v2-journey-card {
+    border: 2px solid var(--accent);
+    background: rgba(var(--accent-rgb), 0.05);
+    border-radius: 20px;
+    padding: 20px 18px;
+    max-width: 380px;
+    margin: 12px auto 0;
     display: flex;
     flex-direction: column;
-    gap: 0;
-    max-width: 380px;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 10px 28px -14px rgba(var(--accent-rgb), 0.35);
   }
-  .onb-screen.onb-v2 .onb-v2-journey-beat {
+  .onb-screen.onb-v2 .onb-v2-journey-card-head {
     font-family: 'Nunito', sans-serif;
     font-weight: 800;
-    font-size: calc(22px * var(--text-scale));
+    font-size: calc(17px * var(--text-scale));
     color: var(--ink);
-    line-height: 1.35;
-    padding: 16px 4px;
-    border-bottom: 1.5px solid rgba(var(--accent-rgb), 0.15);
-    text-align: start;
-  }
-  .onb-screen.onb-v2 .onb-v2-journey-beat:last-child { border-bottom: none; }
-  .onb-screen.onb-v2 .onb-v2-journey-footer {
-    font-family: 'Nunito', sans-serif;
-    font-weight: 600;
-    font-size: calc(16px * var(--text-scale));
-    color: var(--ink);
-    opacity: 0.6;
-    line-height: 1.4;
-    margin: 0 auto;
-    max-width: 380px;
+    line-height: 1.3;
     text-align: center;
   }
-  html.dark .onb-screen.onb-v2 .onb-v2-journey-beat,
-  html.dark .onb-screen.onb-v2 .onb-v2-journey-footer { color: var(--text); }
+  .onb-screen.onb-v2 .onb-v2-journey-date-pill {
+    padding: 6px 16px;
+    background: var(--accent);
+    color: #FFFFFF;
+    border-radius: 999px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: calc(16px * var(--text-scale));
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 12px -4px rgba(var(--accent-rgb), 0.5);
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-tiles {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-tile {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 6px;
+    background: var(--surface);
+    border: 1.5px solid rgba(var(--accent-rgb), 0.20);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-tile-emoji {
+    font-size: calc(24px * var(--text-scale));
+    line-height: 1;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-tile-label {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: calc(12px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-stat {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: calc(14px * var(--text-scale));
+    color: var(--ink);
+    opacity: 0.85;
+    line-height: 1.3;
+    text-align: center;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-card {
+    background: rgba(var(--accent-rgb), 0.10);
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-card-head,
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-stat,
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-tile-label { color: var(--text); }
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-tile {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  /* Section head + feature blocks below the projection card. Section
+     head is start-aligned (RTL-aware); features carry an icon on the
+     start edge with a stacked title + supporting paragraph. */
+  .onb-screen.onb-v2 .onb-v2-journey-section-head {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: calc(17px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.3;
+    margin: 28px auto 12px;
+    max-width: 380px;
+    text-align: start;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-feature {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1.5px solid rgba(var(--accent-rgb), 0.18);
+    border-radius: 14px;
+    text-align: start;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-feature-icon {
+    font-size: calc(24px * var(--text-scale));
+    line-height: 1.1;
+    flex-shrink: 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-feature-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-feature-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: calc(15px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.3;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-feature-desc {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;
+    font-size: calc(13px * var(--text-scale));
+    color: var(--ink);
+    opacity: 0.7;
+    line-height: 1.4;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-section-head,
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-feature-title,
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-feature-desc { color: var(--text); }
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-feature {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
 
   /* Progress-pill active fill on v2 uses the current subject accent
      (not the hardcoded philosophy fallback used by legacy v1 progress).
@@ -11252,33 +11368,39 @@ const _ONB_COPY = {
     cta:  { en: 'Continue',                               he: 'המשך' },
     // Options — stable ids for analytics; text is what the user sees
     // on the picker (emoji-prefixed on both langs); support is the
-    // "here's what Corpus does about that" line rendered on the
-    // mirror card for this option (step 13).
+    // per-option line on the mirror card (step 13); tile is the very
+    // short label used in the journey card tiles (step 18).
     options: [
       { id: 'understand-ideas',
         text:    { en: '🧠 Understand ideas that shaped the world',   he: '🧠 להבין רעיונות שעיצבו את העולם' },
         support: { en: 'Every idea comes from the thinker who first put it into words.',
-                   he: 'כל רעיון בא מההוגה שנתן לו את המילים הראשונות.' } },
+                   he: 'כל רעיון בא מההוגה שנתן לו את המילים הראשונות.' },
+        tile:    { en: 'Big ideas', he: 'רעיונות גדולים' } },
       { id: 'worth-reading',
         text:    { en: '📵 Something worth reading instead of scrolling', he: '📵 משהו ששווה לקרוא במקום לגלול' },
         support: { en: 'Five worthwhile minutes replace the scroll, one day at a time.',
-                   he: 'חמש דקות שוות מחליפות את הגלילה, יום אחד בכל פעם.' } },
+                   he: 'חמש דקות שוות מחליפות את הגלילה, יום אחד בכל פעם.' },
+        tile:    { en: 'Worth reading', he: 'שווה לקרוא' } },
       { id: 'hold-own',
         text:    { en: '💬 Hold my own in a real conversation',       he: '💬 לעמוד על שלי בשיחה אמיתית' },
         support: { en: "You'll walk out of each lesson with one idea you can quote out loud.",
-                   he: 'מכל שיעור תצא עם רעיון אחד שאפשר לצטט בשיחה.' } },
+                   he: 'מכל שיעור תצא עם רעיון אחד שאפשר לצטט בשיחה.' },
+        tile:    { en: 'Real talk', he: 'שיחה אמיתית' } },
       { id: 'read-thinkers',
         text:    { en: '📚 Finally read the thinkers I\'ve heard about', he: '📚 סוף סוף לקרוא את ההוגים ששמעתי עליהם' },
         support: { en: "You'll meet the thinkers themselves, not just their summaries.",
-                   he: 'תפגוש את ההוגים עצמם, לא רק את התקצירים.' } },
+                   he: 'תפגוש את ההוגים עצמם, לא רק את התקצירים.' },
+        tile:    { en: 'The thinkers', he: 'ההוגים' } },
       { id: 'build-habit',
         text:    { en: '🔥 Build a habit that actually sticks',       he: '🔥 לבנות הרגל שבאמת נשאר' },
         support: { en: 'Short daily lessons and a streak do the sticking for you.',
-                   he: 'שיעורים קצרים יומיים ורצף עושים את העבודה בשבילך.' } },
+                   he: 'שיעורים קצרים יומיים ורצף עושים את העבודה בשבילך.' },
+        tile:    { en: 'Habit', he: 'הרגל' } },
       { id: 'think-clearly',
         text:    { en: '🔍 Think more clearly about my own life',     he: '🔍 לחשוב בצלילות על החיים שלי' },
         support: { en: 'Every idea lands with a way to try it on your own week.',
-                   he: 'כל רעיון מגיע עם דרך לנסות אותו על השבוע שלך.' } },
+                   he: 'כל רעיון מגיע עם דרך לנסות אותו על השבוע שלך.' },
+        tile:    { en: 'Clarity', he: 'צלילות' } },
     ],
   },
   q2: {
@@ -11291,27 +11413,32 @@ const _ONB_COPY = {
         text:    { en: '💡 Having ideas of my own, not borrowed ones',
                    he: '💡 רעיונות משלי, ולא של אחרים' },
         support: { en: "You'll practice reasoning from ideas, not just recognizing them.",
-                   he: 'תתרגל להסיק מרעיונות, לא רק לזהות אותם.' } },
+                   he: 'תתרגל להסיק מרעיונות, לא רק לזהות אותם.' },
+        tile:    { en: 'Own ideas', he: 'משלי' } },
       { id: 'explain-clearly',
         text:    { en: '🗣️ Explaining things clearly to other people',
                    he: '🗣️ להסביר דברים בבהירות לאנשים אחרים' },
         support: { en: 'Every lesson ends with the idea in one sentence you can say back.',
-                   he: 'כל שיעור נגמר ברעיון במשפט אחד שאפשר לחזור עליו.' } },
+                   he: 'כל שיעור נגמר ברעיון במשפט אחד שאפשר לחזור עליו.' },
+        tile:    { en: 'Clear speech', he: 'בבהירות' } },
       { id: 'know-opinions',
         text:    { en: '🧭 Knowing where my opinions come from',
                    he: '🧭 לדעת מאיפה באות הדעות שלי' },
         support: { en: "You'll see where the ideas you hold came from.",
-                   he: 'תראה מאיפה הגיעו הרעיונות שאתה מחזיק בהם.' } },
+                   he: 'תראה מאיפה הגיעו הרעיונות שאתה מחזיק בהם.' },
+        tile:    { en: 'Opinion roots', he: 'שורשי דעות' } },
       { id: 'finish-hard',
         text:    { en: '📖 Reading things that are hard and finishing them',
                    he: '📖 לקרוא דברים קשים ולסיים אותם' },
         support: { en: 'Hard books get broken into finishable pieces, one a day.',
-                   he: 'ספרים קשים מתפרקים לחתיכות שאפשר לסיים, אחת ביום.' } },
+                   he: 'ספרים קשים מתפרקים לחתיכות שאפשר לסיים, אחת ביום.' },
+        tile:    { en: 'Finish hard books', he: 'לסיים ספרים קשים' } },
       { id: 'news-underneath',
         text:    { en: '🌍 Understanding the news underneath the headlines',
                    he: '🌍 להבין את החדשות מתחת לכותרות' },
         support: { en: "Each week's ideas connect to something happening right now.",
-                   he: 'הרעיונות של השבוע מתחברים למשהו שקורה עכשיו.' } },
+                   he: 'הרעיונות של השבוע מתחברים למשהו שקורה עכשיו.' },
+        tile:    { en: 'News depth', he: 'עומק בחדשות' } },
     ],
   },
   q3: {
@@ -11324,19 +11451,23 @@ const _ONB_COPY = {
       { id: 'daily',
         text:    { en: '⚡ Five minutes a day, every day', he: '⚡ חמש דקות ביום, כל יום' },
         support: { en: 'A short daily reminder lands at a time you pick.',
-                   he: 'תזכורת יומית קצרה תגיע בשעה שתבחר.' } },
+                   he: 'תזכורת יומית קצרה תגיע בשעה שתבחר.' },
+        tile:    { en: 'Daily', he: 'יומי' } },
       { id: 'few-week',
         text:    { en: '📅 A few times a week',            he: '📅 כמה פעמים בשבוע' },
         support: { en: 'Reminders stay gentle — a few days a week, not every day.',
-                   he: 'התזכורות נשארות רכות — כמה פעמים בשבוע, לא כל יום.' } },
+                   he: 'התזכורות נשארות רכות — כמה פעמים בשבוע, לא כל יום.' },
+        tile:    { en: 'Weekly', he: 'שבועי' } },
       { id: 'finish',
         text:    { en: '🏛️ Finish a whole subject',        he: '🏛️ לסיים תחום שלם' },
         support: { en: 'Your path is planned to complete your subject end to end.',
-                   he: 'המסלול שלך מתוכנן לסיים את התחום מקצה לקצה.' } },
+                   he: 'המסלול שלך מתוכנן לסיים את התחום מקצה לקצה.' },
+        tile:    { en: 'Complete subject', he: 'לסיים תחום' } },
       { id: 'longest-streak',
         text:    { en: '🔥 Build the longest streak I can', he: '🔥 לבנות את הרצף הכי ארוך שאפשר' },
         support: { en: "Reminders and a streak counter that's hard to lose.",
-                   he: 'תזכורות ומונה רצף שקשה לאבד.' } },
+                   he: 'תזכורות ומונה רצף שקשה לאבד.' },
+        tile:    { en: 'Long streak', he: 'רצף ארוך' } },
     ],
   },
   q4: {
@@ -11379,8 +11510,8 @@ const _ONB_COPY = {
   streak: {
     eyebrow: { en: 'DAY 1 · STREAK',        he: 'יום 1 · רצף' },
     head:    { en: 'You showed up.',        he: 'הרצף שלך התחיל.' },
-    sub:     { en: 'Every day from here adds one. Skip a day and it resets.',
-               he: 'כל יום מכאן מוסיף עוד. יום דילוג ומאפס.' },
+    sub:     { en: 'Every day adds to your streak. Miss one and it resets.',
+               he: 'כל יום מוסיף לרצף. יום שתפספס מאפס.' },
     cta:     { en: 'Continue',              he: 'המשך' },
   },
 
@@ -11389,45 +11520,68 @@ const _ONB_COPY = {
   // Skip and Rate both advance to step 18, so the ask is soft.
   review: {
     head:     { en: 'Before we start.',     he: 'לפני שמתחילים' },
-    sub:      { en: 'If this feels worth your time, a rating helps others find it too.',
-                he: 'אם זה שווה את הזמן שלך, דירוג עוזר לעוד אנשים למצוא אותנו.' },
+    sub:      { en: 'If you like Corpus, a rating helps others find it.',
+                he: 'אם Corpus מוצא חן בעיניך, דירוג עוזר לאנשים נוספים למצוא אותו.' },
     cta:      { en: 'Rate Corpus',          he: 'דרג את Corpus' },
     skip:     { en: 'Not right now',        he: 'לא עכשיו' },
   },
 
-  // Step 18 — journey summary. Rhythm-focused: what the cadence looks
-  // like when it's working. Three lines, one per timescale.
+  // Step 18 — journey summary. An accent-bordered card at the top
+  // projects the user's next 30 days (name + date pill + three tiles
+  // drawn from their Q1/Q2/Q3 picks + a stat row), then two feature
+  // blocks below explain the mechanism ("A dialogue a day", "Real
+  // texts, not summaries"). The card is rendered dynamically in
+  // _onbV2PrepareJourney; static copy for the rest sits below.
   journey: {
-    head:   { en: 'The path ahead.',        he: 'הדרך שלפניך.' },
-    beats: [
-      { en: '🧠 One idea a day.',           he: '🧠 רעיון אחד ביום.' },
-      { en: '🎓 One thinker a week.',       he: '🎓 הוגה אחד בשבוע.' },
-      { en: '🏛️ One subject a season.',     he: '🏛️ תחום אחד בעונה.' },
+    // Head interpolates {name} + {n}. {n} is the subject-specific count
+    // of unique thinkers a user meets in the first 30 dialogues,
+    // computed at render time by _onbV2CountFirstThinkers walking
+    // getW() — stays honest as content shifts. Verified 2026-08-27:
+    // philosophy 16, economics 17, psychology 21 (psychology has only
+    // 28 authored dialogues total, but the subject is currently
+    // LOCKED_SUBJECTS-gated so users can't reach this screen on it).
+    card_head:          { en: "{name}, you'll have met {n} thinkers by",
+                          he: '{name}, תפגוש {n} הוגים עד' },
+    card_head_nameless: { en: "You'll have met {n} thinkers by",
+                          he: 'תפגוש {n} הוגים עד' },
+    card_stat:          { en: '🕐 30+ hours a year with the greatest minds',
+                          he: '🕐 30+ שעות בשנה עם הוגי הדעות הגדולים' },
+    section_head:       { en: "How we'll get you there:",
+                          he: 'איך נגיע לשם:' },
+    features: [
+      { icon: '📖',
+        title: { en: 'A dialogue a day.',
+                 he: 'דיאלוג ביום.' },
+        desc:  { en: 'Five minutes with one thinker and one idea. No reading list, no catching up.',
+                 he: 'חמש דקות עם הוגה אחד ורעיון אחד. בלי רשימת קריאה, בלי להשלים פערים.' } },
+      { icon: '📚',
+        title: { en: 'Real texts, not summaries.',
+                 he: 'טקסטים אמיתיים, לא תקצירים.' },
+        desc:  { en: 'Every dialogue is built around something the thinker actually wrote.',
+                 he: 'כל דיאלוג נבנה סביב משהו שההוגה באמת כתב.' } },
     ],
-    footer: { en: "That's how it adds up.", he: 'ככה זה מצטבר.' },
-    cta:    { en: 'Continue',               he: 'המשך' },
+    cta: { en: "Let's begin", he: 'בוא נתחיל' },
   },
 
-  // Step 19 — commitment level. Terminal onboarding screen. The user
-  // states their commitment level (single-choice); the picked id is
-  // captured to state.onbAnswers.commitment for later analysis but
-  // does not gate anything downstream — all three land the user on
-  // home. CTA advances via _onbComplete. Head interpolates the
-  // captured name; if no name was captured (guest who skipped step 4),
-  // _onbV2PrepareCommit falls back to head_nameless.
+  // Step 19 — commitment level. Terminal onboarding screen. Five
+  // emoji-prefixed cards state the user's commitment level; the picked
+  // id is captured to state.onbAnswers.commitment for later analysis
+  // but does not gate anything downstream — all five land the user on
+  // home via _onbComplete.
   commit: {
-    head: { en: '{name}, are you in?',      he: '{name}, אתה בפנים?' },
-    head_nameless: { en: 'Are you in?',     he: 'אתה בפנים?' },
-    sub:  { en: 'Five minutes. Every day. Even the hard ones.',
-            he: 'חמש דקות. כל יום. גם בקשים.' },
-    cta:  { en: 'Continue',                 he: 'המשך' },
+    head: { en: 'So, how committed are you?', he: 'אז כמה אתה מחויב?' },
+    cta:  { en: 'Continue',                    he: 'המשך' },
     options: [
-      { id: 'all-in',
-        text: { en: "I'm all in.",              he: 'אני בפנים לגמרי.' } },
-      { id: 'real-try',
-        text: { en: "I'll give it a real try.", he: 'אני אתן לזה צאנס אמיתי.' } },
-      { id: 'looking',
-        text: { en: 'Just looking around.',      he: 'רק מסתכל.' } },
+      { id: 'extreme',
+        text: { en: '🔥 Extremely committed',        he: '🔥 מחויב לגמרי' } },
+      { id: 'very',
+        text: { en: '💪 Very committed',             he: '💪 מאוד מחויב' } },
+      { id: 'somewhat',
+        text: { en: '🤔 Somewhat committed',         he: '🤔 מחויב במידה מסוימת' } },
+      { id: 'little',
+        text: { en: '🌱 A little committed',         he: '🌱 קצת מחויב' } },
+      { id: 'trying',
+        text: { en: '🪶 Just trying it out',         he: '🪶 רק מנסה' } },
     ],
   },
 };
@@ -11487,11 +11641,10 @@ function _onbApplyLang(lang) {
   setText('onb-v2-review-sub',    'review',   'sub');
   setText('onb-v2-review-cta',    'review',   'cta');
   setText('onb-v2-review-skip',   'review',   'skip');
-  setText('onb-v2-journey-head',  'journey',  'head');
-  setText('onb-v2-journey-footer','journey',  'footer');
+  // Journey screen: card + tiles + features rendered dynamically in
+  // _onbV2PrepareJourney. Only the CTA is static.
   setText('onb-v2-journey-cta',   'journey',  'cta');
-  // Commit head interpolates {name}; done in _onbV2PrepareCommit.
-  setText('onb-v2-commit-sub',    'commit',   'sub');
+  setText('onb-v2-commit-head',   'commit',   'head');
   setText('onb-v2-commit-cta',    'commit',   'cta');
   // Text/number input placeholders (slider has none).
   const setPlaceholder = (id, group) => {
@@ -12163,42 +12316,141 @@ function _onbV2PrepareMirror() {
   list.appendChild(closing);
 }
 
-// Screen 18 — journey summary. Renders the three rhythm beats from
-// _ONB_COPY.journey.beats. Refreshed on every show so language switches
-// pick up the correct copy.
-function _onbV2PrepareJourney() {
-  const list = document.getElementById('onb-v2-journey-beats');
-  if (!list) return;
-  const isEn = state.lang === 'en';
-  const beats = (_ONB_COPY.journey && _ONB_COPY.journey.beats) || [];
-  list.innerHTML = '';
-  beats.forEach(b => {
-    const li = document.createElement('li');
-    li.className = 'onb-v2-journey-beat';
-    li.textContent = isEn ? b.en : b.he;
-    list.appendChild(li);
-  });
+// Counts unique thinkerIds a user would meet in the first `n`
+// dialogues of the currently-picked subject. Walks getW() so the
+// answer stays honest as content shifts (adding an intro/summary
+// day changes the ratio without changing this code). Skips Day 0
+// bonus intros and coming-soon chapters. Falls back to 16
+// (philosophy's current number) if getW() throws.
+function _onbV2CountFirstThinkers(n) {
+  try {
+    const weeks = (typeof getW === 'function') ? getW() : [];
+    let days = 0;
+    const ids = new Set();
+    for (const w of weeks) {
+      if (w.comingSoon || !w.days || !w.days.length) continue;
+      for (const d of w.days) {
+        if (d.id === 0) continue;
+        if (days >= n) break;
+        days++;
+        if (d.thinkerId) ids.add(d.thinkerId);
+      }
+      if (days >= n) break;
+    }
+    return ids.size || 16;
+  } catch(e) { return 16; }
 }
 
-// Screen 19 — commit. Interpolates the captured name into the head,
-// then renders the three commitment-level cards (single-choice).
-function _onbV2PrepareCommit() {
-  const head = document.getElementById('onb-v2-commit-head');
-  const list = document.getElementById('onb-v2-commit-cards');
-  const cta  = document.getElementById('onb-v2-commit-cta');
+// Screen 18 — journey. Top card projects the next 30 days (name +
+// date + three tiles drawn from Q1/Q2/Q3 picks + stat row). Below
+// the card, two feature blocks explain the mechanism. All copy is
+// re-rendered on every show so language switches pick up the correct
+// strings and the date pill stays fresh.
+function _onbV2PrepareJourney() {
   const isEn = state.lang === 'en';
-  const name = (state.onbAnswers && state.onbAnswers.name) || '';
-  if (head) {
-    if (name) {
-      const tmpl = isEn ? _ONB_COPY.commit.head.en : _ONB_COPY.commit.head.he;
-      head.textContent = tmpl.replace('{name}', name);
-    } else {
-      head.textContent = isEn
-        ? _ONB_COPY.commit.head_nameless.en
-        : _ONB_COPY.commit.head_nameless.he;
+  const a = state.onbAnswers || {};
+
+  // Card head — interpolates the captured name AND the honest
+  // subject-specific thinker count. Nameless fallback if the user
+  // skipped step 4.
+  const headEl = document.getElementById('onb-v2-journey-card-head');
+  if (headEl) {
+    const name = a.name || '';
+    const nThinkers = _onbV2CountFirstThinkers(30);
+    const tmpl = name
+      ? (isEn ? _ONB_COPY.journey.card_head.en          : _ONB_COPY.journey.card_head.he)
+      : (isEn ? _ONB_COPY.journey.card_head_nameless.en : _ONB_COPY.journey.card_head_nameless.he);
+    headEl.textContent = tmpl
+      .replace('{name}', name)
+      .replace('{n}', String(nThinkers));
+  }
+
+  // Date pill — 30 days from today, locale-formatted (long month +
+  // day; year omitted to keep the pill tight).
+  const pillEl = document.getElementById('onb-v2-journey-date-pill');
+  if (pillEl) {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    const locale = isEn ? 'en-US' : 'he-IL';
+    try {
+      pillEl.textContent = d.toLocaleDateString(locale, { month: 'long', day: 'numeric' });
+    } catch(e) {
+      pillEl.textContent = d.toDateString();
     }
   }
+
+  // Three tiles — Q1 pick, Q2 pick, Q3 pick. Each shows the option's
+  // emoji (extracted from option.text as the first space-delimited
+  // token, which handles multi-codepoint emoji like 🗣️) and its
+  // short tile label. If a pick is missing (defensive; the flow
+  // requires all three), we skip that tile rather than render blank.
+  const tilesEl = document.getElementById('onb-v2-journey-tiles');
+  if (tilesEl) {
+    tilesEl.innerHTML = '';
+    const picks = [
+      (Array.isArray(a.q1) && a.q1[0]) ? _ONB_COPY.q1.options.find(o => o.id === a.q1[0]) : null,
+      (Array.isArray(a.q2) && a.q2[0]) ? _ONB_COPY.q2.options.find(o => o.id === a.q2[0]) : null,
+      a.q3 ? _ONB_COPY.q3.options.find(o => o.id === a.q3) : null,
+    ];
+    picks.forEach(opt => {
+      if (!opt) return;
+      const tile = document.createElement('div');
+      tile.className = 'onb-v2-journey-tile';
+      const emoji = (isEn ? opt.text.en : opt.text.he).split(' ')[0];
+      const label = isEn ? opt.tile.en : opt.tile.he;
+      const emojiEl = document.createElement('div');
+      emojiEl.className = 'onb-v2-journey-tile-emoji';
+      emojiEl.textContent = emoji;
+      const labelEl = document.createElement('div');
+      labelEl.className = 'onb-v2-journey-tile-label';
+      labelEl.textContent = label;
+      tile.appendChild(emojiEl);
+      tile.appendChild(labelEl);
+      tilesEl.appendChild(tile);
+    });
+  }
+
+  // Card stat row + section head — static per-language.
+  const statEl = document.getElementById('onb-v2-journey-stat');
+  if (statEl) statEl.textContent = isEn ? _ONB_COPY.journey.card_stat.en : _ONB_COPY.journey.card_stat.he;
+  const sectionEl = document.getElementById('onb-v2-journey-section-head');
+  if (sectionEl) sectionEl.textContent = isEn ? _ONB_COPY.journey.section_head.en : _ONB_COPY.journey.section_head.he;
+
+  // Feature blocks below the card.
+  const featEl = document.getElementById('onb-v2-journey-features');
+  if (featEl) {
+    featEl.innerHTML = '';
+    (_ONB_COPY.journey.features || []).forEach(f => {
+      const li = document.createElement('li');
+      li.className = 'onb-v2-journey-feature';
+      const icon = document.createElement('div');
+      icon.className = 'onb-v2-journey-feature-icon';
+      icon.textContent = f.icon;
+      const body = document.createElement('div');
+      body.className = 'onb-v2-journey-feature-body';
+      const title = document.createElement('div');
+      title.className = 'onb-v2-journey-feature-title';
+      title.textContent = isEn ? f.title.en : f.title.he;
+      const desc = document.createElement('div');
+      desc.className = 'onb-v2-journey-feature-desc';
+      desc.textContent = isEn ? f.desc.en : f.desc.he;
+      body.appendChild(title);
+      body.appendChild(desc);
+      li.appendChild(icon);
+      li.appendChild(body);
+      featEl.appendChild(li);
+    });
+  }
+}
+
+// Screen 19 — commit. Renders five commitment-level cards (single-
+// choice). Head is static via _onbApplyLang; only the card list is
+// dynamic here.
+function _onbV2PrepareCommit() {
+  const list = document.getElementById('onb-v2-commit-cards');
+  const cta  = document.getElementById('onb-v2-commit-cta');
   if (!list) return;
+  const isEn = state.lang === 'en';
   const pick = (state.onbAnswers && state.onbAnswers.commitment) || '';
   _onbV2CommitPick = pick || null;
   const options = (_ONB_COPY.commit && _ONB_COPY.commit.options) || [];
@@ -23900,17 +24152,25 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 18 — journey summary. Three-beat rhythm list rendered from
-     _ONB_COPY.journey.beats in _onbV2PrepareJourney. -->
+<!-- Step 18 — journey. Top: accent-bordered card projecting the next
+     30 days (name-interpolated head + date pill + three tiles from the
+     user's Q1/Q2/Q3 picks + stat row). Below: section head + two
+     feature blocks explaining the mechanism. All dynamic content is
+     rendered in _onbV2PrepareJourney. -->
 <div id="onb-v2-journey" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="6">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
-      <h1 class="onb-v2-head" id="onb-v2-journey-head"></h1>
-      <ul class="onb-v2-journey-beats" id="onb-v2-journey-beats"></ul>
-      <p class="onb-v2-journey-footer" id="onb-v2-journey-footer"></p>
+      <div class="onb-v2-journey-card">
+        <div class="onb-v2-journey-card-head" id="onb-v2-journey-card-head"></div>
+        <div class="onb-v2-journey-date-pill" id="onb-v2-journey-date-pill"></div>
+        <div class="onb-v2-journey-tiles" id="onb-v2-journey-tiles"></div>
+        <div class="onb-v2-journey-stat" id="onb-v2-journey-stat"></div>
+      </div>
+      <div class="onb-v2-journey-section-head" id="onb-v2-journey-section-head"></div>
+      <ul class="onb-v2-journey-features" id="onb-v2-journey-features"></ul>
     </div>
   </div>
   <div class="onb-cta-holder">
@@ -23918,11 +24178,10 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 19 — commitment level. Terminal step. Head interpolates the
-     captured name (nameless fallback if the user skipped step 4).
-     Three single-choice cards state the user's commitment level; the
-     pick is captured to state.onbAnswers.commitment for later analysis
-     but doesn't gate anything downstream. CTA runs _onbComplete → home. -->
+<!-- Step 19 — commitment level. Terminal step. Five single-choice
+     cards state the user's commitment level; the pick is captured to
+     state.onbAnswers.commitment for later analysis but doesn't gate
+     anything downstream. CTA runs _onbComplete → home. -->
 <div id="onb-v2-commit" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="6">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
@@ -23930,7 +24189,6 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
       <h1 class="onb-v2-head" id="onb-v2-commit-head"></h1>
-      <p class="onb-v2-sub" id="onb-v2-commit-sub"></p>
       <div class="onb-v2-cards" id="onb-v2-commit-cards"></div>
     </div>
   </div>
