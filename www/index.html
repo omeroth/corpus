@@ -5251,6 +5251,17 @@
     --onb-accent-shadow: rgba(123, 79, 212, 0.30);
     --onb-accent-shadow-soft: rgba(123, 79, 212, 0.18);
   }
+  /* Onboarding v2 subject-themed screens (9-14). Maps --onb-accent
+     onto the app's current --accent so the CTA button, its shadow,
+     and any --onb-* edge tint follow the picked subject (purple →
+     blue for economics, orange for psychology). Screens 1-8 keep
+     .onb-bg-philosophy so they stay purple until the user picks. */
+  .onb-bg-themed {
+    --onb-edge:               rgba(var(--accent-rgb), 0.14);
+    --onb-accent:             var(--accent);
+    --onb-accent-shadow:      rgba(var(--accent-rgb), 0.32);
+    --onb-accent-shadow-soft: rgba(var(--accent-rgb), 0.20);
+  }
 
   /* Onboarding CTA — filled in the screen's accent (not a white pill).
      Overrides base .nav-btn so the primary action carries the screen's
@@ -6000,7 +6011,10 @@
   /* Subject-card variant: adds portrait + tag under the name. Layout
      is a horizontal flex; the base padding/border rules from .onb-v2-card
      still apply. */
-  /* Hint line below the head on multi-select questions (Q1, Q2). */
+  /* Prioritization hint below the head on Q1 / Q2 — signals the pick
+     is single-choice so the second tap doesn't feel like a dead
+     interaction. Same "restrained caption" treatment as other v2
+     secondary text (Nunito 500, low opacity). */
   .onb-screen.onb-v2 .onb-v2-hint {
     font-family: 'Nunito', sans-serif;
     font-weight: 500;
@@ -11143,7 +11157,7 @@ const _ONB_COPY = {
   },
   q1: {
     head: { en: 'What do you want to get out of Corpus?', he: 'מה תרצה להוציא מ-Corpus?' },
-    hint: { en: 'Pick up to 3',                           he: 'בחר עד שלוש' },
+    hint: { en: 'The one that matters most.',             he: 'מה שהכי חשוב לך.' },
     cta:  { en: 'Continue',                               he: 'המשך' },
     // Options — stable ids for analytics; text is what the user sees
     // on the picker (emoji-prefixed on both langs); support is the
@@ -11179,8 +11193,8 @@ const _ONB_COPY = {
   q2: {
     head: { en: 'Thinking bigger, what does a well-read life look like to you?',
             he: 'במבט רחב יותר, איך נראים לך חיים של אדם קורא?' },
-    hint: { en: 'Pick up to 3', he: 'בחר עד שלוש' },
-    cta:  { en: 'Continue',     he: 'המשך' },
+    hint: { en: 'The one that matters most.', he: 'מה שהכי חשוב לך.' },
+    cta:  { en: 'Continue',                    he: 'המשך' },
     options: [
       { id: 'own-ideas',
         text:    { en: '💡 Having ideas of my own, not borrowed ones',
@@ -11476,27 +11490,17 @@ function _onbV2CtaSubject() {
   _onbAdvanceStep(9, 10);
 }
 
-// Screens 10, 11 (Q1, Q2) — multi-select up to 3. Selections stored
-// as arrays of stable ids in state.onbAnswers.q1 / .q2. Tap toggles;
-// if at cap, additional selections are ignored (no shake feedback for
-// now — could add later if reviews call it out).
+// Screens 10, 11 (Q1, Q2) — single-select. Tap replaces the previous
+// pick. State shape stays as a single-element array in
+// state.onbAnswers.q1 / .q2 so the mirror renderer (which iterates
+// the array) doesn't need to know Q1/Q2 changed cardinality.
 function _onbV2MselTap(question, optionId) {
-  const arr = state.onbAnswers[question] || [];
-  const idx = arr.indexOf(optionId);
-  if (idx >= 0) {
-    arr.splice(idx, 1);
-  } else if (arr.length < 3) {
-    arr.push(optionId);
-  } else {
-    return; // at cap
-  }
-  state.onbAnswers[question] = arr;
-  // Reflect in DOM: mark selected cards, enable CTA if any picks.
+  state.onbAnswers[question] = [optionId];
   document.querySelectorAll('#onb-v2-' + question + ' .onb-v2-card').forEach(c => {
-    c.classList.toggle('is-selected', arr.indexOf(c.dataset.option) >= 0);
+    c.classList.toggle('is-selected', c.dataset.option === optionId);
   });
   const cta = document.getElementById('onb-v2-' + question + '-cta');
-  if (cta) cta.disabled = arr.length === 0;
+  if (cta) cta.disabled = false;
 }
 function _onbV2CtaQ1() {
   if (!state.onbAnswers.q1 || !state.onbAnswers.q1.length) return;
@@ -23369,7 +23373,7 @@ document.addEventListener('DOMContentLoaded', function() {
      _onbV2PrepareSubject from _ONB_COPY.subject. Tap sets a live
      preview via previewSubjectTheme; CTA commits via setSubject
      which flips the app-wide theme for every downstream v2 screen. -->
-<div id="onb-v2-subject" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<div id="onb-v2-subject" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="4">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -23387,7 +23391,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 10 — Q1 multi-select. Cards rendered by _onbV2PrepareQ1
      from _ONB_COPY.q1.options. Hint reminds "pick up to 3"; CTA
      disabled until at least one pick, tap caps at 3. -->
-<div id="onb-v2-q1" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<div id="onb-v2-q1" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="4">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -23404,7 +23408,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- Step 11 — Q2 multi-select. Same component + shape as Q1. -->
-<div id="onb-v2-q2" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<div id="onb-v2-q2" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="4">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -23423,7 +23427,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 12 — Q3 single choice. Also sets state.dailyGoalHistory (see
      _onbV2CtaQ3) so the daily-goal reminder machinery picks up the
      intent without a separate migration prompt. -->
-<div id="onb-v2-q3" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<div id="onb-v2-q3" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="4">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -23442,7 +23446,7 @@ document.addEventListener('DOMContentLoaded', function() {
      sometimes / often / every day). Live label updates via the
      .onb-v2-slider-value display. Slider primitive reused from
      step 6. -->
-<div id="onb-v2-q4" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<div id="onb-v2-q4" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -23468,7 +23472,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 14 — Mirror. Reflects the user's picks back. Head + list
      rendered dynamically in _onbV2PrepareMirror from state.onbAnswers
      and state.subject. -->
-<div id="onb-v2-mirror" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<div id="onb-v2-mirror" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
