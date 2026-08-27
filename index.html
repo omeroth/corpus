@@ -18949,20 +18949,30 @@ const _NPS_STORE_URL_ANDROID = 'https://play.google.com/store/apps/details?id=co
 // `npx cap sync` hasn't been run, etc.) — this is a fallback, NOT a
 // guess about whether the native sheet appeared.
 //
+// Diagnostic logging (temporary): logs presence of the plugin, which
+// path was taken, and any error, so on-device Safari Web Inspector /
+// chrome://inspect gives a clean trace of what happened when the user
+// taps "Rate Corpus". Remove once the wiring is confirmed working.
+//
 // Returns { path: 'native' | 'url' }. Callers use this to attribute in
 // analytics but don't gate anything on it.
 async function _requestNativeReview() {
-  const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CorpusReview;
-  if (P && typeof P.requestReview === 'function') {
+  const platform = (window.Capacitor && Capacitor.getPlatform && Capacitor.getPlatform()) || 'web';
+  const hasCap = !!(window.Capacitor && window.Capacitor.Plugins);
+  const P = hasCap ? window.Capacitor.Plugins.CorpusReview : null;
+  const pluginPresent = !!(P && typeof P.requestReview === 'function');
+  console.log('[review] request', { platform, hasCap, pluginPresent });
+  if (pluginPresent) {
     try {
-      await P.requestReview();
+      const res = await P.requestReview();
+      console.log('[review] native call resolved', res);
       return { path: 'native' };
     } catch (e) {
       console.warn('[review] native plugin call failed, falling back to store URL', e);
     }
   }
-  const platform = (window.Capacitor && Capacitor.getPlatform && Capacitor.getPlatform()) || 'web';
   const url = platform === 'android' ? _NPS_STORE_URL_ANDROID : _NPS_STORE_URL_IOS;
+  console.log('[review] falling back to store URL', { url });
   try { window.open(url, '_blank'); } catch(e) {}
   return { path: 'url' };
 }
@@ -21137,13 +21147,19 @@ const WALKTHROUGH_STEPS = [
     allowChromeTop: true,
     he: 'הרצף גדל בכל יום שמשלימים בו דיאלוג. היום הוא מתחיל.',
     en: 'Your streak grows on every day you complete a dialogue. Today it begins.' },
-  { id: 'closing', expr: 'owl-action',     spotlight: null, isClosing: true,
-    // Copy reads "next" (not "first") because the v2 onboarding always
-    // leaves the user with one completed dialogue — the walkthrough
-    // closes into their SECOND dialogue. Still coherent for any legacy
-    // path where the user has 0 completions (their "next" is Day 1).
-    he: 'זהו, אתם מוכנים. הדיאלוג הבא מחכה.',
-    en: "That's it, you're ready. Your next dialogue is waiting." },
+  { id: 'closing', expr: 'owl-action',
+    // Spotlights the next-up lesson circle (same target as step 2's
+    // `next_up`) so the closing beat has something concrete to point
+    // at. Framing shifts from "next in line" (step 2) to "tomorrow's
+    // dialogue lands here" (step 7). v2 users have already completed
+    // today's dialogue during onboarding, so we don't auto-open a
+    // reader — _walkthroughFinish just tears down. The canvas click
+    // handler also suppresses the tap-shortcut on isClosing steps so
+    // a tap on the spotlighted circle doesn't contradict the copy by
+    // opening day 2 right now.
+    spotlight: '.lesson-node:has(.lesson-circle.next-up)', isClosing: true,
+    he: 'כאן יחכה הדיאלוג של מחר.',
+    en: "This is where tomorrow's dialogue will be waiting." },
 ];
 
 let _walkthroughStepIdx = 0;
@@ -21202,6 +21218,12 @@ function _walkthroughWireCanvas() {
   canvas.addEventListener('click', function(ev) {
     const step = WALKTHROUGH_STEPS[_walkthroughStepIdx];
     if (!step || !step.spotlight) return;             // no punch-out; no shortcut path
+    // The closing beat spotlights the next-up lesson as "here's where
+    // tomorrow's dialogue will land" — tapping it to open the reader
+    // right now would contradict the copy. Only the OK button (fires
+    // _walkthroughFinish) or Skip should end the walkthrough on this
+    // step.
+    if (step.isClosing) return;
     const info = _walkthroughSpotlightRect(step);
     if (!info) return;
     const pad = 8;                                    // match drawSpotlight padding
@@ -21453,8 +21475,8 @@ function _walkthroughRenderStep() {
   const nextBtn    = document.getElementById('onboarding-btn');
   bubbleText.textContent = isEn ? step.en : step.he;
   if (step.isClosing) {
-    nextBtn.textContent = isEn ? "Let's start" : 'בואו נתחיל';
-    nextBtn.onclick     = _walkthroughFinishAndOpen;
+    nextBtn.textContent = isEn ? 'OK' : 'בסדר';
+    nextBtn.onclick     = _walkthroughFinish;
   } else {
     nextBtn.textContent = isEn ? 'Next' : 'הבא';
     nextBtn.onclick     = _walkthroughNext;
@@ -21489,8 +21511,8 @@ function _walkthroughRenderStep() {
 function _walkthroughNext() {
   _walkthroughStepIdx++;
   if (_walkthroughStepIdx >= WALKTHROUGH_STEPS.length) {
-    // Guard against overrun; closing button uses _walkthroughFinishAndOpen.
-    _walkthroughFinishAndOpen();
+    // Guard against overrun; closing button uses _walkthroughFinish.
+    _walkthroughFinish();
     return;
   }
   _walkthroughRenderStep();
@@ -21525,29 +21547,19 @@ function _walkthroughShortcutBail() {
   _walkthroughTeardown({ setFlag: true });
 }
 
-function _walkthroughFinishAndOpen() {
+// v2 users have already read a full dialogue during onboarding (step
+// 15), so the walkthrough finish should NOT auto-open another reader.
+// Land the user on home with everything in place — streak lit, first
+// thinker card unlocked, next dialogue queued visually as "next up" —
+// and let them come back tomorrow. Legacy paths (any pre-v2 user
+// whose corpus_walkthrough_done flag isn't set) end here too; the
+// closing beat's "come back tomorrow" copy is coherent in both cases.
+function _walkthroughFinish() {
   _phCapture('walkthrough_completed', {
     subject: state.subject || null,
     lang:    state.lang || null,
   });
   _walkthroughTeardown({ setFlag: true });
-  // Post-v2 users have completed Day 1 in onboarding step 15, so the
-  // "next dialogue" from the closing beat is really Day 2. Legacy users
-  // (0 completions) fall through to Day 1 via the fallback branch —
-  // getNextLessonInfo needs state.currentWeek/currentDay to be set, and
-  // legacy paths don't guarantee that.
-  const hasCompleted = Object.keys(state.completedDays || {}).length > 0;
-  if (hasCompleted && typeof getNextLessonInfo === 'function') {
-    const next = getNextLessonInfo();
-    if (next && next.hasNext) {
-      openReader(next.weekId, next.dayId);
-      return;
-    }
-  }
-  const weeks = getW();
-  if (weeks && weeks[0] && weeks[0].days && weeks[0].days.length) {
-    openReader(weeks[0].id, weeks[0].days[0].id);
-  }
 }
 
 function _walkthroughTeardown(opts) {
