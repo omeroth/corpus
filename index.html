@@ -6099,6 +6099,91 @@
   html.dark .onb-screen.onb-v2 .onb-v2-mirror-closing-head,
   html.dark .onb-screen.onb-v2 .onb-v2-mirror-closing-line { color: var(--text); }
 
+  /* Step 16 (day-1 streak) — centered flame + amber eyebrow + head.
+     Flame reuses #icon-streak SVG from the endowment overlay so the
+     visual language matches the future post-onboarding endowment
+     modal (users see the same flame at streak-day-1 both places). */
+  .onb-screen.onb-v2 .onb-v2-streak-copy {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  .onb-screen.onb-v2 .onb-v2-streak-flame {
+    color: var(--amber);
+    filter: drop-shadow(0 6px 18px rgba(245, 158, 11, 0.45));
+    margin-bottom: 4px;
+  }
+  .onb-screen.onb-v2 .onb-v2-streak-eyebrow {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: calc(12px * var(--text-scale));
+    letter-spacing: 1.4px;
+    color: var(--amber);
+    text-transform: uppercase;
+  }
+
+  /* Step 17 — skip button below the primary review CTA. Text-only,
+     no fill or border, low visual weight so the Rate action reads
+     as the intended path. */
+  .onb-screen.onb-v2 .onb-v2-skip {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 14px 8px 0;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: calc(15px * var(--text-scale));
+    color: var(--ink);
+    opacity: 0.55;
+    cursor: pointer;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-skip { color: var(--text); }
+
+  /* Step 18 — journey beats. Stacked list with an accent divider
+     underneath each row so the rhythm reads as a set of promises,
+     not a bulleted list. Footer line sits below in the muted body
+     style. */
+  .onb-screen.onb-v2 .onb-v2-journey-beats {
+    list-style: none;
+    padding: 0;
+    margin: 24px auto 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    max-width: 380px;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-beat {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: calc(22px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.35;
+    padding: 16px 4px;
+    border-bottom: 1.5px solid rgba(var(--accent-rgb), 0.15);
+    text-align: start;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-beat:last-child { border-bottom: none; }
+  .onb-screen.onb-v2 .onb-v2-journey-footer {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: calc(16px * var(--text-scale));
+    color: var(--ink);
+    opacity: 0.6;
+    line-height: 1.4;
+    margin: 0 auto;
+    max-width: 380px;
+    text-align: center;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-beat,
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-footer { color: var(--text); }
+
   /* Progress-pill active fill on v2 uses the current subject accent
      (not the hardcoded philosophy fallback used by legacy v1 progress).
      Steps 1-8 all render as philosophy pre-subject-pick; from step 9
@@ -11059,8 +11144,14 @@ const _ONB_STEP_TO_ID = {
   12: 'onb-v2-q3',
   13: 'onb-v2-mirror',
   14: 'onb-v2-q4',
-  15: null, 16: null, 17: null,
-  18: null, 19: null,
+  // Step 15 has no v2 DOM node — the reader takes over the viewport.
+  // _onbShowStep detects n === 15 and routes to _onbEnterFirstDialogue
+  // instead of the normal id-lookup path.
+  15: null,
+  16: 'onb-v2-streak',
+  17: 'onb-v2-review',
+  18: 'onb-v2-journey',
+  19: 'onb-v2-commit',
 };
 
 // Bilingual copy map for the intro screens (1-3). Later commits will
@@ -11271,13 +11362,73 @@ const _ONB_COPY = {
     // No head — the cards *are* the screen. Each user pick becomes a
     // card with the option text + a per-option "here's what Corpus
     // does about it" support line. Closing block below the cards
-    // adds a reassurance beat before the CTA that advances to Q4.
+    // adds a promise beat before the CTA that advances to Q4.
     cta:  { en: 'Continue', he: 'המשך' },
     closing: {
-      head: { en: "That's the plan.",                              he: 'זו התוכנית.' },
-      line: { en: 'You can change any of this later, from settings.',
-              he: 'אפשר לשנות כל דבר בהגדרות בהמשך.' },
+      head: { en: "That's the plan.",     he: 'זו התוכנית' },
+      line: { en: "We'll get you there.", he: 'ואנחנו נדאג שתגיע לשם.' },
     },
+  },
+  // Step 15 has no copy block — it's the reader taking over the visual
+  // layer. _onbEnterFirstDialogue calls openReader(1, 1); finishDay's
+  // onboarding guard runs _onbFinishFirstDialogue on completion, which
+  // shows the thinker card wired to advance to step 16.
+
+  // Step 16 — day-1 streak celebration. Matches the endowment overlay
+  // beat but as a v2 screen (no modal); flame + eyebrow + head + CTA.
+  streak: {
+    eyebrow: { en: 'DAY 1 · STREAK',        he: 'יום 1 · רצף' },
+    head:    { en: 'You showed up.',        he: 'הרצף שלך התחיל.' },
+    sub:     { en: 'Every day from here adds one. Skip a day and it resets.',
+               he: 'כל יום מכאן מוסיף עוד. יום דילוג ומאפס.' },
+    cta:     { en: 'Continue',              he: 'המשך' },
+  },
+
+  // Step 17 — review request. No native prompt plugin wired in yet;
+  // the Rate button opens the platform's store URL in a new tab.
+  // Skip and Rate both advance to step 18, so the ask is soft.
+  review: {
+    head:     { en: 'Before we start.',     he: 'לפני שמתחילים' },
+    sub:      { en: 'If this feels worth your time, a rating helps others find it too.',
+                he: 'אם זה שווה את הזמן שלך, דירוג עוזר לעוד אנשים למצוא אותנו.' },
+    cta:      { en: 'Rate Corpus',          he: 'דרג את Corpus' },
+    skip:     { en: 'Not right now',        he: 'לא עכשיו' },
+  },
+
+  // Step 18 — journey summary. Rhythm-focused: what the cadence looks
+  // like when it's working. Three lines, one per timescale.
+  journey: {
+    head:   { en: 'The path ahead.',        he: 'הדרך שלפניך.' },
+    beats: [
+      { en: '🧠 One idea a day.',           he: '🧠 רעיון אחד ביום.' },
+      { en: '🎓 One thinker a week.',       he: '🎓 הוגה אחד בשבוע.' },
+      { en: '🏛️ One subject a season.',     he: '🏛️ תחום אחד בעונה.' },
+    ],
+    footer: { en: "That's how it adds up.", he: 'ככה זה מצטבר.' },
+    cta:    { en: 'Continue',               he: 'המשך' },
+  },
+
+  // Step 19 — commitment level. Terminal onboarding screen. The user
+  // states their commitment level (single-choice); the picked id is
+  // captured to state.onbAnswers.commitment for later analysis but
+  // does not gate anything downstream — all three land the user on
+  // home. CTA advances via _onbComplete. Head interpolates the
+  // captured name; if no name was captured (guest who skipped step 4),
+  // _onbV2PrepareCommit falls back to head_nameless.
+  commit: {
+    head: { en: '{name}, are you in?',      he: '{name}, אתה בפנים?' },
+    head_nameless: { en: 'Are you in?',     he: 'אתה בפנים?' },
+    sub:  { en: 'Five minutes. Every day. Even the hard ones.',
+            he: 'חמש דקות. כל יום. גם בקשים.' },
+    cta:  { en: 'Continue',                 he: 'המשך' },
+    options: [
+      { id: 'all-in',
+        text: { en: "I'm all in.",              he: 'אני בפנים לגמרי.' } },
+      { id: 'real-try',
+        text: { en: "I'll give it a real try.", he: 'אני אתן לזה צאנס אמיתי.' } },
+      { id: 'looking',
+        text: { en: 'Just looking around.',      he: 'רק מסתכל.' } },
+    ],
   },
 };
 
@@ -11328,6 +11479,20 @@ function _onbApplyLang(lang) {
   // Mirror head + card content are rendered dynamically in
   // _onbV2PrepareMirror from state.onbAnswers; only the CTA is static.
   setText('onb-v2-mirror-cta',    'mirror',   'cta');
+  setText('onb-v2-streak-eyebrow','streak',   'eyebrow');
+  setText('onb-v2-streak-head',   'streak',   'head');
+  setText('onb-v2-streak-sub',    'streak',   'sub');
+  setText('onb-v2-streak-cta',    'streak',   'cta');
+  setText('onb-v2-review-head',   'review',   'head');
+  setText('onb-v2-review-sub',    'review',   'sub');
+  setText('onb-v2-review-cta',    'review',   'cta');
+  setText('onb-v2-review-skip',   'review',   'skip');
+  setText('onb-v2-journey-head',  'journey',  'head');
+  setText('onb-v2-journey-footer','journey',  'footer');
+  setText('onb-v2-journey-cta',   'journey',  'cta');
+  // Commit head interpolates {name}; done in _onbV2PrepareCommit.
+  setText('onb-v2-commit-sub',    'commit',   'sub');
+  setText('onb-v2-commit-cta',    'commit',   'cta');
   // Text/number input placeholders (slider has none).
   const setPlaceholder = (id, group) => {
     const el = document.getElementById(id);
@@ -11363,6 +11528,10 @@ function _onbSetLang(lang) {
 // a user on a missing screen.
 function _onbShowStep(n) {
   if (n < 1 || n > _ONB_TOTAL_STEPS) { _onbComplete(); return; }
+  // Step 15 — reader takes over the viewport (no v2 DOM node). The
+  // onboarding resumes after the user finishes the dialogue via
+  // finishDay's _onbInFirstDialogue guard → _onbFinishFirstDialogue.
+  if (n === 15) { _onbEnterFirstDialogue(); return; }
   const id = _ONB_STEP_TO_ID[n];
   if (!id) {
     // Not-yet-built step — early completion for commit-A cadence.
@@ -11545,14 +11714,147 @@ function _onbV2CtaQ3() {
 // honest-check question before commit.
 function _onbV2CtaMirror() { _onbAdvanceStep(13, 14); }
 
-// Screen 14 (Q4 slider) — terminal step in the current ladder. 0..4
-// Likert (default 2 = "Sometimes"). Advancing runs the null-slot
-// fallback in _onbShowStep and lands the user on the home screen.
+// Screen 14 (Q4 slider) — 0..4 Likert (default 2 = "Sometimes"). CTA
+// "Let's start" advances to step 15, which opens the first dialogue.
 function _onbV2CtaQ4() {
   const el = document.getElementById('onb-v2-q4-input');
   const val = parseInt((el && el.value) || '2', 10);
   const clamped = Math.max(0, Math.min(4, isNaN(val) ? 2 : val));
   _onbAdvanceStep(14, 15, { readingFreq: clamped });
+}
+
+// Screen 15 — first-dialogue entry. Reader takes over the visual
+// layer. state._onbInFirstDialogue is the guard finishDay reads to
+// route the tail to _onbFinishFirstDialogue instead of the normal
+// stats + celebration + guest-prompt chain.
+function _onbEnterFirstDialogue() {
+  state._onbInFirstDialogue = true;
+  document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
+    s.style.display = 'none';
+    s.classList.remove('onb-active');
+  });
+  try { localStorage.setItem('corpus_onboarding_step', '15'); } catch(e) {}
+  try { _phCapture('onboarding_step_shown', { step: 15, phase: 5 }); } catch(e) {}
+  // Chapter 1 / Day 1 is the picked subject's first real lesson.
+  // openReader handles theme, rendering, and section-0 setup.
+  try { openReader(1, 1); } catch(e) {
+    console.warn('[onb-v2] openReader failed for first dialogue', e);
+    state._onbInFirstDialogue = false;
+    _onbShowStep(16);
+  }
+}
+
+// Called from finishDay when state._onbInFirstDialogue is set. Persists
+// the same completion state effects finishDay would run (XP + streak +
+// unlock + first_dialogue_completed_at + posthog capture), minus the
+// celebration-queue push, endowment eligibility trigger, and guest-
+// prompt chain — step 16 is the day-1 streak beat; the endowment
+// overlay would double up on it. Then shows the thinker card with a
+// single "Continue" button that advances to step 16.
+function _onbFinishFirstDialogue() {
+  const chapter = getW().find(w => w.id === state.currentWeek);
+  const day = chapter && chapter.days.find(d => d.id === state.currentDay);
+  if (!chapter || !day) {
+    state._onbInFirstDialogue = false;
+    _onbShowStep(16);
+    return;
+  }
+  const key = dayKey(state.currentWeek, state.currentDay);
+  const thinkerId = day.thinkerId;
+  const isNewThinker = thinkerId && !state.unlockedThinkers.includes(thinkerId);
+
+  state.readerXP += 30;
+  state.readerXP += Math.min(state.dailyStreak * 2, 10);
+  state.xp += state.readerXP;
+  state.completedDays[key] = true;
+  state.todayCompleted = (state.todayCompleted || 0) + 1;
+  const todayIndex = new Date().getDay();
+  if (!state.activeDays) state.activeDays = {};
+  state.activeDays[todayIndex] = true;
+  try { updateDailyStreak(); } catch(e) {}
+  if (isNewThinker) state.unlockedThinkers.push(thinkerId);
+
+  if (!localStorage.getItem('corpus_first_dialogue_completed_at')) {
+    try { localStorage.setItem('corpus_first_dialogue_completed_at', new Date().toISOString()); } catch(e) {}
+    try {
+      _phCapture('first_dialogue_completed', {
+        dialogue_id: String(state.currentWeek) + '-' + String(state.currentDay),
+        subject: state.subject || null,
+        seconds_since_onboarding_started: _secondsSinceOnboardingStart(),
+      });
+    } catch(e) {}
+  }
+  try { saveState(); } catch(e) { try { saveStateLocal(); } catch(e2) {} }
+
+  const thinker = (typeof getT === 'function') ? getT().find(t => t.id === thinkerId) : null;
+  if (thinker && isNewThinker) {
+    // showThinkerCardScreen sets up the flip card + Next/Back buttons.
+    // We call it, then overwrite the buttons: hide "Next Dialogue",
+    // relabel "Back to Home" as "Continue" wired to advance to step 16.
+    try { showThinkerCardScreen(thinker, chapter, day); } catch(e) {}
+    const nextBtn = document.getElementById('modal-next-btn');
+    const backBtn = document.getElementById('modal-continue-btn');
+    if (nextBtn) nextBtn.style.display = 'none';
+    if (backBtn) {
+      const isEn = state.lang === 'en';
+      backBtn.textContent = isEn ? 'Continue' : 'המשך';
+      backBtn.onclick = () => {
+        state._onbInFirstDialogue = false;
+        try { document.getElementById('modal-complete').classList.remove('active'); } catch(e) {}
+        _onbShowStep(16);
+      };
+    }
+  } else {
+    state._onbInFirstDialogue = false;
+    _onbShowStep(16);
+  }
+}
+
+// Screen 16 (day-1 streak) — display-only celebration; advance to 17.
+function _onbV2CtaStreak() { _onbAdvanceStep(16, 17); }
+
+// Screen 17 (review request) — Rate opens the platform store URL in a
+// new tab, then advances. Skip advances without opening. Both land on
+// step 18 so the ask is soft.
+function _onbV2CtaReviewRate() {
+  const platform = (window.Capacitor && Capacitor.getPlatform && Capacitor.getPlatform()) || 'web';
+  const url = platform === 'android' ? _NPS_STORE_URL_ANDROID : _NPS_STORE_URL_IOS;
+  try { window.open(url, '_blank'); } catch(e) {}
+  try { _phCapture('onboarding_review_tapped', { platform: platform }); } catch(e) {}
+  _onbAdvanceStep(17, 18);
+}
+function _onbV2CtaReviewSkip() {
+  try { _phCapture('onboarding_review_skipped', {}); } catch(e) {}
+  _onbAdvanceStep(17, 18);
+}
+
+// Screen 18 (journey summary) — display-only; advance to 19.
+function _onbV2CtaJourney() { _onbAdvanceStep(18, 19); }
+
+// Screen 19 (commitment) — single-choice pick. Terminal step. Tap
+// stores the id in state.onbAnswers.commitment (display-only — no
+// downstream gate); CTA runs _onbComplete which sets
+// corpus_onboarding_done, clears the step cursor, and lands on home.
+let _onbV2CommitPick = null;
+function _onbV2CommitTap(optionId) {
+  _onbV2CommitPick = optionId;
+  state.onbAnswers.commitment = optionId;
+  document.querySelectorAll('#onb-v2-commit .onb-v2-card').forEach(c => {
+    c.classList.toggle('is-selected', c.dataset.option === optionId);
+  });
+  const cta = document.getElementById('onb-v2-commit-cta');
+  if (cta) cta.disabled = false;
+}
+function _onbV2CtaCommit() {
+  const pick = _onbV2CommitPick || state.onbAnswers.commitment;
+  if (!pick) return;
+  try {
+    _phCapture('onboarding_committed', {
+      commitment: pick,
+      name: !!state.onbAnswers.name,
+    });
+  } catch(e) {}
+  _onbComplete();
 }
 
 // Screen prepare hooks — invoked from _onbShowStep once the target
@@ -11861,6 +12163,59 @@ function _onbV2PrepareMirror() {
   list.appendChild(closing);
 }
 
+// Screen 18 — journey summary. Renders the three rhythm beats from
+// _ONB_COPY.journey.beats. Refreshed on every show so language switches
+// pick up the correct copy.
+function _onbV2PrepareJourney() {
+  const list = document.getElementById('onb-v2-journey-beats');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+  const beats = (_ONB_COPY.journey && _ONB_COPY.journey.beats) || [];
+  list.innerHTML = '';
+  beats.forEach(b => {
+    const li = document.createElement('li');
+    li.className = 'onb-v2-journey-beat';
+    li.textContent = isEn ? b.en : b.he;
+    list.appendChild(li);
+  });
+}
+
+// Screen 19 — commit. Interpolates the captured name into the head,
+// then renders the three commitment-level cards (single-choice).
+function _onbV2PrepareCommit() {
+  const head = document.getElementById('onb-v2-commit-head');
+  const list = document.getElementById('onb-v2-commit-cards');
+  const cta  = document.getElementById('onb-v2-commit-cta');
+  const isEn = state.lang === 'en';
+  const name = (state.onbAnswers && state.onbAnswers.name) || '';
+  if (head) {
+    if (name) {
+      const tmpl = isEn ? _ONB_COPY.commit.head.en : _ONB_COPY.commit.head.he;
+      head.textContent = tmpl.replace('{name}', name);
+    } else {
+      head.textContent = isEn
+        ? _ONB_COPY.commit.head_nameless.en
+        : _ONB_COPY.commit.head_nameless.he;
+    }
+  }
+  if (!list) return;
+  const pick = (state.onbAnswers && state.onbAnswers.commitment) || '';
+  _onbV2CommitPick = pick || null;
+  const options = (_ONB_COPY.commit && _ONB_COPY.commit.options) || [];
+  list.innerHTML = '';
+  options.forEach(opt => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'onb-v2-card';
+    card.dataset.option = opt.id;
+    if (opt.id === pick) card.classList.add('is-selected');
+    card.textContent = isEn ? opt.text.en : opt.text.he;
+    card.onclick = () => _onbV2CommitTap(opt.id);
+    list.appendChild(card);
+  });
+  if (cta) cta.disabled = !pick;
+}
+
 // Map from step number → prepare hook. Consumed by _onbShowStep.
 // Only steps with dynamic content need entries; static-copy screens
 // (1, 2, 3, 8) rely on _onbApplyLang alone.
@@ -11875,6 +12230,10 @@ const _ONB_STEP_HOOKS = {
   12: _onbV2PrepareQ3,
   13: _onbV2PrepareMirror,
   14: _onbV2PrepareQ4,
+  // 15: handled specially in _onbShowStep (reader takeover, no v2 DOM).
+  // 16 (streak) + 17 (review) are static once _onbApplyLang runs.
+  18: _onbV2PrepareJourney,
+  19: _onbV2PrepareCommit,
 };
 
 // Silent guest entry: mirrors enterAsGuest but skips hideAuthScreen (the
@@ -17444,6 +17803,17 @@ function showThinkerCardScreen(thinker, chapter, day) {
 
 
 function finishDay() {
+  // Onboarding v2 first-dialogue tail. Guard is set on step 15 entry
+  // (_onbEnterFirstDialogue) and cleared on the thinker card's Continue
+  // button. Bypasses the normal stats + celebration + prompt chain so
+  // onboarding steps 16-19 own those beats (16 = day-1 streak, 17 =
+  // review, 18 = journey, 19 = commit). See _onbFinishFirstDialogue
+  // for the minimal completion path it takes instead.
+  if (state._onbInFirstDialogue) {
+    _onbFinishFirstDialogue();
+    return;
+  }
+
   const chapter = getW().find(w => w.id === state.currentWeek);
   const day = chapter.days.find(d => d.id === state.currentDay);
   const key = dayKey(state.currentWeek, state.currentDay);
@@ -23486,6 +23856,86 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <div class="onb-cta-holder">
     <button type="button" class="nav-btn onb-cta" id="onb-v2-mirror-cta" onclick="_onbV2CtaMirror()"></button>
+  </div>
+</div>
+
+<!-- Step 16 — day-1 streak celebration. Flame icon (reuses #icon-streak
+     from the endowment overlay), amber eyebrow, head, sub, CTA.
+     Fires after the user finishes the first dialogue via
+     _onbFinishFirstDialogue → _onbShowStep(16). -->
+<div id="onb-v2-streak" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="5">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy onb-v2-streak-copy">
+      <div class="onb-v2-streak-flame" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="88" height="88"><use href="#icon-streak"/></svg>
+      </div>
+      <div class="onb-v2-streak-eyebrow" id="onb-v2-streak-eyebrow"></div>
+      <h1 class="onb-v2-head" id="onb-v2-streak-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-streak-sub"></p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-streak-cta" onclick="_onbV2CtaStreak()"></button>
+  </div>
+</div>
+
+<!-- Step 17 — review request. Rate button opens the platform's store
+     URL; Skip advances without opening. Both land on step 18. -->
+<div id="onb-v2-review" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="5">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-review-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-review-sub"></p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-review-cta" onclick="_onbV2CtaReviewRate()"></button>
+    <button type="button" class="onb-v2-skip" id="onb-v2-review-skip" onclick="_onbV2CtaReviewSkip()"></button>
+  </div>
+</div>
+
+<!-- Step 18 — journey summary. Three-beat rhythm list rendered from
+     _ONB_COPY.journey.beats in _onbV2PrepareJourney. -->
+<div id="onb-v2-journey" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="6">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-journey-head"></h1>
+      <ul class="onb-v2-journey-beats" id="onb-v2-journey-beats"></ul>
+      <p class="onb-v2-journey-footer" id="onb-v2-journey-footer"></p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-journey-cta" onclick="_onbV2CtaJourney()"></button>
+  </div>
+</div>
+
+<!-- Step 19 — commitment level. Terminal step. Head interpolates the
+     captured name (nameless fallback if the user skipped step 4).
+     Three single-choice cards state the user's commitment level; the
+     pick is captured to state.onbAnswers.commitment for later analysis
+     but doesn't gate anything downstream. CTA runs _onbComplete → home. -->
+<div id="onb-v2-commit" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="6">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-commit-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-commit-sub"></p>
+      <div class="onb-v2-cards" id="onb-v2-commit-cards"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-commit-cta" onclick="_onbV2CtaCommit()" disabled></button>
   </div>
 </div>
 
