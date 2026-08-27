@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="Corpus">
 <link rel="apple-touch-icon" href="images/icon-192.png">
 <link rel="manifest" href="manifest.json">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/posthog-js@1.396.6/dist/array.full.js"></script>
 <script>
   // capture_pageview:false — the default (true) fires an initial $pageview
@@ -74,7 +74,7 @@
     pointer-events: none;
   }
   .html-splash-wordmark {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-weight: 900;
     /* Font-size scales with the shortest viewport edge to keep the same
        proportion across portrait + landscape. Formula: word width ≈
@@ -622,7 +622,8 @@
   html.dark .onb-progress[data-step="2"] .onb-pill:nth-child(-n+1),
   html.dark .onb-progress[data-step="3"] .onb-pill:nth-child(-n+2),
   html.dark .onb-progress[data-step="4"] .onb-pill:nth-child(-n+3),
-  html.dark .onb-progress[data-step="5"] .onb-pill:nth-child(-n+4) { background: rgba(245, 241, 255, 0.42); }
+  html.dark .onb-progress[data-step="5"] .onb-pill:nth-child(-n+4),
+  html.dark .onb-progress[data-step="6"] .onb-pill:nth-child(-n+5) { background: rgba(245, 241, 255, 0.42); }
 
   /* Walkthrough progress dot ACTIVE state. Source at 5962 uses
      var(--surface) which flips dark → dark dot on dark backdrop is
@@ -654,7 +655,7 @@
   }
 
   body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     background: linear-gradient(160deg, var(--bg) 0%, var(--surface-2) 100%);
     background-attachment: fixed;
     transition: background-color 350ms ease, color 350ms ease;
@@ -783,7 +784,7 @@
     height: 28px;
   }
   .topbar-logo {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 22px;
     font-weight: 900;
     color: var(--accent-text);
@@ -793,7 +794,7 @@
     background: none;
     border: none;
     color: var(--accent-text);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
@@ -802,7 +803,7 @@
     justify-self: end;
   }
   .topbar-tagline {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 11px;
     font-weight: 700;
     color: var(--text-2);
@@ -821,7 +822,7 @@
   }
   .topbar-back:hover { background: var(--border); }
   .topbar-title {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 17px;
     font-weight: 800;
     flex: 1;
@@ -896,7 +897,7 @@
     font-size: 16px;
     font-weight: 600;
     color: var(--ink, #3D1F7A);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     /* offset the title by the back-btn width so it's visually centered */
     padding-right: 36px;
   }
@@ -989,12 +990,12 @@
     font-weight: 700;
     color: var(--ink, #3D1F7A);
     margin-bottom: 8px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
   }
   .journey-xp {
     font-size: 14px;
     color: var(--ink-muted, #6B5B95);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     letter-spacing: 0.5px;
   }
   .journey-current-marker {
@@ -1008,7 +1009,7 @@
     border-radius: 12px;
     letter-spacing: 0.5px;
     margin-bottom: 12px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
   }
   .journey-toast {
     position: fixed;
@@ -1020,7 +1021,7 @@
     padding: 12px 20px;
     border-radius: 20px;
     font-size: 14px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     z-index: 600;
     opacity: 0;
     transition: opacity 0.3s;
@@ -1046,7 +1047,7 @@
   }
   .stat-pill .stat-icon { font-size: 20px; margin-bottom: 4px; }
   .stat-pill .stat-value {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 20px;
     font-weight: 900;
     color: var(--text);
@@ -1101,7 +1102,7 @@
     margin-bottom: 14px;
   }
   .section-title {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 19px;
     font-weight: 900;
     color: var(--text);
@@ -2073,7 +2074,7 @@
     border-radius: 50%;
     background: rgba(var(--accent-rgb), 0.1);
     color: var(--accent-text);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: 15px;
     display: flex;
@@ -2085,7 +2086,7 @@
   .week-item.locked .week-num { background: var(--border); color: var(--text-muted); border-color: transparent; }
   .week-info { flex: 1; }
   .week-title {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 16px;
     font-weight: 800;
     margin-bottom: 3px;
@@ -2232,7 +2233,7 @@
     margin-bottom: 10px;
   }
   .streak-repair-title {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(20px * var(--text-scale));
     font-weight: 900;
     color: var(--ink);
@@ -2403,7 +2404,7 @@
     text-align: start;
   }
   .start-first-dialogue-title {
-    font-family: 'Nunito', 'DM Sans', sans-serif;
+    font-family: 'Nunito', 'DM Sans', 'Assistant', sans-serif;
     font-size: calc(22px * var(--text-scale));
     line-height: 1.25;
     font-weight: 900;
@@ -2503,7 +2504,7 @@
   .psychology-announce-dismiss:hover { background: var(--surface-2); color: var(--psy-ink); }
   .psychology-announce-dismiss:active { transform: scale(0.92); }
   .psychology-announce-title {
-    font-family: 'Nunito', 'DM Sans', sans-serif;
+    font-family: 'Nunito', 'DM Sans', 'Assistant', sans-serif;
     font-size: calc(22px * var(--text-scale));
     line-height: 1.25;
     font-weight: 900;
@@ -2570,7 +2571,7 @@
     padding: 32px 24px 24px;
   }
   .streak-repair-result-title {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(24px * var(--text-scale));
     font-weight: 900;
     color: var(--ink);
@@ -2588,7 +2589,7 @@
     margin-inline: auto;
   }
   .hero-continue-title {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 19px;
     font-weight: 900;
     color: var(--text);
@@ -2615,7 +2616,7 @@
     background: linear-gradient(90deg, var(--accent), var(--purple-light), var(--accent), var(--purple-light));
     background-size: 200% auto;
     color: var(--on-accent);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: 16px;
     border: none;
@@ -2633,7 +2634,7 @@
 
   /* ── Home: section title ── */
   .home-section-title {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 13px;
     font-weight: 800;
     color: var(--text-2);
@@ -2755,7 +2756,7 @@
     background: rgba(255,255,255,0.9);
     border: 1px solid rgba(var(--accent-rgb), 0.2);
     border-radius: 100px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 13px;
     font-weight: 700;
     color: var(--accent-text);
@@ -2772,7 +2773,7 @@
     -webkit-overflow-scrolling: touch;
   }
   .library-modal-title {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 18px;
     font-weight: 900;
     color: var(--text);
@@ -2821,7 +2822,7 @@
   }
   .day-info { flex: 1; }
   .day-title {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-weight: 800;
     font-size: 15px;
     margin-bottom: 2px;
@@ -3003,7 +3004,7 @@
     background: var(--surface);
     border: 1.5px solid var(--accent-soft-border);
     color: var(--accent-text);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 16px;
     font-weight: 800;
     line-height: 1;
@@ -3430,7 +3431,7 @@
   /* DEPRECATED (editorial rollout): centered --accent heading. Shadowed by
      .reader-editorial rules (34px, left-aligned, --ink, tighter tracking). */
   .section-heading {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: var(--fs-heading);
     font-weight: 900;
     line-height: var(--lh-tight);
@@ -3469,7 +3470,7 @@
     margin: 8px 0 14px;
   }
   .source-quote p {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: var(--fs-body);
     font-weight: 700;
     line-height: 1.8;
@@ -3507,7 +3508,7 @@
     letter-spacing: 0.06em;
     color: var(--accent-text);
     text-transform: uppercase;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
   }
   /* DEPRECATED (editorial rollout): italic border-inline-start scene-setter.
      Shadowed by .reader-editorial (19px --text-2, no border, more margin). */
@@ -3523,7 +3524,7 @@
   /* DEPRECATED (editorial rollout): 18px 1.1rem question stem. Shadowed by
      .reader-editorial (24px, tighter lh, more margin). */
   .quiz-question {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: var(--fs-strong);
     line-height: var(--lh-body);
     margin-bottom: 20px;
@@ -3543,7 +3544,7 @@
     font-size: var(--fs-body);
     text-align: start;
     transition: background 0.2s ease, border-color 0.2s ease;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     font-weight: 500;
     color: var(--ink);
     width: 100%;
@@ -3573,7 +3574,7 @@
     font-size: var(--fs-caption);
     font-weight: 800;
     flex-shrink: 0;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     transition: background 0.2s ease, color 0.2s ease;
   }
   .opt-text { flex: 1; line-height: 1.5; }
@@ -3627,7 +3628,7 @@
     font-weight: 800;
     flex-shrink: 0;
     color: var(--accent-dark);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
   }
   .quiz-feedback {
     margin-top: 16px;
@@ -3672,7 +3673,7 @@
   .qfm-icon { font-size: 52px; margin-bottom: 6px; }
   .qfm-xp {
     font-size: 22px; font-weight: 800;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     margin-bottom: 18px;
   }
   .qfm-xp.correct { color: var(--success); }
@@ -3698,7 +3699,7 @@
   .share-modal-text {
     font-size: 16px; line-height: 1.75;
     color: var(--text);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-weight: 600;
     margin-bottom: 8px;
   }
@@ -3730,7 +3731,7 @@
     font-size: 13px;
     color: var(--accent-text);
     margin-top: 8px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-weight: 700;
   }
 
@@ -3738,7 +3739,7 @@
   .quiz-summary { text-align: center; padding: 20px 0 8px; position: relative; }
 
   .quiz-summary-headline {
-    font-family: 'Nunito', sans-serif; font-size: 26px; font-weight: 900;
+    font-family: 'Nunito', 'Assistant', sans-serif; font-size: 26px; font-weight: 900;
     color: var(--ink); margin-bottom: 10px;
     opacity: 0; transform: translateY(-8px);
     animation: qs-headline-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.72s both;
@@ -3773,7 +3774,7 @@
   .quiz-summary--review .qs-star { opacity: 1; transform: scale(1); animation: none; }
 
   .quiz-summary-score {
-    font-size: 52px; font-weight: 900; font-family: 'Nunito', sans-serif;
+    font-size: 52px; font-weight: 900; font-family: 'Nunito', 'Assistant', sans-serif;
     color: var(--accent-text); margin-bottom: 4px;
   }
   .quiz-summary--perfect .quiz-summary-score {
@@ -3843,7 +3844,7 @@
   /* ── XP Float animation ── */
   .xp-float {
     position: fixed;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 20px;
     font-weight: 900;
     color: var(--gold);
@@ -3893,7 +3894,7 @@
     letter-spacing: 0.8px;
     cursor: pointer;
     width: 100%;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     transition: all 0.15s;
     margin-top: 8px;
     min-height: 56px;
@@ -4046,7 +4047,7 @@
      chapter list expands inline to the same day list. */
   .modal-emoji { font-size: 56px; margin-bottom: 12px; }
   .modal-title {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 26px;
     font-weight: 900;
     margin-bottom: 8px;
@@ -4065,7 +4066,7 @@
   }
   .modal-xp-item { text-align: center; }
   .modal-xp-value {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 26px;
     font-weight: 900;
     color: var(--gold);
@@ -4089,7 +4090,7 @@
     100% { transform: scale(1) rotate(0deg); opacity: 1; }
   }
   .thinker-unlock-label {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 12px;
     font-weight: 800;
     color: var(--accent-text);
@@ -4110,7 +4111,7 @@
     margin: 8px 0;
   }
   .thinker-unlock-name {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 17px;
     font-weight: 800;
     color: var(--text);
@@ -4424,7 +4425,7 @@
        to read clearly on any light surface, still soft enough not to
        feel modal-heavy. */
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.20), 0 2px 6px rgba(0, 0, 0, 0.08);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     font-size: 14px;
     font-weight: 600;
     transition: opacity 0.25s ease, transform 0.25s ease;
@@ -4502,7 +4503,7 @@
     color: var(--on-accent);
     padding: 12px 24px;
     border-radius: 99px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-weight: 800;
     font-size: 15px;
     z-index: 200;
@@ -4550,7 +4551,7 @@
     padding: 8px 0;
   }
   .thinker-intro-eyebrow {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 13px;
     font-weight: 800;
     color: var(--accent-text);
@@ -4642,7 +4643,7 @@
     display: block;
   }
   .thinker-intro-name {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 30px;
     font-weight: 900;
     color: var(--ink);
@@ -4675,7 +4676,7 @@
     border: none;
     border-radius: 999px;
     padding: 15px 40px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-weight: 800;
     font-size: 16px;
     cursor: pointer;
@@ -4898,7 +4899,7 @@
      still pass AA on their own; the same shadow just gives them a
      subtle edge lift for consistency. */
   .auth-logo-text {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 38px;
     font-weight: 900;
     color: #FFFFFF;
@@ -4906,7 +4907,7 @@
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   }
   .auth-tagline {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 15px;
     color: #FFFFFF;
     margin-top: 4px;
@@ -4937,7 +4938,7 @@
     background: none;
     border-radius: 9px;
     padding: 9px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 14px;
     font-weight: 700;
     color: var(--text-muted);
@@ -4955,7 +4956,7 @@
     border: 1.5px solid var(--border);
     border-radius: 12px;
     padding: 12px 16px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 16px;
     color: var(--text);
     outline: none;
@@ -4969,7 +4970,7 @@
     border: none;
     border-radius: 12px;
     padding: 13px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
@@ -5024,13 +5025,13 @@
     color: var(--red);
     min-height: 18px;
     text-align: center;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
   }
   .auth-guest-link {
     background: none;
     border: none;
     color: rgba(255,255,255,0.85);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -5057,7 +5058,7 @@
     background: rgba(0, 0, 0, 0.55);
     color: #FFFFFF;
     border-radius: 999px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     font-size: 13px;
     font-weight: 500;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
@@ -5090,7 +5091,7 @@
     border-radius: 8px;
     font-size: 12px;
     font-weight: 700;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     color: var(--text-2);
     cursor: pointer;
     padding: 5px 10px;
@@ -5158,7 +5159,7 @@
     border: none;
     border-radius: 7px;
     padding: 8px 10px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 13px;
     font-weight: 700;
     color: var(--text-muted);
@@ -5250,6 +5251,17 @@
     --onb-accent-shadow: rgba(123, 79, 212, 0.30);
     --onb-accent-shadow-soft: rgba(123, 79, 212, 0.18);
   }
+  /* Onboarding v2 subject-themed screens (9-14). Maps --onb-accent
+     onto the app's current --accent so the CTA button, its shadow,
+     and any --onb-* edge tint follow the picked subject (purple →
+     blue for economics, orange for psychology). Screens 1-8 keep
+     .onb-bg-philosophy so they stay purple until the user picks. */
+  .onb-bg-themed {
+    --onb-edge:               rgba(var(--accent-rgb), 0.14);
+    --onb-accent:             var(--accent);
+    --onb-accent-shadow:      rgba(var(--accent-rgb), 0.32);
+    --onb-accent-shadow-soft: rgba(var(--accent-rgb), 0.20);
+  }
 
   /* Onboarding CTA — filled in the screen's accent (not a white pill).
      Overrides base .nav-btn so the primary action carries the screen's
@@ -5309,14 +5321,16 @@
   .onb-progress[data-step="2"] .onb-pill:nth-child(-n+1),
   .onb-progress[data-step="3"] .onb-pill:nth-child(-n+2),
   .onb-progress[data-step="4"] .onb-pill:nth-child(-n+3),
-  .onb-progress[data-step="5"] .onb-pill:nth-child(-n+4) {
+  .onb-progress[data-step="5"] .onb-pill:nth-child(-n+4),
+  .onb-progress[data-step="6"] .onb-pill:nth-child(-n+5) {
     background: rgba(42, 18, 102, 0.42);
   }
   .onb-progress[data-step="1"] .onb-pill:nth-child(1),
   .onb-progress[data-step="2"] .onb-pill:nth-child(2),
   .onb-progress[data-step="3"] .onb-pill:nth-child(3),
   .onb-progress[data-step="4"] .onb-pill:nth-child(4),
-  .onb-progress[data-step="5"] .onb-pill:nth-child(5) {
+  .onb-progress[data-step="5"] .onb-pill:nth-child(5),
+  .onb-progress[data-step="6"] .onb-pill:nth-child(6) {
     background: var(--onb-accent, #7B4FD4);
     width: 32px;
   }
@@ -5425,7 +5439,7 @@
     z-index: 1;
   }
   .onb-hero-card-name {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(17px * var(--text-scale));
     font-weight: 900;
     color: var(--ink);
@@ -5449,7 +5463,7 @@
     max-width: 460px;
   }
   .onb-welcome-head {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(28px * var(--text-scale));
     font-weight: 900;
     line-height: 1.2;
@@ -5526,7 +5540,7 @@
     z-index: 1;
   }
   .onb-beat-fan-name {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(12px * var(--text-scale));
     font-weight: 900;
     color: var(--ink);
@@ -5572,7 +5586,7 @@
     max-width: 460px;
   }
   .onb-beat-head {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(28px * var(--text-scale));
     font-weight: 900;
     line-height: 1.2;
@@ -5630,7 +5644,7 @@
     max-width: 460px;
   }
   .onb-streak-head {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(26px * var(--text-scale));
     font-weight: 900;
     line-height: 1.2;
@@ -5692,7 +5706,7 @@
     justify-content: center;
     /* Was 0.42 → 2.56:1 (fails AA). Bumped to 0.62 → 4.65:1. */
     color: rgba(42, 18, 102, 0.62);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(28px * var(--text-scale));
     font-weight: 900;
   }
@@ -5723,7 +5737,7 @@
     margin-bottom: 28px;
   }
   .onb-goal-head {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(28px * var(--text-scale));
     font-weight: 900;
     line-height: 1.2;
@@ -5742,6 +5756,563 @@
     flex-direction: column;
     gap: 12px;
   }
+
+  /* ── Onboarding v2 scaffolding ──
+     Minimal layout for the intro screens (welcome / problem / solution)
+     shipped in commit A. Later commits add slider, multi-select-card,
+     text-input, and mirror-pill primitives on top of the same
+     .onb-screen.onb-v2 base. Reuses .onb-cta-holder, .nav-btn, and
+     .onb-progress from v1.
+     Direction A visual layer: soft radial gradient behind the content,
+     accent-colored key phrase in each headline (via .onb-v2-em), and
+     slightly wider vertical rhythm than the v1 heads. */
+  .onb-screen.onb-v2 {
+    background:
+      radial-gradient(circle at 50% 32%, var(--surface) 0%, rgba(var(--accent-rgb), 0.08) 100%),
+      var(--surface);
+  }
+  .onb-screen.onb-v2 .onb-v2-inner {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 24px 8px;
+    max-width: 440px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .onb-screen.onb-v2 .onb-v2-copy {
+    text-align: center;
+  }
+  .onb-screen.onb-v2 .onb-v2-head {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 900;
+    font-size: calc(34px * var(--text-scale));
+    line-height: 1.15;
+    color: var(--ink);
+    margin: 0 0 18px;
+    letter-spacing: -0.01em;
+  }
+  .onb-screen.onb-v2 .onb-v2-em {
+    /* Key-phrase accent. Same weight as the head so it reads as
+       continuous type with a color shift, not a highlight label. */
+    color: var(--accent);
+  }
+  .onb-screen.onb-v2 .onb-v2-sub {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(22px * var(--text-scale));
+    line-height: 1.35;
+    color: var(--ink);
+    margin: 0;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-head,
+  html.dark .onb-screen.onb-v2 .onb-v2-sub,
+  html.dark .onb-screen.onb-v2 .onb-v2-greeting,
+  html.dark .onb-screen.onb-v2 .onb-v2-shock-math,
+  html.dark .onb-screen.onb-v2 .onb-v2-slider-value-unit,
+  html.dark .onb-screen.onb-v2 .onb-v2-slider-scale { color: var(--text); }
+
+  /* ── Onboarding v2 primitives ──
+     Text input / number input / slider — built once, reused across
+     later commits (Q1-Q4 sliders, potential future free-text fields).
+     Styled to match the .onb-v2 tone: accent-tinted borders, wide
+     targets, Nunito for value displays. */
+  .onb-screen.onb-v2 .onb-v2-field {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+  }
+  .onb-screen.onb-v2 .onb-v2-input {
+    width: 100%;
+    max-width: 320px;
+    box-sizing: border-box;
+    padding: 14px 18px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1.5px solid rgba(var(--accent-rgb), 0.22);
+    border-radius: 14px;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-size: calc(18px * var(--text-scale));
+    text-align: center;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .onb-screen.onb-v2 .onb-v2-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
+  }
+  .onb-screen.onb-v2 .onb-v2-input::placeholder {
+    color: var(--text-muted);
+  }
+  /* Kill the native spinner on number inputs — visually noisy and
+     redundant on mobile where inputmode=numeric drives the keyboard. */
+  .onb-screen.onb-v2 .onb-v2-input-num::-webkit-outer-spin-button,
+  .onb-screen.onb-v2 .onb-v2-input-num::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-input-num { -moz-appearance: textfield; }
+  html.dark .onb-screen.onb-v2 .onb-v2-input {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  .onb-screen.onb-v2 .onb-v2-greeting {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(22px * var(--text-scale));
+    color: var(--ink);
+    margin: 0 0 12px;
+    line-height: 1.35;
+  }
+
+  /* Slider — first slider in the app. Track + custom thumb, both webkit
+     and moz-range coverage. Value display sits above the track and uses
+     the wordmark type treatment (Nunito 900, accent color) so the
+     current pick reads as a real headline number. */
+  .onb-screen.onb-v2 .onb-v2-slider-wrap {
+    width: 100%;
+    max-width: 320px;
+    margin: 24px auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .onb-screen.onb-v2 .onb-v2-slider-value {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 900;
+    font-size: calc(56px * var(--text-scale));
+    line-height: 1;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .onb-screen.onb-v2 .onb-v2-slider-value-unit {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(22px * var(--text-scale));
+    color: var(--ink);
+    letter-spacing: 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: rgba(var(--accent-rgb), 0.15);
+    border-radius: 999px;
+    outline: none;
+    cursor: pointer;
+    margin: 4px 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 3px solid var(--surface);
+    box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.35);
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+  .onb-screen.onb-v2 .onb-v2-slider::-webkit-slider-thumb:active {
+    transform: scale(1.08);
+  }
+  .onb-screen.onb-v2 .onb-v2-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 3px solid var(--surface);
+    box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.35);
+    cursor: pointer;
+  }
+  .onb-screen.onb-v2 .onb-v2-slider-scale {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(16px * var(--text-scale));
+    color: var(--ink);
+    padding: 0 4px;
+  }
+
+  /* Shock screen — math line above head is smaller and muted so the
+     punchline (existing .onb-v2-head + .onb-v2-em) does the visual work. */
+  .onb-screen.onb-v2 .onb-v2-copy.onb-v2-shock {
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  .onb-screen.onb-v2 .onb-v2-shock-math {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(22px * var(--text-scale));
+    color: var(--ink);
+    margin: 0 0 24px;
+    line-height: 1.4;
+  }
+
+  /* ── Multi-select / single-select card component ──
+     Base card shape shared by subject picker (step 9), Q1 (10),
+     Q2 (11), and Q3 (12). Selected state uses accent border + tinted
+     background. Q3 renders the same cards as Q1/Q2 (radio behavior
+     handled in the JS layer). */
+  .onb-screen.onb-v2 .onb-v2-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 380px;
+    margin: 20px auto 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-card {
+    padding: 14px 18px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1.5px solid rgba(var(--accent-rgb), 0.18);
+    border-radius: 14px;
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(17px * var(--text-scale));
+    text-align: start;
+    line-height: 1.35;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .onb-screen.onb-v2 .onb-v2-card:hover  { border-color: rgba(var(--accent-rgb), 0.32); }
+  .onb-screen.onb-v2 .onb-v2-card:active { transform: scale(0.98); }
+  .onb-screen.onb-v2 .onb-v2-card.is-selected {
+    background: rgba(var(--accent-rgb), 0.10);
+    border-color: var(--accent);
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-card {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-card.is-selected {
+    background: rgba(var(--accent-rgb), 0.18);
+    border-color: var(--accent);
+  }
+
+  /* Subject-card variant: adds portrait + tag under the name. Layout
+     is a horizontal flex; the base padding/border rules from .onb-v2-card
+     still apply. */
+  /* Prioritization hint below the head on Q1 / Q2 — signals the pick
+     is single-choice so the second tap doesn't feel like a dead
+     interaction. Same "restrained caption" treatment as other v2
+     secondary text (Nunito 500, low opacity). */
+  .onb-screen.onb-v2 .onb-v2-hint {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 500;
+    font-size: calc(15px * var(--text-scale));
+    color: var(--ink);
+    opacity: 0.6;
+    margin: -8px 0 4px;
+    text-align: center;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-hint { color: var(--text); }
+
+  /* Mirror screen (step 13) — one card per pick, closing block below.
+     Card visual mirrors the .onb-v2-card question-screen shape so the
+     mirror reads as "here's what you chose, presented back the same
+     way." Cards are display-only (no cursor, no hover, no selected
+     state). */
+  .onb-screen.onb-v2 .onb-v2-mirror-list {
+    padding: 0;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 380px;
+  }
+  .onb-screen.onb-v2 .onb-v2-mirror-card {
+    padding: 14px 18px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1.5px solid rgba(var(--accent-rgb), 0.18);
+    border-radius: 14px;
+    text-align: start;
+  }
+  .onb-screen.onb-v2 .onb-v2-mirror-card-title {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(17px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.35;
+  }
+  .onb-screen.onb-v2 .onb-v2-mirror-card-support {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 500;
+    font-size: calc(14px * var(--text-scale));
+    color: var(--ink);
+    opacity: 0.7;
+    line-height: 1.4;
+    margin-top: 4px;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-mirror-card {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-mirror-card-title,
+  html.dark .onb-screen.onb-v2 .onb-v2-mirror-card-support { color: var(--text); }
+
+  /* Closing block below the cards — no card chrome, tighter type
+     ladder. Distinct-from-cards is the whole point: this is Corpus
+     speaking, not the user's own picks reflected back. */
+  .onb-screen.onb-v2 .onb-v2-mirror-closing {
+    text-align: center;
+    margin: 24px auto 0;
+    padding: 0 8px;
+  }
+  .onb-screen.onb-v2 .onb-v2-mirror-closing-head {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 900;
+    font-size: calc(22px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .onb-screen.onb-v2 .onb-v2-mirror-closing-line {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 500;
+    font-size: calc(15px * var(--text-scale));
+    color: var(--ink);
+    opacity: 0.65;
+    line-height: 1.4;
+    margin-top: 6px;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-mirror-closing-head,
+  html.dark .onb-screen.onb-v2 .onb-v2-mirror-closing-line { color: var(--text); }
+
+  /* Step 16 (day-1 streak) — centered flame + amber eyebrow + head.
+     Flame reuses #icon-streak SVG from the endowment overlay so the
+     visual language matches the future post-onboarding endowment
+     modal (users see the same flame at streak-day-1 both places). */
+  .onb-screen.onb-v2 .onb-v2-streak-copy {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  .onb-screen.onb-v2 .onb-v2-streak-flame {
+    color: var(--amber);
+    filter: drop-shadow(0 6px 18px rgba(245, 158, 11, 0.45));
+    margin-bottom: 4px;
+  }
+  .onb-screen.onb-v2 .onb-v2-streak-eyebrow {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 800;
+    font-size: calc(12px * var(--text-scale));
+    letter-spacing: 1.4px;
+    color: var(--amber);
+    text-transform: uppercase;
+  }
+
+  /* Step 17 — skip button below the primary review CTA. Text-only,
+     no fill or border, low visual weight so the Rate action reads
+     as the intended path. */
+  .onb-screen.onb-v2 .onb-v2-skip {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 14px 8px 0;
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 600;
+    font-size: calc(15px * var(--text-scale));
+    color: var(--ink);
+    opacity: 0.55;
+    cursor: pointer;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-skip { color: var(--text); }
+
+  /* Step 18 — journey. Top card projects the 30-day future; two
+     feature blocks below explain how. Accent-bordered card carries
+     the promise; feature blocks below sit in the neutral surface
+     card style so the visual weight flows top→bottom from projection
+     to mechanism. */
+  .onb-screen.onb-v2 .onb-v2-journey-card {
+    border: 2px solid var(--accent);
+    background: rgba(var(--accent-rgb), 0.05);
+    border-radius: 20px;
+    padding: 20px 18px;
+    max-width: 380px;
+    margin: 12px auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 10px 28px -14px rgba(var(--accent-rgb), 0.35);
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-card-head {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 800;
+    font-size: calc(17px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.3;
+    text-align: center;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-date-pill {
+    padding: 6px 16px;
+    background: var(--accent);
+    color: #FFFFFF;
+    border-radius: 999px;
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 800;
+    font-size: calc(16px * var(--text-scale));
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 12px -4px rgba(var(--accent-rgb), 0.5);
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-tiles {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-tile {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 6px;
+    background: var(--surface);
+    border: 1.5px solid rgba(var(--accent-rgb), 0.20);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-tile-emoji {
+    font-size: calc(24px * var(--text-scale));
+    line-height: 1;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-tile-label {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(12px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-stat {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(14px * var(--text-scale));
+    color: var(--ink);
+    opacity: 0.85;
+    line-height: 1.3;
+    text-align: center;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-card {
+    background: rgba(var(--accent-rgb), 0.10);
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-card-head,
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-stat,
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-tile-label { color: var(--text); }
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-tile {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  /* Section head + feature blocks below the projection card. Section
+     head is start-aligned (RTL-aware); features carry an icon on the
+     start edge with a stacked title + supporting paragraph. */
+  .onb-screen.onb-v2 .onb-v2-journey-section-head {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 800;
+    font-size: calc(17px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.3;
+    margin: 28px auto 12px;
+    max-width: 380px;
+    text-align: start;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-feature {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1.5px solid rgba(var(--accent-rgb), 0.18);
+    border-radius: 14px;
+    text-align: start;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-feature-icon {
+    font-size: calc(24px * var(--text-scale));
+    line-height: 1.1;
+    flex-shrink: 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-feature-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-feature-title {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 800;
+    font-size: calc(15px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.3;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-feature-desc {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 500;
+    font-size: calc(13px * var(--text-scale));
+    color: var(--ink);
+    opacity: 0.7;
+    line-height: 1.4;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-section-head,
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-feature-title,
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-feature-desc { color: var(--text); }
+  html.dark .onb-screen.onb-v2 .onb-v2-journey-feature {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+
+  /* Progress-pill active fill on v2 uses the current subject accent
+     (not the hardcoded philosophy fallback used by legacy v1 progress).
+     Steps 1-8 all render as philosophy pre-subject-pick; from step 9
+     onward the theme flips and pills follow. */
+  .onb-screen.onb-v2 .onb-progress[data-step="1"] .onb-pill:nth-child(1),
+  .onb-screen.onb-v2 .onb-progress[data-step="2"] .onb-pill:nth-child(2),
+  .onb-screen.onb-v2 .onb-progress[data-step="3"] .onb-pill:nth-child(3),
+  .onb-screen.onb-v2 .onb-progress[data-step="4"] .onb-pill:nth-child(4),
+  .onb-screen.onb-v2 .onb-progress[data-step="5"] .onb-pill:nth-child(5),
+  .onb-screen.onb-v2 .onb-progress[data-step="6"] .onb-pill:nth-child(6) {
+    background: var(--accent);
+  }
+
   .onb-goal-card {
     display: flex;
     align-items: center;
@@ -5826,7 +6397,7 @@
     max-width: 460px;
   }
   .onb-beat-head {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(26px * var(--text-scale));
     font-weight: 900;
     line-height: 1.2;
@@ -5855,7 +6426,7 @@
     font-size: calc(17px * var(--text-scale));
     font-weight: 800;
     color: var(--ink);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
   }
   .onb-goal-hint {
     font-size: calc(13px * var(--text-scale));
@@ -5900,7 +6471,7 @@
     margin-bottom: 12px;
   }
   .endowment-head {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(28px * var(--text-scale));
     font-weight: 900;
     color: var(--ink);
@@ -6006,7 +6577,7 @@
     background: var(--accent-tint);
     border: 1px solid var(--accent-soft-border);
     color: var(--ink);
-    font-family: 'Nunito', 'DM Sans', sans-serif;
+    font-family: 'Nunito', 'DM Sans', 'Assistant', sans-serif;
     font-size: calc(13px * var(--text-scale));
     font-weight: 700;
     line-height: 1.2;
@@ -6030,7 +6601,7 @@
   }
   #modal-guest-signup .modal-title {
     color: var(--ink);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(24px * var(--text-scale));
     font-weight: 900;
     line-height: 1.2;
@@ -6147,7 +6718,7 @@
   .nps-dismiss:active { transform: scale(0.9); }
   .nps-question {
     color: var(--ink);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(19px * var(--text-scale));
     font-weight: 800;
     line-height: 1.3;
@@ -6172,7 +6743,7 @@
     color: var(--ink);
     border: 1px solid rgba(var(--accent-rgb), 0.28);
     border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     font-size: 14px;
     font-weight: 600;
     text-align: center;
@@ -6185,14 +6756,14 @@
   .nps-your-score {
     text-align: center;
     color: var(--text-2);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 8px;
   }
   .nps-branch-prompt {
     color: var(--ink);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(17px * var(--text-scale));
     font-weight: 700;
     line-height: 1.35;
@@ -6207,7 +6778,7 @@
     color: var(--ink);
     border: 1px solid rgba(var(--accent-rgb), 0.22);
     border-radius: 12px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     font-size: 15px;
     line-height: 1.4;
     resize: vertical;
@@ -6218,7 +6789,7 @@
   #nps-store-btn { margin-top: 8px; }
   .nps-thanks {
     color: var(--ink);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(18px * var(--text-scale));
     font-weight: 700;
     line-height: 1.35;
@@ -6284,7 +6855,7 @@
   }
   body.on-subject-screen:not(.drawer-open) .subj-title {
     color: var(--ink);
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(26px * var(--text-scale));
     font-weight: 900;
     letter-spacing: -0.015em;
@@ -6432,7 +7003,7 @@
     padding: 16px 20px;
   }
   .subj-cinematic-name {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(20px * var(--text-scale));
     font-weight: 900;
     line-height: 1.15;
@@ -6768,7 +7339,7 @@
     font-weight: 900;
     color: var(--accent-text);
     line-height: 1;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     letter-spacing: -0.03em;
   }
   .metric-label {
@@ -6797,7 +7368,7 @@
     font-size: 80px;
     font-weight: 900;
     line-height: 1;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     letter-spacing: -0.03em;
   }
   .dc-xp-value { color: var(--accent-text); }
@@ -6818,7 +7389,7 @@
     padding: 16px 48px;
     font-size: 17px;
     font-weight: 700;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     cursor: pointer;
     opacity: 0;
     transform: translateY(20px);
@@ -6834,7 +7405,7 @@
     border: none;
     font-size: 15px;
     font-weight: 600;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     cursor: pointer;
     padding: 8px 16px;
     border-radius: 50px;
@@ -6857,7 +7428,7 @@
     color: var(--accent-text);
     border: 1px solid rgba(var(--accent-rgb), 0.25);
     border-radius: 50px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', 'Assistant', sans-serif;
     font-size: 13.5px;
     font-weight: 700;
     cursor: pointer;
@@ -7465,7 +8036,7 @@
     background: var(--surface-2); color: var(--accent-text);
     display: flex; align-items: center; justify-content: center;
     font-weight: 900; font-size: 15px; flex-shrink: 0;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     transition: background 300ms ease, color 300ms ease;
   }
   .level-card.expanded .level-num { background: var(--accent-badge-bg); color: var(--accent-badge-fg); }
@@ -7474,7 +8045,7 @@
   .level-eyebrow {
     font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
     color: var(--accent-text); text-transform: uppercase;
-    font-family: 'Nunito', sans-serif; margin-bottom: 2px;
+    font-family: 'Nunito', 'Assistant', sans-serif; margin-bottom: 2px;
   }
   .level-title { font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.3; }
   .level-card.locked-week .level-eyebrow,
@@ -7589,7 +8160,7 @@
   .practice-card-eyebrow {
     font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
     color: var(--accent-text); text-transform: uppercase;
-    font-family: 'Nunito', sans-serif; margin-bottom: 2px;
+    font-family: 'Nunito', 'Assistant', sans-serif; margin-bottom: 2px;
   }
   .practice-card-title {
     font-size: 14px; font-weight: 700; color: var(--ink);
@@ -7600,7 +8171,7 @@
     background: var(--accent); color: var(--on-accent);
     border: none; border-radius: 999px;
     padding: 10px 18px; font-size: 13px; font-weight: 800;
-    font-family: 'Nunito', sans-serif; cursor: pointer;
+    font-family: 'Nunito', 'Assistant', sans-serif; cursor: pointer;
     flex-shrink: 0;
     box-shadow: 0 2px 0 var(--accent-dark);
     white-space: nowrap;
@@ -7640,7 +8211,7 @@
      #screen-subject.theme-<X> overrides --accent on scroll settle.
      Reading --accent directly picks up the closer scope. See
      previewSubjectTheme() + _initSubjCarousel() for the swap. */
-  .subj-logo { font-family: 'Nunito', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: var(--accent); margin-bottom: 20px; }
+  .subj-logo { font-family: 'Nunito', 'Assistant', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: var(--accent); margin-bottom: 20px; }
   .subj-title { font-size: 24px; font-weight: 700; color: var(--ink); margin-bottom: 8px; letter-spacing: -0.02em; }
   .subj-subtitle { font-size: 14px; font-weight: 400; color: var(--accent); opacity: 0.65; line-height: 1.5; }
   .subj-carousel-wrap { flex: 1; display: flex; align-items: center; min-height: 0; overflow: visible; }
@@ -7789,7 +8360,7 @@
     background: var(--accent);
     color: var(--on-accent);
     padding: calc(10px + var(--safe-top)) 16px 10px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: 14px;
     display: none;
@@ -9794,6 +10365,17 @@ async function syncProgressToSupabase() {
     }, { onConflict: 'user_id' });
     if (error) _reportSyncFailure('nps_state', error);
   } catch(e) { _reportSyncFailure('nps_state', e); }
+  try {
+    // Onboarding v2 answers — single-object jsonb column added in
+    // migration 20260826150000. Priming-only capture; not read at
+    // runtime for gating. Separate upsert so a missing column doesn't
+    // break base sync.
+    const { error } = await sb.from('user_progress').upsert({
+      user_id: currentUser.id,
+      onboarding_answers: state.onbAnswers || {},
+    }, { onConflict: 'user_id' });
+    if (error) _reportSyncFailure('onboarding_answers', error);
+  } catch(e) { _reportSyncFailure('onboarding_answers', e); }
 }
 
 async function loadProgressFromSupabase() {
@@ -9822,6 +10404,9 @@ async function loadProgressFromSupabase() {
     //                            max(local, server), submittedAt takes the
     //                            first non-empty value (permanent kill flag,
     //                            local wins if both have it)
+    //   onboarding_answers     : field-wise prefer-client-non-empty. Server
+    //                            row is a backup; if the client already has
+    //                            an answer, keep it. Server fills in blanks.
     //   onboarding_done        : OR (server true → local true; false leaves alone)
     //   appearance             : PREFER LOCAL — server row is a backup for
     //                            reinstalls, not an override. On the current
@@ -9949,6 +10534,25 @@ async function loadProgressFromSupabase() {
     if (_srvNps.submittedAt && !state.npsState.submittedAt) {
       state.npsState.submittedAt = _srvNps.submittedAt;
     }
+    // Onboarding answers merge — field-wise, prefer client non-empty.
+    // Server row is a backup for reinstalls; the client's live answers
+    // (or lack of them) are authoritative.
+    state.onbAnswers = state.onbAnswers || {
+      name: '', age: null, phoneHours: null, q1: [], q2: [], q3: '',
+      dailyGoal: '', readingFreq: null, commitment: '', completedAt: ''
+    };
+    const _srvOnb = data.onboarding_answers || {};
+    ['name', 'q3', 'dailyGoal', 'commitment', 'completedAt'].forEach(k => {
+      if (_srvOnb[k] && !state.onbAnswers[k]) state.onbAnswers[k] = _srvOnb[k];
+    });
+    ['age', 'phoneHours', 'readingFreq'].forEach(k => {
+      if (typeof _srvOnb[k] === 'number' && state.onbAnswers[k] == null) state.onbAnswers[k] = _srvOnb[k];
+    });
+    ['q1', 'q2'].forEach(k => {
+      if (Array.isArray(_srvOnb[k]) && _srvOnb[k].length && !state.onbAnswers[k].length) {
+        state.onbAnswers[k] = _srvOnb[k].slice();
+      }
+    });
     migrateCompletedDaysKeys();
     saveStateLocal();
     // All merges ran to completion — mark this session as safe to push.
@@ -10597,87 +11201,1433 @@ function _onbShowScreen(screenId) {
   if (target) { target.style.display = 'flex'; target.classList.add('onb-active'); }
 }
 
-// Cinematic redesign: owl mascot removed from welcome. Kept the stub so
-// any residual caller no-ops safely.
-function _onbMountWelcomeOwl() {}
+// ═══════════════════════════════════════════════════════════
+// ONBOARDING v2 — growth-funnel flow
+// ═══════════════════════════════════════════════════════════
+// 19-screen flow replaces the v1 beat/streak/welcome/subject/goal
+// cascade. Step cursor persisted in localStorage; resume-on-quit
+// lands the user at their last step. State captured in
+// state.onbAnswers; synced to user_progress.onboarding_answers
+// (migration 20260826150000).
+//
+// Phases (progress-pill grouping):
+//   1. Welcome (steps 1-3)       welcome → problem → solution
+//   2. About you (steps 4-6)     name → age → phone hours
+//   3. Reveal (steps 7-8)        shock number → plan intro
+//   4. Choices (steps 9-13)      subject → Q1 → Q2 → Q3 → Q4
+//   5. First step (steps 14-17)  mirror → first dialogue → streak → review
+//   6. Commit (steps 18-19)      journey → commitment
+//
+// Commit A shipped 1-3. Commit B extended to step 7 (as 7 in this
+// numbering — was step 7 there too before age was re-added, then
+// dropped, then re-added; shock is now step 7 with age in the middle).
+// Steps 9-19 land in later commits. While the flow is incomplete,
+// an early-completion path fires when _onbShowStep hits a null-slot
+// step: sets corpus_onboarding_done, defaults subject to philosophy,
+// lands on home. Later commits extend the ladder step by step.
+//
+// Age (step 5): the user's age is used visibly rather than only
+// stored. Shock screen (step 7) opens with "You're {age}." as a
+// small eyebrow above the arithmetic — personalizes the punchline
+// without projecting across a lifetime. Later screens (mirror,
+// step 14) will reference it too when they ship.
 
-// Single language-apply for the intro flow. Toggle lives on the beat
-// screen (first paint), so this updates copy on the three intro screens
-// (beat / streak / welcome) up front — subsequent screens (subject/goal)
-// run their own _onbApplyLangTo* helpers when they're shown. Hebrew is
-// singular 2nd person throughout (דיברת / שלך) — unvocalized past-tense
-// singular is already gender-neutral in writing.
-function _onbApplyLangToWelcome(lang) {
+const _ONB_TOTAL_STEPS = 21;
+// Which phase (1..6) each step belongs to. Drives the 6-pill progress.
+const _ONB_STEP_TO_PHASE = {
+  1: 1, 2: 1, 3: 1,                                  // welcome / problem / solution
+  4: 2, 5: 2, 6: 2,                                  // name / age / phone hours
+  7: 3, 8: 3,                                        // shock / plan intro
+  9: 4, 10: 4, 11: 4, 12: 4,                         // subject / Q1 / Q2 / Q3
+  13: 5, 14: 5, 15: 5, 16: 5, 17: 5, 18: 5, 19: 5,   // mirror / Q4 / let's-start / dialogue / streak / goal / review
+  20: 6, 21: 6,                                      // journey / commit
+};
+// DOM ids in step order. Steps not yet built map to null; _onbShowStep
+// treats a null slot as "not implemented yet, jump to completion" so a
+// partial-ladder commit can ship without HTML for the tail.
+const _ONB_STEP_TO_ID = {
+  1: 'onb-v2-welcome',
+  2: 'onb-v2-problem',
+  3: 'onb-v2-solution',
+  4: 'onb-v2-name',
+  5: 'onb-v2-age',
+  6: 'onb-v2-hours',
+  7: 'onb-v2-shock',
+  8: 'onb-v2-plan',
+  9: 'onb-v2-subject',
+  10: 'onb-v2-q1',
+  11: 'onb-v2-q2',
+  12: 'onb-v2-q3',
+  13: 'onb-v2-mirror',
+  14: 'onb-v2-q4',
+  15: 'onb-v2-lets-start',
+  // Step 16 has no v2 DOM node — the reader takes over the viewport.
+  // _onbShowStep detects n === 16 and routes to _onbEnterFirstDialogue
+  // instead of the normal id-lookup path.
+  16: null,
+  17: 'onb-v2-streak',
+  18: 'onb-v2-goal',
+  19: 'onb-v2-review',
+  20: 'onb-v2-journey',
+  21: 'onb-v2-commit',
+};
+
+// Bilingual copy map for the intro screens (1-3). Later commits will
+// extend this per-screen. Kept as a single map so the language-toggle
+// on step 1 can re-render every visible screen without hunting through
+// individual per-screen appliers.
+const _ONB_COPY = {
+  // All three heads carry <span class="onb-v2-em"> around the accent
+  // phrase. Renderer uses innerHTML for every head, textContent for
+  // the CTAs (copy map is the only source of markup).
+  //
+  // Brand rule: the word "Corpus" is always Latin script, even in
+  // Hebrew copy. Same for every onboarding v2 surface, downstream and
+  // upstream of these three screens.
+  welcome: {
+    head: {
+      en: 'Welcome to <span class="onb-v2-em">Corpus</span>',
+      he: 'ברוך הבא ל-<span class="onb-v2-em">Corpus</span>',
+    },
+    cta: { en: 'Continue', he: 'המשך' },
+  },
+  problem: {
+    head: {
+      en: 'Do you consume a lot but <span class="onb-v2-em">understand little</span>?',
+      he: 'צורך המון תוכן כל יום ו<span class="onb-v2-em">נשאר עם מעט</span>?',
+    },
+    cta: { en: 'Continue', he: 'המשך' },
+  },
+  solution: {
+    head: {
+      en: '<span class="onb-v2-em">Corpus</span> gives you the ideas you care about, in <span class="onb-v2-em">five minutes a day</span>',
+      he: '<span class="onb-v2-em">Corpus</span> נותן לך רעיונות שמעניינים אותך, <span class="onb-v2-em">בחמש דקות ביום</span>',
+    },
+    cta: { en: 'Continue', he: 'המשך' },
+  },
+  name: {
+    head:        { en: 'What should we call you?', he: 'איך לקרוא לך?' },
+    placeholder: { en: 'Your name',                he: 'השם שלך' },
+    cta:         { en: 'Continue',                 he: 'המשך' },
+  },
+  age: {
+    // Greeting sits above the head — first personal-address moment
+    // after name capture. Interpolated in _onbV2PrepareAge.
+    greeting:    { en: 'Nice to meet you, {name}.', he: 'נעים להכיר, {name}.' },
+    head:        { en: 'How old are you?',          he: 'בן כמה אתה?' },
+    placeholder: { en: 'Age',                       he: 'גיל' },
+    cta:         { en: 'Continue',                  he: 'המשך' },
+  },
+  hours: {
+    head:      { en: 'How many hours a day are you on your phone?',
+                 he: 'כמה שעות ביום אתה בטלפון?' },
+    // Singular/plural unit for the slider's live-value display.
+    // Hebrew uses "שעה" for 1, "שעות" for 2+; English "hour" vs "hours".
+    unit_one:  { en: 'hour',                        he: 'שעה' },
+    unit_many: { en: 'hours',                       he: 'שעות' },
+    cta:       { en: 'Continue',                    he: 'המשך' },
+  },
+  shock: {
+    // Age is folded into the punchline via a small forward projection
+    // to the next round age (see _onbV2PrepareShock for the formula).
+    // Math and punch computed at render time from age + phoneHours;
+    // only cta is static here.
+    cta: { en: 'Continue', he: 'המשך' },
+  },
+  plan: {
+    head: {
+      en: 'You have <span class="onb-v2-em">five minutes a day</span>. Let\'s build your plan.',
+      he: 'יש לך <span class="onb-v2-em">חמש דקות ביום</span>. בוא נבנה תוכנית.',
+    },
+    cta: { en: 'Continue', he: 'המשך' },
+  },
+  subject: {
+    head: { en: 'Where would you like to start?', he: 'מאיפה תרצה להתחיל?' },
+    cta:  { en: 'Continue',                       he: 'המשך' },
+    // Subject names, taglines, and thinker bylines. Names + taglines
+    // + bylines match the v1 cinematic subject-select (see
+    // _applyCinematicSubjectCopy) so the two selectors share the same
+    // recognizable per-subject signature.
+    philosophy: {
+      name:   { en: 'Philosophy',          he: 'פילוסופיה' },
+      tag:    { en: 'Wisdom for the everyday', he: 'חוכמה ליום-יום' },
+      byline: { en: 'Plato · Socrates · Aristotle', he: 'אפלטון · סוקרטס · אריסטו' },
+    },
+    economics: {
+      name:   { en: 'Economics',           he: 'כלכלה' },
+      tag:    { en: 'How the world works', he: 'איך העולם עובד' },
+      byline: { en: 'Smith · Marx · Keynes', he: "סמית' · מרקס · קיינס" },
+    },
+    psychology: {
+      name:   { en: 'Psychology',          he: 'פסיכולוגיה' },
+      tag:    { en: 'Understand the mind', he: 'להבין את הנפש' },
+      byline: { en: 'Freud · Jung · James', he: "פרויד · יונג · ג'יימס" },
+    },
+  },
+  q1: {
+    head: { en: 'What do you want to gain from <span class="onb-v2-em">Corpus</span>?',
+            he: 'מה תרצה להשיג מ-<span class="onb-v2-em">Corpus</span>?' },
+    hint: { en: 'The one that matters most.',             he: 'מה שהכי חשוב לך.' },
+    cta:  { en: 'Continue',                               he: 'המשך' },
+    // Options — stable ids for analytics; text is what the user sees
+    // on the picker (emoji-prefixed on both langs); support is the
+    // per-option line on the mirror card (step 13); tile is the very
+    // short label used in the journey card tiles (step 18).
+    options: [
+      { id: 'understand-ideas',
+        text:    { en: '🧠 Understand ideas that shaped the world',   he: '🧠 להבין רעיונות שעיצבו את העולם' },
+        support: { en: 'Every idea comes from the thinker who first put it into words.',
+                   he: 'כל רעיון בא מההוגה שנתן לו את המילים הראשונות.' },
+        tile:    { en: 'Big ideas', he: 'רעיונות גדולים' } },
+      { id: 'worth-reading',
+        text:    { en: '📵 Something worth reading instead of scrolling', he: '📵 משהו ששווה לקרוא במקום לגלול' },
+        support: { en: 'Five worthwhile minutes replace the scroll, one day at a time.',
+                   he: 'חמש דקות שוות מחליפות את הגלילה, יום אחד בכל פעם.' },
+        tile:    { en: 'Worth reading', he: 'שווה לקרוא' } },
+      { id: 'hold-own',
+        text:    { en: '💬 Hold my own in a real conversation',       he: '💬 לעמוד על שלי בשיחה אמיתית' },
+        support: { en: "You'll walk out of each lesson with one idea you can quote out loud.",
+                   he: 'מכל שיעור תצא עם רעיון אחד שאפשר לצטט בשיחה.' },
+        tile:    { en: 'Real talk', he: 'שיחה אמיתית' } },
+      { id: 'read-thinkers',
+        text:    { en: '📚 Finally read the thinkers I\'ve heard about', he: '📚 סוף סוף לקרוא את ההוגים ששמעתי עליהם' },
+        support: { en: "You'll meet the thinkers themselves, not just their summaries.",
+                   he: 'תפגוש את ההוגים עצמם, לא רק את התקצירים.' },
+        tile:    { en: 'The thinkers', he: 'ההוגים' } },
+      { id: 'build-habit',
+        text:    { en: '🔥 Build a habit that actually sticks',       he: '🔥 לבנות הרגל שבאמת נשאר' },
+        support: { en: 'Short daily lessons and a streak do the sticking for you.',
+                   he: 'שיעורים קצרים יומיים ורצף עושים את העבודה בשבילך.' },
+        tile:    { en: 'Habit', he: 'הרגל' } },
+      { id: 'think-clearly',
+        text:    { en: '🔍 Think more clearly about my own life',     he: '🔍 לחשוב בצלילות על החיים שלי' },
+        support: { en: 'Every idea lands with a way to try it on your own week.',
+                   he: 'כל רעיון מגיע עם דרך לנסות אותו על השבוע שלך.' },
+        tile:    { en: 'Clarity', he: 'צלילות' } },
+    ],
+  },
+  q2: {
+    head: { en: 'What would you want to be true about you?',
+            he: 'מה היית רוצה שיהיה נכון לגביך?' },
+    hint: { en: 'The one that matters most.', he: 'מה שהכי חשוב לך.' },
+    cta:  { en: 'Continue',                    he: 'המשך' },
+    options: [
+      { id: 'own-ideas',
+        text:    { en: '💡 That I have my own ideas',
+                   he: '💡 שיהיו לי רעיונות משלי' },
+        support: { en: "You'll practice reasoning from ideas, not just recognizing them.",
+                   he: 'תתרגל להסיק מרעיונות, לא רק לזהות אותם.' },
+        tile:    { en: 'Own ideas', he: 'משלי' } },
+      { id: 'explain-clearly',
+        text:    { en: '🗣️ That I can explain things clearly',
+                   he: '🗣️ שאני אדע להסביר דברים בבהירות' },
+        support: { en: 'Every lesson ends with the idea in one sentence you can say back.',
+                   he: 'כל שיעור נגמר ברעיון במשפט אחד שאפשר לחזור עליו.' },
+        tile:    { en: 'Clear speech', he: 'בבהירות' } },
+      { id: 'know-opinions',
+        text:    { en: '🧭 That I know where my opinions come from',
+                   he: '🧭 שאני אדע מאיפה באות הדעות שלי' },
+        support: { en: "You'll see where the ideas you hold came from.",
+                   he: 'תראה מאיפה הגיעו הרעיונות שאתה מחזיק בהם.' },
+        tile:    { en: 'Opinion roots', he: 'שורשי דעות' } },
+      { id: 'finish-hard',
+        text:    { en: '📖 That I read hard things and finish them',
+                   he: '📖 שאני אקרא דברים קשים ואסיים אותם' },
+        support: { en: 'Hard books get broken into finishable pieces, one a day.',
+                   he: 'ספרים קשים מתפרקים לחתיכות שאפשר לסיים, אחת ביום.' },
+        tile:    { en: 'Finish hard books', he: 'לסיים ספרים קשים' } },
+      { id: 'world-events',
+        text:    { en: "🌍 That I understand what's happening in the world",
+                   he: '🌍 שאני אבין אירועים שמתרחשים בעולם' },
+        support: { en: "Each week's ideas connect to something happening right now.",
+                   he: 'הרעיונות של השבוע מתחברים למשהו שקורה עכשיו.' },
+        tile:    { en: 'World events', he: 'אירועים בעולם' } },
+    ],
+  },
+  q3: {
+    head: { en: "What's your goal?", he: 'מה המטרה שלך?' },
+    cta:  { en: 'Continue',           he: 'המשך' },
+    // Single choice. The picked id also drives state.dailyGoalHistory
+    // (see _onbV2CtaQ3). Each option's support line surfaces on the
+    // mirror card for that pick (step 13).
+    options: [
+      { id: 'daily',
+        text:    { en: '⚡ Five minutes a day, every day', he: '⚡ חמש דקות ביום, כל יום' },
+        support: { en: 'A short daily reminder lands at a time you pick.',
+                   he: 'תזכורת יומית קצרה תגיע בשעה שתבחר.' },
+        tile:    { en: 'Daily', he: 'יומי' } },
+      { id: 'few-week',
+        text:    { en: '📅 A few times a week',            he: '📅 כמה פעמים בשבוע' },
+        support: { en: 'Reminders stay gentle — a few days a week, not every day.',
+                   he: 'התזכורות נשארות רכות — כמה פעמים בשבוע, לא כל יום.' },
+        tile:    { en: 'Weekly', he: 'שבועי' } },
+      { id: 'finish',
+        text:    { en: '🏛️ Finish a whole subject',        he: '🏛️ לסיים תחום שלם' },
+        support: { en: 'Your path is planned to complete your subject end to end.',
+                   he: 'המסלול שלך מתוכנן לסיים את התחום מקצה לקצה.' },
+        tile:    { en: 'Complete subject', he: 'לסיים תחום' } },
+      { id: 'longest-streak',
+        text:    { en: '🔥 Build the longest streak I can', he: '🔥 לבנות את הרצף הכי ארוך שאפשר' },
+        support: { en: "Reminders and a streak counter that's hard to lose.",
+                   he: 'תזכורות ומונה רצף שקשה לאבד.' },
+        tile:    { en: 'Long streak', he: 'רצף ארוך' } },
+    ],
+  },
+  q4: {
+    head: { en: "Be honest, how often do you read something worth your time?",
+            he: 'בכנות, כמה פעמים אתה קורא משהו ששווה את הזמן שלך?' },
+    // Q4 advances into the new "Let's start" statement screen (step 15),
+    // which is the beat that owns the "let's start" copy. Q4 CTA is
+    // therefore neutral — no narrative claim, just advance.
+    cta:  { en: 'Continue', he: 'המשך' },
+    // Discrete 5-point Likert (0..4). Endpoints rendered as scale
+    // labels under the track; the value display above shows the
+    // active label.
+    labels: [
+      { en: 'Never',      he: 'אף פעם' },       // 0
+      { en: 'Rarely',     he: 'לעיתים רחוקות' }, // 1
+      { en: 'Sometimes',  he: 'לפעמים' },       // 2
+      { en: 'Often',      he: 'הרבה' },         // 3
+      { en: 'Every day',  he: 'כל יום' },       // 4
+    ],
+  },
+  // Step 15 — pre-dialogue statement screen. Same visual as welcome /
+  // problem / solution / plan: head + sub + CTA. Land here after Q4;
+  // CTA opens the reader on the first dialogue (step 16).
+  letsStart: {
+    head: { en: "Let's start", he: 'בוא נתחיל' },
+    sub:  { en: 'One dialogue, five minutes',
+            he: 'דיאלוג אחד, חמש דקות' },
+    cta:  { en: "Let's start", he: 'בוא נתחיל' },
+  },
+
+  mirror: {
+    // No head — the cards *are* the screen. Each user pick becomes a
+    // card with the option text + a per-option "here's what Corpus
+    // does about it" support line. Closing block below the cards
+    // adds a promise beat before the CTA that advances to Q4.
+    cta:  { en: 'Continue', he: 'המשך' },
+    closing: {
+      head: { en: "That's the plan.",     he: 'זו התוכנית' },
+      line: { en: "We'll get you there.", he: 'ואנחנו נדאג שתגיע לשם.' },
+    },
+  },
+  // Step 15 has no copy block — it's the reader taking over the visual
+  // layer. _onbEnterFirstDialogue calls openReader(1, 1); finishDay's
+  // onboarding guard runs _onbFinishFirstDialogue on completion, which
+  // shows the thinker card wired to advance to step 16.
+
+  // Step 17 — daily goal. Recovered verbatim from the v1 goal screen
+  // (main:index.html around 22293) — three cards (one / two / own_pace)
+  // with the app's amber flame icon on the picks that anchor to the
+  // streak. Placed after streak so the flame connection reads: user just
+  // learned "miss a day and it resets"; goal picks the daily target.
+  // Q3 preselects a sensible default; user can change on the screen or
+  // accept the default. Writes state.dailyGoalHistory with the exact
+  // 'one' | 'two' | 'own_pace' values the goal-met + partway-nudge
+  // consumers recognize (_maybeMarkGoalMet, _showDcStats). Sub-line
+  // dropped the "change anytime" promise since no Profile UI exists to
+  // change it today.
+  goal: {
+    head: { en: 'How much time each day?',    he: 'כמה זמן ביום?' },
+    sub:  { en: 'Your streak builds from this.',
+            he: 'הרצף שלך נבנה מזה.' },
+    cta:  { en: 'Continue',                    he: 'המשך' },
+    options: [
+      { id: 'one',
+        title: { en: 'One dialogue a day',         he: 'דיאלוג אחד ביום' },
+        hint:  { en: 'A daily rhythm, about five minutes',
+                 he: 'קצב יומיומי, בערך חמש דקות' } },
+      { id: 'two',
+        title: { en: 'Two dialogues',              he: 'שני דיאלוגים' },
+        hint:  { en: 'Go a little deeper, about ten minutes',
+                 he: 'לצלול פנימה, בערך עשר דקות' } },
+      { id: 'own_pace',
+        title: { en: 'My own pace',                he: 'הקצב שלי' },
+        hint:  { en: 'No pressure, learn when it fits',
+                 he: 'בלי לחץ, ללמוד כשמתאים' } },
+    ],
+  },
+
+  // Step 16 — day-1 streak celebration. Matches the endowment overlay
+  // beat but as a v2 screen (no modal); flame + eyebrow + head + CTA.
+  streak: {
+    eyebrow: { en: 'DAY 1 · STREAK',        he: 'יום 1 · רצף' },
+    head:    { en: 'You showed up.',        he: 'הרצף שלך התחיל.' },
+    sub:     { en: 'Every day adds to your streak. Miss one and it resets.',
+               he: 'כל יום מוסיף לרצף. יום שתפספס מאפס.' },
+    cta:     { en: 'Continue',              he: 'המשך' },
+  },
+
+  // Step 17 — review request. No native prompt plugin wired in yet;
+  // the Rate button opens the platform's store URL in a new tab.
+  // Skip and Rate both advance to step 18, so the ask is soft.
+  review: {
+    head:     { en: 'Before we start.',     he: 'לפני שמתחילים' },
+    sub:      { en: 'If you like <span class="onb-v2-em">Corpus</span>, a rating helps others find it.',
+                he: 'אם <span class="onb-v2-em">Corpus</span> מוצא חן בעיניך, דירוג עוזר לאנשים נוספים למצוא אותו.' },
+    cta:      { en: 'Rate Corpus',          he: 'דרג את Corpus' },
+    skip:     { en: 'Not right now',        he: 'לא עכשיו' },
+  },
+
+  // Step 18 — journey summary. An accent-bordered card at the top
+  // projects the user's next 30 days (name + date pill + three tiles
+  // drawn from their Q1/Q2/Q3 picks + a stat row), then two feature
+  // blocks below explain the mechanism ("A dialogue a day", "Real
+  // texts, not summaries"). The card is rendered dynamically in
+  // _onbV2PrepareJourney; static copy for the rest sits below.
+  journey: {
+    // Screen-level heading rendered at the top of the screen, above the
+    // projection card. Static — no interpolation.
+    head: { en: 'Your plan', he: 'התוכנית שלך' },
+    // Card head interpolates {name} + {n}. {n} is the subject-specific
+    // count of unique thinkers a user meets in the first 30 dialogues,
+    // computed at render time by _onbV2CountFirstThinkers walking
+    // getW() — stays honest as content shifts. Verified 2026-08-27:
+    // philosophy 16, economics 17, psychology 21 (psychology has only
+    // 28 authored dialogues total, but the subject is currently
+    // LOCKED_SUBJECTS-gated so users can't reach this screen on it).
+    card_head:          { en: "{name}, you'll have met {n} thinkers by",
+                          he: '{name}, תפגוש {n} הוגים עד' },
+    card_head_nameless: { en: "You'll have met {n} thinkers by",
+                          he: 'תפגוש {n} הוגים עד' },
+    card_stat:          { en: '🕐 30+ hours a year with the greatest minds',
+                          he: '🕐 30+ שעות בשנה עם הוגי הדעות הגדולים' },
+    section_head:       { en: "How we'll get you there:",
+                          he: 'איך נגיע לשם:' },
+    features: [
+      { icon: '📖',
+        title: { en: 'A dialogue a day.',
+                 he: 'דיאלוג ביום.' },
+        desc:  { en: 'Five minutes with one thinker and one idea. No reading list, no catching up.',
+                 he: 'חמש דקות עם הוגה אחד ורעיון אחד. בלי רשימת קריאה, בלי להשלים פערים.' } },
+      { icon: '📚',
+        title: { en: 'Real texts, not summaries.',
+                 he: 'טקסטים אמיתיים, לא תקצירים.' },
+        desc:  { en: 'Every dialogue is built around something the thinker actually wrote.',
+                 he: 'כל דיאלוג נבנה סביב משהו שההוגה באמת כתב.' } },
+    ],
+    cta: { en: "Let's begin", he: 'בוא נתחיל' },
+  },
+
+  // Step 19 — commitment level. Terminal onboarding screen. Five
+  // emoji-prefixed cards state the user's commitment level; the picked
+  // id is captured to state.onbAnswers.commitment for later analysis
+  // but does not gate anything downstream — all five land the user on
+  // home via _onbComplete.
+  commit: {
+    head: { en: 'So, how committed are you?', he: 'אז כמה אתה מחויב?' },
+    cta:  { en: 'Continue',                    he: 'המשך' },
+    options: [
+      { id: 'extreme',
+        text: { en: '🔥 Extremely committed',        he: '🔥 מחויב לגמרי' } },
+      { id: 'very',
+        text: { en: '💪 Very committed',             he: '💪 מאוד מחויב' } },
+      { id: 'somewhat',
+        text: { en: '🤔 Somewhat committed',         he: '🤔 מחויב במידה מסוימת' } },
+      { id: 'little',
+        text: { en: '🌱 A little committed',         he: '🌱 קצת מחויב' } },
+      { id: 'trying',
+        text: { en: '🪶 Just trying it out',         he: '🪶 רק מנסה' } },
+    ],
+  },
+};
+
+function _onbApplyLang(lang) {
   const isEn = lang === 'en';
-  // Screen 1 — Beat (big statement, purple, toggle host)
-  const bHead = document.getElementById('onb-beat-head');
-  const bSub  = document.getElementById('onb-beat-sub');
-  const bCta  = document.getElementById('onb-beat-cta');
-  if (bHead) bHead.textContent = isEn ? "Five minutes a day with history's greatest minds" : 'חמש דקות ביום עם ההוגים הגדולים';
-  if (bSub)  bSub.textContent  = isEn ? 'Philosophy, economics, psychology. Short dialogue, one idea, straight from the source.' : 'פילוסופיה, כלכלה ופסיכולוגיה. דיאלוג קצר, רעיון אחד, ישר מהמקור.';
-  if (bCta)  bCta.textContent  = isEn ? "Let's start" : 'מתחילים';
-  const fanNames = isEn ? ['Kant', 'Marx', 'Freud'] : ['קאנט', 'מרקס', 'פרויד'];
-  ['onb-beat-fan-name-1', 'onb-beat-fan-name-2', 'onb-beat-fan-name-3'].forEach((id, i) => {
+  const setText = (id, group, key) => {
     const el = document.getElementById(id);
-    if (el) el.textContent = fanNames[i];
-  });
-  // Screen 2 — Streak beat (amber, restored)
-  const sHead = document.getElementById('onb-streak-head');
-  const sSub  = document.getElementById('onb-streak-sub');
-  const sCap  = document.getElementById('onb-streak-caption');
-  const sCta  = document.getElementById('onb-streak-cta');
-  if (sHead) sHead.textContent = isEn ? 'Every day adds to the streak' : 'כל יום מוסיף לרצף';
-  if (sSub)  sSub.textContent  = isEn ? 'One dialogue a day keeps the flame lit. Every thinker you meet joins your collection.' : 'דיאלוג ביום מדליק את הלהבה. כל הוגה שפגשת נשמר באוסף שלך.';
-  if (sCap)  sCap.textContent  = isEn ? 'Your collection grows as you read' : 'האוסף שלך נבנה תוך כדי קריאה';
-  if (sCta)  sCta.textContent  = isEn ? 'Continue' : 'המשך';
-  // Screen 3 — Welcome (Socrates, purple)
-  const wHead = document.getElementById('onb-welcome-head');
-  const wSub  = document.getElementById('onb-welcome-sub');
-  const wCta  = document.getElementById('onb-welcome-cta');
-  if (wHead) wHead.textContent = isEn ? 'When did you last talk to Socrates?' : 'מתי בפעם האחרונה דיברת עם סוקרטס?';
-  // Socrates-specific era number (2,400 years). If this hero ever swaps to
-  // another thinker, this string must swap too — hence the explicit hook.
-  if (wSub)  wSub.textContent  = isEn ? 'Not a summary, not a commentary. What was written 2,400 years ago, in today\'s language.' : 'לא סיכום ולא פרשנות. מה שנכתב לפני 2,400 שנה, בשפה של היום.';
-  if (wCta)  wCta.textContent  = isEn ? 'Continue' : 'המשך';
-  const heroName = document.getElementById('onb-hero-card-name');
-  if (heroName) heroName.textContent = isEn ? 'Socrates' : 'סוקרטס';
-  // Toggle indicator + button active state (toggle host: beat screen).
-  document.querySelectorAll('#onboarding-beat .onb-lang-btn').forEach(btn => {
+    if (el && _ONB_COPY[group] && _ONB_COPY[group][key]) {
+      el.textContent = isEn ? _ONB_COPY[group][key].en : _ONB_COPY[group][key].he;
+    }
+  };
+  // All three heads carry a <span class="onb-v2-em"> for the accent
+  // phrase, so use innerHTML. CTAs stay textContent — copy map is the
+  // only vector for markup, and CTAs never carry any.
+  const setHTML = (id, group, key) => {
+    const el = document.getElementById(id);
+    if (el && _ONB_COPY[group] && _ONB_COPY[group][key]) {
+      el.innerHTML = isEn ? _ONB_COPY[group][key].en : _ONB_COPY[group][key].he;
+    }
+  };
+  setHTML('onb-v2-welcome-head',  'welcome',  'head');
+  setText('onb-v2-welcome-cta',   'welcome',  'cta');
+  setHTML('onb-v2-problem-head',  'problem',  'head');
+  setText('onb-v2-problem-cta',   'problem',  'cta');
+  setHTML('onb-v2-solution-head', 'solution', 'head');
+  setText('onb-v2-solution-cta',  'solution', 'cta');
+  setHTML('onb-v2-name-head',     'name',     'head');
+  setText('onb-v2-name-cta',      'name',     'cta');
+  setHTML('onb-v2-age-head',      'age',      'head');
+  setText('onb-v2-age-cta',       'age',      'cta');
+  setHTML('onb-v2-hours-head',    'hours',    'head');
+  setText('onb-v2-hours-cta',     'hours',    'cta');
+  setText('onb-v2-shock-cta',     'shock',    'cta');
+  setHTML('onb-v2-plan-head',     'plan',     'head');
+  setText('onb-v2-plan-cta',      'plan',     'cta');
+  setText('onb-v2-subject-head',  'subject',  'head');
+  setText('onb-v2-subject-cta',   'subject',  'cta');
+  setHTML('onb-v2-q1-head',       'q1',       'head');
+  setText('onb-v2-q1-hint',       'q1',       'hint');
+  setText('onb-v2-q1-cta',        'q1',       'cta');
+  setText('onb-v2-q2-head',       'q2',       'head');
+  setText('onb-v2-q2-hint',       'q2',       'hint');
+  setText('onb-v2-q2-cta',        'q2',       'cta');
+  setText('onb-v2-q3-head',       'q3',       'head');
+  setText('onb-v2-q3-cta',        'q3',       'cta');
+  setText('onb-v2-q4-head',       'q4',       'head');
+  setText('onb-v2-q4-cta',        'q4',       'cta');
+  setText('onb-v2-lets-start-head','letsStart','head');
+  setText('onb-v2-lets-start-sub','letsStart','sub');
+  setText('onb-v2-lets-start-cta','letsStart','cta');
+  // Mirror head + card content are rendered dynamically in
+  // _onbV2PrepareMirror from state.onbAnswers; only the CTA is static.
+  setText('onb-v2-mirror-cta',    'mirror',   'cta');
+  setText('onb-v2-streak-eyebrow','streak',   'eyebrow');
+  setText('onb-v2-streak-head',   'streak',   'head');
+  setText('onb-v2-streak-sub',    'streak',   'sub');
+  setText('onb-v2-streak-cta',    'streak',   'cta');
+  setText('onb-v2-goal-head',     'goal',     'head');
+  setText('onb-v2-goal-sub',      'goal',     'sub');
+  setText('onb-v2-goal-cta',      'goal',     'cta');
+  setText('onb-v2-review-head',   'review',   'head');
+  setHTML('onb-v2-review-sub',    'review',   'sub');
+  setText('onb-v2-review-cta',    'review',   'cta');
+  setText('onb-v2-review-skip',   'review',   'skip');
+  // Journey screen: card + tiles + features rendered dynamically in
+  // _onbV2PrepareJourney. Screen-level head and CTA are static.
+  setText('onb-v2-journey-head',  'journey',  'head');
+  setText('onb-v2-journey-cta',   'journey',  'cta');
+  setText('onb-v2-commit-head',   'commit',   'head');
+  setText('onb-v2-commit-cta',    'commit',   'cta');
+  // Text/number input placeholders (slider has none).
+  const setPlaceholder = (id, group) => {
+    const el = document.getElementById(id);
+    if (el && _ONB_COPY[group] && _ONB_COPY[group].placeholder) {
+      el.placeholder = isEn ? _ONB_COPY[group].placeholder.en : _ONB_COPY[group].placeholder.he;
+    }
+  };
+  setPlaceholder('onb-v2-name-input', 'name');
+  setPlaceholder('onb-v2-age-input',  'age');
+  // Lang toggle indicator on screen 1
+  document.querySelectorAll('#onb-v2-welcome .onb-lang-btn').forEach(btn => {
     btn.classList.toggle('is-active', btn.dataset.lang === lang);
   });
-  // Container is dir="ltr" pinned so the two buttons never physically swap;
-  // only .is-en on the indicator transitions.
-  const indicator = document.getElementById('onb-lang-indicator');
+  const indicator = document.getElementById('onb-v2-lang-indicator');
   if (indicator) indicator.classList.toggle('is-en', isEn);
   document.documentElement.dir = isEn ? 'ltr' : 'rtl';
   document.documentElement.lang = lang;
 }
 
-function _onbSetWelcomeLang(lang) {
+// Called from the lang buttons on screen 1. Persists the pick and
+// re-renders every onboarding screen so subsequent taps land in the
+// chosen language.
+function _onbSetLang(lang) {
   state.lang = lang;
-  try { localStorage.setItem('corpus_lang', lang); } catch (e) {}
-  _onbApplyLangToWelcome(lang);
+  try { localStorage.setItem('corpus_lang', lang); } catch(e) {}
+  _onbApplyLang(lang);
 }
 
-function _onbApplyLangToGoal(lang) {
-  const isEn = lang === 'en';
-  const map = {
-    'onb-goal-head':  { en: 'How much time each day?', he: 'כמה זמן ביום?' },
-    'onb-goal-sub':   { en: 'Your streak builds from this. You can change it anytime.', he: 'הרצף שלך נבנה מזה. אפשר לשנות בכל רגע.' },
-    'onb-goal-t1':    { en: 'One dialogue a day', he: 'דיאלוג אחד ביום' },
-    'onb-goal-h1':    { en: 'A daily rhythm, about five minutes', he: 'קצב יומיומי, בערך חמש דקות' },
-    'onb-goal-t2':    { en: 'Two dialogues', he: 'שני דיאלוגים' },
-    'onb-goal-h2':    { en: 'Go a little deeper, about ten minutes', he: 'לצלול פנימה, בערך עשר דקות' },
-    'onb-goal-t3':    { en: 'My own pace', he: 'הקצב שלי' },
-    'onb-goal-h3':    { en: 'No pressure, learn when it fits', he: 'בלי לחץ, ללמוד כשמתאים' },
-  };
-  Object.keys(map).forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = map[id][lang] || map[id].he;
+// Show step N. Applies current language, sets the 6-pill progress to
+// the appropriate phase, and toggles the .onb-active class on the
+// step's DOM node. If the step's DOM id is null (later-commit
+// placeholder), falls through to completion so commit A doesn't wedge
+// a user on a missing screen.
+function _onbShowStep(n) {
+  if (n < 1 || n > _ONB_TOTAL_STEPS) { _onbComplete(); return; }
+  // Step 16 — reader takes over the viewport (no v2 DOM node). The
+  // onboarding resumes after the user finishes the dialogue via
+  // finishDay's _onbInFirstDialogue guard → _onbFinishFirstDialogue.
+  if (n === 16) { _onbEnterFirstDialogue(); return; }
+  const id = _ONB_STEP_TO_ID[n];
+  if (!id) {
+    // Not-yet-built step — early completion for commit-A cadence.
+    _onbComplete();
+    return;
+  }
+  const lang = state.lang || localStorage.getItem('corpus_lang') || 'he';
+  state.lang = lang;
+  _onbApplyLang(lang);
+  // Hide every onb-v2 screen, then show the target one.
+  document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
+    s.style.display = 'none';
+    s.classList.remove('onb-active');
   });
-  const cta = document.getElementById('onb-goal-cta');
-  if (cta) cta.textContent = isEn ? 'To your first dialogue →' : 'לדיאלוג הראשון ←';
+  const el = document.getElementById(id);
+  if (!el) { _onbComplete(); return; }
+  el.style.display = 'flex';
+  el.classList.add('onb-active');
+  // Update progress: which phase is this step in.
+  const phase = _ONB_STEP_TO_PHASE[n] || 1;
+  document.querySelectorAll('.onb-v2 .onb-progress').forEach(p => {
+    p.setAttribute('data-step', String(phase));
+  });
+  // Per-screen prepare hook — runs after the DOM node is visible so
+  // input focus + slider live-update wiring can happen. Any screen
+  // with dynamic content (age greeting, hours display, shock math)
+  // registers a hook via _ONB_STEP_HOOKS below.
+  const hook = _ONB_STEP_HOOKS[n];
+  if (hook) { try { hook(); } catch(e) { console.warn('[onb-v2] prepare hook failed for step', n, e); } }
+  try { localStorage.setItem('corpus_onboarding_step', String(n)); } catch(e) {}
+  try { _phCapture('onboarding_step_shown', { step: n, phase: phase }); } catch(e) {}
 }
+
+// Move from step `from` to step `to`, optionally merging a patch of
+// answers into state.onbAnswers before saving. `to` may exceed
+// _ONB_TOTAL_STEPS to trigger completion.
+function _onbAdvanceStep(from, to, patch) {
+  if (patch && typeof patch === 'object') {
+    Object.assign(state.onbAnswers, patch);
+    try { saveStateLocal(); } catch(e) {}
+    try { saveState(); } catch(e) {}
+  }
+  if (to > _ONB_TOTAL_STEPS) { _onbComplete(); return; }
+  _onbShowStep(to);
+}
+
+// Mark onboarding done and land on home. Sets defaults for anything
+// the user hasn't picked yet (subject defaults to philosophy from
+// defaultState). Then fires the owl walkthrough — the v2 flow explains
+// the product, the walkthrough explains the interface, and those are
+// different jobs. Bypass flag on the eligibility gate is what lets the
+// walkthrough fire even though the user already completed day 1 in
+// step 15 (the normal eligibility gate would block them).
+function _onbComplete() {
+  const today = _streakDay();
+  state.onbAnswers = state.onbAnswers || {};
+  state.onbAnswers.completedAt = today;
+  try { saveState(); } catch(e) {}
+  try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
+  try { localStorage.removeItem('corpus_onboarding_step'); } catch(e) {}
+  try { _phCapture('onboarding_completed', { platform: _phPlatform(), lang: state.lang || 'he' }); } catch(e) {}
+  document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
+    s.style.display = 'none';
+    s.classList.remove('onb-active');
+  });
+  renderHome();
+  showScreen('home');
+  // Fire the owl walkthrough on this first arrival at home.
+  // { bypassCompletionGate: true } tells _walkthroughShouldStart to
+  // ignore the "already completed a dialogue" gate (which normally
+  // protects returning users) — the v2 flow always leaves the user
+  // with one completed dialogue, but the walkthrough hasn't run yet.
+  try { _walkthroughStartIfEligible({ bypassCompletionGate: true }); } catch(e) {}
+}
+
+// Screen 1 (welcome) CTA — advance to screen 2.
+function _onbV2CtaWelcome() { _onbAdvanceStep(1, 2); }
+// Screen 2 (problem) CTA — advance to screen 3.
+function _onbV2CtaProblem() { _onbAdvanceStep(2, 3); }
+// Screen 3 (solution) CTA — advance to screen 4 (name capture).
+function _onbV2CtaSolution() { _onbAdvanceStep(3, 4); }
+
+// Screen 4 (name) — capture the trimmed name into state.userName +
+// state.onbAnswers.name, advance.
+function _onbV2CtaName() {
+  const el = document.getElementById('onb-v2-name-input');
+  const name = ((el && el.value) || '').trim().slice(0, 40);
+  if (!name) return;
+  state.userName = name;
+  _onbAdvanceStep(4, 5, { name: name });
+}
+
+// Screen 5 (age) — validate 13..120 and advance. CTA is otherwise
+// disabled by the input listener wired in _onbV2PrepareAge.
+function _onbV2CtaAge() {
+  const el = document.getElementById('onb-v2-age-input');
+  const val = parseInt((el && el.value) || '', 10);
+  if (!(val >= 13 && val <= 120)) return;
+  state.userAge = val;
+  _onbAdvanceStep(5, 6, { age: val });
+}
+
+// Screen 6 (phone hours slider) — always has a value, no disabled state.
+function _onbV2CtaHours() {
+  const el = document.getElementById('onb-v2-hours-input');
+  const val = parseInt((el && el.value) || '4', 10) || 4;
+  _onbAdvanceStep(6, 7, { phoneHours: val });
+}
+
+// Screen 7 (shock number) — display-only; advance on tap.
+function _onbV2CtaShock() { _onbAdvanceStep(7, 8); }
+
+// Screen 8 (plan intro) — display-only; advance to subject picker.
+function _onbV2CtaPlan() { _onbAdvanceStep(8, 9); }
+
+// Screen 9 (subject picker) — single selection required; CTA disabled
+// otherwise (set in _onbV2PrepareSubject).
+let _onbV2SubjectPick = null;
+function _onbV2SubjectTap(subjectId) {
+  _onbV2SubjectPick = subjectId;
+  document.querySelectorAll('#onb-v2-subject .subj-cinematic-card').forEach(c => {
+    c.classList.toggle('is-selected', c.dataset.subject === subjectId);
+  });
+  const cta = document.getElementById('onb-v2-subject-cta');
+  if (cta) cta.disabled = false;
+  // Live preview of subject theme so the accent picker + downstream
+  // screens pick up the chosen color as soon as they tap.
+  try { previewSubjectTheme(subjectId); } catch(e) {}
+}
+function _onbV2CtaSubject() {
+  if (!_onbV2SubjectPick) return;
+  try { setSubject(_onbV2SubjectPick); } catch(e) {}
+  _onbAdvanceStep(9, 10);
+}
+
+// Screens 10, 11 (Q1, Q2) — single-select. Tap replaces the previous
+// pick. State shape stays as a single-element array in
+// state.onbAnswers.q1 / .q2 so the mirror renderer (which iterates
+// the array) doesn't need to know Q1/Q2 changed cardinality.
+function _onbV2MselTap(question, optionId) {
+  state.onbAnswers[question] = [optionId];
+  document.querySelectorAll('#onb-v2-' + question + ' .onb-v2-card').forEach(c => {
+    c.classList.toggle('is-selected', c.dataset.option === optionId);
+  });
+  const cta = document.getElementById('onb-v2-' + question + '-cta');
+  if (cta) cta.disabled = false;
+}
+function _onbV2CtaQ1() {
+  if (!state.onbAnswers.q1 || !state.onbAnswers.q1.length) return;
+  _onbAdvanceStep(10, 11);
+}
+function _onbV2CtaQ2() {
+  if (!state.onbAnswers.q2 || !state.onbAnswers.q2.length) return;
+  _onbAdvanceStep(11, 12);
+}
+
+// Screen 12 (Q3) — single choice + sets daily goal via the existing
+// dailyGoalHistory machinery. Writing the goal here lets the app's
+// scheduling / reminder logic pick up the intent without waiting for
+// a separate migration prompt (removed in commit A).
+let _onbV2Q3Pick = null;
+function _onbV2Q3Tap(optionId) {
+  _onbV2Q3Pick = optionId;
+  state.onbAnswers.q3 = optionId;
+  document.querySelectorAll('#onb-v2-q3 .onb-v2-card').forEach(c => {
+    c.classList.toggle('is-selected', c.dataset.option === optionId);
+  });
+  const cta = document.getElementById('onb-v2-q3-cta');
+  if (cta) cta.disabled = false;
+}
+function _onbV2CtaQ3() {
+  const pick = _onbV2Q3Pick || state.onbAnswers.q3;
+  if (!pick) return;
+  // Q3 is captured to state.onbAnswers only. The dedicated goal screen
+  // (step 17) writes state.dailyGoalHistory with the exact 'one' | 'two'
+  // | 'own_pace' values the runtime consumers recognize; Q3's ids
+  // wouldn't match those.
+  _onbAdvanceStep(12, 13, { q3: pick });
+}
+
+// Screen 13 (mirror) — display-only; advance to step 14 (Q4). The
+// mirror is a recap of the user's own picks, then Q4 is one final
+// honest-check question before commit.
+function _onbV2CtaMirror() { _onbAdvanceStep(13, 14); }
+
+// Screen 14 (Q4 slider) — 0..4 Likert (default 2 = "Sometimes"). CTA
+// "Let's start" advances to step 15, which opens the first dialogue.
+function _onbV2CtaQ4() {
+  const el = document.getElementById('onb-v2-q4-input');
+  const val = parseInt((el && el.value) || '2', 10);
+  const clamped = Math.max(0, Math.min(4, isNaN(val) ? 2 : val));
+  _onbAdvanceStep(14, 15, { readingFreq: clamped });
+}
+
+// Screen 15 — first-dialogue entry. Reader takes over the visual
+// layer. state._onbInFirstDialogue is the guard finishDay reads to
+// route the tail to _onbFinishFirstDialogue instead of the normal
+// stats + celebration + guest-prompt chain.
+function _onbEnterFirstDialogue() {
+  state._onbInFirstDialogue = true;
+  document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
+    s.style.display = 'none';
+    s.classList.remove('onb-active');
+  });
+  try { localStorage.setItem('corpus_onboarding_step', '16'); } catch(e) {}
+  try { _phCapture('onboarding_step_shown', { step: 16, phase: 5 }); } catch(e) {}
+  // Chapter 1 / Day 1 is the picked subject's first real lesson.
+  // openReader handles theme, rendering, and section-0 setup.
+  try { openReader(1, 1); } catch(e) {
+    console.warn('[onb-v2] openReader failed for first dialogue', e);
+    state._onbInFirstDialogue = false;
+    _onbShowStep(17);
+  }
+}
+
+// Called from finishDay when state._onbInFirstDialogue is set. Persists
+// the same completion state effects finishDay would run (XP + streak +
+// unlock + first_dialogue_completed_at + posthog capture), minus the
+// celebration-queue push, endowment eligibility trigger, and guest-
+// prompt chain — step 17 is the day-1 streak beat; the endowment
+// overlay would double up on it. Then shows the thinker card with a
+// single "Continue" button that advances to step 17.
+function _onbFinishFirstDialogue() {
+  const chapter = getW().find(w => w.id === state.currentWeek);
+  const day = chapter && chapter.days.find(d => d.id === state.currentDay);
+  if (!chapter || !day) {
+    state._onbInFirstDialogue = false;
+    _onbShowStep(17);
+    return;
+  }
+  const key = dayKey(state.currentWeek, state.currentDay);
+  const thinkerId = day.thinkerId;
+  const isNewThinker = thinkerId && !state.unlockedThinkers.includes(thinkerId);
+
+  state.readerXP += 30;
+  state.readerXP += Math.min(state.dailyStreak * 2, 10);
+  state.xp += state.readerXP;
+  state.completedDays[key] = true;
+  state.todayCompleted = (state.todayCompleted || 0) + 1;
+  const todayIndex = new Date().getDay();
+  if (!state.activeDays) state.activeDays = {};
+  state.activeDays[todayIndex] = true;
+  try { updateDailyStreak(); } catch(e) {}
+  if (isNewThinker) state.unlockedThinkers.push(thinkerId);
+
+  if (!localStorage.getItem('corpus_first_dialogue_completed_at')) {
+    try { localStorage.setItem('corpus_first_dialogue_completed_at', new Date().toISOString()); } catch(e) {}
+    try {
+      _phCapture('first_dialogue_completed', {
+        dialogue_id: String(state.currentWeek) + '-' + String(state.currentDay),
+        subject: state.subject || null,
+        seconds_since_onboarding_started: _secondsSinceOnboardingStart(),
+      });
+    } catch(e) {}
+  }
+  try { saveState(); } catch(e) { try { saveStateLocal(); } catch(e2) {} }
+
+  const thinker = (typeof getT === 'function') ? getT().find(t => t.id === thinkerId) : null;
+  if (thinker && isNewThinker) {
+    // showThinkerCardScreen sets up the flip card + Next/Back buttons.
+    // We call it, then overwrite the buttons: hide "Next Dialogue",
+    // relabel "Back to Home" as "Continue" wired to advance to step 17.
+    try { showThinkerCardScreen(thinker, chapter, day); } catch(e) {}
+    const nextBtn = document.getElementById('modal-next-btn');
+    const backBtn = document.getElementById('modal-continue-btn');
+    if (nextBtn) nextBtn.style.display = 'none';
+    if (backBtn) {
+      const isEn = state.lang === 'en';
+      backBtn.textContent = isEn ? 'Continue' : 'המשך';
+      backBtn.onclick = () => {
+        state._onbInFirstDialogue = false;
+        try { document.getElementById('modal-complete').classList.remove('active'); } catch(e) {}
+        _onbShowStep(17);
+      };
+    }
+  } else {
+    state._onbInFirstDialogue = false;
+    _onbShowStep(17);
+  }
+}
+
+// Screen 15 (let's start) — statement screen bridging Q4 → first
+// dialogue. Head + sub in the standard v2 statement layout; CTA
+// advances into the reader takeover at step 16.
+function _onbV2CtaLetsStart() { _onbAdvanceStep(15, 16); }
+
+// Screen 17 (day-1 streak) — display-only celebration; advance to 18 (goal).
+function _onbV2CtaStreak() { _onbAdvanceStep(17, 18); }
+
+// Screen 18 (daily goal) — single-select radio over three cards
+// ('one' / 'two' / 'own_pace'). Preselect logic maps the Q3 answer to
+// a sensible default so the CTA is enabled on land. Write pattern
+// mirrors the recovered v1 _onbFinishGoal: dated dedup on setAt,
+// persists corpus_daily_goal_set flag, fires posthog event.
+let _onbV2GoalPick = null;
+function _onbV2GoalTap(optionId) {
+  _onbV2GoalPick = optionId;
+  state.onbAnswers.dailyGoal = optionId;
+  document.querySelectorAll('#onb-v2-goal .onb-goal-card').forEach(c => {
+    c.classList.toggle('is-selected', c.dataset.goal === optionId);
+  });
+  const cta = document.getElementById('onb-v2-goal-cta');
+  if (cta) cta.disabled = false;
+}
+function _onbV2CtaGoal() {
+  const goal = _onbV2GoalPick || state.onbAnswers.dailyGoal;
+  if (!goal) return;
+  const today = _streakDay();
+  state.dailyGoalHistory = state.dailyGoalHistory || [];
+  const existingIdx = state.dailyGoalHistory.findIndex(g => g && g.setAt === today);
+  if (existingIdx >= 0) {
+    state.dailyGoalHistory[existingIdx] = { setAt: today, value: goal };
+  } else {
+    state.dailyGoalHistory.push({ setAt: today, value: goal });
+  }
+  try { localStorage.setItem('corpus_daily_goal_set', '1'); } catch(e) {}
+  try {
+    _phCapture('onboarding_goal_selected', {
+      goal: goal,
+      is_existing_user: !!localStorage.getItem('corpus_onboarding_done'),
+    });
+  } catch(e) {}
+  _onbAdvanceStep(18, 19, { dailyGoal: goal });
+}
+
+// Screen 17 (review request) — Rate fires the native review sheet
+// (SKStoreReviewController on iOS, Play ReviewManager on Android).
+// Falls back to opening the store URL on web (or if the plugin is
+// unavailable for any reason). Both stores rate-limit and give no
+// callback, so we advance either way — the user reaches step 18
+// whether the sheet appeared or not. Skip advances without asking.
+function _onbV2CtaReviewRate() {
+  const platform = (window.Capacitor && Capacitor.getPlatform && Capacitor.getPlatform()) || 'web';
+  _requestNativeReview().then(({ path }) => {
+    try {
+      _phCapture('onboarding_review_tapped', { platform: platform, path: path });
+    } catch(e) {}
+    _onbAdvanceStep(19, 20);
+  });
+}
+function _onbV2CtaReviewSkip() {
+  try { _phCapture('onboarding_review_skipped', {}); } catch(e) {}
+  _onbAdvanceStep(19, 20);
+}
+
+// Screen 20 (journey summary) — display-only; advance to commit.
+function _onbV2CtaJourney() { _onbAdvanceStep(20, 21); }
+
+// Screen 19 (commitment) — single-choice pick. Terminal step. Tap
+// stores the id in state.onbAnswers.commitment (display-only — no
+// downstream gate); CTA runs _onbComplete which sets
+// corpus_onboarding_done, clears the step cursor, and lands on home.
+let _onbV2CommitPick = null;
+function _onbV2CommitTap(optionId) {
+  _onbV2CommitPick = optionId;
+  state.onbAnswers.commitment = optionId;
+  document.querySelectorAll('#onb-v2-commit .onb-v2-card').forEach(c => {
+    c.classList.toggle('is-selected', c.dataset.option === optionId);
+  });
+  const cta = document.getElementById('onb-v2-commit-cta');
+  if (cta) cta.disabled = false;
+}
+function _onbV2CtaCommit() {
+  const pick = _onbV2CommitPick || state.onbAnswers.commitment;
+  if (!pick) return;
+  try {
+    _phCapture('onboarding_committed', {
+      commitment: pick,
+      name: !!state.onbAnswers.name,
+    });
+  } catch(e) {}
+  _onbComplete();
+}
+
+// Screen prepare hooks — invoked from _onbShowStep once the target
+// screen is visible. Handle dynamic content (age greeting with the
+// captured name, hours slider live-value, shock arithmetic) and
+// wire input listeners exactly once per element via a data-wired
+// marker.
+function _onbV2PrepareName() {
+  const input = document.getElementById('onb-v2-name-input');
+  const cta   = document.getElementById('onb-v2-name-cta');
+  if (!input || !cta) return;
+  input.value = state.onbAnswers.name || '';
+  cta.disabled = !input.value.trim();
+  if (!input.dataset.wired) {
+    input.dataset.wired = '1';
+    input.addEventListener('input', function() {
+      cta.disabled = !this.value.trim();
+    });
+    // Enter key = advance if valid. Small usability win on keyboards.
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !cta.disabled) { e.preventDefault(); _onbV2CtaName(); }
+    });
+  }
+  requestAnimationFrame(() => { try { input.focus(); } catch(e) {} });
+}
+
+function _onbV2PrepareAge() {
+  const input = document.getElementById('onb-v2-age-input');
+  const cta   = document.getElementById('onb-v2-age-cta');
+  const greet = document.getElementById('onb-v2-age-greeting');
+  const isEn = state.lang === 'en';
+  const name = state.onbAnswers.name;
+  // Greeting above head — first personal-address moment after the
+  // name is captured. Hidden if resume-mid-flow user landed here
+  // without a name.
+  if (greet) {
+    if (name && _ONB_COPY.age && _ONB_COPY.age.greeting) {
+      const tmpl = isEn ? _ONB_COPY.age.greeting.en : _ONB_COPY.age.greeting.he;
+      greet.textContent = tmpl.replace('{name}', name);
+      greet.style.display = '';
+    } else {
+      greet.style.display = 'none';
+    }
+  }
+  if (!input || !cta) return;
+  input.value = state.onbAnswers.age != null ? String(state.onbAnswers.age) : '';
+  const cur = parseInt(input.value, 10);
+  cta.disabled = !(cur >= 13 && cur <= 120);
+  if (!input.dataset.wired) {
+    input.dataset.wired = '1';
+    input.addEventListener('input', function() {
+      const v = parseInt(this.value, 10);
+      cta.disabled = !(v >= 13 && v <= 120);
+    });
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !cta.disabled) { e.preventDefault(); _onbV2CtaAge(); }
+    });
+  }
+  requestAnimationFrame(() => { try { input.focus(); } catch(e) {} });
+}
+
+function _onbV2PrepareHours() {
+  const input   = document.getElementById('onb-v2-hours-input');
+  const display = document.getElementById('onb-v2-hours-value');
+  if (!input || !display) return;
+  const isEn = state.lang === 'en';
+  const initial = state.onbAnswers.phoneHours || 4;
+  const renderValue = (val) => {
+    const unit = val === 1
+      ? (isEn ? _ONB_COPY.hours.unit_one.en  : _ONB_COPY.hours.unit_one.he)
+      : (isEn ? _ONB_COPY.hours.unit_many.en : _ONB_COPY.hours.unit_many.he);
+    display.innerHTML = String(val) +
+      '<span class="onb-v2-slider-value-unit">' + unit + '</span>';
+  };
+  input.value = String(initial);
+  renderValue(initial);
+  if (!input.dataset.wired) {
+    input.dataset.wired = '1';
+    input.addEventListener('input', function() {
+      renderValue(parseInt(this.value, 10) || 1);
+    });
+  }
+}
+
+function _onbV2PrepareShock() {
+  const hours = state.onbAnswers.phoneHours || 4;
+  const age   = state.onbAnswers.age;
+  const isEn  = state.lang === 'en';
+  const math  = document.getElementById('onb-v2-shock-math');
+  const punch = document.getElementById('onb-v2-shock-punch');
+  // Annual days spent on the phone at the picked rate. Floor rather
+  // than round — "full days" reads more honestly as a conservative
+  // count (you have to complete a day for it to be full).
+  const annualDays = Math.floor((hours * 365) / 24);
+  // Next round age at least 5 years out, capped at 100. Formula picks
+  // the smallest multiple of 5 that's ≥ age + 4, so age 27 lands at
+  // 35 (8 yrs), 33 at 40 (7 yrs), 45 at 50 (5 yrs). Always meaningful
+  // years, always a milestone-shaped number the user recognizes.
+  const milestoneRaw = Math.ceil(((age || 30) + 4) / 5) * 5;
+  const milestone = Math.min(100, milestoneRaw);
+  const yearsUntil = Math.max(1, milestone - (age || 30));
+  const cumulativeDays = annualDays * yearsUntil;
+  // Math line — establishes the annual DAYS rate so the punch reads
+  // as multi-year cumulative without a numeric jump the user has to
+  // bridge.
+  if (math) {
+    if (isEn) {
+      const daily = hours === 1 ? '1 hour a day' : hours + ' hours a day';
+      const daysStr = annualDays === 1 ? '1 day a year' : annualDays + ' days a year';
+      math.textContent = daily + ', ' + daysStr + '.';
+    } else {
+      const daily = hours === 1 ? 'שעה ביום' : hours + ' שעות ביום';
+      const daysStr = annualDays === 1 ? 'יום אחד בשנה' : annualDays + ' ימים בשנה';
+      math.textContent = daily + ', ' + daysStr + '.';
+    }
+  }
+  // Punch — projection to next milestone, cumulative days accented.
+  if (punch) {
+    if (isEn) {
+      punch.innerHTML = 'By ' + milestone + ', that\'s <span class="onb-v2-em">' +
+        cumulativeDays + ' full days</span>.';
+    } else {
+      punch.innerHTML = 'עד גיל ' + milestone + ', זה <span class="onb-v2-em">' +
+        cumulativeDays + ' ימים שלמים</span>.';
+    }
+  }
+}
+
+// Screen 9 — subject picker. Renders the 3 thinker cards using the
+// v1 cinematic card visual (portrait + byline + name + tagline), so
+// the two subject selectors share the same recognizable per-subject
+// signature. Live-previews the subject theme on tap so downstream v2
+// screens pick up the chosen accent before the final setSubject commit.
+function _onbV2PrepareSubject() {
+  const list = document.getElementById('onb-v2-subject-cards');
+  const cta  = document.getElementById('onb-v2-subject-cta');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+  const cur  = state.subject || 'philosophy';
+  _onbV2SubjectPick = cur;
+  // Render fresh each time so a re-show doesn't accumulate handlers.
+  list.innerHTML = '';
+  // Signature thinker portrait per subject — same webp assets the v1
+  // cinematic selector uses (./images/*.webp). Socrates stands in for
+  // Plato on philosophy here — closer to the founding "examined life"
+  // beat that opens onboarding.
+  const portraitFor = { philosophy: 'socrates', economics: 'smith', psychology: 'freud' };
+  ['philosophy', 'economics', 'psychology'].forEach(subj => {
+    const cfg = _ONB_COPY.subject[subj];
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'subj-cinematic-card subj-c-' + subj;
+    card.dataset.subject = subj;
+    if (subj === cur) card.classList.add('is-selected');
+    card.innerHTML =
+      '<div class="subj-cinematic-portrait"><img src="./images/' + portraitFor[subj] + '.webp" alt=""></div>' +
+      '<div class="subj-cinematic-body">' +
+        '<div class="subj-cinematic-thinker">' + (isEn ? cfg.byline.en : cfg.byline.he) + '</div>' +
+        '<div class="subj-cinematic-name">'    + (isEn ? cfg.name.en   : cfg.name.he)   + '</div>' +
+        '<div class="subj-cinematic-tagline">' + (isEn ? cfg.tag.en    : cfg.tag.he)    + '</div>' +
+      '</div>';
+    card.onclick = () => _onbV2SubjectTap(subj);
+    list.appendChild(card);
+  });
+  if (cta) cta.disabled = !_onbV2SubjectPick;
+}
+
+// Screens 10, 11 — Q1 / Q2 multi-select. Renders option cards from
+// _ONB_COPY[question].options. Re-rendered on each show so lang
+// switches and re-visits pick up correct copy.
+function _onbV2PrepareMsel(question) {
+  const list = document.getElementById('onb-v2-' + question + '-cards');
+  const cta  = document.getElementById('onb-v2-' + question + '-cta');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+  const picks = state.onbAnswers[question] || [];
+  const options = (_ONB_COPY[question] && _ONB_COPY[question].options) || [];
+  list.innerHTML = '';
+  options.forEach(opt => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'onb-v2-card onb-v2-msel-card';
+    card.dataset.option = opt.id;
+    if (picks.indexOf(opt.id) >= 0) card.classList.add('is-selected');
+    card.textContent = isEn ? opt.text.en : opt.text.he;
+    card.onclick = () => _onbV2MselTap(question, opt.id);
+    list.appendChild(card);
+  });
+  if (cta) cta.disabled = picks.length === 0;
+}
+function _onbV2PrepareQ1() { _onbV2PrepareMsel('q1'); }
+function _onbV2PrepareQ2() { _onbV2PrepareMsel('q2'); }
+
+// Screen 12 — Q3 single choice.
+function _onbV2PrepareQ3() {
+  const list = document.getElementById('onb-v2-q3-cards');
+  const cta  = document.getElementById('onb-v2-q3-cta');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+  const pick = state.onbAnswers.q3 || '';
+  _onbV2Q3Pick = pick || null;
+  const options = _ONB_COPY.q3.options;
+  list.innerHTML = '';
+  options.forEach(opt => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'onb-v2-card';
+    card.dataset.option = opt.id;
+    if (opt.id === pick) card.classList.add('is-selected');
+    card.textContent = isEn ? opt.text.en : opt.text.he;
+    card.onclick = () => _onbV2Q3Tap(opt.id);
+    list.appendChild(card);
+  });
+  if (cta) cta.disabled = !pick;
+}
+
+// Screen 13 — Q4 slider. Live label updates as the user drags.
+function _onbV2PrepareQ4() {
+  const input   = document.getElementById('onb-v2-q4-input');
+  const display = document.getElementById('onb-v2-q4-value');
+  const scaleL  = document.getElementById('onb-v2-q4-scale-left');
+  const scaleR  = document.getElementById('onb-v2-q4-scale-right');
+  if (!input || !display) return;
+  const isEn = state.lang === 'en';
+  const labels = _ONB_COPY.q4.labels;
+  const initial = state.onbAnswers.readingFreq != null ? state.onbAnswers.readingFreq : 2;
+  input.value = String(initial);
+  const renderValue = (val) => {
+    const idx = Math.max(0, Math.min(4, val));
+    display.textContent = isEn ? labels[idx].en : labels[idx].he;
+  };
+  if (scaleL) scaleL.textContent = isEn ? labels[0].en : labels[0].he;
+  if (scaleR) scaleR.textContent = isEn ? labels[4].en : labels[4].he;
+  renderValue(initial);
+  if (!input.dataset.wired) {
+    input.dataset.wired = '1';
+    input.addEventListener('input', function() {
+      renderValue(parseInt(this.value, 10) || 0);
+    });
+  }
+}
+
+// Mirror screen — one card per Q1/Q2/Q3 pick, in that order. Each
+// card shows the option text (with its emoji) as its heading and the
+// option's `support` line underneath explaining what Corpus will do
+// about that choice. No screen heading — the cards *are* the screen.
+// A closing block ("That's the plan." + reassurance) sits below the
+// cards and is styled distinctly from them.
+function _onbV2PrepareMirror() {
+  const isEn = state.lang === 'en';
+  const list = document.getElementById('onb-v2-mirror-list');
+  if (!list) return;
+  const a = state.onbAnswers || {};
+
+  // Collect the picked option objects in Q1 → Q2 → Q3 order. Q1/Q2
+  // are arrays (multi-select); Q3 is a single id.
+  const picked = [];
+  if (Array.isArray(a.q1)) {
+    a.q1.forEach(id => {
+      const opt = _ONB_COPY.q1.options.find(o => o.id === id);
+      if (opt) picked.push(opt);
+    });
+  }
+  if (Array.isArray(a.q2)) {
+    a.q2.forEach(id => {
+      const opt = _ONB_COPY.q2.options.find(o => o.id === id);
+      if (opt) picked.push(opt);
+    });
+  }
+  if (a.q3) {
+    const opt = _ONB_COPY.q3.options.find(o => o.id === a.q3);
+    if (opt) picked.push(opt);
+  }
+
+  list.innerHTML = '';
+  picked.forEach(opt => {
+    const card = document.createElement('div');
+    card.className = 'onb-v2-mirror-card';
+    const title = document.createElement('div');
+    title.className = 'onb-v2-mirror-card-title';
+    title.textContent = isEn ? opt.text.en : opt.text.he;
+    const support = document.createElement('div');
+    support.className = 'onb-v2-mirror-card-support';
+    support.textContent = isEn ? opt.support.en : opt.support.he;
+    card.appendChild(title);
+    card.appendChild(support);
+    list.appendChild(card);
+  });
+
+  // Closing block — distinct from the cards. Head + line pulled from
+  // _ONB_COPY.mirror.closing.
+  const closing = document.createElement('div');
+  closing.className = 'onb-v2-mirror-closing';
+  const closingHead = document.createElement('div');
+  closingHead.className = 'onb-v2-mirror-closing-head';
+  closingHead.textContent = isEn
+    ? _ONB_COPY.mirror.closing.head.en
+    : _ONB_COPY.mirror.closing.head.he;
+  const closingLine = document.createElement('div');
+  closingLine.className = 'onb-v2-mirror-closing-line';
+  closingLine.textContent = isEn
+    ? _ONB_COPY.mirror.closing.line.en
+    : _ONB_COPY.mirror.closing.line.he;
+  closing.appendChild(closingHead);
+  closing.appendChild(closingLine);
+  list.appendChild(closing);
+}
+
+// Counts unique thinkerIds a user would meet in the first `n`
+// dialogues of the currently-picked subject. Walks getW() so the
+// answer stays honest as content shifts (adding an intro/summary
+// day changes the ratio without changing this code). Skips Day 0
+// bonus intros and coming-soon chapters. Falls back to 16
+// (philosophy's current number) if getW() throws.
+function _onbV2CountFirstThinkers(n) {
+  try {
+    const weeks = (typeof getW === 'function') ? getW() : [];
+    let days = 0;
+    const ids = new Set();
+    for (const w of weeks) {
+      if (w.comingSoon || !w.days || !w.days.length) continue;
+      for (const d of w.days) {
+        if (d.id === 0) continue;
+        if (days >= n) break;
+        days++;
+        if (d.thinkerId) ids.add(d.thinkerId);
+      }
+      if (days >= n) break;
+    }
+    return ids.size || 16;
+  } catch(e) { return 16; }
+}
+
+// Screen 17 — goal. Renders three cards (recovered from the v1 goal
+// screen) and preselects one based on the user's Q3 answer. Preselect
+// map: 'daily'/'few-week'/'longest-streak' → 'one'; 'finish' → 'two'.
+// If state.onbAnswers.dailyGoal already has a value (re-entering the
+// step), it takes precedence over the Q3 default.
+function _onbV2PrepareGoal() {
+  const list = document.getElementById('onb-v2-goal-options');
+  const cta  = document.getElementById('onb-v2-goal-cta');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+
+  // Per-card copy update — the DOM structure is static (HTML block),
+  // but titles/hints need to swap with language. Options iteration
+  // matches the render order in HTML.
+  const options = (_ONB_COPY.goal && _ONB_COPY.goal.options) || [];
+  options.forEach(opt => {
+    const titleEl = document.getElementById('onb-v2-goal-title-' + opt.id);
+    const hintEl  = document.getElementById('onb-v2-goal-hint-' + opt.id);
+    if (titleEl) titleEl.textContent = isEn ? opt.title.en : opt.title.he;
+    if (hintEl)  hintEl.textContent  = isEn ? opt.hint.en  : opt.hint.he;
+  });
+
+  // Preselect: user's existing dailyGoal takes precedence (resume);
+  // otherwise map Q3 answer to a default. 'finish' anchors to 'two';
+  // everything else defaults to 'one'.
+  const q3 = (state.onbAnswers && state.onbAnswers.q3) || '';
+  const q3Default = q3 === 'finish' ? 'two' : 'one';
+  const pick = (state.onbAnswers && state.onbAnswers.dailyGoal) || q3Default;
+  _onbV2GoalPick = pick;
+  state.onbAnswers.dailyGoal = pick;
+  document.querySelectorAll('#onb-v2-goal .onb-goal-card').forEach(c => {
+    c.classList.toggle('is-selected', c.dataset.goal === pick);
+  });
+  if (cta) cta.disabled = false;
+}
+
+// Screen 18 — journey. Top card projects the next 30 days (name +
+// date + three tiles drawn from Q1/Q2/Q3 picks + stat row). Below
+// the card, two feature blocks explain the mechanism. All copy is
+// re-rendered on every show so language switches pick up the correct
+// strings and the date pill stays fresh.
+function _onbV2PrepareJourney() {
+  const isEn = state.lang === 'en';
+  const a = state.onbAnswers || {};
+
+  // Card head — interpolates the captured name AND the honest
+  // subject-specific thinker count. Nameless fallback if the user
+  // skipped step 4.
+  const headEl = document.getElementById('onb-v2-journey-card-head');
+  if (headEl) {
+    const name = a.name || '';
+    const nThinkers = _onbV2CountFirstThinkers(30);
+    const tmpl = name
+      ? (isEn ? _ONB_COPY.journey.card_head.en          : _ONB_COPY.journey.card_head.he)
+      : (isEn ? _ONB_COPY.journey.card_head_nameless.en : _ONB_COPY.journey.card_head_nameless.he);
+    headEl.textContent = tmpl
+      .replace('{name}', name)
+      .replace('{n}', String(nThinkers));
+  }
+
+  // Date pill — 30 days from today, locale-formatted (long month +
+  // day; year omitted to keep the pill tight).
+  const pillEl = document.getElementById('onb-v2-journey-date-pill');
+  if (pillEl) {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    const locale = isEn ? 'en-US' : 'he-IL';
+    try {
+      pillEl.textContent = d.toLocaleDateString(locale, { month: 'long', day: 'numeric' });
+    } catch(e) {
+      pillEl.textContent = d.toDateString();
+    }
+  }
+
+  // Three tiles — Q1 pick, Q2 pick, Q3 pick. Each shows the option's
+  // emoji (extracted from option.text as the first space-delimited
+  // token, which handles multi-codepoint emoji like 🗣️) and its
+  // short tile label. If a pick is missing (defensive; the flow
+  // requires all three), we skip that tile rather than render blank.
+  const tilesEl = document.getElementById('onb-v2-journey-tiles');
+  if (tilesEl) {
+    tilesEl.innerHTML = '';
+    const picks = [
+      (Array.isArray(a.q1) && a.q1[0]) ? _ONB_COPY.q1.options.find(o => o.id === a.q1[0]) : null,
+      (Array.isArray(a.q2) && a.q2[0]) ? _ONB_COPY.q2.options.find(o => o.id === a.q2[0]) : null,
+      a.q3 ? _ONB_COPY.q3.options.find(o => o.id === a.q3) : null,
+    ];
+    picks.forEach(opt => {
+      if (!opt) return;
+      const tile = document.createElement('div');
+      tile.className = 'onb-v2-journey-tile';
+      const emoji = (isEn ? opt.text.en : opt.text.he).split(' ')[0];
+      const label = isEn ? opt.tile.en : opt.tile.he;
+      const emojiEl = document.createElement('div');
+      emojiEl.className = 'onb-v2-journey-tile-emoji';
+      emojiEl.textContent = emoji;
+      const labelEl = document.createElement('div');
+      labelEl.className = 'onb-v2-journey-tile-label';
+      labelEl.textContent = label;
+      tile.appendChild(emojiEl);
+      tile.appendChild(labelEl);
+      tilesEl.appendChild(tile);
+    });
+  }
+
+  // Card stat row + section head — static per-language.
+  const statEl = document.getElementById('onb-v2-journey-stat');
+  if (statEl) statEl.textContent = isEn ? _ONB_COPY.journey.card_stat.en : _ONB_COPY.journey.card_stat.he;
+  const sectionEl = document.getElementById('onb-v2-journey-section-head');
+  if (sectionEl) sectionEl.textContent = isEn ? _ONB_COPY.journey.section_head.en : _ONB_COPY.journey.section_head.he;
+
+  // Feature blocks below the card.
+  const featEl = document.getElementById('onb-v2-journey-features');
+  if (featEl) {
+    featEl.innerHTML = '';
+    (_ONB_COPY.journey.features || []).forEach(f => {
+      const li = document.createElement('li');
+      li.className = 'onb-v2-journey-feature';
+      const icon = document.createElement('div');
+      icon.className = 'onb-v2-journey-feature-icon';
+      icon.textContent = f.icon;
+      const body = document.createElement('div');
+      body.className = 'onb-v2-journey-feature-body';
+      const title = document.createElement('div');
+      title.className = 'onb-v2-journey-feature-title';
+      title.textContent = isEn ? f.title.en : f.title.he;
+      const desc = document.createElement('div');
+      desc.className = 'onb-v2-journey-feature-desc';
+      desc.textContent = isEn ? f.desc.en : f.desc.he;
+      body.appendChild(title);
+      body.appendChild(desc);
+      li.appendChild(icon);
+      li.appendChild(body);
+      featEl.appendChild(li);
+    });
+  }
+}
+
+// Screen 19 — commit. Renders five commitment-level cards (single-
+// choice). Head is static via _onbApplyLang; only the card list is
+// dynamic here.
+function _onbV2PrepareCommit() {
+  const list = document.getElementById('onb-v2-commit-cards');
+  const cta  = document.getElementById('onb-v2-commit-cta');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+  const pick = (state.onbAnswers && state.onbAnswers.commitment) || '';
+  _onbV2CommitPick = pick || null;
+  const options = (_ONB_COPY.commit && _ONB_COPY.commit.options) || [];
+  list.innerHTML = '';
+  options.forEach(opt => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'onb-v2-card';
+    card.dataset.option = opt.id;
+    if (opt.id === pick) card.classList.add('is-selected');
+    card.textContent = isEn ? opt.text.en : opt.text.he;
+    card.onclick = () => _onbV2CommitTap(opt.id);
+    list.appendChild(card);
+  });
+  if (cta) cta.disabled = !pick;
+}
+
+// Map from step number → prepare hook. Consumed by _onbShowStep.
+// Only steps with dynamic content need entries; static-copy screens
+// (1, 2, 3, 8) rely on _onbApplyLang alone.
+const _ONB_STEP_HOOKS = {
+  4:  _onbV2PrepareName,
+  5:  _onbV2PrepareAge,
+  6:  _onbV2PrepareHours,
+  7:  _onbV2PrepareShock,
+  9:  _onbV2PrepareSubject,
+  10: _onbV2PrepareQ1,
+  11: _onbV2PrepareQ2,
+  12: _onbV2PrepareQ3,
+  13: _onbV2PrepareMirror,
+  14: _onbV2PrepareQ4,
+  // 15 (let's-start) is static once _onbApplyLang runs.
+  // 16: handled specially in _onbShowStep (reader takeover, no v2 DOM).
+  // 17 (streak) + 19 (review) are static once _onbApplyLang runs.
+  18: _onbV2PrepareGoal,
+  20: _onbV2PrepareJourney,
+  21: _onbV2PrepareCommit,
+};
 
 // Silent guest entry: mirrors enterAsGuest but skips hideAuthScreen (the
 // auth screen isn't up in the new flow). Guest = null currentUser, no
@@ -10693,118 +12643,6 @@ function _enterAsGuestSilent() {
   if (localStorage.getItem('corpus_auth_choice_fired')) return;
   try { localStorage.setItem('corpus_auth_choice_fired', '1'); } catch(e) {}
   _phCapture('onboarding_auth_choice', { choice: 'guest', method: null });
-}
-
-// First-paint of the redesigned onboarding. Beat screen (three-card fan)
-// hosts the language toggle and fires onboarding_started. Kept the 'beat'
-// PostHog prop for funnel comparability against the baseline; the retired
-// 'how'/'what' distinction is now a constant 'cinematic'.
-function showBeat() {
-  console.log('[Onboarding] showBeat() called');
-  const lang = state.lang || localStorage.getItem('corpus_lang') || 'he';
-  state.lang = lang;
-  _onbApplyLangToWelcome(lang);
-  _onbShowScreen('onboarding-beat');
-  console.log('[Onboarding] beat display:', document.getElementById('onboarding-beat').style.display);
-  _phCapture('onboarding_beat_shown', {
-    beat: 'cinematic',
-    platform: _phPlatform(),
-    lang: lang,
-    is_redesign: true,
-  });
-  // Funnel: fire onboarding_started here (beat is now the first paint) so
-  // the redesign cohort is measurable against the baseline. Gated per the
-  // existing rule so a re-enter never double-counts.
-  if (!localStorage.getItem('corpus_onboarding_started_at')) {
-    _getOrSetOnboardingStart();
-    _phCapture('onboarding_started', {
-      platform: _phPlatform(),
-      lang: lang,
-      is_redesign: true,
-    });
-  }
-}
-
-// _onbFinishBeat — beat is screen 1. CTA "מתחילים"/"Let's start"
-// advances to the streak beat (screen 2). Intro-done flag is set at
-// welcome CTA (screen 3), so re-entering before welcome still resurfaces
-// all three intro screens.
-function _onbFinishBeat() {
-  _phCapture('onboarding_beat_cta', { beat: 'cinematic', lang: state.lang || 'he' });
-  showStreakBeat();
-}
-
-// Streak beat (Screen 2) — restored beat between the big statement and
-// the Socrates hero. Amber-tinted; the visual seed of the streak. Kept
-// under a distinct PostHog event so the redesign cohort's funnel drop
-// between beat and welcome is measurable independently.
-function showStreakBeat() {
-  console.log('[Onboarding] showStreakBeat() called');
-  const lang = state.lang || localStorage.getItem('corpus_lang') || 'he';
-  state.lang = lang;
-  _onbApplyLangToWelcome(lang);
-  _onbShowScreen('onboarding-streak');
-  _phCapture('onboarding_streak_shown', {
-    platform: _phPlatform(),
-    lang: lang,
-    is_redesign: true,
-  });
-}
-
-function _onbFinishStreakBeat() {
-  _phCapture('onboarding_streak_cta', { lang: state.lang || 'he' });
-  showWelcomeScreen();
-}
-
-// Welcome — now screen 2. Language toggle no longer here; label picked on
-// beat already applied via _onbApplyLangToWelcome. Fires the welcome_shown
-// event kept from the baseline funnel.
-function showWelcomeScreen() {
-  console.log('[Onboarding] showWelcomeScreen() called');
-  _onbMountWelcomeOwl();
-  const lang = state.lang || localStorage.getItem('corpus_lang') || 'he';
-  state.lang = lang;
-  _onbApplyLangToWelcome(lang);
-  _onbShowScreen('onboarding-welcome');
-  console.log('[Onboarding] welcome display:', document.getElementById('onboarding-welcome').style.display);
-  _phCapture('onboarding_welcome_shown', {
-    platform: _phPlatform(),
-    lang: lang,
-    is_redesign: true,
-  });
-}
-
-// _onbFinishWelcome — welcome is now screen 2. CTA "המשך"/"Continue"
-// commits corpus_intro_done and advances to subject-select (or straight
-// to goal if a subject is already picked from an interrupted prior run).
-function _onbFinishWelcome() {
-  const lang = state.lang || 'he';
-  _phCapture('onboarding_welcome_cta', { lang_picked: lang });
-  try { localStorage.setItem('corpus_intro_done', '1'); } catch (e) {}
-  const el = document.getElementById('onboarding-welcome');
-  if (el) { el.style.display = 'none'; el.classList.remove('onb-active'); }
-  // Deep-link arrivals skip subject-select entirely: the incoming URL
-  // has already expressed subject intent (economics). Set the subject
-  // here so the goal + reader steps operate on the correct chapter set,
-  // then advance straight to the goal picker (4-of-4 in the shortened
-  // pill row set up in initUI).
-  if (_pendingDeepLink === 'bonus-econ') {
-    try { setSubject('economics'); } catch (e) {}
-    showGoalScreen();
-    return;
-  }
-  if (!localStorage.getItem('corpus_subject')) {
-    showSubjectSelect();
-  } else {
-    showGoalScreen();
-  }
-}
-
-// Called from subjConfirm's continuation on new-flow path — inserted into
-// subjConfirm below so the existing subject-select screen slots in
-// unchanged and hands off to the goal screen next.
-function _onbAfterSubjectPickForNewUser() {
-  showGoalScreen();
 }
 
 // Cinematic subject-select — vertical stack tap → set active card and
@@ -10858,140 +12696,45 @@ function _applyCinematicSubjectCopy() {
   if (cta) cta.textContent = isEn ? 'Continue' : 'המשך';
 }
 
-let _onbSelectedGoal = null;
-function showGoalScreen() {
-  _onbSelectedGoal = null;
-  const cta = document.getElementById('onb-goal-cta');
-  if (cta) cta.disabled = true;
-  document.querySelectorAll('#onboarding-goal .onb-goal-card').forEach(c => c.classList.remove('is-selected'));
-  const lang = state.lang || 'he';
-  _onbApplyLangToGoal(lang);
-  _onbShowScreen('onboarding-goal');
-}
-
-function _onbSelectGoal(value) {
-  _onbSelectedGoal = value;
-  document.querySelectorAll('#onboarding-goal .onb-goal-card').forEach(c => {
-    c.classList.toggle('is-selected', c.dataset.goal === value);
-  });
-  const cta = document.getElementById('onb-goal-cta');
-  if (cta) cta.disabled = false;
-}
-
-function _onbFinishGoal() {
-  if (!_onbSelectedGoal) return;
-  const goal = _onbSelectedGoal;
-  const today = _streakDay();
-  state.dailyGoalHistory = state.dailyGoalHistory || [];
-  // Union-dedup by setAt: same-day re-pick overwrites the entry rather than
-  // stacking duplicates. Older days preserved.
-  const existingIdx = state.dailyGoalHistory.findIndex(g => g && g.setAt === today);
-  if (existingIdx >= 0) {
-    state.dailyGoalHistory[existingIdx] = { setAt: today, value: goal };
-  } else {
-    state.dailyGoalHistory.push({ setAt: today, value: goal });
-  }
-  try { localStorage.setItem('corpus_daily_goal_set', '1'); } catch (e) {}
-  saveStateLocal();
-  try { saveState(); } catch (e) {}
-  _phCapture('onboarding_goal_selected', {
-    goal: goal,
-    is_existing_user: !!localStorage.getItem('corpus_onboarding_done'),
-  });
-  const goalEl = document.getElementById('onboarding-goal');
-  if (goalEl) { goalEl.style.display = 'none'; goalEl.classList.remove('onb-active'); }
-  // Mark tour-era flag as done for parity with existing-user semantics —
-  // this is the "user finished onboarding" gate that other code respects.
-  try { localStorage.setItem('corpus_onboarding_done', '1'); } catch (e) {}
-  try { saveState(); } catch (e) {}
-  // Deep-link arrivals route to the intended chapter instead of week 1
-  // day 1. If the promo window closed between click and now (fresh users
-  // can spend minutes in the flow), the consumer no-ops and we fall
-  // through to home — no error, no misleading first-dialogue open.
-  if (_pendingDeepLink) {
-    if (_consumePendingDeepLink()) return;
-    renderHome();
-    showScreen('home');
-    return;
-  }
-  // Land on home so the owl-guided walkthrough gets to fire before the
-  // reader ever opens. rAF defers the eligibility check + startup until
-  // home has painted and the spotlight targets have real bounding rects.
-  renderHome();
-  showScreen('home');
-  requestAnimationFrame(() => {
-    try { _walkthroughStartIfEligible(); } catch (e) {}
-  });
-}
-
-// Fresh-install entry: welcome → subject → goal → reader. Called from
-// initApp when there's no session AND onboarding hasn't been done AND
-// the user has no local progress (guest with completedDays counts as
-// "already using the app"; bypass).
+// Async entry from initApp when no session found. Sibling to the
+// synchronous initUI dispatch: initUI already runs the same step-cursor
+// check and may have dispatched a screen; this function is the fallback
+// for platforms where initApp's async chain wins the race. Guarded by
+// _onboardingBooted so we never re-dispatch on top of the visible
+// screen (Android WebView race — user may have already tapped past
+// step 1 by the time initApp resolves).
 function startNewUserOnboarding() {
   const _localCompletionCount = Object.keys(state.completedDays || {})
     .filter(k => !k.endsWith('-0')).length;
-  const _existingUser = !!localStorage.getItem('corpus_onboarding_done') || _localCompletionCount > 0;
+  const _hasOnbDone = !!localStorage.getItem('corpus_onboarding_done');
+  const _resumeStep = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
   console.log('[Onboarding] startNewUserOnboarding:', {
     localCompletionCount: _localCompletionCount,
-    existingUser: _existingUser,
-    hasIntro: !!localStorage.getItem('corpus_intro_done'),
-    hasSubject: !!localStorage.getItem('corpus_subject'),
-    hasGoal: !!localStorage.getItem('corpus_daily_goal_set'),
+    hasOnbDone: _hasOnbDone,
+    resumeStep: _resumeStep,
+    booted: _onboardingBooted,
   });
-  // Guest with a session but partway through onboarding (e.g. finished
-  // welcome, closed the app before subject) — resume from the missing step.
-  if (_existingUser) {
-    // Existing user path: needs the one-time goal picker if they haven't
-    // set it yet, otherwise straight to home.
+  // Existing user or already-done onboarding → home. Silent guest entry
+  // so the onboarding_auth_choice event fires (once-per-install gated
+  // inside _enterAsGuestSilent).
+  if (_hasOnbDone || _localCompletionCount > 0) {
     _enterAsGuestSilent();
-    // If initUI's synchronous deep-link consume already routed us into a
-    // specific chapter reader, don't override with home. Without this
-    // guard the async initApp path clobbers the reader that just opened.
     if (state.currentScreen !== 'reader') {
       renderHome();
       showScreen('home');
     }
-    if (!localStorage.getItem('corpus_daily_goal_set')) {
-      // Defer goal picker so home renders behind it (visual continuity
-      // when the user dismisses). Small delay lets the home paint settle.
-      setTimeout(showGoalScreen, 400);
-    }
     return;
   }
-  // Fresh install path — beat is now the first paint of the redesigned
-  // onboarding (see showBeat / _onbApplyLangToWelcome).
   _enterAsGuestSilent();
-  // Bounce-back guard: if initUI already dispatched to an onboarding
-  // screen synchronously (fresh install / partial-onboarding returning
-  // user), the user may have already advanced past that screen while
-  // initApp's async chain was completing. Re-calling show*() here would
-  // bump them BACK to the earlier screen. corpus_intro_done doesn't
-  // flip until the welcome CTA is tapped, so this race exists for
-  // beat → streak → welcome transitions on any platform where initApp
-  // is slower than the user's first tap (Android, primarily).
-  // _enterAsGuestSilent still fires above for analytics parity.
+  // Fresh install / partial onboarding. If initUI already dispatched a
+  // screen synchronously, don't re-dispatch — the user may have advanced
+  // past it while initApp was resolving.
   if (_onboardingBooted) {
-    console.log('[Onboarding] startNewUserOnboarding: initUI already booted onboarding, skipping screen dispatch');
+    console.log('[Onboarding] initUI already booted, skipping');
     return;
   }
-  if (!localStorage.getItem('corpus_intro_done')) {
-    _onboardingBooted = true;
-    showBeat();
-    return;
-  }
-  if (!localStorage.getItem('corpus_subject')) {
-    _onboardingBooted = true;
-    showSubjectSelect();
-    return;
-  }
-  if (!localStorage.getItem('corpus_daily_goal_set')) {
-    _onboardingBooted = true;
-    showGoalScreen();
-    return;
-  }
-  renderHome();
-  showScreen('home');
+  _onboardingBooted = true;
+  _onbShowStep(_resumeStep >= 1 && _resumeStep <= _ONB_TOTAL_STEPS ? _resumeStep : 1);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -12826,6 +14569,23 @@ function defaultState() {
       firstCompletionShownAt: '', firstCompletionShownAtCount: 0,
       returnEngagementShownAt: '',
     },
+    // Onboarding v2 answers. Populated by the growth-funnel onboarding flow
+    // and synced to user_progress.onboarding_answers (migration
+    // 20260826150000). Priming-only today: captured for later analysis,
+    // not read at runtime for gating. Merged field-wise on pull, prefer-
+    // client-non-empty. See _onbAdvanceStep for the write pattern.
+    onbAnswers: {
+      name: '',
+      age: null,
+      phoneHours: null,
+      q1: [],              // multi-select ids (stable), up to 3
+      q2: [],              // multi-select ids (stable), up to 3
+      q3: '',              // single-choice id: 'daily' | 'few-week' | 'finish' | 'longest-streak'
+      dailyGoal: '',       // 'one' | 'two' | 'own_pace' — matches state.dailyGoalHistory value shape
+      readingFreq: null,   // slider position, 0..5
+      commitment: '',      // ordered-ladder id: 'curious' | 'trying' | 'committed' | 'all-in'
+      completedAt: '',     // ISO date on final commit
+    },
     // NPS survey cadence. All fields ISO date strings ('YYYY-MM-DD') or empty.
     //   lastShownAt   — stamped on every modal open (including X'd immediately)
     //   lastScoredAt  — stamped when the user actually picks a 0-10 score,
@@ -12952,6 +14712,17 @@ function loadState() {
     { lastShownAt: '', lastScoredAt: '', submittedAt: '' },
     state.npsState || {}
   );
+  // Normalize state.onbAnswers for users whose persisted state predates
+  // the v2 onboarding rebuild. Missing keys hydrated to defaults; any
+  // in-flight answers preserved. Array fields defensively re-arrayed
+  // if a corrupt persist wrote them as something else.
+  state.onbAnswers = Object.assign(
+    { name: '', age: null, phoneHours: null, q1: [], q2: [], q3: '',
+      dailyGoal: '', readingFreq: null, commitment: '', completedAt: '' },
+    state.onbAnswers || {}
+  );
+  if (!Array.isArray(state.onbAnswers.q1)) state.onbAnswers.q1 = [];
+  if (!Array.isArray(state.onbAnswers.q2)) state.onbAnswers.q2 = [];
   if (state.guestSignupPromptShown) {
     // Ensure totalShown reflects "they've seen the welcome prompt before" so
     // first_completion doesn't re-fire. Leave lastShownDate EMPTY — the legacy
@@ -16426,6 +18197,17 @@ function showThinkerCardScreen(thinker, chapter, day) {
 
 
 function finishDay() {
+  // Onboarding v2 first-dialogue tail. Guard is set on step 15 entry
+  // (_onbEnterFirstDialogue) and cleared on the thinker card's Continue
+  // button. Bypasses the normal stats + celebration + prompt chain so
+  // onboarding steps 16-19 own those beats (16 = day-1 streak, 17 =
+  // review, 18 = journey, 19 = commit). See _onbFinishFirstDialogue
+  // for the minimal completion path it takes instead.
+  if (state._onbInFirstDialogue) {
+    _onbFinishFirstDialogue();
+    return;
+  }
+
   const chapter = getW().find(w => w.id === state.currentWeek);
   const day = chapter.days.find(d => d.id === state.currentDay);
   const key = dayKey(state.currentWeek, state.currentDay);
@@ -17287,6 +19069,43 @@ function _shareModalTap(kind) {
 const _NPS_STORE_URL_IOS = 'https://apps.apple.com/app/id6781227385';
 const _NPS_STORE_URL_ANDROID = 'https://play.google.com/store/apps/details?id=com.corpusapp.corpus';
 
+// Native in-app review — fires SKStoreReviewController on iOS or Play's
+// ReviewManager on Android via the corpus-review plugin. Both platforms
+// rate-limit at the OS level and never confirm whether the dialog was
+// actually shown, so we resolve as soon as the plugin call returns and
+// let callers advance their flow regardless. Falls back to opening the
+// store URL on web or if the plugin isn't available (older builds where
+// `npx cap sync` hasn't been run, etc.) — this is a fallback, NOT a
+// guess about whether the native sheet appeared.
+//
+// Diagnostic logging (temporary): logs presence of the plugin, which
+// path was taken, and any error, so on-device Safari Web Inspector /
+// chrome://inspect gives a clean trace of what happened when the user
+// taps "Rate Corpus". Remove once the wiring is confirmed working.
+//
+// Returns { path: 'native' | 'url' }. Callers use this to attribute in
+// analytics but don't gate anything on it.
+async function _requestNativeReview() {
+  const platform = (window.Capacitor && Capacitor.getPlatform && Capacitor.getPlatform()) || 'web';
+  const hasCap = !!(window.Capacitor && window.Capacitor.Plugins);
+  const P = hasCap ? window.Capacitor.Plugins.CorpusReview : null;
+  const pluginPresent = !!(P && typeof P.requestReview === 'function');
+  console.log('[review] request', { platform, hasCap, pluginPresent });
+  if (pluginPresent) {
+    try {
+      const res = await P.requestReview();
+      console.log('[review] native call resolved', res);
+      return { path: 'native' };
+    } catch (e) {
+      console.warn('[review] native plugin call failed, falling back to store URL', e);
+    }
+  }
+  const url = platform === 'android' ? _NPS_STORE_URL_ANDROID : _NPS_STORE_URL_IOS;
+  console.log('[review] falling back to store URL', { url });
+  try { window.open(url, '_blank'); } catch(e) {}
+  return { path: 'url' };
+}
+
 // Days-between helper — same shape as _daysBetween in the guest-prompt
 // cadence, duplicated locally so this section is self-contained.
 function _npsDaysBetween(fromIso, toIso) {
@@ -17554,12 +19373,14 @@ async function _npsSend() {
 }
 
 function _npsOpenStore() {
-  const url = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'android')
-    ? _NPS_STORE_URL_ANDROID
-    : _NPS_STORE_URL_IOS;
-  try { window.open(url, '_blank'); } catch(e) {}
-  _closeNPSModal();
-  _runNPSContinuation();
+  // Fire the native in-app review sheet (SKStoreReviewController on iOS,
+  // Play ReviewManager on Android); falls back to the store URL on web
+  // or if the plugin is unavailable. Advance the NPS flow either way —
+  // both stores rate-limit silently.
+  _requestNativeReview().then(() => {
+    _closeNPSModal();
+    _runNPSContinuation();
+  });
 }
 
 function _npsDismiss(kind) {
@@ -19455,27 +21276,42 @@ const WALKTHROUGH_STEPS = [
     allowChromeTop: true,
     he: 'הרצף גדל בכל יום שמשלימים בו דיאלוג. היום הוא מתחיל.',
     en: 'Your streak grows on every day you complete a dialogue. Today it begins.' },
-  { id: 'closing', expr: 'owl-action',     spotlight: null, isClosing: true,
-    he: 'זהו, אתם מוכנים. הדיאלוג הראשון מחכה.',
-    en: "That's it, you're ready. Your first dialogue is waiting." },
+  { id: 'closing', expr: 'owl-action',
+    // Spotlights the next-up lesson circle (same target as step 2's
+    // `next_up`) so the closing beat has something concrete to point
+    // at. Framing shifts from "next in line" (step 2) to "tomorrow's
+    // dialogue lands here" (step 7). v2 users have already completed
+    // today's dialogue during onboarding, so we don't auto-open a
+    // reader — _walkthroughFinish just tears down. The canvas click
+    // handler also suppresses the tap-shortcut on isClosing steps so
+    // a tap on the spotlighted circle doesn't contradict the copy by
+    // opening day 2 right now.
+    spotlight: '.lesson-node:has(.lesson-circle.next-up)', isClosing: true,
+    he: 'כאן יחכה הדיאלוג של מחר.',
+    en: "This is where tomorrow's dialogue will be waiting." },
 ];
 
 let _walkthroughStepIdx = 0;
 const _walkthroughStepsSeen = new Set();
 
-function _walkthroughShouldStart() {
+function _walkthroughShouldStart(opts) {
   if (localStorage.getItem('corpus_walkthrough_done')) return false;
   // Existing-user gates — same intuition as the initUI onboarding gate.
   // Any signal of prior use blocks the walkthrough so returning users
-  // don't get a first-time tour on top of their existing home.
+  // don't get a first-time tour on top of their existing home. The v2
+  // onboarding path passes { bypassCompletionGate: true } because the
+  // flow always leaves the user with one completed dialogue by design
+  // (step 15) — the "existing user" signal is a legitimate signal for
+  // legacy paths but not for a user who just finished v2 onboarding.
+  if (opts && opts.bypassCompletionGate) return true;
   if (localStorage.getItem('corpus_first_dialogue_completed_at')) return false;
   const completedCount = Object.keys(state.completedDays || {}).length;
   if (completedCount > 0) return false;
   return true;
 }
 
-function _walkthroughStartIfEligible() {
-  if (!_walkthroughShouldStart()) return;
+function _walkthroughStartIfEligible(opts) {
+  if (!_walkthroughShouldStart(opts)) return;
   if (state.currentScreen !== 'home') return;
   const overlay = document.getElementById('onboarding-overlay');
   if (!overlay) return;
@@ -19511,6 +21347,12 @@ function _walkthroughWireCanvas() {
   canvas.addEventListener('click', function(ev) {
     const step = WALKTHROUGH_STEPS[_walkthroughStepIdx];
     if (!step || !step.spotlight) return;             // no punch-out; no shortcut path
+    // The closing beat spotlights the next-up lesson as "here's where
+    // tomorrow's dialogue will land" — tapping it to open the reader
+    // right now would contradict the copy. Only the OK button (fires
+    // _walkthroughFinish) or Skip should end the walkthrough on this
+    // step.
+    if (step.isClosing) return;
     const info = _walkthroughSpotlightRect(step);
     if (!info) return;
     const pad = 8;                                    // match drawSpotlight padding
@@ -19762,8 +21604,8 @@ function _walkthroughRenderStep() {
   const nextBtn    = document.getElementById('onboarding-btn');
   bubbleText.textContent = isEn ? step.en : step.he;
   if (step.isClosing) {
-    nextBtn.textContent = isEn ? "Let's start" : 'בואו נתחיל';
-    nextBtn.onclick     = _walkthroughFinishAndOpen;
+    nextBtn.textContent = isEn ? 'OK' : 'בסדר';
+    nextBtn.onclick     = _walkthroughFinish;
   } else {
     nextBtn.textContent = isEn ? 'Next' : 'הבא';
     nextBtn.onclick     = _walkthroughNext;
@@ -19798,8 +21640,8 @@ function _walkthroughRenderStep() {
 function _walkthroughNext() {
   _walkthroughStepIdx++;
   if (_walkthroughStepIdx >= WALKTHROUGH_STEPS.length) {
-    // Guard against overrun; closing button uses _walkthroughFinishAndOpen.
-    _walkthroughFinishAndOpen();
+    // Guard against overrun; closing button uses _walkthroughFinish.
+    _walkthroughFinish();
     return;
   }
   _walkthroughRenderStep();
@@ -19834,17 +21676,19 @@ function _walkthroughShortcutBail() {
   _walkthroughTeardown({ setFlag: true });
 }
 
-function _walkthroughFinishAndOpen() {
+// v2 users have already read a full dialogue during onboarding (step
+// 15), so the walkthrough finish should NOT auto-open another reader.
+// Land the user on home with everything in place — streak lit, first
+// thinker card unlocked, next dialogue queued visually as "next up" —
+// and let them come back tomorrow. Legacy paths (any pre-v2 user
+// whose corpus_walkthrough_done flag isn't set) end here too; the
+// closing beat's "come back tomorrow" copy is coherent in both cases.
+function _walkthroughFinish() {
   _phCapture('walkthrough_completed', {
     subject: state.subject || null,
     lang:    state.lang || null,
   });
   _walkthroughTeardown({ setFlag: true });
-  // Same target as the start card CTA — subject-aware via getW().
-  const weeks = getW();
-  if (weeks && weeks[0] && weeks[0].days && weeks[0].days.length) {
-    openReader(weeks[0].id, weeks[0].days[0].id);
-  }
 }
 
 function _walkthroughTeardown(opts) {
@@ -20453,18 +22297,13 @@ function subjConfirm() {
       closeDrawer(() => { renderHome(); });
     } else {
       // First-time subject-select mode. New-flow users (welcome-seen but no
-      // goal set yet) advance to the daily-goal screen; already-onboarded
-      // users returning through the subject picker just land on home.
+      // Subject-select is no longer an onboarding step in v2 — it's used
+      // solely for later subject switching via the drawer. Post-tap: back
+      // to home, no goal-picker chaining.
       document.body.classList.remove('on-subject-screen');
-      const _newFlow = !!localStorage.getItem('corpus_intro_done')
-        && !localStorage.getItem('corpus_daily_goal_set');
-      if (_newFlow) {
-        showGoalScreen();
-      } else {
-        showScreen('home');
-        renderHome();
-        animateScreen(document.getElementById('screen-home'), 'anim-fade');
-      }
+      showScreen('home');
+      renderHome();
+      animateScreen(document.getElementById('screen-home'), 'anim-fade');
     }
   }, 450);
 }
@@ -20760,19 +22599,13 @@ async function enterApp(user) {
   // Resume any celebration queue persisted from a prior session that
   // closed mid-play. Session-guarded so this fires at most once per open.
   try { _resumeCelebrationsIfPending(); } catch(e) {}
-  // Onboarding redesign: signed-in users who haven't set a daily goal
-  // yet get the one-time picker after home renders. Fresh signup users
-  // go through the new flow entirely (via startNewUserOnboarding on the
-  // no-session path); this branch covers returning users mid-migration.
-  if (localStorage.getItem('corpus_onboarding_done') && !localStorage.getItem('corpus_daily_goal_set')) {
-    setTimeout(showGoalScreen, 400);
-    return;
-  }
-  // Existing behavior: no-intro-done users see the intro; that path used
-  // to open the iframe carousel and now falls through to the welcome
-  // screen via startNewUserOnboarding's flag chain. Preserved as a guard
-  // for any never-migrated signed-in user.
-  if (!localStorage.getItem('corpus_intro_done')) {
+  // Onboarding v2: the post-signup goal-picker chain is gone. v2 sets
+  // the daily goal inline (step 12 / Q3) so no separate migration prompt
+  // is needed for users who complete v2. Users on the old flow who
+  // finished onboarding but never reached the old goal picker keep the
+  // default reminder settings — they can adjust in Profile if desired.
+  if (!localStorage.getItem('corpus_onboarding_step') &&
+      !localStorage.getItem('corpus_onboarding_done')) {
     startNewUserOnboarding();
     return;
   }
@@ -21031,37 +22864,42 @@ function initUI() {
     document.documentElement.dir = state.lang === 'en' ? 'ltr' : 'rtl';
     document.documentElement.lang = state.lang;
     // Onboarding gate — runs synchronously in initUI BEFORE any home render.
-    // Decoupled from Supabase auth resolution: fresh users see the welcome
-    // screen immediately, regardless of whether Supabase's INITIAL_SESSION
-    // ever fires (incognito third-party-cookie blocking, CDN failures, etc).
+    // Decoupled from Supabase auth resolution: fresh users see the first
+    // onboarding screen immediately, regardless of whether Supabase's
+    // INITIAL_SESSION ever fires (incognito third-party-cookie blocking,
+    // CDN failures, etc).
     //
-    // Gate criteria:
-    //   - No completed dialogues locally (state.completedDays empty)
-    //   - No corpus_onboarding_done flag
-    //   - No corpus_intro_done flag
-    // ANY of these being false → returning user → render home instead.
-    // Note: signed-in returning users may hit this and go straight to home
-    // — enterApp still fires later and handles goal-migration for them.
+    // v2 gate is a step-cursor rewrite of the old flag cascade
+    // (corpus_intro_done → corpus_subject → corpus_daily_goal_set).
+    // Instead, corpus_onboarding_step holds the CURRENT step 1..N,
+    // written by _onbAdvanceStep on every screen transition. Resume
+    // lands the user back at that step; if invalid, restart at 1.
+    //
+    //   corpus_onboarding_done set     → home
+    //   corpus_onboarding_step present → onboarding at that step
+    //   completedDays already exists   → treat as existing user, home
+    //                                    (safety net for pre-v2 upgraders)
+    //   otherwise fresh install        → onboarding at step 1
     const _completedCount = Object.keys(state.completedDays || {}).length;
-    const _hasIntro = !!localStorage.getItem('corpus_intro_done');
     const _hasOnbDone = !!localStorage.getItem('corpus_onboarding_done');
+    const _resumeStep = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
     console.log('[Onboarding] initUI gate:', {
       completedCount: _completedCount,
-      hasIntro: _hasIntro,
       hasOnbDone: _hasOnbDone,
+      resumeStep: _resumeStep,
     });
-    if (!_hasIntro && !_hasOnbDone && _completedCount === 0) {
-      console.log('[Onboarding] Fresh install → showBeat()');
+    if (_hasOnbDone) {
+      console.log('[Onboarding] Onboarding done → home');
+      renderHome();
+      showScreen('home');
+    } else if (_resumeStep >= 1 && _resumeStep <= _ONB_TOTAL_STEPS) {
+      console.log('[Onboarding] Resume onboarding at step', _resumeStep);
       _onboardingBooted = true;
-      showBeat();
-    } else if (_hasIntro && !localStorage.getItem('corpus_subject')) {
-      console.log('[Onboarding] Welcome done, no subject → subject select');
+      _onbShowStep(_resumeStep);
+    } else if (_completedCount === 0) {
+      console.log('[Onboarding] Fresh install → onboarding step 1');
       _onboardingBooted = true;
-      showSubjectSelect();
-    } else if (_hasIntro && localStorage.getItem('corpus_subject') && !localStorage.getItem('corpus_daily_goal_set')) {
-      console.log('[Onboarding] Welcome + subject done, no goal → goal screen');
-      _onboardingBooted = true;
-      showGoalScreen();
+      _onbShowStep(1);
     } else {
       console.log('[Onboarding] Existing user → home');
       renderHome();
@@ -22187,147 +24025,444 @@ document.addEventListener('DOMContentLoaded', function() {
   </button>
 </nav>
 
-<!-- NEW ONBOARDING — Beat + Streak + Welcome + Subject + Daily Goal.
-     Replaces the deprecated Onboarding_new.html iframe carousel + spotlight
-     tour. Fresh users flow:
-       beat → streak → welcome → subject → goal → openReader(1,1).
-     Progress pill row on each inline screen reflects the 5-step position.
-     Existing-user gates preserved (see startNewUserOnboarding / initApp). -->
-<!-- Screen 1: Beat (bright philosophy purple). Three-card fan hero.
-     Language toggle lives here — first paint — and controls copy on all
-     downstream screens through _onbApplyLangToWelcome. -->
-<div id="onboarding-beat" class="onb-screen onb-bg-philosophy" style="display:none">
-  <div class="onb-welcome-lang" id="onb-welcome-lang" dir="ltr">
-    <span class="onb-lang-indicator" id="onb-lang-indicator"></span>
-    <button type="button" class="onb-lang-btn" data-lang="he" onclick="_onbSetWelcomeLang('he')">עברית</button>
-    <button type="button" class="onb-lang-btn" data-lang="en" onclick="_onbSetWelcomeLang('en')">English</button>
+<!-- ONBOARDING v2 — growth-funnel flow.
+     19-step ladder with a step cursor persisted to corpus_onboarding_step.
+     Commit A ships steps 1-3 (welcome, problem, solution). Steps 4-19
+     land in later commits; the null-slot fallback in _onbShowStep runs
+     an early-completion path until they exist. See the ONBOARDING v2
+     header in the main script for the phase model, resume semantics,
+     and delivery plan. -->
+
+<!-- Step 1 — Welcome. Hosts the language toggle; every downstream
+     screen re-renders through _onbApplyLang whenever the toggle
+     switches. Copy anchored on the Corpus mark rather than a specific
+     thinker so this screen doesn't lock us into a single hero image. -->
+<div id="onb-v2-welcome" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-welcome-lang" dir="ltr">
+    <span class="onb-lang-indicator" id="onb-v2-lang-indicator"></span>
+    <button type="button" class="onb-lang-btn" data-lang="he" onclick="_onbSetLang('he')">עברית</button>
+    <button type="button" class="onb-lang-btn" data-lang="en" onclick="_onbSetLang('en')">English</button>
   </div>
   <div class="onb-progress" aria-hidden="true" data-step="1">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
-  <div class="onb-beat-inner">
-    <div class="onb-beat-fan" aria-hidden="true">
-      <div class="onb-beat-fan-glow onb-beat-fan-glow-1"></div>
-      <div class="onb-beat-fan-glow onb-beat-fan-glow-2 subj-economics"></div>
-      <div class="onb-beat-fan-glow onb-beat-fan-glow-3"></div>
-      <div class="onb-beat-fan-card onb-beat-fan-card-1">
-        <img src="./images/kant.webp" alt="">
-        <div class="onb-beat-fan-scroll"><div class="onb-beat-fan-name" id="onb-beat-fan-name-1">קאנט</div></div>
-      </div>
-      <div class="onb-beat-fan-card onb-beat-fan-card-2">
-        <img src="./images/marx.webp" alt="">
-        <div class="onb-beat-fan-scroll"><div class="onb-beat-fan-name" id="onb-beat-fan-name-2">מרקס</div></div>
-      </div>
-      <div class="onb-beat-fan-card onb-beat-fan-card-3">
-        <img src="./images/freud.webp" alt="">
-        <div class="onb-beat-fan-scroll"><div class="onb-beat-fan-name" id="onb-beat-fan-name-3">פרויד</div></div>
-      </div>
-    </div>
-    <div class="onb-beat-copy">
-      <h1 class="onb-beat-head" id="onb-beat-head">חמש דקות ביום עם ההוגים הגדולים</h1>
-      <p class="onb-beat-sub" id="onb-beat-sub">פילוסופיה, כלכלה ופסיכולוגיה. דיאלוג קצר, רעיון אחד, ישר מהמקור.</p>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-welcome-head"></h1>
     </div>
   </div>
   <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-beat-cta" onclick="_onbFinishBeat()">מתחילים</button>
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-welcome-cta" onclick="_onbV2CtaWelcome()"></button>
   </div>
 </div>
 
-<!-- Screen 2: Streak beat (bright amber). Restored. Large flame hero,
-     collection preview row (3 subject-tinted mini-cards + 1 mystery),
-     caption. Copy set in showStreakBeat via _onbApplyLangToWelcome. -->
-<div id="onboarding-streak" class="onb-screen onb-bg-flame" style="display:none">
+<!-- Step 2 — Problem. Confrontation-lite; sets up the reframe on step 3. -->
+<div id="onb-v2-problem" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="1">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-problem-head"></h1>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-problem-cta" onclick="_onbV2CtaProblem()"></button>
+  </div>
+</div>
+
+<!-- Step 3 — Solution. Reframe against step 2. Anchor line, no subtitle. -->
+<div id="onb-v2-solution" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="1">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-solution-head"></h1>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-solution-cta" onclick="_onbV2CtaSolution()"></button>
+  </div>
+</div>
+
+<!-- Step 4 — Name capture. First input screen in the flow. Text input
+     styling from .onb-v2-input (see CSS). Enter key submits when valid. -->
+<div id="onb-v2-name" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="2">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
-  <div class="onb-streak-inner">
-    <div class="onb-streak-hero" aria-hidden="true">
-      <svg viewBox="0 0 64 64" width="78" height="78"><use href="#icon-streak"/></svg>
-    </div>
-    <div class="onb-streak-copy">
-      <h1 class="onb-streak-head" id="onb-streak-head">כל יום מוסיף לרצף</h1>
-      <p class="onb-streak-sub" id="onb-streak-sub">דיאלוג ביום מדליק את הלהבה. כל הוגה שפגשת נשמר באוסף שלך.</p>
-    </div>
-    <div class="onb-streak-row" aria-hidden="true">
-      <div class="onb-streak-mini onb-streak-mini-1"><img src="./images/plato.webp" alt=""></div>
-      <div class="onb-streak-mini onb-streak-mini-2"><img src="./images/smith.webp" alt=""></div>
-      <div class="onb-streak-mini onb-streak-mini-3"><img src="./images/james.webp" alt=""></div>
-      <div class="onb-streak-mini onb-streak-mini-mystery">?</div>
-    </div>
-    <div class="onb-streak-caption" id="onb-streak-caption">האוסף שלך נבנה תוך כדי קריאה</div>
-  </div>
-  <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-streak-cta" onclick="_onbFinishStreakBeat()">המשך</button>
-  </div>
-</div>
-
-<!-- Screen 3: Welcome (philosophy purple tint). Socrates hero card as
-     the human anchor after the streak beat. Language toggle is on the
-     beat (screen 1), not here. -->
-<div id="onboarding-welcome" class="onb-screen onb-bg-philosophy" style="display:none">
-  <div class="onb-progress" aria-hidden="true" data-step="3">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
-  </div>
-  <div class="onb-welcome-inner">
-    <div class="onb-hero-card" aria-hidden="true">
-      <img src="./images/socrates.webp" alt="">
-      <div class="onb-hero-card-scroll">
-        <div class="onb-hero-card-name" id="onb-hero-card-name">סוקרטס</div>
-        <div class="onb-hero-card-era">470–399 BCE</div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-name-head"></h1>
+      <div class="onb-v2-field">
+        <input class="onb-v2-input" type="text" id="onb-v2-name-input"
+               maxlength="40" autocapitalize="words" autocomplete="given-name"
+               aria-label="Name">
       </div>
     </div>
-    <div class="onb-welcome-copy">
-      <h1 class="onb-welcome-head" id="onb-welcome-head">מתי בפעם האחרונה דיברת עם סוקרטס?</h1>
-      <p class="onb-welcome-sub" id="onb-welcome-sub">לא סיכום ולא פרשנות. מה שנכתב לפני 2,400 שנה, בשפה של היום.</p>
-    </div>
   </div>
   <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-welcome-cta" onclick="_onbFinishWelcome()">המשך</button>
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-name-cta" onclick="_onbV2CtaName()" disabled></button>
   </div>
 </div>
 
-<!-- Daily-goal picker. Slotted between subject-select and the first
-     dialogue. Three cards (fan-adjacent, not literal fan): one dialogue,
-     two dialogues, own pace. Choice recorded as a dated array entry in
-     state.dailyGoalHistory. -->
-<div id="onboarding-goal" class="onb-screen onb-bg-brand" style="display:none">
+<!-- Step 5 — Age. Numeric keypad on iOS via inputmode + type=number.
+     Optional greeting line above the head interpolates the captured
+     name from step 4. Validation: 13..120; CTA disabled otherwise.
+     Age is used visibly on the shock screen (step 7) as an eyebrow. -->
+<div id="onb-v2-age" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="2">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <p class="onb-v2-greeting" id="onb-v2-age-greeting" style="display:none"></p>
+      <h1 class="onb-v2-head" id="onb-v2-age-head"></h1>
+      <div class="onb-v2-field">
+        <input class="onb-v2-input onb-v2-input-num" type="number"
+               inputmode="numeric" pattern="[0-9]*" id="onb-v2-age-input"
+               min="13" max="120" aria-label="Age">
+      </div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-age-cta" onclick="_onbV2CtaAge()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 6 — Phone hours. Range slider 1..12 with live value display
+     above the track. First slider in the app — component styling in
+     .onb-v2-slider* CSS is reused by step 13 (reading frequency). -->
+<div id="onb-v2-hours" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="2">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-hours-head"></h1>
+      <div class="onb-v2-slider-wrap">
+        <div class="onb-v2-slider-value" id="onb-v2-hours-value" aria-live="polite"></div>
+        <input type="range" class="onb-v2-slider" id="onb-v2-hours-input"
+               min="1" max="12" step="1" value="4"
+               aria-label="Hours per day">
+        <div class="onb-v2-slider-scale" aria-hidden="true">
+          <span>1</span><span>12</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-hours-cta" onclick="_onbV2CtaHours()"></button>
+  </div>
+</div>
+
+<!-- Step 7 — Shock number. Display-only; no input. Two-line composition:
+     annual math sets the rate ("N hours a day, M days a year"),
+     punchline projects forward to a round-age milestone with
+     cumulative days accented ("By {milestone}, that's D full days").
+     Both rendered in _onbV2PrepareShock from state.onbAnswers.age +
+     phoneHours. Age is load-bearing on the projection, not just
+     displayed. -->
+<div id="onb-v2-shock" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="3">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy onb-v2-shock">
+      <p class="onb-v2-shock-math" id="onb-v2-shock-math"></p>
+      <h1 class="onb-v2-head" id="onb-v2-shock-punch"></h1>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-shock-cta" onclick="_onbV2CtaShock()"></button>
+  </div>
+</div>
+
+<!-- Step 8 — Plan intro. Reframe from the shock: five minutes a day IS
+     the plan. Accent phrase is "five minutes a day" / "חמש דקות ביום". -->
+<div id="onb-v2-plan" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="3">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-plan-head"></h1>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-plan-cta" onclick="_onbV2CtaPlan()"></button>
+  </div>
+</div>
+
+<!-- Step 9 — Subject picker. Three cards rendered dynamically by
+     _onbV2PrepareSubject from _ONB_COPY.subject. Tap sets a live
+     preview via previewSubjectTheme; CTA commits via setSubject
+     which flips the app-wide theme for every downstream v2 screen. -->
+<div id="onb-v2-subject" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="4">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-subject-head"></h1>
+      <div class="onb-v2-cards" id="onb-v2-subject-cards"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-subject-cta" onclick="_onbV2CtaSubject()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 10 — Q1 multi-select. Cards rendered by _onbV2PrepareQ1
+     from _ONB_COPY.q1.options. Hint reminds "pick up to 3"; CTA
+     disabled until at least one pick, tap caps at 3. -->
+<div id="onb-v2-q1" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="4">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-q1-head"></h1>
+      <p class="onb-v2-hint" id="onb-v2-q1-hint"></p>
+      <div class="onb-v2-cards" id="onb-v2-q1-cards"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-q1-cta" onclick="_onbV2CtaQ1()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 11 — Q2 multi-select. Same component + shape as Q1. -->
+<div id="onb-v2-q2" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="4">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-q2-head"></h1>
+      <p class="onb-v2-hint" id="onb-v2-q2-hint"></p>
+      <div class="onb-v2-cards" id="onb-v2-q2-cards"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-q2-cta" onclick="_onbV2CtaQ2()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 12 — Q3 single choice. Also sets state.dailyGoalHistory (see
+     _onbV2CtaQ3) so the daily-goal reminder machinery picks up the
+     intent without a separate migration prompt. -->
+<div id="onb-v2-q3" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="4">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-q3-head"></h1>
+      <div class="onb-v2-cards" id="onb-v2-q3-cards"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-q3-cta" onclick="_onbV2CtaQ3()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 13 — Q4 slider. 5-point Likert 0..4 (never / rarely /
+     sometimes / often / every day). Live label updates via the
+     .onb-v2-slider-value display. Slider primitive reused from
+     step 6. -->
+<div id="onb-v2-q4" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-q4-head"></h1>
+      <div class="onb-v2-slider-wrap">
+        <div class="onb-v2-slider-value" id="onb-v2-q4-value" aria-live="polite"></div>
+        <input type="range" class="onb-v2-slider" id="onb-v2-q4-input"
+               min="0" max="4" step="1" value="2"
+               aria-label="Reading frequency">
+        <div class="onb-v2-slider-scale" aria-hidden="true">
+          <span id="onb-v2-q4-scale-left"></span><span id="onb-v2-q4-scale-right"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-q4-cta" onclick="_onbV2CtaQ4()"></button>
+  </div>
+</div>
+
+<!-- Step 14 — Mirror. Reflects the user's picks back. Head + list
+     rendered dynamically in _onbV2PrepareMirror from state.onbAnswers
+     and state.subject. -->
+<div id="onb-v2-mirror" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="5">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <!-- Mirror has no screen heading — the cards *are* the screen.
+           Cards + closing block are rendered dynamically in
+           _onbV2PrepareMirror from state.onbAnswers. -->
+      <div class="onb-v2-mirror-list" id="onb-v2-mirror-list"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-mirror-cta" onclick="_onbV2CtaMirror()"></button>
+  </div>
+</div>
+
+<!-- Step 15 — Let's start. Statement screen bridging Q4 → first
+     dialogue. Standard v2 head + sub layout. CTA advances to step 16
+     which hijacks the reader (openReader(1, 1)). -->
+<div id="onb-v2-lets-start" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="5">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-lets-start-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-lets-start-sub"></p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-lets-start-cta" onclick="_onbV2CtaLetsStart()"></button>
+  </div>
+</div>
+
+<!-- Step 17 — day-1 streak celebration. Flame icon (reuses #icon-streak
+     from the endowment overlay), amber eyebrow, head, sub, CTA.
+     Fires after the user finishes the first dialogue via
+     _onbFinishFirstDialogue → _onbShowStep(17). -->
+<div id="onb-v2-streak" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="5">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy onb-v2-streak-copy">
+      <div class="onb-v2-streak-flame" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="88" height="88"><use href="#icon-streak"/></svg>
+      </div>
+      <div class="onb-v2-streak-eyebrow" id="onb-v2-streak-eyebrow"></div>
+      <h1 class="onb-v2-head" id="onb-v2-streak-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-streak-sub"></p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-streak-cta" onclick="_onbV2CtaStreak()"></button>
+  </div>
+</div>
+
+<!-- Step 17 — daily goal. Three cards ('one' / 'two' / 'own_pace')
+     with flame icons anchoring to the streak beat just before. Cards
+     + CSS recovered verbatim from the v1 goal screen; _onbV2PrepareGoal
+     preselects based on Q3 answer and writes state.dailyGoalHistory
+     with the exact values the runtime goal-met consumers recognize. -->
+<div id="onb-v2-goal" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="5">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-goal-inner">
     <div class="onb-goal-copy">
-      <h1 class="onb-goal-head" id="onb-goal-head">כמה זמן ביום?</h1>
-      <p class="onb-goal-sub" id="onb-goal-sub">הרצף שלך נבנה מזה. אפשר לשנות בכל רגע.</p>
+      <h1 class="onb-goal-head" id="onb-v2-goal-head"></h1>
+      <p class="onb-goal-sub" id="onb-v2-goal-sub"></p>
     </div>
-    <div class="onb-goal-options" id="onb-goal-options">
-      <button type="button" class="onb-goal-card" data-goal="one" onclick="_onbSelectGoal('one')">
+    <div class="onb-goal-options" id="onb-v2-goal-options">
+      <button type="button" class="onb-goal-card" data-goal="one" onclick="_onbV2GoalTap('one')">
         <span class="onb-goal-icon"><svg viewBox="0 0 64 64" width="34" height="34"><use href="#icon-streak"/></svg></span>
         <span class="onb-goal-text">
-          <span class="onb-goal-title" id="onb-goal-t1">דיאלוג אחד ביום</span>
-          <span class="onb-goal-hint" id="onb-goal-h1">קצב יומיומי, בערך חמש דקות</span>
+          <span class="onb-goal-title" id="onb-v2-goal-title-one"></span>
+          <span class="onb-goal-hint" id="onb-v2-goal-hint-one"></span>
         </span>
       </button>
-      <button type="button" class="onb-goal-card" data-goal="two" onclick="_onbSelectGoal('two')">
+      <button type="button" class="onb-goal-card" data-goal="two" onclick="_onbV2GoalTap('two')">
         <span class="onb-goal-icon onb-goal-icon-double">
           <svg viewBox="0 0 64 64" width="30" height="30"><use href="#icon-streak"/></svg>
           <svg viewBox="0 0 64 64" width="30" height="30"><use href="#icon-streak"/></svg>
         </span>
         <span class="onb-goal-text">
-          <span class="onb-goal-title" id="onb-goal-t2">שני דיאלוגים</span>
-          <span class="onb-goal-hint" id="onb-goal-h2">לצלול פנימה, בערך עשר דקות</span>
+          <span class="onb-goal-title" id="onb-v2-goal-title-two"></span>
+          <span class="onb-goal-hint" id="onb-v2-goal-hint-two"></span>
         </span>
       </button>
-      <button type="button" class="onb-goal-card" data-goal="own_pace" onclick="_onbSelectGoal('own_pace')">
+      <button type="button" class="onb-goal-card" data-goal="own_pace" onclick="_onbV2GoalTap('own_pace')">
         <span class="onb-goal-icon"><svg viewBox="0 0 64 64" width="34" height="34"><use href="#icon-level"/></svg></span>
         <span class="onb-goal-text">
-          <span class="onb-goal-title" id="onb-goal-t3">הקצב שלי</span>
-          <span class="onb-goal-hint" id="onb-goal-h3">בלי לחץ, ללמוד כשמתאים</span>
+          <span class="onb-goal-title" id="onb-v2-goal-title-own_pace"></span>
+          <span class="onb-goal-hint" id="onb-v2-goal-hint-own_pace"></span>
         </span>
       </button>
     </div>
   </div>
   <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-goal-cta" disabled onclick="_onbFinishGoal()">לדיאלוג הראשון ←</button>
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-goal-cta" onclick="_onbV2CtaGoal()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 18 — review request. Rate button opens the platform's store
+     URL; Skip advances without opening. Both land on step 19. -->
+<div id="onb-v2-review" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="5">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-review-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-review-sub"></p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-review-cta" onclick="_onbV2CtaReviewRate()"></button>
+    <button type="button" class="onb-v2-skip" id="onb-v2-review-skip" onclick="_onbV2CtaReviewSkip()"></button>
+  </div>
+</div>
+
+<!-- Step 18 — journey. Top: accent-bordered card projecting the next
+     30 days (name-interpolated head + date pill + three tiles from the
+     user's Q1/Q2/Q3 picks + stat row). Below: section head + two
+     feature blocks explaining the mechanism. All dynamic content is
+     rendered in _onbV2PrepareJourney. -->
+<div id="onb-v2-journey" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="6">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head onb-v2-journey-head" id="onb-v2-journey-head"></h1>
+      <div class="onb-v2-journey-card">
+        <div class="onb-v2-journey-card-head" id="onb-v2-journey-card-head"></div>
+        <div class="onb-v2-journey-date-pill" id="onb-v2-journey-date-pill"></div>
+        <div class="onb-v2-journey-tiles" id="onb-v2-journey-tiles"></div>
+        <div class="onb-v2-journey-stat" id="onb-v2-journey-stat"></div>
+      </div>
+      <div class="onb-v2-journey-section-head" id="onb-v2-journey-section-head"></div>
+      <ul class="onb-v2-journey-features" id="onb-v2-journey-features"></ul>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-journey-cta" onclick="_onbV2CtaJourney()"></button>
+  </div>
+</div>
+
+<!-- Step 21 — commitment level. Terminal step. Five single-choice
+     cards state the user's commitment level; the pick is captured to
+     state.onbAnswers.commitment for later analysis but doesn't gate
+     anything downstream. CTA runs _onbComplete → home. -->
+<div id="onb-v2-commit" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="6">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-commit-head"></h1>
+      <div class="onb-v2-cards" id="onb-v2-commit-cards"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-commit-cta" onclick="_onbV2CtaCommit()" disabled></button>
   </div>
 </div>
 

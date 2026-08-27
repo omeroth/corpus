@@ -20,7 +20,8 @@ let package = Package(
         .package(name: "CapacitorStatusBar", path: "../../../node_modules/@capacitor/status-bar"),
         .package(name: "CapawesomeCapacitorScreenshot", path: "../../../node_modules/@capawesome/capacitor-screenshot"),
         .package(name: "CapgoCapacitorSocialLogin", path: "../../../node_modules/@capgo/capacitor-social-login"),
-        .package(name: "CorpusInstagramShare", path: "../../../plugins/corpus-instagram-share")
+        .package(name: "CorpusInstagramShare", path: "../../../plugins/corpus-instagram-share"),
+        .package(name: "CorpusReview", path: "../../../plugins/corpus-review")
     ],
     targets: [
         .target(
@@ -36,7 +37,8 @@ let package = Package(
                 .product(name: "CapacitorStatusBar", package: "CapacitorStatusBar"),
                 .product(name: "CapawesomeCapacitorScreenshot", package: "CapawesomeCapacitorScreenshot"),
                 .product(name: "CapgoCapacitorSocialLogin", package: "CapgoCapacitorSocialLogin"),
-                .product(name: "CorpusInstagramShare", package: "CorpusInstagramShare")
+                .product(name: "CorpusInstagramShare", package: "CorpusInstagramShare"),
+                .product(name: "CorpusReview", package: "CorpusReview")
             ]
         )
     ]
