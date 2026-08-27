@@ -11300,8 +11300,8 @@ const _ONB_COPY = {
   },
   solution: {
     head: {
-      en: 'Corpus gives you the ideas you care about, in <span class="onb-v2-em">five minutes a day</span>',
-      he: 'Corpus נותן לך רעיונות שמעניינים אותך, <span class="onb-v2-em">בחמש דקות ביום</span>',
+      en: '<span class="onb-v2-em">Corpus</span> gives you the ideas you care about, in <span class="onb-v2-em">five minutes a day</span>',
+      he: '<span class="onb-v2-em">Corpus</span> נותן לך רעיונות שמעניינים אותך, <span class="onb-v2-em">בחמש דקות ביום</span>',
     },
     cta: { en: 'Continue', he: 'המשך' },
   },
@@ -11320,7 +11320,7 @@ const _ONB_COPY = {
   },
   hours: {
     head:      { en: 'How many hours a day are you on your phone?',
-                 he: 'כמה שעות ביום אתה על הטלפון?' },
+                 he: 'כמה שעות ביום אתה בטלפון?' },
     // Singular/plural unit for the slider's live-value display.
     // Hebrew uses "שעה" for 1, "שעות" for 2+; English "hour" vs "hours".
     unit_one:  { en: 'hour',                        he: 'שעה' },
@@ -11365,7 +11365,8 @@ const _ONB_COPY = {
     },
   },
   q1: {
-    head: { en: 'What do you want to get out of Corpus?', he: 'מה תרצה להוציא מ-Corpus?' },
+    head: { en: 'What do you want to gain from <span class="onb-v2-em">Corpus</span>?',
+            he: 'מה תרצה להשיג מ-<span class="onb-v2-em">Corpus</span>?' },
     hint: { en: 'The one that matters most.',             he: 'מה שהכי חשוב לך.' },
     cta:  { en: 'Continue',                               he: 'המשך' },
     // Options — stable ids for analytics; text is what the user sees
@@ -11412,35 +11413,35 @@ const _ONB_COPY = {
     cta:  { en: 'Continue',                    he: 'המשך' },
     options: [
       { id: 'own-ideas',
-        text:    { en: '💡 Having ideas of my own, not borrowed ones',
-                   he: '💡 רעיונות משלי, ולא של אחרים' },
+        text:    { en: '💡 That I have my own ideas',
+                   he: '💡 שיהיו לי רעיונות משלי' },
         support: { en: "You'll practice reasoning from ideas, not just recognizing them.",
                    he: 'תתרגל להסיק מרעיונות, לא רק לזהות אותם.' },
         tile:    { en: 'Own ideas', he: 'משלי' } },
       { id: 'explain-clearly',
-        text:    { en: '🗣️ Explaining things clearly to other people',
-                   he: '🗣️ להסביר דברים בבהירות לאנשים אחרים' },
+        text:    { en: '🗣️ That I can explain things clearly',
+                   he: '🗣️ שאני אדע להסביר דברים בבהירות' },
         support: { en: 'Every lesson ends with the idea in one sentence you can say back.',
                    he: 'כל שיעור נגמר ברעיון במשפט אחד שאפשר לחזור עליו.' },
         tile:    { en: 'Clear speech', he: 'בבהירות' } },
       { id: 'know-opinions',
-        text:    { en: '🧭 Knowing where my opinions come from',
-                   he: '🧭 לדעת מאיפה באות הדעות שלי' },
+        text:    { en: '🧭 That I know where my opinions come from',
+                   he: '🧭 שאני אדע מאיפה באות הדעות שלי' },
         support: { en: "You'll see where the ideas you hold came from.",
                    he: 'תראה מאיפה הגיעו הרעיונות שאתה מחזיק בהם.' },
         tile:    { en: 'Opinion roots', he: 'שורשי דעות' } },
       { id: 'finish-hard',
-        text:    { en: '📖 Reading things that are hard and finishing them',
-                   he: '📖 לקרוא דברים קשים ולסיים אותם' },
+        text:    { en: '📖 That I read hard things and finish them',
+                   he: '📖 שאני אקרא דברים קשים ואסיים אותם' },
         support: { en: 'Hard books get broken into finishable pieces, one a day.',
                    he: 'ספרים קשים מתפרקים לחתיכות שאפשר לסיים, אחת ביום.' },
         tile:    { en: 'Finish hard books', he: 'לסיים ספרים קשים' } },
-      { id: 'news-underneath',
-        text:    { en: '🌍 Understanding the news underneath the headlines',
-                   he: '🌍 להבין את החדשות מתחת לכותרות' },
+      { id: 'world-events',
+        text:    { en: "🌍 That I understand what's happening in the world",
+                   he: '🌍 שאני אבין אירועים שמתרחשים בעולם' },
         support: { en: "Each week's ideas connect to something happening right now.",
                    he: 'הרעיונות של השבוע מתחברים למשהו שקורה עכשיו.' },
-        tile:    { en: 'News depth', he: 'עומק בחדשות' } },
+        tile:    { en: 'World events', he: 'אירועים בעולם' } },
     ],
   },
   q3: {
@@ -11563,8 +11564,8 @@ const _ONB_COPY = {
   // Skip and Rate both advance to step 18, so the ask is soft.
   review: {
     head:     { en: 'Before we start.',     he: 'לפני שמתחילים' },
-    sub:      { en: 'If you like Corpus, a rating helps others find it.',
-                he: 'אם Corpus מוצא חן בעיניך, דירוג עוזר לאנשים נוספים למצוא אותו.' },
+    sub:      { en: 'If you like <span class="onb-v2-em">Corpus</span>, a rating helps others find it.',
+                he: 'אם <span class="onb-v2-em">Corpus</span> מוצא חן בעיניך, דירוג עוזר לאנשים נוספים למצוא אותו.' },
     cta:      { en: 'Rate Corpus',          he: 'דרג את Corpus' },
     skip:     { en: 'Not right now',        he: 'לא עכשיו' },
   },
@@ -11666,7 +11667,7 @@ function _onbApplyLang(lang) {
   setText('onb-v2-plan-cta',      'plan',     'cta');
   setText('onb-v2-subject-head',  'subject',  'head');
   setText('onb-v2-subject-cta',   'subject',  'cta');
-  setText('onb-v2-q1-head',       'q1',       'head');
+  setHTML('onb-v2-q1-head',       'q1',       'head');
   setText('onb-v2-q1-hint',       'q1',       'hint');
   setText('onb-v2-q1-cta',        'q1',       'cta');
   setText('onb-v2-q2-head',       'q2',       'head');
@@ -11690,7 +11691,7 @@ function _onbApplyLang(lang) {
   setText('onb-v2-goal-sub',      'goal',     'sub');
   setText('onb-v2-goal-cta',      'goal',     'cta');
   setText('onb-v2-review-head',   'review',   'head');
-  setText('onb-v2-review-sub',    'review',   'sub');
+  setHTML('onb-v2-review-sub',    'review',   'sub');
   setText('onb-v2-review-cta',    'review',   'cta');
   setText('onb-v2-review-skip',   'review',   'skip');
   // Journey screen: card + tiles + features rendered dynamically in
