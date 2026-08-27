@@ -6012,40 +6012,78 @@
   }
   html.dark .onb-screen.onb-v2 .onb-v2-hint { color: var(--text); }
 
-  /* Mirror list — bulleted recap on step 14. Each item is a full
-     sentence in the promoted body-copy style. Accent dot at start
-     of each row anchors the list without cluttering it. */
+  /* Mirror screen (step 13) — one card per pick, closing block below.
+     Card visual mirrors the .onb-v2-card question-screen shape so the
+     mirror reads as "here's what you chose, presented back the same
+     way." Cards are display-only (no cursor, no hover, no selected
+     state). */
   .onb-screen.onb-v2 .onb-v2-mirror-list {
-    list-style: none;
     padding: 0;
-    margin: 20px 0 0;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 10px;
     max-width: 380px;
-    margin-inline: auto;
   }
-  .onb-screen.onb-v2 .onb-v2-mirror-item {
-    font-family: 'Nunito', sans-serif;
-    font-weight: 700;
-    font-size: calc(19px * var(--text-scale));
+  .onb-screen.onb-v2 .onb-v2-mirror-card {
+    padding: 14px 18px;
+    background: var(--surface);
     color: var(--ink);
-    line-height: 1.4;
-    padding-inline-start: 18px;
-    position: relative;
+    border: 1.5px solid rgba(var(--accent-rgb), 0.18);
+    border-radius: 14px;
     text-align: start;
   }
-  .onb-screen.onb-v2 .onb-v2-mirror-item::before {
-    content: '';
-    position: absolute;
-    inset-inline-start: 0;
-    top: 0.65em;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
+  .onb-screen.onb-v2 .onb-v2-mirror-card-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: calc(17px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.35;
   }
-  html.dark .onb-screen.onb-v2 .onb-v2-mirror-item { color: var(--text); }
+  .onb-screen.onb-v2 .onb-v2-mirror-card-support {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;
+    font-size: calc(14px * var(--text-scale));
+    color: var(--ink);
+    opacity: 0.7;
+    line-height: 1.4;
+    margin-top: 4px;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-mirror-card {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-mirror-card-title,
+  html.dark .onb-screen.onb-v2 .onb-v2-mirror-card-support { color: var(--text); }
+
+  /* Closing block below the cards — no card chrome, tighter type
+     ladder. Distinct-from-cards is the whole point: this is Corpus
+     speaking, not the user's own picks reflected back. */
+  .onb-screen.onb-v2 .onb-v2-mirror-closing {
+    text-align: center;
+    margin: 24px auto 0;
+    padding: 0 8px;
+  }
+  .onb-screen.onb-v2 .onb-v2-mirror-closing-head {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: calc(22px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .onb-screen.onb-v2 .onb-v2-mirror-closing-line {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;
+    font-size: calc(15px * var(--text-scale));
+    color: var(--ink);
+    opacity: 0.65;
+    line-height: 1.4;
+    margin-top: 6px;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-mirror-closing-head,
+  html.dark .onb-screen.onb-v2 .onb-v2-mirror-closing-line { color: var(--text); }
 
   /* Progress-pill active fill on v2 uses the current subject accent
      (not the hardcoded philosophy fallback used by legacy v1 progress).
@@ -11107,28 +11145,35 @@ const _ONB_COPY = {
     head: { en: 'What do you want to get out of Corpus?', he: 'מה תרצה להוציא מ-Corpus?' },
     hint: { en: 'Pick up to 3',                           he: 'בחר עד שלוש' },
     cta:  { en: 'Continue',                               he: 'המשך' },
-    // Options — stable ids for analytics; text is what the user sees on
-    // the picker (emoji-prefixed on both langs); mirror is a shorter
-    // phrase without the emoji for the recap on step 13.
+    // Options — stable ids for analytics; text is what the user sees
+    // on the picker (emoji-prefixed on both langs); support is the
+    // "here's what Corpus does about that" line rendered on the
+    // mirror card for this option (step 13).
     options: [
       { id: 'understand-ideas',
-        text:   { en: '🧠 Understand ideas that shaped the world',   he: '🧠 להבין רעיונות שעיצבו את העולם' },
-        mirror: { en: 'ideas that shaped the world',                 he: 'רעיונות שעיצבו את העולם' } },
+        text:    { en: '🧠 Understand ideas that shaped the world',   he: '🧠 להבין רעיונות שעיצבו את העולם' },
+        support: { en: 'Every idea comes from the thinker who first put it into words.',
+                   he: 'כל רעיון בא מההוגה שנתן לו את המילים הראשונות.' } },
       { id: 'worth-reading',
-        text:   { en: '📵 Something worth reading instead of scrolling', he: '📵 משהו ששווה לקרוא במקום לגלול' },
-        mirror: { en: 'something worth reading',                        he: 'משהו ששווה לקרוא' } },
+        text:    { en: '📵 Something worth reading instead of scrolling', he: '📵 משהו ששווה לקרוא במקום לגלול' },
+        support: { en: 'Five worthwhile minutes replace the scroll, one day at a time.',
+                   he: 'חמש דקות שוות מחליפות את הגלילה, יום אחד בכל פעם.' } },
       { id: 'hold-own',
-        text:   { en: '💬 Hold my own in a real conversation',       he: '💬 לעמוד על שלי בשיחה אמיתית' },
-        mirror: { en: 'holding your own in a real conversation',     he: 'לעמוד על שלך בשיחה' } },
+        text:    { en: '💬 Hold my own in a real conversation',       he: '💬 לעמוד על שלי בשיחה אמיתית' },
+        support: { en: "You'll walk out of each lesson with one idea you can quote out loud.",
+                   he: 'מכל שיעור תצא עם רעיון אחד שאפשר לצטט בשיחה.' } },
       { id: 'read-thinkers',
-        text:   { en: '📚 Finally read the thinkers I\'ve heard about', he: '📚 סוף סוף לקרוא את ההוגים ששמעתי עליהם' },
-        mirror: { en: 'the thinkers you\'ve heard about',              he: 'ההוגים ששמעת עליהם' } },
+        text:    { en: '📚 Finally read the thinkers I\'ve heard about', he: '📚 סוף סוף לקרוא את ההוגים ששמעתי עליהם' },
+        support: { en: "You'll meet the thinkers themselves, not just their summaries.",
+                   he: 'תפגוש את ההוגים עצמם, לא רק את התקצירים.' } },
       { id: 'build-habit',
-        text:   { en: '🔥 Build a habit that actually sticks',       he: '🔥 לבנות הרגל שבאמת נשאר' },
-        mirror: { en: 'a habit that sticks',                         he: 'הרגל שנשאר' } },
+        text:    { en: '🔥 Build a habit that actually sticks',       he: '🔥 לבנות הרגל שבאמת נשאר' },
+        support: { en: 'Short daily lessons and a streak do the sticking for you.',
+                   he: 'שיעורים קצרים יומיים ורצף עושים את העבודה בשבילך.' } },
       { id: 'think-clearly',
-        text:   { en: '🔍 Think more clearly about my own life',     he: '🔍 לחשוב בצלילות על החיים שלי' },
-        mirror: { en: 'clarity about your life',                     he: 'צלילות על החיים שלך' } },
+        text:    { en: '🔍 Think more clearly about my own life',     he: '🔍 לחשוב בצלילות על החיים שלי' },
+        support: { en: 'Every idea lands with a way to try it on your own week.',
+                   he: 'כל רעיון מגיע עם דרך לנסות אותו על השבוע שלך.' } },
     ],
   },
   q2: {
@@ -11138,51 +11183,55 @@ const _ONB_COPY = {
     cta:  { en: 'Continue',     he: 'המשך' },
     options: [
       { id: 'own-ideas',
-        text:   { en: '💡 Having ideas of my own, not borrowed ones',
-                  he: '💡 רעיונות משלי, ולא של אחרים' },
-        mirror: { en: 'ideas of your own',
-                  he: 'רעיונות משלך' } },
+        text:    { en: '💡 Having ideas of my own, not borrowed ones',
+                   he: '💡 רעיונות משלי, ולא של אחרים' },
+        support: { en: "You'll practice reasoning from ideas, not just recognizing them.",
+                   he: 'תתרגל להסיק מרעיונות, לא רק לזהות אותם.' } },
       { id: 'explain-clearly',
-        text:   { en: '🗣️ Explaining things clearly to other people',
-                  he: '🗣️ להסביר דברים בבהירות לאנשים אחרים' },
-        mirror: { en: 'explaining things clearly',
-                  he: 'להסביר דברים בבהירות' } },
+        text:    { en: '🗣️ Explaining things clearly to other people',
+                   he: '🗣️ להסביר דברים בבהירות לאנשים אחרים' },
+        support: { en: 'Every lesson ends with the idea in one sentence you can say back.',
+                   he: 'כל שיעור נגמר ברעיון במשפט אחד שאפשר לחזור עליו.' } },
       { id: 'know-opinions',
-        text:   { en: '🧭 Knowing where my opinions come from',
-                  he: '🧭 לדעת מאיפה באות הדעות שלי' },
-        mirror: { en: 'knowing where your opinions come from',
-                  he: 'לדעת מאיפה באות הדעות שלך' } },
+        text:    { en: '🧭 Knowing where my opinions come from',
+                   he: '🧭 לדעת מאיפה באות הדעות שלי' },
+        support: { en: "You'll see where the ideas you hold came from.",
+                   he: 'תראה מאיפה הגיעו הרעיונות שאתה מחזיק בהם.' } },
       { id: 'finish-hard',
-        text:   { en: '📖 Reading things that are hard and finishing them',
-                  he: '📖 לקרוא דברים קשים ולסיים אותם' },
-        mirror: { en: 'finishing hard books',
-                  he: 'לסיים ספרים קשים' } },
+        text:    { en: '📖 Reading things that are hard and finishing them',
+                   he: '📖 לקרוא דברים קשים ולסיים אותם' },
+        support: { en: 'Hard books get broken into finishable pieces, one a day.',
+                   he: 'ספרים קשים מתפרקים לחתיכות שאפשר לסיים, אחת ביום.' } },
       { id: 'news-underneath',
-        text:   { en: '🌍 Understanding the news underneath the headlines',
-                  he: '🌍 להבין את החדשות מתחת לכותרות' },
-        mirror: { en: 'the news underneath the headlines',
-                  he: 'החדשות מתחת לכותרות' } },
+        text:    { en: '🌍 Understanding the news underneath the headlines',
+                   he: '🌍 להבין את החדשות מתחת לכותרות' },
+        support: { en: "Each week's ideas connect to something happening right now.",
+                   he: 'הרעיונות של השבוע מתחברים למשהו שקורה עכשיו.' } },
     ],
   },
   q3: {
     head: { en: "What's your goal?", he: 'מה המטרה שלך?' },
     cta:  { en: 'Continue',           he: 'המשך' },
     // Single choice. The picked id also drives state.dailyGoalHistory
-    // (see _onbV2CtaQ3) — mirror-form used verbatim in the recap on
-    // step 13 as "Your goal: {mirror}".
+    // (see _onbV2CtaQ3). Each option's support line surfaces on the
+    // mirror card for that pick (step 13).
     options: [
       { id: 'daily',
-        text:   { en: '⚡ Five minutes a day, every day', he: '⚡ חמש דקות ביום, כל יום' },
-        mirror: { en: 'five minutes a day, every day',    he: 'חמש דקות ביום, כל יום' } },
+        text:    { en: '⚡ Five minutes a day, every day', he: '⚡ חמש דקות ביום, כל יום' },
+        support: { en: 'A short daily reminder lands at a time you pick.',
+                   he: 'תזכורת יומית קצרה תגיע בשעה שתבחר.' } },
       { id: 'few-week',
-        text:   { en: '📅 A few times a week',            he: '📅 כמה פעמים בשבוע' },
-        mirror: { en: 'a few times a week',               he: 'כמה פעמים בשבוע' } },
+        text:    { en: '📅 A few times a week',            he: '📅 כמה פעמים בשבוע' },
+        support: { en: 'Reminders stay gentle — a few days a week, not every day.',
+                   he: 'התזכורות נשארות רכות — כמה פעמים בשבוע, לא כל יום.' } },
       { id: 'finish',
-        text:   { en: '🏛️ Finish a whole subject',        he: '🏛️ לסיים תחום שלם' },
-        mirror: { en: 'finish a whole subject',           he: 'לסיים תחום שלם' } },
+        text:    { en: '🏛️ Finish a whole subject',        he: '🏛️ לסיים תחום שלם' },
+        support: { en: 'Your path is planned to complete your subject end to end.',
+                   he: 'המסלול שלך מתוכנן לסיים את התחום מקצה לקצה.' } },
       { id: 'longest-streak',
-        text:   { en: '🔥 Build the longest streak I can', he: '🔥 לבנות את הרצף הכי ארוך שאפשר' },
-        mirror: { en: 'the longest streak you can',        he: 'הרצף הכי ארוך שאפשר' } },
+        text:    { en: '🔥 Build the longest streak I can', he: '🔥 לבנות את הרצף הכי ארוך שאפשר' },
+        support: { en: "Reminders and a streak counter that's hard to lose.",
+                   he: 'תזכורות ומונה רצף שקשה לאבד.' } },
     ],
   },
   q4: {
@@ -11205,21 +11254,16 @@ const _ONB_COPY = {
     ],
   },
   mirror: {
-    head: { en: "Here's what we heard.",
-            he: 'זה מה ששמענו' },
-    // Mirror is no longer the terminal step — CTA advances to Q4
-    // (honesty check). The commit-to-app moment is on Q4.
+    // No head — the cards *are* the screen. Each user pick becomes a
+    // card with the option text + a per-option "here's what Corpus
+    // does about it" support line. Closing block below the cards
+    // adds a reassurance beat before the CTA that advances to Q4.
     cta:  { en: 'Continue', he: 'המשך' },
-    // Line templates — {q1List}, {q2List}, {q3} interpolated at render
-    // time in _onbV2PrepareMirror. Personal + subject lines were dropped
-    // to keep the mirror a clean three-line recap of what the user
-    // *chose*, not what we know about them.
-    line_q1:       { en: 'You want: {q1List}.',
-                     he: 'אתה רוצה: {q1List}.' },
-    line_q2:       { en: 'A well-read life, to you: {q2List}.',
-                     he: 'חיים של אדם קורא בעיניך: {q2List}.' },
-    line_q3:       { en: 'Your goal: {q3}.',
-                     he: 'המטרה שלך: {q3}.' },
+    closing: {
+      head: { en: "That's the plan.",                              he: 'זו התוכנית.' },
+      line: { en: 'You can change any of this later, from settings.',
+              he: 'אפשר לשנות כל דבר בהגדרות בהמשך.' },
+    },
   },
 };
 
@@ -11267,6 +11311,8 @@ function _onbApplyLang(lang) {
   setText('onb-v2-q3-cta',        'q3',       'cta');
   setText('onb-v2-q4-head',       'q4',       'head');
   setText('onb-v2-q4-cta',        'q4',       'cta');
+  // Mirror head + card content are rendered dynamically in
+  // _onbV2PrepareMirror from state.onbAnswers; only the CTA is static.
   setText('onb-v2-mirror-cta',    'mirror',   'cta');
   // Text/number input placeholders (slider has none).
   const setPlaceholder = (id, group) => {
@@ -11745,67 +11791,70 @@ function _onbV2PrepareQ4() {
   }
 }
 
-// Mirror screen — reflects the user's picks back as a clean 3-line
-// recap of Q1 (what they want) + Q2 (well-read-life) + Q3 (goal).
-// Personal (age + hours) and subject lines were intentionally dropped
-// so the mirror reads as "what you chose," not "what we know about
-// you." Q4 (frequency) is asked AFTER the mirror, so it doesn't
-// appear here either.
+// Mirror screen — one card per Q1/Q2/Q3 pick, in that order. Each
+// card shows the option text (with its emoji) as its heading and the
+// option's `support` line underneath explaining what Corpus will do
+// about that choice. No screen heading — the cards *are* the screen.
+// A closing block ("That's the plan." + reassurance) sits below the
+// cards and is styled distinctly from them.
 function _onbV2PrepareMirror() {
   const isEn = state.lang === 'en';
-  const head = document.getElementById('onb-v2-mirror-head');
   const list = document.getElementById('onb-v2-mirror-list');
-  if (!head || !list) return;
+  if (!list) return;
   const a = state.onbAnswers || {};
-  head.textContent = isEn ? _ONB_COPY.mirror.head.en : _ONB_COPY.mirror.head.he;
 
-  const lines = [];
-  // Q1 picks (up to 3, joined comma-and)
-  if (Array.isArray(a.q1) && a.q1.length) {
-    const opts = _ONB_COPY.q1.options.filter(o => a.q1.indexOf(o.id) >= 0);
-    const phrases = opts.map(o => isEn ? o.mirror.en : o.mirror.he);
-    const joined = _onbV2JoinList(phrases, isEn);
-    const t = isEn ? _ONB_COPY.mirror.line_q1.en : _ONB_COPY.mirror.line_q1.he;
-    lines.push(t.replace('{q1List}', joined));
+  // Collect the picked option objects in Q1 → Q2 → Q3 order. Q1/Q2
+  // are arrays (multi-select); Q3 is a single id.
+  const picked = [];
+  if (Array.isArray(a.q1)) {
+    a.q1.forEach(id => {
+      const opt = _ONB_COPY.q1.options.find(o => o.id === id);
+      if (opt) picked.push(opt);
+    });
   }
-  // Q2 picks (up to 3, joined comma-and)
-  if (Array.isArray(a.q2) && a.q2.length) {
-    const opts = _ONB_COPY.q2.options.filter(o => a.q2.indexOf(o.id) >= 0);
-    const phrases = opts.map(o => isEn ? o.mirror.en : o.mirror.he);
-    const joined = _onbV2JoinList(phrases, isEn);
-    const t = isEn ? _ONB_COPY.mirror.line_q2.en : _ONB_COPY.mirror.line_q2.he;
-    lines.push(t.replace('{q2List}', joined));
+  if (Array.isArray(a.q2)) {
+    a.q2.forEach(id => {
+      const opt = _ONB_COPY.q2.options.find(o => o.id === id);
+      if (opt) picked.push(opt);
+    });
   }
-  // Q3 goal
   if (a.q3) {
     const opt = _ONB_COPY.q3.options.find(o => o.id === a.q3);
-    if (opt) {
-      const goalStr = isEn ? opt.mirror.en : opt.mirror.he;
-      const t = isEn ? _ONB_COPY.mirror.line_q3.en : _ONB_COPY.mirror.line_q3.he;
-      lines.push(t.replace('{q3}', goalStr));
-    }
+    if (opt) picked.push(opt);
   }
-  list.innerHTML = '';
-  lines.forEach(text => {
-    const li = document.createElement('li');
-    li.className = 'onb-v2-mirror-item';
-    li.textContent = text;
-    list.appendChild(li);
-  });
-}
 
-// Join a list of phrases with Oxford-comma-and (EN) or Hebrew ", ו" (HE).
-function _onbV2JoinList(phrases, isEn) {
-  if (!phrases.length) return '';
-  if (phrases.length === 1) return phrases[0];
-  if (isEn) {
-    if (phrases.length === 2) return phrases[0] + ' and ' + phrases[1];
-    return phrases.slice(0, -1).join(', ') + ', and ' + phrases[phrases.length - 1];
-  } else {
-    // Hebrew: "A, B ו-C" (no comma before ו). For 2 items: "A ו-B".
-    if (phrases.length === 2) return phrases[0] + ' ו' + phrases[1];
-    return phrases.slice(0, -1).join(', ') + ' ו' + phrases[phrases.length - 1];
-  }
+  list.innerHTML = '';
+  picked.forEach(opt => {
+    const card = document.createElement('div');
+    card.className = 'onb-v2-mirror-card';
+    const title = document.createElement('div');
+    title.className = 'onb-v2-mirror-card-title';
+    title.textContent = isEn ? opt.text.en : opt.text.he;
+    const support = document.createElement('div');
+    support.className = 'onb-v2-mirror-card-support';
+    support.textContent = isEn ? opt.support.en : opt.support.he;
+    card.appendChild(title);
+    card.appendChild(support);
+    list.appendChild(card);
+  });
+
+  // Closing block — distinct from the cards. Head + line pulled from
+  // _ONB_COPY.mirror.closing.
+  const closing = document.createElement('div');
+  closing.className = 'onb-v2-mirror-closing';
+  const closingHead = document.createElement('div');
+  closingHead.className = 'onb-v2-mirror-closing-head';
+  closingHead.textContent = isEn
+    ? _ONB_COPY.mirror.closing.head.en
+    : _ONB_COPY.mirror.closing.head.he;
+  const closingLine = document.createElement('div');
+  closingLine.className = 'onb-v2-mirror-closing-line';
+  closingLine.textContent = isEn
+    ? _ONB_COPY.mirror.closing.line.en
+    : _ONB_COPY.mirror.closing.line.he;
+  closing.appendChild(closingHead);
+  closing.appendChild(closingLine);
+  list.appendChild(closing);
 }
 
 // Map from step number → prepare hook. Consumed by _onbShowStep.
@@ -23425,8 +23474,10 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
-      <h1 class="onb-v2-head" id="onb-v2-mirror-head"></h1>
-      <ul class="onb-v2-mirror-list" id="onb-v2-mirror-list"></ul>
+      <!-- Mirror has no screen heading — the cards *are* the screen.
+           Cards + closing block are rendered dynamically in
+           _onbV2PrepareMirror from state.onbAnswers. -->
+      <div class="onb-v2-mirror-list" id="onb-v2-mirror-list"></div>
     </div>
   </div>
   <div class="onb-cta-holder">
