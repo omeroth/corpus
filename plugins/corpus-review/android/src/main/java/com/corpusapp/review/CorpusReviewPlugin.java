@@ -8,10 +8,10 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
+import com.google.android.gms.tasks.Task;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
-import com.google.android.play.core.tasks.Task;
 
 // In-App Review via Play's ReviewManager. Play rate-limits this and
 // never tells you whether the dialog actually appeared — the launch

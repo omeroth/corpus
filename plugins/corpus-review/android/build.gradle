@@ -44,8 +44,13 @@ repositories {
 
 dependencies {
     implementation project(':capacitor-android')
-    // Google Play In-App Review — the Play Store rate-limits this and
-    // gives no reliable callback, so we treat "requested: true" as
-    // best-effort. Bumping the version is safe; there is no BOM.
+    // Compile-time only — Plugin.getActivity() returns AppCompatActivity,
+    // so the class must be resolvable when javac sees a call to it. The
+    // real activity is provided by the host app at runtime.
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    // Google Play In-App Review 2.x. In this version the Task type lives
+    // in Google Play Services (com.google.android.gms.tasks.Task) rather
+    // than the old com.google.android.play.core.tasks package — the
+    // play-services-tasks lib is pulled in transitively.
     implementation "com.google.android.play:review:2.0.2"
 }

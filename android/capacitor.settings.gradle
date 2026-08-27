@@ -28,3 +28,6 @@ project(':capawesome-capacitor-screenshot').projectDir = new File('../node_modul
 
 include ':capgo-capacitor-social-login'
 project(':capgo-capacitor-social-login').projectDir = new File('../node_modules/@capgo/capacitor-social-login/android')
+
+include ':corpus-review'
+project(':corpus-review').projectDir = new File('../plugins/corpus-review/android')
