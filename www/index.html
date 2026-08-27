@@ -10539,10 +10539,10 @@ async function loadProgressFromSupabase() {
     // (or lack of them) are authoritative.
     state.onbAnswers = state.onbAnswers || {
       name: '', age: null, phoneHours: null, q1: [], q2: [], q3: '',
-      readingFreq: null, commitment: '', completedAt: ''
+      dailyGoal: '', readingFreq: null, commitment: '', completedAt: ''
     };
     const _srvOnb = data.onboarding_answers || {};
-    ['name', 'q3', 'commitment', 'completedAt'].forEach(k => {
+    ['name', 'q3', 'dailyGoal', 'commitment', 'completedAt'].forEach(k => {
       if (_srvOnb[k] && !state.onbAnswers[k]) state.onbAnswers[k] = _srvOnb[k];
     });
     ['age', 'phoneHours', 'readingFreq'].forEach(k => {
@@ -11232,15 +11232,15 @@ function _onbShowScreen(screenId) {
 // without projecting across a lifetime. Later screens (mirror,
 // step 14) will reference it too when they ship.
 
-const _ONB_TOTAL_STEPS = 19;
+const _ONB_TOTAL_STEPS = 20;
 // Which phase (1..6) each step belongs to. Drives the 6-pill progress.
 const _ONB_STEP_TO_PHASE = {
-  1: 1, 2: 1, 3: 1,                  // welcome / problem / solution
-  4: 2, 5: 2, 6: 2,                  // name / age / phone hours
-  7: 3, 8: 3,                        // shock / plan intro
-  9: 4, 10: 4, 11: 4, 12: 4,         // subject / Q1 / Q2 / Q3
-  13: 5, 14: 5, 15: 5, 16: 5, 17: 5, // mirror / Q4 / first dialogue / streak / review
-  18: 6, 19: 6,                      // journey / commit
+  1: 1, 2: 1, 3: 1,                          // welcome / problem / solution
+  4: 2, 5: 2, 6: 2,                          // name / age / phone hours
+  7: 3, 8: 3,                                // shock / plan intro
+  9: 4, 10: 4, 11: 4, 12: 4,                 // subject / Q1 / Q2 / Q3
+  13: 5, 14: 5, 15: 5, 16: 5, 17: 5, 18: 5,  // mirror / Q4 / first dialogue / streak / goal / review
+  19: 6, 20: 6,                              // journey / commit
 };
 // DOM ids in step order. Steps not yet built map to null; _onbShowStep
 // treats a null slot as "not implemented yet, jump to completion" so a
@@ -11265,9 +11265,10 @@ const _ONB_STEP_TO_ID = {
   // instead of the normal id-lookup path.
   15: null,
   16: 'onb-v2-streak',
-  17: 'onb-v2-review',
-  18: 'onb-v2-journey',
-  19: 'onb-v2-commit',
+  17: 'onb-v2-goal',
+  18: 'onb-v2-review',
+  19: 'onb-v2-journey',
+  20: 'onb-v2-commit',
 };
 
 // Bilingual copy map for the intro screens (1-3). Later commits will
@@ -11505,6 +11506,38 @@ const _ONB_COPY = {
   // onboarding guard runs _onbFinishFirstDialogue on completion, which
   // shows the thinker card wired to advance to step 16.
 
+  // Step 17 — daily goal. Recovered verbatim from the v1 goal screen
+  // (main:index.html around 22293) — three cards (one / two / own_pace)
+  // with the app's amber flame icon on the picks that anchor to the
+  // streak. Placed after streak so the flame connection reads: user just
+  // learned "miss a day and it resets"; goal picks the daily target.
+  // Q3 preselects a sensible default; user can change on the screen or
+  // accept the default. Writes state.dailyGoalHistory with the exact
+  // 'one' | 'two' | 'own_pace' values the goal-met + partway-nudge
+  // consumers recognize (_maybeMarkGoalMet, _showDcStats). Sub-line
+  // dropped the "change anytime" promise since no Profile UI exists to
+  // change it today.
+  goal: {
+    head: { en: 'How much time each day?',    he: 'כמה זמן ביום?' },
+    sub:  { en: 'Your streak builds from this.',
+            he: 'הרצף שלך נבנה מזה.' },
+    cta:  { en: 'Continue',                    he: 'המשך' },
+    options: [
+      { id: 'one',
+        title: { en: 'One dialogue a day',         he: 'דיאלוג אחד ביום' },
+        hint:  { en: 'A daily rhythm, about five minutes',
+                 he: 'קצב יומיומי, בערך חמש דקות' } },
+      { id: 'two',
+        title: { en: 'Two dialogues',              he: 'שני דיאלוגים' },
+        hint:  { en: 'Go a little deeper, about ten minutes',
+                 he: 'לצלול פנימה, בערך עשר דקות' } },
+      { id: 'own_pace',
+        title: { en: 'My own pace',                he: 'הקצב שלי' },
+        hint:  { en: 'No pressure, learn when it fits',
+                 he: 'בלי לחץ, ללמוד כשמתאים' } },
+    ],
+  },
+
   // Step 16 — day-1 streak celebration. Matches the endowment overlay
   // beat but as a v2 screen (no modal); flame + eyebrow + head + CTA.
   streak: {
@@ -11637,6 +11670,9 @@ function _onbApplyLang(lang) {
   setText('onb-v2-streak-head',   'streak',   'head');
   setText('onb-v2-streak-sub',    'streak',   'sub');
   setText('onb-v2-streak-cta',    'streak',   'cta');
+  setText('onb-v2-goal-head',     'goal',     'head');
+  setText('onb-v2-goal-sub',      'goal',     'sub');
+  setText('onb-v2-goal-cta',      'goal',     'cta');
   setText('onb-v2-review-head',   'review',   'head');
   setText('onb-v2-review-sub',    'review',   'sub');
   setText('onb-v2-review-cta',    'review',   'cta');
@@ -11858,15 +11894,10 @@ function _onbV2Q3Tap(optionId) {
 function _onbV2CtaQ3() {
   const pick = _onbV2Q3Pick || state.onbAnswers.q3;
   if (!pick) return;
-  const today = _streakDay();
-  state.dailyGoalHistory = state.dailyGoalHistory || [];
-  const existingIdx = state.dailyGoalHistory.findIndex(g => g && g.setAt === today);
-  if (existingIdx >= 0) {
-    state.dailyGoalHistory[existingIdx] = { setAt: today, value: pick };
-  } else {
-    state.dailyGoalHistory.push({ setAt: today, value: pick });
-  }
-  try { localStorage.setItem('corpus_daily_goal_set', '1'); } catch(e) {}
+  // Q3 is captured to state.onbAnswers only. The dedicated goal screen
+  // (step 17) writes state.dailyGoalHistory with the exact 'one' | 'two'
+  // | 'own_pace' values the runtime consumers recognize; Q3's ids
+  // wouldn't match those.
   _onbAdvanceStep(12, 13, { q3: pick });
 }
 
@@ -11971,8 +12002,44 @@ function _onbFinishFirstDialogue() {
   }
 }
 
-// Screen 16 (day-1 streak) — display-only celebration; advance to 17.
+// Screen 16 (day-1 streak) — display-only celebration; advance to 17 (goal).
 function _onbV2CtaStreak() { _onbAdvanceStep(16, 17); }
+
+// Screen 17 (daily goal) — single-select radio over three cards
+// ('one' / 'two' / 'own_pace'). Preselect logic maps the Q3 answer to
+// a sensible default so the CTA is enabled on land. Write pattern
+// mirrors the recovered v1 _onbFinishGoal: dated dedup on setAt,
+// persists corpus_daily_goal_set flag, fires posthog event.
+let _onbV2GoalPick = null;
+function _onbV2GoalTap(optionId) {
+  _onbV2GoalPick = optionId;
+  state.onbAnswers.dailyGoal = optionId;
+  document.querySelectorAll('#onb-v2-goal .onb-goal-card').forEach(c => {
+    c.classList.toggle('is-selected', c.dataset.goal === optionId);
+  });
+  const cta = document.getElementById('onb-v2-goal-cta');
+  if (cta) cta.disabled = false;
+}
+function _onbV2CtaGoal() {
+  const goal = _onbV2GoalPick || state.onbAnswers.dailyGoal;
+  if (!goal) return;
+  const today = _streakDay();
+  state.dailyGoalHistory = state.dailyGoalHistory || [];
+  const existingIdx = state.dailyGoalHistory.findIndex(g => g && g.setAt === today);
+  if (existingIdx >= 0) {
+    state.dailyGoalHistory[existingIdx] = { setAt: today, value: goal };
+  } else {
+    state.dailyGoalHistory.push({ setAt: today, value: goal });
+  }
+  try { localStorage.setItem('corpus_daily_goal_set', '1'); } catch(e) {}
+  try {
+    _phCapture('onboarding_goal_selected', {
+      goal: goal,
+      is_existing_user: !!localStorage.getItem('corpus_onboarding_done'),
+    });
+  } catch(e) {}
+  _onbAdvanceStep(17, 18, { dailyGoal: goal });
+}
 
 // Screen 17 (review request) — Rate fires the native review sheet
 // (SKStoreReviewController on iOS, Play ReviewManager on Android).
@@ -11986,16 +12053,16 @@ function _onbV2CtaReviewRate() {
     try {
       _phCapture('onboarding_review_tapped', { platform: platform, path: path });
     } catch(e) {}
-    _onbAdvanceStep(17, 18);
+    _onbAdvanceStep(18, 19);
   });
 }
 function _onbV2CtaReviewSkip() {
   try { _phCapture('onboarding_review_skipped', {}); } catch(e) {}
-  _onbAdvanceStep(17, 18);
+  _onbAdvanceStep(18, 19);
 }
 
-// Screen 18 (journey summary) — display-only; advance to 19.
-function _onbV2CtaJourney() { _onbAdvanceStep(18, 19); }
+// Screen 19 (journey summary) — display-only; advance to commit.
+function _onbV2CtaJourney() { _onbAdvanceStep(19, 20); }
 
 // Screen 19 (commitment) — single-choice pick. Terminal step. Tap
 // stores the id in state.onbAnswers.commitment (display-only — no
@@ -12354,6 +12421,42 @@ function _onbV2CountFirstThinkers(n) {
   } catch(e) { return 16; }
 }
 
+// Screen 17 — goal. Renders three cards (recovered from the v1 goal
+// screen) and preselects one based on the user's Q3 answer. Preselect
+// map: 'daily'/'few-week'/'longest-streak' → 'one'; 'finish' → 'two'.
+// If state.onbAnswers.dailyGoal already has a value (re-entering the
+// step), it takes precedence over the Q3 default.
+function _onbV2PrepareGoal() {
+  const list = document.getElementById('onb-v2-goal-options');
+  const cta  = document.getElementById('onb-v2-goal-cta');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+
+  // Per-card copy update — the DOM structure is static (HTML block),
+  // but titles/hints need to swap with language. Options iteration
+  // matches the render order in HTML.
+  const options = (_ONB_COPY.goal && _ONB_COPY.goal.options) || [];
+  options.forEach(opt => {
+    const titleEl = document.getElementById('onb-v2-goal-title-' + opt.id);
+    const hintEl  = document.getElementById('onb-v2-goal-hint-' + opt.id);
+    if (titleEl) titleEl.textContent = isEn ? opt.title.en : opt.title.he;
+    if (hintEl)  hintEl.textContent  = isEn ? opt.hint.en  : opt.hint.he;
+  });
+
+  // Preselect: user's existing dailyGoal takes precedence (resume);
+  // otherwise map Q3 answer to a default. 'finish' anchors to 'two';
+  // everything else defaults to 'one'.
+  const q3 = (state.onbAnswers && state.onbAnswers.q3) || '';
+  const q3Default = q3 === 'finish' ? 'two' : 'one';
+  const pick = (state.onbAnswers && state.onbAnswers.dailyGoal) || q3Default;
+  _onbV2GoalPick = pick;
+  state.onbAnswers.dailyGoal = pick;
+  document.querySelectorAll('#onb-v2-goal .onb-goal-card').forEach(c => {
+    c.classList.toggle('is-selected', c.dataset.goal === pick);
+  });
+  if (cta) cta.disabled = false;
+}
+
 // Screen 18 — journey. Top card projects the next 30 days (name +
 // date + three tiles drawn from Q1/Q2/Q3 picks + stat row). Below
 // the card, two feature blocks explain the mechanism. All copy is
@@ -12496,9 +12599,10 @@ const _ONB_STEP_HOOKS = {
   13: _onbV2PrepareMirror,
   14: _onbV2PrepareQ4,
   // 15: handled specially in _onbShowStep (reader takeover, no v2 DOM).
-  // 16 (streak) + 17 (review) are static once _onbApplyLang runs.
-  18: _onbV2PrepareJourney,
-  19: _onbV2PrepareCommit,
+  // 16 (streak) + 18 (review) are static once _onbApplyLang runs.
+  17: _onbV2PrepareGoal,
+  19: _onbV2PrepareJourney,
+  20: _onbV2PrepareCommit,
 };
 
 // Silent guest entry: mirrors enterAsGuest but skips hideAuthScreen (the
@@ -14453,6 +14557,7 @@ function defaultState() {
       q1: [],              // multi-select ids (stable), up to 3
       q2: [],              // multi-select ids (stable), up to 3
       q3: '',              // single-choice id: 'daily' | 'few-week' | 'finish' | 'longest-streak'
+      dailyGoal: '',       // 'one' | 'two' | 'own_pace' — matches state.dailyGoalHistory value shape
       readingFreq: null,   // slider position, 0..5
       commitment: '',      // ordered-ladder id: 'curious' | 'trying' | 'committed' | 'all-in'
       completedAt: '',     // ISO date on final commit
@@ -14589,7 +14694,7 @@ function loadState() {
   // if a corrupt persist wrote them as something else.
   state.onbAnswers = Object.assign(
     { name: '', age: null, phoneHours: null, q1: [], q2: [], q3: '',
-      readingFreq: null, commitment: '', completedAt: '' },
+      dailyGoal: '', readingFreq: null, commitment: '', completedAt: '' },
     state.onbAnswers || {}
   );
   if (!Array.isArray(state.onbAnswers.q1)) state.onbAnswers.q1 = [];
@@ -24209,8 +24314,54 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 17 — review request. Rate button opens the platform's store
-     URL; Skip advances without opening. Both land on step 18. -->
+<!-- Step 17 — daily goal. Three cards ('one' / 'two' / 'own_pace')
+     with flame icons anchoring to the streak beat just before. Cards
+     + CSS recovered verbatim from the v1 goal screen; _onbV2PrepareGoal
+     preselects based on Q3 answer and writes state.dailyGoalHistory
+     with the exact values the runtime goal-met consumers recognize. -->
+<div id="onb-v2-goal" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="5">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-goal-inner">
+    <div class="onb-goal-copy">
+      <h1 class="onb-goal-head" id="onb-v2-goal-head"></h1>
+      <p class="onb-goal-sub" id="onb-v2-goal-sub"></p>
+    </div>
+    <div class="onb-goal-options" id="onb-v2-goal-options">
+      <button type="button" class="onb-goal-card" data-goal="one" onclick="_onbV2GoalTap('one')">
+        <span class="onb-goal-icon"><svg viewBox="0 0 64 64" width="34" height="34"><use href="#icon-streak"/></svg></span>
+        <span class="onb-goal-text">
+          <span class="onb-goal-title" id="onb-v2-goal-title-one"></span>
+          <span class="onb-goal-hint" id="onb-v2-goal-hint-one"></span>
+        </span>
+      </button>
+      <button type="button" class="onb-goal-card" data-goal="two" onclick="_onbV2GoalTap('two')">
+        <span class="onb-goal-icon onb-goal-icon-double">
+          <svg viewBox="0 0 64 64" width="30" height="30"><use href="#icon-streak"/></svg>
+          <svg viewBox="0 0 64 64" width="30" height="30"><use href="#icon-streak"/></svg>
+        </span>
+        <span class="onb-goal-text">
+          <span class="onb-goal-title" id="onb-v2-goal-title-two"></span>
+          <span class="onb-goal-hint" id="onb-v2-goal-hint-two"></span>
+        </span>
+      </button>
+      <button type="button" class="onb-goal-card" data-goal="own_pace" onclick="_onbV2GoalTap('own_pace')">
+        <span class="onb-goal-icon"><svg viewBox="0 0 64 64" width="34" height="34"><use href="#icon-level"/></svg></span>
+        <span class="onb-goal-text">
+          <span class="onb-goal-title" id="onb-v2-goal-title-own_pace"></span>
+          <span class="onb-goal-hint" id="onb-v2-goal-hint-own_pace"></span>
+        </span>
+      </button>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-goal-cta" onclick="_onbV2CtaGoal()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 18 — review request. Rate button opens the platform's store
+     URL; Skip advances without opening. Both land on step 19. -->
 <div id="onb-v2-review" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
