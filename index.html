@@ -11733,15 +11733,17 @@ function _onbAdvanceStep(from, to, patch) {
 
 // Mark onboarding done and land on home. Sets defaults for anything
 // the user hasn't picked yet (subject defaults to philosophy from
-// defaultState). Also suppresses the v1 walkthrough — the v2 flow
-// educates enough that coach marks would be redundant.
+// defaultState). Then fires the owl walkthrough — the v2 flow explains
+// the product, the walkthrough explains the interface, and those are
+// different jobs. Bypass flag on the eligibility gate is what lets the
+// walkthrough fire even though the user already completed day 1 in
+// step 15 (the normal eligibility gate would block them).
 function _onbComplete() {
   const today = _streakDay();
   state.onbAnswers = state.onbAnswers || {};
   state.onbAnswers.completedAt = today;
   try { saveState(); } catch(e) {}
   try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
-  try { localStorage.setItem('corpus_walkthrough_done', '1'); } catch(e) {}
   try { localStorage.removeItem('corpus_onboarding_step'); } catch(e) {}
   try { _phCapture('onboarding_completed', { platform: _phPlatform(), lang: state.lang || 'he' }); } catch(e) {}
   document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
@@ -11750,6 +11752,12 @@ function _onbComplete() {
   });
   renderHome();
   showScreen('home');
+  // Fire the owl walkthrough on this first arrival at home.
+  // { bypassCompletionGate: true } tells _walkthroughShouldStart to
+  // ignore the "already completed a dialogue" gate (which normally
+  // protects returning users) — the v2 flow always leaves the user
+  // with one completed dialogue, but the walkthrough hasn't run yet.
+  try { _walkthroughStartIfEligible({ bypassCompletionGate: true }); } catch(e) {}
 }
 
 // Screen 1 (welcome) CTA — advance to screen 2.
@@ -11966,15 +11974,20 @@ function _onbFinishFirstDialogue() {
 // Screen 16 (day-1 streak) — display-only celebration; advance to 17.
 function _onbV2CtaStreak() { _onbAdvanceStep(16, 17); }
 
-// Screen 17 (review request) — Rate opens the platform store URL in a
-// new tab, then advances. Skip advances without opening. Both land on
-// step 18 so the ask is soft.
+// Screen 17 (review request) — Rate fires the native review sheet
+// (SKStoreReviewController on iOS, Play ReviewManager on Android).
+// Falls back to opening the store URL on web (or if the plugin is
+// unavailable for any reason). Both stores rate-limit and give no
+// callback, so we advance either way — the user reaches step 18
+// whether the sheet appeared or not. Skip advances without asking.
 function _onbV2CtaReviewRate() {
   const platform = (window.Capacitor && Capacitor.getPlatform && Capacitor.getPlatform()) || 'web';
-  const url = platform === 'android' ? _NPS_STORE_URL_ANDROID : _NPS_STORE_URL_IOS;
-  try { window.open(url, '_blank'); } catch(e) {}
-  try { _phCapture('onboarding_review_tapped', { platform: platform }); } catch(e) {}
-  _onbAdvanceStep(17, 18);
+  _requestNativeReview().then(({ path }) => {
+    try {
+      _phCapture('onboarding_review_tapped', { platform: platform, path: path });
+    } catch(e) {}
+    _onbAdvanceStep(17, 18);
+  });
 }
 function _onbV2CtaReviewSkip() {
   try { _phCapture('onboarding_review_skipped', {}); } catch(e) {}
@@ -18927,6 +18940,33 @@ function _shareModalTap(kind) {
 const _NPS_STORE_URL_IOS = 'https://apps.apple.com/app/id6781227385';
 const _NPS_STORE_URL_ANDROID = 'https://play.google.com/store/apps/details?id=com.corpusapp.corpus';
 
+// Native in-app review — fires SKStoreReviewController on iOS or Play's
+// ReviewManager on Android via the corpus-review plugin. Both platforms
+// rate-limit at the OS level and never confirm whether the dialog was
+// actually shown, so we resolve as soon as the plugin call returns and
+// let callers advance their flow regardless. Falls back to opening the
+// store URL on web or if the plugin isn't available (older builds where
+// `npx cap sync` hasn't been run, etc.) — this is a fallback, NOT a
+// guess about whether the native sheet appeared.
+//
+// Returns { path: 'native' | 'url' }. Callers use this to attribute in
+// analytics but don't gate anything on it.
+async function _requestNativeReview() {
+  const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CorpusReview;
+  if (P && typeof P.requestReview === 'function') {
+    try {
+      await P.requestReview();
+      return { path: 'native' };
+    } catch (e) {
+      console.warn('[review] native plugin call failed, falling back to store URL', e);
+    }
+  }
+  const platform = (window.Capacitor && Capacitor.getPlatform && Capacitor.getPlatform()) || 'web';
+  const url = platform === 'android' ? _NPS_STORE_URL_ANDROID : _NPS_STORE_URL_IOS;
+  try { window.open(url, '_blank'); } catch(e) {}
+  return { path: 'url' };
+}
+
 // Days-between helper — same shape as _daysBetween in the guest-prompt
 // cadence, duplicated locally so this section is self-contained.
 function _npsDaysBetween(fromIso, toIso) {
@@ -19194,12 +19234,14 @@ async function _npsSend() {
 }
 
 function _npsOpenStore() {
-  const url = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'android')
-    ? _NPS_STORE_URL_ANDROID
-    : _NPS_STORE_URL_IOS;
-  try { window.open(url, '_blank'); } catch(e) {}
-  _closeNPSModal();
-  _runNPSContinuation();
+  // Fire the native in-app review sheet (SKStoreReviewController on iOS,
+  // Play ReviewManager on Android); falls back to the store URL on web
+  // or if the plugin is unavailable. Advance the NPS flow either way —
+  // both stores rate-limit silently.
+  _requestNativeReview().then(() => {
+    _closeNPSModal();
+    _runNPSContinuation();
+  });
 }
 
 function _npsDismiss(kind) {
@@ -21096,26 +21138,35 @@ const WALKTHROUGH_STEPS = [
     he: 'הרצף גדל בכל יום שמשלימים בו דיאלוג. היום הוא מתחיל.',
     en: 'Your streak grows on every day you complete a dialogue. Today it begins.' },
   { id: 'closing', expr: 'owl-action',     spotlight: null, isClosing: true,
-    he: 'זהו, אתם מוכנים. הדיאלוג הראשון מחכה.',
-    en: "That's it, you're ready. Your first dialogue is waiting." },
+    // Copy reads "next" (not "first") because the v2 onboarding always
+    // leaves the user with one completed dialogue — the walkthrough
+    // closes into their SECOND dialogue. Still coherent for any legacy
+    // path where the user has 0 completions (their "next" is Day 1).
+    he: 'זהו, אתם מוכנים. הדיאלוג הבא מחכה.',
+    en: "That's it, you're ready. Your next dialogue is waiting." },
 ];
 
 let _walkthroughStepIdx = 0;
 const _walkthroughStepsSeen = new Set();
 
-function _walkthroughShouldStart() {
+function _walkthroughShouldStart(opts) {
   if (localStorage.getItem('corpus_walkthrough_done')) return false;
   // Existing-user gates — same intuition as the initUI onboarding gate.
   // Any signal of prior use blocks the walkthrough so returning users
-  // don't get a first-time tour on top of their existing home.
+  // don't get a first-time tour on top of their existing home. The v2
+  // onboarding path passes { bypassCompletionGate: true } because the
+  // flow always leaves the user with one completed dialogue by design
+  // (step 15) — the "existing user" signal is a legitimate signal for
+  // legacy paths but not for a user who just finished v2 onboarding.
+  if (opts && opts.bypassCompletionGate) return true;
   if (localStorage.getItem('corpus_first_dialogue_completed_at')) return false;
   const completedCount = Object.keys(state.completedDays || {}).length;
   if (completedCount > 0) return false;
   return true;
 }
 
-function _walkthroughStartIfEligible() {
-  if (!_walkthroughShouldStart()) return;
+function _walkthroughStartIfEligible(opts) {
+  if (!_walkthroughShouldStart(opts)) return;
   if (state.currentScreen !== 'home') return;
   const overlay = document.getElementById('onboarding-overlay');
   if (!overlay) return;
@@ -21480,7 +21531,19 @@ function _walkthroughFinishAndOpen() {
     lang:    state.lang || null,
   });
   _walkthroughTeardown({ setFlag: true });
-  // Same target as the start card CTA — subject-aware via getW().
+  // Post-v2 users have completed Day 1 in onboarding step 15, so the
+  // "next dialogue" from the closing beat is really Day 2. Legacy users
+  // (0 completions) fall through to Day 1 via the fallback branch —
+  // getNextLessonInfo needs state.currentWeek/currentDay to be set, and
+  // legacy paths don't guarantee that.
+  const hasCompleted = Object.keys(state.completedDays || {}).length > 0;
+  if (hasCompleted && typeof getNextLessonInfo === 'function') {
+    const next = getNextLessonInfo();
+    if (next && next.hasNext) {
+      openReader(next.weekId, next.dayId);
+      return;
+    }
+  }
   const weeks = getW();
   if (weeks && weeks[0] && weeks[0].days && weeks[0].days.length) {
     openReader(weeks[0].id, weeks[0].days[0].id);

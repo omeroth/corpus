@@ -1,0 +1,25 @@
+{
+  "name": "corpus-review",
+  "version": "1.0.0",
+  "description": "Repo-local Capacitor plugin: SKStoreReviewController (iOS) + Play ReviewManager (Android) in-app review prompt. Consumed from index.html via window.Capacitor.Plugins.CorpusReview — no JS wrapper build needed.",
+  "files": [
+    "android/src",
+    "android/build.gradle",
+    "ios/Sources",
+    "Package.swift"
+  ],
+  "capacitor": {
+    "ios": {
+      "src": "ios"
+    },
+    "android": {
+      "src": "android"
+    }
+  },
+  "keywords": ["capacitor", "plugin", "review", "in-app-review", "storekit"],
+  "author": "Corpus",
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "@capacitor/core": "^8.0.0"
+  }
+}
