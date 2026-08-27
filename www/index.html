@@ -11232,15 +11232,15 @@ function _onbShowScreen(screenId) {
 // without projecting across a lifetime. Later screens (mirror,
 // step 14) will reference it too when they ship.
 
-const _ONB_TOTAL_STEPS = 20;
+const _ONB_TOTAL_STEPS = 21;
 // Which phase (1..6) each step belongs to. Drives the 6-pill progress.
 const _ONB_STEP_TO_PHASE = {
-  1: 1, 2: 1, 3: 1,                          // welcome / problem / solution
-  4: 2, 5: 2, 6: 2,                          // name / age / phone hours
-  7: 3, 8: 3,                                // shock / plan intro
-  9: 4, 10: 4, 11: 4, 12: 4,                 // subject / Q1 / Q2 / Q3
-  13: 5, 14: 5, 15: 5, 16: 5, 17: 5, 18: 5,  // mirror / Q4 / first dialogue / streak / goal / review
-  19: 6, 20: 6,                              // journey / commit
+  1: 1, 2: 1, 3: 1,                                  // welcome / problem / solution
+  4: 2, 5: 2, 6: 2,                                  // name / age / phone hours
+  7: 3, 8: 3,                                        // shock / plan intro
+  9: 4, 10: 4, 11: 4, 12: 4,                         // subject / Q1 / Q2 / Q3
+  13: 5, 14: 5, 15: 5, 16: 5, 17: 5, 18: 5, 19: 5,   // mirror / Q4 / let's-start / dialogue / streak / goal / review
+  20: 6, 21: 6,                                      // journey / commit
 };
 // DOM ids in step order. Steps not yet built map to null; _onbShowStep
 // treats a null slot as "not implemented yet, jump to completion" so a
@@ -11260,15 +11260,16 @@ const _ONB_STEP_TO_ID = {
   12: 'onb-v2-q3',
   13: 'onb-v2-mirror',
   14: 'onb-v2-q4',
-  // Step 15 has no v2 DOM node — the reader takes over the viewport.
-  // _onbShowStep detects n === 15 and routes to _onbEnterFirstDialogue
+  15: 'onb-v2-lets-start',
+  // Step 16 has no v2 DOM node — the reader takes over the viewport.
+  // _onbShowStep detects n === 16 and routes to _onbEnterFirstDialogue
   // instead of the normal id-lookup path.
-  15: null,
-  16: 'onb-v2-streak',
-  17: 'onb-v2-goal',
-  18: 'onb-v2-review',
-  19: 'onb-v2-journey',
-  20: 'onb-v2-commit',
+  16: null,
+  17: 'onb-v2-streak',
+  18: 'onb-v2-goal',
+  19: 'onb-v2-review',
+  20: 'onb-v2-journey',
+  21: 'onb-v2-commit',
 };
 
 // Bilingual copy map for the intro screens (1-3). Later commits will
@@ -11299,8 +11300,8 @@ const _ONB_COPY = {
   },
   solution: {
     head: {
-      en: '<span class="onb-v2-em">Corpus</span> turns five minutes a day into ideas that <span class="onb-v2-em">stay with you</span>.',
-      he: '<span class="onb-v2-em">Corpus</span> הופך חמש דקות ביום לרעיונות ש<span class="onb-v2-em">נשארים אתך</span>',
+      en: 'Corpus gives you the ideas you care about, in <span class="onb-v2-em">five minutes a day</span>',
+      he: 'Corpus נותן לך רעיונות שמעניינים אותך, <span class="onb-v2-em">בחמש דקות ביום</span>',
     },
     cta: { en: 'Continue', he: 'המשך' },
   },
@@ -11405,8 +11406,8 @@ const _ONB_COPY = {
     ],
   },
   q2: {
-    head: { en: 'Thinking bigger, what does a well-read life look like to you?',
-            he: 'במבט רחב יותר, איך נראים לך חיים של אדם קורא?' },
+    head: { en: 'What would you want to be true about you?',
+            he: 'מה היית רוצה שיהיה נכון לגביך?' },
     hint: { en: 'The one that matters most.', he: 'מה שהכי חשוב לך.' },
     cta:  { en: 'Continue',                    he: 'המשך' },
     options: [
@@ -11474,11 +11475,10 @@ const _ONB_COPY = {
   q4: {
     head: { en: "Be honest, how often do you read something worth your time?",
             he: 'בכנות, כמה פעמים אתה קורא משהו ששווה את הזמן שלך?' },
-    // Q4 is now the terminal onboarding step (after the mirror). CTA
-    // reads as commitment, not continuation — advancing lands the user
-    // on the home screen (steps 15-19 null-slot short-circuit to
-    // _onbComplete).
-    cta:  { en: "Let's start", he: 'בוא נתחיל' },
+    // Q4 advances into the new "Let's start" statement screen (step 15),
+    // which is the beat that owns the "let's start" copy. Q4 CTA is
+    // therefore neutral — no narrative claim, just advance.
+    cta:  { en: 'Continue', he: 'המשך' },
     // Discrete 5-point Likert (0..4). Endpoints rendered as scale
     // labels under the track; the value display above shows the
     // active label.
@@ -11490,6 +11490,16 @@ const _ONB_COPY = {
       { en: 'Every day',  he: 'כל יום' },       // 4
     ],
   },
+  // Step 15 — pre-dialogue statement screen. Same visual as welcome /
+  // problem / solution / plan: head + sub + CTA. Land here after Q4;
+  // CTA opens the reader on the first dialogue (step 16).
+  letsStart: {
+    head: { en: "Let's start", he: 'בוא נתחיל' },
+    sub:  { en: 'One dialogue, five minutes',
+            he: 'דיאלוג אחד, חמש דקות' },
+    cta:  { en: "Let's start", he: 'בוא נתחיל' },
+  },
+
   mirror: {
     // No head — the cards *are* the screen. Each user pick becomes a
     // card with the option text + a per-option "here's what Corpus
@@ -11566,8 +11576,11 @@ const _ONB_COPY = {
   // texts, not summaries"). The card is rendered dynamically in
   // _onbV2PrepareJourney; static copy for the rest sits below.
   journey: {
-    // Head interpolates {name} + {n}. {n} is the subject-specific count
-    // of unique thinkers a user meets in the first 30 dialogues,
+    // Screen-level heading rendered at the top of the screen, above the
+    // projection card. Static — no interpolation.
+    head: { en: 'Your plan', he: 'התוכנית שלך' },
+    // Card head interpolates {name} + {n}. {n} is the subject-specific
+    // count of unique thinkers a user meets in the first 30 dialogues,
     // computed at render time by _onbV2CountFirstThinkers walking
     // getW() — stays honest as content shifts. Verified 2026-08-27:
     // philosophy 16, economics 17, psychology 21 (psychology has only
@@ -11663,6 +11676,9 @@ function _onbApplyLang(lang) {
   setText('onb-v2-q3-cta',        'q3',       'cta');
   setText('onb-v2-q4-head',       'q4',       'head');
   setText('onb-v2-q4-cta',        'q4',       'cta');
+  setText('onb-v2-lets-start-head','letsStart','head');
+  setText('onb-v2-lets-start-sub','letsStart','sub');
+  setText('onb-v2-lets-start-cta','letsStart','cta');
   // Mirror head + card content are rendered dynamically in
   // _onbV2PrepareMirror from state.onbAnswers; only the CTA is static.
   setText('onb-v2-mirror-cta',    'mirror',   'cta');
@@ -11678,7 +11694,8 @@ function _onbApplyLang(lang) {
   setText('onb-v2-review-cta',    'review',   'cta');
   setText('onb-v2-review-skip',   'review',   'skip');
   // Journey screen: card + tiles + features rendered dynamically in
-  // _onbV2PrepareJourney. Only the CTA is static.
+  // _onbV2PrepareJourney. Screen-level head and CTA are static.
+  setText('onb-v2-journey-head',  'journey',  'head');
   setText('onb-v2-journey-cta',   'journey',  'cta');
   setText('onb-v2-commit-head',   'commit',   'head');
   setText('onb-v2-commit-cta',    'commit',   'cta');
@@ -11717,10 +11734,10 @@ function _onbSetLang(lang) {
 // a user on a missing screen.
 function _onbShowStep(n) {
   if (n < 1 || n > _ONB_TOTAL_STEPS) { _onbComplete(); return; }
-  // Step 15 — reader takes over the viewport (no v2 DOM node). The
+  // Step 16 — reader takes over the viewport (no v2 DOM node). The
   // onboarding resumes after the user finishes the dialogue via
   // finishDay's _onbInFirstDialogue guard → _onbFinishFirstDialogue.
-  if (n === 15) { _onbEnterFirstDialogue(); return; }
+  if (n === 16) { _onbEnterFirstDialogue(); return; }
   const id = _ONB_STEP_TO_ID[n];
   if (!id) {
     // Not-yet-built step — early completion for commit-A cadence.
@@ -11925,14 +11942,14 @@ function _onbEnterFirstDialogue() {
     s.style.display = 'none';
     s.classList.remove('onb-active');
   });
-  try { localStorage.setItem('corpus_onboarding_step', '15'); } catch(e) {}
-  try { _phCapture('onboarding_step_shown', { step: 15, phase: 5 }); } catch(e) {}
+  try { localStorage.setItem('corpus_onboarding_step', '16'); } catch(e) {}
+  try { _phCapture('onboarding_step_shown', { step: 16, phase: 5 }); } catch(e) {}
   // Chapter 1 / Day 1 is the picked subject's first real lesson.
   // openReader handles theme, rendering, and section-0 setup.
   try { openReader(1, 1); } catch(e) {
     console.warn('[onb-v2] openReader failed for first dialogue', e);
     state._onbInFirstDialogue = false;
-    _onbShowStep(16);
+    _onbShowStep(17);
   }
 }
 
@@ -11940,15 +11957,15 @@ function _onbEnterFirstDialogue() {
 // the same completion state effects finishDay would run (XP + streak +
 // unlock + first_dialogue_completed_at + posthog capture), minus the
 // celebration-queue push, endowment eligibility trigger, and guest-
-// prompt chain — step 16 is the day-1 streak beat; the endowment
+// prompt chain — step 17 is the day-1 streak beat; the endowment
 // overlay would double up on it. Then shows the thinker card with a
-// single "Continue" button that advances to step 16.
+// single "Continue" button that advances to step 17.
 function _onbFinishFirstDialogue() {
   const chapter = getW().find(w => w.id === state.currentWeek);
   const day = chapter && chapter.days.find(d => d.id === state.currentDay);
   if (!chapter || !day) {
     state._onbInFirstDialogue = false;
-    _onbShowStep(16);
+    _onbShowStep(17);
     return;
   }
   const key = dayKey(state.currentWeek, state.currentDay);
@@ -11982,7 +11999,7 @@ function _onbFinishFirstDialogue() {
   if (thinker && isNewThinker) {
     // showThinkerCardScreen sets up the flip card + Next/Back buttons.
     // We call it, then overwrite the buttons: hide "Next Dialogue",
-    // relabel "Back to Home" as "Continue" wired to advance to step 16.
+    // relabel "Back to Home" as "Continue" wired to advance to step 17.
     try { showThinkerCardScreen(thinker, chapter, day); } catch(e) {}
     const nextBtn = document.getElementById('modal-next-btn');
     const backBtn = document.getElementById('modal-continue-btn');
@@ -11993,19 +12010,24 @@ function _onbFinishFirstDialogue() {
       backBtn.onclick = () => {
         state._onbInFirstDialogue = false;
         try { document.getElementById('modal-complete').classList.remove('active'); } catch(e) {}
-        _onbShowStep(16);
+        _onbShowStep(17);
       };
     }
   } else {
     state._onbInFirstDialogue = false;
-    _onbShowStep(16);
+    _onbShowStep(17);
   }
 }
 
-// Screen 16 (day-1 streak) — display-only celebration; advance to 17 (goal).
-function _onbV2CtaStreak() { _onbAdvanceStep(16, 17); }
+// Screen 15 (let's start) — statement screen bridging Q4 → first
+// dialogue. Head + sub in the standard v2 statement layout; CTA
+// advances into the reader takeover at step 16.
+function _onbV2CtaLetsStart() { _onbAdvanceStep(15, 16); }
 
-// Screen 17 (daily goal) — single-select radio over three cards
+// Screen 17 (day-1 streak) — display-only celebration; advance to 18 (goal).
+function _onbV2CtaStreak() { _onbAdvanceStep(17, 18); }
+
+// Screen 18 (daily goal) — single-select radio over three cards
 // ('one' / 'two' / 'own_pace'). Preselect logic maps the Q3 answer to
 // a sensible default so the CTA is enabled on land. Write pattern
 // mirrors the recovered v1 _onbFinishGoal: dated dedup on setAt,
@@ -12038,7 +12060,7 @@ function _onbV2CtaGoal() {
       is_existing_user: !!localStorage.getItem('corpus_onboarding_done'),
     });
   } catch(e) {}
-  _onbAdvanceStep(17, 18, { dailyGoal: goal });
+  _onbAdvanceStep(18, 19, { dailyGoal: goal });
 }
 
 // Screen 17 (review request) — Rate fires the native review sheet
@@ -12053,16 +12075,16 @@ function _onbV2CtaReviewRate() {
     try {
       _phCapture('onboarding_review_tapped', { platform: platform, path: path });
     } catch(e) {}
-    _onbAdvanceStep(18, 19);
+    _onbAdvanceStep(19, 20);
   });
 }
 function _onbV2CtaReviewSkip() {
   try { _phCapture('onboarding_review_skipped', {}); } catch(e) {}
-  _onbAdvanceStep(18, 19);
+  _onbAdvanceStep(19, 20);
 }
 
-// Screen 19 (journey summary) — display-only; advance to commit.
-function _onbV2CtaJourney() { _onbAdvanceStep(19, 20); }
+// Screen 20 (journey summary) — display-only; advance to commit.
+function _onbV2CtaJourney() { _onbAdvanceStep(20, 21); }
 
 // Screen 19 (commitment) — single-choice pick. Terminal step. Tap
 // stores the id in state.onbAnswers.commitment (display-only — no
@@ -12598,11 +12620,12 @@ const _ONB_STEP_HOOKS = {
   12: _onbV2PrepareQ3,
   13: _onbV2PrepareMirror,
   14: _onbV2PrepareQ4,
-  // 15: handled specially in _onbShowStep (reader takeover, no v2 DOM).
-  // 16 (streak) + 18 (review) are static once _onbApplyLang runs.
-  17: _onbV2PrepareGoal,
-  19: _onbV2PrepareJourney,
-  20: _onbV2PrepareCommit,
+  // 15 (let's-start) is static once _onbApplyLang runs.
+  // 16: handled specially in _onbShowStep (reader takeover, no v2 DOM).
+  // 17 (streak) + 19 (review) are static once _onbApplyLang runs.
+  18: _onbV2PrepareGoal,
+  20: _onbV2PrepareJourney,
+  21: _onbV2PrepareCommit,
 };
 
 // Silent guest entry: mirrors enterAsGuest but skips hideAuthScreen (the
@@ -24291,10 +24314,28 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 16 — day-1 streak celebration. Flame icon (reuses #icon-streak
+<!-- Step 15 — Let's start. Statement screen bridging Q4 → first
+     dialogue. Standard v2 head + sub layout. CTA advances to step 16
+     which hijacks the reader (openReader(1, 1)). -->
+<div id="onb-v2-lets-start" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="5">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-lets-start-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-lets-start-sub"></p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-lets-start-cta" onclick="_onbV2CtaLetsStart()"></button>
+  </div>
+</div>
+
+<!-- Step 17 — day-1 streak celebration. Flame icon (reuses #icon-streak
      from the endowment overlay), amber eyebrow, head, sub, CTA.
      Fires after the user finishes the first dialogue via
-     _onbFinishFirstDialogue → _onbShowStep(16). -->
+     _onbFinishFirstDialogue → _onbShowStep(17). -->
 <div id="onb-v2-streak" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
@@ -24389,6 +24430,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
+      <h1 class="onb-v2-head onb-v2-journey-head" id="onb-v2-journey-head"></h1>
       <div class="onb-v2-journey-card">
         <div class="onb-v2-journey-card-head" id="onb-v2-journey-card-head"></div>
         <div class="onb-v2-journey-date-pill" id="onb-v2-journey-date-pill"></div>
@@ -24404,7 +24446,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 19 — commitment level. Terminal step. Five single-choice
+<!-- Step 21 — commitment level. Terminal step. Five single-choice
      cards state the user's commitment level; the pick is captured to
      state.onbAnswers.commitment for later analysis but doesn't gate
      anything downstream. CTA runs _onbComplete → home. -->
