@@ -2461,7 +2461,423 @@ const psychologyData = {
         ]},
       ],
     },
-{ id: 5, title: 'רגשות ומצבי רוח', titleEn: 'Emotions and Moods', comingSoon: true, days: [] },
+    {
+      id: 'bonusPsy1',
+      title: 'למה קשה להתנתק',
+      titleEn: 'Why It Is Hard to Disconnect',
+      subtitle: 'חמישה מבטים על הרגל אחד',
+      subtitleEn: 'Five angles on a single habit',
+      isBonus: true,
+      xp: 100,
+      days: [
+        {
+          id: 1,
+          title: 'מכונת המזל בכיס',
+          titleEn: 'The Slot Machine in Your Pocket',
+          thinker: 'ב.פ. סקינר',
+          thinkerEn: 'B. F. Skinner',
+          thinkerId: 'skinner',
+          xp: 50,
+          sections: [
+            {
+              type: 'idea',
+              title: 'הרעיון של היום',
+              titleEn: 'Today\'s Idea',
+              content: 'רגע לפני שקראת את זה, הרמת את הטלפון. אולי לא זכרת שהחלטת, אולי לא הייתה שם החלטה בכלל. פשוט מצאת את עצמך עם המכשיר ביד.\n\nב.פ. סקינר לא הכיר טלפונים חכמים, אבל הוא גילה מנגנון מרכזי שבגללו קשה לנו לעזוב אותם. בשנות ה-50 הוא בדק שאלה פשוטה: מה קורה כשהתגמול לא מגיע בכל פעם?\n\nהתשובה הפתיעה אותו. יונה שזכתה בגרגר (חיזוק חיובי) אחרי <strong>כל</strong> ניקור של לחצן, הפסיקה לנקר כמעט מיד אחרי שהגרגרים הפסיקו להגיע. אבל יונה שקיבלה גרגר רק אחרי <strong>חלק מהניקורים</strong>, בלי שיטה שהיא יכולה לחזות, המשיכה ללחוץ הרבה יותר זמן אחרי שהגרגרים הפסיקו להגיע. סקינר קרא לזה <strong>חיזוק ביחס משתנה</strong>, ומצא שהוא מייצר את קצב התגובה הגבוה ביותר ואת ההתמדה הגדולה ביותר מכל תכנית חיזוקים שבדק.\n\nוזה בדיוק הפיד בטלפון שלך. רוב הגלילות אינן מספקות לנו משהו מעניין. ואז, בלי שאפשר לחזות מתי, מגיע משהו שגורם לך לצחוק, להזדהות, להרגיש משהו. לא תמיד, וזה כל העניין.',
+              contentEn: 'A moment before you read this, you picked up the phone. Maybe you do not remember deciding, maybe there was no decision there at all. You simply found yourself with the device in your hand.\n\nB. F. Skinner did not know smartphones, but he discovered a central mechanism that makes it hard for us to leave them. In the 1950s he examined a simple question: what happens when the reward does not arrive every time?\n\nThe answer surprised him. A pigeon that won a pellet (positive reinforcement) after <strong>every</strong> peck of a lever stopped pecking almost immediately after the pellets stopped arriving. But a pigeon that received a pellet only after <strong>some of the pecks</strong>, with no pattern it could predict, kept pressing for far longer after the pellets stopped arriving. Skinner called this <strong>variable ratio reinforcement</strong>, and found that it produces the highest response rate and the greatest persistence of any reinforcement schedule he tested.\n\nAnd this is exactly the feed on your phone. Most scrolls do not supply us with anything interesting. And then, without any way to predict when, something arrives that makes you laugh, identify, feel something. Not always, and that is the whole point.',
+              image: 'images/bonus/psychology/day1-idea.webp'
+            },
+            {
+              type: 'source',
+              title: 'קטע מקור',
+              titleEn: 'Source Material',
+              quote: '"לוח היחס המשתנה מייצר את קצב התגובה הגבוה והיציב ביותר, ואת ההתנגדות הרבה ביותר לכיבוי, מכל לוחות הזמנים שנבדקו."',
+              quoteEn: '"The variable ratio schedule produces the highest and steadiest rate of response, and the greatest resistance to extinction, of all the schedules examined."',
+              attr: '- צ\'רלס פרסטר וב.פ. סקינר, "לוחות זמנים של חיזוק", 1957',
+              attrEn: '- Charles Ferster and B. F. Skinner, "Schedules of Reinforcement", 1957'
+            },
+            {
+              type: 'explanation',
+              title: 'הסבר',
+              titleEn: 'Explanation',
+              content: 'ההיגיון הפוך למה שנדמה. <strong>תגמול קבוע מייצר הרגל חלש, ותגמול אקראי מייצר הרגל חזק.</strong>\n\nהסיבה פשוטה. אם מכונת שתייה, שאמורה להוציא פחית בכל לחיצה, מקולקלת, מפסיקים ללחוץ אחרי שני ניסיונות, כי ברור שמשהו לא בסדר. אבל אם מכונת מזל לא משלמת, ממשיכים, כי מכונת מזל אף פעם לא משלמת בכל פעם. אין רגע שבו ברור שהיא נגמרה או התקלקלה.\n\nדוגמה מהחיים: אדם פותח את הפיד ל"דקה", וקם ממנו אחרי עשרים. הוא לא נהנה בעשרים הדקות האלה, ואם תשאלו אותו הוא יגיד שרובן היו משעממות. וזו בדיוק הנקודה. <strong>מה שהחזיק אותו לא היה ההנאה, אלא האפשרות שההנאה תגיע בגלילה הבאה.</strong>\n\nוהדבר עובד גם על התראות. אל הודעה שמגיעה בזמן קבוע אנחנו מתרגלים. אבל הודעה שיכולה להגיע בכל רגע מייצרת בדיקה חוזרת, כל היום.',
+              contentEn: 'The logic is the opposite of what it seems. <strong>A fixed reward produces a weak habit, and a random reward produces a strong habit.</strong>\n\nThe reason is simple. If a drinks machine, which is supposed to dispense a can with every press, is broken, people stop pressing after two attempts, because it is clear that something is wrong. But if a slot machine does not pay out, people keep going, because a slot machine never pays out every time. There is no moment at which it is clear that it has run out or broken down.\n\nA real-life example: a person opens the feed for "a minute", and gets up from it after twenty. He did not enjoy those twenty minutes, and if you ask him he will say that most of them were boring. And that is exactly the point. <strong>What held him there was not the enjoyment, but the possibility that the enjoyment would arrive on the next scroll.</strong>\n\nAnd the same works with notifications. A message that arrives at a fixed time is something we get used to. But a message that could arrive at any moment produces repeated checking, all day long.',
+              image: 'images/bonus/psychology/day1-explanation.webp'
+            },
+            {
+              type: 'depth',
+              title: 'עומק',
+              titleEn: 'Depth',
+              content: 'וכאן צריך לומר משהו שהופך את זה מקוריוז למשהו רציני: <strong>זה לא צירוף מקרים.</strong> מכונות המזל תוכננו במפורש על העיקרון הזה, והיה זמן שבו הן הסתובבו רק בקזינו. היום אותו מנגנון נמצא בכיס של כמעט כל אדם ועובד בלי הפסקה.\n\nוהנקודה החדה: מי שמרגיש שבסך הכל אין לו כוח רצון להפחית את השימוש בסמארטפון מפרש לא נכון את המצב. הוא לא מתמודד רק עם חולשת כוח רצון, אלא עם <strong>לוח החיזוק החזק ביותר שנמדד אי פעם</strong>. זה לא פוטר מאחריות, אבל זה מסביר למה "פשוט תשתמש פחות" נכשל שוב ושוב.\n\nוצריך גם איזון. סקינר טען שהתנהגות היא רק תוצר של חיזוקים, ורוב התיאוריות הפסיכולוגיות דוחות את הגרסה הקיצונית הזו, כפי שראינו בפרק הראשון. אבל דווקא כאן, בהרגלים שנבנים מתגמול לא צפוי, הוא קלע בול.\n\nומכאן לדיאלוג הבא. סקינר הסביר למה קשה להניח את הטלפון. דניאל כהנמן ישאל שאלה מוקדמת יותר: מי בכלל החליט להרים אותו.',
+              contentEn: 'And here something must be said that turns this from a curiosity into something serious: <strong>it is not a coincidence.</strong> Slot machines were explicitly designed on this principle, and there was a time when they were found only in casinos. Today that same mechanism sits in the pocket of almost every person and works without stopping.\n\nAnd the sharp point: someone who feels that he simply lacks the willpower to reduce his smartphone use is misreading the situation. He is not only contending with weakness of willpower, but with <strong>the strongest reinforcement schedule ever measured</strong>. This does not exempt anyone from responsibility, but it explains why "just use it less" fails again and again.\n\nAnd balance is also needed. Skinner argued that behavior is only a product of reinforcements, and most psychological theories reject that extreme version, as we saw in the first chapter. But precisely here, in habits built on unpredictable reward, he hit the mark exactly.\n\nAnd from here to the next dialogue. Skinner explained why it is hard to put the phone down. Daniel Kahneman will ask an earlier question: who decided to pick it up in the first place.',
+              image: 'images/bonus/psychology/day1-depth.webp'
+            },
+            {
+              type: 'quiz',
+              intro: 'אדם פותח את הפיד ל"דקה" וקם אחרי עשרים, ומודה שרוב מה שראה היה משעמם.',
+              introEn: 'A person opens the feed for "a minute" and gets up after twenty, and admits that most of what he saw was boring.',
+              question: 'לפי סקינר, מה החזיק אותו שם?',
+              questionEn: 'According to Skinner, what held him there?',
+              options: ['ההנאה מהתוכן עצמו, שהייתה גבוהה לאורך כל הזמן', 'האפשרות שמשהו טוב יגיע בגלילה הבאה, בלי שאפשר לדעת מתי', 'החלטה מודעת שקיבל מראש להישאר עשרים דקות'],
+              optionsEn: ['Enjoyment of the content itself, which was high throughout', 'The possibility that something good would arrive on the next scroll, with no way of knowing when', 'A conscious decision he made in advance to stay for twenty minutes'],
+              correctIndex: 1,
+              explanation: 'זהו חיזוק ביחס משתנה. לא ההנאה מחזיקה, אלא חוסר הוודאות. כשהתגמול יכול להגיע בכל רגע ואין דרך לחזות מתי, אין גם רגע ברור שבו כדאי לעצור.',
+              explanationEn: 'This is variable ratio reinforcement. It is not the enjoyment that holds, but the uncertainty. When the reward can arrive at any moment and there is no way to predict when, there is also no clear moment at which it makes sense to stop.'
+            },
+            {
+              type: 'quiz',
+              intro: 'שתי מכונות: מכונת שתייה שאמורה להוציא פחית בכל לחיצה, ומכונת מזל שנותנת פרס לפעמים.',
+              introEn: 'Two machines: a drinks machine supposed to dispense a can on every press, and a slot machine that gives a prize sometimes.',
+              question: 'מדוע קל יותר להפסיק ללחוץ על מכונת שתייה כשהיא מפסיקה להוציא פחיות מאשר על מכונת מזל כשהיא מפסיקה לתת פרסים?',
+              questionEn: 'Why is it easier to stop pressing a drinks machine when it stops dispensing cans than a slot machine when it stops giving prizes?',
+              options: ['משום שמכונת שתייה זולה יותר, ולכן ההפסד קטן', 'משום שמכונת מזל נותנת תגמול בכל פעם, ולכן היא נעימה יותר', 'משום שמכונת שתייה נותנת תגמול קבוע, ולכן היעדרו מסמן מיד שמשהו השתנה'],
+              optionsEn: ['Because a drinks machine is cheaper, and therefore the loss is small', 'Because a slot machine gives a reward every time, and therefore it is more pleasant', 'Because a drinks machine gives a fixed reward, and therefore its absence immediately signals that something has changed'],
+              correctIndex: 2,
+              explanation: 'זו ההבחנה של סקינר. בתגמול קבוע, הפסקה היא סימן ברור לתקלה. בתגמול משתנה, הפסקה היא חלק מהמשחק, ולכן אין רגע שבו ברור שהגיע הזמן להפסיק.',
+              explanationEn: 'This is Skinner\'s distinction. With a fixed reward, a pause is a clear sign of a malfunction. With a variable reward, a pause is part of the game, and therefore there is no moment at which it is clear that the time has come to stop.'
+            },
+            {
+              type: 'quiz',
+              intro: 'אדם מאשים את עצמו שאין לו כוח רצון מול הטלפון.',
+              introEn: 'A person blames himself for having no willpower in the face of the phone.',
+              question: 'מה סקינר היה מוסיף לתמונה?',
+              questionEn: 'What would Skinner add to the picture?',
+              options: ['שהוא צודק, ושהבעיה כולה נעוצה בחולשת אופי שלו', 'שהוא מתמודד עם לוח החיזוק החזק ביותר שנמדד, ולא רק עם כוח הרצון שלו', 'שכוח רצון אינו קיים כלל, ולכן אין שום טעם לנסות'],
+              optionsEn: ['That he is right, and that the whole problem lies in a weakness of his character', 'That he is contending with the strongest reinforcement schedule ever measured, and not only with his willpower', 'That willpower does not exist at all, and therefore there is no point in trying'],
+              correctIndex: 1,
+              explanation: 'זו לא הסרת אחריות, זו הבנה של הכוחות. המנגנון שפועל כאן תוכנן להיות מתמיד ככל האפשר, ולכן מאמץ אישי לבדו מתמודד מול משהו חזק מאוד.',
+              explanationEn: 'This is not a removal of responsibility, it is an understanding of the forces. The mechanism operating here was designed to be as persistent as possible, and therefore personal effort alone is contending with something very strong.'
+            },
+            { type: 'quiz_summary' }
+          ]
+        },
+        {
+          id: 2,
+          title: 'היד זזה קודם',
+          titleEn: 'The Hand Moves First',
+          thinker: 'דניאל כהנמן',
+          thinkerEn: 'Daniel Kahneman',
+          thinkerId: 'kahneman',
+          xp: 50,
+          sections: [
+            {
+              type: 'idea',
+              title: 'הרעיון של היום',
+              titleEn: 'Today\'s Idea',
+              content: 'סקינר הסביר למה קשה להניח את הטלפון. אבל יש שאלה שקודמת לה: <strong>מתי בדיוק החלטת להרים אותו?</strong>\n\nנסה להיזכר בפעם האחרונה. סביר שאין שם רגע של החלטה. היד זזה, המסך נדלק, וזהו. וזה לא פגם בזיכרון. פשוט לא הייתה החלטה מודעת.\n\nדניאל כהנמן תיאר שתי מערכות. <strong>מערכת 1</strong> מהירה, אוטומטית וחסרת מאמץ. <strong>מערכת 2</strong> איטית, מודעת ודורשת מאמץ. ואנחנו מזהים את עצמנו עם השנייה, עם החלק ששוקל ובוחר.\n\nאבל שליפת הטלפון היא פעולה של מערכת 1 כמעט תמיד. היא מופעלת על ידי רמז בסביבה, שעמום קטן, רגע של המתנה, ויברציה. <strong>אין רגע שבו אפשר לומר לשליפת הטלפון "לא", כי הפעולה קרתה לפני שהיה מי שיאמר.</strong>',
+              contentEn: 'Skinner explained why it is hard to put the phone down. But there is a question that comes before it: <strong>when exactly did you decide to pick it up?</strong>\n\nTry to recall the last time. It is likely that there is no moment of decision there. The hand moved, the screen lit up, and that is it. And this is not a flaw in memory. There simply was no conscious decision.\n\nDaniel Kahneman described two systems. <strong>System 1</strong> is fast, automatic and effortless. <strong>System 2</strong> is slow, conscious and requires effort. And we identify ourselves with the second, with the part that weighs and chooses.\n\nBut reaching for the phone is almost always an action of System 1. It is triggered by a cue in the environment, a little boredom, a moment of waiting, a vibration. <strong>There is no moment at which one can say "no" to reaching for the phone, because the action happened before there was anyone to say it.</strong>',
+              image: 'images/bonus/psychology/day2-idea.webp'
+            },
+            {
+              type: 'source',
+              title: 'קטע מקור',
+              titleEn: 'Source Material',
+              quote: '"בתמונה שעולה מן המחקר, מערכת 1 האינטואיטיבית משפיעה יותר מכפי שהניסיון שלכם מספר לכם, והיא המחברת הסמויה של רבות מן הבחירות והשיפוטים שאתם עושים."',
+              quoteEn: '"In the picture that emerges from recent research, the intuitive System 1 is more influential than your experience tells you, and it is the secret author of many of the choices and judgments you make."',
+              attr: '- דניאל כהנמן, "לחשוב מהר, לחשוב לאט", 2011',
+              attrEn: '- Daniel Kahneman, "Thinking, Fast and Slow", 2011'
+            },
+            {
+              type: 'explanation',
+              title: 'הסבר',
+              titleEn: 'Explanation',
+              content: 'מערכת 1 לומדת קישורים. רמז מסוים מתחיל להפעיל תגובה מסוימת, בלי שהמחשבה נדרשת באמצע.\n\nדוגמה מהחיים: אדם עומד בתור בסופר. הוא לא משועמם במיוחד ולא ציפה למשהו. תוך שנייה הטלפון בידו. אם תשאלו אותו למה, הוא ימצא סיבה: "רציתי לבדוק אם ענו לי". אבל הסיבה נבנתה אחרי המעשה, בדיוק כפי שראינו אצל פרויד בפרק השני. <strong>מה שקרה באמת הוא שרמז מוכר, המתנה משעממת בתור, הפעיל תגובה מאומנת.</strong>\n\nוכאן מתחברות שתי החתיכות. סקינר הסביר למה התגובה נלמדה כל כך חזק כך נעשתה להרגל. כהנמן מסביר למה התגובה שנעשתה להרגל מתרחשת "בלי אישור". יחד הם מתארים מנגנון שלם: <strong>הרגל שנבנה על תגמול לא צפוי, ומופעל על ידי רמז בלי לעבור דרך התודעה.</strong>\n\nולכן שאלת "כמה זמן אתה על הטלפון" לרוב מקבלת תשובה שגויה. לא כי אנשים משקרים, אלא כי אי אפשר לזכור פעולות שלא עברו דרך המערכת הזוכרת.',
+              contentEn: 'System 1 learns associations. A particular cue begins to trigger a particular response, without thought being required in between.\n\nA real-life example: a person is standing in line at the supermarket. He is not especially bored and was not expecting anything. Within a second the phone is in his hand. If you ask him why, he will find a reason: "I wanted to check whether anyone replied to me". But the reason was constructed after the act, exactly as we saw with Freud in the second chapter. <strong>What actually happened is that a familiar cue, boring waiting in a line, triggered a trained response.</strong>\n\nAnd here the two pieces connect. Skinner explained why the response was learned so strongly that it became a habit. Kahneman explains why the response that became a habit occurs "without authorization". Together they describe a whole mechanism: <strong>a habit built on unpredictable reward, and triggered by a cue without passing through consciousness.</strong>\n\nAnd this is why the question "how much time do you spend on your phone" usually gets an incorrect answer. Not because people are lying, but because it is impossible to remember actions that did not pass through the remembering system.',
+              image: 'images/bonus/psychology/day2-explanation.webp'
+            },
+            {
+              type: 'depth',
+              title: 'עומק',
+              titleEn: 'Depth',
+              content: 'וכאן כהנמן מציע את המסקנה המעשית ביותר בפרק, והיא הפוכה לאינטואיציה.\n\nהוא נשאל שוב ושוב איך מתגברים על הטיות, וענה שהוא עצמו, אחרי עשרות שנות מחקר, כמעט לא השתפר בזיהוי ההטיות של עצמו בזמן אמת. ומכאן הסיק: <strong>אם קשה לתפוס את הפעולה ברגע, עדיף לשנות את התנאים מראש במקום להסתמך על כוח רצון בזמן אמת.</strong>\n\nבהקשר של הטלפון זה מסביר תופעה מוכרת. החלטה כמו "אשתמש פחות" פונה למערכת 2, לחלק שמנסח כוונות. אבל הפעולה עצמה מתרחשת במערכת 1, שאינה שומעת כוונות. לכן ההחלטה נשברת בלי שנרגיש שהפרנו אותה. דוגמאות לתנאים שאפשר לשנות מראש, בהקשר של הטלפון: להרחיק את הטלפון מהחדר כשרוצים להתרכז במשהו בלי הסחת דעת, למחוק אפליקציה שנכנסים אליה יותר משרוצים, וכו\'.\n\nוצריך גם ביקורת. החלוקה לשתי מערכות היא מטאפורה שימושית ולא חלוקה ממשית במוח, וחלק מהמחקרים בתחום ההטיות לא שוחזרו במלואם. אבל התובנה המרכזית עומדת: <strong>אנחנו מייחסים לעצמנו הרבה יותר שליטה מכפי שיש לנו באמת.</strong>\n\nומכאן לדיאלוג הבא. עד כה דיברנו על מנגנון. אבל למה דווקא הדבר הזה, דווקא הטלפון, מושך אותנו? היינץ קוהוט יטען שמה שממתין שם נוגע בצורך עמוק מאוד.',
+              contentEn: 'And here Kahneman offers the most practical conclusion in the chapter, and it is counterintuitive.\n\nHe was asked again and again how one overcomes biases, and answered that he himself, after decades of research, had barely improved at identifying his own biases in real time. And from this he concluded: <strong>if it is hard to catch the action in the moment, it is better to change the conditions in advance instead of relying on willpower in real time.</strong>\n\nIn the context of the phone this explains a familiar phenomenon. A decision such as "I will use it less" appeals to System 2, to the part that formulates intentions. But the action itself takes place in System 1, which does not listen to intentions. That is why the decision breaks without our feeling that we have violated it. Examples of conditions that can be changed in advance, in the context of the phone: keeping the phone out of the room when you want to concentrate on something without distraction, deleting an app you open more than you want to, and so on.\n\nAnd criticism is also needed. The division into two systems is a useful metaphor and not an actual division in the brain, and some of the studies in the field of biases were not fully replicated. But the central insight stands: <strong>we attribute to ourselves far more control than we actually have.</strong>\n\nAnd from here to the next dialogue. So far we have spoken about mechanism. But why this thing in particular, why the phone in particular, draws us? Heinz Kohut will argue that what waits there touches a very deep need.',
+              image: 'images/bonus/psychology/day2-depth.webp'
+            },
+            {
+              type: 'quiz',
+              intro: 'אדם עומד בתור, ותוך שנייה הטלפון בידו. כשנשאל למה, הוא עונה "רציתי לבדוק אם ענו לי".',
+              introEn: 'A person is standing in line, and within a second the phone is in his hand. When asked why, he answers "I wanted to check whether anyone replied to me".',
+              question: 'מה קרה כאן לפי כהנמן?',
+              questionEn: 'What happened here according to Kahneman?',
+              options: ['הוא שקל את המצב והחליט במודע לבדוק הודעות', 'רמז בסביבה הפעיל תגובה מאומנת, וההסבר נבנה אחר כך, בדיעבד', 'לא קרה שום תהליך מנטלי, אלא רק תנועה של השריר'],
+              optionsEn: ['He weighed the situation and consciously decided to check messages', 'A cue in the environment triggered a trained response, and the explanation was constructed afterwards, in retrospect', 'No mental process happened at all, only a movement of the muscle'],
+              correctIndex: 1,
+              explanation: 'ההסבר הוא לא בדיוק שקר, הוא פשוט הגיע מאוחר. מערכת 1 הגיבה לרמז מוכר, המתנה ריקה, ומערכת 2 סיפקה סיבה סבירה בדיעבד.',
+              explanationEn: 'The explanation is not exactly a lie, it simply arrived late. System 1 responded to a familiar cue, empty waiting, and System 2 supplied a reasonable reason in retrospect.'
+            },
+            {
+              type: 'quiz',
+              intro: 'אדם מחליט "מהיום אשתמש פחות בטלפון", ותוך יומיים חוזר להרגלו.',
+              introEn: 'A person decides "from today I will use the phone less", and within two days returns to his habit.',
+              question: 'לפי כהנמן, למה זה קורה?',
+              questionEn: 'According to Kahneman, why does this happen?',
+              options: ['משום שההחלטה לא הייתה כנה מספיק מלכתחילה', 'משום שהוא פשוט לא התאמץ מספיק ברגעים הקריטיים', 'משום שההחלטה נוסחה במערכת האיטית, והפעולה מתרחשת במהירה'],
+              optionsEn: ['Because the decision was not sincere enough in the first place', 'Because he simply did not try hard enough at the critical moments', 'Because the decision was formulated in the slow system, and the action takes place in the fast one'],
+              correctIndex: 2,
+              explanation: 'זו הבעיה המבנית. הכוונה נוסחה בחלק ששוקל, אבל הפעולה מופעלת בחלק שאינו מקשיב לכוונות. לכן ההחלטה נשברת בלי שמרגישים ברגע ההפרה.',
+              explanationEn: 'This is the structural problem. The intention was formulated in the part that weighs, but the action is triggered in the part that does not listen to intentions. That is why the decision breaks without one feeling the moment of violation.'
+            },
+            {
+              type: 'quiz',
+              intro: 'כהנמן עצמו, אחרי עשרות שנות מחקר, כמעט לא השתפר בזיהוי הטיותיו בזמן אמת.',
+              introEn: 'Kahneman himself, after decades of research, had barely improved at identifying his own biases in real time.',
+              question: 'מה המסקנה המעשית שהסיק מכך?',
+              questionEn: 'What is the practical conclusion he drew?',
+              options: ['שאין טעם לנסות, ולכן עדיף לוותר על כל שינוי', 'שכדאי לשנות תנאים מראש, במקום להסתמך על ערנות ברגע ההחלטה עצמו', 'שיש להתאמן עוד ולהאמין ביכולת לתפוס כל הטיה בזמן אמת'],
+              optionsEn: ['That there is no point in trying, and therefore it is better to give up on any change', 'That it is worth changing conditions in advance, instead of relying on alertness at the moment of decision itself', 'That one should train more and believe in the ability to catch every bias in real time'],
+              correctIndex: 1,
+              explanation: 'זו מסקנה מפוכחת ולא מייאשת. אם קשה לתפוס את הפעולה כשהיא קורית, עדיף לשנות את מה שקורה לפניה: את הסביבה, את הרמזים, ואת מה שהוחלט מראש.',
+              explanationEn: 'This is a sober conclusion and not a despairing one. If it is hard to catch the action as it happens, it is better to change what happens before it: the environment, the cues, and what was decided in advance.'
+            },
+            { type: 'quiz_summary' }
+          ]
+        },
+        {
+          id: 3,
+          title: 'לייק כשיקוף',
+          titleEn: 'A Like as Mirror',
+          thinker: 'היינץ קוהוט',
+          thinkerEn: 'Heinz Kohut',
+          thinkerId: 'kohut',
+          xp: 50,
+          sections: [
+            {
+              type: 'idea',
+              title: 'הרעיון של היום',
+              titleEn: 'Today\'s Idea',
+              content: 'עד כה דיברנו על מנגנון: הרגל חזק שמופעל בלי אישור. אבל נשארה שאלה. <strong>למה דווקא הדבר הזה?</strong> למה דווקא הטלפון והרשתות החברתיות? יש הרבה הרגלים אפשריים, ולא כולם תופסים אנשים באותה עוצמה.\n\nהיינץ קוהוט הציע תשובה. הוא טען שהצורך שמישהו יראה אותנו אינו חולשה ואינו יהירות, אלא <strong>צורך התפתחותי בסיסי</strong>. הילד זקוק לשיקוף, לפנים של מבוגר שנדלקות כשהוא מופיע, ומכך נבנית בהדרגה תחושה יציבה של "אני קיים, ויש לי ערך".\n\nוהצורך הזה אינו נעלם עם הבגרות, כפי שראינו בפרק השלישי. הוא רק משנה צורה.\n\nוכאן נמצא ההסבר. הרשתות החברתיות אינן ממציאות צורך חדש, הן פוגעות בול בצורך ותיק. <strong>לייק אינו סתם מספר. הוא אות קטן שאומר: מישהו ראה.</strong> ולכן לייק מרגיש כל כך משמעותי.',
+              contentEn: 'So far we have spoken about mechanism: a strong habit triggered without authorization. But a question remains. <strong>Why this thing in particular?</strong> Why the phone and social networks in particular? There are many possible habits, and not all of them grip people with the same intensity.\n\nHeinz Kohut offered an answer. He argued that the need for someone to see us is not a weakness and not arrogance, but <strong>a basic developmental need</strong>. The child needs mirroring, the face of an adult that lights up when he appears, and from this a stable sense of "I exist, and I have worth" is gradually built.\n\nAnd this need does not disappear with maturity, as we saw in the third chapter. It only changes form.\n\nAnd here is the explanation. Social networks do not invent a new need, they hit an old need exactly. <strong>A like is not just a number. It is a small signal that says: someone saw.</strong> And that is why a like feels so meaningful.',
+              image: 'images/bonus/psychology/day3-idea.webp'
+            },
+            {
+              type: 'source',
+              title: 'קטע מקור',
+              titleEn: 'Source Material',
+              quote: '"הניצוץ בעיניה של האם, המשקף את תצוגתו של הילד."',
+              quoteEn: '"The gleam in the mother\'s eye, which mirrors the child\'s exhibitionistic display."',
+              attr: '- היינץ קוהוט, "אנליזה של העצמי", 1971',
+              attrEn: '- Heinz Kohut, "The Analysis of the Self", 1971'
+            },
+            {
+              type: 'explanation',
+              title: 'הסבר',
+              titleEn: 'Explanation',
+              content: 'קוהוט תיאר שיקוף כרגע מדויק, לא ככמות. <strong>מה שבונה אינו כמות התשומת לב, אלא האם התגובה תואמת את מה שהאדם חווה.</strong>\n\nוכאן ההבדל שהופך את הדיאלוג הזה לחשוב. לייק הוא שיקוף בלי דיוק. הוא אומר "נרשמה נוכחות", אבל לא "ראיתי אותך". ולכן הוא עובד לרגע ואז מתפוגג, ודורש עוד.\n\nדוגמה מהחיים: אדם מפרסם משהו שחשוב לו. הוא חוזר לבדוק אחרי דקה, ואחרי חמש, ואחרי חצי שעה. כל בדיקה נותנת משהו קטן, וכל בדיקה מסתיימת בצורך לבדוק שוב. <strong>הוא אינו רודף אחרי מספרים, הוא מחפש את הניצוץ בעיניים.</strong> רק שהמדיום שבחר מספק רק את הצל שלו.\n\nוזה מסביר גם למה תגובה אחת מאדם משמעותי שווה יותר ממאה לייקים. הראשונה היא שיקוף מדויק, והשנייה היא ספירה.',
+              contentEn: 'Kohut described mirroring as a precise moment, not as a quantity. <strong>What builds is not the amount of attention, but whether the response matches what the person is experiencing.</strong>\n\nAnd here is the difference that makes this dialogue important. A like is mirroring without precision. It says "a presence was registered", but not "I saw you". And therefore it works for a moment and then dissipates, and demands more.\n\nA real-life example: a person posts something that matters to him. He goes back to check after a minute, and after five, and after half an hour. Every check gives something small, and every check ends with the need to check again. <strong>He is not chasing numbers, he is looking for the gleam in the eyes.</strong> Only that the medium he chose supplies only its shadow.\n\nAnd this also explains why one response from a significant person is worth more than a hundred likes. The first is precise mirroring, and the second is counting.',
+              image: 'images/bonus/psychology/day3-explanation.webp'
+            },
+            {
+              type: 'depth',
+              title: 'עומק',
+              titleEn: 'Depth',
+              content: 'וכאן שלוש החתיכות של הפרק מתחברות. סקינר הסביר את המנגנון, כהנמן את האוטומטיות, וקוהוט מסביר למה דווקא ההרגל הזה. <strong>ההרגל הזה תפס כל כך חזק לא בגלל התוכן, אלא כי מה שממתין שם נוגע בצורך אמיתי.</strong>\n\nוזו גם הנקודה החשובה מכולן: <strong>הצורך עצמו אינו הבעיה.</strong> קוהוט התעקש שאין כאן פגם אופי. אדם שרוצה שיראו אותו אינו נרקיסיסט, הוא אדם. הקושי אינו ברצון להיראות, אלא בכך שהאמצעי מספק גרסה מהירה ורדודה שלו.\n\nוצריך גם ביקורת. קוהוט נשען על עבודה קלינית ולא על ניסויים, ותורת העצמי קשה למדידה. אבל המחקר על היענות מכווננת בין הורה לתינוק, שכן נמדד, מוצא בדיוק את מה שתיאר: הדיוק חשוב יותר מהכמות.\n\nומכאן לדיאלוג הבא. קוהוט הסביר למה אנחנו נמשכים לשם. אדוארד דצ\'י ישאל שאלה קשה יותר: מה קורה לתחביב שאהבנו כשמתחילים לספור אותו?',
+              contentEn: 'And here the three pieces of the chapter connect. Skinner explained the mechanism, Kahneman the automaticity, and Kohut explains why this particular habit. <strong>This habit took hold so strongly not because of the content, but because what waits there touches a real need.</strong>\n\nAnd this is also the most important point of all: <strong>the need itself is not the problem.</strong> Kohut insisted that there is no character flaw here. A person who wants to be seen is not a narcissist, he is a person. The difficulty is not in the wish to be seen, but in the fact that the means supplies a fast and shallow version of it.\n\nAnd criticism is also needed. Kohut relied on clinical work and not on experiments, and self psychology is hard to measure. But the research on attuned responsiveness between parent and infant, which was measured, finds exactly what he described: precision matters more than quantity.\n\nAnd from here to the next dialogue. Kohut explained why we are drawn there. Edward Deci will ask a harder question: what happens to a hobby we loved when we start counting it?',
+              image: 'images/bonus/psychology/day3-depth.webp'
+            },
+            {
+              type: 'quiz',
+              intro: 'אדם מפרסם משהו שחשוב לו וחוזר לבדוק שוב ושוב.',
+              introEn: 'A person posts something that matters to him and goes back to check again and again.',
+              question: 'לפי קוהוט, מה הוא מחפש?',
+              questionEn: 'According to Kohut, what is he looking for?',
+              options: ['מספרים גבוהים, כי המספר עצמו הוא המטרה שלו', 'שיקוף, כלומר סימן שמישהו ראה אותו באמת', 'שום דבר, שכן זו התנהגות אקראית ללא משמעות'],
+              optionsEn: ['High numbers, because the number itself is his goal', 'Mirroring, that is, a sign that someone really saw him', 'Nothing, since this is random behavior with no meaning'],
+              correctIndex: 1,
+              explanation: 'הוא אינו רודף אחרי הספירה, הוא מחפש את הניצוץ בעיניים. הצורך שמישהו יראה אותנו הוא צורך התפתחותי אמיתי, והמספר הוא רק הצורה שהמדיום מציע לו.',
+              explanationEn: 'He is not chasing the count, he is looking for the gleam in the eyes. The need for someone to see us is a real developmental need, and the number is only the form the medium offers it.'
+            },
+            {
+              type: 'quiz',
+              intro: 'תגובה אחת מאדם קרוב לעומת מאה לייקים.',
+              introEn: 'One response from a close person versus a hundred likes.',
+              question: 'מדוע התגובה מאדם קרוב מרגישה לרוב משמעותית יותר?',
+              questionEn: 'Why does one response from a close person usually feel more meaningful?',
+              options: ['משום שאדם קרוב מכיר אותנו זמן רב יותר, ולכן דעתו חשובה', 'משום שלייקים תמיד חסרי ערך, בעוד שתגובות תמיד בעלות ערך', 'משום ששיקוף נמדד בדיוק ולא בכמות, ותגובה מדויקת אומרת ראיתי אותך'],
+              optionsEn: ['Because a close person has known us longer, and therefore his opinion matters', 'Because likes are always worthless, whereas responses are always valuable', 'Because mirroring is measured by precision and not by quantity, and a precise response says I saw you'],
+              correctIndex: 2,
+              explanation: 'זו הנקודה של קוהוט. שיקוף אינו כמות תשומת לב, אלא התאמה למה שהאדם חווה. לייק מסמן נוכחות, ותגובה מדויקת מסמנת שמישהו באמת ראה.',
+              explanationEn: 'This is Kohut\'s point. Mirroring is not a quantity of attention, but a match to what the person is experiencing. A like signals presence, and a precise response signals that someone really saw.'
+            },
+            {
+              type: 'quiz',
+              intro: 'חבר אומר: "מי שאכפת לו מלייקים הוא פשוט נרקיסיסט."',
+              introEn: 'A friend says: "Anyone who cares about likes is simply a narcissist."',
+              question: 'כיצד קוהוט היה חולק על כך?',
+              questionEn: 'How would Kohut disagree?',
+              options: ['הוא היה מסכים, שכן הצורך בהכרה הוא תמיד סימן לפתולוגיה', 'הצורך שיראו אותנו הוא בסיסי ואנושי, והשאלה היא רק היכן מחפשים אותו', 'הוא היה טוען שרק ילדים זקוקים לכך, ומבוגרים כלל לא'],
+              optionsEn: ['He would agree, since the need for recognition is always a sign of pathology', 'The need for us to be seen is basic and human, and the question is only where one looks for it', 'He would argue that only children need this, and adults not at all'],
+              correctIndex: 1,
+              explanation: 'קוהוט חלק במפורש על התפיסה שהצורך בהכרה הוא פגם. הוא ראה בו צורך התפתחותי, כמו מזון או שינה. מה שכן משתנה הוא היכן הוא נענה, ובאיזו רמת דיוק.',
+              explanationEn: 'Kohut explicitly disagreed with the view that the need for recognition is a flaw. He saw it as a developmental need, like food or sleep. What does change is where it is answered, and at what level of precision.'
+            },
+            { type: 'quiz_summary' }
+          ]
+        },
+        {
+          id: 4,
+          title: 'כשמתחילים לספור',
+          titleEn: 'When You Start Counting',
+          thinker: 'אדוארד דצ\'י',
+          thinkerEn: 'Edward Deci',
+          thinkerId: 'deci',
+          xp: 50,
+          sections: [
+            {
+              type: 'idea',
+              title: 'הרעיון של היום',
+              titleEn: 'Today\'s Idea',
+              content: 'קוהוט הסביר למה אנחנו נמשכים לרשתות החברתיות. עכשיו נשאלת שאלה אחרת, על מה שקורה למי שלא רק צורך תוכן אלא גם יוצר.\n\nאדם מצייר, כותב או מצלם מתוך אהבה. ואז הוא מתחיל לפרסם. ובשלב מסוים הוא שם לב שהוא כבר לא חושב רק על מה שהוא עושה, אלא גם על איך זה יתקבל.\n\nאדוארד דצ\'י הראה במעבדה בדיוק את המנגנון הזה. הוא הבחין בין <strong>מוטיבציה פנימית</strong>, שבה הפעולה עצמה היא הגמול, לבין <strong>מוטיבציה חיצונית</strong>, שבה הגמול נמצא מחוץ לה. וממצא המפתח שלו: <strong>תגמול חיצוני על משהו שכבר אהבנו אינו נערם על האהבה, הוא נוטה להחליף אותה.</strong>\n\nומטריקות הן תגמול חיצוני מהצורה הטהורה ביותר: מדיד, מיידי, וגלוי לעין.',
+              contentEn: 'Kohut explained why we are drawn to social networks. Now a different question arises, about what happens to someone who not only consumes content but also creates.\n\nA person draws, writes or photographs out of love. And then he starts to publish. And at a certain stage he notices that he is no longer thinking only about what he is doing, but also about how it will be received.\n\nEdward Deci demonstrated exactly this mechanism in the laboratory. He distinguished between <strong>intrinsic motivation</strong>, in which the action itself is the reward, and <strong>extrinsic motivation</strong>, in which the reward lies outside it. And his key finding: <strong>an external reward for something we already loved does not pile on top of the love, it tends to replace it.</strong>\n\nAnd metrics are external reward in its purest form: measurable, immediate, and visible to the eye.',
+              image: 'images/bonus/psychology/day4-idea.webp'
+            },
+            {
+              type: 'source',
+              title: 'קטע מקור',
+              titleEn: 'Source Material',
+              quote: '"במקום לשאול איך אני יכול להניע אנשים, עלינו לשאול כיצד ליצור את התנאים שבהם אנשים יניעו את עצמם."',
+              quoteEn: '"Instead of asking how I can motivate people, we should ask how to create the conditions in which people will motivate themselves."',
+              attr: '- אדוארד דצ\'י, "Why We Do What We Do", 1995',
+              attrEn: '- Edward Deci, "Why We Do What We Do", 1995'
+            },
+            {
+              type: 'explanation',
+              title: 'הסבר',
+              titleEn: 'Explanation',
+              content: 'דצ\'י הדגיש שתגמול אינו רע כשלעצמו. <strong>מה שקובע הוא מה התגמול אומר לאדם.</strong> תגמול שמוסר מידע ("זה טוב") מחזק. תגמול שמשדר שליטה ("עשה כך כדי לקבל עוד") מזיז את הסיבה לפעולה מבפנים החוצה.\n\nוהבעיה עם ספירה היא שהיא כמעט תמיד מסוג שני. היא לא אומרת מה היה טוב, היא אומרת כמה.\n\nדוגמה מהחיים: אדם שאהב לצלם בסופי שבוע ומתחיל לפרסם. בהתחלה הוא מצלם מה שמעניין אותו. אחרי כמה חודשים הוא מוצא את עצמו שוקל מראש מה יעבוד טוב יותר. <strong>השאלה שהוא שואל את עצמו לפני הצילום השתנתה.</strong> ובשלב הבא, אם הפרסום מפסיק לעבוד, נעלם גם החשק לצלם.\n\nוזה הצד שלרוב לא מדובר עליו. <strong>הפגיעה אינה רק בזמן שמבזבזים על הטלפון, אלא במשהו שאהבנו לפני שהוא נכנס לתמונה.</strong>',
+              contentEn: 'Deci emphasized that reward is not bad in itself. <strong>What matters is what the reward says to the person.</strong> A reward that conveys information ("this is good") strengthens. A reward that conveys control ("do this in order to get more") moves the reason for the action from inside to outside.\n\nAnd the problem with counting is that it is almost always of the second kind. It does not say what was good, it says how much.\n\nA real-life example: a person who loved photographing on weekends and starts to publish. At first he photographs what interests him. After a few months he finds himself weighing in advance what will work better. <strong>The question he asks himself before taking the photo has changed.</strong> And at the next stage, if publishing stops working, the desire to photograph disappears as well.\n\nAnd this is the side that is usually not discussed. <strong>The harm is not only in the time wasted on the phone, but in something we loved before it entered the picture.</strong>',
+              image: 'images/bonus/psychology/day4-explanation.webp'
+            },
+            {
+              type: 'depth',
+              title: 'עומק',
+              titleEn: 'Depth',
+              content: 'וכאן צריך דיוק, כי הרעיון הזה נמכר לרוב בגרסה מנופחת.\n\nהממצא היה שנוי במחלוקת, וב-1999 השיבו דצ\'י, קסטנר וראיאן במטה-אנליזה של 128 ניסויים שהראתה שתגמולים מוחשיים אכן שוחקים מוטיבציה פנימית. אבל שני סייגים משנים הכל. <strong>ראשית, השחיקה מתרחשת בעיקר במשימות שהיו מעניינות מלכתחילה, ואם לא הייתה אהבה, אין מה לשחוק.</strong> שנית, ומפתיע: <strong>משוב מילולי חיובי דווקא חיזק את המוטיבציה הפנימית.</strong>\n\nוזה מחזיר אותנו לקוהוט מהדיאלוג הקודם, ומחדד את שניהם. תגובה מדויקת של אדם היא משוב מילולי, וספירה היא תגמול מוחשי. לכן השתיים אינן פועלות באותו כיוון, ולכן מאה לייקים יכולים להרגיש ריקים בעוד משפט אחד מחזיק שבוע.\n\nומכאן לדיאלוג הבא. עד כה הסברנו למה קשה להתנתק ומה זה עושה לנו. אריך פרום ישאל את השאלה הכי לא נוחה: אולי אנחנו לא באמת רוצים להתנתק?',
+              contentEn: 'And here precision is needed, because this idea is usually sold in an inflated version.\n\nThe finding was controversial, and in 1999 Deci, Koestner and Ryan replied with a meta-analysis of 128 experiments which showed that tangible rewards do indeed erode intrinsic motivation. But two caveats change everything. <strong>First, the erosion occurs mainly in tasks that were interesting in the first place, and if there was no love, there is nothing to erode.</strong> Second, and surprisingly: <strong>positive verbal feedback actually strengthened intrinsic motivation.</strong>\n\nAnd this brings us back to Kohut from the previous dialogue, and sharpens both of them. A precise response from a person is verbal feedback, and counting is a tangible reward. Therefore the two do not work in the same direction, and therefore a hundred likes can feel empty while one sentence lasts a week.\n\nAnd from here to the next dialogue. So far we have explained why it is hard to disconnect and what it does to us. Erich Fromm will ask the most uncomfortable question: perhaps we do not really want to disconnect?',
+              image: 'images/bonus/psychology/day4-depth.webp'
+            },
+            {
+              type: 'quiz',
+              intro: 'אדם שאהב לצלם מתחיל לפרסם, ואחרי חודשים שוקל מראש מה יעבוד טוב יותר.',
+              introEn: 'A person who loved photographing starts to publish, and after months weighs in advance what will work better.',
+              question: 'לפי דצ\'י, מה קרה?',
+              questionEn: 'According to Deci, what happened?',
+              options: ['הוא פשוט התבגר ולמד לצלם בצורה מקצועית יותר', 'הסיבה לפעולה עברה מבפנים החוצה, מהצילום עצמו אל התגובה עליו', 'לא קרה דבר, שכן תגמול חיצוני אינו משפיע על אהבה לתחביב'],
+              optionsEn: ['He simply matured and learned to photograph more professionally', 'The reason for the action moved from inside to outside, from the photography itself to the response to it', 'Nothing happened, since external reward does not affect love for a hobby'],
+              correctIndex: 1,
+              explanation: 'זו השחיקה שדצ\'י תיאר. התגמול לא נערם על האהבה, הוא החליף אותה. וכשהסיבה נמצאת בחוץ, היא תלויה במה שקורה בחוץ.',
+              explanationEn: 'This is the erosion Deci described. The reward did not pile on top of the love, it replaced it. And when the reason is outside, it depends on what happens outside.'
+            },
+            {
+              type: 'quiz',
+              intro: 'ספירה של לייקים לעומת תגובה מילולית מדויקת.',
+              introEn: 'Counting likes versus a precise verbal response.',
+              question: 'מדוע ספירה שוחקת יותר?',
+              questionEn: 'Why does counting erode more?',
+              options: ['משום שספירה גלויה לאחרים, ותגובה נשארת פרטית', 'משום שכל סוג של משוב שוחק מוטיבציה, בלי הבדל ביניהם', 'משום שספירה היא תגמול מוחשי, ומשוב מילולי חיובי דווקא מחזק'],
+              optionsEn: ['Because counting is visible to others, and a response remains private', 'Because every kind of feedback erodes motivation, with no difference between them', 'Because counting is a tangible reward, and positive verbal feedback actually strengthens'],
+              correctIndex: 2,
+              explanation: 'זה הסייג שמפספסים. המטה-אנליזה מצאה שתגמולים מוחשיים שוחקים, אבל משוב מילולי חיובי מחזק. לכן מספר ומשפט אינם פועלים באותו כיוון.',
+              explanationEn: 'This is the caveat people miss. The meta-analysis found that tangible rewards erode, but positive verbal feedback strengthens. Therefore a number and a sentence do not work in the same direction.'
+            },
+            {
+              type: 'quiz',
+              intro: 'בית ספר מציע פרס לתלמידים על ניקיון החצר, משימה שאיש אינו נהנה ממנה.',
+              introEn: 'A school offers a prize to students for cleaning the yard, a task no one enjoys.',
+              question: 'האם צפויה שחיקה לפי דצ\'י?',
+              questionEn: 'Is erosion expected according to Deci?',
+              options: ['כן, שכן כל תגמול חיצוני שוחק מוטיבציה בכל משימה', 'לא, כי לא הייתה כאן מוטיבציה פנימית מלכתחילה שאפשר לשחוק', 'כן, והתלמידים ינקו פחות משהיו מנקים ללא כל פרס'],
+              optionsEn: ['Yes, since every external reward erodes motivation in every task', 'No, because there was no intrinsic motivation here in the first place that could be eroded', 'Yes, and the students will clean less than they would have cleaned without any prize'],
+              correctIndex: 1,
+              explanation: 'השחיקה קורית כשיש משהו לשחוק. במשימה שאיש אינו אוהב, תגמול הוא בדיוק הכלי הנכון, ואין שם אהבה שתיפגע.',
+              explanationEn: 'The erosion happens when there is something to erode. In a task no one loves, a reward is exactly the right tool, and there is no love there to be harmed.'
+            },
+            { type: 'quiz_summary' }
+          ]
+        },
+        {
+          id: 5,
+          title: 'מנוס מהחלטה',
+          titleEn: 'Escape from Choice',
+          thinker: 'אריך פרום',
+          thinkerEn: 'Erich Fromm',
+          thinkerId: 'fromm',
+          xp: 50,
+          sections: [
+            {
+              type: 'idea',
+              title: 'הרעיון של היום',
+              titleEn: 'Today\'s Idea',
+              content: 'עד כה תיארנו כוחות שפועלים עלינו: לוח חיזוק, אוטומטיות, צורך בהכרה, שחיקה של מוטיבציה. בכל אלה אנחנו הצד שמושפע.\n\nאריך פרום היה שואל שאלה אחרת, ופחות נוחה. <strong>אולי הגלילה בטלפון אינה רק משהו שקורה לנו. אולי היא גם משהו שאנחנו מחפשים.</strong>\n\nפרום כתב על החירות שהמודרנה נתנה לנו, וטען שהיא מגיעה עם מחיר: <strong>החופש לבחור הוא גם החובה לבחור.</strong> ולכן, במקום שבו הבחירה כבדה מדי, בני אדם מוסרים אותה, ולעיתים בהקלה.\n\nעכשיו חשוב על שעה פנויה. היא חופש טהור, ולכן היא גם דורשת החלטה. מה עושים איתה, מה שווה את הזמן הזה, ומה יקרה אם נבזבז אותה. <strong>הגלילה פותרת את זה מיד: היא ממלאת את השעה בלי לדרוש שום החלטה.</strong>',
+              contentEn: 'So far we have described forces that act upon us: a reinforcement schedule, automaticity, a need for recognition, erosion of motivation. In all of these we are the side that is affected.\n\nErich Fromm would ask a different question, and a less comfortable one. <strong>Perhaps scrolling on the phone is not only something that happens to us. Perhaps it is also something we are looking for.</strong>\n\nFromm wrote about the freedom that modernity gave us, and argued that it comes with a price: <strong>the freedom to choose is also the obligation to choose.</strong> And therefore, where the choice is too heavy, human beings hand it over, and sometimes with relief.\n\nNow think about a free hour. It is pure freedom, and therefore it also demands a decision. What to do with it, what is worth this time, and what will happen if we waste it. <strong>Scrolling solves this immediately: it fills the hour without demanding any decision.</strong>',
+              image: 'images/bonus/psychology/day5-idea.webp'
+            },
+            {
+              type: 'source',
+              title: 'קטע מקור',
+              titleEn: 'Source Material',
+              quote: '"החירות, אף שהביאה לו עצמאות ותבונה, הפכה אותו למבודד, ובשל כך לחרד וחסר אונים."',
+              quoteEn: '"Freedom, though it has brought him independence and rationality, has made him isolated and, thereby, anxious and powerless."',
+              attr: '- אריך פרום, "מנוס מחופש", 1941',
+              attrEn: '- Erich Fromm, "Escape from Freedom", 1941'
+            },
+            {
+              type: 'explanation',
+              title: 'הסבר',
+              titleEn: 'Explanation',
+              content: 'פרום הבחין בין <strong>חופש מ</strong> לבין <strong>חופש ל</strong>. הראשון הוא הסרת מגבלות, והשני הוא מה שעושים אחריה. והשני קשה בהרבה.\n\nדוגמה מהחיים: ערב פנוי לגמרי, בלי מטלות ובלי התחייבויות. במקום הקלה, לפעמים מגיעה דווקא תחושה עמומה של אי-נוחות. ואז הטלפון נשלף, לא מתוך רצון עז אלא מתוך הקלה. <strong>הגלילה בטלפון ממלאת את החלל, והשאלה מה לעשות עם הערב פשוט לא נשאלת.</strong>\n\nוזו הנקודה של פרום. <strong>לא ברחנו רק משעמום, ברחנו מהחלטה.</strong> הגלילה אינה רק בידור, היא גם פטור זמני מלהיות מי שקובע מה יקרה עכשיו.\n\nוזה מסביר גם למה "פשוט תעשה משהו אחר" זה נשמע קל כמו שזה נשמע. הצעה כזו מחזירה בדיוק את מה שברחנו ממנו, את הצורך לבחור.',
+              contentEn: 'Fromm distinguished between <strong>"freedom from"</strong> and <strong>"freedom to"</strong>. The first is the removal of restrictions, and the second is what one does afterwards. And the second is far harder.\n\nA real-life example: an entirely free evening, with no chores and no commitments. Instead of relief, sometimes what arrives is actually a vague sense of unease. And then the phone is pulled out, not out of a strong desire but out of relief. <strong>Scrolling on the phone fills the void, and the question of what to do with the evening is simply not asked.</strong>\n\nAnd this is Fromm\'s point. <strong>We did not flee only from boredom, we fled from a decision.</strong> Scrolling is not only entertainment, it is also a temporary exemption from being the one who determines what will happen now.\n\nAnd this also explains why "just do something else" sounds as easy as it sounds. Such a suggestion brings back exactly what we fled from, the need to choose.',
+              image: 'images/bonus/psychology/day5-explanation.webp'
+            },
+            {
+              type: 'depth',
+              title: 'עומק',
+              titleEn: 'Depth',
+              content: 'וכאן הפרק נסגר, וכל החתיכות מתחברות.\n\nסקינר הסביר למה ההרגל חזק. כהנמן למה הוא אוטומטי. קוהוט למה דווקא שם. דצ\'י מה זה עושה למה שאהבנו. ופרום מוסיף את החלק האחרון: <strong>למה חלק מאיתנו לא ממש רוצה שזה ייפסק.</strong>\n\nוזו גם הנקודה שהופכת את הפרק לפחות נוח ויותר מדויק. אם הבעיה הייתה רק מנגנון חיצוני, היה מספיק לשנות הגדרות. אבל אם יש גם ביקוש מבפנים, אז ההסבר "האפליקציות ממכרות אותנו" נכון רק בחציו.\n\nוצריך גם איזון, כי אפשר לקרוא את פרום בצורה מאשימה, וזו טעות. הוא לא תיאר חולשה אלא מצב אנושי. <strong>לשאת את החירות לבד זה באמת קשה, והעובדה שזה קשה לא מעידה על פגם.</strong>\n\n"מנוס מחופש" הוא תיאוריה חברתית שנכתבה בזמן אמת ולא מחקר מבוקר, גם אם המנגנונים שתיאר נמדדו אחר כך בניסויים של אש ומילגרם.\n\nאבל בכל מקרה התובנה שנשארת עומדת היא: <strong>לפעמים אנחנו לא נלכדים בטלפון. לפעמים אנחנו מוסרים לו משהו, ומקבלים בתמורה שקט מסוים.</strong>',
+              contentEn: 'And here the chapter closes, and all the pieces connect.\n\nSkinner explained why the habit is strong. Kahneman why it is automatic. Kohut why there in particular. Deci what it does to what we loved. And Fromm adds the last part: <strong>why a part of us does not really want it to stop.</strong>\n\nAnd this is also the point that makes the chapter less comfortable and more accurate. If the problem were only an external mechanism, it would be enough to change settings. But if there is also demand from within, then the explanation "the apps are addicting us" is only half right.\n\nAnd balance is also needed, because Fromm can be read in an accusatory way, and that is a mistake. He did not describe a weakness but a human condition. <strong>Bearing freedom alone is genuinely hard, and the fact that it is hard does not indicate a flaw.</strong>\n\n"Escape from Freedom" is a social theory written in real time and not a controlled study, even if the mechanisms he described were later measured in the experiments of Asch and Milgram.\n\nBut in any case the insight that remains standing is: <strong>sometimes we are not trapped by the phone. Sometimes we hand it something, and receive in return a certain quiet.</strong>',
+              image: 'images/bonus/psychology/day5-depth.webp'
+            },
+            {
+              type: 'quiz',
+              intro: 'אדם מגיע לערב פנוי לגמרי, מרגיש אי-נוחות קלה, ושולף את הטלפון.',
+              introEn: 'A person arrives at an entirely free evening, feels slight unease, and pulls out the phone.',
+              question: 'לפי פרום, ממה הוא נמלט?',
+              questionEn: 'According to Fromm, what is he fleeing from?',
+              options: ['משעמום בלבד, שהרי אין לו מה לעשות בערב הזה', 'מהצורך להחליט מה לעשות עם הזמן שנפתח לפניו', 'מעייפות פיזית, שאין לה קשר לשאלת הבחירה'],
+              optionsEn: ['From boredom alone, since he has nothing to do this evening', 'From the need to decide what to do with the time that has opened before him', 'From physical fatigue, which has no connection to the question of choice'],
+              correctIndex: 1,
+              explanation: 'זו ההבחנה של פרום. שעה פנויה היא חופש, וחופש דורש הכרעה. הגלילה ממלאת את הזמן בלי לדרוש החלטה, ולכן ההקלה מגיעה עוד לפני ההנאה.',
+              explanationEn: 'This is Fromm\'s distinction. A free hour is freedom, and freedom demands a decision. Scrolling fills the time without demanding a decision, and therefore the relief arrives even before the enjoyment.'
+            },
+            {
+              type: 'quiz',
+              intro: 'עצה מוכרת: "פשוט תעשה משהו אחר עם הזמן".',
+              introEn: 'A familiar piece of advice: "just do something else with the time".',
+              question: 'מדוע היא נכשלת לעיתים קרובות?',
+              questionEn: 'Why does it often fail?',
+              options: ['משום שאנשים אינם יודעים אילו פעילויות קיימות בעולם', 'משום שכל פעילות אחרת פחות מהנה מגלילה בטלפון', 'משום שהיא מחזירה בדיוק את מה שברחנו ממנו, את המטלה לבחור'],
+              optionsEn: ['Because people do not know what activities exist in the world', 'Because every other activity is less enjoyable than scrolling on the phone', 'Because it brings back exactly what we fled from, the chore of choosing'],
+              correctIndex: 2,
+              explanation: 'העצה נשמעת קלה, אבל היא מטילה מחדש את משקל ההחלטה. אם מה שהקל היה דווקא היעדר הבחירה, אז הצעה שדורשת לבחור אינה פותרת את הקושי המקורי.',
+              explanationEn: 'The advice sounds easy, but it re-imposes the weight of the decision. If what brought relief was precisely the absence of choice, then a suggestion that requires choosing does not solve the original difficulty.'
+            },
+            {
+              type: 'quiz',
+              intro: 'חבר אומר: "האפליקציות פשוט ממכרות אותנו, אין לנו שום חלק בהחלטה להשתמש בהן."',
+              introEn: 'A friend says: "The apps are simply addicting us, we have no part at all in the decision to use them."',
+              question: 'כיצד פרום היה מסייג את זה?',
+              questionEn: 'How would Fromm qualify this?',
+              options: ['הוא היה מסכים לחלוטין, שכן ההשפעה מגיעה רק מבחוץ', 'יש גם ביקוש מבפנים, כי לפעמים אנחנו מחפשים פטור מהחלטה', 'הוא היה טוען שאין לעיצוב האפליקציות שום השפעה על אנשים'],
+              optionsEn: ['He would agree entirely, since the influence comes only from outside', 'There is also demand from within, because sometimes we are looking for an exemption from decision', 'He would argue that the design of the apps has no influence at all on people'],
+              correctIndex: 1,
+              explanation: 'פרום לא הכחיש את הכוחות החיצוניים, הוא הוסיף את הצד השני. כשמסירת הבחירה מביאה הקלה, יש כאן גם משהו שאנחנו מחפשים, ולא רק משהו שנעשה לנו.',
+              explanationEn: 'Fromm did not deny the external forces, he added the other side. When handing over the choice brings relief, there is also something here that we are looking for, and not only something that is done to us.'
+            },
+            { type: 'quiz_summary' }
+          ]
+        }
+      ]
+    },
+    { id: 5, title: 'רגשות ומצבי רוח', titleEn: 'Emotions and Moods', comingSoon: true, days: [] },
     { id: 6, title: 'קשרים בין-אישיים', titleEn: 'Interpersonal Relationships', comingSoon: true, days: [] },
   ],
 };

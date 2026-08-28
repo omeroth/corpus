@@ -16403,7 +16403,8 @@ function _onCelebrationQueueEmpty() {
 function _highlightBonusCardOnHome() {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      const bonusId = state.subject === 'economics' ? 'bonusEcon1' : 'bonus1';
+      const bonusId = state.subject === 'economics' ? 'bonusEcon1'
+                    : state.subject === 'psychology' ? 'bonusPsy1' : 'bonus1';
       const bonusCard = document.getElementById('level-card-' + bonusId);
       if (!bonusCard) return;
       try {
@@ -16797,6 +16798,14 @@ function renderHome() {
           // promo window and completed at least one day keep access
           // even if chapter 1 is still incomplete.
           'bonusEcon1': isWeekCompleted(1) || _hasBonusProgress('bonusEcon1'),
+          4: isWeekCompleted(3),
+        }
+      : state.subject === 'psychology'
+      ? {
+          1: true,
+          2: isWeekCompleted(1),
+          3: isWeekCompleted(2),
+          'bonusPsy1': isWeekCompleted(1) || _hasBonusProgress('bonusPsy1'),
           4: isWeekCompleted(3),
         }
       : {
