@@ -11799,6 +11799,11 @@ function _onbComplete() {
   try { saveState(); } catch(e) {}
   try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
   try { localStorage.removeItem('corpus_onboarding_step'); } catch(e) {}
+  // Belt-and-braces: force the first-dialogue guard off even if the
+  // user's flow left it set. If true, finishDay's guard would route
+  // every future completion through _onbFinishFirstDialogue and
+  // suppress level-up + goal-met + chapter-complete + bonus-unlock.
+  try { state._onbInFirstDialogue = false; saveStateLocal(); } catch(e) {}
   try { _phCapture('onboarding_completed', { platform: _phPlatform(), lang: state.lang || 'he' }); } catch(e) {}
   document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
     s.style.display = 'none';
@@ -11962,10 +11967,16 @@ function _onbEnterFirstDialogue() {
 // overlay would double up on it. Then shows the thinker card with a
 // single "Continue" button that advances to step 17.
 function _onbFinishFirstDialogue() {
+  // Clear the guard the moment the reader closes. If we defer this to
+  // the thinker card's Continue button (or _onbComplete), a force-close
+  // between finishDay and the button tap leaves the flag persisted to
+  // localStorage — which then routes every future dialogue completion
+  // through this bare-bones tail and suppresses all celebrations.
+  // Belt-and-braces clears remain below on the exit paths.
+  state._onbInFirstDialogue = false;
   const chapter = getW().find(w => w.id === state.currentWeek);
   const day = chapter && chapter.days.find(d => d.id === state.currentDay);
   if (!chapter || !day) {
-    state._onbInFirstDialogue = false;
     _onbShowStep(17);
     return;
   }
@@ -14659,6 +14670,19 @@ function loadState() {
   // full attribution heuristic. Also runs from loadProgressFromSupabase
   // because the cloud copy still has legacy keys for existing users.
   try { migrateChapterCompleteShown(); } catch(e) { console.warn('[migrate] chapterCompleteShown failed', e); }
+  // Boot-time repair for testers who upgraded into 1.3.3 with
+  // state._onbInFirstDialogue stuck as true — happens when v2 onboarding's
+  // step 15 first-dialogue tail didn't clear the flag before the app was
+  // closed. If left, finishDay routes every subsequent completion through
+  // _onbFinishFirstDialogue, suppressing every celebration overlay. Repair
+  // is safe: any legitimate mid-first-dialogue user also has
+  // corpus_onboarding_step='16' set, so we only clear the flag once
+  // onboarding is marked done.
+  if (localStorage.getItem('corpus_onboarding_done') && state._onbInFirstDialogue) {
+    state._onbInFirstDialogue = false;
+    try { saveStateLocal(); } catch(e) {}
+    console.log('[boot] cleared stuck _onbInFirstDialogue flag');
+  }
   // Normalize state.dailyReminder for existing users whose persisted state predates this field.
   // Shape: { enabled: true, time: '20:00', permissionAsked: false }.
   state.dailyReminder = Object.assign(
