@@ -2558,6 +2558,24 @@
     margin-bottom: 20px;
     font-weight: 600;
   }
+  /* Repair-question intro — scenario/setup rendered above the question
+     when the source quiz section had one. Muted body-copy style so it
+     reads as context, not as the prompt itself. 40vh max-height +
+     scroll is the wall-of-text safety valve: current max in the pool
+     is ~392 chars (well under 40vh), but a future long intro won't
+     push the options and Continue button off-screen. */
+  .streak-repair-intro {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 500;
+    font-size: calc(14px * var(--text-scale));
+    line-height: 1.45;
+    color: var(--text-2);
+    margin: 0 0 14px;
+    text-align: start;
+    max-height: 40vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
   .streak-repair-question.quiz-question {
     font-size: calc(20px * var(--text-scale));
     margin-bottom: 20px;
@@ -15419,6 +15437,26 @@ function recalculateStreak() {
 // across both subjects (philosophy + economics). Returns [] if the pool
 // doesn't have enough questions to satisfy n (belt-and-suspenders — in
 // practice any user with a broken streak has completed several dialogues).
+// Deictic markers — words that point at something outside the question
+// itself. Aggressive filter: a question is dropped even if the intro
+// would supply the antecedent, since a repair session gates a live
+// streak and the cost of showing an ambiguous prompt outweighs the
+// cost of shrinking the pool by 30–40%. Pool is still ~180–220
+// questions after filtering; repair needs 3 per session.
+const REPAIR_HE_DEICTICS = [
+  'הזה', 'הזו', 'הזאת', 'האלו', 'אלה',
+  'כזה', 'כזו', 'כאלה', 'כאן',
+  'בקטע', 'בציטוט', 'בטקסט', 'בסיפור', 'בדוגמה',
+  'לפי הקטע', 'לפי הציטוט', 'לפי הסיפור', 'לפי הדוגמה',
+  'כפי שראינו', 'כפי שנאמר',
+];
+const REPAIR_EN_DEICTICS = /\b(here|above|the passage|the source|the excerpt|(in|according to) the (passage|source|excerpt|story|example|scenario)|as we saw|as noted)\b/i;
+function _isDeicticQuestion(text, isEn) {
+  if (!text) return false;
+  if (isEn) return REPAIR_EN_DEICTICS.test(text);
+  return REPAIR_HE_DEICTICS.some(m => text.indexOf(m) >= 0);
+}
+
 function _sampleRepairQuestions(n) {
   n = n || 3;
   const pool = [];
@@ -15426,6 +15464,7 @@ function _sampleRepairQuestions(n) {
   const sources = [
     { subject: 'philosophy', data: (typeof corpusData !== 'undefined') ? corpusData : null },
     { subject: 'economics',  data: (typeof economicsData !== 'undefined') ? economicsData : null },
+    { subject: 'psychology', data: (typeof psychologyData !== 'undefined') ? psychologyData : null },
   ];
   for (const src of sources) {
     if (!src.data || !Array.isArray(src.data.weeks)) continue;
@@ -15437,13 +15476,19 @@ function _sampleRepairQuestions(n) {
         if (!state.completedDays[key]) continue;
         for (const sec of day.sections) {
           if (!sec || sec.type !== 'quiz') continue;
+          // Intro is per-section (all questions in the section share it).
+          // Carried through the pool item and rendered in the repair
+          // modal above the question so scenario-based prompts are
+          // answerable outside their original page.
+          const introText = isEn ? (sec.introEn || sec.intro) : sec.intro;
           const qs = sec.questions ? sec.questions : [sec];
           for (const q of qs) {
             const qText = isEn ? (q.questionEn || q.question) : q.question;
             const opts  = isEn ? (q.optionsEn  || q.options)  : q.options;
             if (!qText || !Array.isArray(opts) || opts.length < 2) continue;
             if (typeof q.correctIndex !== 'number') continue;
-            pool.push({ question: qText, options: opts, correctIndex: q.correctIndex });
+            if (_isDeicticQuestion(qText, isEn)) continue;
+            pool.push({ question: qText, options: opts, correctIndex: q.correctIndex, intro: introText || null });
           }
         }
       }
@@ -15829,10 +15874,16 @@ function _renderRepairQuestion() {
       '<span class="opt-text">' + opt + '</span>' +
     '</button>'
   ).join('');
+  // Intro (scenario / setup) rendered above the question when the
+  // source quiz section had one. Data pulled through in
+  // _sampleRepairQuestions. CSS caps the block at 40vh with scroll
+  // overflow as the wall-of-text safety valve.
+  const introHtml = q.intro ? '<div class="streak-repair-intro">' + q.intro + '</div>' : '';
   document.getElementById('modal-streak-repair').innerHTML =
     '<div class="modal-box streak-repair-box">' +
       '<div class="streak-repair-eyebrow">' + c.eyebrow + '</div>' +
       '<div class="streak-repair-progress">' + progress + '</div>' +
+      introHtml +
       '<div class="quiz-question streak-repair-question">' + q.question + '</div>' +
       '<div class="quiz-options streak-repair-options">' + optsHtml + '</div>' +
     '</div>';
