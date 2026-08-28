@@ -18395,7 +18395,13 @@ function finishDay() {
     try { state.endowmentShownAt = new Date().toISOString(); } catch(e) {}
   }
 
-  // Queue winner selection.
+  // Queue winner selection. Milestone winner first (bonus_unlock >
+  // chapter_complete > level_up, 1 max), then goal_met tacked on after
+  // it as the daily-cadence cool-down beat. Order matters: bigger
+  // milestone plays first as the peak, goal_met plays as the wrap.
+  // goal_met is NOT ribbon-demoted here — it fires as a full overlay
+  // (see _dcRibbons below; the goalMet field was removed to prevent
+  // ribbon-and-overlay double firing).
   let _queueWinnerType = null;
   const _newCelebrations = [];
   if (_bonusUnlockDue) {
@@ -18408,21 +18414,30 @@ function finishDay() {
     _newCelebrations.push({ type: 'level_up', levelIndex: newLevel - 1 });
     _queueWinnerType = 'level_up';
   }
+  if (_goalMet) {
+    _newCelebrations.push({
+      type: 'goal_met',
+      goal:    _goalMet.goal,
+      count:   _goalMet.count,
+      target:  _goalMet.target,
+      bonusXp: _goalMet.bonusXp,
+    });
+  }
   if (_newCelebrations.length) {
     state.pendingCelebrations = (state.pendingCelebrations || []).concat(_newCelebrations);
   }
   // Persist state after the endowmentShownAt + goal-met writes above.
   saveStateLocal();
 
-  // Ribbons for dc-stats: absorbed items (endowment + goal_met) always
-  // ribbon if applicable; demoted milestone items ribbon when they lost
-  // the queue-winner cap. bonus_unlock is never demoted (always wins if
-  // eligible → always overlay, never ribbon).
+  // Ribbons for dc-stats: endowment (welcome) still absorbed as ribbon;
+  // demoted milestone items ribbon when they lost the queue-winner cap.
+  // goal_met is NOT ribbon-demoted anymore — it queues as a full
+  // overlay above (in _newCelebrations). Keeping it here would double-
+  // fire (ribbon on dc-stats plus overlay after the winner).
   const _dcRibbons = {
     welcome:         _endowmentDue,
     levelUp:         (_levelCrossed && _queueWinnerType !== 'level_up') ? _levelCrossed : null,
     chapterComplete: (_chapterNum   && _queueWinnerType !== 'chapter_complete') ? _chapterNum : null,
-    goalMet:         !!_goalMet,
   };
 
   const thinker = getT().find(t => t.id === thinkerId);
