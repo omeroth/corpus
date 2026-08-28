@@ -1111,11 +1111,11 @@ const corpusData = {
             introEn: 'The AI identifies distress.',
             question: 'קאנט היה מעדיף שהמכונה תענה:',
             questionEn: 'Kant would prefer the machine to answer:',
-            options: ['"יהיה בסדר, אני כאן איתך", נחמה מהירה ומרגיעה', '"אני לא יודע אם יהיה בסדר, אבל הנה מספר של קו סיוע שיכול לעזור", אמת קשה שמכבדת את המשתמש כבוגר', 'שתי התשובות לא טובות, ה-AI צריך לשתוק'],
-            optionsEn: ['"Everything will be okay, I am here with you", quick and soothing comfort', '"I do not know if everything will be okay, but here is a helpline number that can help", a difficult truth that respects the user as an adult', 'Neither answer is good; the AI should remain silent'],
+            options: ['"יהיה בסדר, אני כאן איתך", נחמה מהירה ומרגיעה', '"אני לא יודע אם יהיה בסדר, אבל הנה מספר של קו סיוע שיכול לעזור", אמת קשה שמכבדת את המשתמש כבוגר', 'ה-AI צריך לסרב לענות ולשתוק'],
+            optionsEn: ['"Everything will be okay, I am here with you", quick and soothing comfort', '"I do not know if everything will be okay, but here is a helpline number that can help", a difficult truth that respects the user as an adult', 'The AI should refuse to answer and remain silent'],
             correctIndex: 1,
-            explanation: 'קאנט היה בוחר ב-ב, לא כי הוא קר לב, אלא כי הוא מאמין שאמת, גם כשהיא קשה, היא הצורה הגבוהה ביותר של כבוד לאדם. להגיד "הכל יהיה בסדר" בלי לדעת, זו לא עזרה. זו אשליה.',
-            explanationEn: 'Kant would choose B because he believes that truth, even when difficult, is the highest form of respect for a person. Saying "everything will be okay" without knowing, that is not help. That is illusion.'
+            explanation: 'קאנט היה מעדיף את התשובה הכנה, לא כי הוא קר לב, אלא כי הוא מאמין שאמת, גם כשהיא קשה, היא הצורה הגבוהה ביותר של כבוד לאדם. להגיד "הכל יהיה בסדר" בלי לדעת, זו לא עזרה. זו אשליה. לשתוק לגמרי גם אינו כבוד, כי הוא נוטש את מי שביקש עזרה.',
+            explanationEn: 'Kant would choose the honest answer because he believes that truth, even when difficult, is the highest form of respect for a person. Saying "everything will be okay" without knowing, that is not help. That is illusion. Full silence also is not respect, because it abandons the person who asked for help.'
           },
           {
             type: 'quiz',

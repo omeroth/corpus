@@ -15430,6 +15430,27 @@ function recalculateStreak() {
 }
 
 // ═══════════════════════════════════════════════════════════
+// QUIZ OPTION SHUFFLE
+// ═══════════════════════════════════════════════════════════
+// Correct answers in source order cluster on B (~56% across 289 questions).
+// Shuffle at render to remove the authoring bias. Cache per session so a
+// re-render (wrong-answer retry, section back-nav) keeps the same order —
+// changing option positions under a live question would feel broken.
+// Cache is JS-scoped; refresh reshuffles, which matches "new session".
+const _quizShuffleCache = new Map();
+function _quizShuffle(key, n) {
+  const hit = _quizShuffleCache.get(key);
+  if (hit && hit.length === n) return hit;
+  const perm = Array.from({ length: n }, (_, i) => i);
+  for (let i = perm.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [perm[i], perm[j]] = [perm[j], perm[i]];
+  }
+  _quizShuffleCache.set(key, perm);
+  return perm;
+}
+
+// ═══════════════════════════════════════════════════════════
 // STREAK REPAIR
 // ═══════════════════════════════════════════════════════════
 
@@ -15868,10 +15889,19 @@ function _renderRepairQuestion() {
   const c = _repairCopy();
   const q = _repairFlow.questions[_repairFlow.currentIdx];
   const progress = _repairInterp(c.progress_tpl, _repairFlow.currentIdx + 1);
-  const optsHtml = q.options.map((opt, i) =>
+  // Shuffle once per question and cache on the flow item so a re-render
+  // (same-question retry) keeps the same order.
+  if (!q._perm) {
+    q._perm = _quizShuffle(
+      `repair-${_repairFlow.attempt}-${_repairFlow.currentIdx}-${q.question.slice(0, 40)}`,
+      q.options.length
+    );
+    q._displayCorrect = q._perm.indexOf(q.correctIndex);
+  }
+  const optsHtml = q._perm.map((origI, i) =>
     '<button class="quiz-option repair-option" data-i="' + i + '" onclick="handleRepairAnswer(' + i + ')">' +
       '<span class="opt-letter">' + (state.lang === 'en' ? ['A','B','C'][i] : ['א','ב','ג'][i]) + '</span>' +
-      '<span class="opt-text">' + opt + '</span>' +
+      '<span class="opt-text">' + q.options[origI] + '</span>' +
     '</button>'
   ).join('');
   // Intro (scenario / setup) rendered above the question when the
@@ -15894,13 +15924,14 @@ function handleRepairAnswer(chosen) {
   if (_repairAnswering) return;
   _repairAnswering = true;
   const q = _repairFlow.questions[_repairFlow.currentIdx];
-  const isCorrect = chosen === q.correctIndex;
+  const correctSlot = (typeof q._displayCorrect === 'number') ? q._displayCorrect : q.correctIndex;
+  const isCorrect = chosen === correctSlot;
   if (isCorrect) _repairFlow.correctCount++;
   const opts = document.querySelectorAll('.repair-option');
   opts.forEach((btn, i) => {
     btn.disabled = true;
     if (i === chosen) btn.classList.add(isCorrect ? 'option-correct' : 'option-wrong');
-    else if (!isCorrect && i === q.correctIndex) btn.classList.add('option-correct');
+    else if (!isCorrect && i === correctSlot) btn.classList.add('option-correct');
     else btn.classList.add('option-faded');
   });
   setTimeout(() => {
@@ -17702,11 +17733,15 @@ function renderReader() {
 
       const optsEl = document.createElement('div');
       optsEl.className = 'quiz-options';
-      q.options.forEach((text, i) => {
+      const shuffleKey = `${state.subject}-${state.currentWeek}-${state.currentDay}-${state.currentSection}-${qIdx}`;
+      const perm = _quizShuffle(shuffleKey, q.options.length);
+      const displayCorrect = perm.indexOf(q.correct);
+      perm.forEach((origI, displayI) => {
+        const text = q.options[origI];
         const btn = document.createElement('button');
         btn.className = 'quiz-option';
-        btn.innerHTML = `<span class="opt-letter">${ui.quizLetters[i]}</span><span class="opt-text">${text}</span>`;
-        btn.onclick = () => handleQuiz(i, q.correct, q.explanation, btn, qKey, isSingle);
+        btn.innerHTML = `<span class="opt-letter">${ui.quizLetters[displayI]}</span><span class="opt-text">${text}</span>`;
+        btn.onclick = () => handleQuiz(displayI, displayCorrect, q.explanation, btn, qKey, isSingle);
         optsEl.appendChild(btn);
       });
       block.appendChild(optsEl);
