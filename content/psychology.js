@@ -2491,10 +2491,10 @@ const psychologyData = {
               type: 'source',
               title: 'קטע מקור',
               titleEn: 'Source Material',
-              quote: '"לוח היחס המשתנה מייצר את קצב התגובה הגבוה והיציב ביותר, ואת ההתנגדות הרבה ביותר לכיבוי, מכל לוחות הזמנים שנבדקו."',
-              quoteEn: '"The variable ratio schedule produces the highest and steadiest rate of response, and the greatest resistance to extinction, of all the schedules examined."',
-              attr: '- צ\'רלס פרסטר וב.פ. סקינר, "לוחות זמנים של חיזוק", 1957',
-              attrEn: '- Charles Ferster and B. F. Skinner, "Schedules of Reinforcement", 1957'
+              quote: '"אם בית ההימורים אינו יכול לשכנע לקוח למסור כסף בלי כל תמורה, הוא עשוי להשיג את אותה תוצאה על ידי החזרת חלק מכספו של הלקוח בלוח זמנים של יחס משתנה."',
+              quoteEn: '"If the gambling establishment cannot persuade a patron to turn over money with no return, it may achieve the same effect by returning part of the patron\'s money on a variable-ratio schedule."',
+              attr: '- ב.פ. סקינר, "Science and Human Behavior", 1953, עמ\' 397',
+              attrEn: '- B. F. Skinner, "Science and Human Behavior", 1953, p. 397'
             },
             {
               type: 'explanation',
@@ -2649,14 +2649,20 @@ const psychologyData = {
               contentEn: 'So far we have spoken about mechanism: a strong habit triggered without authorization. But a question remains. <strong>Why this thing in particular?</strong> Why the phone and social networks in particular? There are many possible habits, and not all of them grip people with the same intensity.\n\nHeinz Kohut offered an answer. He argued that the need for someone to see us is not a weakness and not arrogance, but <strong>a basic developmental need</strong>. The child needs mirroring, the face of an adult that lights up when he appears, and from this a stable sense of "I exist, and I have worth" is gradually built.\n\nAnd this need does not disappear with maturity, as we saw in the third chapter. It only changes form.\n\nAnd here is the explanation. Social networks do not invent a new need, they hit an old need exactly. <strong>A like is not just a number. It is a small signal that says: someone saw.</strong> And that is why a like feels so meaningful.',
               image: 'images/bonus/psychology/day3-idea.webp'
             },
+            // Kohut quote verified against secondary sources only: a
+            // Psychology Today aggregator and a ResearchGate paper on
+            // Kohut and Lacan mirroring, both citing Analysis of the
+            // Self 1971 p. 116. Not verified against the primary text.
+            // Aggregator tier, same convention as the Beck source in
+            // chapter 4.
             {
               type: 'source',
               title: 'קטע מקור',
               titleEn: 'Source Material',
               quote: '"הניצוץ בעיניה של האם, המשקף את תצוגתו של הילד."',
               quoteEn: '"The gleam in the mother\'s eye, which mirrors the child\'s exhibitionistic display."',
-              attr: '- היינץ קוהוט, "אנליזה של העצמי", 1971',
-              attrEn: '- Heinz Kohut, "The Analysis of the Self", 1971'
+              attr: '- היינץ קוהוט, "אנליזה של העצמי", 1971, עמ\' 116',
+              attrEn: '- Heinz Kohut, "The Analysis of the Self", 1971, p. 116'
             },
             {
               type: 'explanation',
@@ -2734,10 +2740,10 @@ const psychologyData = {
               type: 'source',
               title: 'קטע מקור',
               titleEn: 'Source Material',
-              quote: '"במקום לשאול איך אני יכול להניע אנשים, עלינו לשאול כיצד ליצור את התנאים שבהם אנשים יניעו את עצמם."',
-              quoteEn: '"Instead of asking how I can motivate people, we should ask how to create the conditions in which people will motivate themselves."',
-              attr: '- אדוארד דצ\'י, "Why We Do What We Do", 1995',
-              attrEn: '- Edward Deci, "Why We Do What We Do", 1995'
+              quote: '"הם היו זקוקים למספרים, ולכן הפנו את היצירתיות והתושייה שלהם אל השגת המספרים האלה, במקום אל ביצוע יעיל."',
+              quoteEn: '"They needed the numbers, so they directed their creativity and resourcefulness toward getting those numbers, rather than toward effective performance."',
+              attr: '- אדוארד דצ\'י וריצ\'רד ראיאן, "Intrinsic Motivation and Self-Determination in Human Behavior", 1985',
+              attrEn: '- Edward Deci and Richard Ryan, "Intrinsic Motivation and Self-Determination in Human Behavior", 1985'
             },
             {
               type: 'explanation',
