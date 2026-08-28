@@ -18147,9 +18147,6 @@ function _showDcStats(titleText, subtitleText, xpAmount, streakCount, onContinue
     if (ribbons && ribbons.welcome) {
       _items.push(isEn ? 'Welcome to Corpus ✨' : 'ברוכים הבאים לקורפוס ✨');
     }
-    if (ribbons && ribbons.levelUp) {
-      _items.push(isEn ? '🎉 Level ' + ribbons.levelUp : '🎉 שלב ' + ribbons.levelUp);
-    }
     if (ribbons && ribbons.chapterComplete) {
       _items.push(isEn
         ? '📚 Chapter ' + ribbons.chapterComplete + ' complete'
@@ -18481,13 +18478,15 @@ function finishDay() {
     try { state.endowmentShownAt = new Date().toISOString(); } catch(e) {}
   }
 
-  // Queue winner selection. Milestone winner first (bonus_unlock >
-  // chapter_complete > level_up, 1 max), then goal_met tacked on after
-  // it as the daily-cadence cool-down beat. Order matters: bigger
-  // milestone plays first as the peak, goal_met plays as the wrap.
-  // goal_met is NOT ribbon-demoted here — it fires as a full overlay
-  // (see _dcRibbons below; the goalMet field was removed to prevent
-  // ribbon-and-overlay double firing).
+  // Celebration queue. Order matters for the exit sequence:
+  //   milestone winner (bonus_unlock > chapter_complete, 1 max)
+  //     → level_up
+  //     → goal_met
+  // level_up is NOT part of the milestone-winner slot — a level crossing
+  // is rare (~8 times over the app's whole span) and losing it to a
+  // ribbon whenever it coincides with a chapter ending drops the rarer
+  // moment. It plays as its own overlay right after the milestone, before
+  // the daily-cadence goal_met wrap.
   let _queueWinnerType = null;
   const _newCelebrations = [];
   if (_bonusUnlockDue) {
@@ -18496,9 +18495,9 @@ function finishDay() {
   } else if (_chapterQualifies) {
     _newCelebrations.push({ type: 'chapter_complete', weekId: completedWeek.id });
     _queueWinnerType = 'chapter_complete';
-  } else if (_levelCrossed) {
+  }
+  if (_levelCrossed) {
     _newCelebrations.push({ type: 'level_up', levelIndex: newLevel - 1 });
-    _queueWinnerType = 'level_up';
   }
   if (_goalMet) {
     _newCelebrations.push({
@@ -18516,14 +18515,13 @@ function finishDay() {
   saveStateLocal();
 
   // Ribbons for dc-stats: endowment (welcome) still absorbed as ribbon;
-  // demoted milestone items ribbon when they lost the queue-winner cap.
-  // goal_met is NOT ribbon-demoted anymore — it queues as a full
-  // overlay above (in _newCelebrations). Keeping it here would double-
-  // fire (ribbon on dc-stats plus overlay after the winner).
+  // chapter_complete demoted to ribbon when bonus_unlock takes the
+  // milestone slot. level_up and goal_met always fire as full overlays
+  // (queued above), never as ribbons — a ribbon here would double-fire
+  // against the overlay.
   const _dcRibbons = {
     welcome:         _endowmentDue,
-    levelUp:         (_levelCrossed && _queueWinnerType !== 'level_up') ? _levelCrossed : null,
-    chapterComplete: (_chapterNum   && _queueWinnerType !== 'chapter_complete') ? _chapterNum : null,
+    chapterComplete: (_chapterNum && _queueWinnerType !== 'chapter_complete') ? _chapterNum : null,
   };
 
   const thinker = getT().find(t => t.id === thinkerId);
