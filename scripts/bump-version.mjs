@@ -27,9 +27,10 @@
 // be bumped once the new release is actually live on the App Store.
 
 import { readFileSync, writeFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
+import { execFileSync } from 'node:child_process';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -52,6 +53,40 @@ const version = positionals[0];
 if (!version || !/^\d+\.\d+\.\d+$/.test(version)) {
   console.error('Usage: node scripts/bump-version.mjs <version> [--ios N] [--android N]');
   console.error('       version must be semver x.y.z (e.g. 1.3.4)');
+  process.exit(1);
+}
+
+// --- dirty-tree guard ---
+// Refuse to run if any of the four version surfaces already has
+// uncommitted changes. Catches an accidental second invocation before
+// the first bump was committed — otherwise the auto-increment would
+// silently step the build number twice (which happened during the
+// 1.3.4 shakedown: builds landed at 43/34 instead of 42/33). Runs
+// atomically before any file reads so a refusal writes nothing.
+function isDirtySinceHead(absPath) {
+  const rel = relative(REPO, absPath);
+  try {
+    const out = execFileSync('git', ['diff', '--name-only', 'HEAD', '--', rel], {
+      cwd: REPO,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    return out.length > 0;
+  } catch (e) {
+    // git failure (not a repo, git missing, HEAD absent): don't block.
+    // The guard is best-effort; the script's other refusals still apply.
+    return false;
+  }
+}
+const dirty = Object.entries(FILES)
+  .filter(([, p]) => isDirtySinceHead(p))
+  .map(([k, p]) => `  - ${k.padEnd(15)} (${relative(REPO, p)})`);
+if (dirty.length) {
+  console.error('bump-version: refusing to run — version surfaces have uncommitted changes:');
+  console.error(dirty.join('\n'));
+  console.error('');
+  console.error('Commit or revert the pending bump first, then re-run.');
+  console.error('(Silent double-invocation is exactly what this guard catches.)');
   process.exit(1);
 }
 
