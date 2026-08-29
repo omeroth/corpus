@@ -16407,7 +16407,25 @@ function _wrapWithQueuePlay(fn) {
 
 function _playNextCelebration() {
   if (_promptModalActiveForCelebrations()) return;  // resumed via prompt-close paths
+  // Invariant: celebrations never render while the reader is open. Leave
+  // the queue intact — it will drain when the reader closes via openReader's
+  // pre-render hook, the dc-stats/thinker buttons, or enterApp's resume
+  // path. Any call from within the reader is a bug that this guard
+  // neutralizes; if line 18085 ever comes back, this catches it.
+  if (state && state.currentScreen === 'reader') return;
+  // Stale-item filter: celebrations belong to today's activity. An item
+  // enqueued in a prior session (user quit mid-chain and returns hours or
+  // days later) is dropped silently — a level-up animation with no context
+  // is worse than not showing it. Legacy items enqueued before enqueuedAt
+  // existed have no stamp and play as before (fall through).
+  const today = _streakDay();
   const q = state.pendingCelebrations || [];
+  let _trimmed = false;
+  while (q.length && q[0].enqueuedAt && q[0].enqueuedAt !== today) {
+    q.shift();
+    _trimmed = true;
+  }
+  if (_trimmed) saveStateLocal();
   if (!q.length) {
     _onCelebrationQueueEmpty();
     return;
@@ -16558,6 +16576,8 @@ function _resumeCelebrationsIfPending() {
   _celebrationResumeChecked = true;
   // Don't fire over onboarding — home has to be the "settled" state.
   if (!localStorage.getItem('corpus_onboarding_done')) return;
+  // Same invariant as _playNextCelebration — never over the reader.
+  if (state && state.currentScreen === 'reader') return;
   const q = state.pendingCelebrations || [];
   if (!q.length) return;
   setTimeout(_playNextCelebration, 500);
@@ -17337,6 +17357,18 @@ function closeLibraryModal() {
 }
 
 function openReader(weekId, dayId, opts) {
+  opts = opts || {};
+  // Drain any stranded celebrations BEFORE the reader becomes interactive.
+  // Covers iOS state-restore into a reader, deep links, push-notification
+  // taps, and any other path that skips the home-based
+  // _resumeCelebrationsIfPending hook. Stale items (from a prior session)
+  // are filtered inside _playNextCelebration before rendering.
+  const _pendingQ = state.pendingCelebrations || [];
+  if (_pendingQ.length && !opts._afterCelebDrain) {
+    _pendingPostQueueFn = () => openReader(weekId, dayId, Object.assign({}, opts, { _afterCelebDrain: true }));
+    setTimeout(_playNextCelebration, 250);
+    return;
+  }
   // Defensive: if the guest-signup modal is somehow still .active when we're
   // about to load a reader, close it. In the intended flow, closeCompleteModal
   // runs the prompt chain (signup → share → streak → continuation) and only
@@ -18081,8 +18113,10 @@ function closeQuizFeedbackModal() {
         // never leave the page in a pointer-events: none state.
         document.body.style.pointerEvents = '';
       }
-      // Resume the celebration queue if it was paused while quiz-feedback was up.
-      try { _playNextCelebration(); } catch(e) {}
+      // NO celebration drain here — the reader is still open and a drain
+      // would fire overlays mid-dialogue. Post-completion drains happen
+      // via _wrapWithQueuePlay on dc-stats/thinker buttons; the reader
+      // guard in _playNextCelebration is the invariant enforcement.
     }, 120);
   });
 }
@@ -18489,15 +18523,19 @@ function finishDay() {
   // the daily-cadence goal_met wrap.
   let _queueWinnerType = null;
   const _newCelebrations = [];
+  // Stamp every enqueued item with today's streak-day. _playNextCelebration
+  // uses this to silently drop items from a prior session (stale celebrations
+  // from a completion hours or days ago are worse than not showing them).
+  const _enqueuedAt = _streakDay();
   if (_bonusUnlockDue) {
-    _newCelebrations.push({ type: 'bonus_unlock', subject: state.subject });
+    _newCelebrations.push({ type: 'bonus_unlock', subject: state.subject, enqueuedAt: _enqueuedAt });
     _queueWinnerType = 'bonus_unlock';
   } else if (_chapterQualifies) {
-    _newCelebrations.push({ type: 'chapter_complete', weekId: completedWeek.id });
+    _newCelebrations.push({ type: 'chapter_complete', weekId: completedWeek.id, enqueuedAt: _enqueuedAt });
     _queueWinnerType = 'chapter_complete';
   }
   if (_levelCrossed) {
-    _newCelebrations.push({ type: 'level_up', levelIndex: newLevel - 1 });
+    _newCelebrations.push({ type: 'level_up', levelIndex: newLevel - 1, enqueuedAt: _enqueuedAt });
   }
   if (_goalMet) {
     _newCelebrations.push({
@@ -18506,10 +18544,14 @@ function finishDay() {
       count:   _goalMet.count,
       target:  _goalMet.target,
       bonusXp: _goalMet.bonusXp,
+      enqueuedAt: _enqueuedAt,
     });
   }
   if (_newCelebrations.length) {
-    state.pendingCelebrations = (state.pendingCelebrations || []).concat(_newCelebrations);
+    // Cap at 6 items (two completions' worth) as defense against adversarial
+    // force-quit patterns that could otherwise let the queue grow. Trims
+    // oldest first so the freshest completion is preserved.
+    state.pendingCelebrations = (state.pendingCelebrations || []).concat(_newCelebrations).slice(-6);
   }
   // Persist state after the endowmentShownAt + goal-met writes above.
   saveStateLocal();
