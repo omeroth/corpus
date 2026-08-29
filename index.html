@@ -14840,6 +14840,11 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
   state.currentScreen = id;
+  // Mirror the reader-active flag so every exit path (readerGoBack, goHome,
+  // profile/pantheon tab, subject switch, auth ejection) automatically
+  // releases the celebration-playback guard. Belt-and-suspenders — finishDay
+  // flips it too, but this catches any nav path that skips finishDay.
+  _readerActive = (id === 'reader');
   window.scrollTo(0, 0);
   const readerBar = document.getElementById('reader-btn-bar');
   if (readerBar) readerBar.style.display = id === 'reader' ? '' : 'none';
@@ -16365,6 +16370,15 @@ function getBonusProgress() {
 // Reveal's continue button is bound.
 let _pendingPostQueueFn = null;
 
+// "User is actively mid-dialogue" flag. Guards celebration playback so
+// overlays never render over an interactive reader. Set true at end of
+// openReader, false at top of finishDay (dc-stats + thinker card must be
+// able to drain — they sit on top of the reader without changing
+// state.currentScreen, so a screen-based guard would have blocked the
+// legitimate drain path). Also mirrored in showScreen for belt-and-
+// suspenders coverage of any exit path (readerGoBack, goHome, etc.).
+let _readerActive = false;
+
 // Items actually played (not skipped) this session. Terminal handler reads
 // this to fire the same guest-signup nudges the individual closers used to
 // fire — daily-cap gate inside maybeShowGuestPrompt dedupes.
@@ -16407,12 +16421,13 @@ function _wrapWithQueuePlay(fn) {
 
 function _playNextCelebration() {
   if (_promptModalActiveForCelebrations()) return;  // resumed via prompt-close paths
-  // Invariant: celebrations never render while the reader is open. Leave
-  // the queue intact — it will drain when the reader closes via openReader's
-  // pre-render hook, the dc-stats/thinker buttons, or enterApp's resume
-  // path. Any call from within the reader is a bug that this guard
-  // neutralizes; if line 18085 ever comes back, this catches it.
-  if (state && state.currentScreen === 'reader') return;
+  // Invariant: celebrations never render while the user is actively
+  // mid-dialogue. Flag is flipped false at the top of finishDay (so
+  // dc-stats/thinker-card drains fire cleanly, since those modals sit on
+  // top of the reader without changing state.currentScreen). Any spurious
+  // call from inside the reader is neutralized here; the queue stays
+  // intact for the next legitimate drain surface (home or dc-stats).
+  if (_readerActive) return;
   // Stale-item filter: celebrations belong to today's activity. An item
   // enqueued in a prior session (user quit mid-chain and returns hours or
   // days later) is dropped silently — a level-up animation with no context
@@ -16576,8 +16591,8 @@ function _resumeCelebrationsIfPending() {
   _celebrationResumeChecked = true;
   // Don't fire over onboarding — home has to be the "settled" state.
   if (!localStorage.getItem('corpus_onboarding_done')) return;
-  // Same invariant as _playNextCelebration — never over the reader.
-  if (state && state.currentScreen === 'reader') return;
+  // Same invariant as _playNextCelebration — never over an interactive reader.
+  if (_readerActive) return;
   const q = state.pendingCelebrations || [];
   if (!q.length) return;
   setTimeout(_playNextCelebration, 500);
@@ -17358,16 +17373,15 @@ function closeLibraryModal() {
 
 function openReader(weekId, dayId, opts) {
   opts = opts || {};
-  // Drain any stranded celebrations BEFORE the reader becomes interactive.
-  // Covers iOS state-restore into a reader, deep links, push-notification
-  // taps, and any other path that skips the home-based
-  // _resumeCelebrationsIfPending hook. Stale items (from a prior session)
-  // are filtered inside _playNextCelebration before rendering.
-  const _pendingQ = state.pendingCelebrations || [];
-  if (_pendingQ.length && !opts._afterCelebDrain) {
-    _pendingPostQueueFn = () => openReader(weekId, dayId, Object.assign({}, opts, { _afterCelebDrain: true }));
-    setTimeout(_playNextCelebration, 250);
-    return;
+  // Silently drop any stranded celebrations from a prior interrupted chain.
+  // Playing them on reader tap-through is jarring — the moment is gone,
+  // whether it was hours ago (stale) or five seconds ago (user chose to
+  // move on rather than see the beat). Celebrations belong to home (via
+  // _resumeCelebrationsIfPending) or the immediate dc-stats/thinker-card
+  // exit (via _wrapWithQueuePlay); everywhere else they're leftovers.
+  if (state.pendingCelebrations && state.pendingCelebrations.length) {
+    state.pendingCelebrations = [];
+    saveStateLocal();
   }
   // Defensive: if the guest-signup modal is somehow still .active when we're
   // about to load a reader, close it. In the intended flow, closeCompleteModal
@@ -18347,6 +18361,13 @@ function showThinkerCardScreen(thinker, chapter, day) {
 
 
 function finishDay() {
+  // Reader is no longer interactive — dc-stats/thinker card take over from
+  // here, and celebration overlays must be free to render on the queue-
+  // drain that runs on their button taps. Flag flip precedes every branch
+  // so onboarding-tail, day-0, already-completed, and normal completion
+  // paths all agree.
+  _readerActive = false;
+
   // Onboarding v2 first-dialogue tail. Guard is set on step 15 entry
   // (_onbEnterFirstDialogue) and cleared on the thinker card's Continue
   // button. Bypasses the normal stats + celebration + prompt chain so
