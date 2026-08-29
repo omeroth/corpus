@@ -19403,10 +19403,6 @@ function _isNPSCatchupEligible() {
 // dismiss/send paths to run the post-prompt continuation exactly once.
 let _npsPendingContinuation = null;
 let _npsCurrentScore = null;
-// Debug mode — set by window._debugShowNPS to bypass state stamps,
-// posthog events, and the Supabase write so a dev can preview the UI
-// without polluting analytics or DB. Reset when the modal closes.
-let _npsDebugMode = false;
 
 function showNPSModal(callback) {
   _npsPendingContinuation = callback || null;
@@ -19444,24 +19440,22 @@ function showNPSModal(callback) {
   const dis = document.getElementById('nps-dismiss');
   if (dis) dis.onclick = () => _npsDismiss('x');
 
-  // Stamp lastShownAt on open (unless debug mode). Cadence starts
-  // ticking from now even if the user X's immediately — the shorter
-  // 30-day no-score cooldown handles the "they just dismissed" case.
-  if (!_npsDebugMode) {
-    const today = new Date().toISOString().split('T')[0];
-    state.npsState = state.npsState || { lastShownAt: '', lastScoredAt: '', submittedAt: '' };
-    const priorShown = state.npsState.lastShownAt;
-    state.npsState.lastShownAt = today;
-    try { saveState(); } catch(e) {}
-    try {
-      posthog.capture('nps_shown', {
-        chapter_week_id: state.currentWeek || null,
-        subject: state.subject || null,
-        days_since_last_shown: priorShown ? _npsDaysBetween(priorShown, today) : null,
-        is_guest: !currentUser,
-      });
-    } catch(e) {}
-  }
+  // Stamp lastShownAt on open. Cadence starts ticking from now even if
+  // the user X's immediately — the shorter 30-day no-score cooldown
+  // handles the "they just dismissed" case.
+  const today = new Date().toISOString().split('T')[0];
+  state.npsState = state.npsState || { lastShownAt: '', lastScoredAt: '', submittedAt: '' };
+  const priorShown = state.npsState.lastShownAt;
+  state.npsState.lastShownAt = today;
+  try { saveState(); } catch(e) {}
+  try {
+    posthog.capture('nps_shown', {
+      chapter_week_id: state.currentWeek || null,
+      subject: state.subject || null,
+      days_since_last_shown: priorShown ? _npsDaysBetween(priorShown, today) : null,
+      is_guest: !currentUser,
+    });
+  } catch(e) {}
 
   modal.classList.add('active');
 }
@@ -19470,15 +19464,13 @@ function _npsScoreTap(score) {
   _npsCurrentScore = score;
   const isEn = state.lang === 'en';
 
-  if (!_npsDebugMode) {
-    const today = new Date().toISOString().split('T')[0];
-    state.npsState = state.npsState || { lastShownAt: '', lastScoredAt: '', submittedAt: '' };
-    state.npsState.lastScoredAt = today;
-    try { saveState(); } catch(e) {}
-    try {
-      posthog.capture('nps_scored', { score: score, branch: _npsBranchFor(score), is_guest: !currentUser });
-    } catch(e) {}
-  }
+  const today = new Date().toISOString().split('T')[0];
+  state.npsState = state.npsState || { lastShownAt: '', lastScoredAt: '', submittedAt: '' };
+  state.npsState.lastScoredAt = today;
+  try { saveState(); } catch(e) {}
+  try {
+    posthog.capture('nps_scored', { score: score, branch: _npsBranchFor(score), is_guest: !currentUser });
+  } catch(e) {}
 
   // Switch to View B.
   document.getElementById('nps-view-score').style.display = 'none';
@@ -19516,41 +19508,39 @@ async function _npsSend() {
   const branch  = _npsBranchFor(score);
   const isEn    = state.lang === 'en';
 
-  if (!_npsDebugMode) {
-    // Supabase insert. Signed-in users write user_id (existing 'insert
-    // own nps' policy); guests write device_id (new 'insert anon nps'
-    // policy from migration 20260826120000). identity_present check
-    // constraint enforces one-or-the-other.
-    const identity = currentUser
-      ? { user_id: currentUser.id, device_id: null }
-      : { user_id: null, device_id: _getDeviceId() };
-    try {
-      const { error } = await sb.from('nps_responses').insert(Object.assign({
-        score: score,
-        comment: comment || null,
-        chapter_week_id: state.currentWeek || null,
-        subject: state.subject || null,
-      }, identity));
-      if (error) console.warn('[NPS] insert failed:', error.message);
-    } catch (e) {
-      console.warn('[NPS] insert exception:', e && e.message);
-    }
-    // Permanent kill: submittedAt stamped. Modal never fires again.
-    const today = new Date().toISOString().split('T')[0];
-    state.npsState = state.npsState || { lastShownAt: '', lastScoredAt: '', submittedAt: '' };
-    state.npsState.submittedAt = today;
-    try { saveState(); } catch(e) {}
-    try {
-      posthog.capture('nps_submitted', {
-        score: score,
-        branch: branch,
-        text_length: comment.length,
-        review_prompt_fired: false,   // commit 3 will flip this for promoters
-        is_guest: !currentUser,
-      });
-      posthog.people.set({ nps_score: score });
-    } catch(e) {}
+  // Supabase insert. Signed-in users write user_id (existing 'insert
+  // own nps' policy); guests write device_id (new 'insert anon nps'
+  // policy from migration 20260826120000). identity_present check
+  // constraint enforces one-or-the-other.
+  const identity = currentUser
+    ? { user_id: currentUser.id, device_id: null }
+    : { user_id: null, device_id: _getDeviceId() };
+  try {
+    const { error } = await sb.from('nps_responses').insert(Object.assign({
+      score: score,
+      comment: comment || null,
+      chapter_week_id: state.currentWeek || null,
+      subject: state.subject || null,
+    }, identity));
+    if (error) console.warn('[NPS] insert failed:', error.message);
+  } catch (e) {
+    console.warn('[NPS] insert exception:', e && e.message);
   }
+  // Permanent kill: submittedAt stamped. Modal never fires again.
+  const today = new Date().toISOString().split('T')[0];
+  state.npsState = state.npsState || { lastShownAt: '', lastScoredAt: '', submittedAt: '' };
+  state.npsState.submittedAt = today;
+  try { saveState(); } catch(e) {}
+  try {
+    posthog.capture('nps_submitted', {
+      score: score,
+      branch: branch,
+      text_length: comment.length,
+      review_prompt_fired: false,   // commit 3 will flip this for promoters
+      is_guest: !currentUser,
+    });
+    posthog.people.set({ nps_score: score });
+  } catch(e) {}
 
   // 9-10 promoters get the App Store CTA. 0-8 close and continue.
   if (branch === 'promoter') {
@@ -19580,16 +19570,14 @@ function _npsOpenStore() {
 
 function _npsDismiss(kind) {
   // kind: 'x' | 'skip' | 'store-skip'
-  if (!_npsDebugMode) {
-    try {
-      posthog.capture('nps_dismissed', {
-        score_selected: _npsCurrentScore,
-        had_text: !!(document.getElementById('nps-textarea').value || '').trim(),
-        kind: kind,
-        is_guest: !currentUser,
-      });
-    } catch(e) {}
-  }
+  try {
+    posthog.capture('nps_dismissed', {
+      score_selected: _npsCurrentScore,
+      had_text: !!(document.getElementById('nps-textarea').value || '').trim(),
+      kind: kind,
+      is_guest: !currentUser,
+    });
+  } catch(e) {}
   _closeNPSModal();
   _runNPSContinuation();
 }
@@ -19598,7 +19586,6 @@ function _closeNPSModal() {
   const modal = document.getElementById('modal-nps');
   if (modal) modal.classList.remove('active');
   _npsCurrentScore = null;
-  _npsDebugMode = false;
 }
 
 function _runNPSContinuation() {
@@ -19606,31 +19593,6 @@ function _runNPSContinuation() {
   _npsPendingContinuation = null;
   if (typeof fn === 'function') fn();
 }
-
-// Console debug entry — opens the modal in the current language with
-// NO state stamps, NO posthog events, NO Supabase write. Analytics
-// stay clean; DB stays clean. Also exposes _debugResetNPS to clear
-// cadence state so the normal gate re-opens after a real submission.
-try {
-  window._debugShowNPS = function() {
-    _npsDebugMode = true;
-    showNPSModal(() => { console.log('[NPS-debug] modal closed'); });
-  };
-  window._debugShowNPSLive = function() {
-    // Real path — state stamps, posthog events, Supabase write on Send.
-    // Bypasses the cadence gate (calls showNPSModal directly), but
-    // otherwise indistinguishable from a natural chapter-complete fire.
-    // submittedAt permanently kills future prompts — call
-    // _debugResetNPS() to re-test. Guest test: sign out first;
-    // insert routes via device_id per the anon RLS policy.
-    showNPSModal(() => { console.log('[NPS-live] modal closed'); });
-  };
-  window._debugResetNPS = function() {
-    state.npsState = { lastShownAt: '', lastScoredAt: '', submittedAt: '' };
-    try { saveState(); } catch(e) {}
-    console.log('[NPS-debug] npsState cleared');
-  };
-} catch(e) {}
 
 function showLogoutConfirm() {
   document.getElementById('modal-logout-confirm').classList.add('active');
