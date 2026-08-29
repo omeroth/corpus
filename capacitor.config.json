@@ -6,8 +6,7 @@
     "SystemBars": { "insetsHandling": "disable" },
     "EdgeToEdge": {
       "backgroundColor": "#FFFFFF",
-      "statusBarColor": "#FFFFFF",
-      "navigationBarColor": "#FFFFFF"
+      "statusBarColor": "#FFFFFF"
     },
     "SplashScreen": {
       "launchAutoHide": false,

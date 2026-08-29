@@ -20,6 +20,17 @@
              #7B4FD4. Same value referenced by AppTheme.NoActionBarLaunch. -->
         <item name="android:windowBackground">@color/splash_purple</item>
         <item name="android:colorBackground">@color/splash_purple</item>
+        <!-- OS system navigation bar. Fixed black so it stays neutral across
+             every subject and both light/dark modes. Without this attribute,
+             Android defaults the nav-bar background to colorBackground above
+             (splash_purple = philosophy #7B4FD4), which leaked the brand
+             color into a surface no theme owns. windowLightNavigationBar
+             = false requests light (white) icons — 21:1 contrast on black,
+             renders correctly on every OEM skin. Requires API 26+; minSdk
+             already exceeds that. Theme is the single source of truth for
+             this surface — do not also set it from JS or plugin config. -->
+        <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
 
 

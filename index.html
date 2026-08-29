@@ -23099,6 +23099,10 @@ function initUI() {
             // fallback keeps chrome positioned even without our vars.
             await _timeboxed(window.Capacitor.Plugins.EdgeToEdge.enable(), 5000, 'EdgeToEdge.enable');
             console.log('[EdgeToEdge] enabled (Android)');
+            // Nav bar color + icon appearance are owned by the AppTheme in
+            // android/app/src/main/res/values/styles.xml (fixed black bg,
+            // light icons via windowLightNavigationBar=false). No JS or
+            // plugin config touches those surfaces — single source of truth.
             // The plugin's enable() sizes the WebView edge-to-edge but does NOT
             // populate CSS env(safe-area-inset-*) in Capacitor's Android WebView.
             // Bridge it manually: read the plugin's insets (device pixels), convert
