@@ -11157,7 +11157,21 @@ async function startPurchase() {
       const returnTo = _paywallReturnTo;
       closePaywall();
       _showToast(state.lang === 'en' ? 'Welcome to Corpus.' : 'ברוכים הבאים לקורפוס.');
-      if (returnTo) openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true });
+      // Post-subscription retro bonus reveal. Try to fire the reveal
+      // 500ms after purchase (lets the "Welcome" toast breathe first).
+      // If the reveal fires, wire returnTo's openReader as the post-
+      // queue callback so the lesson opens AFTER the celebration —
+      // keeps the reveal tied to the purchase moment rather than
+      // buried behind the reader. If the reveal doesn't fire (already
+      // shown, grandfathered, chapter 1 not done, etc.), open the
+      // returnTo lesson directly.
+      const openLessonAfter = returnTo
+        ? () => openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true })
+        : null;
+      setTimeout(() => {
+        const fired = _maybePostSubscriptionBonusReveal({ then: openLessonAfter });
+        if (!fired && openLessonAfter) openLessonAfter();
+      }, 500);
     } else {
       // Purchase came back without the entitlement — treat as failure.
       try { posthog.capture('paywall_purchase_failed', {
@@ -11201,7 +11215,16 @@ async function restorePurchases() {
       const returnTo = _paywallReturnTo;
       closePaywall();
       _showToast(isEn ? 'Welcome back to Corpus.' : 'ברוכים השבים לקורפוס.');
-      if (returnTo) openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true });
+      // Same retro-reveal wiring as startPurchase — a user restoring
+      // a lapsed subscription may also be in the "chapter 1 done +
+      // never seen bonus_unlock" state.
+      const openLessonAfter = returnTo
+        ? () => openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true })
+        : null;
+      setTimeout(() => {
+        const fired = _maybePostSubscriptionBonusReveal({ then: openLessonAfter });
+        if (!fired && openLessonAfter) openLessonAfter();
+      }, 500);
     } else {
       try { posthog.capture('paywall_restore_result', { found: false }); } catch(e) {}
       const plat = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || 'ios';
@@ -17349,10 +17372,20 @@ function showUnlockOverlay() {
 
 function closeUnlockOverlay() {
   document.getElementById('unlock-overlay').style.display = 'none';
-  // Lifetime flag flip moved to _closeBonusUnlockCoachMark so the flag
-  // guards the FULL "you've seen the bonus reveal" sequence (padlock +
-  // owl coach mark), not just the padlock. Otherwise the coach mark
-  // would find the flag already true and refuse to show.
+  // Lifetime flag: fires once per install per subject. Historically this
+  // flip lived in _closeBonusUnlockCoachMark so the flag guarded the
+  // full padlock+coach sequence. The coach mark was retired (see the
+  // comment in _onCelebrationQueueEmpty — "no callers remain"), which
+  // orphaned the setter: bonusUnlockShown never actually became true,
+  // and only the state.currentWeek === 1 clause in _bonusUnlockDue
+  // prevented re-fires. Moving the setter back to overlay close so the
+  // flag is honest. Also required by the post-subscription retro-reveal
+  // trigger, which uses bonusUnlockShown[subject] as its one-shot gate.
+  try {
+    state.bonusUnlockShown = state.bonusUnlockShown || {};
+    if (state.subject) state.bonusUnlockShown[state.subject] = true;
+    saveStateLocal();
+  } catch(e) {}
   _onCelebrationDismissed();
 }
 
@@ -17557,8 +17590,107 @@ if (!window._safeAreaObserverInstalled) {
   _safeAreaObs.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
 }
 
+// Grandfathered-only backfill for bonusUnlockShown. Runs at the top of
+// renderHome (idempotent, cheap). Marks any subject where chapter 1 is
+// fully complete as "already seen" — grandfathered users saw the
+// celebration historically via the pre-paywall natural flow (or would
+// have, when they completed chapter 1), and the setter that used to
+// mark this flag lived in dead code (see closeUnlockOverlay comment).
+//
+// Deliberately gated on state.grandfathered ONLY. Backfilling for
+// currently-paid users would falsely mark chapter-1-done free users
+// as shown the moment they subscribe (canAccessWeek(bonus) flips true
+// on subscribe), erasing the exact retro reveal this feature exists
+// for. Post-launch users flow through:
+//   - complete chapter 1 while paid → _bonusUnlockDue fires inline,
+//     closeUnlockOverlay marks shown.
+//   - complete chapter 1 while free → suppressed, flag stays false,
+//     _maybePostSubscriptionBonusReveal picks it up on next subscribe.
+//
+// Cross-device: state.grandfathered is derived from the server's
+// subscription row (loadSubscription sets it in enterApp). Once that
+// resolves — which enterApp awaits before renderHome runs — device B
+// sees the flag correctly and backfills based on synced completedDays.
+// No sync of bonusUnlockShown itself needed.
+function _backfillBonusUnlockShown() {
+  if (!state.grandfathered) return;
+  try {
+    state.bonusUnlockShown = state.bonusUnlockShown || {};
+    const subjectsData = {
+      philosophy: (typeof corpusData     !== 'undefined') ? corpusData     : null,
+      economics:  (typeof economicsData  !== 'undefined') ? economicsData  : null,
+      psychology: (typeof psychologyData !== 'undefined') ? psychologyData : null,
+    };
+    let dirty = false;
+    Object.keys(subjectsData).forEach(subj => {
+      if (state.bonusUnlockShown[subj]) return;   // already flagged
+      const data = subjectsData[subj];
+      if (!data || !data.weeks) return;
+      const c1 = data.weeks.find(w => w.id === 1);
+      if (!c1 || !c1.days || !c1.days.length) return;
+      const allDone = c1.days.every(d =>
+        state.completedDays && state.completedDays[subj + '-1-' + d.id]);
+      if (allDone) { state.bonusUnlockShown[subj] = true; dirty = true; }
+    });
+    if (dirty) saveStateLocal();
+  } catch(e) {}
+}
+
+// Post-subscription retro-reveal for the bonus_unlock celebration.
+//
+// A free user who completed chapter 1 while the paywall was active had
+// _bonusUnlockDue suppressed (see the honesty gate in finishDay). When
+// they later subscribe, they've never seen the celebration for a
+// chapter they now have full access to. This helper fires the reveal
+// as a delayed but coherent beat — at the first home render after
+// entitlement lands, or immediately after purchase for the settings /
+// chapter-card / lesson-tap paths (see startPurchase).
+//
+// Gates (any false → no fire, silent):
+//   - on home screen (never overlays reader / auth / subject-select)
+//   - state.isPaid AND NOT grandfathered (grandfathered saw it
+//     historically; backfill above marks them so this trigger skips
+//     them too, but the explicit check is defense-in-depth)
+//   - bonus chapter exists AND user has access to it
+//   - chapter 1 fully complete
+//   - bonusUnlockShown[subject] falsy
+//   - no other celebration in the queue (don't stack on end-of-
+//     dialogue or resumed chains)
+//
+// Doesn't set bonusUnlockShown here — closeUnlockOverlay does that
+// when the user dismisses the overlay. Prevents "queued but not seen"
+// from marking as shown.
+//
+// Optional { then: fn } callback: after the reveal drains (user
+// dismisses), the callback runs. Used by startPurchase to open a
+// returnTo lesson AFTER the reveal, not before, so the celebration
+// isn't buried by the reader opening.
+function _maybePostSubscriptionBonusReveal(opts) {
+  opts = opts || {};
+  const _then = typeof opts.then === 'function' ? opts.then : null;
+  if (state.currentScreen !== 'home') return false;
+  if (!state.isPaid || state.grandfathered) return false;
+  const bonusChapter = (typeof getW === 'function' ? getW() : []).find(w => w && w.isBonus);
+  if (!bonusChapter) return false;
+  if (!canAccessWeek(state.subject, bonusChapter.id)) return false;
+  try { if (!isWeekCompleted(1)) return false; } catch(e) { return false; }
+  if ((state.bonusUnlockShown || {})[state.subject]) return false;
+  if (state.pendingCelebrations && state.pendingCelebrations.length) return false;
+
+  state.pendingCelebrations = state.pendingCelebrations || [];
+  state.pendingCelebrations.push({ type: 'bonus_unlock', enqueuedAt: _streakDay() });
+  saveStateLocal();
+  if (_then) _pendingPostQueueFn = _then;
+  try { _playNextCelebration(); } catch(e) {}
+  return true;
+}
+
 function renderHome() {
   const ui = u();
+  // Backfill first, then check the trigger. Order matters: if backfill
+  // marks a grandfathered user's flag, the trigger check below sees it
+  // and skips, so grandfathered users never see the retro reveal.
+  try { _backfillBonusUnlockShown(); } catch(e) {}
   // Start-first-dialogue card: rendered at the very top of the scroll
   // for a user who finished onboarding but hasn't completed their
   // first dialogue yet. Safe to call unconditionally — it clears the
@@ -18078,6 +18210,11 @@ function renderHome() {
 
   populateCarousel();
   requestAnimationFrame(fixStatsPosition);
+  // Post-subscription retro reveal for the bonus_unlock celebration.
+  // Silent no-op unless the user just crossed into the "paid + chapter 1
+  // done + never seen it" state. See _maybePostSubscriptionBonusReveal
+  // for the full gate set.
+  try { _maybePostSubscriptionBonusReveal(); } catch(e) {}
 }
 
 const CAROUSEL_ORDER = {
