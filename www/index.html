@@ -6452,6 +6452,180 @@
     line-height: 1.4;
   }
 
+  /* ── Paywall ─────────────────────────────────────────────────
+     Full-screen entitlement gate. Renders neutral (accent, ink) so
+     it doesn't fight the subject theme too hard while still picking
+     up the active palette via CSS vars. */
+  #modal-paywall .modal-box {
+    background: var(--surface);
+    color: var(--ink);
+    max-width: 460px;
+    padding: 40px 26px 24px;
+    text-align: center;
+    position: relative;
+  }
+  .paywall-close {
+    position: absolute;
+    top: calc(10px + var(--safe-top, 0px));
+    inset-inline-end: 14px;
+    width: 34px; height: 34px;
+    border: none;
+    background: transparent;
+    color: var(--text-2);
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 50%;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .paywall-close:hover { background: var(--surface-2); color: var(--ink); }
+  .paywall-brand {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: 22px; font-weight: 900;
+    color: var(--accent);
+    margin: 8px 0 20px;
+  }
+  .paywall-headline {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(26px * var(--text-scale));
+    font-weight: 900;
+    color: var(--ink);
+    margin: 0 0 10px;
+    line-height: 1.15;
+  }
+  .paywall-sub {
+    font-size: 15px;
+    color: var(--text-2);
+    line-height: 1.5;
+    margin: 0 0 24px;
+    max-width: 340px;
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+  }
+  .paywall-cards {
+    display: flex; gap: 12px;
+    margin: 0 0 20px;
+  }
+  .paywall-card {
+    flex: 1;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 12px 14px;
+    cursor: pointer;
+    position: relative;
+    text-align: center;
+    font-family: inherit;
+    color: var(--ink);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .paywall-card:hover { border-color: var(--accent-muted, var(--accent)); }
+  .paywall-card.selected {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -12px var(--accent-glow);
+  }
+  .paywall-card-featured .paywall-card-badge {
+    position: absolute;
+    top: -10px; left: 50%; transform: translateX(-50%);
+    background: var(--accent);
+    color: var(--on-accent, #FFFFFF);
+    font-size: 11px; font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .paywall-card-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin: 0 0 8px;
+  }
+  .paywall-card-price {
+    font-size: calc(22px * var(--text-scale));
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1.15;
+  }
+  .paywall-card-period {
+    font-size: 12px;
+    color: var(--text-2);
+    margin-top: 2px;
+  }
+  .paywall-card-trial {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-top: 8px;
+  }
+  .paywall-cta {
+    width: 100%;
+    margin: 0 0 12px;
+  }
+  .paywall-cta:disabled { opacity: 0.55; cursor: default; }
+  .paywall-restore {
+    background: transparent;
+    border: none;
+    color: var(--text-2);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 8px;
+    margin: 0 0 16px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .paywall-legal {
+    font-size: 12px;
+    color: var(--text-muted, var(--text-2));
+    line-height: 1.5;
+    margin: 0 0 12px;
+    max-width: 360px;
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+  }
+  .paywall-links {
+    font-size: 12px;
+    color: var(--text-2);
+  }
+  .paywall-links a {
+    color: var(--text-2);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .paywall-links-sep { margin: 0 6px; opacity: 0.55; }
+
+  /* Corpus toast — bottom-center, auto-dismiss. Reused by paywall
+     success/failure and restore results. */
+  .corpus-toast {
+    position: fixed;
+    bottom: calc(24px + var(--safe-bottom, 0px));
+    left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: var(--surface);
+    padding: 12px 18px;
+    border-radius: 999px;
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.35);
+    z-index: 4000;
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+    max-width: 90vw;
+    text-align: center;
+  }
+  .corpus-toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
   /* ── Day-1 endowment overlay — bright amber ──
      Modal shell keeps its .modal-overlay backdrop; the box gets a white
      center → soft amber edge radial. Flame glow softens, headline in ink. */
@@ -9804,6 +9978,25 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const RC_IOS_API_KEY     = 'appl_ALVuRtIPTDlncRpGeAJfgwLLlaY';
 const RC_ANDROID_API_KEY = '';
 
+// Paywall trial gate. FALSE until App Store approves the introductory
+// offer on both products; the buttons charge immediately today, so
+// promising "7 days free" would be false advertising. Flip to true in
+// ONE place (here) once trial is live — the CTA copy, the card footer,
+// and the analytics is_trial flag all key off this.
+const PAYWALL_TRIAL_ENABLED = false;
+
+// Legal links required by Apple + Google in every paywall. Terms is
+// currently 404 — MUST be published at this URL before App Store
+// review or the paywall gets rejected.
+const CORPUS_TERMS_URL   = 'https://get.corpusapp.io/terms.html';
+const CORPUS_PRIVACY_URL = 'https://get.corpusapp.io/privacy.html';
+
+// Fallback prices — used when the RC offering hasn't loaded yet, so the
+// paywall is renderable and legally correct even before Apple approves
+// products. US-only; RC's priceString is localized per storefront.
+const PAYWALL_FALLBACK_MONTHLY_USD = 12.99;
+const PAYWALL_FALLBACK_YEARLY_USD  = 89.99;
+
 // Auth-token removal guard. gotrue-js calls storage.removeItem() on the
 // primary sb-*-auth-token key when it decides a refresh is terminal. On
 // Android cold-boot the network may not be attached yet, and a transient
@@ -10598,28 +10791,47 @@ async function loadProgressFromSupabase() {
 async function loadSubscription() {
   if (!currentUser) return;
   try {
-    // maybeSingle: 0 rows returns { data: null } without a 406 status. The
-    // subscriptions table is empty for the vast majority of users (only a
-    // handful have ever had rows), so single() was emitting a 406 on almost
-    // every app open — visible in the console but functionally correct
-    // because the catch below fails safe. Switching to maybeSingle removes
-    // the noise without changing behavior.
+    // maybeSingle: 0 rows returns { data: null } without a 406 status,
+    // which was noisy for the vast majority of users who have never
+    // subscribed. Empty result = free user.
     const _fetchT0 = performance.now();
     const { data } = await sb.from('subscriptions')
-      .select('*').eq('user_id', currentUser.id).maybeSingle();
+      .select('user_id, entitlement, product_id, platform, status, current_period_end, trial_end, will_renew, originally_purchased_at')
+      .eq('user_id', currentUser.id).maybeSingle();
     console.log('[Sync] subscriptions fetch:', Math.round(performance.now() - _fetchT0), 'ms — data:', !!data);
-    if (!data || !data.current_period_end) {
-      state.isPaid = false;   // no subscription = free user
+    if (!data) {
+      state.isPaid = false;
+      state.grandfathered = false;
+      state.subscription = null;
+      // Do NOT clear subscriptionOptimistic here — a webhook lag after
+      // a real purchase would otherwise lock the user out. Optimistic
+      // clears only when a real entitlement row actually arrives (below).
       saveStateLocal();
       return;
     }
-    // Access lasts until end of paid period, regardless of status
-    const periodEnd = new Date(data.current_period_end);
-    state.isPaid = periodEnd.getTime() > Date.now();
+    state.subscription = data;
+    state.grandfathered = data.platform === 'grandfathered';
+    // Gate on lifecycle status + period. NULL period = non-expiring
+    // (grandfathered uses infinity, treated as NULL here for JS date safety).
+    const goodStatus  = data.status === 'active' || data.status === 'trial' || data.status === 'grace_period';
+    const inPeriod    = !data.current_period_end
+                        || (new Date(data.current_period_end).getTime() > Date.now())
+                        // Grandfathered rows use timestamptz infinity; JS parses
+                        // that to a very large date, but be explicit.
+                        || state.grandfathered;
+    state.isPaid = goodStatus && inPeriod;
+    // Real entitlement arrived — clear the post-purchase optimistic bridge
+    // regardless of whether the DB row says paid or not (the DB row is
+    // now authoritative either way).
+    if (state.subscriptionOptimistic) {
+      state.subscriptionOptimistic = null;
+    }
     saveStateLocal();
   } catch(e) {
-    // on error, fail safe to free (do not grant access on error)
-    state.isPaid = false;
+    // On error, DON'T touch state.isPaid — a transient network hiccup
+    // shouldn't demote a currently-paid user to free until we've actually
+    // confirmed their subscription lapsed. Fail-preserving.
+    console.warn('[Sync] loadSubscription failed — leaving state.isPaid as-is', e);
   }
 }
 
@@ -10709,6 +10921,267 @@ async function _fetchOfferings() {
   } catch (e) {
     console.warn('[RC] getOfferings failed', e);
   }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PAYWALL
+// ═══════════════════════════════════════════════════════════
+// Where the user meets the store. Reads packages from _rcOfferings
+// when available; falls back to hardcoded US prices so the modal is
+// renderable + legally accurate even before Apple approves products.
+// Purchase + restore route through the RC Capacitor plugin; the RC
+// webhook writes state to Supabase; loadSubscription reads it back.
+//
+// Session context set when the paywall opens from a lesson tap, so
+// a successful purchase can re-open the target lesson without an
+// extra tap. Cleared on close.
+let _paywallReturnTo = null;
+let _paywallSelectedPkg = 'yearly';   // 'monthly' | 'yearly' — visual state only
+let _paywallPurchasing = false;       // gate against double-taps mid-purchase
+
+// Reads current package data from RC's offering, or falls back to the
+// hardcoded USD values so the paywall is renderable before products are
+// live in App Store Connect / Play. When falling back, pkg is null and
+// the CTA is disabled — you can't purchase without a real RC package.
+function _paywallPrices() {
+  const pkgs = (_rcOfferings && _rcOfferings.availablePackages) || [];
+  const monthly = pkgs.find(p => p.identifier === '$rc_monthly' || p.packageType === 'MONTHLY');
+  const yearly  = pkgs.find(p => p.identifier === '$rc_annual'  || p.packageType === 'ANNUAL');
+  const isEn = state.lang === 'en';
+  return {
+    monthly: {
+      priceString: (monthly && monthly.product && monthly.product.priceString)
+                   || ('$' + PAYWALL_FALLBACK_MONTHLY_USD.toFixed(2)),
+      periodLabel: isEn ? 'per month' : 'לחודש',
+      pkg:         monthly || null,
+    },
+    yearly: {
+      priceString: (yearly && yearly.product && yearly.product.priceString)
+                   || ('$' + PAYWALL_FALLBACK_YEARLY_USD.toFixed(2)),
+      periodLabel: isEn ? 'per year' : 'לשנה',
+      pkg:         yearly || null,
+    },
+  };
+}
+
+// Populates the paywall DOM from the current offering + language + trial
+// flag, then reveals the modal. opts.source is passed through to analytics.
+function showPaywall(opts) {
+  opts = opts || {};
+  _paywallReturnTo = (typeof opts.weekId !== 'undefined' && typeof opts.dayId !== 'undefined')
+    ? { weekId: opts.weekId, dayId: opts.dayId }
+    : null;
+  _paywallSelectedPkg = 'yearly';   // reset default on every open
+  _paywallPurchasing = false;
+  _renderPaywall();
+  const modal = document.getElementById('modal-paywall');
+  if (modal) modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  try {
+    posthog.capture('paywall_shown', {
+      source: opts.source || 'unknown',
+      subject: opts.subject || state.subject || null,
+      week_id: typeof opts.weekId !== 'undefined' ? opts.weekId : null,
+      day_id:  typeof opts.dayId  !== 'undefined' ? opts.dayId  : null,
+      trial_enabled: PAYWALL_TRIAL_ENABLED,
+    });
+  } catch(e) {}
+}
+
+function closePaywall() {
+  const modal = document.getElementById('modal-paywall');
+  if (modal) modal.classList.remove('active');
+  document.body.style.overflow = '';
+  try {
+    posthog.capture('paywall_dismissed', {
+      package_selected: _paywallSelectedPkg,
+    });
+  } catch(e) {}
+  _paywallReturnTo = null;
+}
+
+function _selectPaywallPackage(which) {
+  if (which !== 'monthly' && which !== 'yearly') return;
+  _paywallSelectedPkg = which;
+  _renderPaywall();
+}
+
+function _renderPaywall() {
+  const isEn = state.lang === 'en';
+  const p = _paywallPrices();
+  const ready = !!(p.monthly.pkg && p.yearly.pkg);
+
+  // Headline + subhead
+  document.getElementById('paywall-headline').textContent =
+    isEn ? 'Unlock everything' : 'פתחו את כל הפרקים';
+  document.getElementById('paywall-sub').textContent =
+    isEn ? 'Every chapter, every subject, every bonus dialogue.'
+         : 'כל פרק, בכל תחום, כולל דיאלוגי הבונוס.';
+
+  // Monthly card
+  document.getElementById('paywall-monthly-title').textContent = isEn ? 'Monthly' : 'חודשי';
+  document.getElementById('paywall-monthly-price').textContent = p.monthly.priceString;
+  document.getElementById('paywall-monthly-period').textContent = p.monthly.periodLabel;
+  const monthlyTrialEl = document.getElementById('paywall-monthly-trial');
+  monthlyTrialEl.textContent = PAYWALL_TRIAL_ENABLED ? (isEn ? '7 days free' : '7 ימי ניסיון חינם') : '';
+  monthlyTrialEl.style.display = PAYWALL_TRIAL_ENABLED ? '' : 'none';
+
+  // Yearly card (default emphasis)
+  document.getElementById('paywall-yearly-title').textContent = isEn ? 'Yearly' : 'שנתי';
+  document.getElementById('paywall-yearly-price').textContent = p.yearly.priceString;
+  document.getElementById('paywall-yearly-period').textContent = p.yearly.periodLabel;
+  document.getElementById('paywall-yearly-badge').textContent = isEn ? 'Save 42%' : 'חיסכון 42%';
+  const yearlyTrialEl = document.getElementById('paywall-yearly-trial');
+  yearlyTrialEl.textContent = PAYWALL_TRIAL_ENABLED ? (isEn ? '7 days free' : '7 ימי ניסיון חינם') : '';
+  yearlyTrialEl.style.display = PAYWALL_TRIAL_ENABLED ? '' : 'none';
+
+  // Selection state
+  document.getElementById('paywall-card-monthly').classList.toggle('selected', _paywallSelectedPkg === 'monthly');
+  document.getElementById('paywall-card-yearly').classList.toggle('selected',  _paywallSelectedPkg === 'yearly');
+
+  // Primary CTA
+  const cta = document.getElementById('paywall-cta');
+  if (!ready) {
+    cta.textContent = isEn ? 'Loading…' : 'טוענים…';
+    cta.disabled = true;
+  } else {
+    cta.textContent = PAYWALL_TRIAL_ENABLED
+      ? (isEn ? 'Start free trial' : 'התחילו ניסיון חינם')
+      : (isEn ? 'Subscribe' : 'הרשמה');
+    cta.disabled = _paywallPurchasing;
+  }
+
+  // Restore link
+  document.getElementById('paywall-restore').textContent = isEn ? 'Restore purchases' : 'שחזרו רכישות';
+
+  // Legal fine print. Dynamic price + period reflect the selected package.
+  const sel = _paywallSelectedPkg === 'monthly' ? p.monthly : p.yearly;
+  const legalEl = document.getElementById('paywall-legal');
+  if (isEn) {
+    legalEl.textContent = 'Auto-renews for ' + sel.priceString + ' ' + sel.periodLabel + ' until canceled. Cancel anytime in App Store settings.';
+  } else {
+    legalEl.textContent = 'מתחדש אוטומטית ב-' + sel.priceString + ' ' + sel.periodLabel + ' עד ביטול. אפשר לבטל בכל עת בהגדרות ה-App Store.';
+  }
+
+  // Terms + Privacy links
+  document.getElementById('paywall-terms').textContent   = isEn ? 'Terms of Service' : 'תנאי שימוש';
+  document.getElementById('paywall-privacy').textContent = isEn ? 'Privacy Policy'  : 'מדיניות פרטיות';
+}
+
+async function startPurchase() {
+  if (_paywallPurchasing) return;
+  const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
+  if (!P) return;
+  const p = _paywallPrices();
+  const sel = _paywallSelectedPkg === 'monthly' ? p.monthly : p.yearly;
+  if (!sel.pkg) return;   // fallback prices — no real package to purchase
+
+  _paywallPurchasing = true;
+  _renderPaywall();
+  try { posthog.capture('paywall_purchase_started', { package_id: sel.pkg.identifier }); } catch(e) {}
+
+  try {
+    const result = await P.purchasePackage({ aPackage: sel.pkg });
+    const paid = !!(result && result.customerInfo && result.customerInfo.entitlements
+                    && result.customerInfo.entitlements.active
+                    && result.customerInfo.entitlements.active.paid);
+    if (paid) {
+      // Optimistic bridge — persists 24h so an app crash before the webhook
+      // lands can't lock the user out. Cleared by loadSubscription as soon
+      // as a real entitlement row appears.
+      state.subscriptionOptimistic = { until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() };
+      state.isPaid = true;
+      saveStateLocal();
+      try { posthog.capture('paywall_purchase_succeeded', {
+        package_id: sel.pkg.identifier,
+        is_trial: PAYWALL_TRIAL_ENABLED,
+      }); } catch(e) {}
+      // Nudge loadSubscription to catch the webhook write. If it hasn't
+      // landed yet, optimistic keeps access alive until it does.
+      try { loadSubscription(); } catch(e) {}
+      setTimeout(() => { try { loadSubscription(); } catch(e) {} }, 3000);
+      setTimeout(() => { try { loadSubscription(); } catch(e) {} }, 10000);
+
+      const returnTo = _paywallReturnTo;
+      closePaywall();
+      _showToast(state.lang === 'en' ? 'Welcome to Corpus.' : 'ברוכים הבאים לקורפוס.');
+      if (returnTo) openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true });
+    } else {
+      // Purchase came back without the entitlement — treat as failure.
+      try { posthog.capture('paywall_purchase_failed', {
+        package_id: sel.pkg.identifier, error_code: 'no_entitlement',
+      }); } catch(e) {}
+    }
+  } catch (e) {
+    // RC surfaces userCancelled as e.userCancelled === true (Capacitor
+    // plugin flattens it); silent no-op for that case, toast for real errors.
+    const cancelled = !!(e && (e.userCancelled || (e.errorCode === '1') || /cancel/i.test(String(e && e.message))));
+    if (!cancelled) {
+      const msg = (e && e.message) || 'Purchase failed';
+      _showToast(state.lang === 'en' ? ('Purchase failed: ' + msg) : ('הרכישה נכשלה: ' + msg));
+      try { posthog.capture('paywall_purchase_failed', {
+        package_id: sel.pkg.identifier,
+        error_code: (e && (e.errorCode || e.code)) || 'unknown',
+      }); } catch(_) {}
+    }
+  } finally {
+    _paywallPurchasing = false;
+    _renderPaywall();
+  }
+}
+
+async function restorePurchases() {
+  const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
+  if (!P) return;
+  const isEn = state.lang === 'en';
+  try { posthog.capture('paywall_restore_tapped'); } catch(e) {}
+  try {
+    const info = await P.restorePurchases();
+    const paid = !!(info && info.customerInfo && info.customerInfo.entitlements
+                    && info.customerInfo.entitlements.active
+                    && info.customerInfo.entitlements.active.paid);
+    if (paid) {
+      state.subscriptionOptimistic = { until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() };
+      state.isPaid = true;
+      saveStateLocal();
+      try { loadSubscription(); } catch(e) {}
+      try { posthog.capture('paywall_restore_result', { found: true }); } catch(e) {}
+      const returnTo = _paywallReturnTo;
+      closePaywall();
+      _showToast(isEn ? 'Welcome back to Corpus.' : 'ברוכים השבים לקורפוס.');
+      if (returnTo) openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true });
+    } else {
+      try { posthog.capture('paywall_restore_result', { found: false }); } catch(e) {}
+      const plat = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || 'ios';
+      const storeName = plat === 'android' ? (isEn ? 'Google Play account' : 'חשבון Google Play')
+                                           : (isEn ? 'Apple ID' : 'Apple ID');
+      _showToast(isEn ? ('No previous purchases found on this ' + storeName + '.')
+                      : ('לא נמצאו רכישות קודמות ב' + storeName + '.'));
+    }
+  } catch (e) {
+    _showToast(isEn ? 'Restore failed. Try again.' : 'שחזור נכשל. נסו שוב.');
+  }
+}
+
+function _openLegalUrl(which) {
+  const url = which === 'terms' ? CORPUS_TERMS_URL : CORPUS_PRIVACY_URL;
+  try { window.open(url, '_blank'); } catch(e) {}
+}
+
+// Minimal toast — fixed bottom center, auto-dismiss in 2.4s. Reused
+// across paywall success/failure paths so results always surface.
+function _showToast(text) {
+  try {
+    const el = document.createElement('div');
+    el.className = 'corpus-toast';
+    el.textContent = text;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('visible'));
+    setTimeout(() => {
+      el.classList.remove('visible');
+      setTimeout(() => { try { el.parentNode && el.parentNode.removeChild(el); } catch(_){} }, 300);
+    }, 2400);
+  } catch(e) {}
 }
 
 // Opens the Corpus Privacy Policy in the system browser. Uses plain window.open
@@ -14726,7 +15199,23 @@ function defaultState() {
     // (migration 20260825120000).
     npsState: { lastShownAt: '', lastScoredAt: '', submittedAt: '' },
     settingsExpanded: false,   // Profile → Settings collapsible; persisted with the rest of state.
-    isPaid: false,   // manual flag for now; later driven by subscription
+    // Paid entitlement — reflects the subscriptions row in Supabase, written
+    // by the RevenueCat webhook. Locally derived by loadSubscription from
+    // subscription.status ∈ {active,trial,grace_period} plus period_end.
+    isPaid: false,
+    // Grandfathered flag — subscription row with platform='grandfathered'.
+    // Full paid access, no manage-deeplink in Settings, no store transaction.
+    grandfathered: false,
+    // Full subscription object mirror for the Settings screen (trial end,
+    // will_renew, product_id). Populated by loadSubscription; null when
+    // no row exists in Supabase.
+    subscription: null,
+    // Post-purchase optimistic entitlement. Persists across restarts so
+    // an app crash between the store confirmation and the webhook writing
+    // the row can't lock a user out of content they just bought.
+    // { until: ISO8601 string } — 24h window from purchase. Cleared as
+    // soon as loadSubscription sees a real entitlement.
+    subscriptionOptimistic: null,
     subject: 'philosophy',
     // Dark-mode preference. 'system' follows the OS via prefers-color-scheme
     // (with a live change listener); 'light' / 'dark' force a mode regardless
@@ -16419,10 +16908,50 @@ function isWeekCompleted(weekId) {
   return chapter.days.every(d => state.completedDays[dayKey(weekId, d.id)]);
 }
 
+// ⚠ SHIP PREREQUISITE — DO NOT SUBMIT A BUILD CONTAINING THIS GATE
+// UNTIL THE GRANDFATHERING INSERT HAS RUN AGAINST PROD SUPABASE.
+//
+// Every existing user's subscriptions row is null today (empty table).
+// state.isPaid = false, state.grandfathered = false → this function
+// returns false for chapter 2+, and every pre-paywall user gets locked
+// out of content they previously had free.
+//
+// The migration must:
+//   INSERT INTO subscriptions
+//     (user_id, entitlement, platform, status,
+//      current_period_end, originally_purchased_at)
+//   SELECT id, 'paid', 'grandfathered', 'active',
+//          'infinity'::timestamptz, created_at
+//   FROM auth.users
+//   WHERE created_at < <the launch commit's timestamp>
+//   ON CONFLICT (user_id) DO NOTHING;
+//
+// Run + verify BEFORE either App Store or Play review begins on any
+// version >= the one that introduces this gate.
+//
+// ─────────────────────────────────────────────────────────────
+// Free tier = chapter 1 of each subject. Chapters 2+ and every bonus
+// chapter (string IDs like 'bonus1', 'bonusEcon1', 'bonusPsy1' —
+// never === 1) require paid entitlement.
+//
+// Paid = state.isPaid (real Supabase entitlement from RC webhook)
+//      OR state.grandfathered (existing users at launch cutoff)
+//      OR the post-purchase optimistic bridge (persisted 24h, cleared
+//         as soon as a real entitlement row arrives — protects against
+//         the ~5-30s webhook lag AND app-crash mid-purchase).
+function canAccessWeek(subject, weekId) {
+  if (weekId === 1) return true;                              // free tier
+  if (state.grandfathered) return true;
+  if (state.isPaid) return true;
+  const opt = state.subscriptionOptimistic;
+  if (opt && opt.until && new Date(opt.until).getTime() > Date.now()) return true;
+  return false;
+}
+
+// Legacy alias — renderHome and any other pre-paywall consumers still
+// call canAccessChapter. Keep the shape so nothing breaks.
 function canAccessChapter(weekId) {
-  // All chapters currently free. Monetization, if added, must use native IAP
-  // (App Store / Play Billing) — not external checkout.
-  return true;
+  return canAccessWeek(state.subject, weekId);
 }
 
 function getWeekProgress(weekId) {
@@ -17471,6 +18000,20 @@ function closeLibraryModal() {
 
 function openReader(weekId, dayId, opts) {
   opts = opts || {};
+  // Paywall gate. Free tier = chapter 1 of each subject; everything else
+  // requires paid entitlement. A lapsed user keeps access to dialogues
+  // they've already completed — the moment stays theirs even after the
+  // subscription ends. _afterPurchase bypasses the gate for the post-
+  // purchase callback that re-opens the reader with a fresh entitlement
+  // still propagating from the webhook.
+  if (!opts._afterPurchase && !canAccessWeek(state.subject, weekId)) {
+    const completedKey = dayKey(weekId, dayId);
+    if (!state.completedDays || !state.completedDays[completedKey]) {
+      showPaywall({ subject: state.subject, weekId, dayId, source: 'lesson-tap' });
+      return;
+    }
+    // Falls through — completed dialogues remain accessible for re-read.
+  }
   // Silently drop any stranded celebrations from a prior interrupted chain.
   // Playing them on reader tap-through is jarring — the moment is gone,
   // whether it was hours ago (stale) or five seconds ago (user chose to
@@ -24774,6 +25317,42 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     </div>
     <button type="button" class="nav-btn endowment-cta" id="goal-met-cta" onclick="closeGoalMet()">המשך</button>
+  </div>
+</div>
+
+<!-- Paywall. Full-screen modal shown from openReader when the user taps
+     into a paid chapter. Populated by _renderPaywall() from the current
+     RC offering (or fallback prices when the offering isn't loaded).
+     Trial framing controlled by PAYWALL_TRIAL_ENABLED in the JS block. -->
+<div class="modal-overlay" id="modal-paywall">
+  <div class="modal-box paywall-box">
+    <button type="button" class="paywall-close" onclick="closePaywall()" aria-label="Close">×</button>
+    <div class="paywall-brand">Corpus</div>
+    <h1 class="paywall-headline" id="paywall-headline"></h1>
+    <p class="paywall-sub" id="paywall-sub"></p>
+    <div class="paywall-cards">
+      <button type="button" class="paywall-card" id="paywall-card-monthly" onclick="_selectPaywallPackage('monthly')">
+        <div class="paywall-card-title" id="paywall-monthly-title"></div>
+        <div class="paywall-card-price" id="paywall-monthly-price"></div>
+        <div class="paywall-card-period" id="paywall-monthly-period"></div>
+        <div class="paywall-card-trial" id="paywall-monthly-trial"></div>
+      </button>
+      <button type="button" class="paywall-card paywall-card-featured" id="paywall-card-yearly" onclick="_selectPaywallPackage('yearly')">
+        <div class="paywall-card-badge" id="paywall-yearly-badge"></div>
+        <div class="paywall-card-title" id="paywall-yearly-title"></div>
+        <div class="paywall-card-price" id="paywall-yearly-price"></div>
+        <div class="paywall-card-period" id="paywall-yearly-period"></div>
+        <div class="paywall-card-trial" id="paywall-yearly-trial"></div>
+      </button>
+    </div>
+    <button type="button" class="nav-btn paywall-cta" id="paywall-cta" onclick="startPurchase()"></button>
+    <button type="button" class="paywall-restore" id="paywall-restore" onclick="restorePurchases()"></button>
+    <p class="paywall-legal" id="paywall-legal"></p>
+    <div class="paywall-links">
+      <a href="#" id="paywall-terms" onclick="event.preventDefault(); _openLegalUrl('terms');"></a>
+      <span class="paywall-links-sep">·</span>
+      <a href="#" id="paywall-privacy" onclick="event.preventDefault(); _openLegalUrl('privacy');"></a>
+    </div>
   </div>
 </div>
 
