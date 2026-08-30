@@ -6460,14 +6460,25 @@
     background: var(--surface);
     color: var(--ink);
     max-width: 460px;
-    padding: 40px 26px 24px;
+    /* Top padding is small — the .paywall-topbar owns the top strip
+       (safe-area + close X). Bottom / horizontal padding unchanged. */
+    padding: 8px 26px 24px;
     text-align: center;
-    position: relative;
+  }
+  /* Flex header row anchoring the close X to the top-right corner
+     without absolute positioning. padding-top absorbs the notch safe-area
+     so the button sits below status-bar / dynamic-island on notched iOS.
+     Negative side margins pull the button flush to the box edge
+     regardless of the box's horizontal padding. */
+  .paywall-topbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: var(--safe-top, 0px);
+    margin: 0 -12px 4px;
+    min-height: 34px;
   }
   .paywall-close {
-    position: absolute;
-    top: calc(10px + var(--safe-top, 0px));
-    inset-inline-end: 14px;
     width: 34px; height: 34px;
     border: none;
     background: transparent;
@@ -11009,7 +11020,6 @@ function _selectPaywallPackage(which) {
 function _renderPaywall() {
   const isEn = state.lang === 'en';
   const p = _paywallPrices();
-  const ready = !!(p.monthly.pkg && p.yearly.pkg);
 
   // Headline + subhead
   document.getElementById('paywall-headline').textContent =
@@ -11039,17 +11049,17 @@ function _renderPaywall() {
   document.getElementById('paywall-card-monthly').classList.toggle('selected', _paywallSelectedPkg === 'monthly');
   document.getElementById('paywall-card-yearly').classList.toggle('selected',  _paywallSelectedPkg === 'yearly');
 
-  // Primary CTA
+  // Primary CTA. Always shows the real label — never falls into a
+  // "Loading…" state that would sit there indefinitely while products
+  // are pending Apple approval. An App Store reviewer opening the
+  // paywall before products are attached now sees a functional-looking
+  // button; the tap-time handler in startPurchase surfaces a clear
+  // toast if no real RC package is available yet.
   const cta = document.getElementById('paywall-cta');
-  if (!ready) {
-    cta.textContent = isEn ? 'Loading…' : 'טוענים…';
-    cta.disabled = true;
-  } else {
-    cta.textContent = PAYWALL_TRIAL_ENABLED
-      ? (isEn ? 'Start free trial' : 'התחילו ניסיון חינם')
-      : (isEn ? 'Subscribe' : 'הרשמה');
-    cta.disabled = _paywallPurchasing;
-  }
+  cta.textContent = PAYWALL_TRIAL_ENABLED
+    ? (isEn ? 'Start free trial' : 'התחילו ניסיון חינם')
+    : (isEn ? 'Subscribe' : 'הרשמה');
+  cta.disabled = _paywallPurchasing;
 
   // Restore link
   document.getElementById('paywall-restore').textContent = isEn ? 'Restore purchases' : 'שחזרו רכישות';
@@ -11074,7 +11084,19 @@ async function startPurchase() {
   if (!P) return;
   const p = _paywallPrices();
   const sel = _paywallSelectedPkg === 'monthly' ? p.monthly : p.yearly;
-  if (!sel.pkg) return;   // fallback prices — no real package to purchase
+  const isEn = state.lang === 'en';
+  if (!sel.pkg) {
+    // No real RC package yet — usually because products are still
+    // pending App Store / Play approval, occasionally a transient
+    // network glitch on the getOfferings fetch. Surface a clear
+    // toast and kick a background retry so the next tap can succeed
+    // once the offering resolves.
+    _fetchOfferings();
+    _showToast(isEn
+      ? 'Subscription options aren\'t loaded yet — try again in a moment.'
+      : 'אפשרויות המנוי לא נטענו עדיין — נסו שוב בעוד רגע.');
+    return;
+  }
 
   _paywallPurchasing = true;
   _renderPaywall();
@@ -25326,7 +25348,9 @@ document.addEventListener('DOMContentLoaded', function() {
      Trial framing controlled by PAYWALL_TRIAL_ENABLED in the JS block. -->
 <div class="modal-overlay" id="modal-paywall">
   <div class="modal-box paywall-box">
-    <button type="button" class="paywall-close" onclick="closePaywall()" aria-label="Close">×</button>
+    <div class="paywall-topbar">
+      <button type="button" class="paywall-close" onclick="closePaywall()" aria-label="Close">×</button>
+    </div>
     <div class="paywall-brand">Corpus</div>
     <h1 class="paywall-headline" id="paywall-headline"></h1>
     <p class="paywall-sub" id="paywall-sub"></p>
