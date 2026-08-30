@@ -17712,11 +17712,28 @@ function renderHome() {
           4: isWeekCompleted(3),
         };
 
-    // Find the single next-up lesson (first non-done, non-locked lesson across all chapters)
+    // Find the single next-up lesson (first non-done, non-locked lesson
+    // across all accessible chapters). Also detect whether any inaccessible
+    // paid content remains, so the practice card can distinguish the two
+    // empty states:
+    //   * genuinely done (everything the user has access to is completed,
+    //     AND no paid content remains) → "You've completed everything!"
+    //   * done-with-accessible (chapter 1 finished, paid content locked)
+    //     → "Continue with Corpus" → paywall
     let nextUpWeekId = null, nextUpDayId = null;
+    let _anyLockedRemains = false;
     for (const w of chapters) {
+      if (!w || !w.days) continue;
       const wkUnlocked = weekLockMap[w.id] !== undefined ? weekLockMap[w.id] : true;
-      if (w.locked || w.comingSoon || !wkUnlocked || !w.days) continue;
+      if (w.locked || w.comingSoon || !wkUnlocked) continue;
+      // Paywall-locked chapters shouldn't appear as next-up (would surface
+      // paid content in the "Continue" affordance and read as broken). Note
+      // the paywall-locked state, so the empty-state copy below can offer
+      // the paywall instead of falsely claiming completion.
+      if (!canAccessWeek(state.subject, w.id)) {
+        _anyLockedRemains = true;
+        continue;
+      }
       for (let di = 0; di < w.days.length; di++) {
         const d = w.days[di];
         const lessonLocked = di > 0 && !state.completedDays[dayKey(w.id, w.days[di-1].id)];
@@ -18035,6 +18052,18 @@ function renderHome() {
         } else {
           pc.style.display = 'none';
         }
+      } else if (_anyLockedRemains) {
+        // Everything the user currently has access to is done, but paid
+        // chapters remain untouched. Show the paywall as the CTA rather
+        // than falsely claiming completion.
+        pc.style.display = 'block';
+        pc.innerHTML = `<div class="practice-card-inner" onclick="showPaywall({source:'practice-card-continue-corpus'})">
+          <div class="practice-card-text">
+            <div class="practice-card-eyebrow">${isEn ? 'Keep going' : 'המשיכו הלאה'}</div>
+            <div class="practice-card-title">${isEn ? 'Continue with Corpus' : 'המשיכו עם Corpus'}</div>
+          </div>
+          <button class="practice-btn" onclick="event.stopPropagation();showPaywall({source:'practice-card-continue-corpus'})">${isEn ? 'Unlock' : 'לפתיחה'} ›</button>
+        </div>`;
       } else {
         pc.style.display = 'block';
         pc.innerHTML = `<div class="practice-card-inner" style="justify-content:center">
