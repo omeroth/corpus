@@ -57,6 +57,11 @@ jobs:
           # Thinker landing pages (/t/marx-en.html etc). Committed under t/
           # by the thinker-share-card generator; served at corpusapp.io/t/*.
           if [ -d t ];     then cp -r t     _deploy/; fi
+          # Platform-detection redirect served at corpusapp.io/go — routes
+          # iOS UAs to the App Store, Android UAs to Play, everything else
+          # to the manual-choice buttons. Extensionless URL requires the
+          # go/index.html shape (GitHub Pages won't serve bare go.html).
+          if [ -d go ];    then cp -r go    _deploy/; fi
           # Static assets referenced by Loops re-engagement emails (bonus
           # unlocked art, etc). Not consumed by the app itself.
           if [ -d email ]; then cp -r email _deploy/; fi
