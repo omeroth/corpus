@@ -16997,17 +16997,23 @@ function canAccessWeek(subject, weekId) {
   if (state.isPaid) return true;
   const opt = state.subscriptionOptimistic;
   if (opt && opt.until && new Date(opt.until).getTime() > Date.now()) return true;
-  // Started-this-chapter clause: any completed day in this specific chapter
+  // Started-this-chapter clause: any completed REAL day in this chapter
   // grants full access to it. Protects lapsed subscribers from losing
   // mid-chapter access — they can finish what they started, and the paywall
   // fires on the JUMP to a chapter they haven't touched, not mid-read.
-  // Also protects the (rare) case where a fresh user completed the bonus
-  // preamble Day 0 during their optimistic window and then refunded — they
-  // keep the chapter they engaged with, paywall on new territory.
+  //
+  // Day 0 is deliberately excluded (d.id !== 0). Day 0 is the preamble
+  // pattern used by bonus chapters — a title/intro page with no quiz that
+  // auto-completes on tap-through (see finishDay's if (day.id === 0)
+  // branch). Counting it as "started" would let a single tap on the bonus
+  // intro unlock the entire chapter for free. Codebase convention:
+  // id === 0 means preamble everywhere it appears.
   try {
     const chapter = getW().find(w => w.id === weekId);
     if (chapter && chapter.days
-        && chapter.days.some(d => state.completedDays && state.completedDays[dayKey(weekId, d.id)])) {
+        && chapter.days.some(d =>
+             d.id !== 0
+             && state.completedDays && state.completedDays[dayKey(weekId, d.id)])) {
       return true;
     }
   } catch(e) {}
@@ -17443,24 +17449,11 @@ function showChapterCompleteOverlay(chapter) {
         saveStateLocal();
       }
       document.getElementById('modal-complete').classList.remove('active');
-      // === DIAGNOSTIC (temporary) — chapter_complete overlay Continue.
-      const _fdId = nextWeek.days[0].id;
-      try {
-        console.log('[GATE] chapter_complete Continue',
-          'justFinished=', chapter.id,
-          'nextWeek.id=', nextWeek.id,
-          'firstDayId=', _fdId,
-          'subject=', state.subject,
-          'canAccessWeek(next)=', canAccessWeek(state.subject, nextWeek.id),
-          'completedDays[next-first]=', !!(state.completedDays && state.completedDays[dayKey(nextWeek.id, _fdId)]),
-          'willPaywall=',
-          !canAccessWeek(state.subject, nextWeek.id) && !(state.completedDays && state.completedDays[dayKey(nextWeek.id, _fdId)]));
-      } catch(_){}
       // Paywall check. If the user can't access the next chapter AND
       // hasn't already completed any day of it (started-clause), surface
       // the contextual paywall instead of routing through openReader
       // (which would surface the generic paywall via its own gate).
-      const firstDayId = _fdId;
+      const firstDayId = nextWeek.days[0].id;
       if (!canAccessWeek(state.subject, nextWeek.id)
           && !(state.completedDays && state.completedDays[dayKey(nextWeek.id, firstDayId)])) {
         // Contextual eyebrow reflects the chapter that was just completed
@@ -17485,7 +17478,6 @@ function showChapterCompleteOverlay(chapter) {
         });
         return;
       }
-      console.log('[GATE] chapter_complete Continue → openReader(', nextWeek.id, ',', firstDayId, ') without paywall');
       openReader(nextWeek.id, firstDayId);
     };
   }
@@ -18168,23 +18160,6 @@ function closeLibraryModal() {
 
 function openReader(weekId, dayId, opts) {
   opts = opts || {};
-  // === DIAGNOSTIC (temporary) — log every entry with gate inputs.
-  // Includes the caller frame so we can tell which path invoked us.
-  try {
-    const _stack = (new Error()).stack || '';
-    const _callerLine = _stack.split('\n').slice(2, 4).join(' | ');
-    const _ck = dayKey(weekId, dayId);
-    console.log('[GATE] openReader',
-      'weekId=', weekId, 'dayId=', dayId,
-      'subject=', state.subject,
-      'opts=', JSON.stringify(opts),
-      'canAccessWeek=', canAccessWeek(state.subject, weekId),
-      'completedDays[' + _ck + ']=', !!(state.completedDays && state.completedDays[_ck]),
-      'isPaid=', state.isPaid,
-      'grandfathered=', state.grandfathered,
-      'optimistic=', JSON.stringify(state.subscriptionOptimistic),
-      'caller=', _callerLine);
-  } catch(_){}
   // Paywall gate. Free tier = chapter 1 of each subject; everything else
   // requires paid entitlement. A lapsed user keeps access to dialogues
   // they've already completed — the moment stays theirs even after the
@@ -18194,14 +18169,10 @@ function openReader(weekId, dayId, opts) {
   if (!opts._afterPurchase && !canAccessWeek(state.subject, weekId)) {
     const completedKey = dayKey(weekId, dayId);
     if (!state.completedDays || !state.completedDays[completedKey]) {
-      console.log('[GATE] openReader → showPaywall (locked + uncompleted)');
       showPaywall({ subject: state.subject, weekId, dayId, source: 'lesson-tap' });
       return;
     }
-    console.log('[GATE] openReader → falling through (locked but completed — lapsed re-read)');
     // Falls through — completed dialogues remain accessible for re-read.
-  } else {
-    console.log('[GATE] openReader → passing gate (accessible or _afterPurchase)');
   }
   // Silently drop any stranded celebrations from a prior interrupted chain.
   // Playing them on reader tap-through is jarring — the moment is gone,
@@ -18996,26 +18967,10 @@ function goToNextLesson() {
   // sale bump.
   closeCompleteModal({
     continuation: () => {
-      // === DIAGNOSTIC (temporary) — log resolved next + gate inputs.
-      try {
-        console.log('[GATE] goToNextLesson continuation',
-          'next=', JSON.stringify(next),
-          'state.currentWeek=', state.currentWeek,
-          'state.subject=', state.subject,
-          'canAccessWeek(next.weekId)=', next.hasNext ? canAccessWeek(state.subject, next.weekId) : 'n/a',
-          'completedDays[next]=', next.hasNext ? !!(state.completedDays && state.completedDays[dayKey(next.weekId, next.dayId)]) : 'n/a',
-          'isPaid=', state.isPaid, 'grandfathered=', state.grandfathered,
-          'optimistic=', JSON.stringify(state.subscriptionOptimistic));
-      } catch(_){}
-      if (!next.hasNext) { console.log('[GATE] goToNextLesson → bail (no next)'); return; }
+      if (!next.hasNext) return;
       const isEn = state.lang === 'en';
       const completedNext = state.completedDays && state.completedDays[dayKey(next.weekId, next.dayId)];
       const nextIsNewChapter = next.weekId !== state.currentWeek;
-      console.log('[GATE] goToNextLesson branch check',
-        'nextIsNewChapter=', nextIsNewChapter,
-        '!canAccessWeek=', !canAccessWeek(state.subject, next.weekId),
-        '!completedNext=', !completedNext,
-        '→ willPaywall=', (nextIsNewChapter && !canAccessWeek(state.subject, next.weekId) && !completedNext));
       if (nextIsNewChapter && !canAccessWeek(state.subject, next.weekId) && !completedNext) {
         // The just-completed chapter is state.currentWeek here — that's
         // still set at the just-finished dialogue's coords until openReader
@@ -19043,7 +18998,6 @@ function goToNextLesson() {
         });
         return;
       }
-      console.log('[GATE] goToNextLesson → openReader(', next.weekId, ',', next.dayId, ') without paywall');
       openReader(next.weekId, next.dayId);
     }
   });
