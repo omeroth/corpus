@@ -36,6 +36,7 @@
     "@capawesome/capacitor-screenshot": "^8.0.1",
     "@capgo/capacitor-social-login": "^8.3.22",
     "@napi-rs/canvas": "^1.0.2",
+    "@revenuecat/purchases-capacitor": "^13.4.2",
     "corpus-instagram-share": "file:plugins/corpus-instagram-share",
     "corpus-review": "file:plugins/corpus-review"
   },
