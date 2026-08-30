@@ -13704,8 +13704,11 @@ async function deleteAccount() {
   try {
     // 1. Delete own data rows (RLS allows auth.uid() = user_id). Each wrapped
     //    so one failing doesn't prevent the rest from being attempted.
+    //    subscriptions is NOT deleted here — the "Users can delete own
+    //    subscriptions" RLS policy was dropped in migration 20260830120000,
+    //    and the FK ON DELETE CASCADE on subscriptions.user_id → auth.users(id)
+    //    handles cleanup automatically when the auth.users row goes below.
     try { await sb.from('user_progress').delete().eq('user_id', userId); } catch(e) {}
-    try { await sb.from('subscriptions').delete().eq('user_id', userId); } catch(e) {}
     // 2. Invoke the Edge Function to delete the auth.users row + PostHog person.
     //    Any failure here is fatal — surface it to the user so they can retry.
     const { error } = await sb.functions.invoke('delete-account');

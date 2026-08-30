@@ -123,12 +123,11 @@ serve(async (req: Request): Promise<Response> => {
   } catch (e) {
     console.error("[delete-account] user_progress delete threw:", e);
   }
-  try {
-    const { error } = await admin.from("subscriptions").delete().eq("user_id", userId);
-    if (error) console.error("[delete-account] subscriptions delete error:", error.message);
-  } catch (e) {
-    console.error("[delete-account] subscriptions delete threw:", e);
-  }
+  // subscriptions is NOT deleted here — the FK ON DELETE CASCADE on
+  // subscriptions.user_id → auth.users(id) (added in migration
+  // 20260830120000) removes the row automatically when the auth.users
+  // row is deleted in step 7. Keeping a manual delete would be two
+  // mechanisms pointed at the same cleanup, which is how these drift.
 
   // 6. Best-effort PostHog person deletion. The whole helper is wrapped in try/catch internally;
   //    it never throws back here. If POSTHOG_PERSONAL_API_KEY is unset, skip silently.
