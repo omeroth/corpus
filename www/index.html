@@ -6496,6 +6496,20 @@
     color: var(--accent);
     margin: 0 0 20px;
   }
+  /* Contextual eyebrow — populated by _renderPaywall when the caller
+     passes a contextEyebrow (e.g. "CHAPTER 1 COMPLETE"). Small caps,
+     accent color, sits above the headline. Hidden when empty so the
+     default paywall layout is untouched. */
+  .paywall-eyebrow {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0 0 10px;
+  }
+  .paywall-eyebrow:empty { display: none; }
   .paywall-headline {
     font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(26px * var(--text-scale));
@@ -10976,11 +10990,21 @@ function _paywallPrices() {
 
 // Populates the paywall DOM from the current offering + language + trial
 // flag, then reveals the modal. opts.source is passed through to analytics.
+// opts.contextEyebrow / contextHeadline / contextSub override the default
+// copy for triggers that want a specific framing (chapter-complete
+// continuation, bonus tap). Nulls fall back to defaults, so the base
+// lesson-tap entry stays untouched.
+let _paywallContext = null;
 function showPaywall(opts) {
   opts = opts || {};
   _paywallReturnTo = (typeof opts.weekId !== 'undefined' && typeof opts.dayId !== 'undefined')
     ? { weekId: opts.weekId, dayId: opts.dayId }
     : null;
+  _paywallContext = {
+    eyebrow:  opts.contextEyebrow  || null,
+    headline: opts.contextHeadline || null,
+    sub:      opts.contextSub      || null,
+  };
   _paywallSelectedPkg = 'yearly';   // reset default on every open
   _paywallPurchasing = false;
   _renderPaywall();
@@ -11008,6 +11032,7 @@ function closePaywall() {
     });
   } catch(e) {}
   _paywallReturnTo = null;
+  _paywallContext = null;
 }
 
 function _selectPaywallPackage(which) {
@@ -11019,13 +11044,19 @@ function _selectPaywallPackage(which) {
 function _renderPaywall() {
   const isEn = state.lang === 'en';
   const p = _paywallPrices();
+  const ctx = _paywallContext || {};
 
-  // Headline + subhead
+  // Contextual eyebrow — empty string when the trigger didn't pass one,
+  // which hides the row via the .paywall-eyebrow:empty CSS rule.
+  document.getElementById('paywall-eyebrow').textContent = ctx.eyebrow || '';
+
+  // Headline + subhead. Trigger-supplied context overrides the defaults;
+  // when null (base lesson-tap entry), the "Unlock everything" copy runs.
   document.getElementById('paywall-headline').textContent =
-    isEn ? 'Unlock everything' : 'פתחו את כל הפרקים';
+    ctx.headline || (isEn ? 'Unlock everything' : 'פתחו את כל הפרקים');
   document.getElementById('paywall-sub').textContent =
-    isEn ? 'Every chapter, every subject, every bonus dialogue.'
-         : 'כל פרק, בכל תחום, כולל דיאלוגי הבונוס.';
+    ctx.sub || (isEn ? 'Every chapter, every subject, every bonus dialogue.'
+                     : 'כל פרק, בכל תחום, כולל דיאלוגי הבונוס.');
 
   // Monthly card
   document.getElementById('paywall-monthly-title').textContent = isEn ? 'Monthly' : 'חודשי';
@@ -16966,6 +16997,20 @@ function canAccessWeek(subject, weekId) {
   if (state.isPaid) return true;
   const opt = state.subscriptionOptimistic;
   if (opt && opt.until && new Date(opt.until).getTime() > Date.now()) return true;
+  // Started-this-chapter clause: any completed day in this specific chapter
+  // grants full access to it. Protects lapsed subscribers from losing
+  // mid-chapter access — they can finish what they started, and the paywall
+  // fires on the JUMP to a chapter they haven't touched, not mid-read.
+  // Also protects the (rare) case where a fresh user completed the bonus
+  // preamble Day 0 during their optimistic window and then refunded — they
+  // keep the chapter they engaged with, paywall on new territory.
+  try {
+    const chapter = getW().find(w => w.id === weekId);
+    if (chapter && chapter.days
+        && chapter.days.some(d => state.completedDays && state.completedDays[dayKey(weekId, d.id)])) {
+      return true;
+    }
+  } catch(e) {}
   return false;
 }
 
@@ -17351,29 +17396,85 @@ function showChapterCompleteOverlay(chapter) {
   if (xpLabel) xpLabel.textContent = isEn ? 'XP earned' : 'XP הרווחת';
   if (labels[0]) labels[0].textContent = isEn ? 'thinkers met' : 'הוגים שפגשנו';
 
-  // Buttons
+  // Buttons.
+  //
+  // "Next" resolution: walk forward from the just-completed chapter, skip
+  // any comingSoon placeholders, land on the first real chapter — bonus or
+  // regular. If nothing valid remains, hide the button (only Back to Home).
+  //
+  // Label reflects what "next" actually is:
+  //   real chapter (economics 1→2)        → "Continue to Next Chapter"
+  //   bonus chapter (philosophy/psychology
+  //     after chapter 1, economics after
+  //     the last regular chapter)         → "Try the Bonus Chapter"
+  //   nothing valid                       → button hidden
+  //
+  // Behavior: if the next chapter is paywall-locked, route to the
+  // contextual paywall (chapter-complete-continue framing) rather than
+  // openReader — the gate would fire anyway, but a bespoke framing
+  // acknowledges the completion moment properly.
+  const allWeeks = getW();
+  const currentIndex = allWeeks.findIndex(w => w.id === chapter.id);
+  let nextWeek = null;
+  for (let i = currentIndex + 1; i < allWeeks.length; i++) {
+    const w = allWeeks[i];
+    if (w && !w.comingSoon && w.days && w.days[0]) {
+      nextWeek = w;
+      break;
+    }
+  }
+
   const continueBtn = document.getElementById('chapter-continue-btn');
-  continueBtn.textContent = isEn ? 'Continue to Next Chapter' : 'המשך לפרק הבא';
-  continueBtn.onclick = () => {
-    // Hard-exit path: user opts into the next chapter. Pop only THIS item
-    // from the queue; leave anything remaining (e.g. a bonus_unlock that
-    // was going to play next) in state.pendingCelebrations so it resumes
-    // on the next home render rather than being silently dropped.
-    closeChapterCompleteOverlay();
-    if (state.pendingCelebrations && state.pendingCelebrations.length) {
-      state.pendingCelebrations.shift();
-      saveStateLocal();
-    }
-    document.getElementById('modal-complete').classList.remove('active');
-    const allWeeks = getW();
-    const currentIndex = allWeeks.findIndex(w => w.id === chapter.id);
-    const nextWeek = allWeeks[currentIndex + 1];
-    if (nextWeek && nextWeek.days && nextWeek.days[0]) {
-      openReader(nextWeek.id, nextWeek.days[0].id);
-    } else {
-      showScreen('home');
-    }
-  };
+  if (!nextWeek) {
+    continueBtn.style.display = 'none';
+  } else {
+    continueBtn.style.display = '';
+    continueBtn.textContent = nextWeek.isBonus
+      ? (isEn ? 'Try the Bonus Chapter' : 'לפרק הבונוס')
+      : (isEn ? 'Continue to Next Chapter' : 'המשך לפרק הבא');
+    continueBtn.onclick = () => {
+      // Hard-exit path: user opts into the next chapter. Pop only THIS item
+      // from the queue; leave anything remaining (e.g. a bonus_unlock that
+      // was going to play next) in state.pendingCelebrations so it resumes
+      // on the next home render rather than being silently dropped.
+      closeChapterCompleteOverlay();
+      if (state.pendingCelebrations && state.pendingCelebrations.length) {
+        state.pendingCelebrations.shift();
+        saveStateLocal();
+      }
+      document.getElementById('modal-complete').classList.remove('active');
+      // Paywall check. If the user can't access the next chapter AND
+      // hasn't already completed any day of it (started-clause), surface
+      // the contextual paywall instead of routing through openReader
+      // (which would surface the generic paywall via its own gate).
+      const firstDayId = nextWeek.days[0].id;
+      if (!canAccessWeek(state.subject, nextWeek.id)
+          && !(state.completedDays && state.completedDays[dayKey(nextWeek.id, firstDayId)])) {
+        // Contextual eyebrow reflects the chapter that was just completed
+        // (numeric weeks only — bonus chapters don't fire chapter_complete).
+        const ebrowNum = typeof chapter.id === 'number' ? chapter.id : '';
+        showPaywall({
+          subject: state.subject,
+          weekId:  nextWeek.id,
+          dayId:   firstDayId,
+          source:  'chapter-complete-continue',
+          contextEyebrow: ebrowNum
+            ? (isEn ? 'CHAPTER ' + ebrowNum + ' COMPLETE' : 'פרק ' + ebrowNum + ' הושלם')
+            : null,
+          contextHeadline: isEn ? 'Keep going.' : 'המשיכו הלאה.',
+          contextSub: nextWeek.isBonus
+            ? (isEn
+                ? 'The bonus chapter and every chapter beyond await.'
+                : 'פרק הבונוס וכל הפרקים הבאים — מחכים.')
+            : (isEn
+                ? 'Chapters ' + nextWeek.id + ' onward and every bonus dialogue await.'
+                : 'פרקים ' + nextWeek.id + ' והלאה, וכל דיאלוגי הבונוס — מחכים.'),
+        });
+        return;
+      }
+      openReader(nextWeek.id, firstDayId);
+    };
+  }
 
   const homeBtn = document.getElementById('chapter-back-home-btn');
   homeBtn.textContent = isEn ? 'Back to Home' : 'חזרה לבית';
@@ -17717,13 +17818,45 @@ function renderHome() {
             });
           } catch (e) {}
           if (wkLocked) {
-            _showBonusLockToast();
+            // Under the paid model, wkLocked on a bonus card means either
+            // the sequential-unlock condition (chapter 1 not done) OR the
+            // paywall gate. Distinguish: paywall-locked → show paywall with
+            // bonus-specific framing. Not-yet-unlocked (chapter 1 open) →
+            // fall back to the original toast so the user knows to keep
+            // going through chapter 1.
+            if (!canAccessWeek(state.subject, w.id) && isWeekCompleted(1)) {
+              const isEn = state.lang === 'en';
+              showPaywall({
+                subject: state.subject,
+                weekId:  w.id,
+                dayId:   (w.days && w.days[0] && w.days[0].id) || 1,
+                source:  'bonus-tap',
+                contextHeadline: isEn ? 'Unlock the bonus.' : 'פתחו את הבונוס.',
+                contextSub:      isEn
+                  ? 'Every bonus dialogue plus every future chapter, one subscription.'
+                  : 'כל דיאלוגי הבונוס וכל הפרקים הבאים, במנוי אחד.',
+              });
+            } else {
+              _showBonusLockToast();
+            }
             return;
           }
           toggleLevel(w.id);
         };
       } else if (!wkLocked) {
         card.onclick = () => toggleLevel(w.id);
+      } else if (!canAccessWeek(state.subject, w.id) && !w.comingSoon) {
+        // Non-bonus paywall-locked chapter card (chapter 2+ for a free user).
+        // Previously had no handler at all — tap was silently dead. Route to
+        // the default paywall.
+        card.onclick = () => {
+          showPaywall({
+            subject: state.subject,
+            weekId:  w.id,
+            dayId:   (w.days && w.days[0] && w.days[0].id) || 1,
+            source:  'chapter-lock-tap',
+          });
+        };
       } else if (w.comingSoon) {
         // Coming-soon placeholder — toast feedback so a curious tap isn't silent
         card.onclick = () => {
@@ -18813,14 +18946,53 @@ function getNextLessonInfo() {
 
 function goToNextLesson() {
   const next = getNextLessonInfo();
-  // Pass openReader as a continuation. closeCompleteModal will run any due
-  // prompts (signup / share / streak_milestone) and only invoke this thunk
-  // AFTER the user closes the last prompt in the chain. If nothing is due
-  // the thunk runs immediately and the user goes straight to the next
+  // Pass a continuation into closeCompleteModal. It runs any due prompts
+  // (signup / share / streak_milestone) and only invokes this thunk after
+  // the user closes the last prompt in the chain. If nothing is due the
+  // thunk runs immediately and the user goes straight to the next
   // dialogue with no home flash.
+  //
+  // Gate check: if the next dialogue is in a paywall-locked chapter AND
+  // the user hasn't already completed any day of it (started-clause),
+  // surface the contextual paywall INSTEAD of routing through openReader.
+  // openReader's gate would surface the generic paywall on its own; the
+  // explicit check here lets us pass the chapter-complete-continue
+  // framing so the moment reads as a natural progression rather than a
+  // sale bump.
   closeCompleteModal({
     continuation: () => {
-      if (next.hasNext) openReader(next.weekId, next.dayId);
+      if (!next.hasNext) return;
+      const isEn = state.lang === 'en';
+      const completedNext = state.completedDays && state.completedDays[dayKey(next.weekId, next.dayId)];
+      const nextIsNewChapter = next.weekId !== state.currentWeek;
+      if (nextIsNewChapter && !canAccessWeek(state.subject, next.weekId) && !completedNext) {
+        // The just-completed chapter is state.currentWeek here — that's
+        // still set at the just-finished dialogue's coords until openReader
+        // fires. Use it to build the eyebrow.
+        const justFinished = state.currentWeek;
+        const ebrowNum = typeof justFinished === 'number' ? justFinished : '';
+        const nextChap = getW().find(w => w.id === next.weekId);
+        const isBonusNext = !!(nextChap && nextChap.isBonus);
+        showPaywall({
+          subject: state.subject,
+          weekId:  next.weekId,
+          dayId:   next.dayId,
+          source:  'chapter-complete-continue',
+          contextEyebrow: ebrowNum
+            ? (isEn ? 'CHAPTER ' + ebrowNum + ' COMPLETE' : 'פרק ' + ebrowNum + ' הושלם')
+            : null,
+          contextHeadline: isEn ? 'Keep going.' : 'המשיכו הלאה.',
+          contextSub: isBonusNext
+            ? (isEn
+                ? 'The bonus chapter and every chapter beyond await.'
+                : 'פרק הבונוס וכל הפרקים הבאים — מחכים.')
+            : (isEn
+                ? 'Chapters ' + next.weekId + ' onward and every bonus dialogue await.'
+                : 'פרקים ' + next.weekId + ' והלאה, וכל דיאלוגי הבונוס — מחכים.'),
+        });
+        return;
+      }
+      openReader(next.weekId, next.dayId);
     }
   });
 }
@@ -19177,10 +19349,23 @@ function finishDay() {
       && !(state.chapterCompleteShown && state.chapterCompleteShown[chapterCompleteKey(state.subject, completedWeek.id)]);
   const _chapterNum = _chapterQualifies ? completedWeek.id : null;
 
-  const _hasBonusChapter = getW().some(w => w && w.isBonus);
+  const _bonusChapter = getW().find(w => w && w.isBonus);
+  const _hasBonusChapter = !!_bonusChapter;
   const _bonusShown = (state.bonusUnlockShown || {})[state.subject];
+  // Honesty gate: don't fire the bonus_unlock celebration for users who
+  // can't actually access the bonus. Without this, a paywall-locked user
+  // finishing chapter 1 sees "Bonus Chapter Unlocked!" and then hits the
+  // paywall the moment they tap into it — celebrating giving something
+  // and then charging for it. Suppressing here lets chapter_complete win
+  // the milestone slot naturally (via the else-if chain below), which is
+  // the correct celebration for "you finished chapter 1."
+  //
+  // We deliberately do NOT set bonusUnlockShown on the suppression path,
+  // so if the user later subscribes and unlocks the bonus, a genuine
+  // reveal can still fire (queued as a follow-up — see task list).
+  const _canAccessBonus = _bonusChapter ? canAccessWeek(state.subject, _bonusChapter.id) : false;
   const _bonusUnlockDue = state.currentWeek === 1 && isWeekCompleted(1)
-      && _hasBonusChapter && !_bonusShown;
+      && _hasBonusChapter && !_bonusShown && _canAccessBonus;
   if (_bonusUnlockDue) {
     try { posthog.capture('bonus_unlocked', {
       user_id: currentUser?.id || null, subject: state.subject }); } catch(e) {}
@@ -25351,6 +25536,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <button type="button" class="paywall-close" onclick="closePaywall()" aria-label="Close">×</button>
     </div>
     <div class="paywall-brand">Corpus</div>
+    <div class="paywall-eyebrow" id="paywall-eyebrow"></div>
     <h1 class="paywall-headline" id="paywall-headline"></h1>
     <p class="paywall-sub" id="paywall-sub"></p>
     <div class="paywall-cards">
