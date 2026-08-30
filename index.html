@@ -6466,17 +6466,16 @@
     text-align: center;
   }
   /* Flex header row anchoring the close X to the top-right corner
-     without absolute positioning. padding-top absorbs the notch safe-area
-     so the button sits below status-bar / dynamic-island on notched iOS.
-     Negative side margins pull the button flush to the box edge
-     regardless of the box's horizontal padding. */
+     without absolute positioning. .modal-overlay already applies
+     safe-top padding at the overlay level (line 3970), so no
+     safe-area math here — that would double-count on notched iOS
+     and push the wordmark ~50px down. Negative side margins pull
+     the button flush to the box edge regardless of box padding. */
   .paywall-topbar {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    padding-top: var(--safe-top, 0px);
     margin: 0 -12px 4px;
-    min-height: 34px;
   }
   .paywall-close {
     width: 34px; height: 34px;
@@ -6495,7 +6494,7 @@
     font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: 22px; font-weight: 900;
     color: var(--accent);
-    margin: 8px 0 20px;
+    margin: 0 0 20px;
   }
   .paywall-headline {
     font-family: 'Nunito', 'Assistant', sans-serif;
