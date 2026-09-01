@@ -17073,8 +17073,15 @@ async function maybeRequestReminderPermission() {
   const perm = await _requestNotifPermission();
   state.dailyReminder.permissionAsked = true;
   if (perm === 'granted') {
-    await _cancelReminder();
-    await _scheduleReminderFor(state.dailyReminder.time);
+    // Route through _reconcileReminders — the current scheduler. The
+    // legacy _scheduleReminderFor(time) was deleted when the model
+    // shifted from a single repeating notification to a rolling window
+    // of per-day evenings, but this call site was missed. Calling
+    // _reconcileReminders here matches setReminder's pattern (which
+    // handles the manual "user enables reminders in Profile" path) and
+    // no-ops correctly if r.enabled is false or permission was denied
+    // after all (guarded inside the reconcile function).
+    await _reconcileReminders();
   } else {
     // Permission denied → reflect in state so the Profile toggle shows OFF.
     state.dailyReminder.enabled = false;
