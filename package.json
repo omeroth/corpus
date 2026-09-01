@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "sync-web": "rsync -a --delete --exclude='*.DS_Store' index.html Onboarding_new.html manifest.json CNAME version.json assets images content www/",
     "gen:share": "node scripts/generate-share-cards.mjs",
-    "bump": "node scripts/bump-version.mjs"
+    "bump": "node scripts/bump-version.mjs",
+    "mark-live": "node scripts/mark-live.mjs"
   },
   "repository": {
     "type": "git",
