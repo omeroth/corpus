@@ -62,3 +62,8 @@ _deploy/
 # (see scripts/fonts/README.md). Generated cards + pages are committed so
 # GitHub Pages can serve them without a CI generation step.
 scripts/fonts/*.ttf
+
+# Gemini-generated PNGs get dropped into images/ during design exploration
+# but aren't referenced by the app. Ignore at any depth so drops into
+# images/ or www/images/ don't clutter git status.
+**/Gemini_Generated_Image_*.png
