@@ -5015,7 +5015,6 @@
     background: #000;
     color: var(--on-accent);
     border-color: #000;
-    margin-top: 8px;
   }
   .auth-btn-apple:hover { background: #1a1a1a; border-color: #1a1a1a; }
   .auth-btn-apple .auth-social-icon { color: var(--on-accent); display: inline-flex; align-items: center; }
@@ -6163,6 +6162,30 @@
     -webkit-tap-highlight-color: transparent;
   }
   html.dark .onb-screen.onb-v2 .onb-v2-skip { color: var(--text); }
+
+  /* Step 22 — signup actions. The .onb-cta-holder base rule takes care
+     of margin-top:auto (push to bottom) and max-width; this rule stacks
+     the three provider buttons + skip with consistent vertical spacing.
+     Uses gap so the individual .auth-btn spacing is uniform regardless
+     of whether .auth-btn-apple has its own margin-top (removed at 5014).
+     Error slot sits at the top of the stack, collapsed when empty so
+     it doesn't leave a visible gap. */
+  .onb-screen.onb-v2 .onb-v2-signup-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .onb-screen.onb-v2 .onb-v2-signup-error {
+    color: #C0392B;
+    font-size: calc(14px * var(--text-scale));
+    font-weight: 600;
+    text-align: center;
+    min-height: 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-signup-error:empty {
+    display: none;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-signup-error { color: #FF8574; }
 
   /* Step 18 — journey. Top card projects the 30-day future; two
      feature blocks below explain how. Accent-bordered card carries
@@ -9249,11 +9272,14 @@
       <button class="auth-mode-btn active" id="auth-signin-tab" onclick="setAuthMode('signin')">Sign In</button>
       <button class="auth-mode-btn" id="auth-signup-tab" onclick="setAuthMode('signup')">Sign Up</button>
     </div>
-    <button class="auth-btn auth-btn-social" onclick="authWithGoogle()">
-      <span class="auth-social-icon">G</span> <span id="auth-google-text">Continue with Google</span>
-    </button>
-    <button class="auth-btn auth-btn-social auth-btn-apple" onclick="authWithApple()">
+    <!-- Apple ordered above Google to satisfy App Store guideline 4.8:
+         Sign in with Apple must be offered as prominently as any other
+         social sign-in option when both are present. -->
+    <button class="auth-btn auth-btn-social auth-btn-apple" id="auth-apple-btn" onclick="authWithApple()">
       <span class="auth-social-icon"><svg width="14" height="17" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg></span> <span id="auth-apple-text">Continue with Apple</span>
+    </button>
+    <button class="auth-btn auth-btn-social" id="auth-google-btn" onclick="authWithGoogle()">
+      <span class="auth-social-icon">G</span> <span id="auth-google-text">Continue with Google</span>
     </button>
     <div class="auth-divider"><span>or</span></div>
     <div class="auth-error" id="auth-error"></div>
@@ -9868,11 +9894,15 @@
          hidden for all other triggers (existing behavior preserved). -->
     <div class="guest-signup-stats" id="guest-signup-stats" style="display:none"></div>
     <div class="modal-subtitle" id="guest-signup-body">Nice start. Create a free account so your progress is always here.</div>
-    <button class="nav-btn auth-btn-social" id="guest-signup-google-btn" onclick="_guestSignupTap('google')" style="margin-top:16px;">
-      <span class="auth-social-icon">G</span> <span id="guest-signup-google-text">Continue with Google</span>
-    </button>
-    <button class="nav-btn auth-btn-social auth-btn-apple" id="guest-signup-apple-btn" onclick="_guestSignupTap('apple')" style="margin-top:8px;">
+    <!-- Apple ordered above Google to satisfy App Store guideline 4.8:
+         Sign in with Apple must be as prominent as other social sign-ins
+         on the same surface. Margins swap with the order (16px pull from
+         copy on the first button, 8px between the paired social CTAs). -->
+    <button class="nav-btn auth-btn-social auth-btn-apple" id="guest-signup-apple-btn" onclick="_guestSignupTap('apple')" style="margin-top:16px;">
       <span class="auth-social-icon"><svg width="14" height="17" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg></span> <span id="guest-signup-apple-text">Continue with Apple</span>
+    </button>
+    <button class="nav-btn auth-btn-social" id="guest-signup-google-btn" onclick="_guestSignupTap('google')" style="margin-top:8px;">
+      <span class="auth-social-icon">G</span> <span id="guest-signup-google-text">Continue with Google</span>
     </button>
     <button class="nav-btn" id="guest-signup-email-btn" onclick="_guestSignupTap('email')" style="margin-top:10px;">Sign up with email</button>
     <button type="button" class="share-modal-skip" id="guest-signup-skip" onclick="_guestSignupTap('skip')">Maybe later</button>
@@ -11481,39 +11511,60 @@ async function handleAuthSubmit() {
   }
 }
 
-async function authWithGoogle() {
-  const btn = document.querySelector('.auth-btn-social');
+// Shared OAuth flow used by both the auth-screen buttons (authWithGoogle /
+// authWithApple) and the inline provider buttons on onboarding step 22.
+// Handles the full sequence: disable button, swap text to "Signing in…",
+// hint at 4s, call the provider (native SocialLogin plugin or web OAuth),
+// exchange the idToken with Supabase, and route to home via enterApp.
+// All error paths surface via ctx.errorEl and restore ctx.textEl to
+// ctx.defaultLabel so the caller can retry from the same button.
+//
+// ctx = {
+//   btn:            HTMLElement — button to disable during the flow
+//   textEl:         HTMLElement — inner text span to swap for status
+//   errorEl:        HTMLElement — where to surface failure messages
+//   defaultLabel:   string — restore text on failure
+//   onBeforeEnter?: () => void — optional hook fired after successful
+//                   Supabase exchange, before enterApp. Onboarding step
+//                   22 uses this to mark corpus_onboarding_done and hide
+//                   the onboarding overlay before home renders.
+// }
+async function _authProviderStart(provider, ctx) {
+  const { btn, textEl, errorEl, defaultLabel, onBeforeEnter } = ctx;
   const isEn = state.lang === 'en';
-  const gTxt = document.getElementById('auth-google-text');
-  // Update the inner text span, not the button itself, so the "G" icon
-  // survives the transient state.
-  if (btn) { btn.disabled = true; if (gTxt) gTxt.textContent = isEn ? 'Signing in...' : 'מתחבר...'; }
-  const errEl0 = document.getElementById('auth-error');
-  if (errEl0) errEl0.textContent = '';
+  if (btn) btn.disabled = true;
+  if (textEl) textEl.textContent = isEn ? 'Signing in...' : 'מתחבר...';
+  if (errorEl) errorEl.textContent = '';
+  // Declare "auth surface active" so enterApp's UI-tail guard doesn't
+  // treat this as a mid-navigation session-recovery race and refuse to
+  // route to home. When called from onboarding step 22, state.current
+  // Screen may still be stale as 'reader' (from the step-15 first
+  // dialogue), which would otherwise trigger reader_ejection_blocked
+  // and drop the user on step 22 with no way home.
+  if (state) state.currentScreen = 'auth';
   const _isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   _authInProgress = true;
   // Funnel: fire onboarding_auth_choice at CLICK time. OAuth uses a single
   // "Continue with…" button regardless of new/returning, so intent defaults
   // to 'signin'; user_signed_up (fired in enterApp) still counts the
   // signup-vs-signin split for successful OAuth flows.
-  _phCapture('onboarding_auth_choice', { choice: 'signin', method: 'google' });
-  // Progress hint at 4s.
+  _phCapture('onboarding_auth_choice', { choice: 'signin', method: provider });
   const hintTimer = setTimeout(() => {
-    if (btn && btn.disabled && gTxt) gTxt.textContent = isEn ? 'Still working…' : 'עדיין עובד…';
+    if (btn && btn.disabled && textEl) textEl.textContent = isEn ? 'Still working…' : 'עדיין עובד…';
   }, 4000);
   const restoreBtn = () => {
-    if (!btn) return;
-    btn.disabled = false;
-    if (gTxt) gTxt.textContent = isEn ? 'Continue with Google' : 'המשך עם Google';
-    else btn.innerHTML = '<span class="auth-social-icon">G</span> <span id="auth-google-text">' + (isEn ? 'Continue with Google' : 'המשך עם Google') + '</span>';
+    if (btn) btn.disabled = false;
+    if (textEl) textEl.textContent = defaultLabel;
   };
   const hangMsg = isEn ? 'Sign in didn’t complete. Please try again.' : 'ההתחברות לא הושלמה. נסו שוב.';
+  const genericFailMsg = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
+  const showErr = (msg) => { if (errorEl) errorEl.textContent = msg; };
   const capFail = (phase, err) => {
     const info = _extractAuthError(err);
-    _phCapture('auth_failure', { method: 'google', intent: 'signin', phase, error_code: info.code, error_message: info.message });
+    _phCapture('auth_failure', { method: provider, intent: 'signin', phase, error_code: info.code, error_message: info.message });
   };
   const capHang = (phase) => {
-    _phCapture('auth_hang', { method: 'google', intent: 'signin', phase, budget_ms: 10000 });
+    _phCapture('auth_hang', { method: provider, intent: 'signin', phase, budget_ms: 10000 });
   };
   try {
     if (_isNative) {
@@ -11523,185 +11574,104 @@ async function authWithGoogle() {
       // resolves immediately. Guarded so the auth flow can't run before
       // the plugin is registered.
       try { if (_socialLoginReady) await _socialLoginReady; } catch(e) {}
-      // Native iOS: native Google Sign-In via Capgo, then hand the idToken to Supabase.
-      // Log out of the plugin's cached Google session first so the account
-      // picker always appears (otherwise iOS silently reuses the last account).
-      try { await window.Capacitor.Plugins.SocialLogin.logout({ provider: 'google' }); } catch(e) {}
-      // Android: the Capgo plugin throws if `options.scopes` is passed without a
-      // matching MainActivity modification. The default scopes (email + profile)
-      // come from the Web Client ID config, which is all we need. iOS still
-      // accepts scopes, so pass them there for parity with the existing behavior.
-      const loginArgs = { provider: 'google' };
-      if (window.Capacitor.getPlatform() === 'ios') {
+      if (provider === 'google') {
+        // Log out of the plugin's cached Google session first so the
+        // account picker always appears (otherwise iOS silently reuses
+        // the last account).
+        try { await window.Capacitor.Plugins.SocialLogin.logout({ provider: 'google' }); } catch(e) {}
+      }
+      // Android: the Capgo plugin throws if `options.scopes` is passed for
+      // Google without a matching MainActivity modification. The default
+      // scopes (email + profile) come from the Web Client ID config,
+      // which is all we need there. iOS still accepts scopes, so pass
+      // them there for parity. Apple accepts scopes on both platforms.
+      const loginArgs = { provider };
+      if (provider === 'apple') {
+        loginArgs.options = { scopes: ['name', 'email'] };
+      } else if (window.Capacitor.getPlatform() === 'ios') {
         loginArgs.options = { scopes: ['email', 'profile'] };
       }
       let loginRes;
       try {
         loginRes = await _authRace(window.Capacitor.Plugins.SocialLogin.login(loginArgs), 10000);
       } catch(e) {
-        if (e === _AUTH_HANG_SENTINEL) { capHang('provider_call'); const errEl = document.getElementById('auth-error'); if (errEl) errEl.textContent = hangMsg; restoreBtn(); return; }
-        capFail('provider_call', e);
-        const errEl = document.getElementById('auth-error');
-        if (errEl) errEl.textContent = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
-        restoreBtn();
-        return;
+        if (e === _AUTH_HANG_SENTINEL) { capHang('provider_call'); showErr(hangMsg); restoreBtn(); return; }
+        capFail('provider_call', e); showErr(genericFailMsg); restoreBtn(); return;
       }
       const idToken = loginRes && loginRes.result && loginRes.result.idToken;
       if (!idToken) {
-        capFail('provider_call', new Error('No idToken from Google'));
-        const errEl = document.getElementById('auth-error');
-        if (errEl) errEl.textContent = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
-        restoreBtn();
-        return;
+        capFail('provider_call', new Error('No idToken from ' + provider));
+        showErr(genericFailMsg); restoreBtn(); return;
       }
       let exchange;
       try {
-        exchange = await _authRace(sb.auth.signInWithIdToken({ provider: 'google', token: idToken }), 10000);
+        exchange = await _authRace(sb.auth.signInWithIdToken({ provider, token: idToken }), 10000);
       } catch(e) {
-        if (e === _AUTH_HANG_SENTINEL) { capHang('supabase_exchange'); const errEl = document.getElementById('auth-error'); if (errEl) errEl.textContent = hangMsg; restoreBtn(); return; }
-        capFail('supabase_exchange', e);
-        const errEl = document.getElementById('auth-error');
-        if (errEl) errEl.textContent = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
-        restoreBtn();
-        return;
+        if (e === _AUTH_HANG_SENTINEL) { capHang('supabase_exchange'); showErr(hangMsg); restoreBtn(); return; }
+        capFail('supabase_exchange', e); showErr(genericFailMsg); restoreBtn(); return;
       }
       const { data, error } = exchange;
-      if (error) {
-        capFail('supabase_exchange', error);
-        const errEl = document.getElementById('auth-error');
-        if (errEl) errEl.textContent = error.message || (isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.');
-        restoreBtn();
-        return;
-      }
+      if (error) { capFail('supabase_exchange', error); showErr(error.message || genericFailMsg); restoreBtn(); return; }
+      // Onboarding hook — mark done + hide overlays BEFORE enterApp
+      // renders home, so home isn't briefly obscured by the onboarding
+      // screen's z-index:1100 fixed overlay.
+      if (typeof onBeforeEnter === 'function') { try { onBeforeEnter(); } catch(e) {} }
       // Route through enterApp the same way handleAuthSubmit does after
-      // signInWithPassword — no full-page reload. The reload existed as a
-      // workaround from before the Capacitor Preferences storage adapter,
-      // when the in-place render "raced on device" because there was no
-      // reliable session persistence to fall back on. The adapter now
-      // persists the session before subscribers fire, so this path can
-      // just navigate the UI in place. Clearing appStarted lets enterApp
-      // run cleanly to completion here even if the SIGNED_IN subscriber's
-      // own enterApp call was still mid-await when the promise resolved.
+      // signInWithPassword — no full-page reload. Session is already
+      // persisted to Preferences before subscribers fire, so this path
+      // can just navigate the UI in place. Clearing appStarted lets
+      // enterApp run cleanly to completion here even if the SIGNED_IN
+      // subscriber's own enterApp call was still mid-await when the
+      // promise resolved.
       appStarted = false;
       await enterApp((data && data.session && data.session.user) || (data && data.user) || null);
     } else {
       // Web: existing OAuth redirect. If the call itself hangs before
       // triggering navigation, the timeout below fires and we recover;
       // once navigation starts, the page tears down and the timer is
-      // irrelevant.
+      // irrelevant. Redirect targets differ per provider — Google goes
+      // to the pages mirror, Apple to the apex domain, matching what
+      // each provider was configured with in Supabase.
+      const redirectTo = provider === 'apple' ? 'https://corpusapp.io/' : 'https://omeroth.github.io/corpus-app/';
       let webRes;
       try {
-        webRes = await _authRace(sb.auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo: 'https://omeroth.github.io/corpus-app/' }
-        }), 10000);
+        webRes = await _authRace(sb.auth.signInWithOAuth({ provider, options: { redirectTo } }), 10000);
       } catch(e) {
-        if (e === _AUTH_HANG_SENTINEL) { capHang('provider_call'); const errEl = document.getElementById('auth-error'); if (errEl) errEl.textContent = hangMsg; restoreBtn(); return; }
-        capFail('provider_call', e);
-        const errEl = document.getElementById('auth-error');
-        if (errEl) errEl.textContent = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
-        restoreBtn();
-        return;
+        if (e === _AUTH_HANG_SENTINEL) { capHang('provider_call'); showErr(hangMsg); restoreBtn(); return; }
+        capFail('provider_call', e); showErr(genericFailMsg); restoreBtn(); return;
       }
-      if (webRes && webRes.error) {
-        capFail('provider_call', webRes.error);
-        const errEl = document.getElementById('auth-error');
-        if (errEl) errEl.textContent = webRes.error.message || (isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.');
-        restoreBtn();
-        return;
-      }
+      if (webRes && webRes.error) { capFail('provider_call', webRes.error); showErr(webRes.error.message || genericFailMsg); restoreBtn(); return; }
     }
   } catch(e) {
     // Belt-and-suspenders — the per-phase catches should cover everything,
     // but any unexpected throw still lands here for capture rather than
     // silently pinning the button.
-    console.error('[Auth] Google sign-in unexpected error:', e);
-    capFail('unknown', e);
-    const errEl = document.getElementById('auth-error');
-    if (errEl) errEl.textContent = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
-    restoreBtn();
+    console.error('[Auth] ' + provider + ' sign-in unexpected error:', e);
+    capFail('unknown', e); showErr(genericFailMsg); restoreBtn();
   } finally {
     clearTimeout(hintTimer);
     _authInProgress = false;
   }
 }
 
-async function authWithApple() {
-  const btn = document.querySelector('.auth-btn-apple');
+async function authWithGoogle() {
   const isEn = state.lang === 'en';
-  const aTxt = document.getElementById('auth-apple-text');
-  if (btn) { btn.disabled = true; if (aTxt) aTxt.textContent = isEn ? 'Signing in...' : 'מתחבר...'; }
-  const errEl = document.getElementById('auth-error'); if (errEl) errEl.textContent = '';
-  const _isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
-  _authInProgress = true;
-  _phCapture('onboarding_auth_choice', { choice: 'signin', method: 'apple' });
-  const hintTimer = setTimeout(() => {
-    if (btn && btn.disabled && aTxt) aTxt.textContent = isEn ? 'Still working…' : 'עדיין עובד…';
-  }, 4000);
-  const restoreBtn = () => {
-    if (!btn) return;
-    btn.disabled = false;
-    if (aTxt) aTxt.textContent = isEn ? 'Continue with Apple' : 'המשך עם Apple';
-    else btn.innerHTML = '<span class="auth-social-icon"></span> <span id="auth-apple-text">' + (isEn ? 'Continue with Apple' : 'המשך עם Apple') + '</span>';
-  };
-  const hangMsg = isEn ? 'Sign in didn’t complete. Please try again.' : 'ההתחברות לא הושלמה. נסו שוב.';
-  const genericFailMsg = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
-  const capFail = (phase, err) => {
-    const info = _extractAuthError(err);
-    _phCapture('auth_failure', { method: 'apple', intent: 'signin', phase, error_code: info.code, error_message: info.message });
-  };
-  const capHang = (phase) => {
-    _phCapture('auth_hang', { method: 'apple', intent: 'signin', phase, budget_ms: 10000 });
-  };
-  try {
-    if (_isNative) {
-      // Same defer guard as authWithGoogle. See that function's
-      // comment for the rationale.
-      try { if (_socialLoginReady) await _socialLoginReady; } catch(e) {}
-      let loginRes;
-      try {
-        loginRes = await _authRace(window.Capacitor.Plugins.SocialLogin.login({ provider: 'apple', options: { scopes: ['name', 'email'] } }), 10000);
-      } catch(e) {
-        if (e === _AUTH_HANG_SENTINEL) { capHang('provider_call'); if (errEl) errEl.textContent = hangMsg; restoreBtn(); return; }
-        capFail('provider_call', e); if (errEl) errEl.textContent = genericFailMsg; restoreBtn(); return;
-      }
-      const idToken = loginRes && loginRes.result && loginRes.result.idToken;
-      if (!idToken) { capFail('provider_call', new Error('No idToken from Apple')); if (errEl) errEl.textContent = genericFailMsg; restoreBtn(); return; }
-      let exchange;
-      try {
-        exchange = await _authRace(sb.auth.signInWithIdToken({ provider: 'apple', token: idToken }), 10000);
-      } catch(e) {
-        if (e === _AUTH_HANG_SENTINEL) { capHang('supabase_exchange'); if (errEl) errEl.textContent = hangMsg; restoreBtn(); return; }
-        capFail('supabase_exchange', e); if (errEl) errEl.textContent = genericFailMsg; restoreBtn(); return;
-      }
-      const { data, error } = exchange;
-      if (error) { capFail('supabase_exchange', error); if (errEl) errEl.textContent = error.message || genericFailMsg; restoreBtn(); return; }
-      // Route through enterApp the same way Google now does — see the
-      // matching block in authWithGoogle for the full rationale. Session
-      // is already persisted to Preferences before subscribers fire, and
-      // enterApp's Supabase awaits are timeboxed, so the in-place
-      // transition is safe without the full-page reload.
-      appStarted = false;
-      await enterApp((data && data.session && data.session.user) || (data && data.user) || null);
-    } else {
-      let webRes;
-      try {
-        webRes = await _authRace(sb.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: 'https://corpusapp.io/' } }), 10000);
-      } catch(e) {
-        if (e === _AUTH_HANG_SENTINEL) { capHang('provider_call'); if (errEl) errEl.textContent = hangMsg; restoreBtn(); return; }
-        capFail('provider_call', e); if (errEl) errEl.textContent = genericFailMsg; restoreBtn(); return;
-      }
-      if (webRes && webRes.error) { capFail('provider_call', webRes.error); if (errEl) errEl.textContent = webRes.error.message || genericFailMsg; restoreBtn(); return; }
-    }
-  } catch(e) {
-    console.error('[Auth] Apple sign-in unexpected error:', e);
-    capFail('unknown', e);
-    if (errEl) errEl.textContent = genericFailMsg;
-    restoreBtn();
-  } finally {
-    clearTimeout(hintTimer);
-    _authInProgress = false;
-  }
+  return _authProviderStart('google', {
+    btn: document.getElementById('auth-google-btn'),
+    textEl: document.getElementById('auth-google-text'),
+    errorEl: document.getElementById('auth-error'),
+    defaultLabel: isEn ? 'Continue with Google' : 'המשך עם Google',
+  });
+}
+
+async function authWithApple() {
+  const isEn = state.lang === 'en';
+  return _authProviderStart('apple', {
+    btn: document.getElementById('auth-apple-btn'),
+    textEl: document.getElementById('auth-apple-text'),
+    errorEl: document.getElementById('auth-error'),
+    defaultLabel: isEn ? 'Continue with Apple' : 'המשך עם Apple',
+  });
 }
 
 let _introCarouselInited = false;
@@ -12298,14 +12268,18 @@ const _ONB_COPY = {
   // deliberately does NOT mention subscription; the paywall wasn't
   // shipped when this landed, and promising a paid tier that isn't
   // live yet is premature. Add the "you'll need an account to
-  // subscribe" line when the paywall goes live.
+  // subscribe" line when the paywall goes live. Provider order (Apple
+  // first) matches the auth screen and is enforced for App Store
+  // guideline 4.8 compliance.
   signup: {
-    head: { en: 'Save your progress',
-            he: 'שמרו את ההתקדמות שלכם' },
-    sub:  { en: 'Create an account to keep your XP, streak, and unlocked thinkers safe across devices.',
-            he: 'צרו חשבון כדי לשמור על ה-XP, הרצף וההוגים שלכם בין מכשירים.' },
-    cta:  { en: 'Create account', he: 'צרו חשבון' },
-    skip: { en: 'Not now',        he: 'לא עכשיו' },
+    head:   { en: 'Save your progress',
+              he: 'שמרו את ההתקדמות שלכם' },
+    sub:    { en: 'Create an account to keep your XP, streak, and unlocked thinkers safe across devices.',
+              he: 'צרו חשבון כדי לשמור על ה-XP, הרצף וההוגים שלכם בין מכשירים.' },
+    apple:  { en: 'Continue with Apple',  he: 'המשך עם Apple' },
+    google: { en: 'Continue with Google', he: 'המשך עם Google' },
+    email:  { en: 'Continue with email',  he: 'המשך עם אימייל' },
+    skip:   { en: 'Not now',              he: 'לא עכשיו' },
   },
 };
 
@@ -12378,7 +12352,9 @@ function _onbApplyLang(lang) {
   setText('onb-v2-commit-cta',    'commit',   'cta');
   setText('onb-v2-signup-head',   'signup',   'head');
   setText('onb-v2-signup-sub',    'signup',   'sub');
-  setText('onb-v2-signup-cta',    'signup',   'cta');
+  setText('onb-signup-apple-text',  'signup', 'apple');
+  setText('onb-signup-google-text', 'signup', 'google');
+  setText('onb-signup-email-text',  'signup', 'email');
   setText('onb-v2-signup-skip',   'signup',   'skip');
   // Text/number input placeholders (slider has none).
   const setPlaceholder = (id, group) => {
@@ -12820,40 +12796,73 @@ function _onbV2CtaCommit() {
   _onbAdvanceStep(21, 22);
 }
 
-// Step 22 — signup offer. Two CTAs; either exits the flow.
+// Step 22 — signup offer. Four CTAs: three inline providers (Apple,
+// Google, Email) and a "Not now" skip.
 //
-// Create-account path marks corpus_onboarding_done BEFORE opening the
-// auth screen so a mid-auth force-quit doesn't strand the user in a
-// "half-onboarded" state (they'd re-enter onboarding on next launch,
-// which would be the wrong signal — they made it through the flow;
-// the auth choice is optional). Auth-success routes through enterApp
-// → home via existing paths; auth-cancel / failure lands them on home
-// via renderHome + showScreen('home') here as the fallback.
-function _onbV2CtaSignupCreate() {
-  try {
-    _phCapture('onboarding_signup_prompt_action', { action: 'signup' });
-  } catch(e) {}
-  // Mark done + clear session state, but do NOT call _onbComplete (it
-  // renders home + walkthrough, which we don't want overlaying the
-  // auth screen). Inline the essentials from _onbComplete.
+// Inline provider taps run OAuth from step 22 (buttons/text/error slot
+// all on the step 22 DOM). On successful Supabase exchange, the
+// _authProviderStart helper fires our _onbSignupMarkDoneAndHide hook
+// before enterApp → home; that hook marks corpus_onboarding_done, clears
+// the step cursor, fires onboarding_completed, and hides all onb-v2
+// screens so home isn't obscured by their z-index:1100 overlay. On
+// OAuth failure, the step 22 error slot surfaces the message and the
+// button re-enables so the user can retry or tap Not now.
+//
+// Done-flag is NOT set until success — a mid-OAuth force-quit leaves
+// the user on step 22 next launch (via corpus_onboarding_step === '22').
+// This is safer than pre-marking done, which would leave a half-authed
+// user with no onboarding to return to and no error context.
+function _onbSignupMarkDoneAndHide() {
   const today = _streakDay();
   state.onbAnswers = state.onbAnswers || {};
   state.onbAnswers.completedAt = today;
   try { saveState(); } catch(e) {}
   try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
   try { localStorage.removeItem('corpus_onboarding_step'); } catch(e) {}
+  // Belt-and-braces: same as _onbComplete — force the first-dialogue
+  // guard off so finishDay's onboarding tail can't fire again.
   try { state._onbInFirstDialogue = false; saveStateLocal(); } catch(e) {}
   try { _phCapture('onboarding_completed', { platform: _phPlatform(), lang: state.lang || 'he', via: 'signup_screen' }); } catch(e) {}
   document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
     s.style.display = 'none';
     s.classList.remove('onb-active');
   });
-  // Show the auth screen. Existing auth-success path (enterApp) takes
-  // the user home; enterApp is idempotent under the appStarted guard,
-  // so a returning-guest → signed-in transition Just Works.
-  try { showAuthScreen(); } catch(e) {
-    // Auth screen unavailable for any reason → fall through to home,
-    // same as skip. Never trap the user.
+}
+
+async function _onbSignupApple() {
+  try { _phCapture('onboarding_signup_prompt_action', { action: 'apple' }); } catch(e) {}
+  const isEn = state.lang === 'en';
+  return _authProviderStart('apple', {
+    btn: document.getElementById('onb-signup-apple-btn'),
+    textEl: document.getElementById('onb-signup-apple-text'),
+    errorEl: document.getElementById('onb-v2-signup-error'),
+    defaultLabel: isEn ? 'Continue with Apple' : 'המשך עם Apple',
+    onBeforeEnter: _onbSignupMarkDoneAndHide,
+  });
+}
+
+async function _onbSignupGoogle() {
+  try { _phCapture('onboarding_signup_prompt_action', { action: 'google' }); } catch(e) {}
+  const isEn = state.lang === 'en';
+  return _authProviderStart('google', {
+    btn: document.getElementById('onb-signup-google-btn'),
+    textEl: document.getElementById('onb-signup-google-text'),
+    errorEl: document.getElementById('onb-v2-signup-error'),
+    defaultLabel: isEn ? 'Continue with Google' : 'המשך עם Google',
+    onBeforeEnter: _onbSignupMarkDoneAndHide,
+  });
+}
+
+// Email path: no inline OAuth to run, so mark done + hide + open the
+// auth screen in signup mode. Same fallback as the old create-account
+// path if the auth screen fails to show — never trap the user.
+function _onbSignupEmail() {
+  try { _phCapture('onboarding_signup_prompt_action', { action: 'email' }); } catch(e) {}
+  _onbSignupMarkDoneAndHide();
+  try {
+    setAuthMode('signup');
+    showAuthScreen();
+  } catch(e) {
     renderHome();
     showScreen('home');
     try { _walkthroughStartIfEligible({ bypassCompletionGate: true }); } catch(_e) {}
@@ -25753,9 +25762,12 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 22 — signup offer. Optional beat before _onbComplete. Skippable
-     via secondary "Not now" link that runs _onbComplete directly. Create-
-     account path marks onboarding done then opens the auth screen. -->
+<!-- Step 22 — signup offer. Four CTAs: three inline provider buttons
+     (Apple/Google/Email) driven from _onbSignupApple/_onbSignupGoogle/
+     _onbSignupEmail, plus a "Not now" skip. Apple is first to satisfy
+     App Store guideline 4.8 (Sign in with Apple must be at least as
+     prominent as other social sign-ins on the same surface). Reuses
+     .auth-btn styling so provider buttons match the auth screen. -->
 <div id="onb-v2-signup" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="6">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
@@ -25766,8 +25778,17 @@ document.addEventListener('DOMContentLoaded', function() {
       <p class="onb-v2-sub" id="onb-v2-signup-sub"></p>
     </div>
   </div>
-  <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-v2-signup-cta" onclick="_onbV2CtaSignupCreate()"></button>
+  <div class="onb-cta-holder onb-v2-signup-actions">
+    <div class="onb-v2-signup-error" id="onb-v2-signup-error"></div>
+    <button type="button" class="auth-btn auth-btn-social auth-btn-apple" id="onb-signup-apple-btn" onclick="_onbSignupApple()">
+      <span class="auth-social-icon"><svg width="14" height="17" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg></span> <span id="onb-signup-apple-text"></span>
+    </button>
+    <button type="button" class="auth-btn auth-btn-social" id="onb-signup-google-btn" onclick="_onbSignupGoogle()">
+      <span class="auth-social-icon">G</span> <span id="onb-signup-google-text"></span>
+    </button>
+    <button type="button" class="auth-btn auth-btn-social" id="onb-signup-email-btn" onclick="_onbSignupEmail()">
+      <span id="onb-signup-email-text"></span>
+    </button>
     <button type="button" class="onb-v2-skip" id="onb-v2-signup-skip" onclick="_onbV2CtaSignupSkip()"></button>
   </div>
 </div>
