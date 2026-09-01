@@ -42,6 +42,36 @@
   });
   posthog.capture('$pageview');
   console.log("PostHog ready");
+
+  // Unhandled promise rejection reporter. Attached in <head> so it's in
+  // place before the main script's ~15k lines and any async work runs.
+  // Motivation: a ReferenceError inside a fire-and-forget async call
+  // (maybeRequestReminderPermission → deleted _scheduleReminderFor)
+  // hid for 38 days across every release from 1.0.9 forward because
+  // the rejection surfaced only in the console and nobody was watching.
+  // See commit a9d32f1 for the incident. This reporter forwards every
+  // unhandled rejection to PostHog so the next one surfaces within a
+  // day of shipping rather than only when a developer happens to open
+  // DevTools.
+  //
+  // Per-session cap: 20 events. A rejection inside a retry loop would
+  // otherwise flood PostHog and burn ingest quota. Once tripped, the
+  // handler silently drops further events for the session — the first
+  // 20 are more than enough to identify a bug; the 21st is just cost.
+  let _unhandledRejectCount = 0;
+  window.addEventListener('unhandledrejection', (ev) => {
+    if (_unhandledRejectCount >= 20) return;
+    _unhandledRejectCount++;
+    try {
+      const reason = ev.reason;
+      const message = (reason && (reason.message || String(reason))) || 'unknown';
+      const stack = reason && reason.stack ? String(reason.stack).slice(0, 2000) : null;
+      posthog.capture('unhandled_promise_rejection', {
+        error_message: String(message).slice(0, 500),
+        error_stack:   stack,
+      });
+    } catch (e) { /* never let the reporter itself throw — would recurse */ }
+  });
 </script>
 <style>
   /* ─── HTML splash bridge ─────────────────────────────────────
@@ -11208,10 +11238,12 @@ async function startPurchase() {
         is_trial: PAYWALL_TRIAL_ENABLED,
       }); } catch(e) {}
       // Nudge loadSubscription to catch the webhook write. If it hasn't
-      // landed yet, optimistic keeps access alive until it does.
-      try { loadSubscription(); } catch(e) {}
-      setTimeout(() => { try { loadSubscription(); } catch(e) {} }, 3000);
-      setTimeout(() => { try { loadSubscription(); } catch(e) {} }, 10000);
+      // landed yet, optimistic keeps access alive until it does. Explicit
+      // .catch() rather than try/catch — try/catch around an un-awaited
+      // async call cannot catch its rejection.
+      loadSubscription().catch(e => console.error('[Sub] loadSubscription failed:', e));
+      setTimeout(() => loadSubscription().catch(e => console.error('[Sub] loadSubscription @3s failed:', e)), 3000);
+      setTimeout(() => loadSubscription().catch(e => console.error('[Sub] loadSubscription @10s failed:', e)), 10000);
 
       const returnTo = _paywallReturnTo;
       closePaywall();
@@ -11269,7 +11301,8 @@ async function restorePurchases() {
       state.subscriptionOptimistic = { until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() };
       state.isPaid = true;
       saveStateLocal();
-      try { loadSubscription(); } catch(e) {}
+      // Explicit .catch() — try/catch would not catch the async rejection.
+      loadSubscription().catch(e => console.error('[Sub] loadSubscription (restore) failed:', e));
       try { posthog.capture('paywall_restore_result', { found: true }); } catch(e) {}
       const returnTo = _paywallReturnTo;
       closePaywall();
@@ -19617,8 +19650,10 @@ function finishDay() {
   // Reconcile the rolling reminder window now that today is complete — this
   // cancels today's evening notif if the fire time hasn't passed yet, and
   // ensures the window's tail is topped up. Fire-and-forget on native; a
-  // no-op on web.
-  try { _reconcileReminders(); } catch(e) {}
+  // no-op on web. Explicit .catch() rather than the try/catch idiom that
+  // used to live here — try/catch around an un-awaited async call cannot
+  // catch its rejection.
+  _reconcileReminders().catch(e => console.error('[Reminder] reconcile failed:', e));
 
   try {
     posthog.capture('day_completed', { chapter: state.currentWeek, day: state.currentDay });
@@ -24502,8 +24537,12 @@ function initUI() {
           const _deferWasExpired = _wasExpiredEntry;
           setTimeout(async () => {
             if (_deferWasExpired) {
-              try { loadProgressFromSupabase(); } catch(e) {}
-              try { syncProgressToSupabase(); } catch(e) {}
+              // Explicit .catch() rather than try/catch — try/catch around
+              // an un-awaited async call cannot catch its rejection. Matched
+              // pair: load then push. Errors here are non-fatal; enterApp
+              // below carries the session forward regardless.
+              loadProgressFromSupabase().catch(e => console.error('[Sync] post-recovery loadProgressFromSupabase failed:', e));
+              syncProgressToSupabase().catch(e => console.error('[Sync] post-recovery syncProgressToSupabase failed:', e));
             }
             await enterApp(_deferSess);
             rescheduleReminderFromToday();
