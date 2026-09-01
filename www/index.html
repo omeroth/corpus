@@ -10032,6 +10032,29 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const RC_IOS_API_KEY     = 'appl_ALVuRtIPTDlncRpGeAJfgwLLlaY';
 const RC_ANDROID_API_KEY = '';
 
+// Master paywall kill-switch. FALSE ships the release with subscriptions
+// dark — no gate ever locks content, no paywall modal ever appears —
+// while keeping every line of paywall code in place. Two neutralization
+// points enforce it:
+//
+//   1. canAccessWeek() short-circuits to true, which single-handedly
+//      neutralizes all five showPaywall() call sites (each lives inside
+//      a !canAccessWeek(...) guard) plus the practice-card empty state
+//      and the bonus-access computation.
+//   2. showPaywall() early-returns as a no-op. Belt-and-braces against
+//      any future direct call, DevTools invocation, or refactor that
+//      routes around (1).
+//
+// Onboarding step 22 (auth), RC SDK configure, loadSubscription, and
+// the guest-signup modal are ALL untouched — none surface the paywall,
+// they just prepare state for the day it flips on.
+//
+// Flip to true when: (a) RC products are approved on both stores, (b)
+// pricing has been sanity-checked in production Storefronts, and (c)
+// grandfathering INSERT has run against prod (see the migration at
+// supabase/migrations/20260901170000_grandfathering.sql).
+const PAYWALL_ENABLED = false;
+
 // Paywall trial gate. FALSE until App Store approves the introductory
 // offer on both products; the buttons charge immediately today, so
 // promising "7 days free" would be false advertising. Flip to true in
@@ -11026,6 +11049,12 @@ function _paywallPrices() {
 // lesson-tap entry stays untouched.
 let _paywallContext = null;
 function showPaywall(opts) {
+  // Master kill-switch — no-op when the paywall is disabled for this
+  // release. canAccessWeek short-circuits above every call site so this
+  // shouldn't be reachable, but defence in depth: any direct call, any
+  // DevTools invocation, any future refactor that routes around the
+  // gate — silent no-op. See PAYWALL_ENABLED for the full rationale.
+  if (!PAYWALL_ENABLED) return;
   opts = opts || {};
   _paywallReturnTo = (typeof opts.weekId !== 'undefined' && typeof opts.dayId !== 'undefined')
     ? { weekId: opts.weekId, dayId: opts.dayId }
@@ -17128,6 +17157,14 @@ function isWeekCompleted(weekId) {
 //         as soon as a real entitlement row arrives — protects against
 //         the ~5-30s webhook lag AND app-crash mid-purchase).
 function canAccessWeek(subject, weekId) {
+  // Master kill-switch — with the paywall disabled, every chapter of
+  // every subject is accessible. Single lever that neutralizes every
+  // downstream gate: the 5 showPaywall() call sites (all inside
+  // !canAccessWeek(...) guards), the practice-card "Continue with
+  // Corpus" empty state (driven by _anyLockedRemains, set inside the
+  // same guard), and _canAccessBonus (reads through this function).
+  // See PAYWALL_ENABLED for why this ships false in this release.
+  if (!PAYWALL_ENABLED) return true;
   if (weekId === 1) return true;                              // free tier
   if (state.grandfathered) return true;
   if (state.isPaid) return true;
