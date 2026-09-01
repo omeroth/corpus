@@ -11894,7 +11894,7 @@ function _onbShowScreen(screenId) {
 // without projecting across a lifetime. Later screens (mirror,
 // step 14) will reference it too when they ship.
 
-const _ONB_TOTAL_STEPS = 21;
+const _ONB_TOTAL_STEPS = 22;
 // Which phase (1..6) each step belongs to. Drives the 6-pill progress.
 const _ONB_STEP_TO_PHASE = {
   1: 1, 2: 1, 3: 1,                                  // welcome / problem / solution
@@ -11932,6 +11932,7 @@ const _ONB_STEP_TO_ID = {
   19: 'onb-v2-review',
   20: 'onb-v2-journey',
   21: 'onb-v2-commit',
+  22: 'onb-v2-signup',
 };
 
 // Bilingual copy map for the intro screens (1-3). Later commits will
@@ -12293,6 +12294,19 @@ const _ONB_COPY = {
         text: { en: '🪶 Just trying it out',         he: '🪶 רק מנסה' } },
     ],
   },
+  // Step 22 — signup offer. Optional beat before _onbComplete. Body
+  // deliberately does NOT mention subscription; the paywall wasn't
+  // shipped when this landed, and promising a paid tier that isn't
+  // live yet is premature. Add the "you'll need an account to
+  // subscribe" line when the paywall goes live.
+  signup: {
+    head: { en: 'Save your progress',
+            he: 'שמרו את ההתקדמות שלכם' },
+    sub:  { en: 'Create an account to keep your XP, streak, and unlocked thinkers safe across devices.',
+            he: 'צרו חשבון כדי לשמור על ה-XP, הרצף וההוגים שלכם בין מכשירים.' },
+    cta:  { en: 'Create account', he: 'צרו חשבון' },
+    skip: { en: 'Not now',        he: 'לא עכשיו' },
+  },
 };
 
 function _onbApplyLang(lang) {
@@ -12362,6 +12376,10 @@ function _onbApplyLang(lang) {
   setText('onb-v2-journey-cta',   'journey',  'cta');
   setText('onb-v2-commit-head',   'commit',   'head');
   setText('onb-v2-commit-cta',    'commit',   'cta');
+  setText('onb-v2-signup-head',   'signup',   'head');
+  setText('onb-v2-signup-sub',    'signup',   'sub');
+  setText('onb-v2-signup-cta',    'signup',   'cta');
+  setText('onb-v2-signup-skip',   'signup',   'skip');
   // Text/number input placeholders (slider has none).
   const setPlaceholder = (id, group) => {
     const el = document.getElementById(id);
@@ -12664,9 +12682,22 @@ function _onbFinishFirstDialogue() {
         dialogue_id: String(state.currentWeek) + '-' + String(state.currentDay),
         subject: state.subject || null,
         seconds_since_onboarding_started: _secondsSinceOnboardingStart(),
+        is_onboarding: true,
       });
     } catch(e) {}
   }
+  // Mirror the normal finishDay path's day_completed. Without this the
+  // onboarding cohort is invisible to every retention/completion cohort
+  // keyed off day_completed (they see the pre-existing "day 2 cliff"
+  // that's actually just the first natural dialogue). is_onboarding
+  // lets analysis include or exclude it via a single filter.
+  try {
+    posthog.capture('day_completed', {
+      chapter: state.currentWeek,
+      day: state.currentDay,
+      is_onboarding: true,
+    });
+  } catch(e) {}
   try { saveState(); } catch(e) { try { saveStateLocal(); } catch(e2) {} }
 
   const thinker = (typeof getT === 'function') ? getT().find(t => t.id === thinkerId) : null;
@@ -12782,6 +12813,56 @@ function _onbV2CtaCommit() {
       commitment: pick,
       name: !!state.onbAnswers.name,
     });
+  } catch(e) {}
+  // Advance to step 22 (signup offer) instead of completing directly.
+  // Signup screen's CTAs call _onbComplete themselves (skip) or open
+  // the auth screen after marking onboarding done (create account).
+  _onbAdvanceStep(21, 22);
+}
+
+// Step 22 — signup offer. Two CTAs; either exits the flow.
+//
+// Create-account path marks corpus_onboarding_done BEFORE opening the
+// auth screen so a mid-auth force-quit doesn't strand the user in a
+// "half-onboarded" state (they'd re-enter onboarding on next launch,
+// which would be the wrong signal — they made it through the flow;
+// the auth choice is optional). Auth-success routes through enterApp
+// → home via existing paths; auth-cancel / failure lands them on home
+// via renderHome + showScreen('home') here as the fallback.
+function _onbV2CtaSignupCreate() {
+  try {
+    _phCapture('onboarding_signup_prompt_action', { action: 'signup' });
+  } catch(e) {}
+  // Mark done + clear session state, but do NOT call _onbComplete (it
+  // renders home + walkthrough, which we don't want overlaying the
+  // auth screen). Inline the essentials from _onbComplete.
+  const today = _streakDay();
+  state.onbAnswers = state.onbAnswers || {};
+  state.onbAnswers.completedAt = today;
+  try { saveState(); } catch(e) {}
+  try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
+  try { localStorage.removeItem('corpus_onboarding_step'); } catch(e) {}
+  try { state._onbInFirstDialogue = false; saveStateLocal(); } catch(e) {}
+  try { _phCapture('onboarding_completed', { platform: _phPlatform(), lang: state.lang || 'he', via: 'signup_screen' }); } catch(e) {}
+  document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
+    s.style.display = 'none';
+    s.classList.remove('onb-active');
+  });
+  // Show the auth screen. Existing auth-success path (enterApp) takes
+  // the user home; enterApp is idempotent under the appStarted guard,
+  // so a returning-guest → signed-in transition Just Works.
+  try { showAuthScreen(); } catch(e) {
+    // Auth screen unavailable for any reason → fall through to home,
+    // same as skip. Never trap the user.
+    renderHome();
+    showScreen('home');
+    try { _walkthroughStartIfEligible({ bypassCompletionGate: true }); } catch(_e) {}
+  }
+}
+
+function _onbV2CtaSignupSkip() {
+  try {
+    _phCapture('onboarding_signup_prompt_action', { action: 'skip' });
   } catch(e) {}
   _onbComplete();
 }
@@ -13300,7 +13381,20 @@ const _ONB_STEP_HOOKS = {
   18: _onbV2PrepareGoal,
   20: _onbV2PrepareJourney,
   21: _onbV2PrepareCommit,
+  22: _onbV2PrepareSignup,
 };
+
+// Step 22 prepare hook — fires the explicit prompt-shown event so it's
+// filterable in PostHog without stringifying step numbers. Copy is
+// static (applied by _onbApplyLang above); nothing dynamic to render.
+function _onbV2PrepareSignup() {
+  try {
+    _phCapture('onboarding_signup_prompt_shown', {
+      lang: state.lang || null,
+      subject: state.subject || null,
+    });
+  } catch(e) {}
+}
 
 // Silent guest entry: mirrors enterAsGuest but skips hideAuthScreen (the
 // auth screen isn't up in the new flow). Guest = null currentUser, no
@@ -18384,7 +18478,7 @@ function openReader(weekId, dayId, opts) {
     alert(state.lang === 'en' ? 'Coming soon' : 'בקרוב');
     return;
   }
-  try { posthog.capture('lesson_started', { chapter: weekId, day: dayId }); } catch(e) {}
+  try { posthog.capture('lesson_started', { chapter: weekId, day: dayId, is_onboarding: !!state._onbInFirstDialogue }); } catch(e) {}
   // Suppress the psychology-release card once the user has opened any
   // psychology dialogue by any path (including deep-link that bypasses
   // setSubject).
@@ -18398,6 +18492,7 @@ function openReader(weekId, dayId, opts) {
     _phCapture('first_dialogue_opened', {
       dialogue_id: String(weekId) + '-' + String(dayId),
       subject: state.subject || null,
+      is_onboarding: !!state._onbInFirstDialogue,
     });
   }
   state.currentWeek = weekId;
@@ -21226,6 +21321,7 @@ function _readerBaseProps() {
     page_type:        _readerLastPageType,
     total_pages:      _readerLastPageTotal,
     is_first_dialogue: _isFirstDialogue(),
+    is_onboarding:    !!state._onbInFirstDialogue,
     reader_version:   READER_VERSION,
   });
 }
@@ -25654,6 +25750,25 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <div class="onb-cta-holder">
     <button type="button" class="nav-btn onb-cta" id="onb-v2-commit-cta" onclick="_onbV2CtaCommit()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 22 — signup offer. Optional beat before _onbComplete. Skippable
+     via secondary "Not now" link that runs _onbComplete directly. Create-
+     account path marks onboarding done then opens the auth screen. -->
+<div id="onb-v2-signup" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="6">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-signup-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-signup-sub"></p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-signup-cta" onclick="_onbV2CtaSignupCreate()"></button>
+    <button type="button" class="onb-v2-skip" id="onb-v2-signup-skip" onclick="_onbV2CtaSignupSkip()"></button>
   </div>
 </div>
 
