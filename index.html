@@ -5029,6 +5029,28 @@
     gap: 8px;
   }
   .auth-btn:disabled { opacity: 0.6; cursor: default; }
+  /* In-flight spinner during OAuth. Added by _authProviderStart's flow,
+     removed on completion / hang / failure by restoreBtn. Explicit class
+     (not :disabled) so email-confirmation "disabled after submit" states
+     don't spin. Border uses currentColor so the ring inherits the
+     button's text color — white on the Apple button, dark on Google's
+     white bg. The provider icon is hidden while loading so spinner +
+     icon don't compete for the same slot; layout stays stable via
+     the flex gap. */
+  .auth-btn-loading .auth-social-icon { display: none; }
+  .auth-btn-loading::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: auth-spin 0.7s linear infinite;
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+  @keyframes auth-spin { to { transform: rotate(360deg); } }
   .auth-btn-primary {
     background: var(--accent);
     color: var(--on-accent);
@@ -11591,10 +11613,23 @@ async function handleAuthSubmit() {
 //                   22 uses this to mark corpus_onboarding_done and hide
 //                   the onboarding overlay before home renders.
 // }
+// Per-phase timeout budgets. Separated because the two failure modes are
+// different: a hung native picker (provider_call) is basically never
+// going to complete once it's stalled — 7s is generous — while a slow
+// network round-trip to Supabase (supabase_exchange) can legitimately
+// take longer on a bad connection, and cutting it short would turn a
+// slow-but-successful sign-in into a failed one. Keeping both budgets
+// in one place also guarantees the analytics field (auth_hang.budget_ms)
+// stays aligned with the timeout that actually fired.
+const _AUTH_PHASE_BUDGETS_MS = {
+  provider_call:     7000,
+  supabase_exchange: 10000,
+};
+
 async function _authProviderStart(provider, ctx) {
   const { btn, textEl, errorEl, defaultLabel, onBeforeEnter } = ctx;
   const isEn = state.lang === 'en';
-  if (btn) btn.disabled = true;
+  if (btn) { btn.disabled = true; btn.classList.add('auth-btn-loading'); }
   if (textEl) textEl.textContent = isEn ? 'Signing in...' : 'מתחבר...';
   if (errorEl) errorEl.textContent = '';
   // Declare "auth surface active" so enterApp's UI-tail guard doesn't
@@ -11615,10 +11650,12 @@ async function _authProviderStart(provider, ctx) {
     if (btn && btn.disabled && textEl) textEl.textContent = isEn ? 'Still working…' : 'עדיין עובד…';
   }, 4000);
   const restoreBtn = () => {
-    if (btn) btn.disabled = false;
+    if (btn) { btn.disabled = false; btn.classList.remove('auth-btn-loading'); }
     if (textEl) textEl.textContent = defaultLabel;
   };
-  const hangMsg = isEn ? 'Sign in didn’t complete. Please try again.' : 'ההתחברות לא הושלמה. נסו שוב.';
+  const hangMsg = isEn
+    ? 'Sign in didn’t complete. Try again, or continue with email.'
+    : 'ההתחברות לא הושלמה. נסו שוב או המשיכו עם אימייל.';
   const genericFailMsg = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
   const showErr = (msg) => { if (errorEl) errorEl.textContent = msg; };
   const capFail = (phase, err) => {
@@ -11626,7 +11663,7 @@ async function _authProviderStart(provider, ctx) {
     _phCapture('auth_failure', { method: provider, intent: 'signin', phase, error_code: info.code, error_message: info.message });
   };
   const capHang = (phase) => {
-    _phCapture('auth_hang', { method: provider, intent: 'signin', phase, budget_ms: 10000 });
+    _phCapture('auth_hang', { method: provider, intent: 'signin', phase, budget_ms: _AUTH_PHASE_BUDGETS_MS[phase] });
   };
   try {
     if (_isNative) {
@@ -11655,7 +11692,7 @@ async function _authProviderStart(provider, ctx) {
       }
       let loginRes;
       try {
-        loginRes = await _authRace(window.Capacitor.Plugins.SocialLogin.login(loginArgs), 10000);
+        loginRes = await _authRace(window.Capacitor.Plugins.SocialLogin.login(loginArgs), _AUTH_PHASE_BUDGETS_MS.provider_call);
       } catch(e) {
         if (e === _AUTH_HANG_SENTINEL) { capHang('provider_call'); showErr(hangMsg); restoreBtn(); return; }
         capFail('provider_call', e); showErr(genericFailMsg); restoreBtn(); return;
@@ -11667,7 +11704,7 @@ async function _authProviderStart(provider, ctx) {
       }
       let exchange;
       try {
-        exchange = await _authRace(sb.auth.signInWithIdToken({ provider, token: idToken }), 10000);
+        exchange = await _authRace(sb.auth.signInWithIdToken({ provider, token: idToken }), _AUTH_PHASE_BUDGETS_MS.supabase_exchange);
       } catch(e) {
         if (e === _AUTH_HANG_SENTINEL) { capHang('supabase_exchange'); showErr(hangMsg); restoreBtn(); return; }
         capFail('supabase_exchange', e); showErr(genericFailMsg); restoreBtn(); return;
@@ -11697,7 +11734,7 @@ async function _authProviderStart(provider, ctx) {
       const redirectTo = provider === 'apple' ? 'https://corpusapp.io/' : 'https://omeroth.github.io/corpus-app/';
       let webRes;
       try {
-        webRes = await _authRace(sb.auth.signInWithOAuth({ provider, options: { redirectTo } }), 10000);
+        webRes = await _authRace(sb.auth.signInWithOAuth({ provider, options: { redirectTo } }), _AUTH_PHASE_BUDGETS_MS.provider_call);
       } catch(e) {
         if (e === _AUTH_HANG_SENTINEL) { capHang('provider_call'); showErr(hangMsg); restoreBtn(); return; }
         capFail('provider_call', e); showErr(genericFailMsg); restoreBtn(); return;
