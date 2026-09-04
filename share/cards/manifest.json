@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-23T19:52:01.240Z",
+  "generatedAt": "2026-09-04T06:04:21.534Z",
   "items": [
     {
       "weekId": 1,
@@ -1540,6 +1540,106 @@
       "title": "What if most of what we do was decided before we thought?",
       "card": "share/cards/en/psyc-4-6.png",
       "page": "d/psyc-4-6-en.html"
+    },
+    {
+      "weekId": "bonusPsy1",
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "skinner",
+      "title": "מכונת המזל בכיס",
+      "card": "share/cards/he/psyc-bonusPsy1-1.png",
+      "page": "d/psyc-bonusPsy1-1-he.html"
+    },
+    {
+      "weekId": "bonusPsy1",
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "skinner",
+      "title": "The Slot Machine in Your Pocket",
+      "card": "share/cards/en/psyc-bonusPsy1-1.png",
+      "page": "d/psyc-bonusPsy1-1-en.html"
+    },
+    {
+      "weekId": "bonusPsy1",
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "kahneman",
+      "title": "היד זזה קודם",
+      "card": "share/cards/he/psyc-bonusPsy1-2.png",
+      "page": "d/psyc-bonusPsy1-2-he.html"
+    },
+    {
+      "weekId": "bonusPsy1",
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "kahneman",
+      "title": "The Hand Moves First",
+      "card": "share/cards/en/psyc-bonusPsy1-2.png",
+      "page": "d/psyc-bonusPsy1-2-en.html"
+    },
+    {
+      "weekId": "bonusPsy1",
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "kohut",
+      "title": "לייק כשיקוף",
+      "card": "share/cards/he/psyc-bonusPsy1-3.png",
+      "page": "d/psyc-bonusPsy1-3-he.html"
+    },
+    {
+      "weekId": "bonusPsy1",
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "kohut",
+      "title": "A Like as Mirror",
+      "card": "share/cards/en/psyc-bonusPsy1-3.png",
+      "page": "d/psyc-bonusPsy1-3-en.html"
+    },
+    {
+      "weekId": "bonusPsy1",
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "deci",
+      "title": "כשמתחילים לספור",
+      "card": "share/cards/he/psyc-bonusPsy1-4.png",
+      "page": "d/psyc-bonusPsy1-4-he.html"
+    },
+    {
+      "weekId": "bonusPsy1",
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "deci",
+      "title": "When You Start Counting",
+      "card": "share/cards/en/psyc-bonusPsy1-4.png",
+      "page": "d/psyc-bonusPsy1-4-en.html"
+    },
+    {
+      "weekId": "bonusPsy1",
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "fromm",
+      "title": "מנוס מהחלטה",
+      "card": "share/cards/he/psyc-bonusPsy1-5.png",
+      "page": "d/psyc-bonusPsy1-5-he.html"
+    },
+    {
+      "weekId": "bonusPsy1",
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "fromm",
+      "title": "Escape from Choice",
+      "card": "share/cards/en/psyc-bonusPsy1-5.png",
+      "page": "d/psyc-bonusPsy1-5-en.html"
     }
   ]
 }
