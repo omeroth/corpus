@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>לייק כשיקוף · Corpus</title>
+<meta name="description" content="דיאלוג עם היינץ קוהוט. 5 דקות ביום עם גדולי ההוגים.">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="לייק כשיקוף">
+<meta property="og:description" content="דיאלוג עם היינץ קוהוט. 5 דקות ביום עם גדולי ההוגים.">
+<meta property="og:image" content="https://corpusapp.io/share/cards/he/psyc-bonusPsy1-3.png">
+<meta property="og:image:secure_url" content="https://corpusapp.io/share/cards/he/psyc-bonusPsy1-3.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://corpusapp.io/d/psyc-bonusPsy1-3-he.html">
+<meta property="og:site_name" content="Corpus">
+<meta property="og:locale" content="he_IL">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="לייק כשיקוף">
+<meta name="twitter:description" content="דיאלוג עם היינץ קוהוט. 5 דקות ביום עם גדולי ההוגים.">
+<meta name="twitter:image" content="https://corpusapp.io/share/cards/he/psyc-bonusPsy1-3.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Rubik:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:      #FFF7ED;
+    --plate:   #FDFBF6;
+    --rim:     #E5C158;
+    --wordmark: #E8853A;
+    --name:    #5C1F0C;
+    --era:     #A85832;
+    --question: #863F09;
+    --url:     #B8860B;
+  }
+  html, body {
+    background: var(--bg);
+    color: var(--name);
+    font-family: 'Rubik', sans-serif;
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+    text-align: center;
+  }
+  .wordmark {
+    /* Mirrors index.html .auth-logo-text — Nunito 900, tight tracking, subject accent. */
+    font-family: 'Nunito', 'Rubik', sans-serif;
+    font-weight: 900;
+    font-size: 26px;
+    color: var(--wordmark);
+    letter-spacing: -0.7px;
+    margin-bottom: 32px;
+  }
+  .card {
+    display: block;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto 32px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  }
+  .redirecting {
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--name);
+    margin-bottom: 20px;
+    opacity: 0.75;
+  }
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 16px;
+    text-decoration: none;
+    background: var(--wordmark);
+    color: #FFFFFF;
+    transition: transform .15s;
+  }
+  .cta:active { transform: scale(.97); }
+  .url {
+    display: block;
+    margin-top: 32px;
+    color: var(--url);
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="wordmark">Corpus</div>
+  <img class="card" src="https://corpusapp.io/share/cards/he/psyc-bonusPsy1-3.png" alt="לייק כשיקוף — היינץ קוהוט" width="1200" height="630">
+  <p class="redirecting">פותח את Corpus…</p>
+  <a class="cta" id="manual" href="https://apps.apple.com/app/id6781227385">פתח את Corpus</a>
+  <a class="url" href="https://corpusapp.io">corpusapp.io</a>
+</main>
+<script>
+  // Client-side redirect + PostHog beacon telemetry.
+  //
+  // Crawlers (facebookexternalhit, WhatsApp, Twitterbot, Slackbot,
+  // LinkedInBot) don't execute JS — they only read the OG tags above,
+  // so the events below fire ONLY for real human visits. That's why
+  // no is_bot flag is emitted; it'd be false on 100% of records.
+  //
+  // Direct capture via navigator.sendBeacon rather than loading the
+  // PostHog SDK from CDN: the 250ms redirect timer is faster than the
+  // SDK can hydrate on mobile data, so landing_page_view would be
+  // silently undercounted. Beacon queues the request in the background
+  // and survives location.replace by spec. text/plain blob avoids the
+  // CORS preflight while PostHog's /i/v0/e/ endpoint still parses the
+  // JSON body.
+  (function () {
+    var POSTHOG_KEY = 'phc_vUupVqSRdBay7mQ4Aswudhu8mFHnych6PKNRpP6BHoS4';
+    var POSTHOG_URL = 'https://us.i.posthog.com/i/v0/e/';
+    // Ephemeral distinct_id, per page load. Both events from this
+    // visit (view + cta click) share it so the in-visit micro-funnel
+    // joins; we deliberately don't persist across visits or stitch
+    // into the app — see the scoped-attribution decision in the audit.
+    var distinctId = (window.crypto && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : ('anon-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+
+    var ua = navigator.userAgent || '';
+    var isIOS     = /iPhone|iPad|iPod/i.test(ua);
+    var isAndroid = /Android/i.test(ua);
+    var target     = "https://corpusapp.io";
+    var targetKind = 'desktop';
+    if (isIOS)          { target = "https://apps.apple.com/app/id6781227385";     targetKind = 'ios'; }
+    else if (isAndroid) { target = "https://play.google.com/store/apps/details?id=com.corpusapp.corpus"; targetKind = 'android'; }
+
+    var baseProps = {
+      dialogue_id: "bonusPsy1-3",
+      subject:     "psychology",
+      lang:        "he",
+      target:      targetKind,
+      referrer:    document.referrer || null,
+      // Suppress Person creation on PostHog server side. The distinct_id
+      // is a fresh UUID per page load, so without this every landing
+      // would materialize a phantom Person — hundreds per day of empty
+      // profiles polluting the project. identified_only in the app's
+      // SDK init does not apply here since the beacon bypasses the SDK.
+      $process_person_profile: false
+    };
+
+    function beacon(event, extraProps) {
+      var props = extraProps ? Object.assign({}, baseProps, extraProps) : baseProps;
+      var payload = {
+        api_key:     POSTHOG_KEY,
+        event:       event,
+        distinct_id: distinctId,
+        properties:  props,
+        timestamp:   new Date().toISOString()
+      };
+      try {
+        var blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
+        navigator.sendBeacon(POSTHOG_URL, blob);
+      } catch (e) { /* never block the redirect on capture failure */ }
+    }
+
+    beacon('landing_page_view');
+
+    var manual = document.getElementById('manual');
+    if (manual) {
+      manual.href = target;
+      manual.addEventListener('click', function () {
+        beacon('landing_cta_click');
+      });
+    }
+
+    // Delay one tick so the visible fallback flashes long enough to
+    // explain what's happening if the store app takes a moment to open.
+    setTimeout(function () { location.replace(target); }, 250);
+  })();
+</script>
+</body>
+</html>
