@@ -2299,60 +2299,6 @@
   .streak-repair-cta:hover { background: #F59E0B; }
   .streak-repair-cta:active { transform: scale(0.97); }
 
-  /* ── Welcome-back banner (home) ─────────────────────────────────
-     Shown once per streak-day on the first home render, deferring to
-     the streak-repair card and any pending celebrations. Slim banner
-     with the onboarding owl on inline-start, greeting on inline-end,
-     and a dismiss × on the far end. Does NOT block lesson-node taps
-     (they occupy separate DOM below); auto-clears the moment the
-     user opens any lesson via openReader's dismissWelcomeBack call.
-     Purple accent (subject-agnostic — welcome-back precedes any
-     subject theming). Slide-in on first paint. */
-  .welcome-back-banner {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: 16px;
-    padding: 12px 14px 12px 12px;
-    margin: 0 20px 12px;
-    box-shadow: 0 4px 14px rgba(var(--accent-rgb), 0.10);
-    animation: welcome-back-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .welcome-back-owl {
-    width: 56px;
-    height: 56px;
-    flex-shrink: 0;
-    display: grid;
-    place-items: center;
-  }
-  .welcome-back-owl svg { width: 100%; height: 100%; }
-  .welcome-back-text {
-    flex: 1;
-    font-family: 'Nunito', 'Assistant', sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    color: var(--ink);
-    line-height: 1.35;
-  }
-  .welcome-back-dismiss {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 22px;
-    line-height: 1;
-    padding: 6px 8px;
-    cursor: pointer;
-    flex-shrink: 0;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .welcome-back-dismiss:hover { color: var(--ink); }
-  @keyframes welcome-back-in {
-    from { opacity: 0; transform: translateY(-8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
   /* ── Bonus level-card (home) ────────────────────────────────────
      Inline entry point for the bonus chapter. Renders between chapters 1
      and 2 in the level-card list, replacing the retired econ-promo card.
@@ -6779,6 +6725,50 @@
     transform: translateX(-50%) translateY(0);
   }
 
+  /* ── Welcome-back modal ──
+     Same shell as endowment/goal-met/etc: .modal-overlay backdrop, popIn
+     modal-box. Purple accent (subject-agnostic — welcome-back precedes
+     any subject theming). Owl sits large and centered above the greeting;
+     single Continue CTA is the only exit (backdrop tap does not dismiss,
+     matching the celebration overlays). */
+  #welcome-back-modal .modal-box {
+    background-color: var(--surface);
+    background-image:
+      radial-gradient(circle at 50% 32%, var(--surface) 0%, rgba(var(--accent-rgb), 0.14) 100%);
+    border: 1px solid rgba(var(--accent-rgb), 0.28);
+    color: var(--ink);
+    box-shadow: 0 30px 80px -20px rgba(var(--accent-rgb), 0.35);
+    padding: 40px 26px 28px;
+    max-width: 380px;
+  }
+  .welcome-back-owl-wrap {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 20px;
+    display: grid;
+    place-items: center;
+    filter: drop-shadow(0 12px 20px rgba(var(--accent-rgb), 0.30));
+    /* Reuse the same gentle hero float used by the endowment icon so the
+       owl reads as alive on entry, not as a static illustration. */
+    animation: onbHeroFloat 6s ease-in-out infinite;
+    transform-origin: 50% 80%;
+  }
+  .welcome-back-owl-wrap svg { width: 100%; height: 100%; }
+  .welcome-back-headline {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(24px * var(--text-scale));
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1.25;
+    margin-bottom: 24px;
+    letter-spacing: -0.01em;
+  }
+  .welcome-back-cta {
+    /* Reuses .nav-btn for the base pill; this rule just guarantees full
+       width and proper margin against the headline. */
+    width: 100%;
+  }
+
   /* ── Day-1 endowment overlay — bright amber ──
      Modal shell keeps its .modal-overlay backdrop; the box gets a white
      center → soft amber edge radial. Flame glow softens, headline in ink. */
@@ -9525,13 +9515,6 @@
 
       <!-- Streak repair card — filled by renderStreakRepairCard when eligible. -->
       <div id="streak-repair-card-holder" style="display:none"></div>
-
-      <!-- Welcome-back banner — filled by renderWelcomeBackBanner on the
-           first home render of each new streak-day for post-onboarding
-           users. Sits below streak-repair (repair wins the top-of-home
-           slot when both would fire — the banner's gate defers to it).
-           Auto-clears on lesson-node tap via openReader. -->
-      <div id="welcome-back-banner-holder" style="display:none"></div>
 
       <!-- Psychology-release announcement card — filled by
            renderPsychologyAnnounceCard. Sits below streak-repair
@@ -15574,7 +15557,7 @@ function defaultState() {
     // Welcome-back banner cadence. welcomeBackShownAt is a streak-day (ISO
     // YYYY-MM-DD) that gates one-fire-per-day; welcomeBackLastVariant is
     // the variant key most recently shown, used by _welcomeBackPickVariant
-    // to skip repeats across days. See renderWelcomeBackBanner.
+    // to skip repeats across days. See showWelcomeBackModal.
     welcomeBackShownAt: '',
     welcomeBackLastVariant: '',
   };
@@ -16765,18 +16748,28 @@ async function _schedulePsychologyAnnouncement() {
   }
 }
 
-// === Welcome-back banner =============================================
+// === Welcome-back modal ==============================================
 //
 // One-per-streak-day greeting on home entry for post-onboarding users.
-// Three copy pools chosen by the gap in streak-days since the user's
-// last active date (last completion):
-//   daily  (gap ≤ 1)  — warm, casual; owl waves
-//   missed (gap 2–6)  — gentle, non-judgmental; owl waves softer
-//   long   (gap ≥ 7)  — explicit welcome-back; owl bounces
+// Full modal overlay (same shell as endowment/goal-met celebrations)
+// with the purple owl above a greeting and a single Continue CTA.
+//
+// Three copy pools chosen by gap in streak-days since lastActiveDate:
+//   daily  (gap ≤ 1)  — warm, casual
+//   missed (gap 2–6)  — gentle, non-judgmental
+//   long   (gap ≥ 7)  — explicit welcome-back, more enthusiastic owl
+//
+// Daily pool tapers after the first week of engagement (measured from
+// corpus_first_dialogue_completed_at). Rationale: the modal is warm in
+// week one and an obstacle by week three, especially for daily regulars
+// who see it most. The missed and long pools stay on — those are the
+// real "welcome BACK" moments the feature is built for. See design
+// report for the fuller argument.
 //
 // Fires from renderHome, gated behind: onboarding done, not-already-
 // shown-today, no pending celebrations, no streak-repair card visible.
-// Auto-dismisses on lesson-node tap via openReader → dismissWelcomeBack.
+// Backdrop tap does NOT dismiss — matches every sibling celebration
+// overlay in the app. Continue button is the only exit.
 const WELCOME_BACK_COPY = {
   daily: [
     { key: 'ready',    en: "Ready for today's five minutes?", he: "מוכנים לחמש הדקות של היום?" },
@@ -16799,6 +16792,37 @@ const WELCOME_BACK_COPY = {
   ],
 };
 
+// Per-variant owl expression. Four expressions are available on the
+// owl SVG template (owl-neutral waves, owl-determined lifts, owl-
+// admiring bounces, owl-action points). Assigned so the pool has
+// visual variation across launches, not just copy variation. Some
+// expressions repeat across variants deliberately — e.g. the long
+// pool is 3× admiring because "you're back" earns bouncing regardless
+// of the specific words.
+const WELCOME_BACK_VARIANT_EXPR = {
+  // daily
+  ready:      'owl-determined',
+  few_mins:   'owl-neutral',
+  today:      'owl-admiring',
+  welcome:    'owl-neutral',    // shared key across daily+long; daily uses neutral
+  five_min:   'owl-action',
+  // missed
+  good_see:   'owl-admiring',
+  pickup:     'owl-neutral',
+  no_press:   'owl-neutral',
+  back_on:    'owl-determined',
+  // long (variant 'welcome' handled per-pool below)
+  been_while: 'owl-admiring',
+  glad:       'owl-admiring',
+  owl_hoping: 'owl-action',
+};
+
+// Module-scope snapshot of what was shown, so closeWelcomeBackModal
+// can log accurate pool + variant even if state changes between show
+// and dismiss (e.g. a completion arrives while the modal is open —
+// unlikely with the blocking overlay, but cheap insurance).
+let _welcomeBackShownContext = null;
+
 // Gap in streak-days since lastActiveDate. Null if no prior activity
 // (first-ever launch), 0 if already active today. Uses local-time
 // Date construction to match _streakDay semantics — parsing ISO
@@ -16810,10 +16834,30 @@ function _welcomeBackGapDays() {
   return Math.round((toLocal(today) - toLocal(state.lastActiveDate)) / 86400000);
 }
 
+// Calendar days since the user's first dialogue completion. 0 if the
+// user has never completed a dialogue (shouldn't happen for post-
+// onboarding users — the onboarding first dialogue sets this — but
+// handled defensively so a corrupted or pre-timestamp install can't
+// crash the pool selector).
+function _daysSinceFirstDialogue() {
+  const iso = localStorage.getItem('corpus_first_dialogue_completed_at');
+  if (!iso) return 0;
+  const first = new Date(iso).getTime();
+  if (!first || Number.isNaN(first)) return 0;
+  return Math.floor((Date.now() - first) / 86400000);
+}
+
 function _welcomeBackPickPool() {
   const gap = _welcomeBackGapDays();
   if (gap === null || gap === 0) return null;   // no history / already active today
-  if (gap <= 1) return 'daily';
+  if (gap <= 1) {
+    // Daily pool tapers after the honeymoon window (see block comment
+    // above). Regulars past week one only see the modal on real
+    // absences — missed (2-6 days) or long (7+ days) — which is the
+    // "welcome BACK" moment the feature is built for.
+    if (_daysSinceFirstDialogue() >= 7) return null;
+    return 'daily';
+  }
   if (gap <= 6) return 'missed';
   return 'long';
 }
@@ -16829,6 +16873,15 @@ function _welcomeBackPickVariant(pool) {
   return pick[Math.floor(Math.random() * pick.length)];
 }
 
+// Owl expression per (pool, variant). The 'welcome' key appears in
+// both daily and long pools with different intended tone — daily gets
+// a simple wave (neutral), long gets an enthusiastic bounce (admiring).
+// Everything else routes through the flat map above.
+function _welcomeBackExprFor(pool, variantKey) {
+  if (variantKey === 'welcome') return pool === 'long' ? 'owl-admiring' : 'owl-neutral';
+  return WELCOME_BACK_VARIANT_EXPR[variantKey] || 'owl-neutral';
+}
+
 // Clone the owl SVG template with the given expression class applied.
 // Returns HTML string ready to inject via innerHTML.
 function _cloneOwlSvgHTML(exprClass) {
@@ -16842,43 +16895,36 @@ function _cloneOwlSvgHTML(exprClass) {
   return wrap.innerHTML;
 }
 
-function renderWelcomeBackBanner() {
-  const holder = document.getElementById('welcome-back-banner-holder');
-  if (!holder) return;
-  // Guards (any → hide + return).
-  if (!localStorage.getItem('corpus_onboarding_done')) { holder.style.display = 'none'; return; }
-  if (state.welcomeBackShownAt === _streakDay())      { holder.style.display = 'none'; return; }
-  if ((state.pendingCelebrations || []).length > 0)   { holder.style.display = 'none'; return; }
+function showWelcomeBackModal() {
+  const modal = document.getElementById('welcome-back-modal');
+  if (!modal) return;
+  // Guards (any → return without showing).
+  if (!localStorage.getItem('corpus_onboarding_done')) return;
+  if (state.welcomeBackShownAt === _streakDay())      return;
+  if ((state.pendingCelebrations || []).length > 0)   return;
   // Streak-repair wins the top-of-home slot when it's visible. Check
   // holder state (not just card eligibility) so a dismissed-this-session
-  // repair card doesn't block the welcome-back.
+  // repair card doesn't block the welcome-back modal.
   const repairHolder = document.getElementById('streak-repair-card-holder');
-  if (repairHolder && repairHolder.style.display !== 'none' && repairHolder.innerHTML.trim()) {
-    holder.style.display = 'none';
-    return;
-  }
+  if (repairHolder && repairHolder.style.display !== 'none' && repairHolder.innerHTML.trim()) return;
   const pool = _welcomeBackPickPool();
-  if (!pool) { holder.style.display = 'none'; return; }
+  if (!pool) return;
   const variant = _welcomeBackPickVariant(pool);
   const isEn = state.lang === 'en';
   const text = isEn ? variant.en : variant.he;
-  // Owl expression: long-absence gets the bouncing admiring owl (more
-  // enthusiastic "hey you're back!"); daily and missed both wave.
-  const expr = pool === 'long' ? 'owl-admiring' : 'owl-neutral';
-  const owlHTML = _cloneOwlSvgHTML(expr);
-  const dismissLabel = isEn ? 'Dismiss' : 'סגור';
-  const ariaLabel = isEn ? 'Welcome back' : 'ברוכים השבים';
-  holder.innerHTML =
-    '<div class="welcome-back-banner" role="region" aria-label="' + ariaLabel + '"' +
-      ' data-pool="' + pool + '" data-variant="' + variant.key + '">' +
-      '<div class="welcome-back-owl">' + owlHTML + '</div>' +
-      '<div class="welcome-back-text">' + text + '</div>' +
-      '<button class="welcome-back-dismiss" aria-label="' + dismissLabel + '"' +
-        ' onclick="dismissWelcomeBack(\'x_button\')">×</button>' +
-    '</div>';
-  holder.style.display = '';
-  // Mark shown for the day so subsequent home re-renders in the same
-  // streak-day don't re-fire (or pick a different variant).
+  const expr = _welcomeBackExprFor(pool, variant.key);
+  const owlWrap = document.getElementById('welcome-back-owl-wrap');
+  const headline = document.getElementById('welcome-back-headline');
+  const cta = document.getElementById('welcome-back-cta');
+  if (!owlWrap || !headline || !cta) return;
+  owlWrap.innerHTML = _cloneOwlSvgHTML(expr);
+  headline.textContent = text;
+  cta.textContent = isEn ? 'Continue' : 'המשך';
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  // Snapshot for the dismiss handler + mark shown for the day so
+  // subsequent home re-renders in the same streak-day don't re-fire.
+  _welcomeBackShownContext = { pool: pool, variant: variant.key };
   state.welcomeBackShownAt = _streakDay();
   state.welcomeBackLastVariant = variant.key;
   try { saveStateLocal(); } catch(e) {}
@@ -16887,33 +16933,28 @@ function renderWelcomeBackBanner() {
       pool: pool,
       variant: variant.key,
       gap_days: _welcomeBackGapDays(),
+      days_since_first_dialogue: _daysSinceFirstDialogue(),
       streak: state.dailyStreak || 0,
     });
   } catch(e) {}
 }
 
-// Called by the × button (source='x_button') and openReader (source=
-// 'lesson_tap'). Reads pool + variant off the DOM data attributes so
-// the analytics event reflects what was actually shown, even if the
-// gap has changed between show and dismiss.
-function dismissWelcomeBack(source) {
-  const holder = document.getElementById('welcome-back-banner-holder');
-  if (!holder) return;
-  const banner = holder.querySelector('.welcome-back-banner');
-  if (!banner || holder.style.display === 'none') return;
-  const pool = banner.getAttribute('data-pool') || null;
-  const variant = banner.getAttribute('data-variant') || null;
-  holder.innerHTML = '';
-  holder.style.display = 'none';
+function closeWelcomeBackModal() {
+  const modal = document.getElementById('welcome-back-modal');
+  if (!modal) return;
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+  const ctx = _welcomeBackShownContext || {};
+  _welcomeBackShownContext = null;
   try {
     posthog.capture('welcome_back_dismissed', {
-      pool: pool,
-      variant: variant,
-      dismiss_source: source || 'unknown',
+      pool: ctx.pool || null,
+      variant: ctx.variant || null,
+      dismiss_source: 'continue',
     });
   } catch(e) {}
 }
-// === End welcome-back banner =========================================
+// === End welcome-back modal ==========================================
 
 function renderStreakRepairCard() {
   const holder = document.getElementById('streak-repair-card-holder');
@@ -18137,10 +18178,11 @@ function renderHome() {
   // safe to call unconditionally — it clears the holder if the user isn't
   // eligible or has dismissed it this session.
   try { renderStreakRepairCard(); } catch (e) {}
-  // Welcome-back banner: rendered right after streak-repair so the gate
-  // inside can check whether repair took the top-of-home slot. Fires at
-  // most once per streak-day; internal guards handle all other cases.
-  try { renderWelcomeBackBanner(); } catch (e) {}
+  // Welcome-back modal: opens right after streak-repair renders so the
+  // gate inside can check whether repair took the top-of-home slot.
+  // Fires at most once per streak-day; internal guards handle all
+  // other cases. Blocks tap-through by design (see design report).
+  try { showWelcomeBackModal(); } catch (e) {}
   // Psychology-release announcement card: safe to call unconditionally —
   // guards inside clear the holder for users who've already dismissed,
   // visited psychology, or aren't past the first-dialogue milestone.
@@ -18767,13 +18809,6 @@ function closeLibraryModal() {
 
 function openReader(weekId, dayId, opts) {
   opts = opts || {};
-  // Auto-clear the welcome-back banner if it was still showing — the
-  // moment the user opens a lesson the greeting has done its job.
-  // Safe no-op if the banner isn't up. Called before the paywall gate
-  // so a blocked-by-paywall tap still counts as engaging with the home
-  // affordance (the banner would look stale sitting behind the paywall
-  // modal otherwise).
-  try { dismissWelcomeBack('lesson_tap'); } catch (e) {}
   // Paywall gate. Free tier = chapter 1 of each subject; everything else
   // requires paid entitlement. A lapsed user keeps access to dialogues
   // they've already completed — the moment stays theirs even after the
@@ -26182,6 +26217,20 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     </div>
     <button type="button" class="nav-btn endowment-cta" id="goal-met-cta" onclick="closeGoalMet()">המשך</button>
+  </div>
+</div>
+
+<!-- Welcome-back modal — populated + shown by showWelcomeBackModal on
+     the first home render of each new streak-day for post-onboarding
+     users. Owl expression, greeting text, and button label are all
+     written into the inner nodes at show time. Backdrop tap does NOT
+     dismiss (matches every celebration overlay); the CTA is the only
+     exit. -->
+<div id="welcome-back-modal" class="modal-overlay">
+  <div class="modal-box welcome-back-box">
+    <div class="welcome-back-owl-wrap" id="welcome-back-owl-wrap" aria-hidden="true"></div>
+    <div class="welcome-back-headline" id="welcome-back-headline"></div>
+    <button type="button" class="nav-btn welcome-back-cta" id="welcome-back-cta" onclick="closeWelcomeBackModal()"></button>
   </div>
 </div>
 
