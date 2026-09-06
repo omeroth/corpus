@@ -2299,6 +2299,60 @@
   .streak-repair-cta:hover { background: #F59E0B; }
   .streak-repair-cta:active { transform: scale(0.97); }
 
+  /* ── Welcome-back banner (home) ─────────────────────────────────
+     Shown once per streak-day on the first home render, deferring to
+     the streak-repair card and any pending celebrations. Slim banner
+     with the onboarding owl on inline-start, greeting on inline-end,
+     and a dismiss × on the far end. Does NOT block lesson-node taps
+     (they occupy separate DOM below); auto-clears the moment the
+     user opens any lesson via openReader's dismissWelcomeBack call.
+     Purple accent (subject-agnostic — welcome-back precedes any
+     subject theming). Slide-in on first paint. */
+  .welcome-back-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 14px 12px 12px;
+    margin: 0 20px 12px;
+    box-shadow: 0 4px 14px rgba(var(--accent-rgb), 0.10);
+    animation: welcome-back-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .welcome-back-owl {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+  }
+  .welcome-back-owl svg { width: 100%; height: 100%; }
+  .welcome-back-text {
+    flex: 1;
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1.35;
+  }
+  .welcome-back-dismiss {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 22px;
+    line-height: 1;
+    padding: 6px 8px;
+    cursor: pointer;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .welcome-back-dismiss:hover { color: var(--ink); }
+  @keyframes welcome-back-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   /* ── Bonus level-card (home) ────────────────────────────────────
      Inline entry point for the bonus chapter. Renders between chapters 1
      and 2 in the level-card list, replacing the retired econ-promo card.
@@ -9472,6 +9526,13 @@
       <!-- Streak repair card — filled by renderStreakRepairCard when eligible. -->
       <div id="streak-repair-card-holder" style="display:none"></div>
 
+      <!-- Welcome-back banner — filled by renderWelcomeBackBanner on the
+           first home render of each new streak-day for post-onboarding
+           users. Sits below streak-repair (repair wins the top-of-home
+           slot when both would fire — the banner's gate defers to it).
+           Auto-clears on lesson-node tap via openReader. -->
+      <div id="welcome-back-banner-holder" style="display:none"></div>
+
       <!-- Psychology-release announcement card — filled by
            renderPsychologyAnnounceCard. Sits below streak-repair
            (which is time-sensitive) and above the level cards.
@@ -15510,6 +15571,12 @@ function defaultState() {
     // _playNextCelebration drains it one at a time. Persisted so an app close
     // mid-queue resumes on next entry. See _resumeCelebrationsIfPending.
     pendingCelebrations: [],
+    // Welcome-back banner cadence. welcomeBackShownAt is a streak-day (ISO
+    // YYYY-MM-DD) that gates one-fire-per-day; welcomeBackLastVariant is
+    // the variant key most recently shown, used by _welcomeBackPickVariant
+    // to skip repeats across days. See renderWelcomeBackBanner.
+    welcomeBackShownAt: '',
+    welcomeBackLastVariant: '',
   };
 }
 let state = defaultState();
@@ -16697,6 +16764,156 @@ async function _schedulePsychologyAnnouncement() {
     console.error('[Announce] psychology notification schedule failed:', e);
   }
 }
+
+// === Welcome-back banner =============================================
+//
+// One-per-streak-day greeting on home entry for post-onboarding users.
+// Three copy pools chosen by the gap in streak-days since the user's
+// last active date (last completion):
+//   daily  (gap ≤ 1)  — warm, casual; owl waves
+//   missed (gap 2–6)  — gentle, non-judgmental; owl waves softer
+//   long   (gap ≥ 7)  — explicit welcome-back; owl bounces
+//
+// Fires from renderHome, gated behind: onboarding done, not-already-
+// shown-today, no pending celebrations, no streak-repair card visible.
+// Auto-dismisses on lesson-node tap via openReader → dismissWelcomeBack.
+const WELCOME_BACK_COPY = {
+  daily: [
+    { key: 'ready',    en: "Ready for today's five minutes?", he: "מוכנים לחמש הדקות של היום?" },
+    { key: 'few_mins', en: "A few minutes with a great mind.", he: "כמה דקות עם מוח גדול." },
+    { key: 'today',    en: "Today's idea is waiting.",         he: "הרעיון של היום מחכה." },
+    { key: 'welcome',  en: "Welcome back.",                    he: "ברוכים השבים." },
+    { key: 'five_min', en: "Five minutes today.",              he: "חמש דקות היום." },
+  ],
+  missed: [
+    { key: 'good_see', en: "Good to see you.",           he: "טוב לראות אתכם." },
+    { key: 'pickup',   en: "Pick up wherever.",          he: "תמשיכו מאיפה שנוח." },
+    { key: 'no_press', en: "No pressure — just start.",  he: "בלי לחץ — פשוט להתחיל." },
+    { key: 'back_on',  en: "Back on it.",                he: "חזרנו לזה." },
+  ],
+  long: [
+    { key: 'been_while', en: "It's been a while.",                    he: "עבר זמן." },
+    { key: 'welcome',    en: "Welcome back.",                         he: "ברוכים השבים." },
+    { key: 'glad',       en: "Glad you're here.",                     he: "שמחים שחזרתם." },
+    { key: 'owl_hoping', en: "The owl was hoping you'd come by.",     he: "הינשוף חיכה שתעברו." },
+  ],
+};
+
+// Gap in streak-days since lastActiveDate. Null if no prior activity
+// (first-ever launch), 0 if already active today. Uses local-time
+// Date construction to match _streakDay semantics — parsing ISO
+// YYYY-MM-DD as UTC would drift on the DST-transition day boundary.
+function _welcomeBackGapDays() {
+  if (!state.lastActiveDate) return null;
+  const today = _streakDay();
+  const toLocal = (s) => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+  return Math.round((toLocal(today) - toLocal(state.lastActiveDate)) / 86400000);
+}
+
+function _welcomeBackPickPool() {
+  const gap = _welcomeBackGapDays();
+  if (gap === null || gap === 0) return null;   // no history / already active today
+  if (gap <= 1) return 'daily';
+  if (gap <= 6) return 'missed';
+  return 'long';
+}
+
+// Random pick with anti-repeat: never re-pick the variant shown last
+// time. If the pool has only one option (shouldn't happen for the
+// current sizes but guard anyway), fall back to it.
+function _welcomeBackPickVariant(pool) {
+  const options = WELCOME_BACK_COPY[pool];
+  const last = state.welcomeBackLastVariant || '';
+  const filtered = options.filter(v => v.key !== last);
+  const pick = filtered.length ? filtered : options;
+  return pick[Math.floor(Math.random() * pick.length)];
+}
+
+// Clone the owl SVG template with the given expression class applied.
+// Returns HTML string ready to inject via innerHTML.
+function _cloneOwlSvgHTML(exprClass) {
+  const tpl = document.getElementById('owl-template');
+  if (!tpl) return '';
+  const clone = tpl.content.cloneNode(true);
+  const svg = clone.querySelector('.owl-svg');
+  if (svg) svg.classList.add(exprClass);
+  const wrap = document.createElement('div');
+  wrap.appendChild(clone);
+  return wrap.innerHTML;
+}
+
+function renderWelcomeBackBanner() {
+  const holder = document.getElementById('welcome-back-banner-holder');
+  if (!holder) return;
+  // Guards (any → hide + return).
+  if (!localStorage.getItem('corpus_onboarding_done')) { holder.style.display = 'none'; return; }
+  if (state.welcomeBackShownAt === _streakDay())      { holder.style.display = 'none'; return; }
+  if ((state.pendingCelebrations || []).length > 0)   { holder.style.display = 'none'; return; }
+  // Streak-repair wins the top-of-home slot when it's visible. Check
+  // holder state (not just card eligibility) so a dismissed-this-session
+  // repair card doesn't block the welcome-back.
+  const repairHolder = document.getElementById('streak-repair-card-holder');
+  if (repairHolder && repairHolder.style.display !== 'none' && repairHolder.innerHTML.trim()) {
+    holder.style.display = 'none';
+    return;
+  }
+  const pool = _welcomeBackPickPool();
+  if (!pool) { holder.style.display = 'none'; return; }
+  const variant = _welcomeBackPickVariant(pool);
+  const isEn = state.lang === 'en';
+  const text = isEn ? variant.en : variant.he;
+  // Owl expression: long-absence gets the bouncing admiring owl (more
+  // enthusiastic "hey you're back!"); daily and missed both wave.
+  const expr = pool === 'long' ? 'owl-admiring' : 'owl-neutral';
+  const owlHTML = _cloneOwlSvgHTML(expr);
+  const dismissLabel = isEn ? 'Dismiss' : 'סגור';
+  const ariaLabel = isEn ? 'Welcome back' : 'ברוכים השבים';
+  holder.innerHTML =
+    '<div class="welcome-back-banner" role="region" aria-label="' + ariaLabel + '"' +
+      ' data-pool="' + pool + '" data-variant="' + variant.key + '">' +
+      '<div class="welcome-back-owl">' + owlHTML + '</div>' +
+      '<div class="welcome-back-text">' + text + '</div>' +
+      '<button class="welcome-back-dismiss" aria-label="' + dismissLabel + '"' +
+        ' onclick="dismissWelcomeBack(\'x_button\')">×</button>' +
+    '</div>';
+  holder.style.display = '';
+  // Mark shown for the day so subsequent home re-renders in the same
+  // streak-day don't re-fire (or pick a different variant).
+  state.welcomeBackShownAt = _streakDay();
+  state.welcomeBackLastVariant = variant.key;
+  try { saveStateLocal(); } catch(e) {}
+  try {
+    posthog.capture('welcome_back_shown', {
+      pool: pool,
+      variant: variant.key,
+      gap_days: _welcomeBackGapDays(),
+      streak: state.dailyStreak || 0,
+    });
+  } catch(e) {}
+}
+
+// Called by the × button (source='x_button') and openReader (source=
+// 'lesson_tap'). Reads pool + variant off the DOM data attributes so
+// the analytics event reflects what was actually shown, even if the
+// gap has changed between show and dismiss.
+function dismissWelcomeBack(source) {
+  const holder = document.getElementById('welcome-back-banner-holder');
+  if (!holder) return;
+  const banner = holder.querySelector('.welcome-back-banner');
+  if (!banner || holder.style.display === 'none') return;
+  const pool = banner.getAttribute('data-pool') || null;
+  const variant = banner.getAttribute('data-variant') || null;
+  holder.innerHTML = '';
+  holder.style.display = 'none';
+  try {
+    posthog.capture('welcome_back_dismissed', {
+      pool: pool,
+      variant: variant,
+      dismiss_source: source || 'unknown',
+    });
+  } catch(e) {}
+}
+// === End welcome-back banner =========================================
 
 function renderStreakRepairCard() {
   const holder = document.getElementById('streak-repair-card-holder');
@@ -17920,6 +18137,10 @@ function renderHome() {
   // safe to call unconditionally — it clears the holder if the user isn't
   // eligible or has dismissed it this session.
   try { renderStreakRepairCard(); } catch (e) {}
+  // Welcome-back banner: rendered right after streak-repair so the gate
+  // inside can check whether repair took the top-of-home slot. Fires at
+  // most once per streak-day; internal guards handle all other cases.
+  try { renderWelcomeBackBanner(); } catch (e) {}
   // Psychology-release announcement card: safe to call unconditionally —
   // guards inside clear the holder for users who've already dismissed,
   // visited psychology, or aren't past the first-dialogue milestone.
@@ -18546,6 +18767,13 @@ function closeLibraryModal() {
 
 function openReader(weekId, dayId, opts) {
   opts = opts || {};
+  // Auto-clear the welcome-back banner if it was still showing — the
+  // moment the user opens a lesson the greeting has done its job.
+  // Safe no-op if the banner isn't up. Called before the paywall gate
+  // so a blocked-by-paywall tap still counts as engaging with the home
+  // affordance (the banner would look stale sitting behind the paywall
+  // modal otherwise).
+  try { dismissWelcomeBack('lesson_tap'); } catch (e) {}
   // Paywall gate. Free tier = chapter 1 of each subject; everything else
   // requires paid entitlement. A lapsed user keeps access to dialogues
   // they've already completed — the moment stays theirs even after the
