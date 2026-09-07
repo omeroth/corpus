@@ -6754,14 +6754,37 @@
     transform-origin: 50% 80%;
   }
   .welcome-back-owl-wrap svg { width: 100%; height: 100%; }
+  /* Text block wraps headline + sub so their vertical rhythm is owned
+     here rather than by margin-collapsing between siblings. Bottom
+     margin pushes the CTA down consistently regardless of whether the
+     sub-line is present (it collapses via :empty below when absent). */
+  .welcome-back-text-block {
+    margin-bottom: 24px;
+  }
   .welcome-back-headline {
     font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(24px * var(--text-scale));
     font-weight: 900;
     color: var(--ink);
     line-height: 1.25;
-    margin-bottom: 24px;
     letter-spacing: -0.01em;
+  }
+  /* Sub-line: lighter and smaller than the headline, softer colour so
+     it reads as invitation rather than second title. Only long-pool
+     variants provide sub_en / sub_he today; other pools leave the
+     element empty and :empty below collapses it to zero-height so
+     the layout stays identical. */
+  .welcome-back-sub {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(17px * var(--text-scale));
+    font-weight: 600;
+    color: var(--text-2);
+    line-height: 1.4;
+    margin-top: 8px;
+  }
+  .welcome-back-sub:empty {
+    display: none;
+    margin: 0;
   }
   .welcome-back-cta {
     /* Reuses .nav-btn for the base pill; this rule just guarantees full
@@ -16784,11 +16807,17 @@ const WELCOME_BACK_COPY = {
     { key: 'no_press', en: "No pressure — just start.",  he: "בלי לחץ — פשוט להתחיל." },
     { key: 'back_on',  en: "Back on it.",                he: "חזרנו לזה." },
   ],
+  // Long pool uses a two-line shape: a headline greeting plus a
+  // sub-line invitation. Variants with sub_en/sub_he render both;
+  // variants without (all of daily + missed) render just the head
+  // — the modal template hides the sub element via :empty when
+  // absent.
   long: [
-    { key: 'been_while', en: "It's been a while.",                    he: "עבר זמן." },
-    { key: 'welcome',    en: "Welcome back.",                         he: "ברוכים השבים." },
-    { key: 'glad',       en: "Glad you're here.",                     he: "שמחים שחזרתם." },
-    { key: 'owl_hoping', en: "The owl was hoping you'd come by.",     he: "הינשוף חיכה שתעברו." },
+    { key: 'pick_up',          en: "Welcome back.",          sub_en: "Let's pick up where you left off.",     he: "ברוכים השבים.",  sub_he: "בואו נמשיך מאיפה שהפסקתם." },
+    { key: 'have_you_here',    en: "Good to have you here.", sub_en: "Let's begin.",                          he: "טוב שאתם כאן.",  sub_he: "בואו נתחיל." },
+    { key: 'thinkers_waiting', en: "You're back.",           sub_en: "Your thinkers are waiting.",            he: "חזרתם.",         sub_he: "ההוגים שלכם מחכים." },
+    { key: 'feels_right',      en: "Welcome back.",          sub_en: "Start wherever feels right.",           he: "ברוכים השבים.",  sub_he: "תתחילו מאיפה שמרגיש נכון." },
+    { key: 'ready_for_you',    en: "Good to see you.",       sub_en: "There's a dialogue ready for you.",     he: "טוב לראות אתכם.", sub_he: "יש דיאלוג שמחכה לכם." },
   ],
 };
 
@@ -16796,25 +16825,25 @@ const WELCOME_BACK_COPY = {
 // owl SVG template (owl-neutral waves, owl-determined lifts, owl-
 // admiring bounces, owl-action points). Assigned so the pool has
 // visual variation across launches, not just copy variation. Some
-// expressions repeat across variants deliberately — e.g. the long
-// pool is 3× admiring because "you're back" earns bouncing regardless
-// of the specific words.
+// expressions repeat across variants deliberately — warmth is warmth.
 const WELCOME_BACK_VARIANT_EXPR = {
   // daily
-  ready:      'owl-determined',
-  few_mins:   'owl-neutral',
-  today:      'owl-admiring',
-  welcome:    'owl-neutral',    // shared key across daily+long; daily uses neutral
-  five_min:   'owl-action',
+  ready:            'owl-determined',
+  few_mins:         'owl-neutral',
+  today:            'owl-admiring',
+  welcome:          'owl-neutral',
+  five_min:         'owl-action',
   // missed
-  good_see:   'owl-admiring',
-  pickup:     'owl-neutral',
-  no_press:   'owl-neutral',
-  back_on:    'owl-determined',
-  // long (variant 'welcome' handled per-pool below)
-  been_while: 'owl-admiring',
-  glad:       'owl-admiring',
-  owl_hoping: 'owl-action',
+  good_see:         'owl-admiring',
+  pickup:           'owl-neutral',
+  no_press:         'owl-neutral',
+  back_on:          'owl-determined',
+  // long
+  pick_up:          'owl-determined',
+  have_you_here:    'owl-admiring',
+  thinkers_waiting: 'owl-action',
+  feels_right:      'owl-neutral',
+  ready_for_you:    'owl-admiring',
 };
 
 // Module-scope snapshot of what was shown, so closeWelcomeBackModal
@@ -16873,12 +16902,10 @@ function _welcomeBackPickVariant(pool) {
   return pick[Math.floor(Math.random() * pick.length)];
 }
 
-// Owl expression per (pool, variant). The 'welcome' key appears in
-// both daily and long pools with different intended tone — daily gets
-// a simple wave (neutral), long gets an enthusiastic bounce (admiring).
-// Everything else routes through the flat map above.
-function _welcomeBackExprFor(pool, variantKey) {
-  if (variantKey === 'welcome') return pool === 'long' ? 'owl-admiring' : 'owl-neutral';
+// Owl expression per variant. Straight map lookup with a safe fallback
+// — every current variant has an entry above, so the fallback only
+// fires if someone adds a new variant without wiring an expression.
+function _welcomeBackExprFor(variantKey) {
   return WELCOME_BACK_VARIANT_EXPR[variantKey] || 'owl-neutral';
 }
 
@@ -16911,14 +16938,21 @@ function showWelcomeBackModal() {
   if (!pool) return;
   const variant = _welcomeBackPickVariant(pool);
   const isEn = state.lang === 'en';
-  const text = isEn ? variant.en : variant.he;
-  const expr = _welcomeBackExprFor(pool, variant.key);
+  const headText = isEn ? variant.en : variant.he;
+  // Sub-line is present on long-pool variants only today. Empty string
+  // (not omitted) so the sub element renders empty and its :empty CSS
+  // rule collapses it — keeps the layout consistent for pools that
+  // don't provide a sub-line.
+  const subText = isEn ? (variant.sub_en || '') : (variant.sub_he || '');
+  const expr = _welcomeBackExprFor(variant.key);
   const owlWrap = document.getElementById('welcome-back-owl-wrap');
   const headline = document.getElementById('welcome-back-headline');
+  const sub = document.getElementById('welcome-back-sub');
   const cta = document.getElementById('welcome-back-cta');
-  if (!owlWrap || !headline || !cta) return;
+  if (!owlWrap || !headline || !sub || !cta) return;
   owlWrap.innerHTML = _cloneOwlSvgHTML(expr);
-  headline.textContent = text;
+  headline.textContent = headText;
+  sub.textContent = subText;
   cta.textContent = isEn ? 'Continue' : 'המשך';
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
@@ -26229,7 +26263,10 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="welcome-back-modal" class="modal-overlay">
   <div class="modal-box welcome-back-box">
     <div class="welcome-back-owl-wrap" id="welcome-back-owl-wrap" aria-hidden="true"></div>
-    <div class="welcome-back-headline" id="welcome-back-headline"></div>
+    <div class="welcome-back-text-block">
+      <div class="welcome-back-headline" id="welcome-back-headline"></div>
+      <div class="welcome-back-sub" id="welcome-back-sub"></div>
+    </div>
     <button type="button" class="nav-btn welcome-back-cta" id="welcome-back-cta" onclick="closeWelcomeBackModal()"></button>
   </div>
 </div>
