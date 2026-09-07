@@ -16852,6 +16852,29 @@ const WELCOME_BACK_VARIANT_EXPR = {
 // unlikely with the blocking overlay, but cheap insurance).
 let _welcomeBackShownContext = null;
 
+// Soft-instrumentation timestamps for measuring engagement with the
+// modal. NOT a controlled experiment — see the block below.
+//
+//   IMPORTANT: everything downstream of these timestamps (dwell time,
+//   has_seen_welcome_back_today, seconds_since_welcome_back_dismissed)
+//   is DIRECTIONAL, NOT CAUSAL. Users who see the modal today are a
+//   self-selected group — they opened the app and stayed past the
+//   modal — not a randomised sample. Correlations between "saw modal"
+//   and "completed dialogue" do NOT establish that the modal caused
+//   the completion. If we ever want a causal answer we need a proper
+//   holdout arm, which we've decided against at current scale (see
+//   the discussion around commit 348620e).
+//
+// _welcomeBackShownAtMs — Date.now() at the moment the modal opened,
+//                        used to compute dwell on dismiss.
+// _welcomeBackDismissedAtMs — Date.now() at Continue tap; used by
+//                        finishDay to stamp seconds_since_welcome_back
+//                        _dismissed onto the day_completed event so
+//                        we can see how often a dismissal is followed
+//                        by a completion in the same session.
+let _welcomeBackShownAtMs = null;
+let _welcomeBackDismissedAtMs = null;
+
 // Gap in streak-days since lastActiveDate. Null if no prior activity
 // (first-ever launch), 0 if already active today. Uses local-time
 // Date construction to match _streakDay semantics — parsing ISO
@@ -16959,6 +16982,7 @@ function showWelcomeBackModal() {
   // Snapshot for the dismiss handler + mark shown for the day so
   // subsequent home re-renders in the same streak-day don't re-fire.
   _welcomeBackShownContext = { pool: pool, variant: variant.key };
+  _welcomeBackShownAtMs = Date.now();
   state.welcomeBackShownAt = _streakDay();
   state.welcomeBackLastVariant = variant.key;
   try { saveStateLocal(); } catch(e) {}
@@ -16980,11 +17004,21 @@ function closeWelcomeBackModal() {
   document.body.style.overflow = '';
   const ctx = _welcomeBackShownContext || {};
   _welcomeBackShownContext = null;
+  // Dwell in ms: how long the modal was open. Null if we somehow got
+  // here without a shown timestamp (e.g. hot-reload during dev, or
+  // a future path that closes the modal without having shown it).
+  // Also stash dismissedAtMs so the next day_completed event in the
+  // same session can report seconds-since-dismiss (see finishDay).
+  const dwellMs = (typeof _welcomeBackShownAtMs === 'number')
+    ? (Date.now() - _welcomeBackShownAtMs) : null;
+  _welcomeBackShownAtMs = null;
+  _welcomeBackDismissedAtMs = Date.now();
   try {
     posthog.capture('welcome_back_dismissed', {
       pool: ctx.pool || null,
       variant: ctx.variant || null,
       dismiss_source: 'continue',
+      dwell_ms: dwellMs,
     });
   } catch(e) {}
 }
@@ -19990,7 +20024,28 @@ function finishDay() {
   _reconcileReminders().catch(e => console.error('[Reminder] reconcile failed:', e));
 
   try {
-    posthog.capture('day_completed', { chapter: state.currentWeek, day: state.currentDay });
+    // Soft-instrumentation for the welcome-back modal. Directional
+    // signal only — see the block comment near _welcomeBackShownAtMs
+    // for why these do NOT establish causation. Users who saw the
+    // modal today are a self-selected group (they opened the app);
+    // any correlation with completion is confounded by that.
+    //
+    //   has_seen_welcome_back_today — was the modal shown at least
+    //     once this streak-day? Reads the same field that gates
+    //     re-show.
+    //   seconds_since_welcome_back_dismissed — null unless a dismiss
+    //     happened in this session. Lets us slice "completions within
+    //     N minutes of the modal" without picking a threshold now.
+    const sawWB = state.welcomeBackShownAt === _streakDay();
+    const secsSinceDismiss = (typeof _welcomeBackDismissedAtMs === 'number')
+      ? Math.round((Date.now() - _welcomeBackDismissedAtMs) / 1000)
+      : null;
+    posthog.capture('day_completed', {
+      chapter: state.currentWeek,
+      day: state.currentDay,
+      has_seen_welcome_back_today: sawWB,
+      seconds_since_welcome_back_dismissed: secsSinceDismiss,
+    });
     if (completedInWeek === totalDays) posthog.capture('week_completed', { chapter: state.currentWeek });
   } catch(e) {}
   // Funnel: first_dialogue_completed. Once per install. Includes
