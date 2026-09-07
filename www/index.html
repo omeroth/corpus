@@ -21971,6 +21971,38 @@ function shareCompletion() {
       const slug = _SHARE_SLUG_PREFIX[subject] || 'phil';
       const lang = isEn ? 'en' : 'he';
       overrideUrl = `https://corpusapp.io/d/${slug}-${state.currentWeek}-${state.currentDay}-${lang}.html`;
+    } else {
+      // Silent-fallback instrumentation. The share still works — the user
+      // gets a bare corpusapp.io / App Store link — but the OG image and
+      // dialogue-specific preview are gone, so the shared link doesn't
+      // render a rich card on WhatsApp / Twitter / iMessage. Without this
+      // event the degradation is invisible to us until someone notices
+      // and reports it (which is exactly how the phil-2-1 case surfaced).
+      //
+      // Reason distinguishes the two known causes:
+      //   no_thinker_id  — dialogue has thinkerId:null (chapter intros,
+      //                    chapter summaries, multi-thinker critiques).
+      //                    Generator skips these at
+      //                    generate-share-cards.mjs:1254. Design decision:
+      //                    thinker-less dialogues genuinely have no card
+      //                    today, and inventing an attribution to satisfy
+      //                    tooling would violate content standards.
+      //   no_week_day    — state.currentWeek/currentDay unset. Shouldn't
+      //                    happen from the completion modal (finishDay
+      //                    guarantees they're set) but captured
+      //                    defensively so any future caller anomaly
+      //                    surfaces here rather than degrading silently.
+      const reason = (state.currentWeek && state.currentDay) ? 'no_thinker_id' : 'no_week_day';
+      try {
+        posthog.capture('share_degraded_no_card', {
+          reason: reason,
+          subject: state.subject || null,
+          week_id: state.currentWeek || null,
+          day_id:  state.currentDay || null,
+          lang:    isEn ? 'en' : 'he',
+          title:   title || null,
+        });
+      } catch(e) {}
     }
     await _shareCorpus('completion_modal', text, overrideUrl, { thinker_id: thinkerId || null });
   });
