@@ -536,7 +536,7 @@ const psychologyData = {
         ]},
 
 // ─── Chapter 1, Dialogue 7, Summary: What Is the Mind, Anyway? ───
-        { id: 7, title: 'מה זאת בכלל נפש?', titleEn: 'What Is the Mind, Anyway?', xp: 50, sections: [
+        { id: 7, title: 'מה זאת בכלל נפש?', titleEn: 'What Is the Mind, Anyway?', xp: 50, isSummary: true, sections: [
           {
             type: 'idea',
             title: 'מה זאת בכלל נפש?', titleEn: 'What Is the Mind, Anyway?',
@@ -1132,7 +1132,7 @@ const psychologyData = {
           },
           { type: 'quiz_summary' },
         ]},
-        { id: 7, title: 'שישה מנועים, שאלה אחת', titleEn: 'Six Engines, One Question', xp: 50, sections: [
+        { id: 7, title: 'שישה מנועים, שאלה אחת', titleEn: 'Six Engines, One Question', xp: 50, isSummary: true, sections: [
           {
             type: 'idea',
             title: 'שישה מנועים, שאלה אחת', titleEn: 'Six Engines, One Question',
@@ -1747,7 +1747,7 @@ const psychologyData = {
           },
           { type: 'quiz_summary' },
         ]},
-        { id: 7, title: 'שישה מקורות, אני אחד', titleEn: 'Six Sources, One Self', xp: 50, sections: [
+        { id: 7, title: 'שישה מקורות, אני אחד', titleEn: 'Six Sources, One Self', xp: 50, isSummary: true, sections: [
           {
             type: 'idea',
             title: 'שישה מקורות, אני אחד', titleEn: 'Six Sources, One Self',
@@ -2375,7 +2375,7 @@ const psychologyData = {
         ]},
 
 // ─── Chapter 4, Dialogue 7 — Summary: Why is it so hard to be different? ───
-        { id: 7, title: 'למה כל כך קשה להיות אחר?', titleEn: 'Why is it so hard to be different?', xp: 50, sections: [
+        { id: 7, title: 'למה כל כך קשה להיות אחר?', titleEn: 'Why is it so hard to be different?', xp: 50, isSummary: true, sections: [
           {
             type: 'idea',
             title: 'למה כל כך קשה להיות אחר?', titleEn: 'Why is it so hard to be different?',
