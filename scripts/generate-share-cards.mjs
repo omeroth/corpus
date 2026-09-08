@@ -511,6 +511,220 @@ async function renderCard({ thinker, dayTitle, subject, lang }) {
   return canvas.toBuffer('image/png');
 }
 
+// Kind-label copy for the kindless card (stands in for the thinker
+// name in the text column). Keep short — this is the card's second-
+// tier text, not a headline. Summary labels include the chapter
+// number since the summary card treats the CHAPTER as its subject
+// (chapter title is the hero), so "Chapter 1 · Summary" reads as a
+// specific completion moment rather than a generic label.
+function _kindlessLabel(kind, lang, chapterId) {
+  const isEn = lang === 'en';
+  if (kind === 'summary') return isEn ? `Chapter ${chapterId} · Summary` : `פרק ${chapterId} · סיכום`;
+  if (kind === 'intro')   return isEn ? 'An Introduction'                : 'פתיחת פרק';
+  return isEn ? 'A Dialogue' : 'דיאלוג';   // catch-all for null-thinker non-summary non-intro
+}
+
+// Kindless dialogue card — 1200×630 landscape for dialogues without
+// a thinker (chapter intros, chapter summaries, comparative critiques).
+// Same shell as renderCard so the two are visually one family: same
+// background, same Corpus wordmark, same corpusapp.io footer, same
+// gold divider.
+//
+// Two layouts, keyed off `kind`:
+//
+//   summary — chapter title is the hero (left column, big). No right
+//             panel. Reasoning: summary dialogues have no unique title
+//             in the data ("Chapter Summary" / "סיכום הפרק"), so
+//             using dayTitle as the hero would duplicate the label.
+//             The completion moment is really about the CHAPTER, so
+//             the chapter title carries the card. Cleaner + honest.
+//
+//   intro / other — dayTitle is the hero (left column). Right panel
+//             shows chapter context (CHAPTER N + chapter title) so
+//             the viewer sees which chapter the dialogue anchors.
+//
+// kindLabels come pre-translated per lang; caller resolves them from
+// day.isSummary / (day.id === 1) / fallback. Chapter context comes
+// from the enclosing week.
+async function renderKindlessCard({ dayTitle, subject, lang, chapterId, chapterTitle, kindLabel, kind }) {
+  const W = 1200, H = 630;
+  const isEn = lang === 'en';
+  const theme = THEMES[subject] || THEMES.philosophy;
+  const canvas = createCanvas(W, H);
+  const ctx = canvas.getContext('2d');
+  ctx.textBaseline = 'top';
+
+  ctx.fillStyle = theme.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Layout branch — summary is single-column (chapter title = hero,
+  // no right panel), everything else is two-column with the chapter-
+  // context panel on the portrait side. See block comment above.
+  const isSummary = kind === 'summary';
+  const heroText  = isSummary ? chapterTitle : dayTitle;
+
+  // Chapter-context panel — occupies the same slot the portrait circle
+  // does in renderCard. Rounded rect (not a circle) to signal "this is
+  // a different kind of card" while staying in the same visual family.
+  // Skipped entirely for summaries.
+  const PANEL_W = 360;
+  const PANEL_H = 400;
+  const OUTER_MARGIN_TEXT     = 60;
+  const OUTER_MARGIN_PORTRAIT = 40;
+  const GUTTER                = 80;
+  const panelX = isEn ? (W - OUTER_MARGIN_PORTRAIT - PANEL_W)
+                      : OUTER_MARGIN_PORTRAIT;
+  const panelY = (H - PANEL_H) / 2;
+  const panelRadius = 24;
+
+  if (isSummary) {
+    // Summary: large decorative chapter numeral on the far side of the
+    // card, opposite the text column. Very pale accent so it reads as
+    // ornament, not competing text — the eye lands on the chapter
+    // title first, the numeral registers as background context. Same
+    // side the portrait would sit on for other kinds, so the card
+    // family holds its visual rhythm.
+    ctx.save();
+    ctx.fillStyle = theme.wordmark;
+    ctx.globalAlpha = 0.10;
+    ctx.font = '900 340px "Nunito Black", Rubik, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const numeralX = isEn ? (W - OUTER_MARGIN_PORTRAIT - PANEL_W / 2)
+                          : (OUTER_MARGIN_PORTRAIT + PANEL_W / 2);
+    ctx.fillText(String(chapterId), numeralX, H / 2);
+    ctx.textBaseline = 'top';
+    ctx.restore();
+  } else {
+    // Fill: solid off-white plate (same as thinker portrait plate) so
+    // the panel reads as a physical card, not a background tint.
+    ctx.fillStyle = PLATE;
+    _roundRectPath(ctx, panelX, panelY, PANEL_W, PANEL_H, panelRadius);
+    ctx.fill();
+    // Border: subject-themed frame if available, gold otherwise (same
+    // fallback logic as the portrait rim). 3px matches thinker card's
+    // rim visual weight at the smaller panel size.
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = (USE_FRAME_RIM && theme.frame) ? theme.frame : RIM;
+    _roundRectPath(ctx, panelX, panelY, PANEL_W, PANEL_H, panelRadius);
+    ctx.stroke();
+
+    // Panel content — centered horizontally in the panel, vertically
+    // stacked. Chapter eyebrow (small caps, tracked, ink-2 color) → hair
+    // rule → chapter title big (weight 900, ink) → optional footer.
+    const panelCx = panelX + PANEL_W / 2;
+    ctx.textAlign = 'center';
+    const eyebrow = isEn ? `CHAPTER ${chapterId}` : `פרק ${chapterId}`;
+    ctx.fillStyle = theme.era;
+    ctx.font = '700 20px Rubik, sans-serif';
+    ctx.letterSpacing = '2px';
+    ctx.fillText(eyebrow, panelCx, panelY + 60);
+    ctx.letterSpacing = '0px';
+    // Hair rule
+    const ruleY = panelY + 100;
+    const ruleW = 60;
+    ctx.strokeStyle = RIM;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(panelCx - ruleW / 2, ruleY);
+    ctx.lineTo(panelCx + ruleW / 2, ruleY);
+    ctx.stroke();
+    // Chapter title — shrink-to-fit within the panel with 24px inner pad.
+    const titleMaxWidth = PANEL_W - 48;
+    const { size, lines } = fitQuestion(ctx, chapterTitle, titleMaxWidth, 2, 'Rubik, sans-serif');
+    ctx.fillStyle = theme.name;
+    ctx.font = `900 ${size}px Rubik, sans-serif`;
+    const titleLineH = size * 1.2;
+    const titleBlockH = lines.length * titleLineH;
+    let titleY = panelY + PANEL_H / 2 - titleBlockH / 2 + 18;
+    for (const line of lines) {
+      const rendered = !isEn ? (RLM + line + RLM) : line;
+      ctx.fillText(rendered, panelCx, titleY);
+      titleY += titleLineH;
+    }
+    ctx.textAlign = isEn ? 'left' : 'right';   // reset for the text column below
+  }
+
+  // Text column — same anchor as renderCard so the two card kinds
+  // share their skeleton. Summary layout is full-width (no panel), so
+  // the column extends across the whole card minus the two outer
+  // margins; other layouts subtract the panel width + gutter.
+  const colX     = isEn ? OUTER_MARGIN_TEXT : (W - OUTER_MARGIN_TEXT);
+  const colWidth = isSummary
+    ? (W - OUTER_MARGIN_TEXT - OUTER_MARGIN_PORTRAIT)
+    : (W - OUTER_MARGIN_TEXT - PANEL_W - GUTTER - OUTER_MARGIN_PORTRAIT);
+  ctx.textAlign = isEn ? 'left' : 'right';
+
+  let y = 70;
+
+  // Wordmark
+  ctx.font = '50px "Nunito Black", Rubik, sans-serif';
+  ctx.fillStyle = theme.wordmark;
+  ctx.letterSpacing = '-1.32px';
+  ctx.fillText('Corpus', colX, y);
+  ctx.letterSpacing = '0px';
+  y += 74;
+
+  // Hero — dialogue title for intro/other, chapter title for summary.
+  // fitQuestion handles shrink-to-fit so a long chapter title (e.g.
+  // "Doubt and Knowledge") doesn't clip.
+  const heroTrimmed = String(heroText || '').trim();
+  if (heroTrimmed) {
+    const { size: qsize, lines: qlines } = fitQuestion(ctx, heroTrimmed, colWidth, 3, 'Rubik, sans-serif');
+    ctx.fillStyle = theme.question;
+    ctx.font = `800 ${qsize}px Rubik, sans-serif`;
+    const lh = qsize * 1.2;
+    for (const line of qlines) {
+      const rendered = !isEn ? (RLM + line + RLM) : line;
+      ctx.fillText(rendered, colX, y);
+      y += lh;
+    }
+    y += 24;
+  }
+
+  // Kind label — standing in for the thinker name in renderCard. Same
+  // font weight and colour so the visual rhythm holds; caller provides
+  // pre-translated copy ("An Introduction" / "אקדמה" / etc.).
+  ctx.fillStyle = theme.name;
+  ctx.font = '900 32px Rubik, sans-serif';
+  ctx.fillText(kindLabel, colX, y);
+  y += 44;
+
+  // Gold divider — same short bar as renderCard
+  const divW = 80;
+  const divY = y + 8;
+  const divX = isEn ? colX : (colX - divW);
+  ctx.strokeStyle = RIM;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(divX, divY);
+  ctx.lineTo(divX + divW, divY);
+  ctx.stroke();
+
+  // corpusapp.io
+  ctx.fillStyle = URL_TXT;
+  ctx.font = '700 22px Rubik, sans-serif';
+  ctx.fillText('corpusapp.io', colX, H - 60);
+
+  return canvas.toBuffer('image/png');
+}
+
+// Helper: rounded-rect path (canvas doesn't provide one natively in
+// the version we ship). Used by the kindless card panel.
+function _roundRectPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // Thinker card renderers — collectible-illustration hero
 // ─────────────────────────────────────────────────────────────────────────
@@ -1251,55 +1465,93 @@ async function main() {
     for (const week of data.weeks) {
       if (!week || !Array.isArray(week.days)) continue;
       for (const day of week.days) {
-        if (!day || !day.thinkerId) continue;
+        if (!day) continue;
+        // Day 0 preambles auto-complete on tap-through (finishDay short-
+        // circuits at day.id === 0) and never surface a completion modal
+        // or share button, so a share card would be dead weight.
+        if (day.id === 0) continue;
+
+        // Kind classification. thinker → normal renderCard path. Every
+        // thinker-less dialogue gets a kindless card + landing page.
+        //
+        //   thinker  — day.thinkerId is set. Existing renderCard.
+        //   summary  — day.isSummary === true. Chapter-completion moment.
+        //   intro    — chapter day 1 with no thinker (philosophy 2.1 / 3.1
+        //              / 4.1 shape). "Started a new chapter" beat.
+        //   other    — everything else with thinkerId null (philosophy 4.5
+        //              comparative critique; catch-all for future data).
+        let kind;
+        if (day.thinkerId) kind = 'thinker';
+        else if (day.isSummary) kind = 'summary';
+        else if (day.id === 1)  kind = 'intro';
+        else                    kind = 'other';
 
         for (const lang of ['he', 'en']) {
           const isEn = lang === 'en';
-          const thinker = (isEn ? THINKERS_EN : THINKERS).find(t => t.id === day.thinkerId);
-          if (!thinker) {
-            console.warn('[gen:share] thinker not found for id', day.thinkerId, 'lang', lang);
-            continue;
-          }
           const dayTitle = isEn
             ? (day.titleEn || day.title)
             : (day.title    || day.titleEn);
           if (!dayTitle) continue;
 
           const slug = _SUBJECT_SLUG[subject] || 'phil';
+          const cardFileName = `${slug}-${week.id}-${day.id}.png`;
+          const pageFileName = `${slug}-${week.id}-${day.id}-${lang}.html`;
 
-          // Card PNG — only when canvas is available. Pages don't depend on
-          // the card existing to round-trip; the og:image will just 404 until
-          // a run with canvas installed writes the PNGs. Skip silently.
-          if (CANVAS_ENABLED) {
-            const cardDir  = path.join(OUT_CARDS, lang);
-            const cardFile = path.join(cardDir, `${slug}-${week.id}-${day.id}.png`);
-            fs.mkdirSync(cardDir, { recursive: true });
-            const buf = await renderCard({ thinker, dayTitle, subject, lang });
-            fs.writeFileSync(cardFile, buf);
+          if (kind === 'thinker') {
+            const thinker = (isEn ? THINKERS_EN : THINKERS).find(t => t.id === day.thinkerId);
+            if (!thinker) {
+              console.warn('[gen:share] thinker not found for id', day.thinkerId, 'lang', lang);
+              continue;
+            }
+            if (CANVAS_ENABLED) {
+              const cardDir  = path.join(OUT_CARDS, lang);
+              fs.mkdirSync(cardDir, { recursive: true });
+              const buf = await renderCard({ thinker, dayTitle, subject, lang });
+              fs.writeFileSync(path.join(cardDir, cardFileName), buf);
+            }
+            fs.mkdirSync(OUT_PAGES, { recursive: true });
+            fs.writeFileSync(path.join(OUT_PAGES, pageFileName), renderPage({
+              weekId: week.id, dayId: day.id, thinker, dayTitle, subject, lang,
+            }));
+            manifest.items.push({
+              weekId: week.id, dayId: day.id, subject, lang,
+              thinkerId: day.thinkerId, title: dayTitle,
+              card: `share/cards/${lang}/${cardFileName}`,
+              page: `d/${pageFileName}`,
+            });
+          } else {
+            // Kindless dialogue (summary / intro / other). Chapter context
+            // and kind label come from the enclosing week + kind above.
+            const chapterTitle = isEn
+              ? (week.titleEn || week.title || '')
+              : (week.title || week.titleEn || '');
+            const kindLabel = _kindlessLabel(kind, lang, week.id);
+            if (CANVAS_ENABLED) {
+              const cardDir = path.join(OUT_CARDS, lang);
+              fs.mkdirSync(cardDir, { recursive: true });
+              const buf = await renderKindlessCard({
+                dayTitle, subject, lang,
+                chapterId: week.id, chapterTitle, kindLabel, kind,
+              });
+              fs.writeFileSync(path.join(cardDir, cardFileName), buf);
+            }
+            fs.mkdirSync(OUT_PAGES, { recursive: true });
+            fs.writeFileSync(path.join(OUT_PAGES, pageFileName), renderPage({
+              weekId: week.id, dayId: day.id,
+              // No thinker — renderPage's inner treatment falls through
+              // to the day-title-driven meta already (bio/quote fields
+              // guarded by `thinker &&`). Pass a minimal shape so the
+              // template's field accesses don't NPE.
+              thinker: { id: null, name: '', era: '', bio: '', quote: '' },
+              dayTitle, subject, lang,
+            }));
+            manifest.items.push({
+              weekId: week.id, dayId: day.id, subject, lang,
+              thinkerId: null, kind, title: dayTitle,
+              card: `share/cards/${lang}/${cardFileName}`,
+              page: `d/${pageFileName}`,
+            });
           }
-
-          // HTML landing page
-          fs.mkdirSync(OUT_PAGES, { recursive: true });
-          const pageFile = path.join(OUT_PAGES, `${slug}-${week.id}-${day.id}-${lang}.html`);
-          fs.writeFileSync(pageFile, renderPage({
-            weekId:   week.id,
-            dayId:    day.id,
-            thinker,
-            dayTitle,
-            subject,
-            lang,
-          }));
-
-          manifest.items.push({
-            weekId: week.id,
-            dayId:  day.id,
-            subject,
-            lang,
-            thinkerId: day.thinkerId,
-            title:  dayTitle,
-            card:   `share/cards/${lang}/${slug}-${week.id}-${day.id}.png`,
-            page:   `d/${slug}-${week.id}-${day.id}-${lang}.html`,
-          });
         }
       }
     }

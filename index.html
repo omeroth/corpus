@@ -21945,8 +21945,37 @@ function shareCompletion() {
       const t = getT().find(x => x.id === thinkerId);
       if (t) thinkerName = t.name;
     }
+    // Kind classification. Mirrors the generator's routing at
+    // scripts/generate-share-cards.mjs so the URL, the card, and the
+    // share text agree on what kind of dialogue this is:
+    //   thinker  — day.thinkerId is set. Normal thinker card + URL.
+    //   summary  — day.isSummary === true. Chapter-completion moment;
+    //              chapter title is the natural share subject.
+    //   intro    — chapter day 1 with no thinker. Chapter-opening.
+    //   other    — everything else with thinkerId null (comparative
+    //              critiques etc.). Catch-all.
+    let kind;
+    if (thinkerId)          kind = 'thinker';
+    else if (day && day.isSummary) kind = 'summary';
+    else if (day && day.id === 1)  kind = 'intro';
+    else                    kind = 'other';
+
+    // Chapter title — used by summary text. Read off the enclosing
+    // chapter, not the dialogue, since the summary's OWN title is
+    // usually just "Chapter Summary" / "סיכום הפרק" (which would
+    // read badly in the share text: "Just finished the Chapter
+    // Summary chapter on Corpus"). Chapter title carries the topic
+    // ("Ethics" / "אתיקה") that a share recipient actually cares
+    // about.
+    const chapterTitle = chapter ? (isEn ? (chapter.titleEn || chapter.title || '') : (chapter.title || chapter.titleEn || '')) : '';
+
+    // Per-kind share text. Colon-title structure across all kinds so
+    // the chapter/dialogue name always sits after "on Corpus:" —
+    // consistent shape, avoids the "chapter 2:" digit+colon bidi
+    // boundary in Hebrew (a known WhatsApp/iMessage rendering risk
+    // when a digit sits between Hebrew tokens with a colon).
     let text;
-    if (title && thinkerName) {
+    if (kind === 'thinker' && thinkerName && title) {
       // Newline (not period) between the title clause and the CTA. The old
       // auto-appended "?" gave sentence separation via punctuation; that's
       // gone now, and dropping just a period on question titles like
@@ -21956,46 +21985,57 @@ function shareCompletion() {
       text = isEn
         ? `Just finished a dialogue with ${thinkerName} on: ${title}\nTry Corpus too:`
         : `סיימתי עכשיו דיאלוג עם ${thinkerName} על: ${title}\nנסה גם את Corpus:`;
+    } else if (kind === 'summary' && chapterTitle) {
+      text = isEn
+        ? `Just finished a chapter on Corpus: ${chapterTitle}\nTry Corpus too:`
+        : `סיימתי פרק ב-Corpus: ${chapterTitle}\nנסה גם את Corpus:`;
+    } else if (kind === 'intro' && title) {
+      text = isEn
+        ? `Started a new chapter on Corpus: ${title}\nTry Corpus too:`
+        : `התחלתי פרק חדש ב-Corpus: ${title}\nנסה גם את Corpus:`;
+    } else if (title) {
+      // Catch-all — non-thinker non-summary non-intro dialogue with
+      // a title (e.g. comparative critique). Still name the dialogue
+      // so the share text isn't fully generic.
+      text = isEn
+        ? `Just finished a dialogue on Corpus: ${title}\nTry Corpus too:`
+        : `סיימתי דיאלוג ב-Corpus: ${title}\nנסה גם את Corpus:`;
     } else {
+      // Absolute fallback — no title, no thinker, no chapter. Should
+      // never fire in practice (finishDay guarantees currentWeek/Day
+      // and every dialogue has some title), but insured against.
       text = isEn
         ? 'Just finished a dialogue on Corpus.\nTry Corpus too:'
         : 'סיימתי עכשיו דיאלוג ב-Corpus.\nנסה גם את Corpus:';
     }
-    // Build the /d/ landing-page URL only when the dialogue has both a
-    // thinker (so a page was generated) and current week/day are set.
-    // Otherwise fall through to the profile-style store link — better than
-    // a 404-inducing malformed slug.
+
+    // Build the /d/ landing-page URL. Every dialogue with a
+    // resolvable week/day + subject now has a landing page (the
+    // generator was extended to emit pages for thinker-less
+    // dialogues too — chapter intros, summaries, critiques —
+    // paired with the new kindless card design). The bare-link
+    // fallback only fires now for the defensive case where
+    // currentWeek/currentDay aren't set, which shouldn't happen
+    // from the completion modal.
     let overrideUrl;
-    if (thinkerId && state.currentWeek && state.currentDay) {
-      const subject = _subjectForThinker(thinkerId) || state.subject || 'philosophy';
+    if (state.currentWeek && state.currentDay) {
+      // subject: prefer the thinker's assigned subject when available
+      // (multi-subject thinkers like Kahneman need this to hit the
+      // right per-subject landing page), otherwise state.subject,
+      // else philosophy as the ultimate fallback.
+      const subject = (thinkerId && _subjectForThinker(thinkerId)) || state.subject || 'philosophy';
       const slug = _SHARE_SLUG_PREFIX[subject] || 'phil';
       const lang = isEn ? 'en' : 'he';
       overrideUrl = `https://corpusapp.io/d/${slug}-${state.currentWeek}-${state.currentDay}-${lang}.html`;
     } else {
-      // Silent-fallback instrumentation. The share still works — the user
-      // gets a bare corpusapp.io / App Store link — but the OG image and
-      // dialogue-specific preview are gone, so the shared link doesn't
-      // render a rich card on WhatsApp / Twitter / iMessage. Without this
-      // event the degradation is invisible to us until someone notices
-      // and reports it (which is exactly how the phil-2-1 case surfaced).
-      //
-      // Reason distinguishes the two known causes:
-      //   no_thinker_id  — dialogue has thinkerId:null (chapter intros,
-      //                    chapter summaries, multi-thinker critiques).
-      //                    Generator skips these at
-      //                    generate-share-cards.mjs:1254. Design decision:
-      //                    thinker-less dialogues genuinely have no card
-      //                    today, and inventing an attribution to satisfy
-      //                    tooling would violate content standards.
-      //   no_week_day    — state.currentWeek/currentDay unset. Shouldn't
-      //                    happen from the completion modal (finishDay
-      //                    guarantees they're set) but captured
-      //                    defensively so any future caller anomaly
-      //                    surfaces here rather than degrading silently.
-      const reason = (state.currentWeek && state.currentDay) ? 'no_thinker_id' : 'no_week_day';
+      // Silent-fallback instrumentation. Only reachable if
+      // currentWeek/currentDay isn't set — the "no_thinker_id" reason
+      // was retired now that every dialogue has a landing page. Kept
+      // the event so any future caller anomaly surfaces in PostHog
+      // rather than degrading silently to a bare link.
       try {
         posthog.capture('share_degraded_no_card', {
-          reason: reason,
+          reason: 'no_week_day',
           subject: state.subject || null,
           week_id: state.currentWeek || null,
           day_id:  state.currentDay || null,
@@ -22004,7 +22044,7 @@ function shareCompletion() {
         });
       } catch(e) {}
     }
-    await _shareCorpus('completion_modal', text, overrideUrl, { thinker_id: thinkerId || null });
+    await _shareCorpus('completion_modal', text, overrideUrl, { thinker_id: thinkerId || null, kind });
   });
 }
 

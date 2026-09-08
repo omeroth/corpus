@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-04T06:04:21.534Z",
+  "generatedAt": "2026-09-08T16:07:19.180Z",
   "items": [
     {
       "weekId": 1,
@@ -122,6 +122,50 @@
       "page": "d/phil-1-6-en.html"
     },
     {
+      "weekId": 1,
+      "dayId": 7,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "סיכום הפרק",
+      "card": "share/cards/he/phil-1-7.png",
+      "page": "d/phil-1-7-he.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 7,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "Chapter Summary",
+      "card": "share/cards/en/phil-1-7.png",
+      "page": "d/phil-1-7-en.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 1,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "intro",
+      "title": "מה הופך שאלה למוסרית?",
+      "card": "share/cards/he/phil-2-1.png",
+      "page": "d/phil-2-1-he.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 1,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "intro",
+      "title": "What Makes a Question Moral?",
+      "card": "share/cards/en/phil-2-1.png",
+      "page": "d/phil-2-1-en.html"
+    },
+    {
       "weekId": 2,
       "dayId": 2,
       "subject": "philosophy",
@@ -220,6 +264,28 @@
       "title": "The Trolley Problem",
       "card": "share/cards/en/phil-2-6.png",
       "page": "d/phil-2-6-en.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 7,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "סיכום הפרק",
+      "card": "share/cards/he/phil-2-7.png",
+      "page": "d/phil-2-7-he.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 7,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "Chapter Summary",
+      "card": "share/cards/en/phil-2-7.png",
+      "page": "d/phil-2-7-en.html"
     },
     {
       "weekId": "bonus1",
@@ -323,6 +389,28 @@
     },
     {
       "weekId": 3,
+      "dayId": 1,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "intro",
+      "title": "מה זה לדעת?",
+      "card": "share/cards/he/phil-3-1.png",
+      "page": "d/phil-3-1-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 1,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "intro",
+      "title": "What does it mean to know?",
+      "card": "share/cards/en/phil-3-1.png",
+      "page": "d/phil-3-1-en.html"
+    },
+    {
+      "weekId": 3,
       "dayId": 2,
       "subject": "philosophy",
       "lang": "he",
@@ -422,6 +510,50 @@
       "page": "d/phil-3-6-en.html"
     },
     {
+      "weekId": 3,
+      "dayId": 7,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "ספק וידע - סיכום הפרק",
+      "card": "share/cards/he/phil-3-7.png",
+      "page": "d/phil-3-7-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 7,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "Doubt and Knowledge - Chapter Summary",
+      "card": "share/cards/en/phil-3-7.png",
+      "page": "d/phil-3-7-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 1,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "intro",
+      "title": "מה אמיתי?",
+      "card": "share/cards/he/phil-4-1.png",
+      "page": "d/phil-4-1-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 1,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "intro",
+      "title": "What is Real?",
+      "card": "share/cards/en/phil-4-1.png",
+      "page": "d/phil-4-1-en.html"
+    },
+    {
       "weekId": 4,
       "dayId": 2,
       "subject": "philosophy",
@@ -483,6 +615,28 @@
     },
     {
       "weekId": 4,
+      "dayId": 5,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "other",
+      "title": "ביקורת: איפה כל גישה נכשלת?",
+      "card": "share/cards/he/phil-4-5.png",
+      "page": "d/phil-4-5-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 5,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "other",
+      "title": "Critique: Where Each Approach Fails",
+      "card": "share/cards/en/phil-4-5.png",
+      "page": "d/phil-4-5-en.html"
+    },
+    {
+      "weekId": 4,
       "dayId": 6,
       "subject": "philosophy",
       "lang": "he",
@@ -500,6 +654,28 @@
       "title": "Are We Living Inside a Simulation?",
       "card": "share/cards/en/phil-4-6.png",
       "page": "d/phil-4-6-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 7,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "מהי המציאות? - סיכום הפרק",
+      "card": "share/cards/he/phil-4-7.png",
+      "page": "d/phil-4-7-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 7,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "What is Reality? - Chapter Summary",
+      "card": "share/cards/en/phil-4-7.png",
+      "page": "d/phil-4-7-en.html"
     },
     {
       "weekId": 1,
@@ -622,6 +798,28 @@
       "page": "d/econ-1-6-en.html"
     },
     {
+      "weekId": 1,
+      "dayId": 7,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "סיכום: מה זאת בכלל כלכלה?",
+      "card": "share/cards/he/econ-1-7.png",
+      "page": "d/econ-1-7-he.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 7,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "Summary: What is Economics Anyway?",
+      "card": "share/cards/en/econ-1-7.png",
+      "page": "d/econ-1-7-en.html"
+    },
+    {
       "weekId": 2,
       "dayId": 1,
       "subject": "economics",
@@ -740,6 +938,28 @@
       "title": "When the Mind Deceives Us",
       "card": "share/cards/en/econ-2-6.png",
       "page": "d/econ-2-6-en.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 7,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "סיכום: מהו ערך?",
+      "card": "share/cards/he/econ-2-7.png",
+      "page": "d/econ-2-7-he.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 7,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "Summary: What is Value?",
+      "card": "share/cards/en/econ-2-7.png",
+      "page": "d/econ-2-7-en.html"
     },
     {
       "weekId": "bonusEcon1",
@@ -942,6 +1162,28 @@
       "page": "d/econ-3-5-en.html"
     },
     {
+      "weekId": 3,
+      "dayId": 6,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "סיכום: הון ועבודה",
+      "card": "share/cards/he/econ-3-6.png",
+      "page": "d/econ-3-6-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 6,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "Summary: Capital and Labor",
+      "card": "share/cards/en/econ-3-6.png",
+      "page": "d/econ-3-6-en.html"
+    },
+    {
       "weekId": 4,
       "dayId": 1,
       "subject": "economics",
@@ -1060,6 +1302,28 @@
       "title": "Human Capabilities",
       "card": "share/cards/en/econ-4-6.png",
       "page": "d/econ-4-6-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 7,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "סיכום: צדק כלכלי",
+      "card": "share/cards/he/econ-4-7.png",
+      "page": "d/econ-4-7-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 7,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "Summary: Economic Justice",
+      "card": "share/cards/en/econ-4-7.png",
+      "page": "d/econ-4-7-en.html"
     },
     {
       "weekId": 1,
@@ -1182,6 +1446,28 @@
       "page": "d/psyc-1-6-en.html"
     },
     {
+      "weekId": 1,
+      "dayId": 7,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "מה זאת בכלל נפש?",
+      "card": "share/cards/he/psyc-1-7.png",
+      "page": "d/psyc-1-7-he.html"
+    },
+    {
+      "weekId": 1,
+      "dayId": 7,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "What Is the Mind, Anyway?",
+      "card": "share/cards/en/psyc-1-7.png",
+      "page": "d/psyc-1-7-en.html"
+    },
+    {
       "weekId": 2,
       "dayId": 1,
       "subject": "psychology",
@@ -1300,6 +1586,28 @@
       "title": "When You Pay for Love",
       "card": "share/cards/en/psyc-2-6.png",
       "page": "d/psyc-2-6-en.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 7,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "שישה מנועים, שאלה אחת",
+      "card": "share/cards/he/psyc-2-7.png",
+      "page": "d/psyc-2-7-he.html"
+    },
+    {
+      "weekId": 2,
+      "dayId": 7,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "Six Engines, One Question",
+      "card": "share/cards/en/psyc-2-7.png",
+      "page": "d/psyc-2-7-en.html"
     },
     {
       "weekId": 3,
@@ -1422,6 +1730,28 @@
       "page": "d/psyc-3-6-en.html"
     },
     {
+      "weekId": 3,
+      "dayId": 7,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "שישה מקורות, אני אחד",
+      "card": "share/cards/he/psyc-3-7.png",
+      "page": "d/psyc-3-7-he.html"
+    },
+    {
+      "weekId": 3,
+      "dayId": 7,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "Six Sources, One Self",
+      "card": "share/cards/en/psyc-3-7.png",
+      "page": "d/psyc-3-7-en.html"
+    },
+    {
       "weekId": 4,
       "dayId": 1,
       "subject": "psychology",
@@ -1540,6 +1870,28 @@
       "title": "What if most of what we do was decided before we thought?",
       "card": "share/cards/en/psyc-4-6.png",
       "page": "d/psyc-4-6-en.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 7,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "למה כל כך קשה להיות אחר?",
+      "card": "share/cards/he/psyc-4-7.png",
+      "page": "d/psyc-4-7-he.html"
+    },
+    {
+      "weekId": 4,
+      "dayId": 7,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "Why is it so hard to be different?",
+      "card": "share/cards/en/psyc-4-7.png",
+      "page": "d/psyc-4-7-en.html"
     },
     {
       "weekId": "bonusPsy1",
