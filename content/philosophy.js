@@ -440,7 +440,7 @@ const corpusData = {
           id: 7,
           title: 'סיכום הפרק', titleEn: 'Chapter Summary',
           thinker: 'סיכום', thinkerEn: 'Summary',
-          thinkerId: null, xp: 80,
+          thinkerId: null, xp: 80, isSummary: true,
           sections: [
             {
               type: 'idea',
@@ -946,7 +946,7 @@ const corpusData = {
         id: 7,
         title: 'סיכום הפרק', titleEn: 'Chapter Summary',
         thinker: 'סיכום', thinkerEn: 'Summary',
-        thinkerId: null, xp: 80,
+        thinkerId: null, xp: 80, isSummary: true,
         sections: [
           {
             type: 'idea',
@@ -1845,7 +1845,7 @@ const corpusData = {
         id: 7,
         title: 'ספק וידע - סיכום הפרק', titleEn: 'Doubt and Knowledge - Chapter Summary',
         thinker: 'סיכום', thinkerEn: 'Summary',
-        thinkerId: null, xp: 80,
+        thinkerId: null, xp: 80, isSummary: true,
         sections: [
           {
             type: 'idea',
@@ -2359,7 +2359,7 @@ const corpusData = {
         id: 7,
         title: 'מהי המציאות? - סיכום הפרק', titleEn: 'What is Reality? - Chapter Summary',
         thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary',
-        thinkerId: null, xp: 50,
+        thinkerId: null, xp: 50, isSummary: true,
         sections: [
           {
             type: 'idea',
