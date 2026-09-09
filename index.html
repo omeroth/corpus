@@ -10174,11 +10174,21 @@ const RC_ANDROID_API_KEY = '';
 // supabase/migrations/20260901170000_grandfathering.sql).
 const PAYWALL_ENABLED = false;
 
-// Paywall trial gate. FALSE until App Store approves the introductory
-// offer on both products; the buttons charge immediately today, so
-// promising "7 days free" would be false advertising. Flip to true in
-// ONE place (here) once trial is live — the CTA copy, the card footer,
-// and the analytics is_trial flag all key off this.
+// Paywall trial gate. DELIBERATELY FALSE — Corpus does not offer a
+// free trial. This is a product decision, not a technical placeholder
+// waiting on App Store approval.
+//
+// The free tier is chapter 1 of each subject plus any chapter a user
+// has already started — that IS the trial. Layering a time-limited
+// introductory offer on top would train users to churn at day 8 and
+// muddy the free-tier value story ("what am I trying, exactly?").
+//
+// Do NOT flip this to true expecting the trial UI to Just Work when
+// Apple approves an introductory offer. If a trial is ever added,
+// the product decision needs to be revisited first — it isn't a
+// tooling gate. The CTA copy, card footer, and is_trial analytics
+// flag all key off this constant, so the wiring is intact; the
+// decision to not use it is the point.
 const PAYWALL_TRIAL_ENABLED = false;
 
 // Legal links required by Apple + Google in every paywall. Terms is
