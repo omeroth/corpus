@@ -105,6 +105,7 @@ function deriveProgressProps(record: Record<string, unknown>) {
     chaptersCompleted: chapterCompleteShown.length,
   };
   if (typeof record.lang === "string" && record.lang) props.language = record.lang;
+  if (typeof record.platform === "string" && record.platform) props.platform = record.platform;
   return props;
 }
 
@@ -174,6 +175,7 @@ serve(async (req: Request): Promise<Response> => {
   // record had a non-empty lang). Omitting on null keeps a previously-set
   // Loops language from being cleared by a partial sync.
   if (typeof derived.language === "string") body.language = derived.language;
+  if (typeof derived.platform === "string") body.platform = derived.platform;
 
   try {
     const updateRes = await fetch(LOOPS_UPDATE_URL, {

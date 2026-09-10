@@ -10750,6 +10750,38 @@ async function syncProgressToSupabase() {
     }
   } catch(e) { _reportSyncFailure('lang', e); }
   try {
+    // platform: added as text column in migration 20260910120000_user_progress
+    // _platform.sql. Forwarded by the loops-progress trigger (row_to_json(NEW))
+    // to Loops as the `platform` contact property so the pipeline can segment
+    // by device. Capacitor.getPlatform() returns 'web' for the browser/PWA
+    // surface — mapped to 'ios' before writing so the Loops segment isn't
+    // split three ways with a near-empty 'web' bucket. Separate upsert so a
+    // missing column on an un-migrated database doesn't break the base sync.
+    //
+    // Cadence: cache the last-synced value in localStorage and only upsert
+    // when the current platform differs. Keeps the boot path clean — steady-
+    // state users skip this entirely, and a user who signs in on Android and
+    // later opens on iOS still gets the flip picked up on the first open
+    // that sees the new value. localStorage is only written on successful
+    // upsert so a failed sync doesn't cache the intended value and prevent
+    // the retry on next call.
+    const _rawPlatform = (window.Capacitor && typeof window.Capacitor.getPlatform === 'function')
+      ? window.Capacitor.getPlatform() : 'web';
+    const _platform = _rawPlatform === 'android' ? 'android' : 'ios';
+    const _lastSynced = localStorage.getItem('corpus_platform_synced');
+    if (_platform !== _lastSynced) {
+      const { error } = await sb.from('user_progress').upsert({
+        user_id: currentUser.id,
+        platform: _platform,
+      }, { onConflict: 'user_id' });
+      if (error) {
+        _reportSyncFailure('platform', error);
+      } else {
+        try { localStorage.setItem('corpus_platform_synced', _platform); } catch(e) {}
+      }
+    }
+  } catch(e) { _reportSyncFailure('platform', e); }
+  try {
     // Streak state: repair audit trail (dated-array fields, migration
     // 20260721210000) + activeDates (jsonb string array, migration
     // 20260824210000). activeDates is the source of truth for the streak

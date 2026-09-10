@@ -69,6 +69,7 @@ function deriveProgressProps(record: Record<string, unknown> | null | undefined)
     chaptersCompleted: chapterCompleteShown.length,
   };
   if (typeof rec.lang === "string" && rec.lang) props.language = rec.lang;
+  if (typeof rec.platform === "string" && rec.platform) props.platform = rec.platform;
   return props;
 }
 
@@ -113,7 +114,7 @@ serve(async (req: Request): Promise<Response> => {
 
   const { data: progressRows, error: progressErr } = await admin
     .from("user_progress")
-    .select("user_id, last_active_at, last_subject, completed_days, chapter_complete_shown, lang");
+    .select("user_id, last_active_at, last_subject, completed_days, chapter_complete_shown, lang, platform");
   if (progressErr) {
     console.error("[backfill] user_progress fetch failed:", progressErr);
     return jsonResponse({ ok: false, error: "Progress fetch failed" }, 500);
