@@ -11718,9 +11718,18 @@ async function handleAuthSubmit() {
 //   errorEl:        HTMLElement — where to surface failure messages
 //   defaultLabel:   string — restore text on failure
 //   onBeforeEnter?: () => void — optional hook fired after successful
-//                   Supabase exchange, before enterApp. Onboarding step
-//                   22 uses this to mark corpus_onboarding_done and hide
-//                   the onboarding overlay before home renders.
+//                   Supabase exchange, before enterApp / postAuthContinue.
+//                   Onboarding step 22 uses this to mark corpus_onboarding
+//                   _done and hide the onboarding overlay before home
+//                   renders.
+//   postAuthContinue?: (user) => Promise<void> | void — optional
+//                   replacement for the default enterApp(user) at the
+//                   end of a successful native OAuth flow. When present,
+//                   this runs INSTEAD of enterApp — the caller decides
+//                   what state setup + UI routing happens (e.g. run
+//                   enterAppState alone and continue an in-progress
+//                   onboarding). Unused in-tree today; a subsequent
+//                   commit will wire it from the onboarding-signup path.
 // }
 // Per-phase timeout budgets. Separated because the two failure modes are
 // different: a hung native picker (provider_call) is basically never
@@ -11736,7 +11745,7 @@ const _AUTH_PHASE_BUDGETS_MS = {
 };
 
 async function _authProviderStart(provider, ctx) {
-  const { btn, textEl, errorEl, defaultLabel, onBeforeEnter } = ctx;
+  const { btn, textEl, errorEl, defaultLabel, onBeforeEnter, postAuthContinue } = ctx;
   const isEn = state.lang === 'en';
   if (btn) { btn.disabled = true; btn.classList.add('auth-btn-loading'); }
   if (textEl) textEl.textContent = isEn ? 'Signing in...' : 'מתחבר...';
@@ -11828,11 +11837,20 @@ async function _authProviderStart(provider, ctx) {
       // signInWithPassword — no full-page reload. Session is already
       // persisted to Preferences before subscribers fire, so this path
       // can just navigate the UI in place. Clearing appStarted lets
-      // enterApp run cleanly to completion here even if the SIGNED_IN
-      // subscriber's own enterApp call was still mid-await when the
-      // promise resolved.
+      // enterApp / enterAppState run cleanly to completion here even if
+      // the SIGNED_IN subscriber's own enterApp call was still mid-await
+      // when the promise resolved.
       appStarted = false;
-      await enterApp((data && data.session && data.session.user) || (data && data.user) || null);
+      const _resolvedUser = (data && data.session && data.session.user) || (data && data.user) || null;
+      if (typeof postAuthContinue === 'function') {
+        // Caller (e.g. onboarding-signup) takes ownership of what runs
+        // after the Supabase session lands. Typical use: run enterAppState
+        // alone to load progress + subscription + telemetry, then advance
+        // the onboarding step instead of routing to home.
+        await postAuthContinue(_resolvedUser);
+      } else {
+        await enterApp(_resolvedUser);
+      }
     } else {
       // Web: existing OAuth redirect. If the call itself hangs before
       // triggering navigation, the timeout below fires and we recover;
@@ -24303,14 +24321,46 @@ let _onboardingBooted = false;
 let _socialLoginReady = null;
 
 let appStarted = false;
-async function enterApp(user) {
+// enterApp is split into two halves so callers can run STATE side
+// effects (progress + subscription load, save, telemetry, mark auth
+// resolved) without the UI-routing half yanking the user to home.
+// The onboarding-signup path will use enterAppState alone in a later
+// commit; every existing caller in this file keeps calling the
+// enterApp wrapper below and gets identical behaviour.
+//
+// enterAppState:
+//   Zones A + B + C + D + _markAuthResolved.
+//   _markAuthResolved moved here from the top of the old Zone E —
+//   the topbar reads _authKnown and is visible during onboarding
+//   overlays, so leaving it in the UI half would leave the topbar in
+//   loading-state for a mid-signup user.
+//
+// enterAppUi:
+//   Zone E — the reader-ejection defer-zone guard, hideAuthScreen,
+//   renderHome, showScreen('home'), _resumeCelebrationsIfPending,
+//   onboarding-restart check, subject-select check.
+async function enterAppState(user) {
+  // appStarted idempotency guard. Set here so concurrent enterApp /
+  // enterAppState calls (SIGNED_IN subscriber racing an OAuth
+  // completion) resolve to a single run.
+  //
+  // Named edge case, since silently-not-reachable reasoning is what
+  // let the reader-ejection bug survive earlier: if a user signs in
+  // at onboarding step 3, then signs out and back in during the same
+  // session, the second sign-in's enterApp will early-return here
+  // without doing UI routing. Not reachable in practice today — the
+  // sign-out button lives on Profile, which sits behind home, and
+  // home isn't reached until end of onboarding. If a future path
+  // exposes sign-out from an onboarding surface (e.g. from the
+  // step-3 signup screen while signed in), reset appStarted = false
+  // before re-entering.
   if (appStarted) return;
   appStarted = true;
   currentUser = user;
   // RevenueCat SDK: configure (or logIn on subsequent enterApp calls)
   // with the Supabase user id so the webhook can route entitlement
   // events back to this user's subscriptions row. Fire-and-forget —
-  // must not block boot. enterApp is always called outside the
+  // must not block boot. enterAppState is always called outside the
   // supabase-js auth lock (all onAuthStateChange handlers defer via
   // setTimeout(0) before invoking enterApp), so it's safe to touch
   // native plugins here.
@@ -24431,23 +24481,27 @@ async function enterApp(user) {
     }
   }
   // Auth is confirmed at this point (we have a real user object).
-  // Flip _authKnown before the home render so the topbar's decision
-  // sees the fresh state.
+  // Flip _authKnown before returning so the topbar (visible during
+  // onboarding overlays too, not just home) sees the fresh state.
+  // Moved into enterAppState from the old Zone E — see the block
+  // comment above enterAppState for rationale.
   _markAuthResolved();
+}
 
+function enterAppUi() {
   // Reader-and-friends defer-zone: if the user has navigated to any
   // screen other than 'auth' (or the initial empty state) during the
   // ~2s eager session-recovery window, DO NOT yank them to home.
   // enterApp's tail block below is the "arrived from auth screen"
   // transition — appropriate when the user was on auth, wrong when
   // they've already navigated into a dialogue, opened the subject
-  // drawer, are mid-onboarding, etc. All the enterApp side effects
-  // above this point (currentUser set, progress load, subscription
-  // load, saveState, identify, telemetry) still run — only the UI
-  // transition is skipped. Prior behavior ejected the user back to
-  // home mid-dialogue whenever this race hit; more reachable after
-  // the 1787efd SocialLogin.initialize deferral widened the race
-  // window on Android.
+  // drawer, are mid-onboarding, etc. All the enterAppState side effects
+  // (currentUser set, progress load, subscription load, saveState,
+  // identify, telemetry, mark-auth-resolved) still run above this in
+  // the wrapper — only the UI transition is skipped. Prior behavior
+  // ejected the user back to home mid-dialogue whenever this race hit;
+  // more reachable after the 1787efd SocialLogin.initialize deferral
+  // widened the race window on Android.
   const _uiCurScreen = (state && state.currentScreen) || '';
   const _uiOnAuthOrUnset = !_uiCurScreen || _uiCurScreen === 'auth';
   if (!_uiOnAuthOrUnset) {
@@ -24462,7 +24516,7 @@ async function enterApp(user) {
         deferred_subject_select: !localStorage.getItem('corpus_subject'),
       });
     } catch(e) {}
-    console.log('[Auth] enterApp: user is on', _uiCurScreen, '- skipping UI tail (would have ejected to home)');
+    console.log('[Auth] enterAppUi: user is on', _uiCurScreen, '- skipping UI tail (would have ejected to home)');
     return;
   }
 
@@ -24486,6 +24540,14 @@ async function enterApp(user) {
   if (!localStorage.getItem('corpus_subject')) {
     showSubjectSelect();
   }
+}
+
+// Thin wrapper — preserves the original behaviour for every existing
+// caller. New paths that only need the state half (or only the UI
+// half) can call the split functions directly.
+async function enterApp(user) {
+  await enterAppState(user);
+  enterAppUi();
 }
 
 // Session-scoped flag: once the user dismisses the banner (or the check
