@@ -17946,23 +17946,29 @@ function canAccessWeek(subject, weekId) {
   if (state.isPaid) return true;
   const opt = state.subscriptionOptimistic;
   if (opt && opt.until && new Date(opt.until).getTime() > Date.now()) return true;
-  // Started-this-chapter clause: any completed REAL day in this chapter
-  // grants full access to it. Protects lapsed subscribers from losing
-  // mid-chapter access — they can finish what they started, and the paywall
-  // fires on the JUMP to a chapter they haven't touched, not mid-read.
+  // Started-this-chapter clause: any completed day in this chapter —
+  // including the auto-completing Day 0 preamble — grants full access
+  // to it. Protects lapsed subscribers from losing mid-chapter access
+  // and honors the "if you opened it, you get to finish it" rule at
+  // every entry point, including intro cards.
   //
-  // Day 0 is deliberately excluded (d.id !== 0). Day 0 is the preamble
-  // pattern used by bonus chapters — a title/intro page with no quiz that
-  // auto-completes on tap-through (see finishDay's if (day.id === 0)
-  // branch). Counting it as "started" would let a single tap on the bonus
-  // intro unlock the entire chapter for free. Codebase convention:
-  // id === 0 means preamble everywhere it appears.
+  // Day 0 (the preamble pattern used by bonus chapters — a title/intro
+  // page with no quiz that auto-completes on tap-through; see
+  // finishDay's if (day.id === 0) branch) is DELIBERATELY counted here.
+  // That means a single tap on the bonus-chapter intro card unlocks
+  // the entire bonus chapter for free. This was a considered choice
+  // rather than an oversight: the alternative — paywalling someone
+  // who already tapped through the intro — is the more jarring UX,
+  // and the bonus chapter's role as a delight moment reads better as
+  // a full-chapter reward for engaging with the intro than as a
+  // half-experience gated on a store transaction. The regular chapters
+  // are unaffected: their first real day is id === 1, so this loosening
+  // only touches the bonus surface.
   try {
     const chapter = getW().find(w => w.id === weekId);
     if (chapter && chapter.days
         && chapter.days.some(d =>
-             d.id !== 0
-             && state.completedDays && state.completedDays[dayKey(weekId, d.id)])) {
+             state.completedDays && state.completedDays[dayKey(weekId, d.id)])) {
       return true;
     }
   } catch(e) {}
