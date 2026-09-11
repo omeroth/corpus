@@ -6837,9 +6837,16 @@
      when a guest taps Subscribe / Restore. Reuses .modal-overlay +
      .modal-box for the frame and shape; only overrides the internals
      that need paywall-specific layout (stacked buttons, cancel link
-     below). Same z-index as the paywall modal (300) — the last-active
-     class wins the stacking context via order-of-open, which matches
-     how every stacked modal already behaves in the app. */
+     below).
+     z-index: 1150 — must sit above both paywall shells (the modal
+     paywall inherits .modal-overlay's z-index: 300; the onboarding
+     paywall uses .onb-screen's z-index: 1100). 1150 slots between the
+     onboarding paywall (1100) and the celebration overlay band
+     (unlock / chapter-complete at 1200) — semantically the sign-in
+     prompt is a paywall companion, not a celebration, and no
+     celebration can fire while a paywall is open. ID selector to beat
+     .modal-overlay's z-index: 300 without needing !important. */
+  #modal-signin-required { z-index: 1150; }
   .signin-required-box {
     max-width: 380px;
     text-align: center;
