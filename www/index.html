@@ -15593,7 +15593,14 @@ const UI = {
 };
 
 function u() { return UI[state.lang] || UI.he; }
-function getW() {
+// Optional `subject` argument for cross-subject callers (e.g. computing
+// access for a chapter in a subject other than the currently-active one
+// — see canAccessWeek). Defaults to state.subject, so every existing
+// no-argument caller keeps its current behavior. The three branches
+// below key off the resolved `sub` rather than reading state.subject
+// directly.
+function getW(subject) {
+  const sub  = subject || state.subject;
   const lang = state.lang;
 
   function deriveDay(d) {
@@ -15666,7 +15673,7 @@ function getW() {
   }
 
   // Economics branch - separate data source
-  if (state.subject === 'economics') {
+  if (sub === 'economics') {
     return economicsData.weeks.map(function(w) {
       return {
         id: w.id,
@@ -15683,7 +15690,7 @@ function getW() {
   // LOCKED_SUBJECTS. Coming-soon chapters render as locked cards on home
   // (comingSoon:true + days:[] short-circuits deriveDay); filled chapters
   // will flow through the same deriveDay pipeline as economics.
-  if (state.subject === 'psychology') {
+  if (sub === 'psychology') {
     return psychologyData.weeks.map(function(w) {
       return {
         id: w.id,
@@ -17965,10 +17972,15 @@ function canAccessWeek(subject, weekId) {
   // are unaffected: their first real day is id === 1, so this loosening
   // only touches the bonus surface.
   try {
-    const chapter = getW().find(w => w.id === weekId);
+    // Both getW() and dayKey() must be told which subject to look at
+    // — both default to state.subject internally, which would silently
+    // answer about the wrong subject when a caller passes a subject
+    // other than the currently-active one. Plumbing subject through
+    // here keeps the function honest to its signature.
+    const chapter = getW(subject).find(w => w.id === weekId);
     if (chapter && chapter.days
         && chapter.days.some(d =>
-             state.completedDays && state.completedDays[dayKey(weekId, d.id)])) {
+             state.completedDays && state.completedDays[dayKey(weekId, d.id, subject)])) {
       return true;
     }
   } catch(e) {}
