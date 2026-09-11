@@ -6465,6 +6465,71 @@
      (not the hardcoded philosophy fallback used by legacy v1 progress).
      Steps 1-8 all render as philosophy pre-subject-pick; from step 9
      onward the theme flips and pills follow. */
+  /* ── Scroll variant — long-content steps (Q1/Q2/Q3, subject picker,
+     commit, paywall) ──
+     Base .onb-screen ships with `overflow-y: auto` on the outer frame,
+     which lets the CTA scroll away below the fold on short viewports
+     (e.g. Android with a small WebView height when the option list is
+     6+ items tall). This variant flips to the subject-select pattern
+     from commit b5390aa: outer non-scrolling, inner region scrolls,
+     CTA holder is a fixed-height sibling. Uses only Flexbox Level 1
+     primitives so it works on every WebView we support.
+     Add .onb-v2-scroll to any screen whose content might not fit. */
+  .onb-screen.onb-v2.onb-v2-scroll {
+    overflow: hidden;
+  }
+  .onb-screen.onb-v2.onb-v2-scroll .onb-v2-inner {
+    justify-content: flex-start;
+    align-items: stretch;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .onb-screen.onb-v2.onb-v2-scroll .onb-cta-holder {
+    flex-shrink: 0;
+  }
+
+  /* ── Paywall onboarding step ──
+     Owns the outer layout only; the inner card + button typography
+     comes from the shared .paywall-* classes (defined for #modal-paywall
+     above). The inner scrolls when the price cards + legal + links tail
+     pushes past the fold. */
+  #onb-v2-paywall {
+    overflow: hidden;
+  }
+  #onb-v2-paywall .onb-v2-paywall-inner {
+    justify-content: flex-start;
+    align-items: stretch;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    text-align: center;
+    padding-top: calc(52px + var(--safe-top));
+  }
+  #onb-v2-paywall .paywall-brand {
+    margin-bottom: 12px;
+  }
+  #onb-v2-paywall .paywall-cta {
+    /* The onboarding paywall's primary CTA lives inside the scrollable
+       inner (not in .onb-cta-holder) so it's tightly grouped with the
+       price cards. Give it the same accent-fill treatment as other
+       .onb-cta buttons for visual consistency with the rest of onboarding. */
+    background: var(--onb-accent, #7B4FD4);
+    color: #FFFFFF;
+    border: none;
+    border-bottom: 5px solid rgba(0, 0, 0, 0.14);
+    border-radius: 999px;
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 800;
+    font-size: calc(17px * var(--text-scale));
+    padding: 14px 20px;
+    box-shadow: 0 10px 28px -6px var(--onb-accent-shadow, rgba(123, 79, 212, 0.35));
+    text-transform: none;
+    letter-spacing: 0;
+    margin-top: 8px;
+    margin-bottom: 12px;
+  }
+
   .onb-screen.onb-v2 .onb-progress[data-step="1"] .onb-pill:nth-child(1),
   .onb-screen.onb-v2 .onb-progress[data-step="2"] .onb-pill:nth-child(2),
   .onb-screen.onb-v2 .onb-progress[data-step="3"] .onb-pill:nth-child(3),
@@ -11244,6 +11309,18 @@ async function _fetchOfferings() {
 let _paywallReturnTo = null;
 let _paywallSelectedPkg = 'yearly';   // 'monthly' | 'yearly' — visual state only
 let _paywallPurchasing = false;       // gate against double-taps mid-purchase
+// Which DOM subtree the paywall is currently painting into. Set by
+// showPaywall (modal mode → #modal-paywall) and by _onbV2PreparePaywall
+// (onboarding mode → #onb-v2-paywall). _renderPaywall + _selectPaywallPackage
+// resolve every .paywall-* selector against this root so a single copy of
+// the render logic drives both shells. Kept as document.getElementById by
+// default so early calls before either shell mounts don't crash.
+let _paywallActiveRoot = null;
+// 'modal' when the paywall runs as an overlay (chapter/bonus tap etc.);
+// 'onboarding' when it runs as an onboarding step. Gates the modal-only
+// side effects (body-scroll lock, "Welcome to Corpus" toast, returnTo
+// openReader after purchase) so the onboarding path doesn't fire either.
+let _paywallMode = 'modal';
 
 // Reads current package data from RC's offering, or falls back to the
 // hardcoded USD values so the paywall is renderable before products are
@@ -11277,11 +11354,11 @@ function _paywallPrices() {
 // continuation, bonus tap). Nulls fall back to defaults, so the base
 // lesson-tap entry stays untouched.
 let _paywallContext = null;
-// Optional single-shot callback fired by closePaywall on any exit
-// path (X close, purchase success, restore success). Used by the
+// Optional single-shot callback fired by _exitPaywall on any exit
+// path (X close, Skip, purchase success, restore success). Used by the
 // onboarding paywall step to advance the flow regardless of how the
-// modal was dismissed. Consumed once and cleared, so a subsequent
-// showPaywall without an onClose is unaffected.
+// paywall was dismissed. Consumed once and cleared, so a subsequent
+// showPaywall / prep without an onClose is unaffected.
 let _paywallOnClose = null;
 
 function showPaywall(opts) {
@@ -11292,6 +11369,8 @@ function showPaywall(opts) {
   // gate — silent no-op. See PAYWALL_ENABLED for the full rationale.
   if (!PAYWALL_ENABLED) return;
   opts = opts || {};
+  _paywallActiveRoot = document.getElementById('modal-paywall');
+  _paywallMode = 'modal';
   _paywallReturnTo = (typeof opts.weekId !== 'undefined' && typeof opts.dayId !== 'undefined')
     ? { weekId: opts.weekId, dayId: opts.dayId }
     : null;
@@ -11304,8 +11383,7 @@ function showPaywall(opts) {
   _paywallSelectedPkg = 'yearly';   // reset default on every open
   _paywallPurchasing = false;
   _renderPaywall();
-  const modal = document.getElementById('modal-paywall');
-  if (modal) modal.classList.add('active');
+  if (_paywallActiveRoot) _paywallActiveRoot.classList.add('active');
   document.body.style.overflow = 'hidden';
   try {
     posthog.capture('paywall_shown', {
@@ -11318,13 +11396,21 @@ function showPaywall(opts) {
   } catch(e) {}
 }
 
-function closePaywall() {
-  const modal = document.getElementById('modal-paywall');
-  if (modal) modal.classList.remove('active');
-  document.body.style.overflow = '';
+// Exits the paywall, regardless of mode. Modal mode: drops the .active
+// class from #modal-paywall + unlocks body scroll (the modal's overlay
+// backdrop was hiding the page behind it). Onboarding mode: no DOM /
+// scroll changes here — the onClose hook (_onbAdvanceStep) will show
+// the next onboarding step, which hides the current one via the same
+// .onb-active toggle that every step transition uses.
+function _exitPaywall() {
+  if (_paywallMode === 'modal' && _paywallActiveRoot) {
+    _paywallActiveRoot.classList.remove('active');
+    document.body.style.overflow = '';
+  }
   try {
     posthog.capture('paywall_dismissed', {
       package_selected: _paywallSelectedPkg,
+      source_mode: _paywallMode,
     });
   } catch(e) {}
   _paywallReturnTo = null;
@@ -11347,39 +11433,46 @@ function _renderPaywall() {
   const isEn = state.lang === 'en';
   const p = _paywallPrices();
   const ctx = _paywallContext || {};
+  // Scope every lookup to the active shell (#modal-paywall in modal
+  // mode, #onb-v2-paywall in onboarding mode). Both shells carry
+  // identical .paywall-* class contracts; the one that isn't active
+  // sits idle in the DOM without contending for these queries.
+  const root = _paywallActiveRoot;
+  if (!root) return;
+  const q = (sel) => root.querySelector(sel);
 
   // Contextual eyebrow — empty string when the trigger didn't pass one,
   // which hides the row via the .paywall-eyebrow:empty CSS rule.
-  document.getElementById('paywall-eyebrow').textContent = ctx.eyebrow || '';
+  q('.paywall-eyebrow').textContent = ctx.eyebrow || '';
 
   // Headline + subhead. Trigger-supplied context overrides the defaults;
   // when null (base lesson-tap entry), the "Unlock everything" copy runs.
-  document.getElementById('paywall-headline').textContent =
+  q('.paywall-headline').textContent =
     ctx.headline || (isEn ? 'Unlock everything' : 'פתחו את כל הפרקים');
-  document.getElementById('paywall-sub').textContent =
+  q('.paywall-sub').textContent =
     ctx.sub || (isEn ? 'Every chapter, every subject, every bonus dialogue.'
                      : 'כל פרק, בכל תחום, כולל דיאלוגי הבונוס.');
 
   // Monthly card
-  document.getElementById('paywall-monthly-title').textContent = isEn ? 'Monthly' : 'חודשי';
-  document.getElementById('paywall-monthly-price').textContent = p.monthly.priceString;
-  document.getElementById('paywall-monthly-period').textContent = p.monthly.periodLabel;
-  const monthlyTrialEl = document.getElementById('paywall-monthly-trial');
+  q('.paywall-monthly-title').textContent = isEn ? 'Monthly' : 'חודשי';
+  q('.paywall-monthly-price').textContent = p.monthly.priceString;
+  q('.paywall-monthly-period').textContent = p.monthly.periodLabel;
+  const monthlyTrialEl = q('.paywall-monthly-trial');
   monthlyTrialEl.textContent = PAYWALL_TRIAL_ENABLED ? (isEn ? '7 days free' : '7 ימי ניסיון חינם') : '';
   monthlyTrialEl.style.display = PAYWALL_TRIAL_ENABLED ? '' : 'none';
 
   // Yearly card (default emphasis)
-  document.getElementById('paywall-yearly-title').textContent = isEn ? 'Yearly' : 'שנתי';
-  document.getElementById('paywall-yearly-price').textContent = p.yearly.priceString;
-  document.getElementById('paywall-yearly-period').textContent = p.yearly.periodLabel;
-  document.getElementById('paywall-yearly-badge').textContent = isEn ? 'Save 42%' : 'חיסכון 42%';
-  const yearlyTrialEl = document.getElementById('paywall-yearly-trial');
+  q('.paywall-yearly-title').textContent = isEn ? 'Yearly' : 'שנתי';
+  q('.paywall-yearly-price').textContent = p.yearly.priceString;
+  q('.paywall-yearly-period').textContent = p.yearly.periodLabel;
+  q('.paywall-yearly-badge').textContent = isEn ? 'Save 42%' : 'חיסכון 42%';
+  const yearlyTrialEl = q('.paywall-yearly-trial');
   yearlyTrialEl.textContent = PAYWALL_TRIAL_ENABLED ? (isEn ? '7 days free' : '7 ימי ניסיון חינם') : '';
   yearlyTrialEl.style.display = PAYWALL_TRIAL_ENABLED ? '' : 'none';
 
   // Selection state
-  document.getElementById('paywall-card-monthly').classList.toggle('selected', _paywallSelectedPkg === 'monthly');
-  document.getElementById('paywall-card-yearly').classList.toggle('selected',  _paywallSelectedPkg === 'yearly');
+  q('.paywall-card-monthly').classList.toggle('selected', _paywallSelectedPkg === 'monthly');
+  q('.paywall-card-yearly').classList.toggle('selected',  _paywallSelectedPkg === 'yearly');
 
   // Primary CTA. Always shows the real label — never falls into a
   // "Loading…" state that would sit there indefinitely while products
@@ -11387,18 +11480,18 @@ function _renderPaywall() {
   // paywall before products are attached now sees a functional-looking
   // button; the tap-time handler in startPurchase surfaces a clear
   // toast if no real RC package is available yet.
-  const cta = document.getElementById('paywall-cta');
+  const cta = q('.paywall-cta');
   cta.textContent = PAYWALL_TRIAL_ENABLED
     ? (isEn ? 'Start free trial' : 'התחילו ניסיון חינם')
     : (isEn ? 'Subscribe' : 'הרשמה');
   cta.disabled = _paywallPurchasing;
 
   // Restore link
-  document.getElementById('paywall-restore').textContent = isEn ? 'Restore purchases' : 'שחזרו רכישות';
+  q('.paywall-restore').textContent = isEn ? 'Restore purchases' : 'שחזרו רכישות';
 
   // Legal fine print. Dynamic price + period reflect the selected package.
   const sel = _paywallSelectedPkg === 'monthly' ? p.monthly : p.yearly;
-  const legalEl = document.getElementById('paywall-legal');
+  const legalEl = q('.paywall-legal');
   if (isEn) {
     legalEl.textContent = 'Auto-renews for ' + sel.priceString + ' ' + sel.periodLabel + ' until canceled. Cancel anytime in App Store settings.';
   } else {
@@ -11406,8 +11499,8 @@ function _renderPaywall() {
   }
 
   // Terms + Privacy links
-  document.getElementById('paywall-terms').textContent   = isEn ? 'Terms of Service' : 'תנאי שימוש';
-  document.getElementById('paywall-privacy').textContent = isEn ? 'Privacy Policy'  : 'מדיניות פרטיות';
+  q('.paywall-terms').textContent   = isEn ? 'Terms of Service' : 'תנאי שימוש';
+  q('.paywall-privacy').textContent = isEn ? 'Privacy Policy'  : 'מדיניות פרטיות';
 }
 
 async function startPurchase() {
@@ -11459,23 +11552,32 @@ async function startPurchase() {
       setTimeout(() => loadSubscription().catch(e => console.error('[Sub] loadSubscription @10s failed:', e)), 10000);
 
       const returnTo = _paywallReturnTo;
-      closePaywall();
-      _showToast(state.lang === 'en' ? 'Welcome to Corpus.' : 'ברוכים הבאים לקורפוס.');
-      // Post-subscription retro bonus reveal. Try to fire the reveal
-      // 500ms after purchase (lets the "Welcome" toast breathe first).
-      // If the reveal fires, wire returnTo's openReader as the post-
-      // queue callback so the lesson opens AFTER the celebration —
-      // keeps the reveal tied to the purchase moment rather than
-      // buried behind the reader. If the reveal doesn't fire (already
-      // shown, grandfathered, chapter 1 not done, etc.), open the
-      // returnTo lesson directly.
-      const openLessonAfter = returnTo
-        ? () => openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true })
-        : null;
-      setTimeout(() => {
-        const fired = _maybePostSubscriptionBonusReveal({ then: openLessonAfter });
-        if (!fired && openLessonAfter) openLessonAfter();
-      }, 500);
+      const wasModalMode = _paywallMode === 'modal';
+      _exitPaywall();
+      // Modal-mode UX chrome: "Welcome to Corpus" toast + returnTo
+      // openReader + post-subscription bonus reveal. All of these
+      // presume there's a lesson the user was trying to open — the
+      // onboarding paywall has no such lesson (Chapter 1 Day 1 opens
+      // as step 18 immediately after), and the toast + celebration
+      // would compete with the "let's start" beat that follows.
+      if (wasModalMode) {
+        _showToast(state.lang === 'en' ? 'Welcome to Corpus.' : 'ברוכים הבאים לקורפוס.');
+        // Post-subscription retro bonus reveal. Try to fire the reveal
+        // 500ms after purchase (lets the "Welcome" toast breathe first).
+        // If the reveal fires, wire returnTo's openReader as the post-
+        // queue callback so the lesson opens AFTER the celebration —
+        // keeps the reveal tied to the purchase moment rather than
+        // buried behind the reader. If the reveal doesn't fire (already
+        // shown, grandfathered, chapter 1 not done, etc.), open the
+        // returnTo lesson directly.
+        const openLessonAfter = returnTo
+          ? () => openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true })
+          : null;
+        setTimeout(() => {
+          const fired = _maybePostSubscriptionBonusReveal({ then: openLessonAfter });
+          if (!fired && openLessonAfter) openLessonAfter();
+        }, 500);
+      }
     } else {
       // Purchase came back without the entitlement — treat as failure.
       try { posthog.capture('paywall_purchase_failed', {
@@ -11518,18 +11620,21 @@ async function restorePurchases() {
       loadSubscription().catch(e => console.error('[Sub] loadSubscription (restore) failed:', e));
       try { posthog.capture('paywall_restore_result', { found: true }); } catch(e) {}
       const returnTo = _paywallReturnTo;
-      closePaywall();
-      _showToast(isEn ? 'Welcome back to Corpus.' : 'ברוכים השבים לקורפוס.');
-      // Same retro-reveal wiring as startPurchase — a user restoring
-      // a lapsed subscription may also be in the "chapter 1 done +
-      // never seen bonus_unlock" state.
-      const openLessonAfter = returnTo
-        ? () => openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true })
-        : null;
-      setTimeout(() => {
-        const fired = _maybePostSubscriptionBonusReveal({ then: openLessonAfter });
-        if (!fired && openLessonAfter) openLessonAfter();
-      }, 500);
+      const wasModalMode = _paywallMode === 'modal';
+      _exitPaywall();
+      // Same reasoning as startPurchase — onboarding-mode restore
+      // skips the toast + returnTo + retro-reveal; the flow's own
+      // next step frames the moment.
+      if (wasModalMode) {
+        _showToast(isEn ? 'Welcome back to Corpus.' : 'ברוכים השבים לקורפוס.');
+        const openLessonAfter = returnTo
+          ? () => openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true })
+          : null;
+        setTimeout(() => {
+          const fired = _maybePostSubscriptionBonusReveal({ then: openLessonAfter });
+          if (!fired && openLessonAfter) openLessonAfter();
+        }, 500);
+      }
     } else {
       try { posthog.capture('paywall_restore_result', { found: false }); } catch(e) {}
       const plat = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || 'ios';
@@ -12178,16 +12283,16 @@ function _onbShowScreen(screenId) {
 // paths (search corpus_onboarding_flow_version) — mismatch triggers
 // a reset to step 1 rather than a mapping table (small population,
 // simpler to restart than to translate).
-const _ONB_FLOW_VERSION = '2';
+const _ONB_FLOW_VERSION = '3';
 
 const _ONB_TOTAL_STEPS = 23;
 // Which phase (1..6) each step belongs to. Drives the 6-pill progress.
 const _ONB_STEP_TO_PHASE = {
-  1: 1, 2: 1, 3: 1,                                          // welcome / problem / signup
-  4: 2, 5: 2, 6: 2, 7: 2,                                    // solution / name / age / phone hours
+  1: 1, 2: 1, 3: 1,                                          // welcome / problem / solution
+  4: 2, 5: 2, 6: 2, 7: 2,                                    // signup / name / age / phone hours
   8: 3, 9: 3,                                                // shock / plan intro
   10: 4, 11: 4, 12: 4, 13: 4,                                // subject / Q1 / Q2 / Q3
-  14: 5, 15: 5, 16: 5, 17: 5, 18: 5, 19: 5, 20: 5, 21: 5,   // mirror / Q4 / paywall / let's-start / dialogue / streak / goal / review
+  14: 5, 15: 5, 16: 5, 17: 5, 18: 5, 19: 5, 20: 5, 21: 5,   // Q4 / mirror / paywall / let's-start / dialogue / streak / goal / review
   22: 6, 23: 6,                                              // journey / commit
 };
 // DOM ids in step order. Steps not yet built map to null; _onbShowStep
@@ -12196,12 +12301,16 @@ const _ONB_STEP_TO_PHASE = {
 const _ONB_STEP_TO_ID = {
   1:  'onb-v2-welcome',
   2:  'onb-v2-problem',
-  // Step 3 (signup) was step 22 in flow v1. Moved to phase 1 so an
-  // account is offered before the user invests real effort in the
-  // 20+ screens that follow. Handlers use postAuthContinue to route
-  // auth success back into onboarding at step 4 instead of home.
-  3:  'onb-v2-signup',
-  4:  'onb-v2-solution',
+  // Solution sits between the problem and the signup ask in flow v3 —
+  // the user first sees the value pitch, THEN is invited to make an
+  // account. Reversing this order (v2) put signup before the reader
+  // knew what they'd be signing up for.
+  3:  'onb-v2-solution',
+  // Signup moved to step 4 in flow v3 (was step 3 in v2). Now follows
+  // solution so the offer lands after the value proposition. Handlers
+  // use postAuthContinue to route auth success back into onboarding at
+  // step 5 (name) instead of home.
+  4:  'onb-v2-signup',
   5:  'onb-v2-name',
   6:  'onb-v2-age',
   7:  'onb-v2-hours',
@@ -12211,13 +12320,18 @@ const _ONB_STEP_TO_ID = {
   11: 'onb-v2-q1',
   12: 'onb-v2-q2',
   13: 'onb-v2-q3',
-  14: 'onb-v2-mirror',
-  15: 'onb-v2-q4',
-  // Step 16 (paywall) has no v2 DOM node — the shared showPaywall
-  // modal is opened with onboarding context copy + an onClose hook
-  // that advances to step 17. _onbShowStep detects n === 16 and
-  // routes to _onbShowPaywall instead of the normal id-lookup path.
-  16: null,
+  // Q4 sits before mirror in flow v3 (was 14=mirror, 15=Q4 in v2). Q4
+  // stays grouped with the other Q-prompts, and mirror becomes the
+  // last emotional beat before the paywall — the user sees their full
+  // set of picks reflected back, then the paywall.
+  14: 'onb-v2-q4',
+  15: 'onb-v2-mirror',
+  // Step 16 (paywall) — full onboarding step in flow v3 (was a modal
+  // overlay in v2). Shares the DOM chrome + prepare hook pattern with
+  // every other onboarding step; the underlying paywall render / purchase
+  // / restore logic is unchanged and reused by the modal-mode paywall
+  // (chapter tap, bonus tap, etc.) via _paywallActiveRoot scoping.
+  16: 'onb-v2-paywall',
   17: 'onb-v2-lets-start',
   // Step 18 has no v2 DOM node — the reader takes over the viewport.
   // _onbShowStep detects n === 18 and routes to _onbEnterFirstDialogue
@@ -12737,12 +12851,6 @@ function _onbSetLang(lang) {
 // a user on a missing screen.
 function _onbShowStep(n) {
   if (n < 1 || n > _ONB_TOTAL_STEPS) { _onbComplete(); return; }
-  // Step 16 — paywall (no v2 DOM node). Opens the shared paywall
-  // modal with onboarding context copy and an onClose hook that
-  // advances to step 17. All three exit paths (X close, purchase
-  // success, restore success) route through closePaywall, which
-  // fires the onClose. See _onbShowPaywall for the wiring.
-  if (n === 16) { _onbShowPaywall(); return; }
   // Step 18 — reader takes over the viewport (no v2 DOM node). The
   // onboarding resumes after the user finishes the dialogue via
   // finishDay's _onbInFirstDialogue guard → _onbFinishFirstDialogue.
@@ -12783,7 +12891,7 @@ function _onbShowStep(n) {
   // paths can detect an old-layout step number and reset to step 1
   // rather than resume onto the wrong screen.
   try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(e) {}
-  try { _phCapture('onboarding_step_shown', { step: n, phase: phase, flow_version: 2 }); } catch(e) {}
+  try { _phCapture('onboarding_step_shown', { step: n, phase: phase, flow_version: 3 }); } catch(e) {}
 }
 
 // Move from step `from` to step `to`, optionally merging a patch of
@@ -12837,8 +12945,8 @@ function _onbComplete() {
 function _onbV2CtaWelcome() { _onbAdvanceStep(1, 2); }
 // Screen 2 (problem) CTA — advance to screen 3.
 function _onbV2CtaProblem() { _onbAdvanceStep(2, 3); }
-// Screen 3 (solution) CTA — advance to screen 4 (name capture).
-function _onbV2CtaSolution() { _onbAdvanceStep(4, 5); }
+// Screen 3 (solution) CTA — advance to screen 4 (signup).
+function _onbV2CtaSolution() { _onbAdvanceStep(3, 4); }
 
 // Screen 4 (name) — capture the trimmed name into state.userName +
 // state.onbAnswers.name, advance.
@@ -12938,46 +13046,63 @@ function _onbV2CtaQ3() {
   _onbAdvanceStep(13, 14, { q3: pick });
 }
 
-// Screen 13 (mirror) — display-only; advance to step 14 (Q4). The
-// mirror is a recap of the user's own picks, then Q4 is one final
-// honest-check question before commit.
-function _onbV2CtaMirror() { _onbAdvanceStep(14, 15); }
-
-// Screen 14 (Q4 slider) — 0..4 Likert (default 2 = "Sometimes"). CTA
-// "Let's start" advances to step 15, which opens the first dialogue.
+// Screen 14 (Q4 slider) — 0..4 Likert (default 2 = "Sometimes").
+// Advances to step 15 (mirror). Q4 sits before mirror in flow v3 so
+// the reflection includes this last answer.
 function _onbV2CtaQ4() {
   const el = document.getElementById('onb-v2-q4-input');
   const val = parseInt((el && el.value) || '2', 10);
   const clamped = Math.max(0, Math.min(4, isNaN(val) ? 2 : val));
-  _onbAdvanceStep(15, 16, { readingFreq: clamped });
+  _onbAdvanceStep(14, 15, { readingFreq: clamped });
 }
 
-// Step 16 — paywall. Opens the shared paywall modal with onboarding
-// context copy and an onClose hook that advances to step 17
-// (lets-start) regardless of exit path. All three exit paths (X
-// close, purchase success, restore success) route through
-// closePaywall, which fires the onClose. Persists the step cursor +
-// stamps the analytics event before showing, matching the pattern
-// _onbShowStep uses for regular DOM-node screens.
-function _onbShowPaywall() {
+// Screen 15 (mirror) — display-only recap of every pick. Advances to
+// step 16 (paywall). Mirror is the emotional peak before the paywall;
+// putting the paywall immediately after keeps the momentum.
+function _onbV2CtaMirror() { _onbAdvanceStep(15, 16); }
+
+// Step 16 — paywall (full onboarding step in flow v3). Prep hook wires
+// the shared _renderPaywall / startPurchase / restorePurchases / _exitPaywall
+// machinery to the onboarding shell instead of the modal box:
+//   - Points _paywallActiveRoot at #onb-v2-paywall so every scoped
+//     paywall querySelector reads from the onboarding shell.
+//   - Sets _paywallMode = 'onboarding' so purchase / restore success
+//     paths skip the "Welcome to Corpus" toast + returnTo openReader
+//     (there's no returnTo lesson from an onboarding paywall, and the
+//     next onboarding beat already frames the moment).
+//   - Registers an onClose hook that advances to step 17 (lets-start)
+//     regardless of exit path (skip, purchase success, restore success).
+// The Skip control (top-right corner) calls _exitPaywall directly,
+// which fires the onClose. Purchase / restore success also route
+// through _exitPaywall so the flow always advances after the paywall.
+function _onbV2PreparePaywall() {
   const isEn = state.lang === 'en';
-  document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
-    s.style.display = 'none';
-    s.classList.remove('onb-active');
-  });
-  try { localStorage.setItem('corpus_onboarding_step', '16'); } catch(e) {}
-  try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(e) {}
-  try { _phCapture('onboarding_step_shown', { step: 16, phase: 5, flow_version: 2 }); } catch(e) {}
-  showPaywall({
-    source: 'onboarding',
-    subject: state.subject || null,
-    contextEyebrow:  isEn ? 'UNLOCK EVERYTHING' : 'לפתוח הכל',
-    contextHeadline: isEn ? 'Ready to go deeper?' : 'מוכנים להעמיק?',
-    contextSub:      isEn
-      ? 'Every chapter, every subject, every bonus dialogue.'
-      : 'כל פרק, כל נושא, כל דיאלוג בונוס.',
-    onClose: () => _onbAdvanceStep(16, 17),
-  });
+  _paywallActiveRoot = document.getElementById('onb-v2-paywall');
+  _paywallMode = 'onboarding';
+  _paywallReturnTo = null;
+  _paywallContext = {
+    eyebrow:  isEn ? 'UNLOCK EVERYTHING' : 'לפתוח הכל',
+    headline: isEn ? 'Ready to go deeper?' : 'מוכנים להעמיק?',
+    sub:      isEn
+                ? 'Every chapter, every subject, every bonus dialogue.'
+                : 'כל פרק, כל נושא, כל דיאלוג בונוס.',
+  };
+  _paywallOnClose = () => _onbAdvanceStep(16, 17);
+  _paywallSelectedPkg = 'yearly';
+  _paywallPurchasing = false;
+  // Localize the Skip label — reuses the signup-skip localization.
+  const skipEl = document.getElementById('onb-v2-paywall-skip');
+  if (skipEl && _ONB_COPY.signup && _ONB_COPY.signup.skip) {
+    skipEl.textContent = isEn ? _ONB_COPY.signup.skip.en : _ONB_COPY.signup.skip.he;
+  }
+  _renderPaywall();
+  try {
+    posthog.capture('paywall_shown', {
+      source:        'onboarding',
+      subject:       state.subject || null,
+      trial_enabled: PAYWALL_TRIAL_ENABLED,
+    });
+  } catch(e) {}
 }
 
 // Step 18 — first-dialogue entry. Reader takes over the visual
@@ -12992,7 +13117,7 @@ function _onbEnterFirstDialogue() {
   });
   try { localStorage.setItem('corpus_onboarding_step', '18'); } catch(e) {}
   try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(e) {}
-  try { _phCapture('onboarding_step_shown', { step: 18, phase: 5, flow_version: 2 }); } catch(e) {}
+  try { _phCapture('onboarding_step_shown', { step: 18, phase: 5, flow_version: 3 }); } catch(e) {}
   // Chapter 1 / Day 1 is the picked subject's first real lesson.
   // openReader handles theme, rendering, and section-0 setup.
   try { openReader(1, 1); } catch(e) {
@@ -13217,9 +13342,9 @@ async function _onbSignupApple() {
     postAuthContinue: async (user) => {
       // State-only enter: load progress + subscription + telemetry
       // + mark-auth-resolved, but DON'T route UI to home. Then
-      // advance onboarding to step 4 (solution).
+      // advance onboarding to step 5 (name).
       await enterAppState(user);
-      _onbAdvanceStep(3, 4);
+      _onbAdvanceStep(4, 5);
     },
   });
 }
@@ -13234,7 +13359,7 @@ async function _onbSignupGoogle() {
     defaultLabel: isEn ? 'Continue with Google' : 'המשך עם Google',
     postAuthContinue: async (user) => {
       await enterAppState(user);
-      _onbAdvanceStep(3, 4);
+      _onbAdvanceStep(4, 5);
     },
   });
 }
@@ -13243,7 +13368,7 @@ function _onbV2CtaSignupSkip() {
   try {
     _phCapture('onboarding_signup_prompt_action', { action: 'skip' });
   } catch(e) {}
-  _onbAdvanceStep(3, 4);
+  _onbAdvanceStep(4, 5);
 }
 
 // Screen prepare hooks — invoked from _onbShowStep once the target
@@ -13743,10 +13868,10 @@ function _onbV2PrepareCommit() {
 // Map from step number → prepare hook. Consumed by _onbShowStep.
 // Only steps with dynamic content need entries; static-copy screens
 // (welcome, problem, solution, plan) rely on _onbApplyLang alone.
-// Reordered for flow v2: signup moved to step 3, all downstream
-// steps shifted by 1 (plus a further +1 past step 15 for paywall).
+// Flow v3 layout: signup at step 4 (after solution), Q4 at 14
+// (before mirror at 15), paywall at 16 as a full onboarding step.
 const _ONB_STEP_HOOKS = {
-  3:  _onbV2PrepareSignup,
+  4:  _onbV2PrepareSignup,
   5:  _onbV2PrepareName,
   6:  _onbV2PrepareAge,
   7:  _onbV2PrepareHours,
@@ -13755,9 +13880,9 @@ const _ONB_STEP_HOOKS = {
   11: _onbV2PrepareQ1,
   12: _onbV2PrepareQ2,
   13: _onbV2PrepareQ3,
-  14: _onbV2PrepareMirror,
-  15: _onbV2PrepareQ4,
-  // 16: handled specially in _onbShowStep (paywall modal, no v2 DOM).
+  14: _onbV2PrepareQ4,
+  15: _onbV2PrepareMirror,
+  16: _onbV2PreparePaywall,
   // 17 (let's-start) is static once _onbApplyLang runs.
   // 18: handled specially in _onbShowStep (reader takeover, no v2 DOM).
   // 19 (streak) + 21 (review) are static once _onbApplyLang runs.
@@ -26321,7 +26446,7 @@ document.addEventListener('DOMContentLoaded', function() {
      _onbV2PrepareSubject from _ONB_COPY.subject. Tap sets a live
      preview via previewSubjectTheme; CTA commits via setSubject
      which flips the app-wide theme for every downstream v2 screen. -->
-<div id="onb-v2-subject" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-subject" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="4">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -26339,7 +26464,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 10 — Q1 multi-select. Cards rendered by _onbV2PrepareQ1
      from _ONB_COPY.q1.options. Hint reminds "pick up to 3"; CTA
      disabled until at least one pick, tap caps at 3. -->
-<div id="onb-v2-q1" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-q1" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="4">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -26356,7 +26481,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- Step 11 — Q2 multi-select. Same component + shape as Q1. -->
-<div id="onb-v2-q2" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-q2" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="4">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -26375,7 +26500,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 12 — Q3 single choice. Also sets state.dailyGoalHistory (see
      _onbV2CtaQ3) so the daily-goal reminder machinery picks up the
      intent without a separate migration prompt. -->
-<div id="onb-v2-q3" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-q3" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="4">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -26417,7 +26542,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 14 — Mirror. Reflects the user's picks back. Head + list
+<!-- Step 15 — Mirror. Reflects the user's picks back. Head + list
      rendered dynamically in _onbV2PrepareMirror from state.onbAnswers
      and state.subject. -->
 <div id="onb-v2-mirror" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
@@ -26437,8 +26562,51 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 15 — Let's start. Statement screen bridging Q4 → first
-     dialogue. Standard v2 head + sub layout. CTA advances to step 16
+<!-- Step 16 — Paywall (onboarding shell). Shares .paywall-* class
+     contracts with #modal-paywall above so a single _renderPaywall()
+     drives both, scoped by _paywallActiveRoot. Skip corner exits and
+     advances; purchase / restore success also route through _exitPaywall,
+     which fires the onClose set by _onbV2PreparePaywall. No close X and
+     no modal backdrop — Skip means "skip this step" (matches the signup
+     step); X on the modal shell means "close the overlay". -->
+<div id="onb-v2-paywall" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-paywall-skip" onclick="_exitPaywall()"></button>
+  <div class="onb-progress" aria-hidden="true" data-step="5">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner onb-v2-paywall-inner">
+    <div class="paywall-brand">Corpus</div>
+    <div class="paywall-eyebrow"></div>
+    <h1 class="paywall-headline"></h1>
+    <p class="paywall-sub"></p>
+    <div class="paywall-cards">
+      <button type="button" class="paywall-card paywall-card-monthly" onclick="_selectPaywallPackage('monthly')">
+        <div class="paywall-card-title paywall-monthly-title"></div>
+        <div class="paywall-card-price paywall-monthly-price"></div>
+        <div class="paywall-card-period paywall-monthly-period"></div>
+        <div class="paywall-card-trial paywall-monthly-trial"></div>
+      </button>
+      <button type="button" class="paywall-card paywall-card-featured paywall-card-yearly" onclick="_selectPaywallPackage('yearly')">
+        <div class="paywall-card-badge paywall-yearly-badge"></div>
+        <div class="paywall-card-title paywall-yearly-title"></div>
+        <div class="paywall-card-price paywall-yearly-price"></div>
+        <div class="paywall-card-period paywall-yearly-period"></div>
+        <div class="paywall-card-trial paywall-yearly-trial"></div>
+      </button>
+    </div>
+    <button type="button" class="nav-btn paywall-cta" onclick="startPurchase()"></button>
+    <button type="button" class="paywall-restore" onclick="restorePurchases()"></button>
+    <p class="paywall-legal"></p>
+    <div class="paywall-links">
+      <a href="#" class="paywall-terms" onclick="event.preventDefault(); _openLegalUrl('terms');"></a>
+      <span class="paywall-links-sep">·</span>
+      <a href="#" class="paywall-privacy" onclick="event.preventDefault(); _openLegalUrl('privacy');"></a>
+    </div>
+  </div>
+</div>
+
+<!-- Step 17 — Let's start. Statement screen bridging paywall → first
+     dialogue. Standard v2 head + sub layout. CTA advances to step 18
      which hijacks the reader (openReader(1, 1)). -->
 <div id="onb-v2-lets-start" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
@@ -26573,7 +26741,7 @@ document.addEventListener('DOMContentLoaded', function() {
      cards state the user's commitment level; the pick is captured to
      state.onbAnswers.commitment for later analysis but doesn't gate
      anything downstream. CTA runs _onbComplete → home. -->
-<div id="onb-v2-commit" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-commit" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="6">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -26597,7 +26765,7 @@ document.addEventListener('DOMContentLoaded', function() {
      block comment. -->
 <div id="onb-v2-signup" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-signup-skip" onclick="_onbV2CtaSignupSkip()"></button>
-  <div class="onb-progress" aria-hidden="true" data-step="1">
+  <div class="onb-progress" aria-hidden="true" data-step="2">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
@@ -26680,41 +26848,43 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Paywall. Full-screen modal shown from openReader when the user taps
-     into a paid chapter. Populated by _renderPaywall() from the current
-     RC offering (or fallback prices when the offering isn't loaded).
-     Trial framing controlled by PAYWALL_TRIAL_ENABLED in the JS block. -->
+<!-- Paywall (modal shell). Opened from openReader when the user taps
+     into a paid chapter, from bonus tap, from chapter-complete overlay,
+     etc. Populated by _renderPaywall() using .paywall-* class selectors
+     scoped by _paywallActiveRoot — the same render logic drives the
+     onboarding paywall step (#onb-v2-paywall below). Trial framing
+     controlled by PAYWALL_TRIAL_ENABLED in the JS block. -->
 <div class="modal-overlay" id="modal-paywall">
   <div class="modal-box paywall-box">
     <div class="paywall-topbar">
-      <button type="button" class="paywall-close" onclick="closePaywall()" aria-label="Close">×</button>
+      <button type="button" class="paywall-close" onclick="_exitPaywall()" aria-label="Close">×</button>
     </div>
     <div class="paywall-brand">Corpus</div>
-    <div class="paywall-eyebrow" id="paywall-eyebrow"></div>
-    <h1 class="paywall-headline" id="paywall-headline"></h1>
-    <p class="paywall-sub" id="paywall-sub"></p>
+    <div class="paywall-eyebrow"></div>
+    <h1 class="paywall-headline"></h1>
+    <p class="paywall-sub"></p>
     <div class="paywall-cards">
-      <button type="button" class="paywall-card" id="paywall-card-monthly" onclick="_selectPaywallPackage('monthly')">
-        <div class="paywall-card-title" id="paywall-monthly-title"></div>
-        <div class="paywall-card-price" id="paywall-monthly-price"></div>
-        <div class="paywall-card-period" id="paywall-monthly-period"></div>
-        <div class="paywall-card-trial" id="paywall-monthly-trial"></div>
+      <button type="button" class="paywall-card paywall-card-monthly" onclick="_selectPaywallPackage('monthly')">
+        <div class="paywall-card-title paywall-monthly-title"></div>
+        <div class="paywall-card-price paywall-monthly-price"></div>
+        <div class="paywall-card-period paywall-monthly-period"></div>
+        <div class="paywall-card-trial paywall-monthly-trial"></div>
       </button>
-      <button type="button" class="paywall-card paywall-card-featured" id="paywall-card-yearly" onclick="_selectPaywallPackage('yearly')">
-        <div class="paywall-card-badge" id="paywall-yearly-badge"></div>
-        <div class="paywall-card-title" id="paywall-yearly-title"></div>
-        <div class="paywall-card-price" id="paywall-yearly-price"></div>
-        <div class="paywall-card-period" id="paywall-yearly-period"></div>
-        <div class="paywall-card-trial" id="paywall-yearly-trial"></div>
+      <button type="button" class="paywall-card paywall-card-featured paywall-card-yearly" onclick="_selectPaywallPackage('yearly')">
+        <div class="paywall-card-badge paywall-yearly-badge"></div>
+        <div class="paywall-card-title paywall-yearly-title"></div>
+        <div class="paywall-card-price paywall-yearly-price"></div>
+        <div class="paywall-card-period paywall-yearly-period"></div>
+        <div class="paywall-card-trial paywall-yearly-trial"></div>
       </button>
     </div>
-    <button type="button" class="nav-btn paywall-cta" id="paywall-cta" onclick="startPurchase()"></button>
-    <button type="button" class="paywall-restore" id="paywall-restore" onclick="restorePurchases()"></button>
-    <p class="paywall-legal" id="paywall-legal"></p>
+    <button type="button" class="nav-btn paywall-cta" onclick="startPurchase()"></button>
+    <button type="button" class="paywall-restore" onclick="restorePurchases()"></button>
+    <p class="paywall-legal"></p>
     <div class="paywall-links">
-      <a href="#" id="paywall-terms" onclick="event.preventDefault(); _openLegalUrl('terms');"></a>
+      <a href="#" class="paywall-terms" onclick="event.preventDefault(); _openLegalUrl('terms');"></a>
       <span class="paywall-links-sep">·</span>
-      <a href="#" id="paywall-privacy" onclick="event.preventDefault(); _openLegalUrl('privacy');"></a>
+      <a href="#" class="paywall-privacy" onclick="event.preventDefault(); _openLegalUrl('privacy');"></a>
     </div>
   </div>
 </div>
