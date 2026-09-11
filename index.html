@@ -6832,6 +6832,56 @@
   }
   .paywall-links-sep { margin: 0 6px; opacity: 0.55; }
 
+  /* ── Sign-in-required overlay ──
+     Small dialog that rides on top of a paywall (modal or onboarding)
+     when a guest taps Subscribe / Restore. Reuses .modal-overlay +
+     .modal-box for the frame and shape; only overrides the internals
+     that need paywall-specific layout (stacked buttons, cancel link
+     below). Same z-index as the paywall modal (300) — the last-active
+     class wins the stacking context via order-of-open, which matches
+     how every stacked modal already behaves in the app. */
+  .signin-required-box {
+    max-width: 380px;
+    text-align: center;
+  }
+  .signin-required-box .modal-title { margin-bottom: 8px; }
+  .signin-required-box .modal-subtitle { margin-bottom: 20px; }
+  .signin-required-error {
+    color: var(--red, #E24545);
+    font-size: 13px;
+    font-weight: 600;
+    min-height: 18px;
+    margin-bottom: 8px;
+  }
+  .signin-required-error:empty {
+    /* Reserve the row so button positions don't jump when an error
+       appears; empty state keeps the min-height. */
+    display: block;
+  }
+  .signin-required-primary,
+  .signin-required-secondary {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .signin-required-cancel {
+    display: block;
+    margin: 16px auto 0;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-muted, var(--text-2));
+    cursor: pointer;
+    padding: 8px 12px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .signin-required-cancel:hover { color: var(--ink); }
+
   /* Corpus toast — bottom-center, auto-dismiss. Reused by paywall
      success/failure and restore results. */
   .corpus-toast {
@@ -11513,8 +11563,114 @@ function _renderPaywall() {
   q('.paywall-privacy').textContent = isEn ? 'Privacy Policy'  : 'מדיניות פרטיות';
 }
 
+// Sign-in requirement for purchase / restore. RevenueCat's SDK is only
+// configured with a real appUserID for signed-in users (see
+// _configureRC's single callsite at enterAppState). A guest tapping
+// Subscribe would run against an anonymous / unconfigured SDK, where
+// customerInfo.entitlements.active comes back empty — the paid check
+// silently fails, no _exitPaywall, and (on onboarding) the flow gets
+// stuck on the paywall because the onClose hook never fires.
+//
+// The gate opens a small overlay atop whichever paywall shell is
+// active (modal or onboarding). Apple / Google run through
+// _authProviderStart with a postAuthContinue that:
+//   1. enterAppState(user)   — sets currentUser, fires _configureRC
+//                              fire-and-forget
+//   2. await _configureRC    — explicit await; enterAppState's call
+//                              doesn't wait and startPurchase runs
+//                              synchronously right after, would race
+//   3. await _fetchOfferings — ensures sel.pkg is resolved before the
+//                              re-entered purchase reads it
+//   4. re-enter startPurchase / restorePurchases
+//
+// Every paywall module var (_paywallActiveRoot, _paywallMode,
+// _paywallOnClose, _paywallSelectedPkg, _paywallContext) persists
+// across the auth roundtrip, so the resumed call runs against the
+// exact same paywall shell + package selection + onClose hook. Cancel
+// just dismisses the overlay; the paywall stays visible and untouched.
+//
+// Overlay copy deliberately does NOT re-pitch signup — the user
+// already skipped the onboarding signup step twelve steps ago on the
+// onboarding paywall path, and asking again with the same "save your
+// progress" framing reads as harassment. The copy frames it strictly
+// as a purchase requirement.
+let _signInGateIntent = null;   // 'purchase' | 'restore' — remembered across the auth roundtrip
+async function _requestSignInForPurchase(intent) {
+  _signInGateIntent = intent === 'restore' ? 'restore' : 'purchase';
+  const isEn = state.lang === 'en';
+  const modal   = document.getElementById('modal-signin-required');
+  const head    = document.getElementById('signin-required-head');
+  const sub     = document.getElementById('signin-required-sub');
+  const cancel  = document.getElementById('signin-required-cancel');
+  const appleT  = document.getElementById('signin-required-apple-text');
+  const googleT = document.getElementById('signin-required-google-text');
+  const errorEl = document.getElementById('signin-required-error');
+  if (!modal) return;
+  head.textContent    = isEn ? 'Subscribing needs an account' : 'למנוי נדרש חשבון';
+  sub.textContent     = isEn
+    ? 'The App Store needs an account to attach your subscription to.'
+    : 'ה-App Store צריך חשבון כדי לשייך אליו את המנוי.';
+  appleT.textContent  = isEn ? 'Continue with Apple'  : 'המשך עם Apple';
+  googleT.textContent = isEn ? 'Continue with Google' : 'המשך עם Google';
+  cancel.textContent  = isEn ? 'Cancel' : 'ביטול';
+  if (errorEl) errorEl.textContent = '';
+  modal.classList.add('active');
+  try { _phCapture('paywall_signin_gate_shown', { intent: _signInGateIntent }); } catch(e) {}
+}
+
+function _closeSignInRequired() {
+  const modal = document.getElementById('modal-signin-required');
+  if (modal) modal.classList.remove('active');
+}
+
+function _signInRequiredCancel() {
+  try { _phCapture('paywall_signin_gate_cancel', { intent: _signInGateIntent }); } catch(e) {}
+  _signInGateIntent = null;
+  _closeSignInRequired();
+}
+
+// Post-auth resume. Called from both Apple / Google buttons after a
+// successful sign-in. See the head comment on _requestSignInForPurchase
+// for why each step is awaited.
+async function _resumePurchaseAfterSignIn(user) {
+  await enterAppState(user);
+  try { await _configureRC(user.id); } catch(e) { console.warn('[Sub] resume _configureRC failed', e); }
+  try { await _fetchOfferings(); }    catch(e) { console.warn('[Sub] resume _fetchOfferings failed', e); }
+  const intent = _signInGateIntent;
+  _signInGateIntent = null;
+  _closeSignInRequired();
+  if (intent === 'restore') { restorePurchases(); return; }
+  startPurchase();
+}
+
+async function _signInRequiredApple() {
+  const isEn = state.lang === 'en';
+  return _authProviderStart('apple', {
+    btn:      document.getElementById('signin-required-apple-btn'),
+    textEl:   document.getElementById('signin-required-apple-text'),
+    errorEl:  document.getElementById('signin-required-error'),
+    defaultLabel: isEn ? 'Continue with Apple' : 'המשך עם Apple',
+    postAuthContinue: _resumePurchaseAfterSignIn,
+  });
+}
+
+async function _signInRequiredGoogle() {
+  const isEn = state.lang === 'en';
+  return _authProviderStart('google', {
+    btn:      document.getElementById('signin-required-google-btn'),
+    textEl:   document.getElementById('signin-required-google-text'),
+    errorEl:  document.getElementById('signin-required-error'),
+    defaultLabel: isEn ? 'Continue with Google' : 'המשך עם Google',
+    postAuthContinue: _resumePurchaseAfterSignIn,
+  });
+}
+
 async function startPurchase() {
   if (_paywallPurchasing) return;
+  // Sign-in gate. Guests would run purchasePackage against an
+  // anonymous RC session and get empty entitlements.active back —
+  // paid stays false, no advance. See _requestSignInForPurchase.
+  if (!currentUser) { _requestSignInForPurchase('purchase'); return; }
   const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
   if (!P) return;
   const p = _paywallPrices();
@@ -11624,6 +11780,11 @@ async function startPurchase() {
 }
 
 async function restorePurchases() {
+  // Sign-in gate — same reasoning as startPurchase. RC restore against
+  // an anonymous SDK returns an empty active-entitlements map, which
+  // reads as "no previous purchases found" and surfaces the confusing
+  // "no Apple ID matches" toast to a guest who never signed in.
+  if (!currentUser) { _requestSignInForPurchase('restore'); return; }
   const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
   if (!P) return;
   const isEn = state.lang === 'en';
@@ -26933,6 +27094,26 @@ document.addEventListener('DOMContentLoaded', function() {
       <span class="paywall-links-sep">·</span>
       <a href="#" class="paywall-privacy" onclick="event.preventDefault(); _openLegalUrl('privacy');"></a>
     </div>
+  </div>
+</div>
+
+<!-- Sign-in-required overlay. Opened by _requestSignInForPurchase when a
+     guest taps Subscribe or Restore on any paywall shell. Rides on top of
+     the paywall (same .modal-overlay z-index 300 stack). Copy is set at
+     open time by _requestSignInForPurchase so it can be language-aware
+     without an _onbApplyLang-style loop. -->
+<div class="modal-overlay" id="modal-signin-required">
+  <div class="modal-box signin-required-box">
+    <h2 class="modal-title" id="signin-required-head"></h2>
+    <p class="modal-subtitle" id="signin-required-sub"></p>
+    <div class="signin-required-error" id="signin-required-error"></div>
+    <button type="button" class="auth-btn auth-btn-social auth-btn-apple signin-required-primary" id="signin-required-apple-btn" onclick="_signInRequiredApple()">
+      <span class="auth-social-icon"><svg width="14" height="17" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg></span> <span id="signin-required-apple-text"></span>
+    </button>
+    <button type="button" class="auth-btn auth-btn-social signin-required-secondary" id="signin-required-google-btn" onclick="_signInRequiredGoogle()">
+      <span class="auth-social-icon">G</span> <span id="signin-required-google-text"></span>
+    </button>
+    <button type="button" class="signin-required-cancel" id="signin-required-cancel" onclick="_signInRequiredCancel()"></button>
   </div>
 </div>
 
