@@ -10336,6 +10336,16 @@ const CORPUS_PRIVACY_URL = 'https://get.corpusapp.io/privacy.html';
 const PAYWALL_FALLBACK_MONTHLY_USD = 12.99;
 const PAYWALL_FALLBACK_YEARLY_USD  = 89.99;
 
+// RevenueCat entitlement identifier attached to every Corpus paid
+// product (monthly + yearly, both stores). Configured in the RC
+// dashboard; used as the key into customerInfo.entitlements.active
+// after purchase / restore to decide whether the transaction actually
+// granted access. MUST match the identifier on the RC dashboard exactly
+// — a mismatch fails silently (the lookup returns undefined, the
+// success branch never runs, and the user is charged but locked out).
+// If this ever needs to change, change it in ONE place: here.
+const PAYWALL_ENTITLEMENT_ID = 'premium';
+
 // Auth-token removal guard. gotrue-js calls storage.removeItem() on the
 // primary sb-*-auth-token key when it decides a refresh is terminal. On
 // Android cold-boot the network may not be attached yet, and a transient
@@ -11529,9 +11539,20 @@ async function startPurchase() {
 
   try {
     const result = await P.purchasePackage({ aPackage: sel.pkg });
+    // Log every identifier RC returned on success. If PAYWALL_ENTITLEMENT_ID
+    // ever drifts from what's actually configured in the RC dashboard,
+    // the mismatch is silent (paid stays false, success branch never
+    // runs, user charged + locked out — see 2026-09-11 sandbox purchase
+    // 2000001235132838 for the incident). This log is the tripwire.
+    const _activeKeys = (result && result.customerInfo && result.customerInfo.entitlements
+                          && result.customerInfo.entitlements.active)
+      ? Object.keys(result.customerInfo.entitlements.active)
+      : [];
+    console.log('[RC] purchase resolved — active entitlements:', _activeKeys,
+                'expected:', PAYWALL_ENTITLEMENT_ID);
     const paid = !!(result && result.customerInfo && result.customerInfo.entitlements
                     && result.customerInfo.entitlements.active
-                    && result.customerInfo.entitlements.active.paid);
+                    && result.customerInfo.entitlements.active[PAYWALL_ENTITLEMENT_ID]);
     if (paid) {
       // Optimistic bridge — persists 24h so an app crash before the webhook
       // lands can't lock the user out. Cleared by loadSubscription as soon
@@ -11609,9 +11630,17 @@ async function restorePurchases() {
   try { posthog.capture('paywall_restore_tapped'); } catch(e) {}
   try {
     const info = await P.restorePurchases();
+    // Same tripwire as startPurchase — surface every returned entitlement
+    // identifier so a config drift is loud, not silent.
+    const _activeKeys = (info && info.customerInfo && info.customerInfo.entitlements
+                          && info.customerInfo.entitlements.active)
+      ? Object.keys(info.customerInfo.entitlements.active)
+      : [];
+    console.log('[RC] restore resolved — active entitlements:', _activeKeys,
+                'expected:', PAYWALL_ENTITLEMENT_ID);
     const paid = !!(info && info.customerInfo && info.customerInfo.entitlements
                     && info.customerInfo.entitlements.active
-                    && info.customerInfo.entitlements.active.paid);
+                    && info.customerInfo.entitlements.active[PAYWALL_ENTITLEMENT_ID]);
     if (paid) {
       state.subscriptionOptimistic = { until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() };
       state.isPaid = true;
