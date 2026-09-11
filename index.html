@@ -11640,12 +11640,27 @@ function _signInRequiredCancel() {
 // successful sign-in. See the head comment on _requestSignInForPurchase
 // for why each step is awaited.
 async function _resumePurchaseAfterSignIn(user) {
+  console.log('[Sub/resume] entry — user:', user && user.email,
+              'isPaid(pre):', !!state.isPaid,
+              'onClose(pre):', typeof _paywallOnClose,
+              'purchasing(pre):', !!_paywallPurchasing);
   await enterAppState(user);
-  try { await _configureRC(user.id); } catch(e) { console.warn('[Sub] resume _configureRC failed', e); }
-  try { await _fetchOfferings(); }    catch(e) { console.warn('[Sub] resume _fetchOfferings failed', e); }
+  console.log('[Sub/resume] after enterAppState — currentUser:', !!currentUser,
+              'isPaid:', !!state.isPaid,
+              'sub:', state.subscription && { status: state.subscription.status, entitlement: state.subscription.entitlement, platform: state.subscription.platform },
+              'onClose:', typeof _paywallOnClose);
+  try { await _configureRC(user.id); } catch(e) { console.warn('[Sub/resume] _configureRC failed', e); }
+  console.log('[Sub/resume] after _configureRC — _rcConfigured:', _rcConfigured);
+  try { await _fetchOfferings(); }    catch(e) { console.warn('[Sub/resume] _fetchOfferings failed', e); }
+  const pkgs = (_rcOfferings && _rcOfferings.availablePackages) || [];
+  console.log('[Sub/resume] after _fetchOfferings — offering:', _rcOfferings && _rcOfferings.identifier,
+              'packages:', pkgs.map(p => p.identifier));
   const intent = _signInGateIntent;
   _signInGateIntent = null;
   _closeSignInRequired();
+  console.log('[Sub/resume] re-entering', intent, '— purchasing:', !!_paywallPurchasing,
+              'currentUser:', !!currentUser, 'mode:', _paywallMode, 'activeRoot:', _paywallActiveRoot && _paywallActiveRoot.id,
+              'selectedPkg:', _paywallSelectedPkg, 'onClose:', typeof _paywallOnClose);
   if (intent === 'restore') { restorePurchases(); return; }
   startPurchase();
 }
@@ -11673,13 +11688,17 @@ async function _signInRequiredGoogle() {
 }
 
 async function startPurchase() {
-  if (_paywallPurchasing) return;
+  console.log('[Sub/purchase] startPurchase called — purchasing:', !!_paywallPurchasing,
+              'currentUser:', currentUser && currentUser.email,
+              'mode:', _paywallMode, 'selectedPkg:', _paywallSelectedPkg,
+              'onClose:', typeof _paywallOnClose);
+  if (_paywallPurchasing) { console.log('[Sub/purchase] BLOCKED by _paywallPurchasing'); return; }
   // Sign-in gate. Guests would run purchasePackage against an
   // anonymous RC session and get empty entitlements.active back —
   // paid stays false, no advance. See _requestSignInForPurchase.
-  if (!currentUser) { _requestSignInForPurchase('purchase'); return; }
+  if (!currentUser) { console.log('[Sub/purchase] BLOCKED by !currentUser → opening sign-in gate'); _requestSignInForPurchase('purchase'); return; }
   const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
-  if (!P) return;
+  if (!P) { console.log('[Sub/purchase] BLOCKED — Purchases plugin not present'); return; }
   const p = _paywallPrices();
   const sel = _paywallSelectedPkg === 'monthly' ? p.monthly : p.yearly;
   const isEn = state.lang === 'en';
@@ -11717,6 +11736,9 @@ async function startPurchase() {
                     && result.customerInfo.entitlements.active
                     && result.customerInfo.entitlements.active[PAYWALL_ENTITLEMENT_ID]);
     if (paid) {
+      console.log('[Sub/purchase] SUCCESS branch — will fire _exitPaywall',
+                  'onClose(pre-exit):', typeof _paywallOnClose,
+                  'mode:', _paywallMode);
       // Optimistic bridge — persists 24h so an app crash before the webhook
       // lands can't lock the user out. Cleared by loadSubscription as soon
       // as a real entitlement row appears.
@@ -11763,12 +11785,18 @@ async function startPurchase() {
         }, 500);
       }
     } else {
+      console.log('[Sub/purchase] ELSE branch — paid=false, active keys were:', _activeKeys,
+                  '— _exitPaywall NOT called, onClose stays:', typeof _paywallOnClose);
       // Purchase came back without the entitlement — treat as failure.
       try { posthog.capture('paywall_purchase_failed', {
         package_id: sel.pkg.identifier, error_code: 'no_entitlement',
       }); } catch(e) {}
     }
   } catch (e) {
+    console.log('[Sub/purchase] CATCH branch — purchase threw:',
+                { message: e && e.message, code: e && (e.errorCode || e.code),
+                  userCancelled: e && e.userCancelled, name: e && e.name },
+                '— _exitPaywall NOT called, onClose stays:', typeof _paywallOnClose);
     // RC surfaces userCancelled as e.userCancelled === true (Capacitor
     // plugin flattens it); silent no-op for that case, toast for real errors.
     const cancelled = !!(e && (e.userCancelled || (e.errorCode === '1') || /cancel/i.test(String(e && e.message))));
