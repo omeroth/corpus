@@ -6239,6 +6239,74 @@
   }
   html.dark .onb-screen.onb-v2 .onb-v2-signup-error { color: #FF8574; }
 
+  /* Step 3 — Headway signup elements. Owl hero at the top, small
+     grey Skip in the top-right corner (not in the CTA holder), legal
+     disclosure line above the buttons, Apple as the primary full-
+     width CTA with weight 900 and no border, Google as a smaller
+     secondary CTA with reduced padding + weight 700. */
+  .onb-screen.onb-v2 .onb-v2-signup-hero {
+    width: 140px;
+    height: 140px;
+    margin: 8px auto 20px;
+    display: grid;
+    place-items: center;
+    filter: drop-shadow(0 12px 20px rgba(var(--accent-rgb), 0.30));
+    animation: onbHeroFloat 6s ease-in-out infinite;
+    transform-origin: 50% 80%;
+  }
+  .onb-screen.onb-v2 .onb-v2-signup-hero svg { width: 100%; height: 100%; }
+  /* Skip corner — matches the walkthrough Skip pattern: fixed top-
+     right, safe-area-inset aware, text-only, low visual weight. */
+  .onb-screen.onb-v2 .onb-v2-signup-skip-corner {
+    position: absolute;
+    top: calc(16px + var(--safe-top));
+    inset-inline-end: 20px;
+    z-index: 10;
+    background: none;
+    border: none;
+    padding: 8px 4px;
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 600;
+    font-size: calc(15px * var(--text-scale));
+    color: var(--text-muted);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .onb-screen.onb-v2 .onb-v2-signup-skip-corner:hover { color: var(--ink); }
+  /* Legal disclosure — small, muted, centered above the buttons.
+     Anchor tags inherit the accent link color. */
+  .onb-screen.onb-v2 .onb-v2-signup-legal {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(12px * var(--text-scale));
+    font-weight: 500;
+    color: var(--text-muted);
+    line-height: 1.45;
+    text-align: center;
+    margin: 4px 8px 4px;
+  }
+  .onb-screen.onb-v2 .onb-v2-signup-legal a {
+    color: var(--accent-text);
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .onb-screen.onb-v2 .onb-v2-signup-legal a:hover { text-decoration: underline; }
+  /* Primary Apple button — full-width, prominent. Inherits .auth-btn-
+     apple's black surface + white text; this rule bumps weight + font
+     size to reinforce "primary". */
+  .onb-screen.onb-v2 .onb-v2-signup-primary {
+    font-weight: 900;
+    font-size: calc(16px * var(--text-scale));
+    padding: 15px 13px;
+  }
+  /* Secondary Google button — smaller than primary. Same width but
+     lighter font + tighter padding so the two read as a hierarchy
+     rather than two equally-weighted options. */
+  .onb-screen.onb-v2 .onb-v2-signup-secondary {
+    font-weight: 700;
+    font-size: calc(14px * var(--text-scale));
+    padding: 11px 13px;
+  }
+
   /* Step 18 — journey. Top card projects the 30-day future; two
      feature blocks below explain how. Accent-bordered card carries
      the promise; feature blocks below sit in the neutral surface
@@ -10172,7 +10240,7 @@ const RC_ANDROID_API_KEY = '';
 // pricing has been sanity-checked in production Storefronts, and (c)
 // grandfathering INSERT has run against prod (see the migration at
 // supabase/migrations/20260901170000_grandfathering.sql).
-const PAYWALL_ENABLED = false;
+const PAYWALL_ENABLED = true;
 
 // Paywall trial gate. DELIBERATELY FALSE — Corpus does not offer a
 // free trial. This is a product decision, not a technical placeholder
@@ -11209,6 +11277,13 @@ function _paywallPrices() {
 // continuation, bonus tap). Nulls fall back to defaults, so the base
 // lesson-tap entry stays untouched.
 let _paywallContext = null;
+// Optional single-shot callback fired by closePaywall on any exit
+// path (X close, purchase success, restore success). Used by the
+// onboarding paywall step to advance the flow regardless of how the
+// modal was dismissed. Consumed once and cleared, so a subsequent
+// showPaywall without an onClose is unaffected.
+let _paywallOnClose = null;
+
 function showPaywall(opts) {
   // Master kill-switch — no-op when the paywall is disabled for this
   // release. canAccessWeek short-circuits above every call site so this
@@ -11225,6 +11300,7 @@ function showPaywall(opts) {
     headline: opts.contextHeadline || null,
     sub:      opts.contextSub      || null,
   };
+  _paywallOnClose = typeof opts.onClose === 'function' ? opts.onClose : null;
   _paywallSelectedPkg = 'yearly';   // reset default on every open
   _paywallPurchasing = false;
   _renderPaywall();
@@ -11253,6 +11329,12 @@ function closePaywall() {
   } catch(e) {}
   _paywallReturnTo = null;
   _paywallContext = null;
+  // Fire the single-shot onClose hook if the caller passed one. Read
+  // + null-out before invoking so a re-entrant showPaywall inside the
+  // hook (unlikely, but defensive) doesn't see a stale callback.
+  const _hook = _paywallOnClose;
+  _paywallOnClose = null;
+  if (typeof _hook === 'function') { try { _hook(); } catch(e) {} }
 }
 
 function _selectPaywallPackage(which) {
@@ -12090,45 +12172,62 @@ function _onbShowScreen(screenId) {
 // without projecting across a lifetime. Later screens (mirror,
 // step 14) will reference it too when they ship.
 
-const _ONB_TOTAL_STEPS = 22;
+// Flow layout version. Bumped when the step ordering changes so mid-
+// onboarding users on a persisted corpus_onboarding_step from an
+// earlier layout don't resume onto the wrong screen. See boot-resume
+// paths (search corpus_onboarding_flow_version) — mismatch triggers
+// a reset to step 1 rather than a mapping table (small population,
+// simpler to restart than to translate).
+const _ONB_FLOW_VERSION = '2';
+
+const _ONB_TOTAL_STEPS = 23;
 // Which phase (1..6) each step belongs to. Drives the 6-pill progress.
 const _ONB_STEP_TO_PHASE = {
-  1: 1, 2: 1, 3: 1,                                  // welcome / problem / solution
-  4: 2, 5: 2, 6: 2,                                  // name / age / phone hours
-  7: 3, 8: 3,                                        // shock / plan intro
-  9: 4, 10: 4, 11: 4, 12: 4,                         // subject / Q1 / Q2 / Q3
-  13: 5, 14: 5, 15: 5, 16: 5, 17: 5, 18: 5, 19: 5,   // mirror / Q4 / let's-start / dialogue / streak / goal / review
-  20: 6, 21: 6,                                      // journey / commit
+  1: 1, 2: 1, 3: 1,                                          // welcome / problem / signup
+  4: 2, 5: 2, 6: 2, 7: 2,                                    // solution / name / age / phone hours
+  8: 3, 9: 3,                                                // shock / plan intro
+  10: 4, 11: 4, 12: 4, 13: 4,                                // subject / Q1 / Q2 / Q3
+  14: 5, 15: 5, 16: 5, 17: 5, 18: 5, 19: 5, 20: 5, 21: 5,   // mirror / Q4 / paywall / let's-start / dialogue / streak / goal / review
+  22: 6, 23: 6,                                              // journey / commit
 };
 // DOM ids in step order. Steps not yet built map to null; _onbShowStep
 // treats a null slot as "not implemented yet, jump to completion" so a
 // partial-ladder commit can ship without HTML for the tail.
 const _ONB_STEP_TO_ID = {
-  1: 'onb-v2-welcome',
-  2: 'onb-v2-problem',
-  3: 'onb-v2-solution',
-  4: 'onb-v2-name',
-  5: 'onb-v2-age',
-  6: 'onb-v2-hours',
-  7: 'onb-v2-shock',
-  8: 'onb-v2-plan',
-  9: 'onb-v2-subject',
-  10: 'onb-v2-q1',
-  11: 'onb-v2-q2',
-  12: 'onb-v2-q3',
-  13: 'onb-v2-mirror',
-  14: 'onb-v2-q4',
-  15: 'onb-v2-lets-start',
-  // Step 16 has no v2 DOM node — the reader takes over the viewport.
-  // _onbShowStep detects n === 16 and routes to _onbEnterFirstDialogue
-  // instead of the normal id-lookup path.
+  1:  'onb-v2-welcome',
+  2:  'onb-v2-problem',
+  // Step 3 (signup) was step 22 in flow v1. Moved to phase 1 so an
+  // account is offered before the user invests real effort in the
+  // 20+ screens that follow. Handlers use postAuthContinue to route
+  // auth success back into onboarding at step 4 instead of home.
+  3:  'onb-v2-signup',
+  4:  'onb-v2-solution',
+  5:  'onb-v2-name',
+  6:  'onb-v2-age',
+  7:  'onb-v2-hours',
+  8:  'onb-v2-shock',
+  9:  'onb-v2-plan',
+  10: 'onb-v2-subject',
+  11: 'onb-v2-q1',
+  12: 'onb-v2-q2',
+  13: 'onb-v2-q3',
+  14: 'onb-v2-mirror',
+  15: 'onb-v2-q4',
+  // Step 16 (paywall) has no v2 DOM node — the shared showPaywall
+  // modal is opened with onboarding context copy + an onClose hook
+  // that advances to step 17. _onbShowStep detects n === 16 and
+  // routes to _onbShowPaywall instead of the normal id-lookup path.
   16: null,
-  17: 'onb-v2-streak',
-  18: 'onb-v2-goal',
-  19: 'onb-v2-review',
-  20: 'onb-v2-journey',
-  21: 'onb-v2-commit',
-  22: 'onb-v2-signup',
+  17: 'onb-v2-lets-start',
+  // Step 18 has no v2 DOM node — the reader takes over the viewport.
+  // _onbShowStep detects n === 18 and routes to _onbEnterFirstDialogue
+  // instead of the normal id-lookup path. (Was step 16 in flow v1.)
+  18: null,
+  19: 'onb-v2-streak',
+  20: 'onb-v2-goal',
+  21: 'onb-v2-review',
+  22: 'onb-v2-journey',
+  23: 'onb-v2-commit',
 };
 
 // Bilingual copy map for the intro screens (1-3). Later commits will
@@ -12504,8 +12603,18 @@ const _ONB_COPY = {
               he: 'צרו חשבון כדי לשמור על ההתקדמות, הרצף וההוגים שלכם' },
     apple:  { en: 'Continue with Apple',  he: 'המשך עם Apple' },
     google: { en: 'Continue with Google', he: 'המשך עם Google' },
-    email:  { en: 'Continue with email',  he: 'המשך עם אימייל' },
-    skip:   { en: 'Not now',              he: 'לא עכשיו' },
+    skip:   { en: 'Skip',                 he: 'דלגו' },
+    // Legal disclosure required above the auth buttons per the
+    // Headway pattern. The Terms and Privacy Policy tokens are
+    // replaced by <a> tags in _onbApplyLang; keep the { terms } and
+    // { privacy } placeholders in the copy so the linker can find
+    // its splice points.
+    legal:  {
+      en: 'By continuing you agree to our { terms } and { privacy }.',
+      he: 'בהמשך אתם מסכימים ל{ terms } ול{ privacy } שלנו.',
+    },
+    legalTerms:   { en: 'Terms',          he: 'תנאי השימוש' },
+    legalPrivacy: { en: 'Privacy Policy', he: 'מדיניות הפרטיות' },
   },
 };
 
@@ -12580,8 +12689,19 @@ function _onbApplyLang(lang) {
   setText('onb-v2-signup-sub',    'signup',   'sub');
   setText('onb-signup-apple-text',  'signup', 'apple');
   setText('onb-signup-google-text', 'signup', 'google');
-  setText('onb-signup-email-text',  'signup', 'email');
   setText('onb-v2-signup-skip',   'signup',   'skip');
+  // Legal disclosure line — splices in Terms + Privacy anchor tags at
+  // the { terms } / { privacy } placeholders. Uses innerHTML so the
+  // link markup lands as real anchors rather than escaped text.
+  const legalEl = document.getElementById('onb-v2-signup-legal');
+  if (legalEl && _ONB_COPY.signup && _ONB_COPY.signup.legal) {
+    const _tpl = isEn ? _ONB_COPY.signup.legal.en : _ONB_COPY.signup.legal.he;
+    const _termsLabel   = isEn ? _ONB_COPY.signup.legalTerms.en   : _ONB_COPY.signup.legalTerms.he;
+    const _privacyLabel = isEn ? _ONB_COPY.signup.legalPrivacy.en : _ONB_COPY.signup.legalPrivacy.he;
+    legalEl.innerHTML = _tpl
+      .replace('{ terms }',   '<a href="#" onclick="event.preventDefault(); _openLegalUrl(\'terms\');">'   + _termsLabel   + '</a>')
+      .replace('{ privacy }', '<a href="#" onclick="event.preventDefault(); _openLegalUrl(\'privacy\');">' + _privacyLabel + '</a>');
+  }
   // Text/number input placeholders (slider has none).
   const setPlaceholder = (id, group) => {
     const el = document.getElementById(id);
@@ -12617,10 +12737,18 @@ function _onbSetLang(lang) {
 // a user on a missing screen.
 function _onbShowStep(n) {
   if (n < 1 || n > _ONB_TOTAL_STEPS) { _onbComplete(); return; }
-  // Step 16 — reader takes over the viewport (no v2 DOM node). The
+  // Step 16 — paywall (no v2 DOM node). Opens the shared paywall
+  // modal with onboarding context copy and an onClose hook that
+  // advances to step 17. All three exit paths (X close, purchase
+  // success, restore success) route through closePaywall, which
+  // fires the onClose. See _onbShowPaywall for the wiring.
+  if (n === 16) { _onbShowPaywall(); return; }
+  // Step 18 — reader takes over the viewport (no v2 DOM node). The
   // onboarding resumes after the user finishes the dialogue via
   // finishDay's _onbInFirstDialogue guard → _onbFinishFirstDialogue.
-  if (n === 16) { _onbEnterFirstDialogue(); return; }
+  // (Was step 16 in flow v1; renumbered when the paywall step was
+  // inserted.)
+  if (n === 18) { _onbEnterFirstDialogue(); return; }
   const id = _ONB_STEP_TO_ID[n];
   if (!id) {
     // Not-yet-built step — early completion for commit-A cadence.
@@ -12651,7 +12779,11 @@ function _onbShowStep(n) {
   const hook = _ONB_STEP_HOOKS[n];
   if (hook) { try { hook(); } catch(e) { console.warn('[onb-v2] prepare hook failed for step', n, e); } }
   try { localStorage.setItem('corpus_onboarding_step', String(n)); } catch(e) {}
-  try { _phCapture('onboarding_step_shown', { step: n, phase: phase }); } catch(e) {}
+  // Stamp the flow layout version alongside the step so boot-resume
+  // paths can detect an old-layout step number and reset to step 1
+  // rather than resume onto the wrong screen.
+  try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(e) {}
+  try { _phCapture('onboarding_step_shown', { step: n, phase: phase, flow_version: 2 }); } catch(e) {}
 }
 
 // Move from step `from` to step `to`, optionally merging a patch of
@@ -12706,7 +12838,7 @@ function _onbV2CtaWelcome() { _onbAdvanceStep(1, 2); }
 // Screen 2 (problem) CTA — advance to screen 3.
 function _onbV2CtaProblem() { _onbAdvanceStep(2, 3); }
 // Screen 3 (solution) CTA — advance to screen 4 (name capture).
-function _onbV2CtaSolution() { _onbAdvanceStep(3, 4); }
+function _onbV2CtaSolution() { _onbAdvanceStep(4, 5); }
 
 // Screen 4 (name) — capture the trimmed name into state.userName +
 // state.onbAnswers.name, advance.
@@ -12715,7 +12847,7 @@ function _onbV2CtaName() {
   const name = ((el && el.value) || '').trim().slice(0, 40);
   if (!name) return;
   state.userName = name;
-  _onbAdvanceStep(4, 5, { name: name });
+  _onbAdvanceStep(5, 6, { name: name });
 }
 
 // Screen 5 (age) — validate 13..120 and advance. CTA is otherwise
@@ -12725,21 +12857,21 @@ function _onbV2CtaAge() {
   const val = parseInt((el && el.value) || '', 10);
   if (!(val >= 13 && val <= 120)) return;
   state.userAge = val;
-  _onbAdvanceStep(5, 6, { age: val });
+  _onbAdvanceStep(6, 7, { age: val });
 }
 
 // Screen 6 (phone hours slider) — always has a value, no disabled state.
 function _onbV2CtaHours() {
   const el = document.getElementById('onb-v2-hours-input');
   const val = parseInt((el && el.value) || '4', 10) || 4;
-  _onbAdvanceStep(6, 7, { phoneHours: val });
+  _onbAdvanceStep(7, 8, { phoneHours: val });
 }
 
 // Screen 7 (shock number) — display-only; advance on tap.
-function _onbV2CtaShock() { _onbAdvanceStep(7, 8); }
+function _onbV2CtaShock() { _onbAdvanceStep(8, 9); }
 
 // Screen 8 (plan intro) — display-only; advance to subject picker.
-function _onbV2CtaPlan() { _onbAdvanceStep(8, 9); }
+function _onbV2CtaPlan() { _onbAdvanceStep(9, 10); }
 
 // Screen 9 (subject picker) — single selection required; CTA disabled
 // otherwise (set in _onbV2PrepareSubject).
@@ -12758,7 +12890,7 @@ function _onbV2SubjectTap(subjectId) {
 function _onbV2CtaSubject() {
   if (!_onbV2SubjectPick) return;
   try { setSubject(_onbV2SubjectPick); } catch(e) {}
-  _onbAdvanceStep(9, 10);
+  _onbAdvanceStep(10, 11);
 }
 
 // Screens 10, 11 (Q1, Q2) — single-select. Tap replaces the previous
@@ -12775,11 +12907,11 @@ function _onbV2MselTap(question, optionId) {
 }
 function _onbV2CtaQ1() {
   if (!state.onbAnswers.q1 || !state.onbAnswers.q1.length) return;
-  _onbAdvanceStep(10, 11);
+  _onbAdvanceStep(11, 12);
 }
 function _onbV2CtaQ2() {
   if (!state.onbAnswers.q2 || !state.onbAnswers.q2.length) return;
-  _onbAdvanceStep(11, 12);
+  _onbAdvanceStep(12, 13);
 }
 
 // Screen 12 (Q3) — single choice + sets daily goal via the existing
@@ -12803,13 +12935,13 @@ function _onbV2CtaQ3() {
   // (step 17) writes state.dailyGoalHistory with the exact 'one' | 'two'
   // | 'own_pace' values the runtime consumers recognize; Q3's ids
   // wouldn't match those.
-  _onbAdvanceStep(12, 13, { q3: pick });
+  _onbAdvanceStep(13, 14, { q3: pick });
 }
 
 // Screen 13 (mirror) — display-only; advance to step 14 (Q4). The
 // mirror is a recap of the user's own picks, then Q4 is one final
 // honest-check question before commit.
-function _onbV2CtaMirror() { _onbAdvanceStep(13, 14); }
+function _onbV2CtaMirror() { _onbAdvanceStep(14, 15); }
 
 // Screen 14 (Q4 slider) — 0..4 Likert (default 2 = "Sometimes"). CTA
 // "Let's start" advances to step 15, which opens the first dialogue.
@@ -12817,10 +12949,38 @@ function _onbV2CtaQ4() {
   const el = document.getElementById('onb-v2-q4-input');
   const val = parseInt((el && el.value) || '2', 10);
   const clamped = Math.max(0, Math.min(4, isNaN(val) ? 2 : val));
-  _onbAdvanceStep(14, 15, { readingFreq: clamped });
+  _onbAdvanceStep(15, 16, { readingFreq: clamped });
 }
 
-// Screen 15 — first-dialogue entry. Reader takes over the visual
+// Step 16 — paywall. Opens the shared paywall modal with onboarding
+// context copy and an onClose hook that advances to step 17
+// (lets-start) regardless of exit path. All three exit paths (X
+// close, purchase success, restore success) route through
+// closePaywall, which fires the onClose. Persists the step cursor +
+// stamps the analytics event before showing, matching the pattern
+// _onbShowStep uses for regular DOM-node screens.
+function _onbShowPaywall() {
+  const isEn = state.lang === 'en';
+  document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
+    s.style.display = 'none';
+    s.classList.remove('onb-active');
+  });
+  try { localStorage.setItem('corpus_onboarding_step', '16'); } catch(e) {}
+  try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(e) {}
+  try { _phCapture('onboarding_step_shown', { step: 16, phase: 5, flow_version: 2 }); } catch(e) {}
+  showPaywall({
+    source: 'onboarding',
+    subject: state.subject || null,
+    contextEyebrow:  isEn ? 'UNLOCK EVERYTHING' : 'לפתוח הכל',
+    contextHeadline: isEn ? 'Ready to go deeper?' : 'מוכנים להעמיק?',
+    contextSub:      isEn
+      ? 'Every chapter, every subject, every bonus dialogue.'
+      : 'כל פרק, כל נושא, כל דיאלוג בונוס.',
+    onClose: () => _onbAdvanceStep(16, 17),
+  });
+}
+
+// Step 18 — first-dialogue entry. Reader takes over the visual
 // layer. state._onbInFirstDialogue is the guard finishDay reads to
 // route the tail to _onbFinishFirstDialogue instead of the normal
 // stats + celebration + guest-prompt chain.
@@ -12830,14 +12990,15 @@ function _onbEnterFirstDialogue() {
     s.style.display = 'none';
     s.classList.remove('onb-active');
   });
-  try { localStorage.setItem('corpus_onboarding_step', '16'); } catch(e) {}
-  try { _phCapture('onboarding_step_shown', { step: 16, phase: 5 }); } catch(e) {}
+  try { localStorage.setItem('corpus_onboarding_step', '18'); } catch(e) {}
+  try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(e) {}
+  try { _phCapture('onboarding_step_shown', { step: 18, phase: 5, flow_version: 2 }); } catch(e) {}
   // Chapter 1 / Day 1 is the picked subject's first real lesson.
   // openReader handles theme, rendering, and section-0 setup.
   try { openReader(1, 1); } catch(e) {
     console.warn('[onb-v2] openReader failed for first dialogue', e);
     state._onbInFirstDialogue = false;
-    _onbShowStep(17);
+    _onbShowStep(19);
   }
 }
 
@@ -12859,7 +13020,7 @@ function _onbFinishFirstDialogue() {
   const chapter = getW().find(w => w.id === state.currentWeek);
   const day = chapter && chapter.days.find(d => d.id === state.currentDay);
   if (!chapter || !day) {
-    _onbShowStep(17);
+    _onbShowStep(19);
     return;
   }
   const key = dayKey(state.currentWeek, state.currentDay);
@@ -12917,22 +13078,22 @@ function _onbFinishFirstDialogue() {
       backBtn.onclick = () => {
         state._onbInFirstDialogue = false;
         try { document.getElementById('modal-complete').classList.remove('active'); } catch(e) {}
-        _onbShowStep(17);
+        _onbShowStep(19);
       };
     }
   } else {
     state._onbInFirstDialogue = false;
-    _onbShowStep(17);
+    _onbShowStep(19);
   }
 }
 
 // Screen 15 (let's start) — statement screen bridging Q4 → first
 // dialogue. Head + sub in the standard v2 statement layout; CTA
 // advances into the reader takeover at step 16.
-function _onbV2CtaLetsStart() { _onbAdvanceStep(15, 16); }
+function _onbV2CtaLetsStart() { _onbAdvanceStep(17, 18); }
 
 // Screen 17 (day-1 streak) — display-only celebration; advance to 18 (goal).
-function _onbV2CtaStreak() { _onbAdvanceStep(17, 18); }
+function _onbV2CtaStreak() { _onbAdvanceStep(19, 20); }
 
 // Screen 18 (daily goal) — single-select radio over three cards
 // ('one' / 'two' / 'own_pace'). Preselect logic maps the Q3 answer to
@@ -12967,7 +13128,7 @@ function _onbV2CtaGoal() {
       is_existing_user: !!localStorage.getItem('corpus_onboarding_done'),
     });
   } catch(e) {}
-  _onbAdvanceStep(18, 19, { dailyGoal: goal });
+  _onbAdvanceStep(20, 21, { dailyGoal: goal });
 }
 
 // Screen 17 (review request) — Rate fires the native review sheet
@@ -12982,16 +13143,16 @@ function _onbV2CtaReviewRate() {
     try {
       _phCapture('onboarding_review_tapped', { platform: platform, path: path });
     } catch(e) {}
-    _onbAdvanceStep(19, 20);
+    _onbAdvanceStep(21, 22);
   });
 }
 function _onbV2CtaReviewSkip() {
   try { _phCapture('onboarding_review_skipped', {}); } catch(e) {}
-  _onbAdvanceStep(19, 20);
+  _onbAdvanceStep(21, 22);
 }
 
 // Screen 20 (journey summary) — display-only; advance to commit.
-function _onbV2CtaJourney() { _onbAdvanceStep(20, 21); }
+function _onbV2CtaJourney() { _onbAdvanceStep(22, 23); }
 
 // Screen 19 (commitment) — single-choice pick. Terminal step. Tap
 // stores the id in state.onbAnswers.commitment (display-only — no
@@ -13016,45 +13177,35 @@ function _onbV2CtaCommit() {
       name: !!state.onbAnswers.name,
     });
   } catch(e) {}
-  // Advance to step 22 (signup offer) instead of completing directly.
-  // Signup screen's CTAs call _onbComplete themselves (skip) or open
-  // the auth screen after marking onboarding done (create account).
-  _onbAdvanceStep(21, 22);
+  // Advance past _ONB_TOTAL_STEPS to trigger _onbComplete. Signup
+  // moved to step 3 in flow v2; commit (step 23) is now the last
+  // screen before completion.
+  _onbAdvanceStep(23, 24);
 }
 
-// Step 22 — signup offer. Four CTAs: three inline providers (Apple,
-// Google, Email) and a "Not now" skip.
+// Step 3 — signup offer, Headway-style. Three CTAs: Apple (primary,
+// full-width), Google (secondary), Skip (top-right corner). Email is
+// deliberately absent for this commit — an "Continue with email"
+// button that doesn't actually collect an email address would be
+// dishonest, and the auth-screen route from here would disrupt the
+// remaining 20 onboarding screens. Adding real email signup during
+// onboarding (a modal form or a returns-here auth-screen flag) is
+// worth doing for the segment that won't use either social provider;
+// tracked as a follow-up.
 //
-// Inline provider taps run OAuth from step 22 (buttons/text/error slot
-// all on the step 22 DOM). On successful Supabase exchange, the
-// _authProviderStart helper fires our _onbSignupMarkDoneAndHide hook
-// before enterApp → home; that hook marks corpus_onboarding_done, clears
-// the step cursor, fires onboarding_completed, and hides all onb-v2
-// screens so home isn't obscured by their z-index:1100 overlay. On
-// OAuth failure, the step 22 error slot surfaces the message and the
-// button re-enables so the user can retry or tap Not now.
-//
-// Done-flag is NOT set until success — a mid-OAuth force-quit leaves
-// the user on step 22 next launch (via corpus_onboarding_step === '22').
-// This is safer than pre-marking done, which would leave a half-authed
-// user with no onboarding to return to and no error context.
-function _onbSignupMarkDoneAndHide() {
-  const today = _streakDay();
-  state.onbAnswers = state.onbAnswers || {};
-  state.onbAnswers.completedAt = today;
-  try { saveState(); } catch(e) {}
-  try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
-  try { localStorage.removeItem('corpus_onboarding_step'); } catch(e) {}
-  // Belt-and-braces: same as _onbComplete — force the first-dialogue
-  // guard off so finishDay's onboarding tail can't fire again.
-  try { state._onbInFirstDialogue = false; saveStateLocal(); } catch(e) {}
-  try { _phCapture('onboarding_completed', { platform: _phPlatform(), lang: state.lang || 'he', via: 'signup_screen' }); } catch(e) {}
-  document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
-    s.style.display = 'none';
-    s.classList.remove('onb-active');
-  });
-}
-
+// Signup moved from step 22 to step 3 (flow v2) so an account is
+// offered before the user invests real effort. Behaviour changes vs.
+// the old step-22 signup:
+//   * Auth success does NOT mark corpus_onboarding_done or route to
+//     home — the user still has 20 screens of onboarding to complete.
+//     _authProviderStart's postAuthContinue option runs enterAppState
+//     (progress + subscription load, save, telemetry, mark auth
+//     resolved) then advances to step 4.
+//   * Skip does NOT call _onbComplete — it advances to step 4. The
+//     user finishes onboarding as a guest and can sign up from
+//     Profile later.
+//   * OAuth failure surfaces the error in the step 3 error slot; the
+//     button re-enables so the user can retry or tap Skip.
 async function _onbSignupApple() {
   try { _phCapture('onboarding_signup_prompt_action', { action: 'apple' }); } catch(e) {}
   const isEn = state.lang === 'en';
@@ -13063,7 +13214,13 @@ async function _onbSignupApple() {
     textEl: document.getElementById('onb-signup-apple-text'),
     errorEl: document.getElementById('onb-v2-signup-error'),
     defaultLabel: isEn ? 'Continue with Apple' : 'המשך עם Apple',
-    onBeforeEnter: _onbSignupMarkDoneAndHide,
+    postAuthContinue: async (user) => {
+      // State-only enter: load progress + subscription + telemetry
+      // + mark-auth-resolved, but DON'T route UI to home. Then
+      // advance onboarding to step 4 (solution).
+      await enterAppState(user);
+      _onbAdvanceStep(3, 4);
+    },
   });
 }
 
@@ -13075,31 +13232,18 @@ async function _onbSignupGoogle() {
     textEl: document.getElementById('onb-signup-google-text'),
     errorEl: document.getElementById('onb-v2-signup-error'),
     defaultLabel: isEn ? 'Continue with Google' : 'המשך עם Google',
-    onBeforeEnter: _onbSignupMarkDoneAndHide,
+    postAuthContinue: async (user) => {
+      await enterAppState(user);
+      _onbAdvanceStep(3, 4);
+    },
   });
-}
-
-// Email path: no inline OAuth to run, so mark done + hide + open the
-// auth screen in signup mode. Same fallback as the old create-account
-// path if the auth screen fails to show — never trap the user.
-function _onbSignupEmail() {
-  try { _phCapture('onboarding_signup_prompt_action', { action: 'email' }); } catch(e) {}
-  _onbSignupMarkDoneAndHide();
-  try {
-    setAuthMode('signup');
-    showAuthScreen();
-  } catch(e) {
-    renderHome();
-    showScreen('home');
-    try { _walkthroughStartIfEligible({ bypassCompletionGate: true }); } catch(_e) {}
-  }
 }
 
 function _onbV2CtaSignupSkip() {
   try {
     _phCapture('onboarding_signup_prompt_action', { action: 'skip' });
   } catch(e) {}
-  _onbComplete();
+  _onbAdvanceStep(3, 4);
 }
 
 // Screen prepare hooks — invoked from _onbShowStep once the target
@@ -13598,31 +13742,39 @@ function _onbV2PrepareCommit() {
 
 // Map from step number → prepare hook. Consumed by _onbShowStep.
 // Only steps with dynamic content need entries; static-copy screens
-// (1, 2, 3, 8) rely on _onbApplyLang alone.
+// (welcome, problem, solution, plan) rely on _onbApplyLang alone.
+// Reordered for flow v2: signup moved to step 3, all downstream
+// steps shifted by 1 (plus a further +1 past step 15 for paywall).
 const _ONB_STEP_HOOKS = {
-  4:  _onbV2PrepareName,
-  5:  _onbV2PrepareAge,
-  6:  _onbV2PrepareHours,
-  7:  _onbV2PrepareShock,
-  9:  _onbV2PrepareSubject,
-  10: _onbV2PrepareQ1,
-  11: _onbV2PrepareQ2,
-  12: _onbV2PrepareQ3,
-  13: _onbV2PrepareMirror,
-  14: _onbV2PrepareQ4,
-  // 15 (let's-start) is static once _onbApplyLang runs.
-  // 16: handled specially in _onbShowStep (reader takeover, no v2 DOM).
-  // 17 (streak) + 19 (review) are static once _onbApplyLang runs.
-  18: _onbV2PrepareGoal,
-  20: _onbV2PrepareJourney,
-  21: _onbV2PrepareCommit,
-  22: _onbV2PrepareSignup,
+  3:  _onbV2PrepareSignup,
+  5:  _onbV2PrepareName,
+  6:  _onbV2PrepareAge,
+  7:  _onbV2PrepareHours,
+  8:  _onbV2PrepareShock,
+  10: _onbV2PrepareSubject,
+  11: _onbV2PrepareQ1,
+  12: _onbV2PrepareQ2,
+  13: _onbV2PrepareQ3,
+  14: _onbV2PrepareMirror,
+  15: _onbV2PrepareQ4,
+  // 16: handled specially in _onbShowStep (paywall modal, no v2 DOM).
+  // 17 (let's-start) is static once _onbApplyLang runs.
+  // 18: handled specially in _onbShowStep (reader takeover, no v2 DOM).
+  // 19 (streak) + 21 (review) are static once _onbApplyLang runs.
+  20: _onbV2PrepareGoal,
+  22: _onbV2PrepareJourney,
+  23: _onbV2PrepareCommit,
 };
 
-// Step 22 prepare hook — fires the explicit prompt-shown event so it's
-// filterable in PostHog without stringifying step numbers. Copy is
-// static (applied by _onbApplyLang above); nothing dynamic to render.
+// Step 3 prepare hook — injects the owl SVG into the hero slot and
+// fires the prompt-shown event. Uses the neutral (waving) expression
+// so the owl reads as a warm welcome rather than an aggressive
+// upsell. _cloneOwlSvgHTML lives in the welcome-back-modal block;
+// same helper works here since it just clones #owl-template with a
+// class applied.
 function _onbV2PrepareSignup() {
+  const owlEl = document.getElementById('onb-v2-signup-owl');
+  if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
   try {
     _phCapture('onboarding_signup_prompt_shown', {
       lang: state.lang || null,
@@ -13709,11 +13861,25 @@ function startNewUserOnboarding() {
   const _localCompletionCount = Object.keys(state.completedDays || {})
     .filter(k => !k.endsWith('-0')).length;
   const _hasOnbDone = !!localStorage.getItem('corpus_onboarding_done');
-  const _resumeStep = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
+  let _resumeStep = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
+  // Flow-version guard: if the persisted step was written by a
+  // previous layout (missing or old corpus_onboarding_flow_version),
+  // discard it and restart from step 1. Mapping tables between
+  // layouts are more code and more risk than a restart, and the
+  // affected population (users mid-onboarding when the layout
+  // shipped) is small. See _ONB_FLOW_VERSION for the current value.
+  const _resumeFlowVersion = localStorage.getItem('corpus_onboarding_flow_version') || '';
+  if (_resumeStep >= 1 && _resumeFlowVersion !== _ONB_FLOW_VERSION) {
+    console.log('[Onboarding] flow-version mismatch — persisted step', _resumeStep,
+                'from version', _resumeFlowVersion || '(none)', '→ resetting to step 1');
+    try { localStorage.removeItem('corpus_onboarding_step'); } catch(e) {}
+    _resumeStep = 0;
+  }
   console.log('[Onboarding] startNewUserOnboarding:', {
     localCompletionCount: _localCompletionCount,
     hasOnbDone: _hasOnbDone,
     resumeStep: _resumeStep,
+    flowVersion: _resumeFlowVersion,
     booted: _onboardingBooted,
   });
   // Existing user or already-done onboarding → home. Silent guest entry
@@ -24818,11 +24984,23 @@ function initUI() {
     //   otherwise fresh install        → onboarding at step 1
     const _completedCount = Object.keys(state.completedDays || {}).length;
     const _hasOnbDone = !!localStorage.getItem('corpus_onboarding_done');
-    const _resumeStep = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
+    let _resumeStep = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
+    // Flow-version guard — see the matching block in
+    // startNewUserOnboarding. If the persisted step was written by a
+    // previous layout, discard it so the resume falls through to the
+    // fresh-install branch (which starts at step 1).
+    const _resumeFlowVersion = localStorage.getItem('corpus_onboarding_flow_version') || '';
+    if (_resumeStep >= 1 && _resumeFlowVersion !== _ONB_FLOW_VERSION) {
+      console.log('[Onboarding] initUI gate: flow-version mismatch — persisted step',
+                  _resumeStep, 'from version', _resumeFlowVersion || '(none)', '→ resetting to step 1');
+      try { localStorage.removeItem('corpus_onboarding_step'); } catch(e) {}
+      _resumeStep = 0;
+    }
     console.log('[Onboarding] initUI gate:', {
       completedCount: _completedCount,
       hasOnbDone: _hasOnbDone,
       resumeStep: _resumeStep,
+      flowVersion: _resumeFlowVersion,
     });
     if (_hasOnbDone) {
       console.log('[Onboarding] Onboarding done → home');
@@ -26280,7 +26458,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 17 — day-1 streak celebration. Flame icon (reuses #icon-streak
      from the endowment overlay), amber eyebrow, head, sub, CTA.
      Fires after the user finishes the first dialogue via
-     _onbFinishFirstDialogue → _onbShowStep(17). -->
+     _onbFinishFirstDialogue → _onbShowStep(19). -->
 <div id="onb-v2-streak" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
@@ -26410,17 +26588,20 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 22 — signup offer. Four CTAs: three inline provider buttons
-     (Apple/Google/Email) driven from _onbSignupApple/_onbSignupGoogle/
-     _onbSignupEmail, plus a "Not now" skip. Apple is first to satisfy
-     App Store guideline 4.8 (Sign in with Apple must be at least as
-     prominent as other social sign-ins on the same surface). Reuses
-     .auth-btn styling so provider buttons match the auth screen. -->
+<!-- Step 3 — signup offer, Headway-style. Owl visual, legal disclosure
+     above the buttons, Apple as the primary full-width CTA, Google as
+     a smaller secondary CTA below, and a small grey Skip in the top-
+     right corner. Apple is placed above Google to satisfy App Store
+     guideline 4.8 (Sign in with Apple must be at least as prominent).
+     Email is deliberately absent for this commit — see _onbSignupApple
+     block comment. -->
 <div id="onb-v2-signup" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
-  <div class="onb-progress" aria-hidden="true" data-step="6">
+  <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-signup-skip" onclick="_onbV2CtaSignupSkip()"></button>
+  <div class="onb-progress" aria-hidden="true" data-step="1">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
+    <div class="onb-v2-signup-hero" id="onb-v2-signup-owl" aria-hidden="true"></div>
     <div class="onb-v2-copy">
       <h1 class="onb-v2-head" id="onb-v2-signup-head"></h1>
       <p class="onb-v2-sub" id="onb-v2-signup-sub"></p>
@@ -26428,16 +26609,13 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <div class="onb-cta-holder onb-v2-signup-actions">
     <div class="onb-v2-signup-error" id="onb-v2-signup-error"></div>
-    <button type="button" class="auth-btn auth-btn-social auth-btn-apple" id="onb-signup-apple-btn" onclick="_onbSignupApple()">
+    <p class="onb-v2-signup-legal" id="onb-v2-signup-legal"></p>
+    <button type="button" class="auth-btn auth-btn-social auth-btn-apple onb-v2-signup-primary" id="onb-signup-apple-btn" onclick="_onbSignupApple()">
       <span class="auth-social-icon"><svg width="14" height="17" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg></span> <span id="onb-signup-apple-text"></span>
     </button>
-    <button type="button" class="auth-btn auth-btn-social" id="onb-signup-google-btn" onclick="_onbSignupGoogle()">
+    <button type="button" class="auth-btn auth-btn-social onb-v2-signup-secondary" id="onb-signup-google-btn" onclick="_onbSignupGoogle()">
       <span class="auth-social-icon">G</span> <span id="onb-signup-google-text"></span>
     </button>
-    <button type="button" class="auth-btn auth-btn-social" id="onb-signup-email-btn" onclick="_onbSignupEmail()">
-      <span id="onb-signup-email-text"></span>
-    </button>
-    <button type="button" class="onb-v2-skip" id="onb-v2-signup-skip" onclick="_onbV2CtaSignupSkip()"></button>
   </div>
 </div>
 
