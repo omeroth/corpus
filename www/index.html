@@ -11468,7 +11468,15 @@ function showPaywall(opts) {
 // scroll changes here — the onClose hook (_onbAdvanceStep) will show
 // the next onboarding step, which hides the current one via the same
 // .onb-active toggle that every step transition uses.
-function _exitPaywall() {
+// `reason` classifies the exit for the paywall_dismissed funnel event:
+//   'close_x'          — modal X button (chapter/bonus paywall)
+//   'skip'             — onboarding paywall Skip corner
+//   'purchase_success' — post-purchase self-close (both shells)
+//   'restore_success'  — post-restore self-close (both shells)
+// Every _exitPaywall callsite passes one. A missing reason falls back
+// to 'unknown' rather than the more-informative 'close_x' so a future
+// caller that forgets the argument is loud in the funnel, not silent.
+function _exitPaywall(reason) {
   if (_paywallMode === 'modal' && _paywallActiveRoot) {
     _paywallActiveRoot.classList.remove('active');
     document.body.style.overflow = '';
@@ -11476,7 +11484,8 @@ function _exitPaywall() {
   try {
     posthog.capture('paywall_dismissed', {
       package_selected: _paywallSelectedPkg,
-      source_mode: _paywallMode,
+      source_mode:      _paywallMode,
+      reason:           reason || 'unknown',
     });
   } catch(e) {}
   _paywallReturnTo = null;
@@ -11687,6 +11696,18 @@ async function startPurchase() {
               'currentUser:', currentUser && currentUser.email,
               'mode:', _paywallMode, 'selectedPkg:', _paywallSelectedPkg,
               'onClose:', typeof _paywallOnClose);
+  // Fire BEFORE any guard so every user tap is captured even when the
+  // call ultimately short-circuits (guest hits the sign-in gate, plugin
+  // absent, already in-flight, etc.). The paywall_purchase_started
+  // event further down only fires after the guards pass, which under-
+  // reports actual intent — this event is the counterpart that counts
+  // every tap regardless of outcome.
+  try { posthog.capture('paywall_cta_tapped', {
+    intent: 'purchase',
+    source_mode: _paywallMode,
+    package_selected: _paywallSelectedPkg,
+    is_signed_in: !!currentUser,
+  }); } catch(e) {}
   if (_paywallPurchasing) { console.log('[Sub/purchase] BLOCKED by _paywallPurchasing'); return; }
   // Sign-in gate. Guests would run purchasePackage against an
   // anonymous RC session and get empty entitlements.active back —
@@ -11754,7 +11775,7 @@ async function startPurchase() {
 
       const returnTo = _paywallReturnTo;
       const wasModalMode = _paywallMode === 'modal';
-      _exitPaywall();
+      _exitPaywall('purchase_success');
       // Modal-mode UX chrome: "Welcome to Corpus" toast + returnTo
       // openReader + post-subscription bonus reveal. All of these
       // presume there's a lesson the user was trying to open — the
@@ -11793,9 +11814,17 @@ async function startPurchase() {
                   userCancelled: e && e.userCancelled, name: e && e.name },
                 '— _exitPaywall NOT called, onClose stays:', typeof _paywallOnClose);
     // RC surfaces userCancelled as e.userCancelled === true (Capacitor
-    // plugin flattens it); silent no-op for that case, toast for real errors.
+    // plugin flattens it); UI stays silent (no toast) but analytics
+    // does capture — the "user cancelled at the Apple / Play dialog"
+    // moment is a distinct funnel signal from silent failures and from
+    // true errors, and previously collapsed to nothing.
     const cancelled = !!(e && (e.userCancelled || (e.errorCode === '1') || /cancel/i.test(String(e && e.message))));
-    if (!cancelled) {
+    if (cancelled) {
+      try { posthog.capture('paywall_purchase_cancelled', {
+        package_id:  sel.pkg.identifier,
+        source_mode: _paywallMode,
+      }); } catch(_) {}
+    } else {
       const msg = (e && e.message) || 'Purchase failed';
       _showToast(state.lang === 'en' ? ('Purchase failed: ' + msg) : ('הרכישה נכשלה: ' + msg));
       try { posthog.capture('paywall_purchase_failed', {
@@ -11810,6 +11839,14 @@ async function startPurchase() {
 }
 
 async function restorePurchases() {
+  // Fire BEFORE the sign-in gate + plugin guard so every restore tap
+  // is captured even when the call short-circuits — same rationale as
+  // paywall_cta_tapped in startPurchase.
+  try { posthog.capture('paywall_cta_tapped', {
+    intent: 'restore',
+    source_mode: _paywallMode,
+    is_signed_in: !!currentUser,
+  }); } catch(e) {}
   // Sign-in gate — same reasoning as startPurchase. RC restore against
   // an anonymous SDK returns an empty active-entitlements map, which
   // reads as "no previous purchases found" and surfaces the confusing
@@ -11841,7 +11878,7 @@ async function restorePurchases() {
       try { posthog.capture('paywall_restore_result', { found: true }); } catch(e) {}
       const returnTo = _paywallReturnTo;
       const wasModalMode = _paywallMode === 'modal';
-      _exitPaywall();
+      _exitPaywall('restore_success');
       // Same reasoning as startPurchase — onboarding-mode restore
       // skips the toast + returnTo + retro-reveal; the flow's own
       // next step frames the moment.
@@ -26808,7 +26845,7 @@ document.addEventListener('DOMContentLoaded', function() {
      no modal backdrop — Skip means "skip this step" (matches the signup
      step); X on the modal shell means "close the overlay". -->
 <div id="onb-v2-paywall" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
-  <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-paywall-skip" onclick="_exitPaywall()"></button>
+  <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-paywall-skip" onclick="_exitPaywall('skip')"></button>
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -27095,7 +27132,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="modal-overlay" id="modal-paywall">
   <div class="modal-box paywall-box">
     <div class="paywall-topbar">
-      <button type="button" class="paywall-close" onclick="_exitPaywall()" aria-label="Close">×</button>
+      <button type="button" class="paywall-close" onclick="_exitPaywall('close_x')" aria-label="Close">×</button>
     </div>
     <div class="paywall-brand">Corpus</div>
     <div class="paywall-eyebrow"></div>
