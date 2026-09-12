@@ -12175,21 +12175,32 @@ async function handleAuthSubmit() {
 //                   onboarding). Unused in-tree today; a subsequent
 //                   commit will wire it from the onboarding-signup path.
 // }
-// Per-phase timeout budgets. Separated because the two failure modes are
-// different: a hung native picker (provider_call) is basically never
-// going to complete once it's stalled — 7s is generous — while a slow
-// network round-trip to Supabase (supabase_exchange) can legitimately
-// take longer on a bad connection, and cutting it short would turn a
-// slow-but-successful sign-in into a failed one. Keeping both budgets
-// in one place also guarantees the analytics field (auth_hang.budget_ms)
-// stays aligned with the timeout that actually fired.
+// Per-phase timeout budgets. The two phases measure completely
+// different things:
+//
+// provider_call — bounded by USER INTERACTION with the native Google
+//   / Apple sheet: reading the account chooser, tapping an account,
+//   handling first-time consent, unlocking with biometric or 2FA
+//   (which can wait 10-20s on push notification delivery alone).
+//   Prior 7s budget over-fired: a 7-day audit showed 24 hangs, all
+//   in this phase, 0/15 users ever recovered — the timeout was
+//   killing slow-but-successful sign-ins, not catching real hangs.
+//   Raised to 60s to cover the realistic p95 of legit interaction
+//   time on a system sheet. Old auth_hang events with budget_ms:
+//   7000 stay in the funnel and are distinguishable from post-fix
+//   hangs (budget_ms: 60000).
+//
+// supabase_exchange — bounded by a MACHINE-TO-MACHINE round trip
+//   to the Supabase auth endpoint after we already have an idToken.
+//   No human interaction, so a legitimate hang deserves early
+//   detection. Kept at 10s.
 const _AUTH_PHASE_BUDGETS_MS = {
-  provider_call:     7000,
+  provider_call:     60000,
   supabase_exchange: 10000,
 };
 
 async function _authProviderStart(provider, ctx) {
-  const { btn, textEl, errorEl, defaultLabel, onBeforeEnter, postAuthContinue } = ctx;
+  const { btn, textEl, errorEl, defaultLabel, onBeforeEnter, postAuthContinue, emailFallbackAvailable } = ctx;
   const isEn = state.lang === 'en';
   if (btn) { btn.disabled = true; btn.classList.add('auth-btn-loading'); }
   if (textEl) textEl.textContent = isEn ? 'Signing in...' : 'מתחבר...';
@@ -12208,16 +12219,43 @@ async function _authProviderStart(provider, ctx) {
   // to 'signin'; user_signed_up (fired in enterApp) still counts the
   // signup-vs-signin split for successful OAuth flows.
   _phCapture('onboarding_auth_choice', { choice: 'signin', method: provider });
-  const hintTimer = setTimeout(() => {
+  // Two-stage hint schedule. At 4s the button label softens to a
+  // "still working" message. At 15s it softens again to name the
+  // system window the user should be looking at — after ~15s of
+  // silence a stalled-looking button reads as "app frozen"; the
+  // second hint tells the user we know they're on Google/Apple's
+  // sheet and it's their turn to act. Both fire only if the button
+  // is still in-flight (disabled). Cleared in finally.
+  const hintTimer1 = setTimeout(() => {
     if (btn && btn.disabled && textEl) textEl.textContent = isEn ? 'Still working…' : 'עדיין עובד…';
   }, 4000);
+  const hintTimer2 = setTimeout(() => {
+    if (btn && btn.disabled && textEl) {
+      if (provider === 'google') {
+        textEl.textContent = isEn ? 'Pick an account in the Google window' : 'בחרו חשבון בחלון של Google';
+      } else if (provider === 'apple') {
+        textEl.textContent = isEn ? 'Confirm in the Apple window' : 'אשרו בחלון של Apple';
+      }
+    }
+  }, 15000);
   const restoreBtn = () => {
     if (btn) { btn.disabled = false; btn.classList.remove('auth-btn-loading'); }
     if (textEl) textEl.textContent = defaultLabel;
   };
-  const hangMsg = isEn
-    ? 'Sign in didn’t complete. Try again, or continue with email.'
-    : 'ההתחברות לא הושלמה. נסו שוב או המשיכו עם אימייל.';
+  // Two hang-message variants. The standalone auth screen (authWith
+  // Google / authWithApple) surfaces this into a slot that sits above
+  // a visible email form — "or continue with email" is real, actionable
+  // advice there. The onboarding step 4 signup and the paywall sign-in
+  // gate have no email option (Apple / Google / Skip only), so
+  // suggesting email would point at nothing. Callers on the auth screen
+  // pass ctx.emailFallbackAvailable = true; every other caller omits it.
+  const hangMsg = emailFallbackAvailable
+    ? (isEn
+        ? 'Sign in didn’t complete. Try again, or continue with email.'
+        : 'ההתחברות לא הושלמה. נסו שוב או המשיכו עם אימייל.')
+    : (isEn
+        ? 'Sign in didn’t complete. Try again.'
+        : 'ההתחברות לא הושלמה. נסו שוב.');
   const genericFailMsg = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
   const showErr = (msg) => { if (errorEl) errorEl.textContent = msg; };
   const capFail = (phase, err) => {
@@ -12319,7 +12357,8 @@ async function _authProviderStart(provider, ctx) {
     console.error('[Auth] ' + provider + ' sign-in unexpected error:', e);
     capFail('unknown', e); showErr(genericFailMsg); restoreBtn();
   } finally {
-    clearTimeout(hintTimer);
+    clearTimeout(hintTimer1);
+    clearTimeout(hintTimer2);
     _authInProgress = false;
   }
 }
@@ -12331,6 +12370,9 @@ async function authWithGoogle() {
     textEl: document.getElementById('auth-google-text'),
     errorEl: document.getElementById('auth-error'),
     defaultLabel: isEn ? 'Continue with Google' : 'המשך עם Google',
+    // Auth screen has a visible email form below the OAuth buttons —
+    // the hang message can point at it as a real alternative.
+    emailFallbackAvailable: true,
   });
 }
 
@@ -12341,6 +12383,7 @@ async function authWithApple() {
     textEl: document.getElementById('auth-apple-text'),
     errorEl: document.getElementById('auth-error'),
     defaultLabel: isEn ? 'Continue with Apple' : 'המשך עם Apple',
+    emailFallbackAvailable: true,
   });
 }
 
