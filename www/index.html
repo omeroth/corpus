@@ -5950,7 +5950,7 @@
     margin: 20px auto 0;
   }
   .onb-screen.onb-v2 .onb-v2-card {
-    padding: 14px 18px;
+    padding: 12px 16px;
     background: var(--surface);
     color: var(--ink);
     border: 1.5px solid rgba(var(--accent-rgb), 0.18);
@@ -5963,6 +5963,37 @@
     cursor: pointer;
     transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
     -webkit-tap-highlight-color: transparent;
+    /* Icon + label layout. Flex-row means the icon leads on the
+       start edge in both LTR (icon-left) and RTL (icon-right) via
+       the inherited <html dir>, so no logical-property gymnastics
+       are needed. gap replaces the emoji-space that used to sit
+       inside the text. */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .onb-screen.onb-v2 .onb-v2-card-icon {
+    /* Fixed-size icon slot. flex-shrink:0 so a long label doesn't
+       squeeze the icon on Q1's 6-option list. 34px sits between the
+       existing tab-bar icons (24px) and the endowment overlay hero
+       (48px+) — large enough to read the interior detail, small
+       enough that six cards stack cleanly on a 320px viewport. */
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .onb-screen.onb-v2 .onb-v2-card-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .onb-screen.onb-v2 .onb-v2-card-label {
+    flex: 1;
+    min-width: 0;
+    text-align: start;
   }
   .onb-screen.onb-v2 .onb-v2-card:hover  { border-color: rgba(var(--accent-rgb), 0.32); }
   .onb-screen.onb-v2 .onb-v2-card:active { transform: scale(0.98); }
@@ -6025,6 +6056,29 @@
     font-size: calc(17px * var(--text-scale));
     color: var(--ink);
     line-height: 1.35;
+    /* Icon + label — smaller icon slot than the answer cards (26px
+       vs 34px), because the mirror is a recap and the type carries
+       the emotional beat more than the icon does. */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .onb-screen.onb-v2 .onb-v2-mirror-icon {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .onb-screen.onb-v2 .onb-v2-mirror-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .onb-screen.onb-v2 .onb-v2-mirror-label {
+    flex: 1;
+    min-width: 0;
   }
   .onb-screen.onb-v2 .onb-v2-mirror-card-support {
     font-family: 'Nunito', 'Assistant', sans-serif;
@@ -6266,9 +6320,17 @@
     gap: 6px;
     text-align: center;
   }
-  .onb-screen.onb-v2 .onb-v2-journey-tile-emoji {
-    font-size: calc(24px * var(--text-scale));
-    line-height: 1;
+  .onb-screen.onb-v2 .onb-v2-journey-tile-icon {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-tile-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
   .onb-screen.onb-v2 .onb-v2-journey-tile-label {
     font-family: 'Nunito', 'Assistant', sans-serif;
@@ -6285,6 +6347,26 @@
     opacity: 0.85;
     line-height: 1.3;
     text-align: center;
+    /* Icon + text row inside the stat line. Flex + justify:center
+       keeps it centered under the tiles; gap tucks the clock next
+       to the copy. */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-stat-icon {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-stat-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
   html.dark .onb-screen.onb-v2 .onb-v2-journey-card {
     background: rgba(var(--accent-rgb), 0.10);
@@ -6330,9 +6412,18 @@
     text-align: start;
   }
   .onb-screen.onb-v2 .onb-v2-journey-feature-icon {
-    font-size: calc(24px * var(--text-scale));
-    line-height: 1.1;
+    width: 32px;
+    height: 32px;
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+  .onb-screen.onb-v2 .onb-v2-journey-feature-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
   .onb-screen.onb-v2 .onb-v2-journey-feature-body {
     flex: 1;
@@ -8971,6 +9062,272 @@
       <path d="M32 9 Q 33 14 32 18" stroke="#FFF3D0" stroke-width="1.2" fill="none" stroke-linecap="round"/>
       <circle cx="48" cy="14" r="1.8" fill="#F59E0B" stroke="#2A1266" stroke-width="0.8"/>
       <circle cx="14" cy="20" r="1.4" fill="#FFCF7A"/>
+    </symbol>
+
+    <!-- Onboarding v3 concept icons — 18 hero-family symbols
+         used by Q1/Q2/Q3/commit option cards, the mirror card, and the
+         journey card. Same visual family as icon-streak / icon-xp /
+         icon-level above: 64×64 viewBox, deep-ink #2A1266 outlines,
+         warm-gold ornament (F59E0B), ground-shadow ellipse.
+         var(--accent) themes fills to the active subject.
+         Replaced 19 emoji glyphs on those surfaces; 🔥 reuses
+         #icon-streak so a 20th symbol wasn't needed. -->
+    <symbol id="icon-bolt" viewBox="0 0 64 64">
+      <clipPath id="c-bolt"><path d="M35.5 6 L19 31 H28 L27.5 54 L45 27 H34.5 Z"></path></clipPath>
+      <ellipse cx="32" cy="57" rx="9" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <path d="M35.5 6 L19 31 H28 L27.5 54 L45 27 H34.5 Z" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      <g clip-path="url(#c-bolt)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <path d="M31 14 L25 25" fill="none" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"></path>
+      <path d="M48 8.6 L49.1 10.9 L51.4 12 L49.1 13.1 L48 15.4 L46.9 13.1 L44.6 12 L46.9 10.9 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2" stroke-linejoin="round"></path>
+      <path d="M23 29 C25 24 29 17 32 12" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+      <circle cx="27.5" cy="22" r="1.3" fill="#FFFFFF"></circle>
+    </symbol>
+    <symbol id="icon-books" viewBox="0 0 64 64">
+      <clipPath id="c-books"><path d="M12 37 H50 V47 H12 Z M15 27 H53 V37 H15 Z M18 17 H48 V27 H18 Z"></path></clipPath>
+      <ellipse cx="32" cy="52" rx="17" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <path d="M12 37 H50 V47 H12 Z M15 27 H53 V37 H15 Z M18 17 H48 V27 H18 Z" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      <g clip-path="url(#c-books)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <path d="M12 44 H50 M15 34 H53 M18 24 H48" fill="none" stroke="#2A1266" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"></path>
+      <path d="M17 37 V47 M20 27 V37 M23 17 V27" fill="none" stroke="#2A1266" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"></path>
+      <path d="M32 5 L33.3 7.7 L36 9 L33.3 10.3 L32 13 L30.7 10.3 L28 9 L30.7 7.7 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2" stroke-linejoin="round"></path>
+      <path d="M21 25 C21 21 23 19 26 18" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+      <circle cx="24" cy="20.5" r="1.4" fill="#FFFFFF"></circle>
+    </symbol>
+    <symbol id="icon-brain" viewBox="0 0 64 64">
+      <clipPath id="c-brain"><path d="M32.0 10.5 C38.3 4.3 44.3 6.8 44.4 15.6 C53.2 15.8 55.7 21.7 49.5 28.0 C55.7 34.3 53.2 40.3 44.4 40.4 C44.3 49.2 38.3 51.7 32.0 45.5 C25.7 51.7 19.8 49.2 19.6 40.4 C10.8 40.3 8.3 34.3 14.5 28.0 C8.3 21.7 10.8 15.7 19.6 15.6 C19.7 6.8 25.7 4.3 32.0 10.5 Z"></path></clipPath>
+      <ellipse cx="32" cy="56" rx="15" ry="3.2" fill="#2A1266" opacity="0.16"></ellipse>
+      <path d="M32.0 10.5 C38.3 4.3 44.3 6.8 44.4 15.6 C53.2 15.8 55.7 21.7 49.5 28.0 C55.7 34.3 53.2 40.3 44.4 40.4 C44.3 49.2 38.3 51.7 32.0 45.5 C25.7 51.7 19.8 49.2 19.6 40.4 C10.8 40.3 8.3 34.3 14.5 28.0 C8.3 21.7 10.8 15.7 19.6 15.6 C19.7 6.8 25.7 4.3 32.0 10.5 Z" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      <g clip-path="url(#c-brain)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <path d="M32 8 C29.5 15 34 21 32 27 C30 35 33 42 32 49" fill="none" stroke="#2A1266" stroke-width="1.3" stroke-linecap="round"></path>
+      <path d="M22 22 C26 23.5 26 29 22.5 30.5 M42 22 C38 23.5 38 29 41.5 30.5" fill="none" stroke="#2A1266" stroke-width="1.2" stroke-linecap="round" opacity="0.75"></path>
+      <path d="M16 26 C17 19 22 13 27.5 9.5" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+      <path d="M53 7.5 L54.5 11 L58 12.5 L54.5 14 L53 17.5 L51.5 14 L48 12.5 L51.5 11 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2" stroke-linejoin="round"></path>
+      <circle cx="21" cy="17.5" r="1.7" fill="#FFFFFF"></circle>
+      <circle cx="25.5" cy="14.2" r="0.9" fill="#FFFFFF" opacity="0.85"></circle>
+    </symbol>
+    <symbol id="icon-building" viewBox="0 0 64 64">
+      <clipPath id="c-building"><path d="M32 7 L54 23 H10 Z M14 23 H50 V46 H14 Z M9 46 H55 V53 H9 Z"></path></clipPath>
+      <ellipse cx="32" cy="56" rx="17" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <path d="M9 46 H55 V53 H9 Z" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      <path d="M32 7 L54 23 H10 Z M14 23 H50 V46 H14 Z" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      <g clip-path="url(#c-building)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <path d="M22 26 V45 M32 26 V45 M42 26 V45" fill="none" stroke="#2A1266" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"></path>
+      <path d="M32 12.6 L33.1 14.9 L35.4 16 L33.1 17.1 L32 19.4 L30.9 17.1 L28.6 16 L30.9 14.9 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2" stroke-linejoin="round"></path>
+      <path d="M16 22 C20 17 26 12 31 9" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+      <circle cx="24" cy="17" r="1.3" fill="#FFFFFF"></circle>
+    </symbol>
+    <symbol id="icon-bulb" viewBox="0 0 64 64">
+      <clipPath id="c-bulb"><circle cx="32" cy="24" r="16"></circle></clipPath>
+      <ellipse cx="32" cy="57" rx="10" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <path d="M26 37 H38 V46 A6 6 0 0 1 26 46 Z" fill="#2A1266" opacity="0.8" stroke="#2A1266" stroke-width="1.6" stroke-linejoin="round"></path>
+      <circle cx="32" cy="24" r="16" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2"></circle>
+      <g clip-path="url(#c-bulb)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <path d="M27 41 H37 M28.5 45 H35.5" fill="none" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"></path>
+      <path d="M32 19.2 L33.5 22.5 L36.8 24 L33.5 25.5 L32 28.8 L30.5 25.5 L27.2 24 L30.5 22.5 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2" stroke-linejoin="round"></path>
+      <path d="M20 17 C22 12 26 9 31 8.5" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+      <circle cx="23" cy="14" r="1.4" fill="#FFFFFF"></circle>
+    </symbol>
+    <symbol id="icon-calendar" viewBox="0 0 64 64">
+      <clipPath id="c-calendar"><path d="M17 14 H47 A6 6 0 0 1 53 20 V46 A6 6 0 0 1 47 52 H17 A6 6 0 0 1 11 46 V20 A6 6 0 0 1 17 14 Z"></path></clipPath>
+      <ellipse cx="32" cy="56" rx="15" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <path d="M22 14 V7.5 M42 14 V7.5" fill="none" stroke="#2A1266" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" opacity="1"></path>
+      <path d="M17 14 H47 A6 6 0 0 1 53 20 V46 A6 6 0 0 1 47 52 H17 A6 6 0 0 1 11 46 V20 A6 6 0 0 1 17 14 Z" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      <g clip-path="url(#c-calendar)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <path d="M11 20 A6 6 0 0 1 17 14 H47 A6 6 0 0 1 53 20 V25 H11 Z" fill="#2A1266" opacity="0.5"></path>
+      <path d="M20 34 V34.1 M32 34 V34.1 M44 34 V34.1 M20 44 V44.1 M44 44 V44.1" fill="none" stroke="#2A1266" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"></path>
+      <circle cx="32" cy="44" r="3.8" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2"></circle>
+      <path d="M15 24 C15 20 17 17 20 16" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+      <circle cx="19" cy="20" r="1.3" fill="#FFFFFF"></circle>
+    </symbol>
+    <symbol id="icon-clock" viewBox="0 0 64 64">
+      <clipPath id="c-clock"><circle cx="32" cy="31" r="20"></circle></clipPath>
+      <ellipse cx="32" cy="57" rx="15" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <circle cx="32" cy="31" r="20" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2"></circle>
+      <g clip-path="url(#c-clock)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <circle cx="32" cy="31" r="15" fill="#FFFFFF" fill-opacity="0.46" stroke="#2A1266" stroke-width="1.3" stroke-opacity="0.8"></circle>
+      <path d="M32 31 V17.5" fill="none" stroke="#2A1266" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"></path>
+      <path d="M32 31 L40.5 35" fill="none" stroke="#2A1266" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"></path>
+      <circle cx="32" cy="31" r="3" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2"></circle>
+      <path d="M14 25 C17 17 24 12 31 11" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+      <circle cx="20" cy="20" r="1.5" fill="#FFFFFF"></circle>
+    </symbol>
+    <symbol id="icon-compass" viewBox="0 0 64 64">
+      <clipPath id="c-compass"><circle cx="32" cy="31" r="22"></circle></clipPath>
+      <ellipse cx="32" cy="57" rx="15" ry="3.2" fill="#2A1266" opacity="0.16"></ellipse>
+      <circle cx="32" cy="31" r="22" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2"></circle>
+      <g clip-path="url(#c-compass)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <circle cx="32" cy="31" r="15" fill="#FFFFFF" fill-opacity="0.46" stroke="#2A1266" stroke-width="1.3" stroke-opacity="0.8"></circle>
+      <path d="M32 16.5 L36.4 31 L27.6 31 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.3" stroke-linejoin="round"></path>
+      <path d="M32 45.5 L36.4 31 L27.6 31 Z" fill="#2A1266" opacity="0.58" stroke="#2A1266" stroke-width="1.3" stroke-linejoin="round"></path>
+      <circle cx="32" cy="31" r="2.3" fill="#FFFFFF" stroke="#2A1266" stroke-width="1.2"></circle>
+      <path d="M13.5 25 C16.5 17 23.5 11.5 31 10.5" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+      <circle cx="19.5" cy="19.5" r="1.6" fill="#FFFFFF"></circle>
+    </symbol>
+    <symbol id="icon-feather" viewBox="0 0 64 64">
+      <clipPath id="c-feather"><path d="M32 4 C37 12 39.5 23 38 32 C37 39 34.5 45 32 48 C29.5 45 27 39 26 32 C24.5 23 27 12 32 4 Z"></path></clipPath>
+      <ellipse cx="32" cy="58" rx="7" ry="2.6" fill="#2A1266" opacity="0.16"></ellipse>
+      <path d="M32 8 V55" fill="none" stroke="#2A1266" stroke-width="2" stroke-linecap="round"></path>
+      <path d="M32 4 C37 12 39.5 23 38 32 C37 39 34.5 45 32 48 C29.5 45 27 39 26 32 C24.5 23 27 12 32 4 Z" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      <g clip-path="url(#c-feather)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <path d="M32 8 V48" fill="none" stroke="#2A1266" stroke-width="1.5" stroke-linecap="round" opacity="0.85"></path>
+      <path d="M32 14 L27.5 18 M32 14 L36.5 18 M32 22 L26.5 26.5 M32 22 L37.5 26.5 M32 30 L27 34.5 M32 30 L37 34.5" fill="none" stroke="#2A1266" stroke-width="1.4" stroke-linecap="round" opacity="0.6"></path>
+      <path d="M45 6.6 L46.1 8.9 L48.4 10 L46.1 11.1 L45 13.4 L43.9 11.1 L41.6 10 L43.9 8.9 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2" stroke-linejoin="round"></path>
+      <path d="M28.5 28 C28 20 29.5 12 31 8.5" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.55"></path>
+      <circle cx="30" cy="18" r="1.2" fill="#FFFFFF"></circle>
+    </symbol>
+    <symbol id="icon-figure" viewBox="0 0 64 64">
+      <clipPath id="c-figure"><circle cx="32" cy="18" r="9.5"></circle><path d="M13 50 C13 39 21 32.5 32 32.5 C43 32.5 51 39 51 50 Z"></path></clipPath>
+      <ellipse cx="32" cy="53" rx="15" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <path d="M13 50 C13 39 21 32.5 32 32.5 C43 32.5 51 39 51 50 Z" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      <circle cx="32" cy="18" r="9.5" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2"></circle>
+      <g clip-path="url(#c-figure)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <path d="M29 20.5 C30.5 23 33.5 23 35 20.5" fill="none" stroke="#2A1266" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"></path>
+      <path d="M7 19 C2.5 24 2.5 32 7 37 M57 19 C61.5 24 61.5 32 57 37 M14.5 23.5 C11.5 27 11.5 29 14.5 32.5 M49.5 23.5 C52.5 27 52.5 29 49.5 32.5" fill="none" stroke="#F59E0B" stroke-width="2.4" stroke-linecap="round"></path>
+      <path d="M17 46 C17 40 20 36 25 34.5" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+      <circle cx="26" cy="14" r="1.5" fill="#FFFFFF"></circle>
+    </symbol>
+    <symbol id="icon-flex" viewBox="0 0 64 64">
+      <clipPath id="c-flex"><path d="M23.4 5 C25.2 5.1 29.7 7 31.1 7.6 C32.6 8.2 32.1 8.1 32.1 8.7 C32.1 9.3 31 10.3 31.1 11.1 C31.2 11.9 33.1 12.3 32.7 13.5 C32.4 14.7 30.5 16.7 29 18 C27.5 19.3 24.7 17.5 23.7 21.1 C22.7 24.8 21.8 38.3 22.9 39.9 C24 41.5 28.6 32.4 30.5 30.6 C32.4 28.8 32.5 29.4 34.2 29.1 C35.9 28.9 38.9 28.8 40.9 29.1 C42.9 29.5 44.3 30 46.1 31.2 C47.9 32.4 50.6 34.6 51.7 36.5 C52.9 38.4 53.3 40.7 53 42.3 C52.7 43.9 51.4 45 50.1 46 C48.8 47 47.9 47.8 45.4 48.6 C42.9 49.4 41 50.8 35.3 51 C29.6 51.2 15 52.5 11 49.7 C7 46.9 10.8 38.6 11.5 34.1 C12.3 29.7 14.5 26.7 15.5 23 C16.5 19.3 16.5 14.8 17.3 12.1 C18.1 9.4 19.5 8.3 20.5 7.1 C21.5 5.9 21.6 4.9 23.4 5 Z"></path></clipPath>
+      <ellipse cx="32" cy="55" rx="16" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <path d="M23.4 5 C25.2 5.1 29.7 7 31.1 7.6 C32.6 8.2 32.1 8.1 32.1 8.7 C32.1 9.3 31 10.3 31.1 11.1 C31.2 11.9 33.1 12.3 32.7 13.5 C32.4 14.7 30.5 16.7 29 18 C27.5 19.3 24.7 17.5 23.7 21.1 C22.7 24.8 21.8 38.3 22.9 39.9 C24 41.5 28.6 32.4 30.5 30.6 C32.4 28.8 32.5 29.4 34.2 29.1 C35.9 28.9 38.9 28.8 40.9 29.1 C42.9 29.5 44.3 30 46.1 31.2 C47.9 32.4 50.6 34.6 51.7 36.5 C52.9 38.4 53.3 40.7 53 42.3 C52.7 43.9 51.4 45 50.1 46 C48.8 47 47.9 47.8 45.4 48.6 C42.9 49.4 41 50.8 35.3 51 C29.6 51.2 15 52.5 11 49.7 C7 46.9 10.8 38.6 11.5 34.1 C12.3 29.7 14.5 26.7 15.5 23 C16.5 19.3 16.5 14.8 17.3 12.1 C18.1 9.4 19.5 8.3 20.5 7.1 C21.5 5.9 21.6 4.9 23.4 5 Z" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      <g clip-path="url(#c-flex)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <path d="M19.5 14 C23 12.2 27.5 11.6 30.5 12.6" fill="none" stroke="#2A1266" stroke-width="1.4" stroke-linecap="round" opacity="0.5"></path>
+      <path d="M23.5 40 C26 35 29.5 31.5 33.5 30.2" fill="none" stroke="#2A1266" stroke-width="1.4" stroke-linecap="round" opacity="0.4"></path>
+      <path d="M48 10.6 L49.1 13.1 L51.4 14 L49.1 14.9 L48 17.4 L46.9 14.9 L44.6 14 L46.9 13.1 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2" stroke-linejoin="round"></path>
+      <path d="M18.8 13 C19.2 10 20.8 7.8 22.8 6.8" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+      <circle cx="24" cy="8.6" r="1.3" fill="#FFFFFF"></circle>
+    </symbol>
+    <symbol id="icon-globe" viewBox="0 0 64 64">
+      <clipPath id="c-globe"><circle cx="32" cy="30" r="20"></circle></clipPath>
+      <ellipse cx="32" cy="55" rx="14" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <circle cx="32" cy="30" r="20" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2"></circle>
+      <g clip-path="url(#c-globe)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <ellipse cx="32" cy="30" rx="9" ry="20" fill="none" stroke="#2A1266" stroke-width="1.3" opacity="0.65"></ellipse>
+      <path d="M12.5 30 H51.5 M16 20 H48 M16 40 H48" fill="none" stroke="#2A1266" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"></path>
+      <path d="M49 9.4 L50.2 11.8 L52.6 13 L50.2 14.2 L49 16.6 L47.8 14.2 L45.4 13 L47.8 11.8 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2" stroke-linejoin="round"></path>
+      <path d="M17 22 C20 16 26 12 31 11" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+      <circle cx="23" cy="19" r="1.5" fill="#FFFFFF"></circle>
+    </symbol>
+    <symbol id="icon-magnifier" viewBox="0 0 64 64">
+      <clipPath id="c-magnifier"><circle cx="32" cy="25" r="16"></circle></clipPath>
+      <ellipse cx="32" cy="57" rx="11" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <g transform="rotate(-24 32 32)">
+      <path d="M32 41 V54" fill="none" stroke="#2A1266" stroke-width="7" stroke-linecap="round"></path>
+      <circle cx="32" cy="25" r="16" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2"></circle>
+      <g clip-path="url(#c-magnifier)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <circle cx="32" cy="25" r="11" fill="#FFFFFF" fill-opacity="0.42" stroke="#2A1266" stroke-width="1.3" stroke-opacity="0.75"></circle>
+      <path d="M32 20.5 L33.4 23.6 L36.5 25 L33.4 26.4 L32 29.5 L30.6 26.4 L27.5 25 L30.6 23.6 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2" stroke-linejoin="round"></path>
+      <path d="M20 18 C22 13 26 10 31 9.5" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+      <circle cx="23" cy="15" r="1.4" fill="#FFFFFF"></circle>
+      </g>
+    </symbol>
+    <symbol id="icon-openbook" viewBox="0 0 64 64">
+      <clipPath id="c-openbook"><path d="M32 19 C26 14 18 12 11 13 V44 C18 43 26 45 32 50 C38 45 46 43 53 44 V13 C46 12 38 14 32 19 Z"></path></clipPath>
+      <ellipse cx="32" cy="55" rx="15" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <path d="M32 19 C26 14 18 12 11 13 V44 C18 43 26 45 32 50 C38 45 46 43 53 44 V13 C46 12 38 14 32 19 Z" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      <g clip-path="url(#c-openbook)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <path d="M32 19 V50" fill="none" stroke="#2A1266" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"></path>
+      <path d="M32 3.2 L33.2 5.8 L35.8 7 L33.2 8.2 L32 10.8 L30.8 8.2 L28.2 7 L30.8 5.8 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2" stroke-linejoin="round"></path>
+      <path d="M15 19 C17 16 21 15 25 16" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+      <circle cx="20" cy="20" r="1.4" fill="#FFFFFF"></circle>
+    </symbol>
+    <symbol id="icon-phone" viewBox="0 0 64 64">
+      <clipPath id="c-phone"><path d="M25 6 H39 A7 7 0 0 1 46 13 V45 A7 7 0 0 1 39 52 H25 A7 7 0 0 1 18 45 V13 A7 7 0 0 1 25 6 Z"></path></clipPath>
+      <ellipse cx="32" cy="57" rx="11" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <path d="M25 6 H39 A7 7 0 0 1 46 13 V45 A7 7 0 0 1 39 52 H25 A7 7 0 0 1 18 45 V13 A7 7 0 0 1 25 6 Z" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      <g clip-path="url(#c-phone)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <path d="M24 13 H40 V41 H24 Z" fill="#FFFFFF" opacity="0.32"></path>
+      <path d="M29 9.5 H35" fill="none" stroke="#2A1266" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"></path>
+      <path d="M13 49 L51 9" fill="none" stroke="#2A1266" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round" opacity="1"></path>
+      <path d="M15.5 46.5 L48 12" fill="none" stroke="#FFFFFF" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" opacity="0.35"></path>
+      <path d="M50 6.4 L51.2 8.8 L53.6 10 L51.2 11.2 L50 13.6 L48.8 11.2 L46.4 10 L48.8 8.8 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2" stroke-linejoin="round"></path>
+      <path d="M21.5 20 C21.5 15 23 12 26.5 10.5" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+    </symbol>
+    <symbol id="icon-seedling" viewBox="0 0 64 64">
+      <clipPath id="c-seed"><path d="M32 33 C33 24 39 17 49 15 C50 25 43 33 32 33 Z M32 33 C31 24 25 17 15 15 C14 25 21 33 32 33 Z"></path></clipPath>
+      <ellipse cx="32" cy="54" rx="13" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <path d="M32 52 C32 45 32 40 32 32" fill="none" stroke="#2A1266" stroke-width="2.2" stroke-linecap="round"></path>
+      <path d="M32 33 C33 24 39 17 49 15 C50 25 43 33 32 33 Z M32 33 C31 24 25 17 15 15 C14 25 21 33 32 33 Z" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      <g clip-path="url(#c-seed)">
+        <path d="M6 27 C18 33 46 33 58 27 L58 42 L6 42 Z" fill="#2A1266" opacity="0.3"></path>
+        <path d="M6 8 C18 4 46 4 58 8 C46 22 18 22 6 14 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <path d="M33 31.5 C36 27 41 21.5 46.5 17.5 M31 31.5 C28 27 23 21.5 17.5 17.5" fill="none" stroke="#2A1266" stroke-width="1.2" stroke-linecap="round" opacity="0.7"></path>
+      <path d="M32 5 L33.6 8.6 L37.2 10.2 L33.6 11.8 L32 15.4 L30.4 11.8 L26.8 10.2 L30.4 8.6 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2" stroke-linejoin="round"></path>
+      <circle cx="22.5" cy="20" r="1.5" fill="#FFFFFF"></circle>
+    </symbol>
+    <symbol id="icon-speech" viewBox="0 0 64 64">
+      <clipPath id="c-speech"><path d="M20 10 H44 A10 10 0 0 1 54 20 V33 A10 10 0 0 1 44 43 H36.5 L32 51 L27.5 43 H20 A10 10 0 0 1 10 33 V20 A10 10 0 0 1 20 10 Z"></path></clipPath>
+      <ellipse cx="32" cy="56" rx="11" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <path d="M20 10 H44 A10 10 0 0 1 54 20 V33 A10 10 0 0 1 44 43 H36.5 L32 51 L27.5 43 H20 A10 10 0 0 1 10 33 V20 A10 10 0 0 1 20 10 Z" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+      <g clip-path="url(#c-speech)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <path d="M19 22 H45 M23 31 H41" fill="none" stroke="#2A1266" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"></path>
+      <path d="M49.5 5.2 L50.7 7.8 L53.3 9 L50.7 10.2 L49.5 12.8 L48.3 10.2 L45.7 9 L48.3 7.8 Z" fill="#F59E0B" stroke="#2A1266" stroke-width="1.2" stroke-linejoin="round"></path>
+      <path d="M12.5 28 C12 20 16 14 22 12" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
+      <circle cx="18" cy="17" r="1.4" fill="#FFFFFF"></circle>
+    </symbol>
+    <symbol id="icon-thinking" viewBox="0 0 64 64">
+      <clipPath id="c-thinking"><circle cx="30" cy="34" r="19"></circle></clipPath>
+      <ellipse cx="30" cy="58" rx="13" ry="3" fill="#2A1266" opacity="0.16"></ellipse>
+      <circle cx="30" cy="34" r="19" style="fill:var(--accent, #7B4FD4)" stroke="#2A1266" stroke-width="2"></circle>
+      <g clip-path="url(#c-thinking)">
+        <path d="M40 -6 C43 14 46 38 30 70 L70 70 L70 -6 Z" fill="#2A1266" opacity="0.32"></path>
+        <path d="M-6 37 C9 30 23 18 28 -6 L-6 -6 Z" fill="#FFFFFF" opacity="0.3"></path>
+      </g>
+      <path d="M22 26 C24 25.2 27.5 25.2 29.5 25.6 M34 22 C36 19.6 39.5 20 41 22.4" fill="none" stroke="#2A1266" stroke-width="1.8" stroke-linecap="round" opacity="0.8"></path>
+      <path d="M26 30.5 V30.6 M37.5 29.5 V29.6" fill="none" stroke="#2A1266" stroke-width="3.8" stroke-linecap="round" opacity="0.9"></path>
+      <path d="M26.5 43 C28.5 41.6 30.5 43.8 33 42.4" fill="none" stroke="#2A1266" stroke-width="1.8" stroke-linecap="round" opacity="0.75"></path>
+      <path d="M46 9 C46 4 54.5 4 54.5 9 C54.5 12.2 50.2 12.8 50.2 15.6" fill="none" stroke="#F59E0B" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"></path>
+      <circle cx="50.2" cy="19.6" r="2.3" fill="#F59E0B"></circle>
+      <path d="M15 28 C17 22 22 18 27 17" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" opacity="0.55"></path>
     </symbol>
 
     <!-- Content section icons -->
@@ -12649,32 +13006,38 @@ const _ONB_COPY = {
     // short label used in the journey card tiles (step 18).
     options: [
       { id: 'understand-ideas',
-        text:    { en: '🧠 Understand ideas that shaped the world',   he: '🧠 להבין רעיונות שעיצבו את העולם' },
+        icon:    'icon-brain',
+        text:    { en: 'Understand ideas that shaped the world',   he: 'להבין רעיונות שעיצבו את העולם' },
         support: { en: 'Every idea comes from the thinker who first put it into words.',
                    he: 'כל רעיון בא מההוגה שנתן לו את המילים הראשונות.' },
         tile:    { en: 'Big ideas', he: 'רעיונות גדולים' } },
       { id: 'worth-reading',
-        text:    { en: '📵 Something worth reading instead of scrolling', he: '📵 משהו ששווה לקרוא במקום לגלול' },
+        icon:    'icon-phone',
+        text:    { en: 'Something worth reading instead of scrolling', he: 'משהו ששווה לקרוא במקום לגלול' },
         support: { en: 'Five worthwhile minutes replace the scroll, one day at a time.',
                    he: 'חמש דקות שוות מחליפות את הגלילה, יום אחד בכל פעם.' },
         tile:    { en: 'Worth reading', he: 'שווה לקרוא' } },
       { id: 'hold-own',
-        text:    { en: '💬 Hold my own in a real conversation',       he: '💬 לעמוד על שלי בשיחה אמיתית' },
+        icon:    'icon-speech',
+        text:    { en: 'Hold my own in a real conversation',       he: 'לעמוד על שלי בשיחה אמיתית' },
         support: { en: "You'll walk out of each lesson with one idea you can quote out loud.",
                    he: 'מכל שיעור תצא עם רעיון אחד שאפשר לצטט בשיחה.' },
         tile:    { en: 'Real talk', he: 'שיחה אמיתית' } },
       { id: 'read-thinkers',
-        text:    { en: '📚 Finally read the thinkers I\'ve heard about', he: '📚 סוף סוף לקרוא את ההוגים ששמעתי עליהם' },
+        icon:    'icon-books',
+        text:    { en: "Finally read the thinkers I've heard about", he: 'סוף סוף לקרוא את ההוגים ששמעתי עליהם' },
         support: { en: "You'll meet the thinkers themselves, not just their summaries.",
                    he: 'תפגוש את ההוגים עצמם, לא רק את התקצירים.' },
         tile:    { en: 'The thinkers', he: 'ההוגים' } },
       { id: 'build-habit',
-        text:    { en: '🔥 Build a habit that actually sticks',       he: '🔥 לבנות הרגל שבאמת נשאר' },
+        icon:    'icon-streak',
+        text:    { en: 'Build a habit that actually sticks',       he: 'לבנות הרגל שבאמת נשאר' },
         support: { en: 'Short daily lessons and a streak do the sticking for you.',
                    he: 'שיעורים קצרים יומיים ורצף עושים את העבודה בשבילך.' },
         tile:    { en: 'Habit', he: 'הרגל' } },
       { id: 'think-clearly',
-        text:    { en: '🔍 Think more clearly about my own life',     he: '🔍 לחשוב בצלילות על החיים שלי' },
+        icon:    'icon-magnifier',
+        text:    { en: 'Think more clearly about my own life',     he: 'לחשוב בצלילות על החיים שלי' },
         support: { en: 'Every idea lands with a way to try it on your own week.',
                    he: 'כל רעיון מגיע עם דרך לנסות אותו על השבוע שלך.' },
         tile:    { en: 'Clarity', he: 'צלילות' } },
@@ -12687,32 +13050,37 @@ const _ONB_COPY = {
     cta:  { en: 'Continue',                    he: 'המשך' },
     options: [
       { id: 'own-ideas',
-        text:    { en: '💡 That I have my own ideas',
-                   he: '💡 שיהיו לי רעיונות משלי' },
+        icon:    'icon-bulb',
+        text:    { en: 'That I have my own ideas',
+                   he: 'שיהיו לי רעיונות משלי' },
         support: { en: "You'll practice reasoning from ideas, not just recognizing them.",
                    he: 'תתרגל להסיק מרעיונות, לא רק לזהות אותם.' },
         tile:    { en: 'Own ideas', he: 'משלי' } },
       { id: 'explain-clearly',
-        text:    { en: '🗣️ That I can explain things clearly',
-                   he: '🗣️ שאני אדע להסביר דברים בבהירות' },
+        icon:    'icon-figure',
+        text:    { en: 'That I can explain things clearly',
+                   he: 'שאני אדע להסביר דברים בבהירות' },
         support: { en: 'Every lesson ends with the idea in one sentence you can say back.',
                    he: 'כל שיעור נגמר ברעיון במשפט אחד שאפשר לחזור עליו.' },
         tile:    { en: 'Clear speech', he: 'בבהירות' } },
       { id: 'know-opinions',
-        text:    { en: '🧭 That I know where my opinions come from',
-                   he: '🧭 שאני אדע מאיפה באות הדעות שלי' },
+        icon:    'icon-compass',
+        text:    { en: 'That I know where my opinions come from',
+                   he: 'שאני אדע מאיפה באות הדעות שלי' },
         support: { en: "You'll see where the ideas you hold came from.",
                    he: 'תראה מאיפה הגיעו הרעיונות שאתה מחזיק בהם.' },
         tile:    { en: 'Opinion roots', he: 'שורשי דעות' } },
       { id: 'finish-hard',
-        text:    { en: '📖 That I read hard things and finish them',
-                   he: '📖 שאני אקרא דברים קשים ואסיים אותם' },
+        icon:    'icon-openbook',
+        text:    { en: 'That I read hard things and finish them',
+                   he: 'שאני אקרא דברים קשים ואסיים אותם' },
         support: { en: 'Hard books get broken into finishable pieces, one a day.',
                    he: 'ספרים קשים מתפרקים לחתיכות שאפשר לסיים, אחת ביום.' },
         tile:    { en: 'Finish hard books', he: 'לסיים ספרים קשים' } },
       { id: 'world-events',
-        text:    { en: "🌍 That I understand what's happening in the world",
-                   he: '🌍 שאני אבין אירועים שמתרחשים בעולם' },
+        icon:    'icon-globe',
+        text:    { en: "That I understand what's happening in the world",
+                   he: 'שאני אבין אירועים שמתרחשים בעולם' },
         support: { en: "Each week's ideas connect to something happening right now.",
                    he: 'הרעיונות של השבוע מתחברים למשהו שקורה עכשיו.' },
         tile:    { en: 'World events', he: 'אירועים בעולם' } },
@@ -12726,22 +13094,26 @@ const _ONB_COPY = {
     // mirror card for that pick (step 13).
     options: [
       { id: 'daily',
-        text:    { en: '⚡ Five minutes a day, every day', he: '⚡ חמש דקות ביום, כל יום' },
+        icon:    'icon-bolt',
+        text:    { en: 'Five minutes a day, every day', he: 'חמש דקות ביום, כל יום' },
         support: { en: 'A short daily reminder lands at a time you pick.',
                    he: 'תזכורת יומית קצרה תגיע בשעה שתבחר.' },
         tile:    { en: 'Daily', he: 'יומי' } },
       { id: 'few-week',
-        text:    { en: '📅 A few times a week',            he: '📅 כמה פעמים בשבוע' },
+        icon:    'icon-calendar',
+        text:    { en: 'A few times a week',            he: 'כמה פעמים בשבוע' },
         support: { en: 'Reminders stay gentle — a few days a week, not every day.',
                    he: 'התזכורות נשארות רכות — כמה פעמים בשבוע, לא כל יום.' },
         tile:    { en: 'Weekly', he: 'שבועי' } },
       { id: 'finish',
-        text:    { en: '🏛️ Finish a whole subject',        he: '🏛️ לסיים תחום שלם' },
+        icon:    'icon-building',
+        text:    { en: 'Finish a whole subject',        he: 'לסיים תחום שלם' },
         support: { en: 'Your path is planned to complete your subject end to end.',
                    he: 'המסלול שלך מתוכנן לסיים את התחום מקצה לקצה.' },
         tile:    { en: 'Complete subject', he: 'לסיים תחום' } },
       { id: 'longest-streak',
-        text:    { en: '🔥 Build the longest streak I can', he: '🔥 לבנות את הרצף הכי ארוך שאפשר' },
+        icon:    'icon-streak',
+        text:    { en: 'Build the longest streak I can', he: 'לבנות את הרצף הכי ארוך שאפשר' },
         support: { en: "Reminders and a streak counter that's hard to lose.",
                    he: 'תזכורות ומונה רצף שקשה לאבד.' },
         tile:    { en: 'Long streak', he: 'רצף ארוך' } },
@@ -12865,17 +13237,18 @@ const _ONB_COPY = {
                           he: '{name}, תפגוש {n} הוגים עד' },
     card_head_nameless: { en: "You'll have met {n} thinkers by",
                           he: 'תפגוש {n} הוגים עד' },
-    card_stat:          { en: '🕐 30+ hours a year with the greatest minds',
-                          he: '🕐 30+ שעות בשנה עם הוגי הדעות הגדולים' },
+    card_stat_icon:     'icon-clock',
+    card_stat:          { en: '30+ hours a year with the greatest minds',
+                          he: '30+ שעות בשנה עם הוגי הדעות הגדולים' },
     section_head:       { en: "How we'll get you there:",
                           he: 'איך נגיע לשם:' },
     features: [
-      { icon: '📖',
+      { icon: 'icon-openbook',
         title: { en: 'A dialogue a day.',
                  he: 'דיאלוג ביום.' },
         desc:  { en: 'Five minutes with one thinker and one idea. No reading list, no catching up.',
                  he: 'חמש דקות עם הוגה אחד ורעיון אחד. בלי רשימת קריאה, בלי להשלים פערים.' } },
-      { icon: '📚',
+      { icon: 'icon-books',
         title: { en: 'Real texts, not summaries.',
                  he: 'טקסטים אמיתיים, לא תקצירים.' },
         desc:  { en: 'Every dialogue is built around something the thinker actually wrote.',
@@ -12894,15 +13267,20 @@ const _ONB_COPY = {
     cta:  { en: 'Continue',                    he: 'המשך' },
     options: [
       { id: 'extreme',
-        text: { en: '🔥 Extremely committed',        he: '🔥 מחויב לגמרי' } },
+        icon:    'icon-streak',
+        text: { en: 'Extremely committed',        he: 'מחויב לגמרי' } },
       { id: 'very',
-        text: { en: '💪 Very committed',             he: '💪 מאוד מחויב' } },
+        icon:    'icon-flex',
+        text: { en: 'Very committed',             he: 'מאוד מחויב' } },
       { id: 'somewhat',
-        text: { en: '🤔 Somewhat committed',         he: '🤔 מחויב במידה מסוימת' } },
+        icon:    'icon-thinking',
+        text: { en: 'Somewhat committed',         he: 'מחויב במידה מסוימת' } },
       { id: 'little',
-        text: { en: '🌱 A little committed',         he: '🌱 קצת מחויב' } },
+        icon:    'icon-seedling',
+        text: { en: 'A little committed',         he: 'קצת מחויב' } },
       { id: 'trying',
-        text: { en: '🪶 Just trying it out',         he: '🪶 רק מנסה' } },
+        icon:    'icon-feather',
+        text: { en: 'Just trying it out',         he: 'רק מנסה' } },
     ],
   },
   // Step 22 — signup offer. Optional beat before _onbComplete. Body
@@ -13741,6 +14119,21 @@ function _onbV2PrepareSubject() {
 // Screens 10, 11 — Q1 / Q2 multi-select. Renders option cards from
 // _ONB_COPY[question].options. Re-rendered on each show so lang
 // switches and re-visits pick up correct copy.
+// Every answer-card renderer (Q1 / Q2 / Q3 / commit) uses this shape:
+// an icon slot on the leading edge + a text label. opt.icon points at
+// a hero-family <symbol> in the inline <defs>. Text has NO leading
+// glyph — the icon carries that role. Escapes the label since we're
+// composing innerHTML around a user-visible option string. Direction
+// falls out of flex-row via <html dir> — no per-icon RTL handling.
+function _onbV2CardHTML(opt, isEn) {
+  const label = String(isEn ? opt.text.en : opt.text.he);
+  const safe  = label.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return '<span class="onb-v2-card-icon" aria-hidden="true">' +
+           '<svg viewBox="0 0 64 64"><use href="#' + opt.icon + '"/></svg>' +
+         '</span>' +
+         '<span class="onb-v2-card-label">' + safe + '</span>';
+}
+
 function _onbV2PrepareMsel(question) {
   const list = document.getElementById('onb-v2-' + question + '-cards');
   const cta  = document.getElementById('onb-v2-' + question + '-cta');
@@ -13755,7 +14148,7 @@ function _onbV2PrepareMsel(question) {
     card.className = 'onb-v2-card onb-v2-msel-card';
     card.dataset.option = opt.id;
     if (picks.indexOf(opt.id) >= 0) card.classList.add('is-selected');
-    card.textContent = isEn ? opt.text.en : opt.text.he;
+    card.innerHTML = _onbV2CardHTML(opt, isEn);
     card.onclick = () => _onbV2MselTap(question, opt.id);
     list.appendChild(card);
   });
@@ -13764,7 +14157,7 @@ function _onbV2PrepareMsel(question) {
 function _onbV2PrepareQ1() { _onbV2PrepareMsel('q1'); }
 function _onbV2PrepareQ2() { _onbV2PrepareMsel('q2'); }
 
-// Screen 12 — Q3 single choice.
+// Screen 12 — Q3 single choice. Same card shape as Q1/Q2.
 function _onbV2PrepareQ3() {
   const list = document.getElementById('onb-v2-q3-cards');
   const cta  = document.getElementById('onb-v2-q3-cta');
@@ -13780,7 +14173,7 @@ function _onbV2PrepareQ3() {
     card.className = 'onb-v2-card';
     card.dataset.option = opt.id;
     if (opt.id === pick) card.classList.add('is-selected');
-    card.textContent = isEn ? opt.text.en : opt.text.he;
+    card.innerHTML = _onbV2CardHTML(opt, isEn);
     card.onclick = () => _onbV2Q3Tap(opt.id);
     list.appendChild(card);
   });
@@ -13849,9 +14242,17 @@ function _onbV2PrepareMirror() {
   picked.forEach(opt => {
     const card = document.createElement('div');
     card.className = 'onb-v2-mirror-card';
+    // Title: smaller icon variant + text. Uses innerHTML because a
+    // <use href> can't be created from a textContent path; option
+    // labels are static config, no injection risk.
+    const label = String(isEn ? opt.text.en : opt.text.he);
+    const safe  = label.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const title = document.createElement('div');
     title.className = 'onb-v2-mirror-card-title';
-    title.textContent = isEn ? opt.text.en : opt.text.he;
+    title.innerHTML = '<span class="onb-v2-mirror-icon" aria-hidden="true">' +
+                        '<svg viewBox="0 0 64 64"><use href="#' + opt.icon + '"/></svg>' +
+                      '</span>' +
+                      '<span class="onb-v2-mirror-label">' + safe + '</span>';
     const support = document.createElement('div');
     support.className = 'onb-v2-mirror-card-support';
     support.textContent = isEn ? opt.support.en : opt.support.he;
@@ -13978,11 +14379,12 @@ function _onbV2PrepareJourney() {
     }
   }
 
-  // Three tiles — Q1 pick, Q2 pick, Q3 pick. Each shows the option's
-  // emoji (extracted from option.text as the first space-delimited
-  // token, which handles multi-codepoint emoji like 🗣️) and its
-  // short tile label. If a pick is missing (defensive; the flow
-  // requires all three), we skip that tile rather than render blank.
+  // Three tiles — Q1 pick, Q2 pick, Q3 pick. Each tile renders the
+  // option's hero-family SVG icon (opt.icon → <symbol id=…> in the
+  // inline defs) and its short tile label. Prior version parsed the
+  // leading emoji out of option.text.split(' ')[0]; removed because
+  // the icon field is now the source of truth for the visual glyph
+  // and text is pure text.
   const tilesEl = document.getElementById('onb-v2-journey-tiles');
   if (tilesEl) {
     tilesEl.innerHTML = '';
@@ -13995,27 +14397,38 @@ function _onbV2PrepareJourney() {
       if (!opt) return;
       const tile = document.createElement('div');
       tile.className = 'onb-v2-journey-tile';
-      const emoji = (isEn ? opt.text.en : opt.text.he).split(' ')[0];
       const label = isEn ? opt.tile.en : opt.tile.he;
-      const emojiEl = document.createElement('div');
-      emojiEl.className = 'onb-v2-journey-tile-emoji';
-      emojiEl.textContent = emoji;
+      const iconEl = document.createElement('div');
+      iconEl.className = 'onb-v2-journey-tile-icon';
+      iconEl.innerHTML = '<svg viewBox="0 0 64 64"><use href="#' + opt.icon + '"/></svg>';
       const labelEl = document.createElement('div');
       labelEl.className = 'onb-v2-journey-tile-label';
       labelEl.textContent = label;
-      tile.appendChild(emojiEl);
+      tile.appendChild(iconEl);
       tile.appendChild(labelEl);
       tilesEl.appendChild(tile);
     });
   }
 
-  // Card stat row + section head — static per-language.
+  // Card stat row: leading clock icon + text. card_stat_icon in the
+  // copy block references the symbol id; card_stat carries the pure
+  // text. Section head stays plain text.
   const statEl = document.getElementById('onb-v2-journey-stat');
-  if (statEl) statEl.textContent = isEn ? _ONB_COPY.journey.card_stat.en : _ONB_COPY.journey.card_stat.he;
+  if (statEl) {
+    const statText = isEn ? _ONB_COPY.journey.card_stat.en : _ONB_COPY.journey.card_stat.he;
+    const statIcon = _ONB_COPY.journey.card_stat_icon;
+    const safe = String(statText).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    statEl.innerHTML = '<span class="onb-v2-journey-stat-icon" aria-hidden="true">' +
+                         '<svg viewBox="0 0 64 64"><use href="#' + statIcon + '"/></svg>' +
+                       '</span>' +
+                       '<span class="onb-v2-journey-stat-text">' + safe + '</span>';
+  }
   const sectionEl = document.getElementById('onb-v2-journey-section-head');
   if (sectionEl) sectionEl.textContent = isEn ? _ONB_COPY.journey.section_head.en : _ONB_COPY.journey.section_head.he;
 
-  // Feature blocks below the card.
+  // Feature blocks below the card. f.icon is now a symbol id (was an
+  // emoji string) — rendered as an inline SVG. Title + desc stay plain
+  // text and use textContent for safety.
   const featEl = document.getElementById('onb-v2-journey-features');
   if (featEl) {
     featEl.innerHTML = '';
@@ -14024,7 +14437,7 @@ function _onbV2PrepareJourney() {
       li.className = 'onb-v2-journey-feature';
       const icon = document.createElement('div');
       icon.className = 'onb-v2-journey-feature-icon';
-      icon.textContent = f.icon;
+      icon.innerHTML = '<svg viewBox="0 0 64 64"><use href="#' + f.icon + '"/></svg>';
       const body = document.createElement('div');
       body.className = 'onb-v2-journey-feature-body';
       const title = document.createElement('div');
@@ -14060,7 +14473,7 @@ function _onbV2PrepareCommit() {
     card.className = 'onb-v2-card';
     card.dataset.option = opt.id;
     if (opt.id === pick) card.classList.add('is-selected');
-    card.textContent = isEn ? opt.text.en : opt.text.he;
+    card.innerHTML = _onbV2CardHTML(opt, isEn);
     card.onclick = () => _onbV2CommitTap(opt.id);
     list.appendChild(card);
   });
