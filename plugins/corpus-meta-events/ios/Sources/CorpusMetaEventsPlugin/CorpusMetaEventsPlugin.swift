@@ -23,6 +23,15 @@ import UIKit
 //   2. NEVER set Settings.shared.isAdvertiserTrackingEnabled = true.
 //      This is Meta's own switch that tells their pipeline "this install
 //      is opted in to cross-app correlation". Must stay false.
+//      NOTE (FB SDK 18.x): this property's setter is runtime-deprecated;
+//      Meta's SDK now derives the value from ATT status at read time
+//      instead. Since rule 1 keeps ATT unrequested, the flag naturally
+//      reports false. We still assign = false in load() below for
+//      belt-and-braces (in case the deprecation is ever reverted) AND
+//      because the privacy-check positive-assertion at
+//      scripts/check-privacy-invariants.mjs expects the exact line to
+//      exist. Setting it in 18.x also prints a runtime console warning
+//      from the SDK; that's expected and non-fatal.
 //
 //   3. NEVER set Settings.shared.isAdvertiserIDCollectionEnabled = true.
 //      Turning this on lets Meta read the IDFA (via ATT-approved installs)
@@ -41,10 +50,21 @@ import UIKit
 //      what our code puts in it — not whatever Meta's SDK decides to
 //      autofill (which historically has included receipt data with
 //      identifiers on some iOS versions).
+//      NOTE (FB SDK 18.x): isAutoLogSubscriptionsEnabled has been REMOVED
+//      from the public Settings API in 18.x — subscription auto-log is
+//      now controlled by a server-side GateKeeper
+//      (app_events_if_auto_log_subs) that we don't operate. That means
+//      there's no property to set in Swift any more; rule 5 has no code
+//      path to enforce on iOS. The privacy-check regex for this
+//      property name is kept as a guard against re-introduction if a
+//      future SDK version restores it. The Info.plist
+//      FacebookAutoLogSubscriptionsEnabled key is still structurally
+//      guarded by check-privacy-invariants.mjs; whether 18.x reads that
+//      key is undocumented in the changelog, so keep the guard.
 //
-// The plugin.load() below sets all three Meta-side flags to their
-// safe values BEFORE SDK initialization. Ordering matters: if any event
-// is logged before these flags are set, Meta's SDK reads the pre-set
+// The plugin.load() below sets the remaining safety flags to their safe
+// values BEFORE SDK initialization. Ordering matters: if any event is
+// logged before these flags are set, Meta's SDK reads the pre-set
 // defaults (which favor tracking, not privacy).
 //
 // Test after any config change: on a fresh install, no ATT prompt should
@@ -61,13 +81,21 @@ public class CorpusMetaEventsPlugin: CAPPlugin, CAPBridgedPlugin {
     ]
 
     public override func load() {
-        // Rules 2 + 3 + 5 enforced HERE, before SDK init.
+        // Rules 2 + 3 enforced HERE, before SDK init. Rule 5 (subscription
+        // auto-log) no longer has a code path to enforce on iOS —
+        // Settings.isAutoLogSubscriptionsEnabled was removed from the
+        // public API in FB SDK 18.x; see the header block above for the
+        // full note. Rule 2's assignment prints a runtime deprecation
+        // warning from the SDK in 18.x (expected) and is otherwise a
+        // no-op — kept as belt-and-braces + to satisfy the privacy-check
+        // positive-assertion.
         Settings.shared.isAdvertiserTrackingEnabled = false
         Settings.shared.isAdvertiserIDCollectionEnabled = false
         // Auto-log app-activation events is OK — those don't carry IDFA once
-        // the three flags above are set. Auto-log subscription events is
-        // NOT ok (rule 5) — Meta's SKPaymentQueue hook can attach receipt
-        // data with identifiers.
+        // the two flags above are set. Auto-log subscription events used to
+        // be a distinct concern under rule 5 (Meta's SKPaymentQueue hook
+        // could attach receipt data with identifiers); in 18.x it's a
+        // server-side gate not a client flag, so there's no code to guard.
         Settings.shared.isAutoLogAppEventsEnabled = true
         // SKAdNetwork reporting: opt in. This is Apple's privacy-preserving
         // attribution channel and is orthogonal to IDFA/tracking. Meta reads
