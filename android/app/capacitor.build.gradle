@@ -19,6 +19,7 @@ dependencies {
     implementation project(':capawesome-capacitor-screenshot')
     implementation project(':capgo-capacitor-social-login')
     implementation project(':revenuecat-purchases-capacitor')
+    implementation project(':corpus-meta-events')
     implementation project(':corpus-review')
 
 }

@@ -12013,6 +12013,24 @@ async function startPurchase() {
         package_id: sel.pkg.identifier,
         is_trial: PAYWALL_TRIAL_ENABLED,
       }); } catch(e) {}
+      // Meta App Events: fb_mobile_subscribe with the purchase value so
+      // SKAdNetwork attribution can credit the campaign that drove the
+      // install. Meta's standard event name — do not rename. _valueToSum
+      // is Meta's convention for the numeric weight of the event.
+      // Price / currency read from the resolved RC package (sel.pkg is
+      // guaranteed truthy on this branch — early-return above bails
+      // when sel.pkg is null).
+      try {
+        const _priceStr = sel.pkg.product && sel.pkg.product.priceString;
+        const _priceNum = sel.pkg.product && typeof sel.pkg.product.price === 'number' ? sel.pkg.product.price : null;
+        const _ccy      = (sel.pkg.product && sel.pkg.product.currencyCode) || 'USD';
+        const _params   = { fb_currency: _ccy };
+        if (_priceNum != null) _params._valueToSum = _priceNum;
+        window.Capacitor?.Plugins?.CorpusMetaEvents?.logEvent({
+          name: 'fb_mobile_subscribe',
+          params: _params,
+        });
+      } catch(e) {}
       // Nudge loadSubscription to catch the webhook write. If it hasn't
       // landed yet, optimistic keeps access alive until it does. Explicit
       // .catch() rather than try/catch — try/catch around an un-awaited
@@ -25196,6 +25214,19 @@ async function enterAppState(user) {
       const isNewUser = !!user.created_at && (Date.now() - new Date(user.created_at).getTime() < 60000);
       if (isNewUser) posthog.capture('user_signed_up', { method });
       posthog.capture('user_logged_in', { method });
+      // Meta App Events: fb_mobile_complete_registration only on genuine
+      // signup (not on returning login), so Meta's SKAdNetwork attribution
+      // credits the right install. Method flows through as a param for
+      // Meta's own reporting. Fire-and-forget — Meta doesn't care about
+      // ordering and we don't gate anything on the resolved promise.
+      if (isNewUser) {
+        try {
+          window.Capacitor?.Plugins?.CorpusMetaEvents?.logEvent({
+            name: 'fb_mobile_complete_registration',
+            params: { fb_registration_method: method },
+          });
+        } catch(e) {}
+      }
       // NOTE: onboarding_auth_choice moved to click time in each handler
       // (handleAuthSubmit / authWithGoogle / authWithApple / enterAsGuest /
       // _enterAsGuestSilent). Previously fired here post-success, which

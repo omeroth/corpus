@@ -22,6 +22,7 @@ let package = Package(
         .package(name: "CapgoCapacitorSocialLogin", path: "../../../node_modules/@capgo/capacitor-social-login"),
         .package(name: "RevenuecatPurchasesCapacitor", path: "../../../node_modules/@revenuecat/purchases-capacitor"),
         .package(name: "CorpusInstagramShare", path: "../../../plugins/corpus-instagram-share"),
+        .package(name: "CorpusMetaEvents", path: "../../../plugins/corpus-meta-events"),
         .package(name: "CorpusReview", path: "../../../plugins/corpus-review")
     ],
     targets: [
@@ -40,6 +41,7 @@ let package = Package(
                 .product(name: "CapgoCapacitorSocialLogin", package: "CapgoCapacitorSocialLogin"),
                 .product(name: "RevenuecatPurchasesCapacitor", package: "RevenuecatPurchasesCapacitor"),
                 .product(name: "CorpusInstagramShare", package: "CorpusInstagramShare"),
+                .product(name: "CorpusMetaEvents", package: "CorpusMetaEvents"),
                 .product(name: "CorpusReview", package: "CorpusReview")
             ]
         )

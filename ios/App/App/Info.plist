@@ -24,7 +24,38 @@
 				<string>com.googleusercontent.apps.1010803138404-cs8f3t5vvcqjv0rgldlpm25o07sir1i7</string>
 			</array>
 		</dict>
+		<!-- Facebook SDK requires an fb<APP_ID> URL scheme registered so
+		     deferred-deep-link callbacks and Meta's account-kit-style
+		     returns can reach the app. We don't currently use any Meta
+		     redirect flow (no Facebook Login, no deep-linked ads), so
+		     this is a benign registration required by SDK initialization
+		     rather than an active call site. -->
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb1401631905270210</string>
+			</array>
+		</dict>
 	</array>
+	<!-- Meta App Events SDK — configuration required by FBSDKCoreKit.
+	     App ID + Client Token wire the SDK to our Meta developer console
+	     entry. AdvertiserIDCollectionEnabled and AutoLogAppEventsEnabled
+	     are set imperatively from CorpusMetaEventsPlugin.load() to guarantee
+	     ordering, but Meta also reads these plist keys at very-early SDK
+	     init paths — declaring them false here defends against any race
+	     where an internal Meta hook fires before load() runs.
+	     PRIVACY LABEL COMMITMENT: both must stay false. Changing either
+	     requires updating the App Store Connect privacy label FIRST. -->
+	<key>FacebookAppID</key>
+	<string>1401631905270210</string>
+	<key>FacebookClientToken</key>
+	<string>dd4226a1bf3d50c1fb4576760aabd955</string>
+	<key>FacebookDisplayName</key>
+	<string>Corpus</string>
+	<key>FacebookAdvertiserIDCollectionEnabled</key>
+	<false/>
+	<key>FacebookAutoLogAppEventsEnabled</key>
+	<true/>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -47,6 +78,16 @@
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>instagram-stories</string>
+		<!-- Facebook SDK's connectivity/companion-app probes. Even in
+		     App-Events-only mode (no Facebook Login), the SDK's dialog-
+		     configuration paths canOpenURL these schemes on init. Absent
+		     entries here cause noisy console warnings and, on some SDK
+		     versions, block SDK initialization. Benign to include; adds
+		     zero surface area for tracking. -->
+		<string>fbapi</string>
+		<string>fb-messenger-share-api</string>
+		<string>fbauth2</string>
+		<string>fbshareextension</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

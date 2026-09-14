@@ -1,0 +1,25 @@
+{
+  "name": "corpus-meta-events",
+  "version": "1.0.0",
+  "description": "Repo-local Capacitor plugin: Meta (Facebook) App Events SDK wrapper for install / signup / subscription attribution. Configured SKAdNetwork-only — no ATT prompt, no IDFA, no Advanced Matching. Consumed from index.html via window.Capacitor.Plugins.CorpusMetaEvents.",
+  "files": [
+    "android/src",
+    "android/build.gradle",
+    "ios/Sources",
+    "Package.swift"
+  ],
+  "capacitor": {
+    "ios": {
+      "src": "ios"
+    },
+    "android": {
+      "src": "android"
+    }
+  },
+  "keywords": ["capacitor", "plugin", "meta", "facebook", "app-events", "skadnetwork"],
+  "author": "Corpus",
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "@capacitor/core": "^8.0.0"
+  }
+}

@@ -28,6 +28,25 @@
             android:grantUriPermissions="true">
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Meta App Events SDK — required meta-data. App ID + Client Token
+             wire the SDK to our Meta developer console entry. The advertising
+             ID collection flag is set imperatively in
+             CorpusMetaEventsPlugin.load(), but Meta also reads the plist/
+             manifest boolean at very-early init paths — declaring "false"
+             here defends against any race where an internal Meta hook fires
+             before the plugin's load() runs.
+             PRIVACY DECLARATION COMMITMENT: com.facebook.sdk.AdvertiserIDCollectionEnabled
+             must stay false. See the DO-NOT-CHANGE comment at the top of
+             plugins/corpus-meta-events/android/.../CorpusMetaEventsPlugin.java. -->
+        <meta-data android:name="com.facebook.sdk.ApplicationId"
+                   android:value="@string/facebook_app_id" />
+        <meta-data android:name="com.facebook.sdk.ClientToken"
+                   android:value="@string/facebook_client_token" />
+        <meta-data android:name="com.facebook.sdk.AdvertiserIDCollectionEnabled"
+                   android:value="false" />
+        <meta-data android:name="com.facebook.sdk.AutoLogAppEventsEnabled"
+                   android:value="true" />
     </application>
 
     <!-- Permissions -->

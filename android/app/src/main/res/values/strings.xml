@@ -4,4 +4,11 @@
     <string name="title_activity_main">Corpus</string>
     <string name="package_name">com.corpusapp.corpus</string>
     <string name="custom_url_scheme">com.corpusapp.corpus</string>
+    <!-- Meta App Events SDK credentials. Referenced by AndroidManifest
+         <meta-data> entries. Keep in strings.xml (not manifest inline) so
+         Android's build tooling handles them as string resources — matches
+         Meta's SDK documentation and lets a future flavor split (staging
+         vs prod) swap them via resource overrides. -->
+    <string name="facebook_app_id">1401631905270210</string>
+    <string name="facebook_client_token">dd4226a1bf3d50c1fb4576760aabd955</string>
 </resources>
