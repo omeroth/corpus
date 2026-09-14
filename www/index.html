@@ -6125,7 +6125,7 @@
   html.dark .onb-screen.onb-v2 .onb-v2-mirror-closing-head,
   html.dark .onb-screen.onb-v2 .onb-v2-mirror-closing-line { color: var(--text); }
 
-  /* Step 16 (day-1 streak) — centered flame + amber eyebrow + head.
+  /* Step 20 (day-1 streak) — centered flame + amber eyebrow + head.
      Flame reuses #icon-streak SVG from the endowment overlay so the
      visual language matches the future post-onboarding endowment
      modal (users see the same flame at streak-day-1 both places). */
@@ -6152,9 +6152,10 @@
     text-transform: uppercase;
   }
 
-  /* Step 17 — skip button below the primary review CTA. Text-only,
-     no fill or border, low visual weight so the Rate action reads
-     as the intended path. */
+  /* .onb-v2-skip — text-only skip button. Used by step 16 (notification
+     pre-prompt secondary CTA) and step 22 (review Skip). No fill or
+     border, low visual weight so the primary action reads as the
+     intended path. */
   .onb-screen.onb-v2 .onb-v2-skip {
     display: block;
     width: 100%;
@@ -6172,7 +6173,7 @@
   }
   html.dark .onb-screen.onb-v2 .onb-v2-skip { color: var(--text); }
 
-  /* Step 22 — signup actions. The .onb-cta-holder base rule takes care
+  /* Step 4 — signup actions. The .onb-cta-holder base rule takes care
      of margin-top:auto (push to bottom) and max-width; this rule stacks
      the three provider buttons + skip with consistent vertical spacing.
      Uses gap so the individual .auth-btn spacing is uniform regardless
@@ -6264,7 +6265,7 @@
     padding: 11px 13px;
   }
 
-  /* Step 18 — journey. Top card projects the 30-day future; two
+  /* Step 23 — journey. Top card projects the 30-day future; two
      feature blocks below explain how. Accent-bordered card carries
      the promise; feature blocks below sit in the neutral surface
      card style so the visual weight flows top→bottom from projection
@@ -10606,7 +10607,7 @@ const RC_ANDROID_API_KEY = '';
 //      any future direct call, DevTools invocation, or refactor that
 //      routes around (1).
 //
-// Onboarding step 22 (auth), RC SDK configure, loadSubscription, and
+// Onboarding step 4 (auth), RC SDK configure, loadSubscription, and
 // the guest-signup modal are ALL untouched — none surface the paywall,
 // they just prepare state for the day it flips on.
 //
@@ -12046,7 +12047,7 @@ async function startPurchase() {
       // openReader + post-subscription bonus reveal. All of these
       // presume there's a lesson the user was trying to open — the
       // onboarding paywall has no such lesson (Chapter 1 Day 1 opens
-      // as step 18 immediately after), and the toast + celebration
+      // as step 19 immediately after), and the toast + celebration
       // would compete with the "let's start" beat that follows.
       if (wasModalMode) {
         _showToast(state.lang === 'en' ? 'Welcome to Corpus.' : 'ברוכים הבאים לקורפוס.');
@@ -12426,7 +12427,7 @@ async function handleAuthSubmit() {
 }
 
 // Shared OAuth flow used by both the auth-screen buttons (authWithGoogle /
-// authWithApple) and the inline provider buttons on onboarding step 22.
+// authWithApple) and the inline provider buttons on onboarding step 4.
 // Handles the full sequence: disable button, swap text to "Signing in…",
 // hint at 4s, call the provider (native SocialLogin plugin or web OAuth),
 // exchange the idToken with Supabase, and route to home via enterApp.
@@ -12440,7 +12441,7 @@ async function handleAuthSubmit() {
 //   defaultLabel:   string — restore text on failure
 //   onBeforeEnter?: () => void — optional hook fired after successful
 //                   Supabase exchange, before enterApp / postAuthContinue.
-//                   Onboarding step 22 uses this to mark corpus_onboarding
+//                   Onboarding step 4 uses this to mark corpus_onboarding
 //                   _done and hide the onboarding overlay before home
 //                   renders.
 //   postAuthContinue?: (user) => Promise<void> | void — optional
@@ -12484,10 +12485,10 @@ async function _authProviderStart(provider, ctx) {
   if (errorEl) errorEl.textContent = '';
   // Declare "auth surface active" so enterApp's UI-tail guard doesn't
   // treat this as a mid-navigation session-recovery race and refuse to
-  // route to home. When called from onboarding step 22, state.current
-  // Screen may still be stale as 'reader' (from the step-15 first
-  // dialogue), which would otherwise trigger reader_ejection_blocked
-  // and drop the user on step 22 with no way home.
+  // route to home. When called from onboarding step 4, state.current
+  // Screen may still be stale as 'reader' (from a previous first-
+  // dialogue attempt), which would otherwise trigger
+  // reader_ejection_blocked and drop the user with no way home.
   if (state) state.currentScreen = 'auth';
   const _isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   _authInProgress = true;
@@ -12860,17 +12861,17 @@ function _onbShowScreen(screenId) {
 // paths (search corpus_onboarding_flow_version) — mismatch triggers
 // a reset to step 1 rather than a mapping table (small population,
 // simpler to restart than to translate).
-const _ONB_FLOW_VERSION = '3';
+const _ONB_FLOW_VERSION = '4';
 
-const _ONB_TOTAL_STEPS = 23;
+const _ONB_TOTAL_STEPS = 24;
 // Which phase (1..6) each step belongs to. Drives the 6-pill progress.
 const _ONB_STEP_TO_PHASE = {
-  1: 1, 2: 1, 3: 1,                                          // welcome / problem / solution
-  4: 2, 5: 2, 6: 2, 7: 2,                                    // signup / name / age / phone hours
-  8: 3, 9: 3,                                                // shock / plan intro
-  10: 4, 11: 4, 12: 4, 13: 4,                                // subject / Q1 / Q2 / Q3
-  14: 5, 15: 5, 16: 5, 17: 5, 18: 5, 19: 5, 20: 5, 21: 5,   // Q4 / mirror / paywall / let's-start / dialogue / streak / goal / review
-  22: 6, 23: 6,                                              // journey / commit
+  1: 1, 2: 1, 3: 1,                                              // welcome / problem / solution
+  4: 2, 5: 2, 6: 2, 7: 2,                                        // signup / name / age / phone hours
+  8: 3, 9: 3,                                                    // shock / plan intro
+  10: 4, 11: 4, 12: 4, 13: 4,                                    // subject / Q1 / Q2 / Q3
+  14: 5, 15: 5, 16: 5, 17: 5, 18: 5, 19: 5, 20: 5, 21: 5, 22: 5, // Q4 / mirror / notifications / paywall / let's-start / dialogue / streak / goal / review
+  23: 6, 24: 6,                                                  // journey / commit
 };
 // DOM ids in step order. Steps not yet built map to null; _onbShowStep
 // treats a null slot as "not implemented yet, jump to completion" so a
@@ -12903,22 +12904,29 @@ const _ONB_STEP_TO_ID = {
   // set of picks reflected back, then the paywall.
   14: 'onb-v2-q4',
   15: 'onb-v2-mirror',
-  // Step 16 (paywall) — full onboarding step in flow v3 (was a modal
-  // overlay in v2). Shares the DOM chrome + prepare hook pattern with
-  // every other onboarding step; the underlying paywall render / purchase
-  // / restore logic is unchanged and reused by the modal-mode paywall
+  // Step 16 (notifications pre-prompt) — flow v4 insertion. Placed
+  // BEFORE paywall so the OS-permission ask doesn't inherit a "no"
+  // frame from a paywall decline, and so paywall drop-outs have
+  // already been asked on the way past. Custom in-app screen; the
+  // native OS dialog fires only on the primary CTA. "Not now" sets
+  // dailyReminder.prePromptDeferred so the OS ask stays unspent.
+  16: 'onb-v2-notifications',
+  // Step 17 (paywall) — full onboarding step (was step 16 in v3).
+  // Shares the DOM chrome + prepare hook pattern with every other
+  // onboarding step; the underlying paywall render / purchase /
+  // restore logic is unchanged and reused by the modal-mode paywall
   // (chapter tap, bonus tap, etc.) via _paywallActiveRoot scoping.
-  16: 'onb-v2-paywall',
-  17: 'onb-v2-lets-start',
-  // Step 18 has no v2 DOM node — the reader takes over the viewport.
-  // _onbShowStep detects n === 18 and routes to _onbEnterFirstDialogue
-  // instead of the normal id-lookup path. (Was step 16 in flow v1.)
-  18: null,
-  19: 'onb-v2-streak',
-  20: 'onb-v2-goal',
-  21: 'onb-v2-review',
-  22: 'onb-v2-journey',
-  23: 'onb-v2-commit',
+  17: 'onb-v2-paywall',
+  18: 'onb-v2-lets-start',
+  // Step 19 has no v2 DOM node — the reader takes over the viewport.
+  // _onbShowStep detects n === 19 and routes to _onbEnterFirstDialogue
+  // instead of the normal id-lookup path. (Was step 18 in flow v3.)
+  19: null,
+  20: 'onb-v2-streak',
+  21: 'onb-v2-goal',
+  22: 'onb-v2-review',
+  23: 'onb-v2-journey',
+  24: 'onb-v2-commit',
 };
 
 // Bilingual copy map for the intro screens (1-3). Later commits will
@@ -13020,8 +13028,8 @@ const _ONB_COPY = {
     cta:  { en: 'Continue',                               he: 'המשך' },
     // Options — stable ids for analytics; text is what the user sees
     // on the picker (emoji-prefixed on both langs); support is the
-    // per-option line on the mirror card (step 13); tile is the very
-    // short label used in the journey card tiles (step 18).
+    // per-option line on the mirror card (step 15); tile is the very
+    // short label used in the journey card tiles (step 23).
     options: [
       { id: 'understand-ideas',
         icon:    'icon-brain',
@@ -13155,9 +13163,24 @@ const _ONB_COPY = {
       { en: 'Every day',  he: 'כל יום' },       // 4
     ],
   },
-  // Step 15 — pre-dialogue statement screen. Same visual as welcome /
-  // problem / solution / plan: head + sub + CTA. Land here after Q4;
-  // CTA opens the reader on the first dialogue (step 16).
+  // Step 16 — notification pre-prompt. Custom in-app screen shown
+  // BEFORE the paywall (flow v4). Primary CTA triggers the native OS
+  // permission dialog; secondary CTA sets prePromptDeferred so the OS
+  // ask remains unspent for a later re-attempt (Profile toggle).
+  // Copy deliberately omits the fire time — the time picker lives on
+  // the Profile toggle; keeping the ask abstract avoids implying a
+  // commitment the user can't easily change here.
+  notifications: {
+    head: { en: 'Stay on track',       he: 'שלא תשכחו' },
+    sub:  { en: 'A daily reminder is what turns a plan into a habit.',
+            he: 'תזכורת יומית היא מה שהופכת תוכנית להרגל.' },
+    cta:  { en: 'Turn on reminders',   he: 'הפעילו תזכורות' },
+    skip: { en: 'Not now',             he: 'לא עכשיו' },
+  },
+
+  // Step 18 — pre-dialogue statement screen. Same visual as welcome /
+  // problem / solution / plan: head + sub + CTA. Land here after
+  // paywall; CTA opens the reader on the first dialogue (step 19).
   letsStart: {
     head: { en: "Let's start", he: 'בוא נתחיל' },
     sub:  { en: 'One dialogue, five minutes',
@@ -13176,12 +13199,12 @@ const _ONB_COPY = {
       line: { en: "We'll get you there.", he: 'ואנחנו נדאג שתגיע לשם.' },
     },
   },
-  // Step 15 has no copy block — it's the reader taking over the visual
+  // Step 19 has no copy block — it's the reader taking over the visual
   // layer. _onbEnterFirstDialogue calls openReader(1, 1); finishDay's
   // onboarding guard runs _onbFinishFirstDialogue on completion, which
-  // shows the thinker card wired to advance to step 16.
+  // shows the thinker card wired to advance to step 20.
 
-  // Step 17 — daily goal. Recovered verbatim from the v1 goal screen
+  // Step 21 — daily goal. Recovered verbatim from the v1 goal screen
   // (main:index.html around 22293) — three cards (one / two / own_pace)
   // with the app's amber flame icon on the picks that anchor to the
   // streak. Placed after streak so the flame connection reads: user just
@@ -13213,7 +13236,7 @@ const _ONB_COPY = {
     ],
   },
 
-  // Step 16 — day-1 streak celebration. Matches the endowment overlay
+  // Step 20 — day-1 streak celebration. Matches the endowment overlay
   // beat but as a v2 screen (no modal); flame + eyebrow + head + CTA.
   streak: {
     eyebrow: { en: 'DAY 1 · STREAK',        he: 'יום 1 · רצף' },
@@ -13223,9 +13246,9 @@ const _ONB_COPY = {
     cta:     { en: 'Continue',              he: 'המשך' },
   },
 
-  // Step 17 — review request. No native prompt plugin wired in yet;
+  // Step 22 — review request. No native prompt plugin wired in yet;
   // the Rate button opens the platform's store URL in a new tab.
-  // Skip and Rate both advance to step 18, so the ask is soft.
+  // Skip and Rate both advance to step 23, so the ask is soft.
   review: {
     head:     { en: 'Before we start.',     he: 'לפני שמתחילים' },
     sub:      { en: 'If you like <span class="onb-v2-em">Corpus</span>, a rating helps others find it.',
@@ -13234,7 +13257,7 @@ const _ONB_COPY = {
     skip:     { en: 'Not right now',        he: 'לא עכשיו' },
   },
 
-  // Step 18 — journey summary. An accent-bordered card at the top
+  // Step 23 — journey summary. An accent-bordered card at the top
   // projects the user's next 30 days (name + date pill + three tiles
   // drawn from their Q1/Q2/Q3 picks + a stat row), then two feature
   // blocks below explain the mechanism ("A dialogue a day", "Real
@@ -13275,7 +13298,7 @@ const _ONB_COPY = {
     cta: { en: "Let's begin", he: 'בוא נתחיל' },
   },
 
-  // Step 19 — commitment level. Terminal onboarding screen. Five
+  // Step 24 — commitment level. Terminal onboarding screen. Five
   // emoji-prefixed cards state the user's commitment level; the picked
   // id is captured to state.onbAnswers.commitment for later analysis
   // but does not gate anything downstream — all five land the user on
@@ -13301,7 +13324,7 @@ const _ONB_COPY = {
         text: { en: 'Just trying it out',         he: 'רק מנסה' } },
     ],
   },
-  // Step 22 — signup offer. Optional beat before _onbComplete. Body
+  // Step 4 — signup offer. Placed after solution (step 3). Body
   // deliberately does NOT mention subscription; the paywall wasn't
   // shipped when this landed, and promising a paid tier that isn't
   // live yet is premature. Add the "you'll need an account to
@@ -13374,6 +13397,10 @@ function _onbApplyLang(lang) {
   setText('onb-v2-q3-cta',        'q3',       'cta');
   setText('onb-v2-q4-head',       'q4',       'head');
   setText('onb-v2-q4-cta',        'q4',       'cta');
+  setText('onb-v2-notifications-head','notifications','head');
+  setText('onb-v2-notifications-sub', 'notifications','sub');
+  setText('onb-v2-notifications-cta', 'notifications','cta');
+  setText('onb-v2-notifications-skip','notifications','skip');
   setText('onb-v2-lets-start-head','letsStart','head');
   setText('onb-v2-lets-start-sub','letsStart','sub');
   setText('onb-v2-lets-start-cta','letsStart','cta');
@@ -13449,12 +13476,12 @@ function _onbSetLang(lang) {
 // a user on a missing screen.
 function _onbShowStep(n) {
   if (n < 1 || n > _ONB_TOTAL_STEPS) { _onbComplete(); return; }
-  // Step 18 — reader takes over the viewport (no v2 DOM node). The
+  // Step 19 — reader takes over the viewport (no v2 DOM node). The
   // onboarding resumes after the user finishes the dialogue via
   // finishDay's _onbInFirstDialogue guard → _onbFinishFirstDialogue.
-  // (Was step 16 in flow v1; renumbered when the paywall step was
-  // inserted.)
-  if (n === 18) { _onbEnterFirstDialogue(); return; }
+  // (Was step 16 in flow v1, step 18 in v3; renumbered when the
+  // notification pre-prompt was inserted before the paywall in v4.)
+  if (n === 19) { _onbEnterFirstDialogue(); return; }
   const id = _ONB_STEP_TO_ID[n];
   if (!id) {
     // Not-yet-built step — early completion for commit-A cadence.
@@ -13489,7 +13516,7 @@ function _onbShowStep(n) {
   // paths can detect an old-layout step number and reset to step 1
   // rather than resume onto the wrong screen.
   try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(e) {}
-  try { _phCapture('onboarding_step_shown', { step: n, phase: phase, flow_version: 3 }); } catch(e) {}
+  try { _phCapture('onboarding_step_shown', { step: n, phase: phase, flow_version: 4 }); } catch(e) {}
 }
 
 // Move from step `from` to step `to`, optionally merging a patch of
@@ -13638,7 +13665,7 @@ function _onbV2CtaQ3() {
   const pick = _onbV2Q3Pick || state.onbAnswers.q3;
   if (!pick) return;
   // Q3 is captured to state.onbAnswers only. The dedicated goal screen
-  // (step 17) writes state.dailyGoalHistory with the exact 'one' | 'two'
+  // (step 21) writes state.dailyGoalHistory with the exact 'one' | 'two'
   // | 'own_pace' values the runtime consumers recognize; Q3's ids
   // wouldn't match those.
   _onbAdvanceStep(13, 14, { q3: pick });
@@ -13655,20 +13682,76 @@ function _onbV2CtaQ4() {
 }
 
 // Screen 15 (mirror) — display-only recap of every pick. Advances to
-// step 16 (paywall). Mirror is the emotional peak before the paywall;
-// putting the paywall immediately after keeps the momentum.
+// step 16 (notifications pre-prompt). Mirror is the emotional peak
+// before the ask; putting the notification pre-prompt immediately
+// after leverages the momentum.
 function _onbV2CtaMirror() { _onbAdvanceStep(15, 16); }
 
-// Step 16 — paywall (full onboarding step in flow v3). Prep hook wires
-// the shared _renderPaywall / startPurchase / restorePurchases / _exitPaywall
-// machinery to the onboarding shell instead of the modal box:
+// Step 16 — notification pre-prompt. Custom in-app screen that asks
+// permission BEFORE the paywall (flow v4). Reason for the placement:
+// a user who has just declined to pay is in a "no" frame of mind and
+// the next ask inherits it. Anyone who drops at the paywall has
+// already been asked here on the way past.
+//
+// UX contract:
+//   - Primary CTA calls the native OS permission dialog exactly once
+//     and flips permissionAsked=true regardless of grant result.
+//   - "Not now" sets prePromptDeferred=true and leaves the OS ask
+//     unspent. maybeRequestReminderPermission (finishDay safety net)
+//     respects that flag so a later "Not now"-er isn't OS-prompted
+//     out of nowhere at lesson-1 completion.
+//   - Advance to step 17 (paywall) on both paths.
+function _onbV2PrepareNotifications() {
+  try { _phCapture('notification_prompt_shown', { source: 'onboarding_step16' }); } catch(e) {}
+}
+
+async function _onbV2CtaNotifYes() {
+  try { _phCapture('notification_prompt_response', { response: 'yes' }); } catch(e) {}
+  state.dailyReminder = Object.assign(
+    { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
+    state.dailyReminder || {},
+    { enabled: true, prePromptDeferred: false }
+  );
+  let osResult = 'unavailable';
+  if (_isNotifPluginAvailable()) {
+    osResult = await _requestNotifPermission();
+    state.dailyReminder.permissionAsked = true;
+    if (osResult === 'granted') {
+      // Fire-and-forget reconcile — schedules the 14-day window. Today's
+      // notif gets cancelled when finishDay runs after the first dialogue
+      // completes at step 19.
+      _reconcileReminders().catch(e => console.warn('[Reminder] onboarding-grant reconcile failed:', e));
+    } else {
+      state.dailyReminder.enabled = false;
+    }
+  }
+  try { saveState(); } catch(e) { try { saveStateLocal(); } catch(e2) {} }
+  try { _phCapture('notification_os_result', { result: osResult }); } catch(e) {}
+  _onbAdvanceStep(16, 17);
+}
+
+function _onbV2CtaNotifNotNow() {
+  try { _phCapture('notification_prompt_response', { response: 'not_now' }); } catch(e) {}
+  state.dailyReminder = Object.assign(
+    { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
+    state.dailyReminder || {},
+    { enabled: false, prePromptDeferred: true }
+  );
+  try { saveState(); } catch(e) { try { saveStateLocal(); } catch(e2) {} }
+  _onbAdvanceStep(16, 17);
+}
+
+// Step 17 — paywall (full onboarding step, was step 16 in flow v3).
+// Prep hook wires the shared _renderPaywall / startPurchase /
+// restorePurchases / _exitPaywall machinery to the onboarding shell
+// instead of the modal box:
 //   - Points _paywallActiveRoot at #onb-v2-paywall so every scoped
 //     paywall querySelector reads from the onboarding shell.
 //   - Sets _paywallMode = 'onboarding' so purchase / restore success
 //     paths skip the "Welcome to Corpus" toast + returnTo openReader
 //     (there's no returnTo lesson from an onboarding paywall, and the
 //     next onboarding beat already frames the moment).
-//   - Registers an onClose hook that advances to step 17 (lets-start)
+//   - Registers an onClose hook that advances to step 18 (lets-start)
 //     regardless of exit path (skip, purchase success, restore success).
 // The Skip control (top-right corner) calls _exitPaywall directly,
 // which fires the onClose. Purchase / restore success also route
@@ -13685,7 +13768,7 @@ function _onbV2PreparePaywall() {
                 ? 'Every chapter, every subject, every bonus dialogue.'
                 : 'כל פרק, כל נושא, כל דיאלוג בונוס.',
   };
-  _paywallOnClose = () => _onbAdvanceStep(16, 17);
+  _paywallOnClose = () => _onbAdvanceStep(17, 18);
   _paywallSelectedPkg = 'yearly';
   _paywallPurchasing = false;
   // Localize the Skip label — reuses the signup-skip localization.
@@ -13703,7 +13786,7 @@ function _onbV2PreparePaywall() {
   } catch(e) {}
 }
 
-// Step 18 — first-dialogue entry. Reader takes over the visual
+// Step 19 — first-dialogue entry. Reader takes over the visual
 // layer. state._onbInFirstDialogue is the guard finishDay reads to
 // route the tail to _onbFinishFirstDialogue instead of the normal
 // stats + celebration + guest-prompt chain.
@@ -13713,15 +13796,15 @@ function _onbEnterFirstDialogue() {
     s.style.display = 'none';
     s.classList.remove('onb-active');
   });
-  try { localStorage.setItem('corpus_onboarding_step', '18'); } catch(e) {}
+  try { localStorage.setItem('corpus_onboarding_step', '19'); } catch(e) {}
   try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(e) {}
-  try { _phCapture('onboarding_step_shown', { step: 18, phase: 5, flow_version: 3 }); } catch(e) {}
+  try { _phCapture('onboarding_step_shown', { step: 19, phase: 5, flow_version: 4 }); } catch(e) {}
   // Chapter 1 / Day 1 is the picked subject's first real lesson.
   // openReader handles theme, rendering, and section-0 setup.
   try { openReader(1, 1); } catch(e) {
     console.warn('[onb-v2] openReader failed for first dialogue', e);
     state._onbInFirstDialogue = false;
-    _onbShowStep(19);
+    _onbShowStep(20);
   }
 }
 
@@ -13729,9 +13812,9 @@ function _onbEnterFirstDialogue() {
 // the same completion state effects finishDay would run (XP + streak +
 // unlock + first_dialogue_completed_at + posthog capture), minus the
 // celebration-queue push, endowment eligibility trigger, and guest-
-// prompt chain — step 17 is the day-1 streak beat; the endowment
+// prompt chain — step 20 is the day-1 streak beat; the endowment
 // overlay would double up on it. Then shows the thinker card with a
-// single "Continue" button that advances to step 17.
+// single "Continue" button that advances to step 20.
 function _onbFinishFirstDialogue() {
   // Clear the guard the moment the reader closes. If we defer this to
   // the thinker card's Continue button (or _onbComplete), a force-close
@@ -13743,7 +13826,7 @@ function _onbFinishFirstDialogue() {
   const chapter = getW().find(w => w.id === state.currentWeek);
   const day = chapter && chapter.days.find(d => d.id === state.currentDay);
   if (!chapter || !day) {
-    _onbShowStep(19);
+    _onbShowStep(20);
     return;
   }
   const key = dayKey(state.currentWeek, state.currentDay);
@@ -13790,7 +13873,7 @@ function _onbFinishFirstDialogue() {
   if (thinker && isNewThinker) {
     // showThinkerCardScreen sets up the flip card + Next/Back buttons.
     // We call it, then overwrite the buttons: hide "Next Dialogue",
-    // relabel "Back to Home" as "Continue" wired to advance to step 17.
+    // relabel "Back to Home" as "Continue" wired to advance to step 20.
     try { showThinkerCardScreen(thinker, chapter, day); } catch(e) {}
     const nextBtn = document.getElementById('modal-next-btn');
     const backBtn = document.getElementById('modal-continue-btn');
@@ -13801,24 +13884,24 @@ function _onbFinishFirstDialogue() {
       backBtn.onclick = () => {
         state._onbInFirstDialogue = false;
         try { document.getElementById('modal-complete').classList.remove('active'); } catch(e) {}
-        _onbShowStep(19);
+        _onbShowStep(20);
       };
     }
   } else {
     state._onbInFirstDialogue = false;
-    _onbShowStep(19);
+    _onbShowStep(20);
   }
 }
 
-// Screen 15 (let's start) — statement screen bridging Q4 → first
+// Screen 18 (let's start) — statement screen bridging paywall → first
 // dialogue. Head + sub in the standard v2 statement layout; CTA
-// advances into the reader takeover at step 16.
-function _onbV2CtaLetsStart() { _onbAdvanceStep(17, 18); }
+// advances into the reader takeover at step 19.
+function _onbV2CtaLetsStart() { _onbAdvanceStep(18, 19); }
 
-// Screen 17 (day-1 streak) — display-only celebration; advance to 18 (goal).
-function _onbV2CtaStreak() { _onbAdvanceStep(19, 20); }
+// Screen 20 (day-1 streak) — display-only celebration; advance to 21 (goal).
+function _onbV2CtaStreak() { _onbAdvanceStep(20, 21); }
 
-// Screen 18 (daily goal) — single-select radio over three cards
+// Screen 21 (daily goal) — single-select radio over three cards
 // ('one' / 'two' / 'own_pace'). Preselect logic maps the Q3 answer to
 // a sensible default so the CTA is enabled on land. Write pattern
 // mirrors the recovered v1 _onbFinishGoal: dated dedup on setAt,
@@ -13851,14 +13934,14 @@ function _onbV2CtaGoal() {
       is_existing_user: !!localStorage.getItem('corpus_onboarding_done'),
     });
   } catch(e) {}
-  _onbAdvanceStep(20, 21, { dailyGoal: goal });
+  _onbAdvanceStep(21, 22, { dailyGoal: goal });
 }
 
-// Screen 17 (review request) — Rate fires the native review sheet
+// Screen 22 (review request) — Rate fires the native review sheet
 // (SKStoreReviewController on iOS, Play ReviewManager on Android).
 // Falls back to opening the store URL on web (or if the plugin is
 // unavailable for any reason). Both stores rate-limit and give no
-// callback, so we advance either way — the user reaches step 18
+// callback, so we advance either way — the user reaches step 23
 // whether the sheet appeared or not. Skip advances without asking.
 function _onbV2CtaReviewRate() {
   const platform = (window.Capacitor && Capacitor.getPlatform && Capacitor.getPlatform()) || 'web';
@@ -13866,18 +13949,18 @@ function _onbV2CtaReviewRate() {
     try {
       _phCapture('onboarding_review_tapped', { platform: platform, path: path });
     } catch(e) {}
-    _onbAdvanceStep(21, 22);
+    _onbAdvanceStep(22, 23);
   });
 }
 function _onbV2CtaReviewSkip() {
   try { _phCapture('onboarding_review_skipped', {}); } catch(e) {}
-  _onbAdvanceStep(21, 22);
+  _onbAdvanceStep(22, 23);
 }
 
-// Screen 20 (journey summary) — display-only; advance to commit.
-function _onbV2CtaJourney() { _onbAdvanceStep(22, 23); }
+// Screen 23 (journey summary) — display-only; advance to commit.
+function _onbV2CtaJourney() { _onbAdvanceStep(23, 24); }
 
-// Screen 19 (commitment) — single-choice pick. Terminal step. Tap
+// Screen 24 (commitment) — single-choice pick. Terminal step. Tap
 // stores the id in state.onbAnswers.commitment (display-only — no
 // downstream gate); CTA runs _onbComplete which sets
 // corpus_onboarding_done, clears the step cursor, and lands on home.
@@ -13901,9 +13984,9 @@ function _onbV2CtaCommit() {
     });
   } catch(e) {}
   // Advance past _ONB_TOTAL_STEPS to trigger _onbComplete. Signup
-  // moved to step 3 in flow v2; commit (step 23) is now the last
-  // screen before completion.
-  _onbAdvanceStep(23, 24);
+  // moved to step 4 in flow v3; commit (step 24 in flow v4) is now
+  // the last screen before completion.
+  _onbAdvanceStep(24, 25);
 }
 
 // Step 3 — signup offer, Headway-style. Three CTAs: Apple (primary,
@@ -13916,18 +13999,18 @@ function _onbV2CtaCommit() {
 // worth doing for the segment that won't use either social provider;
 // tracked as a follow-up.
 //
-// Signup moved from step 22 to step 3 (flow v2) so an account is
-// offered before the user invests real effort. Behaviour changes vs.
-// the old step-22 signup:
+// Signup moved from the tail of onboarding to step 4 (flow v3) so an
+// account is offered before the user invests real effort. Behaviour
+// changes vs. the old tail-of-onboarding signup:
 //   * Auth success does NOT mark corpus_onboarding_done or route to
 //     home — the user still has 20 screens of onboarding to complete.
 //     _authProviderStart's postAuthContinue option runs enterAppState
 //     (progress + subscription load, save, telemetry, mark auth
-//     resolved) then advances to step 4.
-//   * Skip does NOT call _onbComplete — it advances to step 4. The
+//     resolved) then advances to step 5 (name).
+//   * Skip does NOT call _onbComplete — it advances to step 5. The
 //     user finishes onboarding as a guest and can sign up from
 //     Profile later.
-//   * OAuth failure surfaces the error in the step 3 error slot; the
+//   * OAuth failure surfaces the error in the step 4 error slot; the
 //     button re-enables so the user can retry or tap Skip.
 async function _onbSignupApple() {
   try { _phCapture('onboarding_signup_prompt_action', { action: 'apple' }); } catch(e) {}
@@ -14198,7 +14281,7 @@ function _onbV2PrepareQ3() {
   if (cta) cta.disabled = !pick;
 }
 
-// Screen 13 — Q4 slider. Live label updates as the user drags.
+// Screen 14 — Q4 slider. Live label updates as the user drags.
 function _onbV2PrepareQ4() {
   const input   = document.getElementById('onb-v2-q4-input');
   const display = document.getElementById('onb-v2-q4-value');
@@ -14323,7 +14406,7 @@ function _onbV2CountFirstThinkers(n) {
   } catch(e) { return 16; }
 }
 
-// Screen 17 — goal. Renders three cards (recovered from the v1 goal
+// Screen 21 — goal. Renders three cards (recovered from the v1 goal
 // screen) and preselects one based on the user's Q3 answer. Preselect
 // map: 'daily'/'few-week'/'longest-streak' → 'one'; 'finish' → 'two'.
 // If state.onbAnswers.dailyGoal already has a value (re-entering the
@@ -14359,7 +14442,7 @@ function _onbV2PrepareGoal() {
   if (cta) cta.disabled = false;
 }
 
-// Screen 18 — journey. Top card projects the next 30 days (name +
+// Screen 23 — journey. Top card projects the next 30 days (name +
 // date + three tiles drawn from Q1/Q2/Q3 picks + stat row). Below
 // the card, two feature blocks explain the mechanism. All copy is
 // re-rendered on every show so language switches pick up the correct
@@ -14473,7 +14556,7 @@ function _onbV2PrepareJourney() {
   }
 }
 
-// Screen 19 — commit. Renders five commitment-level cards (single-
+// Screen 24 — commit. Renders five commitment-level cards (single-
 // choice). Head is static via _onbApplyLang; only the card list is
 // dynamic here.
 function _onbV2PrepareCommit() {
@@ -14501,8 +14584,9 @@ function _onbV2PrepareCommit() {
 // Map from step number → prepare hook. Consumed by _onbShowStep.
 // Only steps with dynamic content need entries; static-copy screens
 // (welcome, problem, solution, plan) rely on _onbApplyLang alone.
-// Flow v3 layout: signup at step 4 (after solution), Q4 at 14
-// (before mirror at 15), paywall at 16 as a full onboarding step.
+// Flow v4 layout: signup at step 4 (after solution), Q4 at 14 (before
+// mirror at 15), notifications at 16 (pre-paywall pre-prompt), paywall
+// at 17 as a full onboarding step.
 const _ONB_STEP_HOOKS = {
   4:  _onbV2PrepareSignup,
   5:  _onbV2PrepareName,
@@ -14515,13 +14599,14 @@ const _ONB_STEP_HOOKS = {
   13: _onbV2PrepareQ3,
   14: _onbV2PrepareQ4,
   15: _onbV2PrepareMirror,
-  16: _onbV2PreparePaywall,
-  // 17 (let's-start) is static once _onbApplyLang runs.
-  // 18: handled specially in _onbShowStep (reader takeover, no v2 DOM).
-  // 19 (streak) + 21 (review) are static once _onbApplyLang runs.
-  20: _onbV2PrepareGoal,
-  22: _onbV2PrepareJourney,
-  23: _onbV2PrepareCommit,
+  16: _onbV2PrepareNotifications,
+  17: _onbV2PreparePaywall,
+  // 18 (let's-start) is static once _onbApplyLang runs.
+  // 19: handled specially in _onbShowStep (reader takeover, no v2 DOM).
+  // 20 (streak) + 22 (review) are static once _onbApplyLang runs.
+  21: _onbV2PrepareGoal,
+  23: _onbV2PrepareJourney,
+  24: _onbV2PrepareCommit,
 };
 
 // Step 3 prepare hook — injects the owl SVG into the hero slot and
@@ -16559,10 +16644,14 @@ function defaultState() {
     // (with a live change listener); 'light' / 'dark' force a mode regardless
     // of OS. Applied by applyAppearance() during init before first paint.
     appearance: 'system',
-    // Daily reminder local-notification settings. Default ON; OS permission is requested
-    // after the user finishes their first lesson (not during onboarding). Until permission
-    // is granted, the toggle reflects intent but no notification is actually scheduled.
-    dailyReminder: { enabled: true, time: '20:00', permissionAsked: false },
+    // Daily reminder local-notification settings. Default ON. In flow v4 the OS
+    // permission ask happens at onboarding step 16 (custom pre-prompt → native
+    // dialog on the "yes" path); a finishDay safety net covers grandfathered
+    // users. prePromptDeferred marks the "Not now" branch of the custom
+    // screen — set true so the finishDay safety net won't surprise-prompt
+    // the OS out from under a user who explicitly declined. Until permission
+    // is granted, the toggle reflects intent but no notification is scheduled.
+    dailyReminder: { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
     // Ordered queue of celebration overlays waiting to play. finishDay pushes
     // { type: 'level_up' | 'chapter_complete' | 'bonus_unlock', … } here;
     // _playNextCelebration drains it one at a time. Persisted so an app close
@@ -16620,12 +16709,12 @@ function loadState() {
   // because the cloud copy still has legacy keys for existing users.
   try { migrateChapterCompleteShown(); } catch(e) { console.warn('[migrate] chapterCompleteShown failed', e); }
   // Boot-time repair for testers who upgraded into 1.3.3 with
-  // state._onbInFirstDialogue stuck as true — happens when v2 onboarding's
-  // step 15 first-dialogue tail didn't clear the flag before the app was
+  // state._onbInFirstDialogue stuck as true — happens when the flow-v4
+  // step-19 first-dialogue tail didn't clear the flag before the app was
   // closed. If left, finishDay routes every subsequent completion through
   // _onbFinishFirstDialogue, suppressing every celebration overlay. Repair
   // is safe: any legitimate mid-first-dialogue user also has
-  // corpus_onboarding_step='16' set, so we only clear the flag once
+  // corpus_onboarding_step='19' set, so we only clear the flag once
   // onboarding is marked done.
   if (localStorage.getItem('corpus_onboarding_done') && state._onbInFirstDialogue) {
     state._onbInFirstDialogue = false;
@@ -16633,9 +16722,9 @@ function loadState() {
     console.log('[boot] cleared stuck _onbInFirstDialogue flag');
   }
   // Normalize state.dailyReminder for existing users whose persisted state predates this field.
-  // Shape: { enabled: true, time: '20:00', permissionAsked: false }.
+  // Shape: { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false }.
   state.dailyReminder = Object.assign(
-    { enabled: true, time: '20:00', permissionAsked: false },
+    { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
     state.dailyReminder || {}
   );
   // One-shot migration: default reminder time moved 19:00 → 20:00. Anyone
@@ -18327,12 +18416,25 @@ async function setReminder(patch) {
   return state.dailyReminder;
 }
 
-// Called once after the user finishes their first lesson. Requests OS permission
-// (we deliberately don't ask during onboarding to avoid scaring people off).
+// Safety-net OS-permission request. In flow v4 the primary ask lives in
+// onboarding step 16 (custom pre-prompt → native dialog on the "yes"
+// path), and this call from finishDay picks up any user who:
+//   - Completed onboarding before step 16 shipped (grandfathered — no
+//     prePromptDeferred flag, treated as never-asked; the OS dialog
+//     fires the usual way at lesson-1 completion).
+//   - Toggled the reminder ON manually via Profile without granting yet
+//     (setReminder handles that path, but this is a belt-and-braces
+//     fallback if a state.enabled=true user reaches finishDay with
+//     permissionAsked still false).
+// The prePromptDeferred guard is what makes "Not now" during onboarding
+// stick — without it, a user who just declined our custom screen would
+// be surprise-prompted by the OS the moment they finished lesson 1,
+// which is exactly the burn we're trying to avoid.
 async function maybeRequestReminderPermission() {
   if (!_isNotifPluginAvailable()) return;
   const r = state.dailyReminder || {};
   if (!r.enabled || r.permissionAsked) return;
+  if (r.prePromptDeferred) return;
   const perm = await _requestNotifPermission();
   state.dailyReminder.permissionAsked = true;
   if (perm === 'granted') {
@@ -27045,7 +27147,33 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 16 — Paywall (onboarding shell). Shares .paywall-* class
+<!-- Step 16 — Notification pre-prompt (flow v4). Custom in-app screen
+     that gates the native OS permission dialog. Placed BEFORE the
+     paywall so the ask doesn't inherit a "no" frame from a paywall
+     decline, and so paywall drop-outs have already been asked here on
+     the way past. Primary CTA fires the native OS dialog exactly once
+     and stamps permissionAsked=true. Secondary CTA ("Not now") sets
+     prePromptDeferred=true and leaves the OS ask unspent — the
+     finishDay safety net in maybeRequestReminderPermission respects
+     that flag so a "Not now"-er isn't surprise-prompted at lesson-1
+     completion. Both paths advance to step 17 (paywall). -->
+<div id="onb-v2-notifications" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="5">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-notifications-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-notifications-sub"></p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-notifications-cta" onclick="_onbV2CtaNotifYes()"></button>
+    <button type="button" class="onb-v2-skip" id="onb-v2-notifications-skip" onclick="_onbV2CtaNotifNotNow()"></button>
+  </div>
+</div>
+
+<!-- Step 17 — Paywall (onboarding shell). Shares .paywall-* class
      contracts with #modal-paywall above so a single _renderPaywall()
      drives both, scoped by _paywallActiveRoot. Skip corner exits and
      advances; purchase / restore success also route through _exitPaywall,
@@ -27088,8 +27216,8 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 17 — Let's start. Statement screen bridging paywall → first
-     dialogue. Standard v2 head + sub layout. CTA advances to step 18
+<!-- Step 18 — Let's start. Statement screen bridging paywall → first
+     dialogue. Standard v2 head + sub layout. CTA advances to step 19
      which hijacks the reader (openReader(1, 1)). -->
 <div id="onb-v2-lets-start" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
@@ -27106,10 +27234,10 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 17 — day-1 streak celebration. Flame icon (reuses #icon-streak
+<!-- Step 20 — day-1 streak celebration. Flame icon (reuses #icon-streak
      from the endowment overlay), amber eyebrow, head, sub, CTA.
      Fires after the user finishes the first dialogue via
-     _onbFinishFirstDialogue → _onbShowStep(19). -->
+     _onbFinishFirstDialogue → _onbShowStep(20). -->
 <div id="onb-v2-streak" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
@@ -27129,7 +27257,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 17 — daily goal. Three cards ('one' / 'two' / 'own_pace')
+<!-- Step 21 — daily goal. Three cards ('one' / 'two' / 'own_pace')
      with flame icons anchoring to the streak beat just before. Cards
      + CSS recovered verbatim from the v1 goal screen; _onbV2PrepareGoal
      preselects based on Q3 answer and writes state.dailyGoalHistory
@@ -27175,8 +27303,8 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 18 — review request. Rate button opens the platform's store
-     URL; Skip advances without opening. Both land on step 19. -->
+<!-- Step 22 — review request. Rate button opens the platform's store
+     URL; Skip advances without opening. Both land on step 23. -->
 <div id="onb-v2-review" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
@@ -27193,7 +27321,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 18 — journey. Top: accent-bordered card projecting the next
+<!-- Step 23 — journey. Top: accent-bordered card projecting the next
      30 days (name-interpolated head + date pill + three tiles from the
      user's Q1/Q2/Q3 picks + stat row). Below: section head + two
      feature blocks explaining the mechanism. All dynamic content is
@@ -27220,7 +27348,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 21 — commitment level. Terminal step. Five single-choice
+<!-- Step 24 — commitment level. Terminal step. Five single-choice
      cards state the user's commitment level; the pick is captured to
      state.onbAnswers.commitment for later analysis but doesn't gate
      anything downstream. CTA runs _onbComplete → home. -->
