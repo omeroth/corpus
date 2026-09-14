@@ -163,10 +163,20 @@ serve(async (req: Request): Promise<Response> => {
   // Loops keeps whatever value it currently has (rather than clearing it).
   const lang = typeof meta.lang === "string" && meta.lang ? meta.lang : "";
 
-  const body: Record<string, string> = { email, source: "app_signup" };
+  const body: Record<string, unknown> = { email, source: "app_signup" };
   if (firstName) body.firstName    = firstName;
   if (provider)  body.signupMethod = provider;
   if (lang)      body.language     = lang;
+  // Subscription-state fields default to "not subscribed" on signup.
+  // Every new contact lands with the field populated so Loops segment
+  // filters like `subscriptionStatus = none` work from day one. The
+  // revenuecat-webhook updates these fields on every state transition
+  // going forward (initial purchase, cancel, expire, refund, etc.).
+  // Not sending subscriptionCurrentPeriodEnd / subscriptionPlatform
+  // because they have no meaningful value at signup — Loops treats
+  // omitted keys as unset, which is what we want.
+  body.subscriptionStatus = "none";
+  body.willRenew          = false;
 
   const loopsHeaders = {
     "Content-Type": "application/json",

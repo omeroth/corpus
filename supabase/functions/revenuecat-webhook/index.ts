@@ -31,6 +31,101 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // ─── Types ──────────────────────────────────────────────────────────────
 
+// Loops contact-update endpoint. See supabase/functions/loops-progress and
+// backfill-loops-progress for the same URL / auth shape.
+const LOOPS_UPDATE_URL = "https://app.loops.so/api/v1/contacts/update";
+
+// Derives the four subscription-state Loops fields from a subscriptions
+// row (post-upsert / post-partial-update state). Also used for the
+// "no row exists" fallback (all defaults). Kept in-file rather than
+// factored into a shared module because cross-function imports in
+// Supabase Edge Functions add deploy complexity for a 20-line helper.
+// Same shape is duplicated in backfill-loops-progress.
+function deriveSubscriptionProps(row: Partial<SubRow> | null | undefined): {
+  subscriptionStatus:           string;
+  willRenew:                    boolean;
+  subscriptionCurrentPeriodEnd: string | null;
+  subscriptionPlatform:         string | null;
+} {
+  if (!row) {
+    return {
+      subscriptionStatus:           "none",
+      willRenew:                    false,
+      subscriptionCurrentPeriodEnd: null,
+      subscriptionPlatform:         null,
+    };
+  }
+  return {
+    subscriptionStatus:           typeof row.status === "string" ? row.status : "none",
+    willRenew:                    !!row.will_renew,
+    subscriptionCurrentPeriodEnd: typeof row.current_period_end === "string" ? row.current_period_end : null,
+    subscriptionPlatform:         typeof row.platform === "string" ? row.platform : null,
+  };
+}
+
+// PATCHes the four subscription-state fields to the user's Loops contact.
+// Fire-and-forget from the caller's perspective — a Loops outage should
+// not fail the webhook back to RC (which would trigger a 24-hour retry
+// storm for state RC already persisted successfully in our own DB).
+// null email → user has no email (phone-only signup, deleted account,
+// etc.) → nothing to update, silent no-op.
+async function pushSubscriptionToLoops(
+  email: string | null,
+  row: Partial<SubRow> | null | undefined,
+  loopsApiKey: string,
+): Promise<void> {
+  if (!email) return;
+  const derived = deriveSubscriptionProps(row);
+  // Loops treats missing keys as "leave alone" and explicit null as
+  // "clear". willRenew stays as a proper boolean (false is meaningful).
+  // subscriptionCurrentPeriodEnd / subscriptionPlatform: send null when
+  // unset so a subscription that ends and later returns to nothing is
+  // reflected — user's contact shouldn't retain a stale period-end date
+  // after the subscription is gone.
+  const body: Record<string, unknown> = {
+    email,
+    subscriptionStatus:           derived.subscriptionStatus,
+    willRenew:                    derived.willRenew,
+    subscriptionCurrentPeriodEnd: derived.subscriptionCurrentPeriodEnd,
+    subscriptionPlatform:         derived.subscriptionPlatform,
+  };
+  try {
+    const res = await fetch(LOOPS_UPDATE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type":  "application/json",
+        "Authorization": `Bearer ${loopsApiKey}`,
+      },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      let errText = "";
+      try { errText = await res.text(); } catch (_) {}
+      console.warn(`[rc-webhook→loops] contact update failed: ${res.status} ${errText.slice(0, 200)}`);
+    }
+  } catch (e) {
+    console.warn("[rc-webhook→loops] contact update threw:", e);
+  }
+}
+
+// Looks up the email for a subscriber via the auth.users table. Uses
+// service role (already the client's auth mode) which has direct read
+// access to auth.users. Returns null when the user has no email (phone-
+// only signup) — Loops PATCH is a no-op in that case.
+async function getEmailForUser(
+  db: ReturnType<typeof createClient>,
+  userId: string,
+): Promise<string | null> {
+  try {
+    const { data, error } = await (db.auth.admin.getUserById(userId) as unknown as Promise<{ data: { user: { email: string | null } | null } | null; error: unknown }>);
+    if (error || !data || !data.user) return null;
+    return data.user.email || null;
+  } catch (e) {
+    console.warn("[rc-webhook→loops] getUserById threw:", e);
+    return null;
+  }
+}
+
 // Not exhaustive — only fields we read. RC's event shape is documented at
 // https://www.revenuecat.com/docs/integrations/webhooks/event-flows.
 type RCEvent = {
@@ -171,19 +266,37 @@ async function partialUpdate(
 async function handleEvent(
   db: ReturnType<typeof createClient>,
   e: RCEvent,
+  loopsApiKey: string,
 ): Promise<{ status: number; body: Record<string, unknown> }> {
   const t = e.type;
   const raw = stripToWhitelist(e);
+
+  // Post-write Loops PATCH: after any DB write, re-read the current row
+  // and forward the four subscription-state fields to the user's Loops
+  // contact. Runs after every successful upsert / partial update so the
+  // Loops contact tracks the subscription lifecycle in real time —
+  // cancels, expirations, refunds, renewals, all mirror through.
+  const patchLoopsFromCurrentRow = async () => {
+    if (!loopsApiKey) return;                                       // Loops disabled → skip
+    const email = await getEmailForUser(db, e.app_user_id);
+    if (!email) return;                                             // phone-only user, deleted, etc.
+    const { data: latest } = await db.from("subscriptions")
+      .select("status, will_renew, current_period_end, platform")
+      .eq("user_id", e.app_user_id).maybeSingle();
+    await pushSubscriptionToLoops(email, latest as Partial<SubRow> | null, loopsApiKey);
+  };
 
   // Read-modify-write for the "flip one field" events.
   if (t === "CANCELLATION" || t === "TRIAL_CANCELLED") {
     const { error } = await partialUpdate(db, e.app_user_id, { will_renew: false }, raw);
     if (error) return { status: 500, body: { ok: false, where: "partialUpdate", type: t, error: String(error) } };
+    await patchLoopsFromCurrentRow();
     return { status: 200, body: { ok: true, type: t, action: "will_renew=false" } };
   }
   if (t === "UNCANCELLATION") {
     const { error } = await partialUpdate(db, e.app_user_id, { will_renew: true }, raw);
     if (error) return { status: 500, body: { ok: false, where: "partialUpdate", type: t, error: String(error) } };
+    await patchLoopsFromCurrentRow();
     return { status: 200, body: { ok: true, type: t, action: "will_renew=true" } };
   }
 
@@ -227,6 +340,7 @@ async function handleEvent(
   const { error } = await db.from("subscriptions")
     .upsert(row as SubRow, { onConflict: "user_id" });
   if (error) return { status: 500, body: { ok: false, where: "upsert", type: t, error: String(error) } };
+  await patchLoopsFromCurrentRow();
   return { status: 200, body: { ok: true, type: t, action: "upserted" } };
 }
 
@@ -298,8 +412,20 @@ serve(async (req: Request): Promise<Response> => {
     { auth: { persistSession: false } },
   );
 
+  // Loops API key: optional. If unset, the Loops PATCH after each write
+  // is silently skipped. This lets the RC webhook keep functioning as
+  // the sole writer to subscriptions even if Loops is temporarily
+  // misconfigured or the key is being rotated — the subscriptions table
+  // stays authoritative and correct; Loops just drifts until the key is
+  // restored (and a subsequent state change re-syncs, or the backfill
+  // Edge Function can be re-run).
+  const loopsApiKey = Deno.env.get("LOOPS_API_KEY") ?? "";
+  if (!loopsApiKey) {
+    console.warn("[rc-webhook] LOOPS_API_KEY not set — Loops contact updates will be skipped");
+  }
+
   try {
-    const { status, body: respBody } = await handleEvent(db, event);
+    const { status, body: respBody } = await handleEvent(db, event, loopsApiKey);
     return new Response(JSON.stringify(respBody), {
       status, headers: { "Content-Type": "application/json" },
     });

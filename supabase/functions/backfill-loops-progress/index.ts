@@ -41,6 +41,34 @@ function timingSafeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
+// Mirror of the same helper in revenuecat-webhook. Kept duplicated
+// intentionally — cross-function imports in Supabase Edge Functions add
+// deploy complexity for a 20-line helper. Any change to the field shape
+// must land in both places (rc-webhook is the real-time writer; this
+// backfill sweeps the whole population on demand). loops-signup sets
+// the same defaults on new-contact CREATE.
+function deriveSubscriptionProps(row: any | null | undefined): {
+  subscriptionStatus:           string;
+  willRenew:                    boolean;
+  subscriptionCurrentPeriodEnd: string | null;
+  subscriptionPlatform:         string | null;
+} {
+  if (!row) {
+    return {
+      subscriptionStatus:           "none",
+      willRenew:                    false,
+      subscriptionCurrentPeriodEnd: null,
+      subscriptionPlatform:         null,
+    };
+  }
+  return {
+    subscriptionStatus:           typeof row.status === "string" ? row.status : "none",
+    willRenew:                    !!row.will_renew,
+    subscriptionCurrentPeriodEnd: typeof row.current_period_end === "string" ? row.current_period_end : null,
+    subscriptionPlatform:         typeof row.platform === "string" ? row.platform : null,
+  };
+}
+
 // Validation mirror of cleanFirstName in loops-progress. Reject empty,
 // whitespace-only, or letter-less strings; no length floor (single-letter
 // names are normal in some languages). Cap at 40 chars.
@@ -142,10 +170,27 @@ serve(async (req: Request): Promise<Response> => {
   const byUser = new Map<string, any>();
   for (const row of progressRows || []) byUser.set(row.user_id, row);
 
+  // Pull subscription rows so we can forward the four subscription-state
+  // fields (subscriptionStatus / willRenew / subscriptionCurrentPeriodEnd
+  // / subscriptionPlatform) on the same PATCH. Users without a row →
+  // subscriptionStatus: 'none', willRenew: false, others null.
+  const { data: subRows, error: subErr } = await admin
+    .from("subscriptions")
+    .select("user_id, status, will_renew, current_period_end, platform");
+  if (subErr) {
+    console.error("[backfill] subscriptions fetch failed:", subErr);
+    return jsonResponse({ ok: false, error: "Subscriptions fetch failed" }, 500);
+  }
+  const subByUser = new Map<string, any>();
+  for (const row of subRows || []) subByUser.set(row.user_id, row);
+
   const targets = users.map((u: any) => ({
     email: u.email as string,
     id:    u.id as string,
-    props: deriveProgressProps(byUser.get(u.id)),
+    props: {
+      ...deriveProgressProps(byUser.get(u.id)),
+      ...deriveSubscriptionProps(subByUser.get(u.id)),
+    },
   }));
 
   if (dryRun) {
