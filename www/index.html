@@ -25768,24 +25768,11 @@ function _walkthroughSpotlightRect(step) {
       bottom += drift;
     }
   }
-  // Clamp to visible interior. Topbar sits at y 0-56; stats bar 56-110
-  // (per #screen-home .scroll-content padding-top:110). Bottom nav is
-  // 64px tall + safe-area at the very bottom. Anything the spotlight
-  // extends into those chrome bands is chrome, not the affordance the
-  // step is teaching, so clip.
-  const chromeTop = step.allowChromeTop
-    ? 0
-    : (document.querySelector('.stats-subheader')?.getBoundingClientRect().bottom || 0);
-  const nav = document.querySelector('.bottom-nav');
-  const navRect = nav ? nav.getBoundingClientRect() : null;
-  const chromeBottom = step.allowChromeBottom
-    ? window.innerHeight
-    : (navRect ? navRect.top : window.innerHeight);
-  top    = Math.max(top,    chromeTop);
-  bottom = Math.min(bottom, chromeBottom);
-  // Optional per-step ceiling on the rect's height — used by 'chapters'
-  // where the expanded card runs 470+px tall and the punch-out would
-  // otherwise slice past the fold and reveal the bonus card / bottom nav.
+  // Optional per-step ceiling on the rect's height — used by the
+  // chapters step where the expanded level card runs 470+px tall
+  // and the halo would otherwise draw around the entire card, which
+  // reads as "everything is important" rather than a focused
+  // spotlight.
   if (step.maxHeight && bottom - top > step.maxHeight) {
     bottom = top + step.maxHeight;
   }
@@ -25799,8 +25786,24 @@ function drawSpotlight(step) {
   canvas.height = window.innerHeight;
   const ctx = canvas.getContext('2d');
 
+  // Tint only the interior band between the stats-subheader and the
+  // bottom-nav. The topbar / wordmark / stats / bottom-nav stay at
+  // full brightness for every step — darkening a chrome element that
+  // a walkthrough beat is pointing INTO (e.g. step 2's pantheon tab
+  // inside the bottom-nav) is self-defeating. Falls back to a full-
+  // viewport tint only when the chrome measurements are unavailable
+  // (defensive; both elements are static DOM and should always exist
+  // once the home screen is rendered).
+  const statsEl = document.querySelector('.stats-subheader');
+  const navEl   = document.querySelector('.bottom-nav');
+  const tintTop = statsEl ? statsEl.getBoundingClientRect().bottom : 0;
+  const tintBot = navEl   ? navEl.getBoundingClientRect().top      : canvas.height;
   ctx.fillStyle = 'rgba(42, 27, 74, 0.75)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (tintBot > tintTop) {
+    ctx.fillRect(0, tintTop, canvas.width, tintBot - tintTop);
+  } else {
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
 
   const info = _walkthroughSpotlightRect(step);
   if (!info) return;
@@ -25859,50 +25862,64 @@ function drawSpotlight(step) {
   ctx.restore();
 }
 
-// ─── Onboarding walkthrough (owl-guided, 2 screens) ─────────────
+// ─── Onboarding walkthrough (owl-guided, 7 screens) ─────────────
 // Fired once per install from the tail of _onbComplete. Gated on
 // corpus_walkthrough_done, no completedDays, no corpus_first_dialogue_
 // completed_at (bypassCompletionGate is passed by v11 _onbComplete
 // because the v11 onboarding no longer completes a real dialogue).
 // Existing users never see it. Skippable at every screen via
 // #walkthrough-skip; a shortcut tap on a spotlighted element also
-// bails (see openReader guard for step 1's lesson-circle tap and
-// _walkthroughShortcutBail for step 2's pantheon-tab tap).
-//
-// Trimmed from seven screens to two on the v11 rebuild. Removed:
-//   - greeting (redundant on top of 36 onboarding steps)
-//   - chapters (v11 how-it-works screen 17 already teaches this)
-//   - carousel (v11 first-card screen 22 shows a card being earned)
-//   - streak (v11 streak screen 23 lands the "day one" idea)
-//   - closing "tomorrow's dialogue" (wrong for v11 — users no longer
-//     complete a real dialogue during onboarding, so lesson-1 IS
-//     today's, not tomorrow's)
-// Kept the two beats doing net-new work: WHERE the next-up lesson
-// lives on home, and WHERE the Pantheon tab is. v11 explains
-// concepts thoroughly but never points at physical UI locations.
+// bails (see openReader guard for the next-up target and
+// _walkthroughShortcutBail for the pantheon-tab target).
 
 // spotlight — CSS selector to spotlight for the step.
-// allowChromeBottom — set true when the target lives in the bottom-
-//                     nav band (pantheon step); prevents the clamp
-//                     from cropping it out of the visible interior.
+// maxHeight — cap for tall targets so the halo doesn't wrap the
+//             entire element (chapters step: the expanded level
+//             card runs 470+px which reads as "everything is
+//             important" instead of a focused spotlight).
 // isClosing — last-step marker: button reads "OK" instead of "Next"
 //             and its click fires _walkthroughFinish instead of
-//             _walkthroughNext. In the pre-trim seven-step version
-//             this also blocked shortcut-tap on the spotlight (the
-//             closing beat pointed at the next-up circle but said
-//             "tomorrow's dialogue", so tapping-through opened the
-//             reader against the copy). Neither trimmed step has
-//             that contradiction — step 2's tap-through switches
-//             to Pantheon, consistent with the copy — so the block
-//             is gone and both steps allow shortcut-tap cleanly.
+//             _walkthroughNext.
+//
+// Chrome-band targets (pantheon inside .bottom-nav, streak stats
+// inside .stats-subheader) need no special flag: drawSpotlight
+// tints only the interior band between stats-subheader.bottom and
+// bottom-nav.top, so chrome elements stay at full brightness and
+// their halo draws around them cleanly. _walkthroughScrollTarget
+// IntoView skips the body-shift for any target whose rect lies in
+// chrome, since a fixed-position target doesn't move with the
+// shift and misplacing home content beneath it would be pointless.
 const WALKTHROUGH_STEPS = [
+  { id: 'greeting', expr: 'owl-neutral',   spotlight: null,
+    he: 'שלום. אני אלווה אתכם בצעדים הראשונים ב-Corpus.',
+    en: "Hello. I'll walk you through your first steps in Corpus." },
+  { id: 'chapters', expr: 'owl-neutral',   spotlight: '#home-levels .level-card.expanded, #home-levels .level-card:first-child',
+    maxHeight: 220,
+    he: 'כל נושא בנוי מפרקים, וכל פרק מקבץ כמה דיאלוגים סביב שאלה אחת.',
+    en: 'Each subject is built from chapters, and each chapter gathers a few dialogues around one question.' },
   { id: 'next_up', expr: 'owl-neutral',    spotlight: '.lesson-node:has(.lesson-circle.next-up)',
-    he: 'הדיאלוג הראשון שלכם כאן, מחכה לכם.',
-    en: 'Your first dialogue is here, ready when you are.' },
+    he: 'כאן מחכה הדיאלוג הבא בתור. לא צריך לבחור, הוא כבר מוכן.',
+    en: "The next dialogue in line waits here. Nothing to choose, it's already set." },
+  { id: 'carousel', expr: 'owl-admiring',  spotlight: '#thinker-carousel-wrap',
+    he: 'כל הוגה שפוגשים מצטרף לאוסף. הוא גדל לאט, לפי מה שקוראים.',
+    en: 'Every thinker you meet joins your collection. It grows slowly, with what you read.' },
   { id: 'pantheon', expr: 'owl-neutral',   spotlight: '#bnav-pantheon',
-    allowChromeBottom: true, isClosing: true,
     he: 'הפנתיאון הוא הבית של האוסף. אפשר לחזור אליו בכל רגע.',
     en: "The Pantheon is where your collection lives. It's there whenever you want it." },
+  { id: 'streak', expr: 'owl-determined',  spotlight: '.stats-subheader',
+    he: 'הרצף גדל בכל יום שמשלימים בו דיאלוג. היום הוא מתחיל.',
+    en: 'Your streak grows on every day you complete a dialogue. Today it begins.' },
+  { id: 'closing', expr: 'owl-action',
+    // Spotlights the next-up lesson circle (same target as step 3).
+    // Step 3 introduces it neutrally ("the next dialogue in line
+    // waits here"); step 7 closes on the user rather than restating
+    // the circle. Rewritten from the v4 "tomorrow's dialogue"
+    // framing, which was wrong for v11 — v11 users don't complete
+    // a real dialogue during onboarding, so the lesson circle
+    // holds their FIRST dialogue, not tomorrow's.
+    spotlight: '.lesson-node:has(.lesson-circle.next-up)', isClosing: true,
+    he: 'כאן תתחילו, מתי שתהיו מוכנים.',
+    en: "You'll begin right here, whenever you're ready." },
 ];
 
 let _walkthroughStepIdx = 0;
@@ -25999,15 +26016,20 @@ function _walkthroughScrollTargetIntoView(step) {
   const screenH = window.innerHeight;
   const statsBottom = document.querySelector('.stats-subheader')?.getBoundingClientRect().bottom || 0;
   const navTop = document.querySelector('.bottom-nav')?.getBoundingClientRect().top || screenH;
-  const safeTop = step.allowChromeTop    ? 0        : statsBottom;
-  const safeBot = step.allowChromeBottom ? screenH  : navTop;
-  const safeMid = (safeTop + safeBot) / 2;
+  const safeMid = (statsBottom + navTop) / 2;
   const rect = target.getBoundingClientRect();
+  // Skip the shift for targets that live in chrome (e.g. step 2's
+  // #bnav-pantheon inside the bottom-nav band). Chrome elements are
+  // position:fixed relative to the viewport, so shifting body doesn't
+  // move them anyway — the shift would only misplace home content
+  // beneath them for no gain. A target is in chrome when its rect
+  // sits entirely below navTop OR entirely above statsBottom.
+  if (rect.top >= navTop || rect.bottom <= statsBottom) return;
   const targetMid = (rect.top + rect.bottom) / 2;
   // If the target's midpoint is already inside the safe band's middle
   // half, no scroll needed. Otherwise shift the "locked" scroll so
   // target midpoint lands on safeMid.
-  const bandHalf = (safeBot - safeTop) / 4;
+  const bandHalf = (navTop - statsBottom) / 4;
   if (Math.abs(targetMid - safeMid) < bandHalf) return;
   const delta = targetMid - safeMid;
   _walkthroughShiftLockedScroll(delta);
@@ -26309,6 +26331,43 @@ function _walkthroughTeardown(opts) {
   }
   _walkthroughStepIdx = 0;
   _walkthroughStepsSeen.clear();
+
+  // TEMPORARY DIAGNOSTIC — walkthrough-teardown chrome-still-hidden.
+  // Two logs: immediately after teardown, and 500ms later. If chrome
+  // is missing at t=0 → teardown itself is incomplete. If chrome is
+  // visible at t=0 but missing at t=500 → something re-hides it after.
+  // Delete once resolved.
+  const snapshot = (tag) => {
+    try {
+      console.log('[teardown diag ' + tag + ']', JSON.stringify({
+        body_style_position:    document.body.style.position,
+        body_style_top:         document.body.style.top,
+        body_computed_position: getComputedStyle(document.body).position,
+        body_computed_top:      getComputedStyle(document.body).top,
+        body_rect_top:          document.body.getBoundingClientRect().top,
+        html_has_walkthrough:   document.documentElement.classList.contains('walkthrough-active'),
+        overlay_inline_display: document.getElementById('onboarding-overlay').style.display,
+        overlay_computed_display: getComputedStyle(document.getElementById('onboarding-overlay')).display,
+        app_computed_display:   getComputedStyle(document.getElementById('app')).display,
+        topbar_inline_display:  document.getElementById('topbar').style.display,
+        topbar_computed_display: getComputedStyle(document.getElementById('topbar')).display,
+        topbar_rect_top:        document.getElementById('topbar').getBoundingClientRect().top,
+        topbar_rect_height:     document.getElementById('topbar').getBoundingClientRect().height,
+        nav_inline_display:     document.getElementById('bottom-nav').style.display,
+        nav_computed_display:   getComputedStyle(document.getElementById('bottom-nav')).display,
+        nav_rect_top:           document.getElementById('bottom-nav').getBoundingClientRect().top,
+        nav_rect_height:        document.getElementById('bottom-nav').getBoundingClientRect().height,
+        stats_computed_display: getComputedStyle(document.querySelector('.stats-subheader')).display,
+        stats_rect_top:         document.querySelector('.stats-subheader').getBoundingClientRect().top,
+        screen_home_active:     document.getElementById('screen-home').classList.contains('active'),
+        current_screen:         (typeof state !== 'undefined') ? state.currentScreen : null,
+        scroll_y:               window.scrollY,
+        viewport_h:             window.innerHeight,
+      }, null, 2));
+    } catch(_) {}
+  };
+  snapshot('t=0');
+  setTimeout(() => snapshot('t=500'), 500);
 }
 
 // ─── Bonus-unlock owl coach mark ────────────────────────────────
