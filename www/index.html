@@ -6635,10 +6635,16 @@
   }
   .onb-screen.onb-v2 .onb-v2-taste-owl svg { width: 100%; height: 100%; }
 
-  /* Page 19 (taste-1) — top-inline-end. */
+  /* Page 19 (taste-1) — perched on the quote card's top-inline-end
+     corner. Positioned relative to the quote card (see the
+     `position: relative` on .onb-v2-quote-card below) rather than
+     the screen, so the owl travels with the card wherever the
+     scroll/centring lands it. Negative insets pull it slightly off
+     the card's edge so it reads as "perched on the corner" instead
+     of "floating above the card". */
   .onb-screen.onb-v2 .onb-v2-taste-owl.owl-t1 {
-    top: calc(54px + var(--safe-top));
-    inset-inline-end: 32px;
+    top: -22px;
+    inset-inline-end: -14px;
     width: 48px; height: 48px;
     transform: rotate(-5deg);
   }
@@ -6665,6 +6671,9 @@
      Sizes bumped to make the quote dominant — it's the whole point
      of the taste screen, so the type has to carry it. */
   .onb-screen.onb-v2 .onb-v2-quote-card {
+    /* Positioning context for the .owl-t1 companion perched on the
+       top-inline-end corner (see the rule above). */
+    position: relative;
     background: var(--surface);
     border: 2px solid var(--border);
     border-radius: 16px;
@@ -14092,12 +14101,11 @@ const _ONB_COPY = {
   //   Card 1 — Daily goal: echoes the dailyGoal answer from step 21
   //            as prose (one dialogue / two dialogues / at your own
   //            pace). No number badge — the goal IS the number.
-  //   Card 2 — Time with ideas: derived from the goal. one → 5 min
-  //            a day + 2.5 hrs a month; two → 10 min a day + 5 hrs
-  //            a month; own_pace → single "At your own pace" line
-  //            with NO minutes or monthly figure. A concrete daily
-  //            number for someone who said "no fixed rate" would be
-  //            a fabrication.
+  //   Card 2 — Time with ideas: derived from the goal. one → "5 min
+  //            a day"; two → "10 min a day"; own_pace → "At your
+  //            own pace" with no numbers. The monthly figure that
+  //            was shown here earlier ("2.5 hrs a month") read as a
+  //            chore rather than an invitation and was removed.
   //   Card 3 — Commitment: bar filled to the tier's proportion, a
   //            single word caption echoing their own pick. No
   //            percentage, no comparison text.
@@ -14113,7 +14121,6 @@ const _ONB_COPY = {
     goalValueOwnPace:  { en: 'At your own pace',             he: 'בקצב שלכם' },
     cardTimeTitle:     { en: 'Time with ideas',              he: 'זמן עם רעיונות' },
     timeValueDaily:    { en: '{n} min a day',                he: '{n} דקות ביום' },
-    timeValueMonthly:  { en: '{h} hrs a month',              he: '{h} שעות בחודש' },
     timeValueOwnPace:  { en: 'At your own pace',             he: 'בקצב שלכם' },
     cardCommitTitle:   { en: 'Commitment',                   he: 'מחויבות' },
   },
@@ -15495,18 +15502,15 @@ function _onbV2PreparePlanReady() {
 //
 // Card 1 — Daily goal: dailyGoal answer as prose. one / two /
 //          own_pace map to the three goalValue* copy keys.
-// Card 2 — Time with ideas: derived from the goal.
-//            one      → "5 min a day" + "2.5 hrs a month"
-//            two      → "10 min a day" + "5 hrs a month"
-//            own_pace → single "At your own pace" line, no numbers
-//          For own_pace, both the daily and monthly text nodes
-//          receive the ownPace line — hiding numbers the user
-//          explicitly declined to commit to.
-// Card 3 — Commitment: bar filled to the tier's internal
-//          proportion. Caption is the level word from
-//          _ONB_COPY.commit.options[…].text. No percentage on the
-//          screen — a number invites the question "of what?" and
-//          there's no honest answer.
+// Card 2 — Time with ideas: derived from the goal. one → "5 min a
+//          day"; two → "10 min a day"; own_pace → "At your own pace"
+//          (no numbers — the user explicitly declined to commit to
+//          a rate). Monthly hours used to show underneath but read
+//          as a chore rather than an invitation and was dropped.
+// Card 3 — Commitment: bar filled to the tier's proportion. Extreme
+//          fills it; every other tier scales below. Caption is the
+//          level word from _ONB_COPY.commit.options[…].text — no
+//          percentage, no comparison text.
 function _onbV2PrepareAddsUp() {
   const isEn = state.lang === 'en';
   const a = state.onbAnswers || {};
@@ -15525,28 +15529,21 @@ function _onbV2PrepareAddsUp() {
   // ── Card 2: time with ideas ───────────────────────────────
   setEl('onb-v2-adds-up-time-title', isEn ? cp.cardTimeTitle.en : cp.cardTimeTitle.he);
   if (goal === 'own_pace') {
-    // Own-pace users explicitly declined to commit to a rate.
-    // Fabricating "3 min a day" for them would contradict what
-    // they just told us; show only the qualitative line.
-    setEl('onb-v2-adds-up-time-value',   isEn ? cp.timeValueOwnPace.en : cp.timeValueOwnPace.he);
-    setEl('onb-v2-adds-up-time-caption', '');
+    setEl('onb-v2-adds-up-time-value', isEn ? cp.timeValueOwnPace.en : cp.timeValueOwnPace.he);
   } else {
     const minPerDay = goal === 'two' ? 10 : 5;
-    const monthlyMin = minPerDay * 30;
-    const monthlyHours = monthlyMin / 60;
-    const hoursStr = (monthlyMin % 60 === 0)
-      ? String(Math.round(monthlyHours))
-      : monthlyHours.toFixed(1);
     setEl('onb-v2-adds-up-time-value',
       (isEn ? cp.timeValueDaily.en : cp.timeValueDaily.he).replace('{n}', String(minPerDay)));
-    setEl('onb-v2-adds-up-time-caption',
-      (isEn ? cp.timeValueMonthly.en : cp.timeValueMonthly.he).replace('{h}', hoursStr));
   }
 
   // ── Card 3: commitment ────────────────────────────────────
+  // Bar scale is anchored: extreme fills the bar (top of the scale
+  // means top of the scale — captions are the user's own words, so
+  // the visual has to echo them honestly). Every other tier scales
+  // below, with `trying` a deliberate sliver.
   const commitment = a.commitment || 'somewhat';
-  const commitPercentMap = { extreme: 92, very: 78, somewhat: 60, little: 42, trying: 28 };
-  const commitPercent = commitPercentMap[commitment] || 60;
+  const commitPercentMap = { extreme: 100, very: 75, somewhat: 50, little: 25, trying: 8 };
+  const commitPercent = commitPercentMap[commitment] || 50;
   const commitOpts = (_ONB_COPY.commit && _ONB_COPY.commit.options) || [];
   const commitOpt = commitOpts.find(o => o.id === commitment) || commitOpts[2];
   const commitWord = commitOpt ? (isEn ? commitOpt.text.en : commitOpt.text.he) : '';
@@ -28435,16 +28432,20 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="onb-v2-inner">
     <div class="onb-v2-copy" style="text-align:start">
       <div class="onb-v2-quote-card">
+        <!-- Companion owl perched on the top-inline-end corner. Sits
+             INSIDE the quote card so the owl travels with the card
+             wherever the scroll/centring lands it; positioned
+             absolutely against the card's own coordinate system via
+             .owl-t1's negative top + inline-end insets. Pages 20 and
+             21 place their owls in different corners with different
+             sizes; three unique positions across the taste block. -->
+        <div class="onb-v2-taste-owl owl-t1" id="onb-v2-taste-1-owl" aria-hidden="true"></div>
         <span id="onb-v2-taste-1-quote"></span>
         <span class="onb-v2-quote-source" id="onb-v2-taste-1-source"></span>
       </div>
       <p class="onb-v2-sub" id="onb-v2-taste-1-page1" style="text-align:start"></p>
     </div>
   </div>
-  <!-- One companion owl (top-inline-end). Pages 20 and 21 place
-       their owls in different corners with different sizes; three
-       unique positions across the taste block. -->
-  <div class="onb-v2-taste-owl owl-t1" id="onb-v2-taste-1-owl" aria-hidden="true"></div>
   <div class="onb-cta-holder">
     <button type="button" class="nav-btn onb-cta" id="onb-v2-taste-1-cta" onclick="_onbV2CtaTaste1()"></button>
   </div>
@@ -28576,7 +28577,6 @@ document.addEventListener('DOMContentLoaded', function() {
           </span>
           <div class="onb-v2-snapshot-title" id="onb-v2-adds-up-time-title"></div>
           <div class="onb-v2-snapshot-value" id="onb-v2-adds-up-time-value"></div>
-          <div class="onb-v2-snapshot-caption" id="onb-v2-adds-up-time-caption"></div>
         </div>
         <!-- Card 3 — Commitment -->
         <div class="onb-v2-snapshot-card">
