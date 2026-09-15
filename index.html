@@ -573,11 +573,13 @@
   html.dark .onb-progress .onb-pill            { background: rgba(245, 241, 255, 0.16); }
   html.dark .onb-welcome-lang                  { background: rgba(245, 241, 255, 0.08); border-color: rgba(245, 241, 255, 0.12); }
   html.dark .onb-lang-btn                      { color: rgba(245, 241, 255, 0.60); }
-  /* Language toggle sliding indicator: --ink already flips to near-white,
-     so the pill sits on the (also lightened) toggle track. Bump the
-     unselected label color contrast (above) and set the selected label
-     to the app's deep-purple ink so it reads against the near-white pill. */
-  html.dark .onb-lang-indicator                { background: var(--ink); }
+  /* Language toggle in dark mode: active button's background comes
+     from var(--ink) (near-white in dark) via the base .is-active
+     rule; here we only need to flip the ACTIVE label color to
+     deep-purple so it reads against the light pill. Base
+     .onb-lang-btn (inactive) inherits the light dark-mode color
+     already. Old sliding indicator rules retired with the
+     indicator element itself. */
   html.dark .onb-lang-btn.is-active            { color: #2A0F5C; }
   html.dark .onb-hero-card-scroll              {
     background: linear-gradient(to bottom, rgba(36, 27, 66, 0) 0%, rgba(36, 27, 66, 0.85) 55%, rgba(36, 27, 66, 0.98) 100%);
@@ -663,7 +665,9 @@
 
   /* Cosmetic shadow overrides — ink-tinted drop shadows disappear on
      dark ground; swap to true-dark rgba so elevation still reads. */
-  html.dark .onb-lang-indicator                 { box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); }
+  /* .onb-lang-indicator shadow rule retired with the indicator
+     element. Active button's own box-shadow (defined on the base
+     .onb-lang-btn.is-active rule) carries dark-mode elevation. */
   html.dark .onboarding-speech                  { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55); }
   html.dark .onboarding-speech.tail-left::before,
   html.dark .onboarding-speech.tail-right::before { filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.35)); }
@@ -5248,10 +5252,10 @@
     background: rgba(255, 255, 255, 0.14);
     border-color: rgba(255, 255, 255, 0.20);
   }
-  .onb-screen.onb-bg-purple-field .onb-lang-btn           { color: rgba(255, 255, 255, 0.70); }
-  .onb-screen.onb-bg-purple-field .onb-lang-btn.is-active { color: var(--purple, #7B4FD4); }
-  .onb-screen.onb-bg-purple-field .onb-lang-indicator {
+  .onb-screen.onb-bg-purple-field .onb-lang-btn { color: rgba(255, 255, 255, 0.70); }
+  .onb-screen.onb-bg-purple-field .onb-lang-btn.is-active {
     background: #FFFFFF;
+    color: var(--purple, #7B4FD4);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.20);
   }
   /* CTA inversion — a purple-fill button on a purple field would be
@@ -5373,29 +5377,20 @@
     max-width: 220px;
     margin: 0 auto 8px;
   }
-  .onb-lang-indicator {
-    position: absolute;
-    top: 4px;
-    bottom: 4px;
-    left: 4px;
-    width: calc(50% - 4px);
-    border-radius: 999px;
-    background: var(--ink);
-    box-shadow: 0 4px 10px rgba(42, 18, 102, 0.25);
-    transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 0;
-    pointer-events: none;
-  }
-  .onb-lang-indicator.is-en { left: 50%; }
+  /* The sliding pill indicator was deleted after two surgical
+     attempts to fix an off-centre English label failed. The base
+     math checked out (border-box 220 → padding-box 218 → indicator
+     calc(50%-4px) = 105 = each flex-1 button = 105), but Safari
+     mobile appeared to render the pill and its button at slightly
+     different rectangles under sub-pixel rounding, making the
+     label look shifted relative to the pill it sat under. Direct
+     styling on the active button eliminates that risk entirely —
+     no absolute-positioned overlay, no calc math, no second
+     coordinate system to keep in sync. Trade lost: the slide
+     animation between HE and EN. Trade gained: guaranteed
+     centered under every engine. */
   .onb-lang-btn {
-    position: relative;
-    z-index: 1;
     flex: 1;
-    /* Explicit text-align:center — buttons default to it via UA
-       stylesheets in most browsers, but Safari mobile has been
-       observed to inherit text-align:start from the flex parent
-       under WebKit. User reported the English label sitting off-
-       centre; this pins the alignment regardless of inheritance. */
     text-align: center;
     padding: 8px 14px;
     background: transparent;
@@ -5406,10 +5401,14 @@
     font-weight: 700;
     color: rgba(42, 18, 102, 0.55);
     cursor: pointer;
-    transition: color 0.28s ease;
+    transition: color 0.28s ease, background-color 0.28s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .onb-lang-btn.is-active { color: #FFFFFF; }
+  .onb-lang-btn.is-active {
+    background: var(--ink);
+    color: #FFFFFF;
+    box-shadow: 0 4px 10px rgba(42, 18, 102, 0.25);
+  }
   .onb-welcome-inner {
     flex: 1;
     display: flex;
@@ -6623,14 +6622,12 @@
     line-height: 1.45;
   }
 
-  /* Taste companion owls (steps 19 and 20). Two per page —
-     deliberately asymmetric: different sizes, different offsets,
-     each owl in its own unique position class. Reads as company,
-     slightly odd, rather than a decorative motif or a mirrored
-     corner pattern. Direction-aware via inset-inline-* so LTR and
-     RTL keep the same relative placement. Modest sizes (44-52px)
-     so they don't dominate. Slight rotations keep the placement
-     from feeling too neat. */
+  /* Taste companion owls (steps 19, 20, 21) — ONE per page, each
+     in a unique position with a unique size + rotation. Reads as
+     company (slightly odd) rather than a decorative motif.
+     Alternates top → bottom → top across the three pages, and
+     shifts side each transition. Direction-aware via inset-inline-*
+     so LTR and RTL keep the same relative placement. */
   .onb-screen.onb-v2 .onb-v2-taste-owl {
     position: absolute;
     pointer-events: none;
@@ -6638,36 +6635,27 @@
   }
   .onb-screen.onb-v2 .onb-v2-taste-owl svg { width: 100%; height: 100%; }
 
-  /* Page 19 (taste-1) — top-inline-end + bottom-inline-start.
-     Bigger owl bottom, smaller top; different offsets so they
-     don't read as bookends. */
-  .onb-screen.onb-v2 .onb-v2-taste-owl.owl-t1a {
-    top: calc(56px + var(--safe-top));
-    inset-inline-end: 22px;
-    width: 44px; height: 44px;
-    transform: rotate(-6deg);
+  /* Page 19 (taste-1) — top-inline-end. */
+  .onb-screen.onb-v2 .onb-v2-taste-owl.owl-t1 {
+    top: calc(54px + var(--safe-top));
+    inset-inline-end: 32px;
+    width: 48px; height: 48px;
+    transform: rotate(-5deg);
   }
-  .onb-screen.onb-v2 .onb-v2-taste-owl.owl-t1b {
-    bottom: calc(108px + var(--safe-bottom));
-    inset-inline-start: 34px;
-    width: 52px; height: 52px;
+  /* Page 20 (taste-2) — bottom-inline-start. Top → bottom, and
+     end → start; largest of the three, sits below the prose. */
+  .onb-screen.onb-v2 .onb-v2-taste-owl.owl-t2 {
+    bottom: calc(112px + var(--safe-bottom));
+    inset-inline-start: 38px;
+    width: 54px; height: 54px;
     transform: rotate(4deg);
   }
-
-  /* Page 20 (taste-2) — top-inline-start + bottom-inline-end.
-     Mirrors page 19's direction across the two pages so the owl
-     reads as "moving" as the reader turns from 19 to 20. Sizes
-     and offsets differ from page 19's pair, again to keep it
-     from feeling like a matched-motif. */
-  .onb-screen.onb-v2 .onb-v2-taste-owl.owl-t2a {
-    top: calc(48px + var(--safe-top));
-    inset-inline-start: 28px;
-    width: 48px; height: 48px;
-    transform: rotate(5deg);
-  }
-  .onb-screen.onb-v2 .onb-v2-taste-owl.owl-t2b {
-    bottom: calc(124px + var(--safe-bottom));
-    inset-inline-end: 46px;
+  /* Page 21 (taste-q) — top-inline-start. Bottom → top; stays on
+     the start side so the top-corner motion echoes but doesn't
+     repeat page 19's corner. Smallest of the three. */
+  .onb-screen.onb-v2 .onb-v2-taste-owl.owl-t3 {
+    top: calc(64px + var(--safe-top));
+    inset-inline-start: 26px;
     width: 46px; height: 46px;
     transform: rotate(-3deg);
   }
@@ -13709,47 +13697,60 @@ const _ONB_COPY = {
       correctIndex: 2,
     },
     psychology: {
-      // Replaced Kahneman (focusing illusion — too mild for a first
-      // impression) with Freud on the unconscious. The claim "you
-      // are not in control of yourself" lands harder as the taste's
-      // opening move, and Freud is thinker id 'freud' in Psychology
-      // Chapter 1 Day 3 ("The Mental Iceberg") — so the first-card
-      // preview here corresponds to a thinker the user will
-      // actually meet on day 3 of their first chapter.
+      // Rebuilt from Psychology Chapter 2 Day 1 "The Excuse Comes
+      // First" (content/psychology.js:626-). The quote + source in
+      // that dialogue are exactly what a good Freud taste wants:
+      //   "These two discoveries amount to a single statement:
+      //    that the ego is not master in its own house."
+      // — A Difficulty in the Path of Psycho-Analysis, 1917
+      // Scenario, punch line and question options are all drawn
+      // from the same dialogue's own idea + explanation + quiz-1
+      // sections, so the taste is genuinely continuous with the
+      // reading rather than a parallel piece of writing.
+      //
+      // First-card preview shows Freud, thinker id 'freud'. Freud
+      // is Psychology Chapter 1 Day 3 ("The Mental Iceberg"), so
+      // the user meets him on their third real dialogue — the
+      // preview matches shipping content.
+      //
+      // EN + HE role deliberately diverge: "The Excavator" carries
+      // the digging-beneath-the-surface metaphor cleanly in
+      // English, but Hebrew "החופר" also reads colloquially as
+      // "the boring rambler." "החוקר" (the investigator) reads
+      // clean and matches Freud's clinical work.
       thinkerName: 'Freud',
-      // EN + HE deliberately diverge: "The Excavator" carries the
-      // digging-beneath-the-surface metaphor cleanly in English,
-      // but Hebrew "החופר" also reads colloquially as "the boring
-      // rambler" which undercuts the weight the card needs.
-      // "החוקר" (the investigator) reads clean, and Freud was a
-      // clinician — the investigator framing is accurate as well
-      // as safer. The two labels don't need to be literal
-      // translations of each other; each is right in its own
-      // language.
       role:  { en: 'The Excavator', he: 'החוקר' },
       icon:  'icon-brain',
-      quote: { en: '"The ego is not master in its own house."',
-               he: '"האני אינו אדון בביתו שלו."' },
-      source: 'Freud, A Difficulty in the Path of Psycho-Analysis (1917)',
-      page1: { en: 'Vienna, 1917. Freud tells his audience: Copernicus showed you are not the center of the universe. Darwin showed you are not a separate species. Now, the third blow: you are not even in charge of your own mind.',
-               he: 'וינה, 1917. פרויד מסביר לקהל: קופרניקוס הראה שאתם לא מרכז היקום. דרווין הראה שאתם לא מין נפרד. עכשיו, המכה השלישית: אתם אפילו לא בשליטה על התודעה שלכם.' },
+      quote: { en: '"These two discoveries amount to a single statement: that the ego is not master in its own house."',
+               he: '"שתי התגליות האלה מסתכמות באמירה אחת: האני אינו אדון בביתו שלו."' },
+      source: 'Freud, A Difficulty in the Path of Psycho-Analysis, 1917',
+      page1: { en: "A close friend posts that he got a promotion. You're happy for him. You write congratulations. Then you decide not to come to the party. You tell yourself you're tired, you had a busy week. The reason sounds completely logical. But is it the real reason?",
+               he: 'חבר קרוב מפרסם שקיבל קידום. אתם שמחים בשבילו, כותבים לו מזל טוב, ואז מחליטים לא להגיע למסיבה. אתם מספרים לעצמכם שהסיבה היא שאתם עייפים, שהיה לכם שבוע עמוס. הסיבה נשמעת הגיונית לגמרי. אבל האם זו הסיבה האמיתית?' },
       page2Head: { en: 'What he meant', he: 'למה הוא התכוון' },
-      page2: { en: 'Not that your thoughts are random. That most of what drives you was set in place before you were old enough to remember. Old fears, old attachments, patterns you never chose. The conscious mind explains what happened, then insists it decided.',
-               he: 'לא שהמחשבות שלכם אקראיות. אלא שרוב מה שמניע אתכם הותקן לפני שהייתם גדולים מספיק כדי לזכור. פחדים ישנים, קשרים ישנים, דפוסים שלא בחרתם. התודעה מסבירה מה קרה, ואז משכנעת את עצמה שהיא החליטה.' },
-      // Punch line lands the consequence rather than repeating the
-      // quote from page 1 — the reader already saw the quote, so
-      // restating it reads as filler.
-      page2Punch: { en: "You are not the author of yourself. You are the one who explains yourself, afterwards.",
-                    he: 'אתם לא מי שכותב אתכם. אתם מי שמסביר אתכם, בדיעבד.' },
-      scenario: { en: 'You find yourself furious at a coworker over something small. Later, alone, you realize they remind you of someone from your childhood you were never allowed to be angry with.',
-                  he: 'אתם מוצאים את עצמכם כועסים על עמית לעבודה בגלל משהו קטן. אחר כך, לבד, אתם מבינים שהוא מזכיר לכם מישהו מהילדות שלא הרשו לכם לכעוס עליו.' },
-      question: { en: 'According to Freud, what was doing the driving?',
-                  he: 'לפי פרויד, מה היה הכוח המניע?' },
+      page2: { en: "The mind is not one unit that knows itself. It is a system with floors. The floor that speaks is not always the floor that decides. Perhaps there was envy there, a feeling you're not allowed to have toward a friend, so the mind buried it and supplied a respectable reason in its place.",
+               he: 'הנפש אינה יחידה אחת שיודעת את עצמה, היא מערכת עם קומות. הקומה שמדברת אינה תמיד הקומה שמחליטה. אולי הייתה שם קנאה, רגש שאסור להרגיש כלפי חבר, אז הנפש קברה אותו וסיפקה במקומו סיבה מכובדת.' },
+      // Punch line lifted from the dialogue's own explanation
+      // section — the "cover over something you're not allowed to
+      // know" formulation. Better than a workshopped restatement.
+      page2Punch: { en: "The excuse is not a cover over a lie. It is a cover over something you are not allowed to know.",
+                    he: 'התירוץ אינו כיסוי על שקר. הוא כיסוי על משהו שאסור לדעת.' },
+      // Scenario adapted from the dialogue's second real-life
+      // example (dental appointment). Needs no social context to
+      // land — putting off a dentist is nearly universal.
+      scenario: { en: "You keep putting off the dentist appointment. Every time there's a good reason: workload, travel, you just forgot. Your calendar is otherwise perfect.",
+                  he: 'אתם דוחים שוב ושוב את הפגישה עם רופא השיניים. כל פעם יש סיבה מוצדקת: עומס, נסיעה, שכחה. שאר היומן שלכם זכור לכם מצוין.' },
+      question: { en: 'According to Freud, what is going on here?',
+                  he: 'לפי פרויד, מה מתרחש כאן?' },
+      // Options adapted from the dialogue\'s quiz 1. Reordering
+      // places the correct answer at index 2 (matches Socrates and
+      // Smith taste options — correct answer is the last one).
       options: [
-        { en: 'You were tired that day',        he: 'הייתם עייפים באותו יום' },
-        { en: 'The coworker was really annoying', he: 'העמית באמת היה מעצבן' },
-        { en: 'An old anger, redirected onto a new target: the unconscious at work',
-          he: 'כעס ישן, שהוסט אל מטרה חדשה: הלא-מודע פועל' },
+        { en: "Just a coincidence. A busy calendar doesn't mean anything.",
+          he: 'צירוף מקרים. ליומן עמוס אין משמעות נפשית.' },
+        { en: 'A memory problem, nothing to do with what you want.',
+          he: 'בעיה בזיכרון, בלי קשר לרצון שלכם.' },
+        { en: "A wish that wasn't allowed to speak, working through 'forgetting' and excuses.",
+          he: 'רצון שלא קיבל רשות להתבטא, ופועל דרך "שכחה" ותירוצים.' },
       ],
       correctIndex: 2,
     },
@@ -14074,12 +14075,13 @@ function _onbApplyLang(lang) {
   };
   setPlaceholder('onb-v2-name-input', 'name');
   setPlaceholder('onb-v2-age-input',  'age');
-  // Lang toggle indicator on screen 1
+  // Lang toggle on screen 1 — sliding indicator retired; the
+  // active button carries the pill treatment via .is-active
+  // directly, so we just flip the class on whichever button
+  // matches the current lang.
   document.querySelectorAll('#onb-v2-welcome .onb-lang-btn').forEach(btn => {
     btn.classList.toggle('is-active', btn.dataset.lang === lang);
   });
-  const indicator = document.getElementById('onb-v2-lang-indicator');
-  if (indicator) indicator.classList.toggle('is-en', isEn);
   document.documentElement.dir = isEn ? 'ltr' : 'rtl';
   document.documentElement.lang = lang;
 }
@@ -15107,35 +15109,33 @@ function _onbV2TasteCfg() {
   return (_ONB_COPY.taste && _ONB_COPY.taste[subj]) || _ONB_COPY.taste.philosophy;
 }
 
-// Step 19 (taste-1) — quote card + source + page-1 prose. Two
-// companion owls injected asymmetrically (top-end + bottom-start,
-// different sizes/rotations) so the pair reads as company rather
-// than decoration.
+// Step 19 (taste-1) — quote card + source + page-1 prose. One
+// companion owl (top-inline-end). Pages 20 and 21 each get their
+// own single owl in a different corner + size — three unique owl
+// positions across the taste block.
 function _onbV2PrepareTaste1() {
   const isEn = state.lang === 'en';
   const cfg = _onbV2TasteCfg();
   const setEl = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
-  const setOwl = (id) => { const el = document.getElementById(id); if (el) el.innerHTML = _cloneOwlSvgHTML('owl-neutral'); };
   setEl('onb-v2-taste-1-quote',  isEn ? cfg.quote.en : cfg.quote.he);
   setEl('onb-v2-taste-1-source', cfg.source);   // source cite doesn't localize
   setEl('onb-v2-taste-1-page1',  isEn ? cfg.page1.en : cfg.page1.he);
-  setOwl('onb-v2-taste-1-owl-a');
-  setOwl('onb-v2-taste-1-owl-b');
+  const owlEl = document.getElementById('onb-v2-taste-1-owl');
+  if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
 }
 
 // Step 20 (taste-2) — "what he meant" head + page-2 prose + optional
 // punch line. Punch line is only in the philosophy config; hidden
-// entirely when empty on Smith / Freud. Owl pair mirrors page 19's
-// positions across the two pages (top-start + bottom-end here).
+// entirely when empty on Smith / Freud. One companion owl (bottom-
+// inline-start, largest of the three).
 function _onbV2PrepareTaste2() {
   const isEn = state.lang === 'en';
   const cfg = _onbV2TasteCfg();
   const setEl = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
-  const setOwl = (id) => { const el = document.getElementById(id); if (el) el.innerHTML = _cloneOwlSvgHTML('owl-neutral'); };
   setEl('onb-v2-taste-2-head',  isEn ? cfg.page2Head.en : cfg.page2Head.he);
   setEl('onb-v2-taste-2-page2', isEn ? cfg.page2.en     : cfg.page2.he);
-  setOwl('onb-v2-taste-2-owl-a');
-  setOwl('onb-v2-taste-2-owl-b');
+  const owlEl = document.getElementById('onb-v2-taste-2-owl');
+  if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
   const punchTxt = isEn ? (cfg.page2Punch && cfg.page2Punch.en) : (cfg.page2Punch && cfg.page2Punch.he);
   const punchEl = document.getElementById('onb-v2-taste-2-punch');
   if (punchEl) {
@@ -15177,6 +15177,9 @@ function _onbV2PrepareTasteQ() {
   }
   const cta = document.getElementById('onb-v2-taste-q-cta');
   if (cta) cta.disabled = true;
+  // One companion owl (top-inline-start, smallest of the three).
+  const owlEl = document.getElementById('onb-v2-taste-q-owl');
+  if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
 }
 
 // Step 22 (first-card) — subject-specific card face (icon + name +
@@ -27727,8 +27730,14 @@ document.addEventListener('DOMContentLoaded', function() {
      empty .onb-v2-inner remains as a flex spacer so
      .onb-cta-holder still sits at the bottom of the flex column. -->
 <div id="onb-v2-welcome" class="onb-screen onb-v2 onb-bg-purple-field" style="display:none">
+  <!-- v11: sliding indicator removed after two surgical attempts to
+       center the English label failed. The active-button-background
+       approach at .onb-lang-btn.is-active does the pill directly,
+       so there's no absolute-positioned overlay to align. Base
+       state (both inactive) shows plain muted labels on the toggle
+       track; on tap, _onbSetLang toggles .is-active which flips
+       one button to the pill treatment. -->
   <div class="onb-welcome-lang" dir="ltr">
-    <span class="onb-lang-indicator" id="onb-v2-lang-indicator"></span>
     <button type="button" class="onb-lang-btn" data-lang="he" onclick="_onbSetLang('he')">עברית</button>
     <button type="button" class="onb-lang-btn" data-lang="en" onclick="_onbSetLang('en')">English</button>
   </div>
@@ -28066,13 +28075,10 @@ document.addEventListener('DOMContentLoaded', function() {
       <p class="onb-v2-sub" id="onb-v2-taste-1-page1" style="text-align:start"></p>
     </div>
   </div>
-  <!-- Two companion owls, deliberately asymmetric — top-inline-end
-       + bottom-inline-start, different sizes, small rotations —
-       reads as company (slightly odd), not decoration. Positions
-       flip to top-inline-start + bottom-inline-end on page 20 so
-       the pair reads as travelling forward with the reader. -->
-  <div class="onb-v2-taste-owl owl-t1a" id="onb-v2-taste-1-owl-a" aria-hidden="true"></div>
-  <div class="onb-v2-taste-owl owl-t1b" id="onb-v2-taste-1-owl-b" aria-hidden="true"></div>
+  <!-- One companion owl (top-inline-end). Pages 20 and 21 place
+       their owls in different corners with different sizes; three
+       unique positions across the taste block. -->
+  <div class="onb-v2-taste-owl owl-t1" id="onb-v2-taste-1-owl" aria-hidden="true"></div>
   <div class="onb-cta-holder">
     <button type="button" class="nav-btn onb-cta" id="onb-v2-taste-1-cta" onclick="_onbV2CtaTaste1()"></button>
   </div>
@@ -28090,11 +28096,10 @@ document.addEventListener('DOMContentLoaded', function() {
       <p class="onb-v2-sub onb-v2-taste-2-punch" id="onb-v2-taste-2-punch"></p>
     </div>
   </div>
-  <!-- Two companion owls, mirroring page 19 across the pair — top-
-       inline-start + bottom-inline-end, again with different sizes
-       and small counter-rotations. -->
-  <div class="onb-v2-taste-owl owl-t2a" id="onb-v2-taste-2-owl-a" aria-hidden="true"></div>
-  <div class="onb-v2-taste-owl owl-t2b" id="onb-v2-taste-2-owl-b" aria-hidden="true"></div>
+  <!-- One companion owl (bottom-inline-start) — largest of the
+       three, sits below the prose to anchor the "what he meant"
+       beat. -->
+  <div class="onb-v2-taste-owl owl-t2" id="onb-v2-taste-2-owl" aria-hidden="true"></div>
   <div class="onb-cta-holder">
     <button type="button" class="nav-btn onb-cta" id="onb-v2-taste-2-cta" onclick="_onbV2CtaTaste2()"></button>
   </div>
@@ -28112,6 +28117,10 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="onb-v2-cards" id="onb-v2-taste-q-options" style="margin-top:8px"></div>
     </div>
   </div>
+  <!-- One companion owl (top-inline-start) — smallest of the three,
+       sits in the upper start corner. Third and last position in
+       the taste's owl sequence. -->
+  <div class="onb-v2-taste-owl owl-t3" id="onb-v2-taste-q-owl" aria-hidden="true"></div>
   <div class="onb-cta-holder">
     <button type="button" class="nav-btn onb-cta" id="onb-v2-taste-q-cta" onclick="_onbV2CtaTasteQ()" disabled></button>
   </div>
