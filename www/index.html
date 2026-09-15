@@ -6794,6 +6794,117 @@
     margin: 6px 0 2px;
   }
 
+  /* ── Act 4: The Plan ─────────────────────────────────────────
+     Building spinner (25), plan card (27), stats row + commitment
+     bar (30). No dedicated styles for plan-ready (26) — it reuses
+     .onb-v2-signup-hero for the owl slot. Accent colors follow the
+     subject picked at step 11 via var(--accent). */
+
+  /* Building spinner (step 25) — accent-topped ring on a muted
+     track, 1s continuous rotate. Respects prefers-reduced-motion. */
+  .onb-screen.onb-v2 .onb-v2-spinner {
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    border: 5px solid var(--border);
+    border-top-color: var(--accent);
+    margin: 0 auto 20px;
+    animation: onbSpinnerSpin 1s linear infinite;
+  }
+  @keyframes onbSpinnerSpin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .onb-screen.onb-v2 .onb-v2-spinner { animation: none; }
+  }
+
+  /* Plan card (step 27) — accent-bordered tile with a bold title
+     and three body lines. Sits below the "path ahead" head. */
+  .onb-screen.onb-v2 .onb-v2-plan-card {
+    background: var(--surface);
+    border: 2px solid var(--accent);
+    border-radius: 16px;
+    padding: 16px 18px;
+    text-align: start;
+    margin-top: 14px;
+  }
+  .onb-screen.onb-v2 .onb-v2-plan-card-title {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 900;
+    font-size: calc(17px * var(--text-scale));
+    color: var(--ink);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  .onb-screen.onb-v2 .onb-v2-plan-card-line {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(15px * var(--text-scale));
+    color: var(--text-2);
+    line-height: 1.45;
+    padding: 4px 0;
+  }
+
+  /* Stats row (step 30) — three tiles, big accent-colored numbers
+     over muted labels. Grid keeps them equally sized regardless of
+     digit count. */
+  .onb-screen.onb-v2 .onb-v2-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 14px 0 24px;
+  }
+  .onb-screen.onb-v2 .onb-v2-stat {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 8px;
+    text-align: center;
+  }
+  .onb-screen.onb-v2 .onb-v2-stat-n {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 900;
+    font-size: calc(30px * var(--text-scale));
+    color: var(--accent);
+    line-height: 1;
+  }
+  .onb-screen.onb-v2 .onb-v2-stat-l {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(12px * var(--text-scale));
+    color: var(--text-2);
+    margin-top: 6px;
+    line-height: 1.3;
+  }
+
+  /* Commitment block (step 30) — head + filled bar + caption. Bar
+     width set inline by the prepare hook based on the commitment
+     tier ('extreme' → 92%, ... 'trying' → 30%). */
+  .onb-screen.onb-v2 .onb-v2-commit-block {
+    text-align: start;
+    margin-top: 4px;
+  }
+  .onb-screen.onb-v2 .onb-v2-commit-label {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 800;
+    font-size: calc(14px * var(--text-scale));
+    color: var(--ink);
+  }
+  .onb-screen.onb-v2 .onb-v2-commit-bar {
+    height: 10px;
+    background: var(--border);
+    border-radius: 999px;
+    margin: 8px 0 6px;
+    overflow: hidden;
+  }
+  .onb-screen.onb-v2 .onb-v2-commit-bar i {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  /* .onb-v2-commit-caption rule retired with the "higher than most"
+     framing — see the addsUp copy comment for the full rationale. */
+
   /* Progress-pill active fill on v2 uses the current subject accent
      (not the hardcoded philosophy fallback used by legacy v1 progress).
      Steps 1-8 all render as philosophy pre-subject-pick; from step 9
@@ -13298,8 +13409,17 @@ const _ONB_STEP_TO_ID = {
   // means the partial-ladder mitigation would catch an accidental
   // advance to 24, which is exactly the defensive behavior we want.
   24: null,
-  // Act 4 — The Plan. Built in Commit 4.
-  25: null, 26: null, 27: null, 28: null, 29: null, 30: null,
+  // Act 4 — The Plan. Six screens: building spinner (25) auto-
+  // advances after 2.5s, plan-ready (26) is an owl bridge, plan-
+  // detail (27) shows the concrete first-chapter promise with a
+  // computed done-by date, then commitment (28) + daily goal (29)
+  // capture user intent, and adds-up (30) rolls both into stats.
+  25: 'onb-v2-building',
+  26: 'onb-v2-plan-ready',
+  27: 'onb-v2-plan-detail',
+  28: 'onb-v2-commit',       // reused DOM from v4
+  29: 'onb-v2-goal',         // reused DOM from v4
+  30: 'onb-v2-adds-up',
   // Act 5 — The Ask. Built in Commit 5 (screens 34-36 blocked on RC
   // 3-day trial config landing on both stores first).
   31: null, 32: null, 33: null, 34: null, 35: null, 36: null,
@@ -13797,24 +13917,30 @@ const _ONB_COPY = {
   // consumers recognize (_maybeMarkGoalMet, _showDcStats). Sub-line
   // dropped the "change anytime" promise since no Profile UI exists to
   // change it today.
+  // v11 step 29 (Daily goal). Copy shifted to the mockup's warmer
+  // "How many a day?" framing with a below-the-cards sub that
+  // reassures the user this is changeable. Option ids ('one' /
+  // 'two' / 'own_pace') stay stable — they're the values
+  // state.dailyGoalHistory persists and the runtime goal-met
+  // consumers hardcode.
   goal: {
-    head: { en: 'How much time each day?',    he: 'כמה זמן ביום?' },
-    sub:  { en: 'Your streak builds from this.',
-            he: 'הרצף שלך נבנה מזה.' },
-    cta:  { en: 'Continue',                    he: 'המשך' },
+    head: { en: 'How many a day?', he: 'כמה ביום?' },
+    sub:  { en: 'Hit it and the day is done. Change it whenever.',
+            he: 'תגיעו אליו והיום הושלם. אפשר לשנות מתי שתרצו.' },
+    cta:  { en: 'Continue',        he: 'המשך' },
     options: [
       { id: 'one',
-        title: { en: 'One dialogue a day',         he: 'דיאלוג אחד ביום' },
-        hint:  { en: 'A daily rhythm, about five minutes',
-                 he: 'קצב יומיומי, בערך חמש דקות' } },
+        title: { en: 'One dialogue',   he: 'דיאלוג אחד' },
+        hint:  { en: 'About five minutes.',
+                 he: 'בערך חמש דקות.' } },
       { id: 'two',
-        title: { en: 'Two dialogues',              he: 'שני דיאלוגים' },
-        hint:  { en: 'Go a little deeper, about ten minutes',
-                 he: 'לצלול פנימה, בערך עשר דקות' } },
+        title: { en: 'Two dialogues',  he: 'שני דיאלוגים' },
+        hint:  { en: 'About ten minutes.',
+                 he: 'בערך עשר דקות.' } },
       { id: 'own_pace',
-        title: { en: 'My own pace',                he: 'הקצב שלי' },
-        hint:  { en: 'No pressure, learn when it fits',
-                 he: 'בלי לחץ, ללמוד כשמתאים' } },
+        title: { en: 'My own pace',    he: 'הקצב שלי' },
+        hint:  { en: 'Whenever it fits.',
+                 he: 'כשזה מתאים.' } },
     ],
   },
 
@@ -13898,26 +14024,74 @@ const _ONB_COPY = {
   // id is captured to state.onbAnswers.commitment for later analysis
   // but does not gate anything downstream — all five land the user on
   // home via _onbComplete.
+  // v11 step 28 (Commitment). Head loses the "So," preamble. Option
+  // labels shorten to the mockup's ladder — the "committed" suffix
+  // is redundant when the whole screen is about commitment. Icons
+  // and ids stay stable.
   commit: {
-    head: { en: 'So, how committed are you?', he: 'אז כמה אתה מחויב?' },
-    cta:  { en: 'Continue',                    he: 'המשך' },
+    head: { en: 'How committed are you?', he: 'כמה אתם מחויבים?' },
+    cta:  { en: 'Continue',                he: 'המשך' },
     options: [
-      { id: 'extreme',
-        icon:    'icon-streak',
-        text: { en: 'Extremely committed',        he: 'מחויב לגמרי' } },
-      { id: 'very',
-        icon:    'icon-flex',
-        text: { en: 'Very committed',             he: 'מאוד מחויב' } },
-      { id: 'somewhat',
-        icon:    'icon-thinking',
-        text: { en: 'Somewhat committed',         he: 'מחויב במידה מסוימת' } },
-      { id: 'little',
-        icon:    'icon-seedling',
-        text: { en: 'A little committed',         he: 'קצת מחויב' } },
-      { id: 'trying',
-        icon:    'icon-feather',
-        text: { en: 'Just trying it out',         he: 'רק מנסה' } },
+      { id: 'extreme',  icon: 'icon-streak',   text: { en: 'Extremely',      he: 'מאוד' } },
+      { id: 'very',     icon: 'icon-flex',     text: { en: 'Very',           he: 'די הרבה' } },
+      { id: 'somewhat', icon: 'icon-thinking', text: { en: 'Somewhat',       he: 'במידה מסוימת' } },
+      { id: 'little',   icon: 'icon-seedling', text: { en: 'A little',       he: 'קצת' } },
+      { id: 'trying',   icon: 'icon-feather',  text: { en: 'Just trying it', he: 'רק מנסה' } },
     ],
+  },
+
+  // ═══ Act 4 (v11 steps 25-30) — The Plan ═══
+  // Building spinner (25). Auto-advances after ~2.5s (see the
+  // prepare hook). Long enough to feel calculated, short enough
+  // not to feel fake.
+  building: {
+    head: { en: 'Building your plan',            he: 'בונים את התוכנית' },
+    sub:  { en: 'Matching thinkers to what you said...',
+            he: 'מתאימים הוגים למה שאמרתם...' },
+  },
+  // Plan ready (26). Owl-fronted bridge into the actual plan.
+  planReady: {
+    head: { en: 'Your plan is ready', he: 'התוכנית שלכם מוכנה' },
+    cta:  { en: 'Show me',            he: 'הראו לי' },
+  },
+  // The plan (27). Concrete first-chapter promise: N dialogues, N
+  // cards to collect, done-by date. All three lines computed at
+  // prepare time from the actual chapter data + today's date. Card
+  // title is "{Subject}: {ChapterTitle}" (colon, not em-dash) —
+  // both parts pulled from _ONB_COPY.subject[…].name and the
+  // subject's first chapter title from content/*.js.
+  planDetail: {
+    head:  { en: 'The path ahead', he: 'הדרך שלפניכם' },
+    cta:   { en: 'Continue',       he: 'המשך' },
+    // Templates with {n} = dialogue count, {date} = localized done-by.
+    lineDialogues: { en: '{n} dialogues, one a day',    he: '{n} דיאלוגים, אחד ביום' },
+    lineCards:     { en: '{n} thinker cards to collect', he: '{n} קלפי הוגים לאסוף' },
+    lineDoneBy:    { en: 'Done by {date}',              he: 'מסתיים ב-{date}' },
+  },
+  // What it adds up to (30). Reads state.onbAnswers.dailyGoal and
+  // .commitment to compute stats + bar fill.
+  //
+  // Stat 3 was "card so far = 1" (echoing the taste's first-card
+  // promise). Dropped — the taste is stateless by design, nothing
+  // was actually collected, and shipping a "1" on a plan screen
+  // right before the paywall would be a lie. Replaced with "N
+  // waiting for you", where N = unique thinker count in chapter 1
+  // computed from getW(). Honest count, forward-looking framing.
+  //
+  // The commitment bar's caption ("{percent}%, higher than most")
+  // was also dropped. That framing claimed a comparison against
+  // other users that we have never measured. The bar itself still
+  // fills to the commitment tier's proportion (visualisation of
+  // the user's own pick), but without a percentage number or a
+  // comparison-against-others claim below it. No invented
+  // statistic on the screen right before we ask for money.
+  addsUp: {
+    head:            { en: 'What that adds up to',   he: 'למה זה מצטבר' },
+    cta:             { en: 'Continue',                he: 'המשך' },
+    stat1Label:      { en: 'thinkers a week',         he: 'הוגים בשבוע' },
+    stat2Label:      { en: 'minutes a day',           he: 'דקות ביום' },
+    stat3Label:      { en: 'waiting for you',         he: 'מחכים לכם' },
+    commitmentHead:  { en: 'Your commitment',         he: 'המחויבות שלכם' },
   },
   // Step 4 — signup offer. Placed after solution (step 3). Body
   // deliberately does NOT mention subscription; the paywall wasn't
@@ -14023,6 +14197,19 @@ function _onbApplyLang(lang) {
   setText('onb-v2-first-card-head',    'firstCard', 'head');
   setText('onb-v2-first-card-sub',     'firstCard', 'sub');
   setText('onb-v2-first-card-cta',     'firstCard', 'cta');
+  // Act 4 — plan block. Building spinner (25), plan-ready (26),
+  // plan-detail (27) and adds-up (30) all have static head/CTA
+  // pairs. plan-detail's card lines + adds-up's stats are computed
+  // in the prepare hooks (subject / goal / commitment sensitive)
+  // and don't bind here.
+  setText('onb-v2-building-head',       'building',   'head');
+  setText('onb-v2-building-sub',        'building',   'sub');
+  setText('onb-v2-plan-ready-head',     'planReady',  'head');
+  setText('onb-v2-plan-ready-cta',      'planReady',  'cta');
+  setText('onb-v2-plan-detail-head',    'planDetail', 'head');
+  setText('onb-v2-plan-detail-cta',     'planDetail', 'cta');
+  setText('onb-v2-adds-up-head',        'addsUp',     'head');
+  setText('onb-v2-adds-up-cta',         'addsUp',     'cta');
   // Mirror head + card content are rendered dynamically in
   // _onbV2PrepareMirror from state.onbAnswers; only the CTA is static.
   setText('onb-v2-mirror-head',   'mirror',   'head');
@@ -14562,6 +14749,25 @@ function _onbV2CtaStreak() {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// Act 4 — The Plan (steps 25-30)
+// ═══════════════════════════════════════════════════════════════════
+// Building spinner (25) auto-advances via setTimeout. Plan-ready
+// (26) and plan-detail (27) are display-only bridges. Commitment
+// (28) and daily goal (29) use existing v4 handlers (rewired to
+// v11 advance targets above). Adds-up (30) rolls everything into a
+// summary and advances into Act 5.
+
+// Step 26 (plan-ready) — owl-fronted bridge. CTA advances to plan.
+function _onbV2CtaPlanReady()  { _onbAdvanceStep(26, 27); }
+// Step 27 (plan-detail)     — CTA advances to commitment.
+function _onbV2CtaPlanDetail() { _onbAdvanceStep(27, 28); }
+// Step 30 (adds-up)         — CTA advances into Act 5 (step 31 is
+// notifications pre-prompt, which is the first v11 slot in Act 5.
+// In Commit 4 that step is still null → the partial-ladder
+// mitigation catches until Commit 5 lands).
+function _onbV2CtaAddsUp()     { _onbAdvanceStep(30, 31); }
+
 // Screen 21 (daily goal) — single-select radio over three cards
 // ('one' / 'two' / 'own_pace'). Preselect logic maps the Q3 answer to
 // a sensible default so the CTA is enabled on land. Write pattern
@@ -14595,7 +14801,7 @@ function _onbV2CtaGoal() {
       is_existing_user: !!localStorage.getItem('corpus_onboarding_done'),
     });
   } catch(e) {}
-  _onbAdvanceStep(21, 22, { dailyGoal: goal });
+  _onbAdvanceStep(29, 30, { dailyGoal: goal });
 }
 
 // Screen 22 (review request) — Rate fires the native review sheet
@@ -14644,10 +14850,9 @@ function _onbV2CtaCommit() {
       name: !!state.onbAnswers.name,
     });
   } catch(e) {}
-  // Advance past _ONB_TOTAL_STEPS to trigger _onbComplete. Signup
-  // moved to step 4 in flow v3; commit (step 24 in flow v4) is now
-  // the last screen before completion.
-  _onbAdvanceStep(24, 25);
+  // v11 commit is step 28 (was step 24 in v4). Advances to daily
+  // goal (29), then adds-up (30), then Act 5 lands.
+  _onbAdvanceStep(28, 29);
 }
 
 // Step 3 — signup offer, Headway-style. Three CTAs: Apple (primary,
@@ -15199,6 +15404,141 @@ function _onbV2PrepareFirstCard() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// Act 4 — The Plan (prepare hooks)
+// ═══════════════════════════════════════════════════════════════════
+
+// Step 25 (building spinner) — head + sub + auto-advance timer.
+// Static copy binds via _onbApplyLang; only the timer needs the
+// hook. Timer is 2500ms — long enough to feel calculated, short
+// enough not to feel fake. Guarded on the persisted step cursor:
+// if the user is no longer on step 25 when the timer fires (they
+// backgrounded the app and the screen changed via another path),
+// don't yank them forward.
+function _onbV2PrepareBuilding() {
+  setTimeout(() => {
+    try {
+      const cursor = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
+      if (cursor === 25) _onbAdvanceStep(25, 26);
+    } catch(e) { _onbAdvanceStep(25, 26); }
+  }, 2500);
+}
+
+// Step 26 (plan-ready) — inject the neutral owl into the hero slot.
+function _onbV2PreparePlanReady() {
+  const owlEl = document.getElementById('onb-v2-plan-ready-owl');
+  if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
+}
+
+// Step 27 (plan-detail) — subject-specific card. Title composes
+// "{Subject}: {ChapterTitle}" using _ONB_COPY.subject[…].name and
+// the first chapter's title from getW(). Lines interpolate {n} and
+// {date} — {n} is the actual chapter dialogue count from getW(),
+// {date} is today + N days formatted per locale. If getW() throws
+// (content not loaded), we fall back to hardcoded 7 dialogues to
+// avoid rendering an empty card.
+function _onbV2PreparePlanDetail() {
+  const isEn = state.lang === 'en';
+  const subj = state.subject || 'philosophy';
+
+  // Dialogue count from the actual first chapter. Falls back to 7
+  // if content isn't loaded yet or throws.
+  let n = 7;
+  let chapterTitleEn = '';
+  let chapterTitleHe = '';
+  try {
+    const weeks = (typeof getW === 'function') ? getW() : [];
+    const ch1 = weeks.find(w => w && !w.comingSoon && Array.isArray(w.days) && w.days.length) || weeks[0];
+    if (ch1) {
+      // Exclude id:0 bonus intros from the count — same convention
+      // as _onbV2CountFirstThinkers.
+      n = ch1.days.filter(d => d && d.id !== 0).length || 7;
+      chapterTitleEn = ch1.titleEn || '';
+      chapterTitleHe = ch1.title   || '';
+    }
+  } catch(e) {}
+
+  // "{Subject}: {Chapter}" — subject name from _ONB_COPY.subject
+  // (localized), chapter title from content. Colon (not em-dash)
+  // per the standing punctuation rule.
+  const subjCfg = (_ONB_COPY.subject && _ONB_COPY.subject[subj]) || _ONB_COPY.subject.philosophy;
+  const subjName = isEn ? subjCfg.name.en : subjCfg.name.he;
+  const chapterTitle = isEn ? chapterTitleEn : chapterTitleHe;
+  const cardTitle = chapterTitle ? (subjName + ': ' + chapterTitle) : subjName;
+
+  // Done-by date. If one-a-day, plan takes N days (today = day 1,
+  // day N = today + (N-1) days). We add N days (rather than N-1)
+  // to give the user a day of grace on the display. Locale-aware
+  // "22 September" (en-GB) / "22 בספטמבר" (he-IL) formatting.
+  const doneBy = new Date();
+  doneBy.setDate(doneBy.getDate() + n);
+  const dateStr = doneBy.toLocaleDateString(isEn ? 'en-GB' : 'he-IL', { day: 'numeric', month: 'long' });
+
+  const cp = _ONB_COPY.planDetail;
+  const setEl = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  setEl('onb-v2-plan-detail-title',  cardTitle);
+  setEl('onb-v2-plan-detail-line1',  (isEn ? cp.lineDialogues.en : cp.lineDialogues.he).replace('{n}', String(n)));
+  setEl('onb-v2-plan-detail-line2',  (isEn ? cp.lineCards.en     : cp.lineCards.he).replace('{n}', String(n)));
+  setEl('onb-v2-plan-detail-line3',  (isEn ? cp.lineDoneBy.en    : cp.lineDoneBy.he).replace('{date}', dateStr));
+}
+
+// Step 30 (adds-up) — three stat tiles + a commitment bar.
+//   Stat 1 (thinkers a week):  goal 'one' → 7,  'two' → 14, 'own_pace' → 4
+//   Stat 2 (minutes a day):    goal 'one' → 5,  'two' → 10, 'own_pace' → 3
+//   Stat 3 (waiting for you):  unique thinker count in chapter 1
+//                              of the picked subject (from getW()).
+//                              Honest — the taste is stateless, so
+//                              nothing was actually collected. All
+//                              N are still waiting; that's true.
+// Commitment bar width maps the commitment ladder to an internal
+// proportion (extreme=92, very=78, somewhat=60, little=42,
+// trying=28). No percentage number or "higher than most" caption
+// rendered — that framing claimed a comparison against other
+// users we have never measured. The bar itself visualises the
+// user's own pick; that's all the claim we can support.
+function _onbV2PrepareAddsUp() {
+  const isEn = state.lang === 'en';
+  const a = state.onbAnswers || {};
+  const goal       = a.dailyGoal  || 'one';
+  const commitment = a.commitment || 'somewhat';
+
+  const perDayMap = { one: 1, two: 2, own_pace: 0.5 };
+  const perDay = perDayMap[goal] || 1;
+  const thinkersPerWeek = Math.round(perDay * 7);
+  const minutesPerDay   = Math.round(perDay * 5);
+
+  // Unique thinkers in chapter 1 of the picked subject. Excludes
+  // id:0 bonus intros and null thinkerIds (summary days). Falls
+  // back to 6 if getW() throws — a plausible default across the
+  // three subjects (philosophy ch1 has 5 unique, economics 6,
+  // psychology 6).
+  let cardsWaiting = 6;
+  try {
+    const weeks = (typeof getW === 'function') ? getW() : [];
+    const ch1 = weeks[0];
+    if (ch1 && Array.isArray(ch1.days)) {
+      const ids = new Set();
+      ch1.days.forEach(d => { if (d && d.id !== 0 && d.thinkerId) ids.add(d.thinkerId); });
+      if (ids.size) cardsWaiting = ids.size;
+    }
+  } catch(e) {}
+
+  const commitmentPercentMap = { extreme: 92, very: 78, somewhat: 60, little: 42, trying: 28 };
+  const percent = commitmentPercentMap[commitment] || 60;
+
+  const cp = _ONB_COPY.addsUp;
+  const setEl = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  setEl('onb-v2-adds-up-n1', String(thinkersPerWeek));
+  setEl('onb-v2-adds-up-l1', isEn ? cp.stat1Label.en : cp.stat1Label.he);
+  setEl('onb-v2-adds-up-n2', String(minutesPerDay));
+  setEl('onb-v2-adds-up-l2', isEn ? cp.stat2Label.en : cp.stat2Label.he);
+  setEl('onb-v2-adds-up-n3', String(cardsWaiting));
+  setEl('onb-v2-adds-up-l3', isEn ? cp.stat3Label.en : cp.stat3Label.he);
+  setEl('onb-v2-adds-up-commit-head', isEn ? cp.commitmentHead.en : cp.commitmentHead.he);
+  const fillEl = document.getElementById('onb-v2-adds-up-commit-fill');
+  if (fillEl) fillEl.style.width = percent + '%';
+}
+
+// ═══════════════════════════════════════════════════════════════════
 
 // Screen 21 — goal. Renders three cards (recovered from the v1 goal
 // screen) and preselects one based on the user's Q3 answer. Preselect
@@ -15440,7 +15780,14 @@ const _ONB_STEP_HOOKS = {
   22: _onbV2PrepareFirstCard, // subject-specific thinker card preview (stateless)
   // 23 (streak) is static once _onbApplyLang runs.
   // 24 (rating) has no DOM — see STEP_TO_ID note above.
-  // 25-36 land as later acts ship.
+  // Act 4 — The Plan
+  25: _onbV2PrepareBuilding,   // spinner + auto-advance timer
+  26: _onbV2PreparePlanReady,  // injects owl into hero slot
+  27: _onbV2PreparePlanDetail, // subject-specific chapter title + done-by date
+  28: _onbV2PrepareCommit,     // existing (unchanged from v4)
+  29: _onbV2PrepareGoal,       // existing (unchanged from v4)
+  30: _onbV2PrepareAddsUp,     // stats computed from goal + commitment picks
+  // 31-36 land in Commit 5 (Act 5).
 };
 
 // Step 3 prepare hook — injects the owl SVG into the hero slot and
@@ -28145,6 +28492,100 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <div class="onb-cta-holder">
     <button type="button" class="nav-btn onb-cta" id="onb-v2-first-card-cta" onclick="_onbV2CtaFirstCard()"></button>
+  </div>
+</div>
+
+<!-- ═══════════════ Act 4 — The Plan (steps 25-30) ═══════════════
+     Screens 25 and 26 are bridges into the plan proper. 27 is the
+     plan card. 28 (commit) and 29 (goal) reuse existing v4 DOM
+     just above. 30 rolls it all into a stats summary. -->
+
+<!-- Step 25 — Building spinner. Head + sub + spinner + auto-advance
+     timer (2500ms) wired in _onbV2PrepareBuilding. No CTA. -->
+<div id="onb-v2-building" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <div class="onb-v2-spinner" aria-hidden="true"></div>
+      <h1 class="onb-v2-head" id="onb-v2-building-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-building-sub"></p>
+    </div>
+  </div>
+</div>
+
+<!-- Step 26 — Plan ready. Owl-fronted bridge into the plan detail. -->
+<div id="onb-v2-plan-ready" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-v2-inner">
+    <div class="onb-v2-signup-hero" id="onb-v2-plan-ready-owl" aria-hidden="true"></div>
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-plan-ready-head"></h1>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-plan-ready-cta" onclick="_onbV2CtaPlanReady()"></button>
+  </div>
+</div>
+
+<!-- Step 27 — The plan. Head + accent-bordered card with title +
+     three body lines. Title composes "{Subject}: {ChapterTitle}"
+     from _ONB_COPY.subject + the first chapter's title. Lines
+     interpolate {n} = dialogue count from getW() + {date} =
+     today + N days formatted per locale (en-GB / he-IL). -->
+<div id="onb-v2-plan-detail" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="6">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-plan-detail-head"></h1>
+      <div class="onb-v2-plan-card">
+        <div class="onb-v2-plan-card-title" id="onb-v2-plan-detail-title"></div>
+        <div class="onb-v2-plan-card-line"  id="onb-v2-plan-detail-line1"></div>
+        <div class="onb-v2-plan-card-line"  id="onb-v2-plan-detail-line2"></div>
+        <div class="onb-v2-plan-card-line"  id="onb-v2-plan-detail-line3"></div>
+      </div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-plan-detail-cta" onclick="_onbV2CtaPlanDetail()"></button>
+  </div>
+</div>
+
+<!-- Step 30 — What it adds up to. Three stat tiles (thinkers/week,
+     minutes/day, card so far = 1 per the taste's promise) computed
+     from state.onbAnswers.dailyGoal in _onbV2PrepareAddsUp; then a
+     commitment bar with a caption using state.onbAnswers.commitment
+     to map into a percentage. .onb-v2-scroll opts this screen into
+     inner-scroll — three stat cards + commitment block + CTA at
+     large font scale can push past the fold. -->
+<div id="onb-v2-adds-up" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="6">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-adds-up-head"></h1>
+      <div class="onb-v2-stats-row">
+        <div class="onb-v2-stat">
+          <div class="onb-v2-stat-n" id="onb-v2-adds-up-n1"></div>
+          <div class="onb-v2-stat-l" id="onb-v2-adds-up-l1"></div>
+        </div>
+        <div class="onb-v2-stat">
+          <div class="onb-v2-stat-n" id="onb-v2-adds-up-n2"></div>
+          <div class="onb-v2-stat-l" id="onb-v2-adds-up-l2"></div>
+        </div>
+        <div class="onb-v2-stat">
+          <div class="onb-v2-stat-n" id="onb-v2-adds-up-n3"></div>
+          <div class="onb-v2-stat-l" id="onb-v2-adds-up-l3"></div>
+        </div>
+      </div>
+      <div class="onb-v2-commit-block">
+        <div class="onb-v2-commit-label" id="onb-v2-adds-up-commit-head"></div>
+        <div class="onb-v2-commit-bar"><i id="onb-v2-adds-up-commit-fill"></i></div>
+      </div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-adds-up-cta" onclick="_onbV2CtaAddsUp()"></button>
   </div>
 </div>
 
