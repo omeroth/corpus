@@ -6715,6 +6715,137 @@
     margin-top: 12px;
   }
 
+  /* Trial intro (step 34) — three-item benefit list. Icon-left rows
+     on surface tiles, matching the visual weight of the mirror cards
+     but simpler (no dedicated title/support split — one line per
+     benefit). Gated by TRIAL_ENABLED at the flow level; CSS ships
+     unconditionally so a locale flip that lands the user here after
+     the flag is enabled renders cleanly. */
+  .onb-screen.onb-v2 .onb-v2-trial-benefits {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .onb-screen.onb-v2 .onb-v2-trial-benefit {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    text-align: start;
+  }
+  .onb-screen.onb-v2 .onb-v2-trial-benefit-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    color: var(--accent);
+    margin-top: 2px;
+  }
+  .onb-screen.onb-v2 .onb-v2-trial-benefit-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+  .onb-screen.onb-v2 .onb-v2-trial-benefit-text {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(15px * var(--text-scale));
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  /* Reminder promise (step 35) — 82px amber bell hero above the head
+     and sub. Bell is deliberately amber, not accent, so it reads as
+     the app's "streak / alert" family rather than the paid-block
+     accent — matching the mockup and the tone of the promise itself
+     (a reminder, not another CTA). */
+  .onb-screen.onb-v2 .onb-v2-reminder-hero {
+    width: 82px;
+    height: 82px;
+    margin: 0 auto 16px;
+    color: var(--amber);
+  }
+  .onb-screen.onb-v2 .onb-v2-reminder-hero svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Paywall trial-mode extras (step 36 with TRIAL_ENABLED on).
+     Timeline + no-payment pill live inside #onb-v2-paywall only —
+     the modal paywall doesn't own the DOM. Selectors are #-scoped
+     so the modal paywall doesn't accidentally inherit these rules
+     if the class names ever spread there. */
+  #onb-v2-paywall .paywall-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 4px 0 8px;
+    padding-inline-start: 6px;
+    border-inline-start: 2px solid var(--border);
+  }
+  #onb-v2-paywall .paywall-timeline-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    position: relative;
+  }
+  #onb-v2-paywall .paywall-timeline-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 4px;
+    margin-inline-start: -13px;
+    border: 2px solid var(--surface);
+  }
+  #onb-v2-paywall .paywall-timeline-dot.hollow {
+    background: var(--surface);
+    border: 2px solid var(--accent);
+  }
+  #onb-v2-paywall .paywall-timeline-body {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(14px * var(--text-scale));
+    line-height: 1.4;
+    color: var(--text);
+    text-align: start;
+  }
+  #onb-v2-paywall .paywall-timeline-title {
+    display: block;
+    font-weight: 900;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  /* No-payment-due pill (trial mode). Green outline strip with a
+     checkmark, colours from the app-wide success token so it reads
+     as reassurance ("nothing charged now") rather than an accent-
+     coloured CTA. Hidden inline when the flag is off. */
+  #onb-v2-paywall .paywall-no-payment-due {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(34, 197, 94, 0.10);
+    border: 2px solid rgba(34, 197, 94, 0.30);
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin: 6px 0 8px;
+  }
+  #onb-v2-paywall .paywall-no-payment-due svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  #onb-v2-paywall .paywall-no-payment-label {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(13px * var(--text-scale));
+    font-weight: 900;
+    color: var(--auth-success);
+  }
+
   /* Reviews (step 33) — social-proof cards, three vertically stacked.
      Each card: five amber stars, italic-free quote, accent first-name
      attribution. Card shell mirrors .onb-v2-quote-card's rhythm but
@@ -11152,22 +11283,29 @@ const RC_ANDROID_API_KEY = '';
 // supabase/migrations/20260901170000_grandfathering.sql).
 const PAYWALL_ENABLED = true;
 
-// Paywall trial gate. DELIBERATELY FALSE — Corpus does not offer a
-// free trial. This is a product decision, not a technical placeholder
-// waiting on App Store approval.
+// Trial gate. False in this build because the Introductory Offers
+// section is missing from App Store Connect — an Apple support case
+// is open, but it could take days. When it flips true:
 //
-// The free tier is chapter 1 of each subject plus any chapter a user
-// has already started — that IS the trial. Layering a time-limited
-// introductory offer on top would train users to churn at day 8 and
-// muddy the free-tier value story ("what am I trying, exactly?").
+//   - Steps 34 (trial intro) and 35 (reminder promise) enter the
+//     Act 5 flow. With the flag off, step 33 (reviews) skips both
+//     and advances straight to step 36 (paywall).
+//   - The paywall shows the trial framing from the mockup:
+//     "Start your free days" head, a Today / Day 2 / Day 3 timeline,
+//     a "No payment due now" reassurance pill, "Start my free trial"
+//     CTA, and the "Free for 3 days, then …" legal fine print. With
+//     the flag off, the paywall shows the plain "Ready to go deeper?"
+//     framing, no timeline, no pill, "Subscribe" CTA, and the
+//     standard auto-renew legal — no trial language, no "3 days free"
+//     card footers, no "$0.00" button anywhere.
+//   - is_trial + trial_enabled analytics props follow the flag.
 //
-// Do NOT flip this to true expecting the trial UI to Just Work when
-// Apple approves an introductory offer. If a trial is ever added,
-// the product decision needs to be revisited first — it isn't a
-// tooling gate. The CTA copy, card footer, and is_trial analytics
-// flag all key off this constant, so the wiring is intact; the
-// decision to not use it is the point.
-const PAYWALL_TRIAL_ENABLED = false;
+// The flow is fully testable in the flag-off state and enabling the
+// trial later is one line — flipping this to true reveals the two
+// gated screens and the paywall's trial framing without any further
+// changes. Previously called PAYWALL_TRIAL_ENABLED; renamed here
+// because the gate now controls more than the paywall itself.
+const TRIAL_ENABLED = false;
 
 // Legal links required by Apple + Google in every paywall. Terms is
 // currently 404 — MUST be published at this URL before App Store
@@ -12242,7 +12380,7 @@ function showPaywall(opts) {
       subject: opts.subject || state.subject || null,
       week_id: typeof opts.weekId !== 'undefined' ? opts.weekId : null,
       day_id:  typeof opts.dayId  !== 'undefined' ? opts.dayId  : null,
-      trial_enabled: PAYWALL_TRIAL_ENABLED,
+      trial_enabled: TRIAL_ENABLED,
     });
   } catch(e) {}
 }
@@ -12313,13 +12451,63 @@ function _renderPaywall() {
     ctx.sub || (isEn ? 'Every chapter, every subject, every bonus dialogue.'
                      : 'כל פרק, בכל תחום, כולל דיאלוגי הבונוס.');
 
-  // Monthly card
+  // Trial-mode extras. Only present on the onboarding paywall DOM
+  // (#onb-v2-paywall); the modal paywall lives without them, so the
+  // querySelectors return null and every branch below is a defensive
+  // no-op. Timeline + no-payment pill are hidden inline when
+  // TRIAL_ENABLED is false so the plain paywall shows no trial UI at
+  // all — the load-bearing point of the flag. Populated from the
+  // paywallTrial copy block so a locale flip re-renders correctly.
+  const trialOn = TRIAL_ENABLED && _paywallMode === 'onboarding';
+  const timelineEl = q('.paywall-timeline');
+  if (timelineEl) {
+    timelineEl.style.display = trialOn ? '' : 'none';
+    if (trialOn) {
+      const tp = _ONB_COPY.paywallTrial;
+      const steps = (tp && tp.timeline) || [];
+      timelineEl.innerHTML = '';
+      steps.forEach((step) => {
+        const row = document.createElement('div');
+        row.className = 'paywall-timeline-step';
+        const dot = document.createElement('span');
+        dot.className = 'paywall-timeline-dot' + (step.hollow ? ' hollow' : '');
+        dot.setAttribute('aria-hidden', 'true');
+        const body = document.createElement('div');
+        body.className = 'paywall-timeline-body';
+        const title = document.createElement('b');
+        title.className = 'paywall-timeline-title';
+        title.textContent = isEn ? step.title.en : step.title.he;
+        const text = document.createTextNode(isEn ? step.text.en : step.text.he);
+        body.appendChild(title);
+        body.appendChild(text);
+        row.appendChild(dot);
+        row.appendChild(body);
+        timelineEl.appendChild(row);
+      });
+    }
+  }
+  const noPayEl = q('.paywall-no-payment-due');
+  if (noPayEl) {
+    noPayEl.style.display = trialOn ? '' : 'none';
+    if (trialOn) {
+      const label = noPayEl.querySelector('.paywall-no-payment-label');
+      if (label) {
+        const tp = _ONB_COPY.paywallTrial;
+        label.textContent = isEn ? tp.noPaymentDue.en : tp.noPaymentDue.he;
+      }
+    }
+  }
+
+  // Monthly card. Per-card trial footer ("7 days free") is trial-off
+  // only when the flag is off (empty string + display:none). Under
+  // trial-mode the timeline above already tells the story, so we
+  // keep the card footers empty too — no visual duplication.
   q('.paywall-monthly-title').textContent = isEn ? 'Monthly' : 'חודשי';
   q('.paywall-monthly-price').textContent = p.monthly.priceString;
   q('.paywall-monthly-period').textContent = p.monthly.periodLabel;
   const monthlyTrialEl = q('.paywall-monthly-trial');
-  monthlyTrialEl.textContent = PAYWALL_TRIAL_ENABLED ? (isEn ? '7 days free' : '7 ימי ניסיון חינם') : '';
-  monthlyTrialEl.style.display = PAYWALL_TRIAL_ENABLED ? '' : 'none';
+  monthlyTrialEl.textContent = '';
+  monthlyTrialEl.style.display = 'none';
 
   // Yearly card (default emphasis)
   q('.paywall-yearly-title').textContent = isEn ? 'Yearly' : 'שנתי';
@@ -12327,8 +12515,8 @@ function _renderPaywall() {
   q('.paywall-yearly-period').textContent = p.yearly.periodLabel;
   q('.paywall-yearly-badge').textContent = isEn ? 'Save 42%' : 'חיסכון 42%';
   const yearlyTrialEl = q('.paywall-yearly-trial');
-  yearlyTrialEl.textContent = PAYWALL_TRIAL_ENABLED ? (isEn ? '7 days free' : '7 ימי ניסיון חינם') : '';
-  yearlyTrialEl.style.display = PAYWALL_TRIAL_ENABLED ? '' : 'none';
+  yearlyTrialEl.textContent = '';
+  yearlyTrialEl.style.display = 'none';
 
   // Selection state
   q('.paywall-card-monthly').classList.toggle('selected', _paywallSelectedPkg === 'monthly');
@@ -12341,9 +12529,12 @@ function _renderPaywall() {
   // button; the tap-time handler in startPurchase surfaces a clear
   // toast if no real RC package is available yet.
   const cta = q('.paywall-cta');
-  cta.textContent = PAYWALL_TRIAL_ENABLED
-    ? (isEn ? 'Start free trial' : 'התחילו ניסיון חינם')
-    : (isEn ? 'Subscribe' : 'הרשמה');
+  if (trialOn) {
+    const tp = _ONB_COPY.paywallTrial;
+    cta.textContent = isEn ? tp.cta.en : tp.cta.he;
+  } else {
+    cta.textContent = isEn ? 'Subscribe' : 'הרשמה';
+  }
   cta.disabled = _paywallPurchasing;
 
   // Restore link
@@ -12352,7 +12543,11 @@ function _renderPaywall() {
   // Legal fine print. Dynamic price + period reflect the selected package.
   const sel = _paywallSelectedPkg === 'monthly' ? p.monthly : p.yearly;
   const legalEl = q('.paywall-legal');
-  if (isEn) {
+  if (trialOn) {
+    const tp = _ONB_COPY.paywallTrial;
+    const tmpl = isEn ? tp.legal.en : tp.legal.he;
+    legalEl.textContent = tmpl.replace('{price}', sel.priceString).replace('{period}', sel.periodLabel);
+  } else if (isEn) {
     legalEl.textContent = 'Auto-renews for ' + sel.priceString + ' ' + sel.periodLabel + ' until canceled. Cancel anytime in App Store settings.';
   } else {
     legalEl.textContent = 'מתחדש אוטומטית ב-' + sel.priceString + ' ' + sel.periodLabel + ' עד ביטול. אפשר לבטל בכל עת בהגדרות ה-App Store.';
@@ -12548,7 +12743,7 @@ async function startPurchase() {
       saveStateLocal();
       try { posthog.capture('paywall_purchase_succeeded', {
         package_id: sel.pkg.identifier,
-        is_trial: PAYWALL_TRIAL_ENABLED,
+        is_trial: TRIAL_ENABLED,
       }); } catch(e) {}
       // Meta App Events: fb_mobile_subscribe with the purchase value so
       // SKAdNetwork attribution can credit the campaign that drove the
@@ -13519,7 +13714,15 @@ const _ONB_STEP_TO_ID = {
   // no-ops — making the tap look broken three screens before the
   // paywall. Keeping the two beats separate avoids that.
   33: 'onb-v2-reviews',
-  34: null, 35: null, 36: null,
+  // Trial-gated screens 34 and 35. When TRIAL_ENABLED is false, step
+  // 33 routes directly to 36 and neither DOM is reached (partial-
+  // ladder mitigation catches any stray navigation). When the flag
+  // flips true, these enter the flow as trial intro → reminder
+  // promise → trial paywall. See the TRIAL_ENABLED comment for the
+  // full gate contract.
+  34: 'onb-v2-trial',
+  35: 'onb-v2-reminder-promise',
+  36: 'onb-v2-paywall',
 };
 
 // Bilingual copy map for the intro screens (1-3). Later commits will
@@ -14118,6 +14321,76 @@ const _ONB_COPY = {
     ],
   },
 
+  // Step 34 (v11) — Trial intro. Warmer framing than a legal-style
+  // trial disclosure — an invitation. The list names only what
+  // payment actually unlocks: cards are earned by reading and streak
+  // repair is already free, so neither belongs here. Gated by
+  // TRIAL_ENABLED; when the flag is off, step 33 skips straight to
+  // the paywall and this copy block goes unread.
+  trial: {
+    head: { en: 'Open everything, free for three days',
+            he: 'פתחו הכל, שלושה ימים בחינם' },
+    cta:  { en: 'Try it for $0.00', he: 'נסו ב-$0.00' },
+    items: [
+      { icon: 'icon-books',
+        text: { en: 'Every chapter in every subject — philosophy, psychology, economics',
+                he: 'כל פרק בכל תחום — פילוסופיה, פסיכולוגיה וכלכלה' } },
+      { icon: 'icon-openbook',
+        text: { en: 'Bonus chapters that turn the ideas into something you can use',
+                he: 'פרקי בונוס שהופכים את הרעיונות למשהו שאפשר להשתמש בו' } },
+      { icon: 'icon-figure',
+        text: { en: 'Every thinker, there to collect',
+                he: 'כל ההוגים, פתוחים לאיסוף' } },
+    ],
+  },
+
+  // Step 35 (v11) — Reminder promise. The single screen that turns a
+  // trial from a trap into an offer — everyone who has ever forgotten
+  // to cancel something is watching for this beat. Amber bell hero;
+  // no owl. Trial-gated (TRIAL_ENABLED); skipped alongside step 34
+  // when the flag is off.
+  reminderPromise: {
+    head: { en: "We'll remind you a day before it ends",
+            he: 'נזכיר לכם יום לפני שזה נגמר' },
+    sub:  { en: "No surprise charge. You'll know before anything happens.",
+            he: 'בלי חיוב מפתיע. תדעו לפני שקורה משהו.' },
+    cta:  { en: 'Continue for free', he: 'המשיכו בחינם' },
+  },
+
+  // Step 36 (v11) — Paywall trial-mode copy. Read by _renderPaywall
+  // when TRIAL_ENABLED is true AND _paywallMode is 'onboarding'
+  // (never in the modal upsell paywall — trial belongs to the
+  // onboarding entry point). Timeline block, no-payment-due pill,
+  // trial CTA, trial legal. The base paywall copy (Monthly/Yearly
+  // titles, Save badge, restore, terms/privacy) stays in
+  // _renderPaywall's inline strings — those don't change in trial
+  // mode. Legal fine print interpolates the SELECTED package's price
+  // and period at render time; the mockup only shows yearly selected
+  // but if the user taps monthly, "then $12.99 per month" reads
+  // honest, which is the point.
+  paywallTrial: {
+    head: { en: 'Start your free days', he: 'התחילו בחינם' },
+    timeline: [
+      { title: { en: 'Today', he: 'היום' },
+        text:  { en: 'Everything unlocks. You pay nothing.',
+                 he: 'הכל נפתח. לא משלמים כלום.' } },
+      { title: { en: 'Day 2', he: 'יום 2' },
+        text:  { en: "We remind you it's nearly up.",
+                 he: 'נזכיר לכם שזה כמעט נגמר.' } },
+      { title: { en: 'Day 3', he: 'יום 3' },
+        text:  { en: 'Your subscription starts, unless you cancelled.',
+                 he: 'המנוי מתחיל, אלא אם ביטלתם.' },
+        hollow: true },
+    ],
+    noPaymentDue: { en: 'No payment due now', he: 'אין חיוב עכשיו' },
+    cta:          { en: 'Start my free trial', he: 'להתחיל את הניסיון' },
+    // {price} and {period} interpolated at render time from the
+    // selected package. "Free for 3 days" is hardcoded to match the
+    // introductory-offer terms Apple / Google expect.
+    legal: { en: 'Free for 3 days, then {price} {period}. Cancel any time in App Store settings.',
+             he: 'חינם ל-3 ימים, אחר כך {price} {period}. אפשר לבטל בכל עת בהגדרות ה-App Store.' },
+  },
+
   // Step 23 — journey summary. An accent-bordered card at the top
   // projects the user's next 30 days (name + date pill + three tiles
   // drawn from their Q1/Q2/Q3 picks + a stat row), then two feature
@@ -14369,6 +14642,17 @@ function _onbApplyLang(lang) {
   // (bilingual re-render on every show).
   setText('onb-v2-reviews-head', 'reviews', 'head');
   setText('onb-v2-reviews-cta',  'reviews', 'cta');
+  // Trial intro (step 34) — head + CTA are subject-invariant. The
+  // three benefit rows are rendered by _onbV2PrepareTrial. Only
+  // reached when TRIAL_ENABLED is true; bindings are cheap and safe
+  // to run regardless of flag state.
+  setText('onb-v2-trial-head', 'trial', 'head');
+  setText('onb-v2-trial-cta',  'trial', 'cta');
+  // Reminder promise (step 35) — static head + sub + CTA. Bell hero
+  // is injected by _onbV2PrepareReminderPromise.
+  setText('onb-v2-reminder-promise-head', 'reminderPromise', 'head');
+  setText('onb-v2-reminder-promise-sub',  'reminderPromise', 'sub');
+  setText('onb-v2-reminder-promise-cta',  'reminderPromise', 'cta');
   // Journey screen: card + tiles + features rendered dynamically in
   // _onbV2PrepareJourney. Screen-level head and CTA are static.
   setText('onb-v2-journey-head',  'journey',  'head');
@@ -14737,34 +15021,48 @@ function _onbV2CtaNotifNotNow() {
   _onbAdvanceStep(31, 33);
 }
 
-// Step 17 — paywall (full onboarding step, was step 16 in flow v3).
-// Prep hook wires the shared _renderPaywall / startPurchase /
-// restorePurchases / _exitPaywall machinery to the onboarding shell
-// instead of the modal box:
+// Step 36 (v11) — Paywall. Prep hook wires the shared _renderPaywall /
+// startPurchase / restorePurchases / _exitPaywall machinery to the
+// onboarding shell instead of the modal box:
 //   - Points _paywallActiveRoot at #onb-v2-paywall so every scoped
 //     paywall querySelector reads from the onboarding shell.
 //   - Sets _paywallMode = 'onboarding' so purchase / restore success
 //     paths skip the "Welcome to Corpus" toast + returnTo openReader
 //     (there's no returnTo lesson from an onboarding paywall, and the
-//     next onboarding beat already frames the moment).
-//   - Registers an onClose hook that advances to step 18 (lets-start)
-//     regardless of exit path (skip, purchase success, restore success).
-// The Skip control (top-right corner) calls _exitPaywall directly,
-// which fires the onClose. Purchase / restore success also route
-// through _exitPaywall so the flow always advances after the paywall.
+//     completion path takes over from here).
+//   - Registers an onClose hook that advances past _ONB_TOTAL_STEPS,
+//     which fires _onbComplete() and lands the user on home with
+//     corpus_onboarding_done set. Every exit path (skip, purchase
+//     success, restore success) routes through _exitPaywall so the
+//     onClose always runs after the paywall.
+//   - Context (eyebrow / headline / sub) switches on TRIAL_ENABLED:
+//     trial mode uses the mockup's "Start your free days" head with
+//     no eyebrow or sub (the timeline + no-payment pill below carry
+//     the framing); plain mode keeps the v4 "Ready to go deeper?"
+//     framing with its "UNLOCK EVERYTHING" eyebrow.
 function _onbV2PreparePaywall() {
   const isEn = state.lang === 'en';
   _paywallActiveRoot = document.getElementById('onb-v2-paywall');
   _paywallMode = 'onboarding';
   _paywallReturnTo = null;
-  _paywallContext = {
-    eyebrow:  isEn ? 'UNLOCK EVERYTHING' : 'לפתוח הכל',
-    headline: isEn ? 'Ready to go deeper?' : 'מוכנים להעמיק?',
-    sub:      isEn
-                ? 'Every chapter, every subject, every bonus dialogue.'
-                : 'כל פרק, כל נושא, כל דיאלוג בונוס.',
-  };
-  _paywallOnClose = () => _onbAdvanceStep(17, 18);
+  if (TRIAL_ENABLED) {
+    const tp = _ONB_COPY.paywallTrial;
+    _paywallContext = {
+      eyebrow:  '',
+      headline: isEn ? tp.head.en : tp.head.he,
+      sub:      '',
+    };
+  } else {
+    _paywallContext = {
+      eyebrow:  isEn ? 'UNLOCK EVERYTHING' : 'לפתוח הכל',
+      headline: isEn ? 'Ready to go deeper?' : 'מוכנים להעמיק?',
+      sub:      isEn
+                  ? 'Every chapter, every subject, every bonus dialogue.'
+                  : 'כל פרק, כל נושא, כל דיאלוג בונוס.',
+    };
+  }
+  // Advance past total steps triggers _onbComplete() in _onbAdvanceStep.
+  _paywallOnClose = () => _onbAdvanceStep(36, 37);
   _paywallSelectedPkg = 'yearly';
   _paywallPurchasing = false;
   // Localize the Skip label — reuses the signup-skip localization.
@@ -14777,7 +15075,7 @@ function _onbV2PreparePaywall() {
     posthog.capture('paywall_shown', {
       source:        'onboarding',
       subject:       state.subject || null,
-      trial_enabled: PAYWALL_TRIAL_ENABLED,
+      trial_enabled: TRIAL_ENABLED,
     });
   } catch(e) {}
 }
@@ -14983,7 +15281,22 @@ function _onbV2CtaGoal() {
 // that fires at step 23 (streak) via SKStoreReviewController; a
 // second fire here would hit Apple's per-user quota and silently
 // no-op, making the tap look inert three screens before the paywall.
-function _onbV2CtaReviews() { _onbAdvanceStep(33, 34); }
+//
+// Routing gate: when TRIAL_ENABLED is true, advance to step 34
+// (trial intro → reminder promise → paywall). When it's false, skip
+// steps 34 and 35 entirely and land on step 36 (paywall) in its
+// plain, non-trial framing — no dead null-slot advance in between.
+function _onbV2CtaReviews() {
+  _onbAdvanceStep(33, TRIAL_ENABLED ? 34 : 36);
+}
+
+// Step 34 (v11) — Trial intro. Owl-fronted invitation with a three-
+// item benefit list. Only reachable when TRIAL_ENABLED is true.
+function _onbV2CtaTrial() { _onbAdvanceStep(34, 35); }
+
+// Step 35 (v11) — Reminder promise. Amber bell hero + head + sub +
+// "Continue for free" CTA. Only reachable when TRIAL_ENABLED is true.
+function _onbV2CtaReminderPromise() { _onbAdvanceStep(35, 36); }
 
 // Screen 23 (journey summary) — display-only; advance to commit.
 // v11: journey is step 27 (was step 23 in v4 as the terminal
@@ -15506,6 +15819,45 @@ function _onbV2PrepareReviews() {
   });
 }
 
+// Step 34 (trial intro) — injects the owl into the hero slot and
+// renders the three benefit rows from _ONB_COPY.trial.items. Only
+// reachable when TRIAL_ENABLED is true; when the flag is off, step
+// 33's advance skips this hook entirely. Static owl expression
+// (neutral / waving) matches the low-pressure invitation framing.
+function _onbV2PrepareTrial() {
+  const owlEl = document.getElementById('onb-v2-trial-owl');
+  if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
+  const list = document.getElementById('onb-v2-trial-benefits');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+  const items = (_ONB_COPY.trial && _ONB_COPY.trial.items) || [];
+  list.innerHTML = '';
+  items.forEach((item) => {
+    const row = document.createElement('div');
+    row.className = 'onb-v2-trial-benefit';
+    const iconWrap = document.createElement('span');
+    iconWrap.className = 'onb-v2-trial-benefit-icon';
+    iconWrap.setAttribute('aria-hidden', 'true');
+    iconWrap.innerHTML = '<svg viewBox="0 0 64 64"><use href="#' + item.icon + '"/></svg>';
+    const text = document.createElement('span');
+    text.className = 'onb-v2-trial-benefit-text';
+    text.textContent = isEn ? item.text.en : item.text.he;
+    row.appendChild(iconWrap);
+    row.appendChild(text);
+    list.appendChild(row);
+  });
+}
+
+// Step 35 (reminder promise) — head + sub are static (bound in
+// _onbApplyLang). The prepare hook exists only to inject the bell
+// SVG into the amber hero slot — kept out of the DOM template so
+// the hero size doesn't fight the base .onb-v2-signup-hero styling
+// used for owl heroes on the neighbouring screens.
+function _onbV2PrepareReminderPromise() {
+  const hero = document.getElementById('onb-v2-reminder-promise-hero');
+  if (hero) hero.innerHTML = '<svg viewBox="0 0 64 64"><use href="#icon-bell"/></svg>';
+}
+
 // Helper: read taste config for the current subject with a
 // philosophy fallback if state.subject is somehow unset (defensive
 // — shouldn't happen post-Commit-2 since step 11 calls setSubject).
@@ -15941,10 +16293,15 @@ const _ONB_STEP_HOOKS = {
   29: _onbV2PrepareGoal,       // existing (unchanged from v4)
   30: _onbV2PrepareAddsUp,     // "what you've set for yourself" — echoes their goal + commitment
   // Act 5 — The Ask
-  31: _onbV2PrepareNotifications, // fires prompt-shown telemetry
+  31: _onbV2PrepareNotifications,  // fires prompt-shown telemetry
   // 32 is a null slot (OS notif dialog).
-  33: _onbV2PrepareReviews,       // renders three testimonial cards
-  // 34-36 land in Commit 6 (trial + reminder promise + paywall).
+  33: _onbV2PrepareReviews,        // renders three testimonial cards
+  // 34 + 35 only ever run when TRIAL_ENABLED is true — step 33's
+  // advance skips both when the flag is off. Registered here
+  // regardless; the hooks are inert until the DOM is shown.
+  34: _onbV2PrepareTrial,          // owl + three benefit rows
+  35: _onbV2PrepareReminderPromise,// bell icon into the hero slot
+  36: _onbV2PreparePaywall,        // shared _renderPaywall machinery
 };
 
 // Step 3 prepare hook — injects the owl SVG into the hero slot and
@@ -28762,13 +29119,58 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 17 — Paywall (onboarding shell). Shares .paywall-* class
-     contracts with #modal-paywall above so a single _renderPaywall()
-     drives both, scoped by _paywallActiveRoot. Skip corner exits and
-     advances; purchase / restore success also route through _exitPaywall,
-     which fires the onClose set by _onbV2PreparePaywall. No close X and
-     no modal backdrop — Skip means "skip this step" (matches the signup
-     step); X on the modal shell means "close the overlay". -->
+<!-- Step 34 (v11) — Trial intro. Owl hero + head + three benefit
+     rows + primary CTA. Gated by TRIAL_ENABLED at the flow level;
+     the DOM is always present so a flag flip requires no HTML
+     changes, just JS. Benefit rows rendered by _onbV2PrepareTrial
+     from _ONB_COPY.trial.items. -->
+<div id="onb-v2-trial" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
+  <div class="onb-v2-inner">
+    <div class="onb-v2-signup-hero" id="onb-v2-trial-owl" aria-hidden="true"></div>
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-trial-head"></h1>
+      <div class="onb-v2-trial-benefits" id="onb-v2-trial-benefits"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-trial-cta" onclick="_onbV2CtaTrial()"></button>
+  </div>
+</div>
+
+<!-- Step 35 (v11) — Reminder promise. Amber bell hero + head + sub
+     + "Continue for free" CTA. Bell injected by
+     _onbV2PrepareReminderPromise; head/sub/CTA bound in
+     _onbApplyLang. The single screen that turns a trial from a trap
+     into an offer — everyone who has forgotten to cancel something
+     is watching for it. -->
+<div id="onb-v2-reminder-promise" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <div class="onb-v2-reminder-hero" id="onb-v2-reminder-promise-hero" aria-hidden="true"></div>
+      <h1 class="onb-v2-head" id="onb-v2-reminder-promise-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-reminder-promise-sub"></p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-reminder-promise-cta" onclick="_onbV2CtaReminderPromise()"></button>
+  </div>
+</div>
+
+<!-- Step 36 (v11) — Paywall (onboarding shell). Shares .paywall-*
+     class contracts with #modal-paywall above so a single
+     _renderPaywall() drives both, scoped by _paywallActiveRoot.
+     Skip corner exits and advances; purchase / restore success also
+     route through _exitPaywall, which fires the onClose set by
+     _onbV2PreparePaywall. No close X and no modal backdrop — Skip
+     means "skip this step" (matches the signup step); X on the
+     modal shell means "close the overlay".
+
+     Trial mode (TRIAL_ENABLED = true): the .paywall-timeline and
+     .paywall-no-payment-due elements below are populated + shown by
+     _renderPaywall from _ONB_COPY.paywallTrial. When the flag is
+     false, both are hidden inline and the plain paywall renders
+     with no trial UI at all — no timeline, no pill, no per-card
+     "3 days free" footer, no "$0.00" button. -->
 <div id="onb-v2-paywall" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-paywall-skip" onclick="_exitPaywall('skip')"></button>
   <div class="onb-progress" aria-hidden="true" data-step="5">
@@ -28779,6 +29181,17 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="paywall-eyebrow"></div>
     <h1 class="paywall-headline"></h1>
     <p class="paywall-sub"></p>
+    <!-- Trial-mode elements — hidden by default, populated + shown
+         by _renderPaywall when TRIAL_ENABLED is on AND the paywall
+         is in onboarding mode. -->
+    <div class="paywall-timeline" style="display:none" aria-hidden="true"></div>
+    <div class="paywall-no-payment-due" style="display:none" aria-hidden="true">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" fill="#22C55E"/>
+        <path d="M7 12.5 L10.5 16 L17 9" stroke="#FFFFFF" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="paywall-no-payment-label"></span>
+    </div>
     <div class="paywall-cards">
       <button type="button" class="paywall-card paywall-card-monthly" onclick="_selectPaywallPackage('monthly')">
         <div class="paywall-card-title paywall-monthly-title"></div>
@@ -29068,7 +29481,7 @@ document.addEventListener('DOMContentLoaded', function() {
      etc. Populated by _renderPaywall() using .paywall-* class selectors
      scoped by _paywallActiveRoot — the same render logic drives the
      onboarding paywall step (#onb-v2-paywall below). Trial framing
-     controlled by PAYWALL_TRIAL_ENABLED in the JS block. -->
+     controlled by TRIAL_ENABLED in the JS block. -->
 <div class="modal-overlay" id="modal-paywall">
   <div class="modal-box paywall-box">
     <div class="paywall-topbar">
