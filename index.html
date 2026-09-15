@@ -12880,72 +12880,65 @@ function _onbShowScreen(screenId) {
 // paths (search corpus_onboarding_flow_version) — mismatch triggers
 // a reset to step 1 rather than a mapping table (small population,
 // simpler to restart than to translate).
-const _ONB_FLOW_VERSION = '4';
+const _ONB_FLOW_VERSION = '5';
 
-const _ONB_TOTAL_STEPS = 24;
+const _ONB_TOTAL_STEPS = 36;
 // Which phase (1..6) each step belongs to. Drives the 6-pill progress.
+// v11 layout: five acts fold into six pills the way the mockup pill
+// counts do — the mockup's own pill values are the source of truth
+// (some Act 3/5 screens deliberately omit pills for flow moments).
 const _ONB_STEP_TO_PHASE = {
-  1: 1, 2: 1, 3: 1,                                              // welcome / problem / solution
-  4: 2, 5: 2, 6: 2, 7: 2,                                        // signup / name / age / phone hours
-  8: 3, 9: 3,                                                    // shock / plan intro
-  10: 4, 11: 4, 12: 4, 13: 4,                                    // subject / Q1 / Q2 / Q3
-  14: 5, 15: 5, 16: 5, 17: 5, 18: 5, 19: 5, 20: 5, 21: 5, 22: 5, // Q4 / mirror / notifications / paywall / let's-start / dialogue / streak / goal / review
-  23: 6, 24: 6,                                                  // journey / commit
+  1: 1,                            // welcome (no pills rendered)
+  2: 1, 3: 1, 4: 1,                // problem / solution / signup
+  5: 2, 6: 2, 7: 2, 8: 2,          // name / gender / age / hours
+  9: 3, 10: 3,                     // shock / bridge
+  11: 4,                           // subject (Act 2 opener)
+  12: 3,                           // honesty — pill 3 per mockup: this
+                                   // MOVED beat still reads as a shock-
+                                   // adjacent screen visually
+  13: 4, 14: 4, 15: 4,             // Q1 / Q2 / Q3
+  16: 5, 17: 5,                    // reflection / how-it-works
+                                   // 18–22: taste block, pills hidden
+  23: 5, 24: 5,                    // streak / rating
+                                   // 25–26: building / plan-ready, pills hidden
+  27: 6, 28: 6, 29: 6, 30: 6,      // plan / commitment / daily goal / adds-up
+  31: 6, 32: 6,                    // notif pre-prompt / OS dialog
+                                   // 33–36: reviews / trial / promise / paywall, pills hidden
 };
 // DOM ids in step order. Steps not yet built map to null; _onbShowStep
-// treats a null slot as "not implemented yet, jump to completion" so a
-// partial-ladder commit can ship without HTML for the tail.
+// treats a null slot as "not built yet" and lands on home WITHOUT
+// marking corpus_onboarding_done — see the partial-ladder mitigation
+// in _onbShowStep for the full note. Commits 2-5 fill in slots 11-36.
 const _ONB_STEP_TO_ID = {
+  // Act 1 — The Hook. All 10 slots built in this commit.
   1:  'onb-v2-welcome',
   2:  'onb-v2-problem',
-  // Solution sits between the problem and the signup ask in flow v3 —
-  // the user first sees the value pitch, THEN is invited to make an
-  // account. Reversing this order (v2) put signup before the reader
-  // knew what they'd be signing up for.
   3:  'onb-v2-solution',
-  // Signup moved to step 4 in flow v3 (was step 3 in v2). Now follows
-  // solution so the offer lands after the value proposition. Handlers
-  // use postAuthContinue to route auth success back into onboarding at
-  // step 5 (name) instead of home.
+  // Signup at step 4. Skip button removed in v11 (mockup: "No skip, so
+  // no justification. A required step should not argue its case.").
+  // postAuthContinue routes back into onboarding at step 5 (name).
   4:  'onb-v2-signup',
   5:  'onb-v2-name',
-  6:  'onb-v2-age',
-  7:  'onb-v2-hours',
-  8:  'onb-v2-shock',
-  9:  'onb-v2-plan',
-  10: 'onb-v2-subject',
-  11: 'onb-v2-q1',
-  12: 'onb-v2-q2',
-  13: 'onb-v2-q3',
-  // Q4 sits before mirror in flow v3 (was 14=mirror, 15=Q4 in v2). Q4
-  // stays grouped with the other Q-prompts, and mirror becomes the
-  // last emotional beat before the paywall — the user sees their full
-  // set of picks reflected back, then the paywall.
-  14: 'onb-v2-q4',
-  15: 'onb-v2-mirror',
-  // Step 16 (notifications pre-prompt) — flow v4 insertion. Placed
-  // BEFORE paywall so the OS-permission ask doesn't inherit a "no"
-  // frame from a paywall decline, and so paywall drop-outs have
-  // already been asked on the way past. Custom in-app screen; the
-  // native OS dialog fires only on the primary CTA. "Not now" sets
-  // dailyReminder.prePromptDeferred so the OS ask stays unspent.
-  16: 'onb-v2-notifications',
-  // Step 17 (paywall) — full onboarding step (was step 16 in v3).
-  // Shares the DOM chrome + prepare hook pattern with every other
-  // onboarding step; the underlying paywall render / purchase /
-  // restore logic is unchanged and reused by the modal-mode paywall
-  // (chapter tap, bonus tap, etc.) via _paywallActiveRoot scoping.
-  17: 'onb-v2-paywall',
-  18: 'onb-v2-lets-start',
-  // Step 19 has no v2 DOM node — the reader takes over the viewport.
-  // _onbShowStep detects n === 19 and routes to _onbEnterFirstDialogue
-  // instead of the normal id-lookup path. (Was step 18 in flow v3.)
-  19: null,
-  20: 'onb-v2-streak',
-  21: 'onb-v2-goal',
-  22: 'onb-v2-review',
-  23: 'onb-v2-journey',
-  24: 'onb-v2-commit',
+  // Gender inserted in v11 (new). Priming-only field; no downstream
+  // gate branches on it.
+  6:  'onb-v2-gender',
+  7:  'onb-v2-age',
+  8:  'onb-v2-hours',
+  9:  'onb-v2-shock',
+  // Bridge (v11 name for the plan intro slot). Copy shifted from
+  // "You have five minutes a day. Let's build your plan." to the
+  // mockup's warmer two-line "It doesn't have to go that way. / You
+  // have five minutes. Let's build a plan." with a "Let's build it" CTA.
+  10: 'onb-v2-plan',
+  // Act 2 — The Mirror. Built in Commit 2.
+  11: null, 12: null, 13: null, 14: null, 15: null, 16: null,
+  // Act 3 — The Taste. Built in Commit 3.
+  17: null, 18: null, 19: null, 20: null, 21: null, 22: null, 23: null, 24: null,
+  // Act 4 — The Plan. Built in Commit 4.
+  25: null, 26: null, 27: null, 28: null, 29: null, 30: null,
+  // Act 5 — The Ask. Built in Commit 5 (screens 34-36 blocked on RC
+  // 3-day trial config landing on both stores first).
+  31: null, 32: null, 33: null, 34: null, 35: null, 36: null,
 };
 
 // Bilingual copy map for the intro screens (1-3). Later commits will
@@ -12986,6 +12979,21 @@ const _ONB_COPY = {
     placeholder: { en: 'Your name',                he: 'השם שלך' },
     cta:         { en: 'Continue',                 he: 'המשך' },
   },
+  // Step 6 (v11-new) — Gender. Priming-only: no downstream flow reads
+  // this. Mockup note: "For your understanding of the audience.
+  // Nothing in the app branches on it." Four options in a fixed order;
+  // stable ids (English snake_case) so cohorts stay comparable across
+  // language toggles.
+  gender: {
+    head: { en: 'How do you identify?', he: 'איך אתם מזדהים?' },
+    cta:  { en: 'Continue',             he: 'המשך' },
+    options: [
+      { id: 'woman',              text: { en: 'Woman',           he: 'אישה' } },
+      { id: 'man',                text: { en: 'Man',             he: 'גבר' } },
+      { id: 'other',              text: { en: 'Another way',     he: 'אחרת' } },
+      { id: 'prefer_not_to_say',  text: { en: 'Rather not say',  he: 'מעדיף/ה לא לומר' } },
+    ],
+  },
   age: {
     // Greeting sits above the head — first personal-address moment
     // after name capture. Interpolated in _onbV2PrepareAge.
@@ -13010,12 +13018,15 @@ const _ONB_COPY = {
     // only cta is static here.
     cta: { en: 'Continue', he: 'המשך' },
   },
+  // Step 10 in v11 — the Bridge (was called "plan intro" through v4).
+  // Two-line copy per the v11 mockup: first line concedes the shock,
+  // second line offers the reframe + micro-commit.
   plan: {
-    head: {
-      en: 'You have <span class="onb-v2-em">five minutes a day</span>. Let\'s build your plan.',
-      he: 'יש לך <span class="onb-v2-em">חמש דקות ביום</span>. בוא נבנה תוכנית.',
-    },
-    cta: { en: 'Continue', he: 'המשך' },
+    head: { en: "It doesn't have to go that way.",
+            he: 'זה לא חייב להיות ככה.' },
+    sub:  { en: "You have five minutes. Let's build a plan.",
+            he: 'יש לכם חמש דקות. בואו נבנה תוכנית.' },
+    cta:  { en: "Let's build it", he: 'בואו נבנה' },
   },
   subject: {
     head: { en: 'Where would you like to start?', he: 'מאיפה תרצה להתחיל?' },
@@ -13218,10 +13229,11 @@ const _ONB_COPY = {
       line: { en: "We'll get you there.", he: 'ואנחנו נדאג שתגיע לשם.' },
     },
   },
-  // Step 19 has no copy block — it's the reader taking over the visual
-  // layer. _onbEnterFirstDialogue calls openReader(1, 1); finishDay's
-  // onboarding guard runs _onbFinishFirstDialogue on completion, which
-  // shows the thinker card wired to advance to step 20.
+  // v11 note: what used to sit here in v4 (a copy-block placeholder
+  // for the reader-takeover first-dialogue step) is gone — the v11
+  // taste (screens 19-22) replaces the openReader dialogue with a
+  // two-page quote + a question, and each of those screens gets its
+  // own copy block when Act 3 lands in Commit 3.
 
   // Step 21 — daily goal. Recovered verbatim from the v1 goal screen
   // (main:index.html around 22293) — three cards (one / two / own_pace)
@@ -13402,8 +13414,11 @@ function _onbApplyLang(lang) {
   setHTML('onb-v2-hours-head',    'hours',    'head');
   setText('onb-v2-hours-cta',     'hours',    'cta');
   setText('onb-v2-shock-cta',     'shock',    'cta');
-  setHTML('onb-v2-plan-head',     'plan',     'head');
+  setText('onb-v2-plan-head',     'plan',     'head');
+  setText('onb-v2-plan-sub',      'plan',     'sub');
   setText('onb-v2-plan-cta',      'plan',     'cta');
+  setText('onb-v2-gender-head',   'gender',   'head');
+  setText('onb-v2-gender-cta',    'gender',   'cta');
   setText('onb-v2-subject-head',  'subject',  'head');
   setText('onb-v2-subject-cta',   'subject',  'cta');
   setHTML('onb-v2-q1-head',       'q1',       'head');
@@ -13447,7 +13462,10 @@ function _onbApplyLang(lang) {
   setText('onb-v2-signup-sub',    'signup',   'sub');
   setText('onb-signup-apple-text',  'signup', 'apple');
   setText('onb-signup-google-text', 'signup', 'google');
-  setText('onb-v2-signup-skip',   'signup',   'skip');
+  // onb-v2-signup-skip: element removed in v11 (no skip on signup).
+  // Copy string _ONB_COPY.signup.skip stays because the paywall
+  // localizer at _onbV2PreparePaywall (index.html:13795-13797) still
+  // reads it for the paywall's own skip corner.
   // Legal disclosure line — splices in Terms + Privacy anchor tags at
   // the { terms } / { privacy } placeholders. Uses innerHTML so the
   // link markup lands as real anchors rather than escaped text.
@@ -13490,21 +13508,36 @@ function _onbSetLang(lang) {
 
 // Show step N. Applies current language, sets the 6-pill progress to
 // the appropriate phase, and toggles the .onb-active class on the
-// step's DOM node. If the step's DOM id is null (later-commit
-// placeholder), falls through to completion so commit A doesn't wedge
-// a user on a missing screen.
+// step's DOM node. If the step's DOM id is null, treats it as a
+// partial-ladder ship — see the mitigation below.
 function _onbShowStep(n) {
   if (n < 1 || n > _ONB_TOTAL_STEPS) { _onbComplete(); return; }
-  // Step 19 — reader takes over the viewport (no v2 DOM node). The
-  // onboarding resumes after the user finishes the dialogue via
-  // finishDay's _onbInFirstDialogue guard → _onbFinishFirstDialogue.
-  // (Was step 16 in flow v1, step 18 in v3; renumbered when the
-  // notification pre-prompt was inserted before the paywall in v4.)
-  if (n === 19) { _onbEnterFirstDialogue(); return; }
   const id = _ONB_STEP_TO_ID[n];
   if (!id) {
-    // Not-yet-built step — early completion for commit-A cadence.
-    _onbComplete();
+    // Partial-ladder ship (v11 acts building out commit by commit):
+    // this step's DOM isn't built yet. Land on home WITHOUT marking
+    // corpus_onboarding_done and WITHOUT firing the walkthrough — the
+    // user hasn't actually completed onboarding, and marking them done
+    // would freeze them out of the remaining acts when subsequent
+    // commits ship. It would also fire onboarding_completed after only
+    // Act N, which is precisely the funnel signal the v11 rebuild
+    // exists to fix. Step cursor is cleared so next open restarts at
+    // step 1 (mapping cross-ship-boundary state is more complexity
+    // than a small population deserves — same call as the flow-
+    // version-bump reset).
+    //
+    // Post-Commit-5, when all 36 slots have real DOM ids, this branch
+    // is defensive-only: reaching it means an _onbAdvanceStep target
+    // was invalid. Keep the warn + telemetry event; it's a bug signal.
+    console.warn('[onb] step ' + n + ' has no DOM id yet — partial-ladder exit');
+    try { localStorage.removeItem('corpus_onboarding_step'); } catch(e) {}
+    document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
+      s.style.display = 'none';
+      s.classList.remove('onb-active');
+    });
+    try { _phCapture('onboarding_partial_exit', { step: n, flow_version: 5 }); } catch(e) {}
+    renderHome();
+    showScreen('home');
     return;
   }
   const lang = state.lang || localStorage.getItem('corpus_lang') || 'he';
@@ -13535,7 +13568,7 @@ function _onbShowStep(n) {
   // paths can detect an old-layout step number and reset to step 1
   // rather than resume onto the wrong screen.
   try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(e) {}
-  try { _phCapture('onboarding_step_shown', { step: n, phase: phase, flow_version: 4 }); } catch(e) {}
+  try { _phCapture('onboarding_step_shown', { step: n, phase: phase, flow_version: 5 }); } catch(e) {}
 }
 
 // Move from step `from` to step `to`, optionally merging a patch of
@@ -13565,11 +13598,6 @@ function _onbComplete() {
   try { saveState(); } catch(e) {}
   try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
   try { localStorage.removeItem('corpus_onboarding_step'); } catch(e) {}
-  // Belt-and-braces: force the first-dialogue guard off even if the
-  // user's flow left it set. If true, finishDay's guard would route
-  // every future completion through _onbFinishFirstDialogue and
-  // suppress level-up + goal-met + chapter-complete + bonus-unlock.
-  try { state._onbInFirstDialogue = false; saveStateLocal(); } catch(e) {}
   try { _phCapture('onboarding_completed', { platform: _phPlatform(), lang: state.lang || 'he' }); } catch(e) {}
   document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
     s.style.display = 'none';
@@ -13592,8 +13620,8 @@ function _onbV2CtaProblem() { _onbAdvanceStep(2, 3); }
 // Screen 3 (solution) CTA — advance to screen 4 (signup).
 function _onbV2CtaSolution() { _onbAdvanceStep(3, 4); }
 
-// Screen 4 (name) — capture the trimmed name into state.userName +
-// state.onbAnswers.name, advance.
+// Screen 5 (name) — capture the trimmed name into state.userName +
+// state.onbAnswers.name, advance to Gender (v11 step 6, new).
 function _onbV2CtaName() {
   const el = document.getElementById('onb-v2-name-input');
   const name = ((el && el.value) || '').trim().slice(0, 40);
@@ -13602,28 +13630,51 @@ function _onbV2CtaName() {
   _onbAdvanceStep(5, 6, { name: name });
 }
 
-// Screen 5 (age) — validate 13..120 and advance. CTA is otherwise
+// Screen 6 (gender, v11-new) — single-choice from four options. Priming-
+// only capture (no runtime branch reads this); persisted to
+// state.onbAnswers.gender and synced to Supabase via the standard
+// onboarding_answers pipeline. Tap sets the pick + enables the CTA;
+// CTA advances to Age (step 7).
+let _onbV2GenderPick = null;
+function _onbV2GenderTap(optionId) {
+  _onbV2GenderPick = optionId;
+  state.onbAnswers.gender = optionId;
+  document.querySelectorAll('#onb-v2-gender .onb-v2-card').forEach(c => {
+    c.classList.toggle('is-selected', c.dataset.option === optionId);
+  });
+  const cta = document.getElementById('onb-v2-gender-cta');
+  if (cta) cta.disabled = false;
+}
+function _onbV2CtaGender() {
+  const pick = _onbV2GenderPick || state.onbAnswers.gender;
+  if (!pick) return;
+  _onbAdvanceStep(6, 7, { gender: pick });
+}
+
+// Screen 7 (age) — validate 13..120 and advance. CTA is otherwise
 // disabled by the input listener wired in _onbV2PrepareAge.
 function _onbV2CtaAge() {
   const el = document.getElementById('onb-v2-age-input');
   const val = parseInt((el && el.value) || '', 10);
   if (!(val >= 13 && val <= 120)) return;
   state.userAge = val;
-  _onbAdvanceStep(6, 7, { age: val });
+  _onbAdvanceStep(7, 8, { age: val });
 }
 
-// Screen 6 (phone hours slider) — always has a value, no disabled state.
+// Screen 8 (phone hours slider) — always has a value, no disabled state.
 function _onbV2CtaHours() {
   const el = document.getElementById('onb-v2-hours-input');
   const val = parseInt((el && el.value) || '4', 10) || 4;
-  _onbAdvanceStep(7, 8, { phoneHours: val });
+  _onbAdvanceStep(8, 9, { phoneHours: val });
 }
 
-// Screen 7 (shock number) — display-only; advance on tap.
-function _onbV2CtaShock() { _onbAdvanceStep(8, 9); }
+// Screen 9 (shock number) — display-only; advance on tap.
+function _onbV2CtaShock() { _onbAdvanceStep(9, 10); }
 
-// Screen 8 (plan intro) — display-only; advance to subject picker.
-function _onbV2CtaPlan() { _onbAdvanceStep(9, 10); }
+// Screen 10 (bridge) — display-only; advance into Act 2. In Commit 1,
+// step 11 is null → the partial-ladder mitigation in _onbShowStep
+// lands the user on home unmarked. Commit 2 fills in Act 2 slots.
+function _onbV2CtaPlan() { _onbAdvanceStep(10, 11); }
 
 // Screen 9 (subject picker) — single selection required; CTA disabled
 // otherwise (set in _onbV2PrepareSubject).
@@ -13805,116 +13856,22 @@ function _onbV2PreparePaywall() {
   } catch(e) {}
 }
 
-// Step 19 — first-dialogue entry. Reader takes over the visual
-// layer. state._onbInFirstDialogue is the guard finishDay reads to
-// route the tail to _onbFinishFirstDialogue instead of the normal
-// stats + celebration + guest-prompt chain.
-function _onbEnterFirstDialogue() {
-  state._onbInFirstDialogue = true;
-  document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
-    s.style.display = 'none';
-    s.classList.remove('onb-active');
-  });
-  try { localStorage.setItem('corpus_onboarding_step', '19'); } catch(e) {}
-  try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(e) {}
-  try { _phCapture('onboarding_step_shown', { step: 19, phase: 5, flow_version: 4 }); } catch(e) {}
-  // Chapter 1 / Day 1 is the picked subject's first real lesson.
-  // openReader handles theme, rendering, and section-0 setup.
-  try { openReader(1, 1); } catch(e) {
-    console.warn('[onb-v2] openReader failed for first dialogue', e);
-    state._onbInFirstDialogue = false;
-    _onbShowStep(20);
-  }
-}
+// v11 cut the in-onboarding first-dialogue: the taste (screens 19-22)
+// replaces it. See the mockup — the taste is a two-page quote + a
+// question, not a real openReader dialogue, so finishDay never fires
+// during onboarding and the _onbInFirstDialogue guard has nothing to
+// protect against. The two functions that used to live here
+// (_onbEnterFirstDialogue, _onbFinishFirstDialogue) plus the guard
+// itself, the boot-time repair for stuck flags, and the three
+// telemetry `is_onboarding` props that read from the flag were all
+// deleted in this commit. corpus_first_dialogue_completed_at now gets
+// set exclusively by the normal finishDay path (index.html around
+// 21000) on the user's first post-onboarding completion, which is
+// where it belongs.
 
-// Called from finishDay when state._onbInFirstDialogue is set. Persists
-// the same completion state effects finishDay would run (XP + streak +
-// unlock + first_dialogue_completed_at + posthog capture), minus the
-// celebration-queue push, endowment eligibility trigger, and guest-
-// prompt chain — step 20 is the day-1 streak beat; the endowment
-// overlay would double up on it. Then shows the thinker card with a
-// single "Continue" button that advances to step 20.
-function _onbFinishFirstDialogue() {
-  // Clear the guard the moment the reader closes. If we defer this to
-  // the thinker card's Continue button (or _onbComplete), a force-close
-  // between finishDay and the button tap leaves the flag persisted to
-  // localStorage — which then routes every future dialogue completion
-  // through this bare-bones tail and suppresses all celebrations.
-  // Belt-and-braces clears remain below on the exit paths.
-  state._onbInFirstDialogue = false;
-  const chapter = getW().find(w => w.id === state.currentWeek);
-  const day = chapter && chapter.days.find(d => d.id === state.currentDay);
-  if (!chapter || !day) {
-    _onbShowStep(20);
-    return;
-  }
-  const key = dayKey(state.currentWeek, state.currentDay);
-  const thinkerId = day.thinkerId;
-  const isNewThinker = thinkerId && !state.unlockedThinkers.includes(thinkerId);
-
-  state.readerXP += 30;
-  state.readerXP += Math.min(state.dailyStreak * 2, 10);
-  state.xp += state.readerXP;
-  state.completedDays[key] = true;
-  state.todayCompleted = (state.todayCompleted || 0) + 1;
-  const todayIndex = new Date().getDay();
-  if (!state.activeDays) state.activeDays = {};
-  state.activeDays[todayIndex] = true;
-  try { updateDailyStreak(); } catch(e) {}
-  if (isNewThinker) state.unlockedThinkers.push(thinkerId);
-
-  if (!localStorage.getItem('corpus_first_dialogue_completed_at')) {
-    try { localStorage.setItem('corpus_first_dialogue_completed_at', new Date().toISOString()); } catch(e) {}
-    try {
-      _phCapture('first_dialogue_completed', {
-        dialogue_id: String(state.currentWeek) + '-' + String(state.currentDay),
-        subject: state.subject || null,
-        seconds_since_onboarding_started: _secondsSinceOnboardingStart(),
-        is_onboarding: true,
-      });
-    } catch(e) {}
-  }
-  // Mirror the normal finishDay path's day_completed. Without this the
-  // onboarding cohort is invisible to every retention/completion cohort
-  // keyed off day_completed (they see the pre-existing "day 2 cliff"
-  // that's actually just the first natural dialogue). is_onboarding
-  // lets analysis include or exclude it via a single filter.
-  try {
-    posthog.capture('day_completed', {
-      chapter: state.currentWeek,
-      day: state.currentDay,
-      is_onboarding: true,
-    });
-  } catch(e) {}
-  try { saveState(); } catch(e) { try { saveStateLocal(); } catch(e2) {} }
-
-  const thinker = (typeof getT === 'function') ? getT().find(t => t.id === thinkerId) : null;
-  if (thinker && isNewThinker) {
-    // showThinkerCardScreen sets up the flip card + Next/Back buttons.
-    // We call it, then overwrite the buttons: hide "Next Dialogue",
-    // relabel "Back to Home" as "Continue" wired to advance to step 20.
-    try { showThinkerCardScreen(thinker, chapter, day); } catch(e) {}
-    const nextBtn = document.getElementById('modal-next-btn');
-    const backBtn = document.getElementById('modal-continue-btn');
-    if (nextBtn) nextBtn.style.display = 'none';
-    if (backBtn) {
-      const isEn = state.lang === 'en';
-      backBtn.textContent = isEn ? 'Continue' : 'המשך';
-      backBtn.onclick = () => {
-        state._onbInFirstDialogue = false;
-        try { document.getElementById('modal-complete').classList.remove('active'); } catch(e) {}
-        _onbShowStep(20);
-      };
-    }
-  } else {
-    state._onbInFirstDialogue = false;
-    _onbShowStep(20);
-  }
-}
-
-// Screen 18 (let's start) — statement screen bridging paywall → first
-// dialogue. Head + sub in the standard v2 statement layout; CTA
-// advances into the reader takeover at step 19.
+// Screen 18 (let's start) — bridge into the first dialogue in v4;
+// still present in v11 (steps renumber to 18 later). Wired up when
+// Act 3 lands in Commit 3.
 function _onbV2CtaLetsStart() { _onbAdvanceStep(18, 19); }
 
 // Screen 20 (day-1 streak) — display-only celebration; advance to 21 (goal).
@@ -14600,32 +14557,55 @@ function _onbV2PrepareCommit() {
   if (cta) cta.disabled = !pick;
 }
 
+// Gender (v11 step 6) — plain-label option cards, no icons. Diverges
+// from _onbV2PrepareCommit's card render because _onbV2CardHTML wants
+// an opt.icon (SVG symbol id) that we deliberately don't have here.
+// Structure otherwise mirrors commit's pattern (dataset.option, is-
+// selected toggle, click → _onbV2GenderTap, CTA gate).
+function _onbV2PrepareGender() {
+  const list = document.getElementById('onb-v2-gender-cards');
+  const cta  = document.getElementById('onb-v2-gender-cta');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+  const pick = (state.onbAnswers && state.onbAnswers.gender) || '';
+  _onbV2GenderPick = pick || null;
+  const options = (_ONB_COPY.gender && _ONB_COPY.gender.options) || [];
+  list.innerHTML = '';
+  options.forEach(opt => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'onb-v2-card';
+    card.dataset.option = opt.id;
+    if (opt.id === pick) card.classList.add('is-selected');
+    const label = document.createElement('span');
+    label.className = 'onb-v2-card-label';
+    label.textContent = isEn ? opt.text.en : opt.text.he;
+    card.appendChild(label);
+    card.onclick = () => _onbV2GenderTap(opt.id);
+    list.appendChild(card);
+  });
+  if (cta) cta.disabled = !pick;
+}
+
 // Map from step number → prepare hook. Consumed by _onbShowStep.
 // Only steps with dynamic content need entries; static-copy screens
-// (welcome, problem, solution, plan) rely on _onbApplyLang alone.
-// Flow v4 layout: signup at step 4 (after solution), Q4 at 14 (before
-// mirror at 15), notifications at 16 (pre-paywall pre-prompt), paywall
-// at 17 as a full onboarding step.
+// (welcome, problem, solution, bridge) rely on _onbApplyLang alone.
+// Flow v11 layout — Act 1 hooks land here in Commit 1; Acts 2-5 add
+// their own entries under v11 numbering as they ship. Old flow-v4
+// hooks for step numbers 10-24 (subject/Q1-4/mirror/notifications/
+// paywall/goal/journey/commit) were removed because their v4
+// numbering no longer maps to any DOM slot; the underlying prepare
+// functions still exist and get re-wired at their v11 step numbers
+// (11, 13-16, 21, 27, 28) as later acts land.
 const _ONB_STEP_HOOKS = {
-  4:  _onbV2PrepareSignup,
-  5:  _onbV2PrepareName,
-  6:  _onbV2PrepareAge,
-  7:  _onbV2PrepareHours,
-  8:  _onbV2PrepareShock,
-  10: _onbV2PrepareSubject,
-  11: _onbV2PrepareQ1,
-  12: _onbV2PrepareQ2,
-  13: _onbV2PrepareQ3,
-  14: _onbV2PrepareQ4,
-  15: _onbV2PrepareMirror,
-  16: _onbV2PrepareNotifications,
-  17: _onbV2PreparePaywall,
-  // 18 (let's-start) is static once _onbApplyLang runs.
-  // 19: handled specially in _onbShowStep (reader takeover, no v2 DOM).
-  // 20 (streak) + 22 (review) are static once _onbApplyLang runs.
-  21: _onbV2PrepareGoal,
-  23: _onbV2PrepareJourney,
-  24: _onbV2PrepareCommit,
+  4: _onbV2PrepareSignup,
+  5: _onbV2PrepareName,
+  6: _onbV2PrepareGender,
+  7: _onbV2PrepareAge,
+  8: _onbV2PrepareHours,
+  9: _onbV2PrepareShock,
+  // 10 (bridge) is static once _onbApplyLang runs.
+  // 11-36 land as later acts ship.
 };
 
 // Step 3 prepare hook — injects the owl SVG into the hero slot and
@@ -16728,18 +16708,15 @@ function loadState() {
   // full attribution heuristic. Also runs from loadProgressFromSupabase
   // because the cloud copy still has legacy keys for existing users.
   try { migrateChapterCompleteShown(); } catch(e) { console.warn('[migrate] chapterCompleteShown failed', e); }
-  // Boot-time repair for testers who upgraded into 1.3.3 with
-  // state._onbInFirstDialogue stuck as true — happens when the flow-v4
-  // step-19 first-dialogue tail didn't clear the flag before the app was
-  // closed. If left, finishDay routes every subsequent completion through
-  // _onbFinishFirstDialogue, suppressing every celebration overlay. Repair
-  // is safe: any legitimate mid-first-dialogue user also has
-  // corpus_onboarding_step='19' set, so we only clear the flag once
-  // onboarding is marked done.
-  if (localStorage.getItem('corpus_onboarding_done') && state._onbInFirstDialogue) {
-    state._onbInFirstDialogue = false;
+  // Belt-and-braces clear of state._onbInFirstDialogue for existing
+  // users whose persisted state predates the v11 rebuild — the flag
+  // is gone in v11 (see the delete-block near _onbShowStep) but a
+  // stuck true on an upgraded install would still be persisted in
+  // localStorage. Clearing once at boot means finishDay never reads
+  // the ghost flag from a defunct code path.
+  if (state._onbInFirstDialogue !== undefined) {
+    delete state._onbInFirstDialogue;
     try { saveStateLocal(); } catch(e) {}
-    console.log('[boot] cleared stuck _onbInFirstDialogue flag');
   }
   // Normalize state.dailyReminder for existing users whose persisted state predates this field.
   // Shape: { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false }.
@@ -19900,7 +19877,7 @@ function openReader(weekId, dayId, opts) {
     alert(state.lang === 'en' ? 'Coming soon' : 'בקרוב');
     return;
   }
-  try { posthog.capture('lesson_started', { chapter: weekId, day: dayId, is_onboarding: !!state._onbInFirstDialogue }); } catch(e) {}
+  try { posthog.capture('lesson_started', { chapter: weekId, day: dayId, is_onboarding: false }); } catch(e) {}
   // Funnel: first_dialogue_opened. Once per install (gated by
   // corpus_first_dialogue_opened_at). Monotonic timestamp, never cleared.
   if (!localStorage.getItem('corpus_first_dialogue_opened_at')) {
@@ -19908,7 +19885,7 @@ function openReader(weekId, dayId, opts) {
     _phCapture('first_dialogue_opened', {
       dialogue_id: String(weekId) + '-' + String(dayId),
       subject: state.subject || null,
-      is_onboarding: !!state._onbInFirstDialogue,
+      is_onboarding: false,
     });
   }
   state.currentWeek = weekId;
@@ -20888,16 +20865,11 @@ function finishDay() {
   // paths all agree.
   _readerActive = false;
 
-  // Onboarding v2 first-dialogue tail. Guard is set on step 15 entry
-  // (_onbEnterFirstDialogue) and cleared on the thinker card's Continue
-  // button. Bypasses the normal stats + celebration + prompt chain so
-  // onboarding steps 16-19 own those beats (16 = day-1 streak, 17 =
-  // review, 18 = journey, 19 = commit). See _onbFinishFirstDialogue
-  // for the minimal completion path it takes instead.
-  if (state._onbInFirstDialogue) {
-    _onbFinishFirstDialogue();
-    return;
-  }
+  // v11 note: the in-onboarding first-dialogue tail was cut when the
+  // taste (screens 19-22) replaced the openReader dialogue. finishDay
+  // no longer needs to branch for onboarding — the user's first real
+  // finishDay always happens post-onboarding, on home, as a normal
+  // event. See the delete-block near _onbShowStep for the full note.
 
   const chapter = getW().find(w => w.id === state.currentWeek);
   const day = chapter.days.find(d => d.id === state.currentDay);
@@ -22761,7 +22733,7 @@ function _readerBaseProps() {
     page_type:        _readerLastPageType,
     total_pages:      _readerLastPageTotal,
     is_first_dialogue: _isFirstDialogue(),
-    is_onboarding:    !!state._onbInFirstDialogue,
+    is_onboarding:    false,
     reader_version:   READER_VERSION,
   });
 }
@@ -26939,7 +26911,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 4 — Name capture. First input screen in the flow. Text input
+<!-- Step 5 — Name capture. First input screen in the flow. Text input
      styling from .onb-v2-input (see CSS). Enter key submits when valid. -->
 <div id="onb-v2-name" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="2">
@@ -26957,6 +26929,27 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <div class="onb-cta-holder">
     <button type="button" class="nav-btn onb-cta" id="onb-v2-name-cta" onclick="_onbV2CtaName()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 6 (v11-new) — Gender. Single-choice from four options with
+     no icons (mockup shows plain-text option cards). Options are
+     rendered by _onbV2PrepareGender from _ONB_COPY.gender.options so
+     the language toggle at any moment re-renders labels correctly.
+     Priming-only capture: nothing in the runtime app branches on
+     state.onbAnswers.gender. -->
+<div id="onb-v2-gender" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="2">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-gender-head"></h1>
+      <div class="onb-v2-cards" id="onb-v2-gender-cards"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-gender-cta" onclick="_onbV2CtaGender()" disabled></button>
   </div>
 </div>
 
@@ -27032,8 +27025,11 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 8 — Plan intro. Reframe from the shock: five minutes a day IS
-     the plan. Accent phrase is "five minutes a day" / "חמש דקות ביום". -->
+<!-- Step 10 (v11) — The Bridge. Was called "Plan intro" through v4.
+     Two-line copy: head concedes the shock ("It doesn't have to go
+     that way."), sub offers the reframe + micro-commit ("You have
+     five minutes. Let's build a plan."). Sub element added in the
+     v11 rebuild — v4 head absorbed both beats in a single line. -->
 <div id="onb-v2-plan" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="3">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
@@ -27041,6 +27037,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
       <h1 class="onb-v2-head" id="onb-v2-plan-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-plan-sub"></p>
     </div>
   </div>
   <div class="onb-cta-holder">
@@ -27255,10 +27252,11 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 20 — day-1 streak celebration. Flame icon (reuses #icon-streak
-     from the endowment overlay), amber eyebrow, head, sub, CTA.
-     Fires after the user finishes the first dialogue via
-     _onbFinishFirstDialogue → _onbShowStep(20). -->
+<!-- Step 23 (v11) — day-1 streak celebration. Flame icon (reuses
+     #icon-streak from the endowment overlay), amber eyebrow, head,
+     sub, CTA. Currently unreachable until Commit 3 (Act 3: Taste)
+     lands — v11 renumbers streak from 20 → 23 and the null-slot
+     mitigation catches any partial-ship advance at slot 23. -->
 <div id="onb-v2-streak" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
@@ -27396,7 +27394,12 @@ document.addEventListener('DOMContentLoaded', function() {
      Email is deliberately absent for this commit — see _onbSignupApple
      block comment. -->
 <div id="onb-v2-signup" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
-  <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-signup-skip" onclick="_onbV2CtaSignupSkip()"></button>
+  <!-- v11 note: the top-right Skip corner was removed. Mockup rationale
+       (screen 4): "No skip, so no justification. A required step should
+       not argue its case." Skip handler _onbV2CtaSignupSkip remains
+       defined in the JS for now — dead in v11 — but adding it back
+       would require re-doing the "the taste replaces the first
+       dialogue" argument, so keep it dead. -->
   <div class="onb-progress" aria-hidden="true" data-step="2">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
