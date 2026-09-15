@@ -5391,6 +5391,12 @@
     position: relative;
     z-index: 1;
     flex: 1;
+    /* Explicit text-align:center — buttons default to it via UA
+       stylesheets in most browsers, but Safari mobile has been
+       observed to inherit text-align:start from the flex parent
+       under WebKit. User reported the English label sitting off-
+       centre; this pins the alignment regardless of inheritance. */
+    text-align: center;
     padding: 8px 14px;
     background: transparent;
     border: none;
@@ -5819,24 +5825,51 @@
        continuous type with a color shift, not a highlight label. */
     color: var(--accent);
   }
-  /* Welcome (v11 screen 1) wordmark layout — small "Welcome to" line
-     above a big "Corpus" wordmark. Colors inherited from the parent
-     .onb-bg-purple-field (white on purple). Kept in .onb-screen.onb-v2
-     so text-scale + font-family propagate naturally. */
-  .onb-screen.onb-v2 .onb-v2-welcome-line {
+  /* Welcome (v11 screen 1) wordmark — MUST match the splash exactly
+     so the transition feels seamless. Splash rule (line 106):
+        font-family:'Nunito','Assistant',sans-serif; font-weight:900;
+        font-size:min(9.6vw, 9.6vh); letter-spacing:-0.5px;
+        line-height:1;
+     Position-wise, splash uses flex align-center on the whole
+     viewport — "Corpus" sits at true viewport center. Reproducing
+     that here requires absolute positioning (the flex layout with
+     a language toggle above would drift "Corpus" below center).
+     Both the mark and the "Welcome to" line are positioned
+     absolutely relative to the .onb-screen (position:fixed), so
+     top:50% / bottom:50% refer to the viewport.
+       .onb-v2-welcome-mark → mark's vertical center at viewport 50%.
+       .onb-v2-welcome-line → sits above the mark with a 16px gap. */
+  .onb-screen.onb-v2 .onb-v2-welcome-mark {
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
     font-family: 'Nunito', 'Assistant', sans-serif;
-    font-size: calc(15px * var(--text-scale));
-    font-weight: 700;
-    opacity: 0.85;
+    font-weight: 900;
+    font-size: min(9.6vw, 9.6vh);
+    letter-spacing: -0.5px;
+    line-height: 1;
+    color: #FFFFFF;
     margin: 0;
   }
-  .onb-screen.onb-v2 .onb-v2-welcome-mark {
+  .onb-screen.onb-v2 .onb-v2-welcome-line {
+    position: absolute;
+    inset-inline: 0;
+    /* bottom:50% means the line's bottom edge sits at 50% viewport.
+       Add margin equal to half the mark height + 16px gap so the
+       line ends just above where the mark starts. min(4.8vw, 4.8vh)
+       = half of min(9.6vw, 9.6vh). */
+    bottom: 50%;
+    margin-bottom: calc(min(4.8vw, 4.8vh) + 16px);
+    text-align: center;
     font-family: 'Nunito', 'Assistant', sans-serif;
-    font-size: calc(42px * var(--text-scale));
-    font-weight: 900;
-    letter-spacing: -0.02em;
-    line-height: 1;
-    margin: 4px 0 0;
+    font-weight: 700;
+    /* Bumped from 15px to 22px per user request. */
+    font-size: calc(22px * var(--text-scale));
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.2;
+    margin-top: 0;
   }
   .onb-screen.onb-v2 .onb-v2-sub {
     font-family: 'Nunito', 'Assistant', sans-serif;
@@ -6590,47 +6623,89 @@
     line-height: 1.45;
   }
 
-  /* Taste companion owl (steps 19 and 20). Reads as reading
-     alongside the user, not decoration. Bottom-inline-start on
-     page 19, bottom-inline-end on page 20 so the owl appears to
-     move across the screen as the story unfolds. Direction-aware
-     positioning via inset-inline-* so LTR + RTL stay symmetric.
-     Sized modest (56px) so it's a companion, not a mascot. */
+  /* Taste companion owls (steps 19 and 20). Two per page —
+     deliberately asymmetric: different sizes, different offsets,
+     each owl in its own unique position class. Reads as company,
+     slightly odd, rather than a decorative motif or a mirrored
+     corner pattern. Direction-aware via inset-inline-* so LTR and
+     RTL keep the same relative placement. Modest sizes (44-52px)
+     so they don't dominate. Slight rotations keep the placement
+     from feeling too neat. */
   .onb-screen.onb-v2 .onb-v2-taste-owl {
     position: absolute;
-    width: 56px;
-    height: 56px;
-    bottom: calc(96px + var(--safe-bottom));  /* clears the CTA */
     pointer-events: none;
-    opacity: 0.9;
+    opacity: 0.85;
   }
-  .onb-screen.onb-v2 .onb-v2-taste-owl.owl-left  { inset-inline-start: 24px; }
-  .onb-screen.onb-v2 .onb-v2-taste-owl.owl-right { inset-inline-end: 24px; }
   .onb-screen.onb-v2 .onb-v2-taste-owl svg { width: 100%; height: 100%; }
 
+  /* Page 19 (taste-1) — top-inline-end + bottom-inline-start.
+     Bigger owl bottom, smaller top; different offsets so they
+     don't read as bookends. */
+  .onb-screen.onb-v2 .onb-v2-taste-owl.owl-t1a {
+    top: calc(56px + var(--safe-top));
+    inset-inline-end: 22px;
+    width: 44px; height: 44px;
+    transform: rotate(-6deg);
+  }
+  .onb-screen.onb-v2 .onb-v2-taste-owl.owl-t1b {
+    bottom: calc(108px + var(--safe-bottom));
+    inset-inline-start: 34px;
+    width: 52px; height: 52px;
+    transform: rotate(4deg);
+  }
+
+  /* Page 20 (taste-2) — top-inline-start + bottom-inline-end.
+     Mirrors page 19's direction across the two pages so the owl
+     reads as "moving" as the reader turns from 19 to 20. Sizes
+     and offsets differ from page 19's pair, again to keep it
+     from feeling like a matched-motif. */
+  .onb-screen.onb-v2 .onb-v2-taste-owl.owl-t2a {
+    top: calc(48px + var(--safe-top));
+    inset-inline-start: 28px;
+    width: 48px; height: 48px;
+    transform: rotate(5deg);
+  }
+  .onb-screen.onb-v2 .onb-v2-taste-owl.owl-t2b {
+    bottom: calc(124px + var(--safe-bottom));
+    inset-inline-end: 46px;
+    width: 46px; height: 46px;
+    transform: rotate(-3deg);
+  }
+
   /* Taste-1 quote card (step 19) — italic pull-quote in a bordered
-     surface tile, with a small accent-colored source cite below. */
+     surface tile, with a small accent-colored source cite below.
+     Sizes bumped to make the quote dominant — it's the whole point
+     of the taste screen, so the type has to carry it. */
   .onb-screen.onb-v2 .onb-v2-quote-card {
     background: var(--surface);
     border: 2px solid var(--border);
     border-radius: 16px;
-    padding: 16px 18px;
+    padding: 20px 22px;
     font-family: 'Nunito', 'Assistant', sans-serif;
-    font-size: calc(15px * var(--text-scale));
+    font-size: calc(24px * var(--text-scale));
+    font-weight: 500;
     font-style: italic;
-    line-height: 1.5;
+    line-height: 1.4;
     text-align: start;
     color: var(--ink);
-    margin: 0 0 14px;
+    margin: 0 0 18px;
   }
   .onb-screen.onb-v2 .onb-v2-quote-source {
     display: block;
     font-style: normal;
     font-weight: 900;
-    font-size: calc(11px * var(--text-scale));
+    font-size: calc(14px * var(--text-scale));
     letter-spacing: 0.02em;
     color: var(--accent);
-    margin-top: 10px;
+    margin-top: 14px;
+  }
+  /* Taste prose (page 1 + page 2) — .onb-v2-sub base is already 22px
+     which is generous, but taste prose deserves more breathing
+     room than a standalone head-sub screen. Loosen line-height so
+     the paragraphs read like a book, not a card. */
+  .onb-screen.onb-v2 #onb-v2-taste-1 .onb-v2-sub,
+  .onb-screen.onb-v2 #onb-v2-taste-2 .onb-v2-sub {
+    line-height: 1.55;
   }
 
   /* Taste-2 punch line (step 20) — bolded closer that only philosophy
@@ -13545,7 +13620,7 @@ const _ONB_COPY = {
         b: { en: 'Earn their card',        he: 'מקבלים את הקלף' },
         t: { en: 'One card for every mind you meet.',
              he: 'קלף לכל הוגה שפגשתם.' } },
-      { icon: 'icon-books', hollow: true,
+      { icon: 'icon-books',
         b: { en: 'Build the collection',   he: 'אוספים' },
         t: { en: 'Your pantheon grows as you read.',
              he: 'הפנתיאון שלכם גדל.' } },
@@ -13634,29 +13709,49 @@ const _ONB_COPY = {
       correctIndex: 2,
     },
     psychology: {
-      thinkerName: 'Daniel Kahneman',
-      role:  { en: 'The Doubter', he: 'המפקפק' },
+      // Replaced Kahneman (focusing illusion — too mild for a first
+      // impression) with Freud on the unconscious. The claim "you
+      // are not in control of yourself" lands harder as the taste's
+      // opening move, and Freud is thinker id 'freud' in Psychology
+      // Chapter 1 Day 3 ("The Mental Iceberg") — so the first-card
+      // preview here corresponds to a thinker the user will
+      // actually meet on day 3 of their first chapter.
+      thinkerName: 'Freud',
+      // EN + HE deliberately diverge: "The Excavator" carries the
+      // digging-beneath-the-surface metaphor cleanly in English,
+      // but Hebrew "החופר" also reads colloquially as "the boring
+      // rambler" which undercuts the weight the card needs.
+      // "החוקר" (the investigator) reads clean, and Freud was a
+      // clinician — the investigator framing is accurate as well
+      // as safer. The two labels don't need to be literal
+      // translations of each other; each is right in its own
+      // language.
+      role:  { en: 'The Excavator', he: 'החוקר' },
       icon:  'icon-brain',
-      quote: { en: '"Nothing in life is as important as you think it is while you are thinking about it."',
-               he: '"שום דבר בחיים אינו חשוב כפי שאתם חושבים שהוא, בזמן שאתם חושבים עליו."' },
-      source: 'Daniel Kahneman, Thinking, Fast and Slow, Ch. 38',
-      page1: { en: 'Kahneman called this the focusing illusion. Ask someone how much happier they would be in California and they will tell you: much. Measure it, and Californians are no happier than anyone else.',
-               he: 'קהנמן קרא לזה אשליית המיקוד. שאלו מישהו כמה מאושר יותר הוא יהיה בקליפורניה, והוא יגיד: הרבה. תמדדו, והקליפורנים לא מאושרים יותר מאיש.' },
+      quote: { en: '"The ego is not master in its own house."',
+               he: '"האני אינו אדון בביתו שלו."' },
+      source: 'Freud, A Difficulty in the Path of Psycho-Analysis (1917)',
+      page1: { en: 'Vienna, 1917. Freud tells his audience: Copernicus showed you are not the center of the universe. Darwin showed you are not a separate species. Now, the third blow: you are not even in charge of your own mind.',
+               he: 'וינה, 1917. פרויד מסביר לקהל: קופרניקוס הראה שאתם לא מרכז היקום. דרווין הראה שאתם לא מין נפרד. עכשיו, המכה השלישית: אתם אפילו לא בשליטה על התודעה שלכם.' },
       page2Head: { en: 'What he meant', he: 'למה הוא התכוון' },
-      page2: { en: 'The trick is in the asking. The moment you point at something, it fills the frame. Weather, salary, a new phone: each one looks decisive while you are looking straight at it.',
-               he: 'הטריק הוא בשאלה. ברגע שמצביעים על משהו, הוא ממלא את המסגרת. מזג אוויר, משכורת, טלפון חדש: כל אחד נראה מכריע כשמסתכלים עליו ישר.' },
-      page2Punch: { en: '', he: '' },
-      scenario: { en: 'You are sure the promotion will change everything. Six months after you get it, you feel about the same.',
-                  he: 'אתם בטוחים שהקידום ישנה הכל. חצי שנה אחרי שקיבלתם אותו, אתם מרגישים בערך אותו דבר.' },
-      question: { en: 'What does the focusing illusion predict here?',
-                  he: 'מה אשליית המיקוד חוזה כאן?' },
+      page2: { en: 'Not that your thoughts are random. That most of what drives you was set in place before you were old enough to remember. Old fears, old attachments, patterns you never chose. The conscious mind explains what happened, then insists it decided.',
+               he: 'לא שהמחשבות שלכם אקראיות. אלא שרוב מה שמניע אתכם הותקן לפני שהייתם גדולים מספיק כדי לזכור. פחדים ישנים, קשרים ישנים, דפוסים שלא בחרתם. התודעה מסבירה מה קרה, ואז משכנעת את עצמה שהיא החליטה.' },
+      // Punch line lands the consequence rather than repeating the
+      // quote from page 1 — the reader already saw the quote, so
+      // restating it reads as filler.
+      page2Punch: { en: "You are not the author of yourself. You are the one who explains yourself, afterwards.",
+                    he: 'אתם לא מי שכותב אתכם. אתם מי שמסביר אתכם, בדיעבד.' },
+      scenario: { en: 'You find yourself furious at a coworker over something small. Later, alone, you realize they remind you of someone from your childhood you were never allowed to be angry with.',
+                  he: 'אתם מוצאים את עצמכם כועסים על עמית לעבודה בגלל משהו קטן. אחר כך, לבד, אתם מבינים שהוא מזכיר לכם מישהו מהילדות שלא הרשו לכם לכעוס עליו.' },
+      question: { en: 'According to Freud, what was doing the driving?',
+                  he: 'לפי פרויד, מה היה הכוח המניע?' },
       options: [
-        { en: 'The promotion was the wrong goal',                    he: 'הקידום היה המטרה הלא נכונה' },
-        { en: 'You overrated it precisely because you were thinking about it',
-          he: 'הערכתם אותו יתר על המידה דווקא כי חשבתם עליו' },
-        { en: 'You will adjust eventually',                          he: 'בסוף תסתגלו' },
+        { en: 'You were tired that day',        he: 'הייתם עייפים באותו יום' },
+        { en: 'The coworker was really annoying', he: 'העמית באמת היה מעצבן' },
+        { en: 'An old anger, redirected onto a new target: the unconscious at work',
+          he: 'כעס ישן, שהוסט אל מטרה חדשה: הלא-מודע פועל' },
       ],
-      correctIndex: 1,
+      correctIndex: 2,
     },
   },
   // Step 22 (v11) — First card reveal. Static preview only —
@@ -15012,33 +15107,35 @@ function _onbV2TasteCfg() {
   return (_ONB_COPY.taste && _ONB_COPY.taste[subj]) || _ONB_COPY.taste.philosophy;
 }
 
-// Step 19 (taste-1) — quote card + source + page-1 prose. Companion
-// owl injected into the bottom-inline-start corner (moves to
-// end-side on page 2 so the owl reads as travelling forward with
-// the reader).
+// Step 19 (taste-1) — quote card + source + page-1 prose. Two
+// companion owls injected asymmetrically (top-end + bottom-start,
+// different sizes/rotations) so the pair reads as company rather
+// than decoration.
 function _onbV2PrepareTaste1() {
   const isEn = state.lang === 'en';
   const cfg = _onbV2TasteCfg();
   const setEl = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  const setOwl = (id) => { const el = document.getElementById(id); if (el) el.innerHTML = _cloneOwlSvgHTML('owl-neutral'); };
   setEl('onb-v2-taste-1-quote',  isEn ? cfg.quote.en : cfg.quote.he);
   setEl('onb-v2-taste-1-source', cfg.source);   // source cite doesn't localize
   setEl('onb-v2-taste-1-page1',  isEn ? cfg.page1.en : cfg.page1.he);
-  const owlEl = document.getElementById('onb-v2-taste-1-owl');
-  if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
+  setOwl('onb-v2-taste-1-owl-a');
+  setOwl('onb-v2-taste-1-owl-b');
 }
 
 // Step 20 (taste-2) — "what he meant" head + page-2 prose + optional
 // punch line. Punch line is only in the philosophy config; hidden
-// entirely when empty on Smith / Kahneman. Owl moves to the
-// end-side corner.
+// entirely when empty on Smith / Freud. Owl pair mirrors page 19's
+// positions across the two pages (top-start + bottom-end here).
 function _onbV2PrepareTaste2() {
   const isEn = state.lang === 'en';
   const cfg = _onbV2TasteCfg();
   const setEl = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  const setOwl = (id) => { const el = document.getElementById(id); if (el) el.innerHTML = _cloneOwlSvgHTML('owl-neutral'); };
   setEl('onb-v2-taste-2-head',  isEn ? cfg.page2Head.en : cfg.page2Head.he);
   setEl('onb-v2-taste-2-page2', isEn ? cfg.page2.en     : cfg.page2.he);
-  const owlEl = document.getElementById('onb-v2-taste-2-owl');
-  if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
+  setOwl('onb-v2-taste-2-owl-a');
+  setOwl('onb-v2-taste-2-owl-b');
   const punchTxt = isEn ? (cfg.page2Punch && cfg.page2Punch.en) : (cfg.page2Punch && cfg.page2Punch.he);
   const punchEl = document.getElementById('onb-v2-taste-2-punch');
   if (punchEl) {
@@ -27621,7 +27718,14 @@ document.addEventListener('DOMContentLoaded', function() {
      continuous with the splash. Pills hidden via .onb-bg-purple-
      field CSS. Wordmark is two elements: a small "Welcome to" line
      over a big Latin "Corpus" mark (mark is static — brand rule
-     never localizes the word). -->
+     never localizes the word).
+
+     Line + mark are direct children of .onb-screen (not nested in
+     .onb-v2-inner) so their `position: absolute` uses the fixed
+     .onb-screen as the containing block — putting "Corpus" at
+     true viewport 50%, matching where the splash placed it. The
+     empty .onb-v2-inner remains as a flex spacer so
+     .onb-cta-holder still sits at the bottom of the flex column. -->
 <div id="onb-v2-welcome" class="onb-screen onb-v2 onb-bg-purple-field" style="display:none">
   <div class="onb-welcome-lang" dir="ltr">
     <span class="onb-lang-indicator" id="onb-v2-lang-indicator"></span>
@@ -27631,12 +27735,9 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="onb-progress" aria-hidden="true" data-step="1">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
-  <div class="onb-v2-inner">
-    <div class="onb-v2-copy">
-      <p class="onb-v2-welcome-line" id="onb-v2-welcome-line"></p>
-      <h1 class="onb-v2-welcome-mark">Corpus</h1>
-    </div>
-  </div>
+  <p class="onb-v2-welcome-line" id="onb-v2-welcome-line"></p>
+  <h1 class="onb-v2-welcome-mark">Corpus</h1>
+  <div class="onb-v2-inner"></div>
   <div class="onb-cta-holder">
     <button type="button" class="nav-btn onb-cta" id="onb-v2-welcome-cta" onclick="_onbV2CtaWelcome()"></button>
   </div>
@@ -27965,10 +28066,13 @@ document.addEventListener('DOMContentLoaded', function() {
       <p class="onb-v2-sub" id="onb-v2-taste-1-page1" style="text-align:start"></p>
     </div>
   </div>
-  <!-- Companion owl on the start-side (LTR: bottom-left; RTL:
-       bottom-right). Moves to the other corner on page 2 so it
-       reads as travelling with the user through the reading. -->
-  <div class="onb-v2-taste-owl owl-left" id="onb-v2-taste-1-owl" aria-hidden="true"></div>
+  <!-- Two companion owls, deliberately asymmetric — top-inline-end
+       + bottom-inline-start, different sizes, small rotations —
+       reads as company (slightly odd), not decoration. Positions
+       flip to top-inline-start + bottom-inline-end on page 20 so
+       the pair reads as travelling forward with the reader. -->
+  <div class="onb-v2-taste-owl owl-t1a" id="onb-v2-taste-1-owl-a" aria-hidden="true"></div>
+  <div class="onb-v2-taste-owl owl-t1b" id="onb-v2-taste-1-owl-b" aria-hidden="true"></div>
   <div class="onb-cta-holder">
     <button type="button" class="nav-btn onb-cta" id="onb-v2-taste-1-cta" onclick="_onbV2CtaTaste1()"></button>
   </div>
@@ -27986,9 +28090,11 @@ document.addEventListener('DOMContentLoaded', function() {
       <p class="onb-v2-sub onb-v2-taste-2-punch" id="onb-v2-taste-2-punch"></p>
     </div>
   </div>
-  <!-- Companion owl on the end-side — moved from left on page 1 so
-       the owl reads as accompanying the reader forward. -->
-  <div class="onb-v2-taste-owl owl-right" id="onb-v2-taste-2-owl" aria-hidden="true"></div>
+  <!-- Two companion owls, mirroring page 19 across the pair — top-
+       inline-start + bottom-inline-end, again with different sizes
+       and small counter-rotations. -->
+  <div class="onb-v2-taste-owl owl-t2a" id="onb-v2-taste-2-owl-a" aria-hidden="true"></div>
+  <div class="onb-v2-taste-owl owl-t2b" id="onb-v2-taste-2-owl-b" aria-hidden="true"></div>
   <div class="onb-cta-holder">
     <button type="button" class="nav-btn onb-cta" id="onb-v2-taste-2-cta" onclick="_onbV2CtaTaste2()"></button>
   </div>
