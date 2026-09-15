@@ -12578,7 +12578,35 @@ function _renderPaywall() {
   // by store review. Falls back to the plain yearly display if the
   // monthly-equivalent can't be computed (missing numeric price).
   q('.paywall-yearly-title').textContent = isEn ? 'Yearly' : 'שנתי';
-  q('.paywall-yearly-badge').textContent = isEn ? 'Save 42%' : 'חיסכון 42%';
+  // Savings badge computed from the two actual prices. Round DOWN so
+  // the claim is conservative — never overstates the discount. Hidden
+  // when either price is unavailable OR the saving comes out below
+  // 10% (regional pricing sometimes rounds so the annual is barely
+  // cheaper, and a "Save 3%" badge is a discount claim that reads as
+  // a mistake). Threshold is deliberately generous: at typical
+  // Corpus pricing the badge reads ~42%; anything under 10% is either
+  // a config error or a currency the plans don't cleanly translate
+  // into. Kept scoped to _renderPaywall — the badge follows the
+  // prices, and both live in the same render pass.
+  const badgeEl = q('.paywall-yearly-badge');
+  const monthlyPrice = (p.monthly && typeof p.monthly.price === 'number') ? p.monthly.price : 0;
+  const yearlyPrice  = (p.yearly  && typeof p.yearly.price  === 'number') ? p.yearly.price  : 0;
+  if (badgeEl) {
+    if (monthlyPrice > 0 && yearlyPrice > 0) {
+      const yearlyPerMonth = yearlyPrice / 12;
+      const savingPct = Math.floor((1 - yearlyPerMonth / monthlyPrice) * 100);
+      if (savingPct >= 10) {
+        badgeEl.textContent = isEn ? 'Save ' + savingPct + '%' : 'חיסכון ' + savingPct + '%';
+        badgeEl.style.display = '';
+      } else {
+        badgeEl.textContent = '';
+        badgeEl.style.display = 'none';
+      }
+    } else {
+      badgeEl.textContent = '';
+      badgeEl.style.display = 'none';
+    }
+  }
   const monthlyEquiv = _paywallMonthlyEquivalent(p.yearly.priceString, p.yearly.price);
   const billedEl = q('.paywall-yearly-billed');
   if (monthlyEquiv) {
