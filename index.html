@@ -11317,7 +11317,7 @@ const PAYWALL_ENABLED = true;
 // gated screens and the paywall's trial framing without any further
 // changes. Previously called PAYWALL_TRIAL_ENABLED; renamed here
 // because the gate now controls more than the paywall itself.
-const TRIAL_ENABLED = false;
+const TRIAL_ENABLED = true;
 
 // Legal links required by Apple + Google in every paywall. Terms is
 // currently 404 — MUST be published at this URL before App Store
@@ -14907,6 +14907,21 @@ function _onbComplete() {
   const today = _streakDay();
   state.onbAnswers = state.onbAnswers || {};
   state.onbAnswers.completedAt = today;
+  // Mark today as the user's last-active day. Completing onboarding IS
+  // activity — spending five to ten minutes in the flow shouldn't count
+  // as "away". Without this, showWelcomeBackModal (fired from renderHome
+  // a few lines below) sees state.lastActiveDate as whatever
+  // recalculateStreak wrote at boot (either empty for a truly fresh
+  // install, or the newest entry in activeDates for anyone with prior
+  // sessions) — and if that lastActiveDate is any date before today,
+  // _welcomeBackGapDays returns ≥ 1 and the modal fires immediately on
+  // top of the just-completed onboarding. Setting it here makes the gap
+  // calculation read zero, which is the natural short-circuit inside
+  // _welcomeBackPickPool. activeDates and dailyStreak are deliberately
+  // left to updateDailyStreak on the user's first real dialogue
+  // completion — this fix is scoped to the modal guard, not to declaring
+  // an onboarding-day streak.
+  state.lastActiveDate = today;
   try { saveState(); } catch(e) {}
   try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
   try { localStorage.removeItem('corpus_onboarding_step'); } catch(e) {}
