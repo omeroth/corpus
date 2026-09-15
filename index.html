@@ -6715,6 +6715,50 @@
     margin-top: 12px;
   }
 
+  /* Reviews (step 33) — social-proof cards, three vertically stacked.
+     Each card: five amber stars, italic-free quote, accent first-name
+     attribution. Card shell mirrors .onb-v2-quote-card's rhythm but
+     smaller type + non-italic quote (these read as short reviews, not
+     pull-quotes from a book). --amber is the app-wide gold, defined on
+     :root; no per-theme override — five-star gold is the same on
+     philosophy / economics / psychology. */
+  .onb-screen.onb-v2 .onb-v2-reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 20px;
+  }
+  .onb-screen.onb-v2 .onb-v2-review-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    text-align: start;
+  }
+  .onb-screen.onb-v2 .onb-v2-review-stars {
+    color: var(--amber);
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(16px * var(--text-scale));
+    letter-spacing: 3px;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .onb-screen.onb-v2 .onb-v2-review-quote {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(16px * var(--text-scale));
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--ink);
+    margin: 0 0 10px;
+  }
+  .onb-screen.onb-v2 .onb-v2-review-name {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(13px * var(--text-scale));
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    color: var(--accent);
+  }
+
   /* Taste-q answer reveal (step 21) — mirrors the real quiz's
      wrong-answer treatment at index.html:3532-3550 so the visual
      expectation the taste sets matches what the user will meet in
@@ -13450,9 +13494,32 @@ const _ONB_STEP_TO_ID = {
   28: 'onb-v2-commit',       // reused DOM from v4
   29: 'onb-v2-goal',         // reused DOM from v4
   30: 'onb-v2-adds-up',
-  // Act 5 — The Ask. Built in Commit 5 (screens 34-36 blocked on RC
-  // 3-day trial config landing on both stores first).
-  31: null, 32: null, 33: null, 34: null, 35: null, 36: null,
+  // Act 5 — The Ask. Notification pre-prompt (31), OS dialog wiring
+  // (null slot 32), and reviews / testimonials (33) built in Commit
+  // 5. The remaining three screens — trial intro (34), reminder
+  // promise (35), paywall (36) — stay null until the RC 3-day intro
+  // offer is configured on both stores. Partial-ladder mitigation
+  // catches step 34 for now and lands the user on home without
+  // marking corpus_onboarding_done, so they can complete when
+  // Commit 6 ships.
+  31: 'onb-v2-notifications',
+  // Step 32 is a null slot: represents "OS notification permission
+  // dialog is in flight". The pre-prompt CTAs (Yes / Not now) advance
+  // directly to 33; Yes awaits the plugin's proper permission-result
+  // callback first (unlike SKStoreReviewController at step 24, the
+  // notification plugin resolves with a real granted / denied result
+  // so we don't need the touchend proxy trick here). 32 is documented
+  // for beat-numbering only, never rendered.
+  32: null,
+  // Step 33 (reviews) is a READ-ONLY social-proof screen — three real
+  // testimonials from get.corpusapp.io, single Continue CTA. This is
+  // NOT a rating ask; that fires at step 23 (streak) via the OS
+  // review sheet. Firing SKStoreReviewController twice per onboarding
+  // session hits Apple's per-user quota and the second call silently
+  // no-ops — making the tap look broken three screens before the
+  // paywall. Keeping the two beats separate avoids that.
+  33: 'onb-v2-reviews',
+  34: null, 35: null, 36: null,
 };
 
 // Bilingual copy map for the intro screens (1-3). Later commits will
@@ -13997,15 +14064,58 @@ const _ONB_COPY = {
     cta:     { en: 'Continue', he: 'המשך' },
   },
 
-  // Step 22 — review request. No native prompt plugin wired in yet;
-  // the Rate button opens the platform's store URL in a new tab.
-  // Skip and Rate both advance to step 23, so the ask is soft.
-  review: {
-    head:     { en: 'Before we start.',     he: 'לפני שמתחילים' },
-    sub:      { en: 'If you like <span class="onb-v2-em">Corpus</span>, a rating helps others find it.',
-                he: 'אם <span class="onb-v2-em">Corpus</span> מוצא חן בעיניך, דירוג עוזר לאנשים נוספים למצוא אותו.' },
-    cta:      { en: 'Rate Corpus',          he: 'דרג את Corpus' },
-    skip:     { en: 'Not right now',        he: 'לא עכשיו' },
+  // Step 33 (v11) — Reviews. Three real testimonials from
+  // get.corpusapp.io, shown as social proof right before the paywall
+  // block. Read-only, no rating ask (that beat happens at step 23,
+  // streak). Head is subject-invariant; each item has a five-star
+  // row rendered as text, a quote, and a first-name attribution.
+  //
+  // ╔═══════════════════════════════════════════════════════════════╗
+  // ║ TODO(honesty): Hebrew quotes are NOT written yet.             ║
+  // ║ ─────────────────────────────────────────────────────────────  ║
+  // ║ These are real people's words. Attributing a translated       ║
+  // ║ sentence to a named reviewer who didn't write it in that      ║
+  // ║ language is a misattribution — the same class of small        ║
+  // ║ inaccuracy we've been careful to avoid with thinker quotes.   ║
+  // ║                                                                ║
+  // ║ Two questions must be resolved before the Hebrew locale can   ║
+  // ║ show a translation:                                            ║
+  // ║   1. Do the reviewers' own Hebrew originals exist? Yoni /      ║
+  // ║      Noga / Ido are Hebrew names — the English on the         ║
+  // ║      marketing site may itself be a translation of what they  ║
+  // ║      actually wrote. If Hebrew originals exist, use them.     ║
+  // ║   2. If no Hebrew originals exist, the honest options are     ║
+  // ║      (a) show the English quotes untranslated in both         ║
+  // ║      locales (current interim state — see below), or (b) get  ║
+  // ║      the reviewers' permission for a translation.             ║
+  // ║                                                                ║
+  // ║ INTERIM (this commit): every he: value below mirrors its en:  ║
+  // ║ counterpart verbatim so Hebrew-locale users see the exact     ║
+  // ║ strings the reviewers wrote, in English. This is the "don't   ║
+  // ║ invent" fallback — imperfect UX but honest. Ship guard: any   ║
+  // ║ he: value that differs from its en: sibling below means       ║
+  // ║ someone has to have answered question 1 or 2 first.           ║
+  // ╚═══════════════════════════════════════════════════════════════╝
+  reviews: {
+    head: { en: 'What readers say',  he: 'מה קוראים אומרים' },
+    cta:  { en: 'Continue',          he: 'המשך' },
+    items: [
+      // TODO(honesty): replace he: with reviewer's Hebrew original OR
+      // a translation they've approved. Until then, en: mirrored below.
+      { quote: { en: 'Much better than staring at reels.',
+                 he: 'Much better than staring at reels.' },
+        name:  { en: 'Yoni',  he: 'Yoni' } },
+      // TODO(honesty): replace he: with reviewer's Hebrew original OR
+      // a translation they've approved. Until then, en: mirrored below.
+      { quote: { en: "A lovely way to show people who don't think philosophy is for them that it clearly is.",
+                 he: "A lovely way to show people who don't think philosophy is for them that it clearly is." },
+        name:  { en: 'Noga',  he: 'Noga' } },
+      // TODO(honesty): replace he: with reviewer's Hebrew original OR
+      // a translation they've approved. Until then, en: mirrored below.
+      { quote: { en: 'What a joy to learn heavy subjects in a way this light and fun.',
+                 he: 'What a joy to learn heavy subjects in a way this light and fun.' },
+        name:  { en: 'Ido',   he: 'Ido' } },
+    ],
   },
 
   // Step 23 — journey summary. An accent-bordered card at the top
@@ -14254,10 +14364,11 @@ function _onbApplyLang(lang) {
   setText('onb-v2-goal-head',     'goal',     'head');
   setText('onb-v2-goal-sub',      'goal',     'sub');
   setText('onb-v2-goal-cta',      'goal',     'cta');
-  setText('onb-v2-review-head',   'review',   'head');
-  setHTML('onb-v2-review-sub',    'review',   'sub');
-  setText('onb-v2-review-cta',    'review',   'cta');
-  setText('onb-v2-review-skip',   'review',   'skip');
+  // Reviews (step 33) — head + CTA are subject-invariant. The three
+  // testimonial cards are rendered dynamically in _onbV2PrepareReviews
+  // (bilingual re-render on every show).
+  setText('onb-v2-reviews-head', 'reviews', 'head');
+  setText('onb-v2-reviews-cta',  'reviews', 'cta');
   // Journey screen: card + tiles + features rendered dynamically in
   // _onbV2PrepareJourney. Screen-level head and CTA are static.
   setText('onb-v2-journey-head',  'journey',  'head');
@@ -14570,11 +14681,11 @@ function _onbV2CtaQ4() {
 // the taste screens land.
 function _onbV2CtaMirror() { _onbAdvanceStep(16, 17); }
 
-// Step 16 — notification pre-prompt. Custom in-app screen that asks
-// permission BEFORE the paywall (flow v4). Reason for the placement:
-// a user who has just declined to pay is in a "no" frame of mind and
-// the next ask inherits it. Anyone who drops at the paywall has
-// already been asked here on the way past.
+// Step 31 (v11) — Notification pre-prompt. Custom in-app screen that
+// asks permission BEFORE the paywall (was step 16 in flow v4). Reason
+// for the placement: a user who has just declined to pay is in a "no"
+// frame of mind and the next ask inherits it. Anyone who drops at the
+// paywall has already been asked here on the way past.
 //
 // UX contract:
 //   - Primary CTA calls the native OS permission dialog exactly once
@@ -14583,13 +14694,15 @@ function _onbV2CtaMirror() { _onbAdvanceStep(16, 17); }
 //     unspent. maybeRequestReminderPermission (finishDay safety net)
 //     respects that flag so a later "Not now"-er isn't OS-prompted
 //     out of nowhere at lesson-1 completion.
-//   - Advance to step 17 (paywall) on both paths.
+//   - Both paths advance to step 33 (reviews / testimonials),
+//     skipping the null slot 32 which represents the OS dialog in
+//     flight.
 function _onbV2PrepareNotifications() {
-  try { _phCapture('notification_prompt_shown', { source: 'onboarding_step16' }); } catch(e) {}
+  try { _phCapture('notification_prompt_shown', { source: 'onboarding_step31' }); } catch(e) {}
 }
 
 async function _onbV2CtaNotifYes() {
-  try { _phCapture('notification_prompt_response', { response: 'yes' }); } catch(e) {}
+  try { _phCapture('notification_prompt_response', { response: 'yes', source: 'onboarding_step31' }); } catch(e) {}
   state.dailyReminder = Object.assign(
     { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
     state.dailyReminder || {},
@@ -14602,26 +14715,26 @@ async function _onbV2CtaNotifYes() {
     if (osResult === 'granted') {
       // Fire-and-forget reconcile — schedules the 14-day window. Today's
       // notif gets cancelled when finishDay runs after the first dialogue
-      // completes at step 19.
+      // completes.
       _reconcileReminders().catch(e => console.warn('[Reminder] onboarding-grant reconcile failed:', e));
     } else {
       state.dailyReminder.enabled = false;
     }
   }
   try { saveState(); } catch(e) { try { saveStateLocal(); } catch(e2) {} }
-  try { _phCapture('notification_os_result', { result: osResult }); } catch(e) {}
-  _onbAdvanceStep(16, 17);
+  try { _phCapture('notification_os_result', { result: osResult, source: 'onboarding_step31' }); } catch(e) {}
+  _onbAdvanceStep(31, 33);
 }
 
 function _onbV2CtaNotifNotNow() {
-  try { _phCapture('notification_prompt_response', { response: 'not_now' }); } catch(e) {}
+  try { _phCapture('notification_prompt_response', { response: 'not_now', source: 'onboarding_step31' }); } catch(e) {}
   state.dailyReminder = Object.assign(
     { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
     state.dailyReminder || {},
     { enabled: false, prePromptDeferred: true }
   );
   try { saveState(); } catch(e) { try { saveStateLocal(); } catch(e2) {} }
-  _onbAdvanceStep(16, 17);
+  _onbAdvanceStep(31, 33);
 }
 
 // Step 17 — paywall (full onboarding step, was step 16 in flow v3).
@@ -14864,25 +14977,13 @@ function _onbV2CtaGoal() {
   _onbAdvanceStep(29, 30, { dailyGoal: goal });
 }
 
-// Screen 22 (review request) — Rate fires the native review sheet
-// (SKStoreReviewController on iOS, Play ReviewManager on Android).
-// Falls back to opening the store URL on web (or if the plugin is
-// unavailable for any reason). Both stores rate-limit and give no
-// callback, so we advance either way — the user reaches step 23
-// whether the sheet appeared or not. Skip advances without asking.
-function _onbV2CtaReviewRate() {
-  const platform = (window.Capacitor && Capacitor.getPlatform && Capacitor.getPlatform()) || 'web';
-  _requestNativeReview().then(({ path }) => {
-    try {
-      _phCapture('onboarding_review_tapped', { platform: platform, path: path });
-    } catch(e) {}
-    _onbAdvanceStep(22, 23);
-  });
-}
-function _onbV2CtaReviewSkip() {
-  try { _phCapture('onboarding_review_skipped', {}); } catch(e) {}
-  _onbAdvanceStep(22, 23);
-}
+// Step 33 (v11) — Reviews / testimonials. Read-only social-proof
+// screen with three real quotes from get.corpusapp.io. Single
+// Continue CTA advances into Act 5's paid block. NOT a rating ask —
+// that fires at step 23 (streak) via SKStoreReviewController; a
+// second fire here would hit Apple's per-user quota and silently
+// no-op, making the tap look inert three screens before the paywall.
+function _onbV2CtaReviews() { _onbAdvanceStep(33, 34); }
 
 // Screen 23 (journey summary) — display-only; advance to commit.
 // v11: journey is step 27 (was step 23 in v4 as the terminal
@@ -15369,6 +15470,42 @@ function _onbV2PrepareLetsStart() {
   if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
 }
 
+// Step 33 (reviews) — renders the three testimonial cards from
+// _ONB_COPY.reviews.items. Bilingual re-render on every show; the
+// language toggle at step 1 will re-invoke this via _onbApplyLang
+// callers if the user flips language while on this screen (they
+// can't — the toggle is welcome-only — but keeping the hook idempotent
+// costs nothing and matches every other list-render hook).
+function _onbV2PrepareReviews() {
+  const list = document.getElementById('onb-v2-reviews-list');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+  const items = (_ONB_COPY.reviews && _ONB_COPY.reviews.items) || [];
+  list.innerHTML = '';
+  items.forEach((item) => {
+    const card = document.createElement('div');
+    card.className = 'onb-v2-review-card';
+    // Stars are rendered as text characters rather than SVG so they
+    // pick up the amber var(--gold) fill from CSS without needing a
+    // filled-star icon in the sprite. aria-label carries the value
+    // for screen readers; the visual glyphs are decorative.
+    const stars = document.createElement('div');
+    stars.className = 'onb-v2-review-stars';
+    stars.setAttribute('aria-label', isEn ? '5 stars' : '5 כוכבים');
+    stars.textContent = '★★★★★';
+    const quote = document.createElement('p');
+    quote.className = 'onb-v2-review-quote';
+    quote.textContent = isEn ? item.quote.en : item.quote.he;
+    const name = document.createElement('div');
+    name.className = 'onb-v2-review-name';
+    name.textContent = '— ' + (isEn ? item.name.en : item.name.he);
+    card.appendChild(stars);
+    card.appendChild(quote);
+    card.appendChild(name);
+    list.appendChild(card);
+  });
+}
+
 // Helper: read taste config for the current subject with a
 // philosophy fallback if state.subject is somehow unset (defensive
 // — shouldn't happen post-Commit-2 since step 11 calls setSubject).
@@ -15803,7 +15940,11 @@ const _ONB_STEP_HOOKS = {
   28: _onbV2PrepareCommit,     // existing (unchanged from v4)
   29: _onbV2PrepareGoal,       // existing (unchanged from v4)
   30: _onbV2PrepareAddsUp,     // "what you've set for yourself" — echoes their goal + commitment
-  // 31-36 land in Commit 5 (Act 5).
+  // Act 5 — The Ask
+  31: _onbV2PrepareNotifications, // fires prompt-shown telemetry
+  // 32 is a null slot (OS notif dialog).
+  33: _onbV2PrepareReviews,       // renders three testimonial cards
+  // 34-36 land in Commit 6 (trial + reminder promise + paywall).
 };
 
 // Step 3 prepare hook — injects the owl SVG into the hero slot and
@@ -28595,7 +28736,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 16 — Notification pre-prompt (flow v4). Custom in-app screen
+<!-- Step 31 (v11) — Notification pre-prompt. Custom in-app screen
      that gates the native OS permission dialog. Placed BEFORE the
      paywall so the ask doesn't inherit a "no" frame from a paywall
      decline, and so paywall drop-outs have already been asked here on
@@ -28604,7 +28745,7 @@ document.addEventListener('DOMContentLoaded', function() {
      prePromptDeferred=true and leaves the OS ask unspent — the
      finishDay safety net in maybeRequestReminderPermission respects
      that flag so a "Not now"-er isn't surprise-prompted at lesson-1
-     completion. Both paths advance to step 17 (paywall). -->
+     completion. Both paths advance to step 33 (reviews). -->
 <div id="onb-v2-notifications" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
@@ -28759,21 +28900,22 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 22 — review request. Rate button opens the platform's store
-     URL; Skip advances without opening. Both land on step 23. -->
-<div id="onb-v2-review" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
-  <div class="onb-progress" aria-hidden="true" data-step="5">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
-  </div>
+<!-- Step 33 (v11) — Reviews. Read-only social-proof beat with three
+     real testimonials from get.corpusapp.io. Head + three cards
+     (five stars, quote, first-name attribution) rendered by
+     _onbV2PrepareReviews. Single Continue CTA. Progress pills
+     deliberately hidden — the phase map notes 33-36 as pills-off,
+     matching the taste block's pattern and marking Act 5's ask
+     beats as narratively separate from the plan pills. -->
+<div id="onb-v2-reviews" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
-      <h1 class="onb-v2-head" id="onb-v2-review-head"></h1>
-      <p class="onb-v2-sub" id="onb-v2-review-sub"></p>
+      <h1 class="onb-v2-head" id="onb-v2-reviews-head"></h1>
+      <div class="onb-v2-reviews-list" id="onb-v2-reviews-list"></div>
     </div>
   </div>
   <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-v2-review-cta" onclick="_onbV2CtaReviewRate()"></button>
-    <button type="button" class="onb-v2-skip" id="onb-v2-review-skip" onclick="_onbV2CtaReviewSkip()"></button>
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-reviews-cta" onclick="_onbV2CtaReviews()"></button>
   </div>
 </div>
 
