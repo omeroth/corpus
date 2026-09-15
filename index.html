@@ -14907,6 +14907,16 @@ function _onbComplete() {
   const today = _streakDay();
   state.onbAnswers = state.onbAnswers || {};
   state.onbAnswers.completedAt = today;
+  // Defensive: clear the two body classes that hide chrome via CSS.
+  // body.on-subject-screen and body.drawer-open both apply
+  // visibility:hidden to .topbar / .stats-subheader / .bottom-nav
+  // (see index.html:9491). The root-cause guard in enterAppUi
+  // prevents on-subject-screen from being added mid-onboarding in
+  // the first place; this belt-and-braces removal guarantees home
+  // renders with visible chrome even if some future path we haven't
+  // audited adds either class along the way.
+  document.body.classList.remove('on-subject-screen');
+  document.body.classList.remove('drawer-open');
   // Mark today as the user's last-active day. Completing onboarding IS
   // activity — spending five to ten minutes in the flow shouldn't count
   // as "away". Without this, showWelcomeBackModal (fired from renderHome
@@ -26331,43 +26341,6 @@ function _walkthroughTeardown(opts) {
   }
   _walkthroughStepIdx = 0;
   _walkthroughStepsSeen.clear();
-
-  // TEMPORARY DIAGNOSTIC — walkthrough-teardown chrome-still-hidden.
-  // Two logs: immediately after teardown, and 500ms later. If chrome
-  // is missing at t=0 → teardown itself is incomplete. If chrome is
-  // visible at t=0 but missing at t=500 → something re-hides it after.
-  // Delete once resolved.
-  const snapshot = (tag) => {
-    try {
-      console.log('[teardown diag ' + tag + ']', JSON.stringify({
-        body_style_position:    document.body.style.position,
-        body_style_top:         document.body.style.top,
-        body_computed_position: getComputedStyle(document.body).position,
-        body_computed_top:      getComputedStyle(document.body).top,
-        body_rect_top:          document.body.getBoundingClientRect().top,
-        html_has_walkthrough:   document.documentElement.classList.contains('walkthrough-active'),
-        overlay_inline_display: document.getElementById('onboarding-overlay').style.display,
-        overlay_computed_display: getComputedStyle(document.getElementById('onboarding-overlay')).display,
-        app_computed_display:   getComputedStyle(document.getElementById('app')).display,
-        topbar_inline_display:  document.getElementById('topbar').style.display,
-        topbar_computed_display: getComputedStyle(document.getElementById('topbar')).display,
-        topbar_rect_top:        document.getElementById('topbar').getBoundingClientRect().top,
-        topbar_rect_height:     document.getElementById('topbar').getBoundingClientRect().height,
-        nav_inline_display:     document.getElementById('bottom-nav').style.display,
-        nav_computed_display:   getComputedStyle(document.getElementById('bottom-nav')).display,
-        nav_rect_top:           document.getElementById('bottom-nav').getBoundingClientRect().top,
-        nav_rect_height:        document.getElementById('bottom-nav').getBoundingClientRect().height,
-        stats_computed_display: getComputedStyle(document.querySelector('.stats-subheader')).display,
-        stats_rect_top:         document.querySelector('.stats-subheader').getBoundingClientRect().top,
-        screen_home_active:     document.getElementById('screen-home').classList.contains('active'),
-        current_screen:         (typeof state !== 'undefined') ? state.currentScreen : null,
-        scroll_y:               window.scrollY,
-        viewport_h:             window.innerHeight,
-      }, null, 2));
-    } catch(_) {}
-  };
-  snapshot('t=0');
-  setTimeout(() => snapshot('t=500'), 500);
 }
 
 // ─── Bonus-unlock owl coach mark ────────────────────────────────
@@ -27328,7 +27301,23 @@ function enterAppUi() {
     startNewUserOnboarding();
     return;
   }
-  if (!localStorage.getItem('corpus_subject')) {
+  // v11 onboarding covers subject-select at step 11. If onboarding is
+  // mid-flight (step cursor set, done flag not), the flow will handle
+  // subject-select itself — enterAppUi must NOT preempt with the
+  // legacy showSubjectSelect() fallback. showSubjectSelect adds the
+  // body.on-subject-screen class, whose CSS rule (see index.html:9491)
+  // paints visibility:hidden on .topbar / .stats-subheader /
+  // .bottom-nav to hide chrome behind the classic subject overlay.
+  // In v11 that class is added here at step 4 (post-signup) but never
+  // cleared — v11's _onbV2CtaSubject (step 11) doesn't remove it,
+  // and neither does anything else on the v11 path — so chrome stays
+  // visibility:hidden through the rest of onboarding and comes out
+  // invisible on home at _onbComplete. Guarding on onboarding_step
+  // keeps the fallback as-is for legacy users who somehow finished
+  // onboarding without ever setting a subject, but skips it for the
+  // common v11 mid-flight case.
+  if (!localStorage.getItem('corpus_subject') &&
+      !localStorage.getItem('corpus_onboarding_step')) {
     showSubjectSelect();
   }
 }
