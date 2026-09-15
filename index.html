@@ -6871,30 +6871,6 @@
     line-height: 1.3;
     margin-top: 8px;
   }
-  /* Track + marker for card 1. Marker positioned by inline
-     `left: N%`, centered on that position via translate(-50%,
-     -50%). At 0% the marker's left edge sits just outside the
-     track — that's intentional (reads as "at the start of the
-     scale"). The track's rounded ends absorb the visual overlap. */
-  .onb-screen.onb-v2 .onb-v2-snapshot-track {
-    height: 6px;
-    background: var(--border);
-    border-radius: 999px;
-    margin: 12px 12px 10px;
-    position: relative;
-  }
-  .onb-screen.onb-v2 .onb-v2-snapshot-marker {
-    position: absolute;
-    top: 50%;
-    width: 18px;
-    height: 18px;
-    border-radius: 999px;
-    background: var(--accent);
-    border: 3px solid var(--surface);
-    box-shadow: 0 3px 8px var(--accent-glow);
-    transform: translate(-50%, -50%);
-    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
   /* Fill bar for card 3. Width set inline by the prepare hook. */
   .onb-screen.onb-v2 .onb-v2-snapshot-bar {
     height: 10px;
@@ -13417,17 +13393,15 @@ const _ONB_STEP_TO_ID = {
   21: 'onb-v2-taste-q',
   22: 'onb-v2-first-card',
   23: 'onb-v2-streak',
-  // Step 24 (rating pre-prompt) is now a real screen. Was a null
-  // slot originally because we fired SKStoreReviewController from
-  // the streak CTA — but that races with the advance: the review
-  // promise resolves ~1ms after the OS sheet is requested (no
-  // dismissal callback exists), so advance ran while the sheet
-  // was still animating in, floating the sheet over the next
-  // screen. Fixed by adopting Apple's own recommendation: a
-  // custom pre-prompt that lets US decide when to fire the OS
-  // sheet AND when to advance. Yes fires review, No advances
-  // without firing. Either way, advance runs on our own click.
-  24: 'onb-v2-rating-prompt',
+  // Step 24 is a null slot: the streak CTA fires the OS review
+  // sheet, then the NEXT document touch/mouseup advances into
+  // building (25). SKStoreReviewController exposes no dismissal
+  // callback and its promise resolves ~1ms after the sheet is
+  // requested — advancing on that promise floated the sheet over
+  // the next screen. iOS blocks touches directed at the app while
+  // the OS sheet is up, so the first touch that reaches us again
+  // is a reliable "sheet is gone" proxy. Handled in _onbV2CtaStreak.
+  24: null,
   // Act 4 — The Plan. Six screens: building spinner (25) auto-
   // advances after 2.5s, plan-ready (26) is an owl bridge, plan-
   // detail (27) shows the concrete first-chapter promise with a
@@ -14084,54 +14058,43 @@ const _ONB_COPY = {
   },
   // planDetail block retired — step 27 now uses the v4 journey
   // screen (kept alive in DOM), copy in the `journey` block above.
-  // Your starting point (30). Redesigned from the earlier "what it
-  // adds up to" stats row. Three vertically stacked cards, each
-  // with an icon from our set (no emoji), each reflecting a
-  // dimension of where the user is now based on what they told us.
+  // What you've set for yourself (30). Forward-looking summary of
+  // the choices the user made in this onboarding — NOT a snapshot
+  // of past behaviour. Earlier draft ("Your starting point") tried
+  // to reflect readingFreq back on a scale, which conflated "what
+  // you did" with "what you signed up for" and quietly re-inserted
+  // "3 min a day" for own-pace users who had explicitly declined
+  // to commit to a rate.
   //
-  //   Card 1 — reading habit: their readingFreq answer (step 12)
-  //            scaled to 0-7 days per week. Track with a marker,
-  //            not a fill bar — visualisation of a POSITION on a
-  //            scale, not accumulated progress. Caption "N of 7
-  //            days". User who said "Never" sees 0; user who said
-  //            "Every day" sees 7. Honest to their pick.
-  //   Card 2 — projected monthly time: daily-goal minutes × 30,
-  //            formatted as hours. Caption explicitly labels the
-  //            source: "estimated from {n} min/day".
-  //   Card 3 — commitment: bar filled to the tier's internal
-  //            proportion. Caption echoes their own answer as a
-  //            single word ("Extremely" / "מאוד"), no percentage,
-  //            no comparison-against-others claim.
+  //   Card 1 — Daily goal: echoes the dailyGoal answer from step 21
+  //            as prose (one dialogue / two dialogues / at your own
+  //            pace). No number badge — the goal IS the number.
+  //   Card 2 — Time with ideas: derived from the goal. one → 5 min
+  //            a day + 2.5 hrs a month; two → 10 min a day + 5 hrs
+  //            a month; own_pace → single "At your own pace" line
+  //            with NO minutes or monthly figure. A concrete daily
+  //            number for someone who said "no fixed rate" would be
+  //            a fabrication.
+  //   Card 3 — Commitment: bar filled to the tier's proportion, a
+  //            single word caption echoing their own pick. No
+  //            percentage, no comparison text.
   addsUp: {
-    head:              { en: 'Your starting point', he: 'נקודת ההתחלה שלכם' },
-    sub:               { en: "Based on your answers, here's where you are now",
-                         he: 'לפי התשובות שלכם, כאן אתם עכשיו' },
-    cta:               { en: 'Continue',            he: 'המשך' },
-    cardHabitTitle:    { en: 'Reading habit',              he: 'הרגל קריאה' },
-    cardHabitCaption:  { en: '{n} of 7 days',              he: '{n} מתוך 7 ימים' },
-    cardTimeTitle:     { en: 'Monthly time with ideas',    he: 'זמן חודשי עם רעיונות' },
-    cardTimeCaption:   { en: 'estimated from {min} min/day',
-                         he: 'הערכה לפי {min} דקות ביום' },
-    cardCommitTitle:   { en: 'Commitment',                 he: 'מחויבות' },
+    head:              { en: "What you've set for yourself",
+                         he: 'מה קבעתם לעצמכם' },
+    sub:               { en: 'Your plan, from your own answers',
+                         he: 'התוכנית שלכם, מהתשובות שלכם' },
+    cta:               { en: 'Continue',                     he: 'המשך' },
+    cardGoalTitle:     { en: 'Daily goal',                   he: 'יעד יומי' },
+    goalValueOne:      { en: 'One dialogue a day',           he: 'דיאלוג אחד ביום' },
+    goalValueTwo:      { en: 'Two dialogues a day',          he: 'שני דיאלוגים ביום' },
+    goalValueOwnPace:  { en: 'At your own pace',             he: 'בקצב שלכם' },
+    cardTimeTitle:     { en: 'Time with ideas',              he: 'זמן עם רעיונות' },
+    timeValueDaily:    { en: '{n} min a day',                he: '{n} דקות ביום' },
+    timeValueMonthly:  { en: '{h} hrs a month',              he: '{h} שעות בחודש' },
+    timeValueOwnPace:  { en: 'At your own pace',             he: 'בקצב שלכם' },
+    cardCommitTitle:   { en: 'Commitment',                   he: 'מחויבות' },
   },
 
-  // Rating pre-prompt (step 24). Our own modal — Apple recommends
-  // this pattern for two reasons: (a) the OS review sheet has no
-  // dismissal callback, so a pre-prompt gives us a click we can
-  // sequence on; (b) it lets us gauge willingness before spending
-  // one of the OS's rate-limited yearly ask slots. Yes fires
-  // _requestNativeReview and advances; No advances without firing.
-  // Styled as our own screen, not an imitation of the system
-  // dialog — Apple has rejected apps whose pre-prompts mimic the
-  // OS sheet too closely.
-  ratingPrompt: {
-    head: { en: 'Enjoying Corpus?',
-            he: 'נהנים מ-Corpus?' },
-    sub:  { en: 'Tap yes if you would give it a rating.',
-            he: 'תקישו כן אם תרצו לדרג.' },
-    yes:  { en: 'Yes, rate it',  he: 'כן, לדרג' },
-    no:   { en: 'Not now',       he: 'לא עכשיו' },
-  },
   // Step 4 — signup offer. Placed after solution (step 3). Body
   // deliberately does NOT mention subscription; the paywall wasn't
   // shipped when this landed, and promising a paid tier that isn't
@@ -14236,11 +14199,6 @@ function _onbApplyLang(lang) {
   setText('onb-v2-first-card-head',    'firstCard', 'head');
   setText('onb-v2-first-card-sub',     'firstCard', 'sub');
   setText('onb-v2-first-card-cta',     'firstCard', 'cta');
-  // Rating pre-prompt (step 24) — head + sub + primary CTA + skip.
-  setText('onb-v2-rating-prompt-head',  'ratingPrompt', 'head');
-  setText('onb-v2-rating-prompt-sub',   'ratingPrompt', 'sub');
-  setText('onb-v2-rating-prompt-yes',   'ratingPrompt', 'yes');
-  setText('onb-v2-rating-prompt-no',    'ratingPrompt', 'no');
   // Act 4 — plan block. Building spinner (25), plan-ready (26)
   // have static head/CTA pairs. plan-detail was retired (step 27
   // now uses the v4 journey screen); adds-up's cards are computed
@@ -14779,38 +14737,44 @@ function _onbV2CtaFirstCard() { _onbAdvanceStep(22, 23); }
 // advance still fires. The .catch handles any promise-reject or
 // synchronous throw so the user is never stuck on the streak
 // screen if the plugin call fails.
-// Streak Continue advances to the rating pre-prompt (step 24).
-// The pre-prompt lets US own the "did the user say yes?" click,
-// which is the only way to sequence around the fact that
-// SKStoreReviewController gives no dismissal callback. Firing the
-// OS review sheet directly here (previous behaviour) races the
-// advance — sheet ends up floating over the next screen.
-function _onbV2CtaStreak() { _onbAdvanceStep(23, 24); }
-
-// Step 24 (rating pre-prompt). Two handlers:
-//   Yes → fire _requestNativeReview, then advance to 25.
-//   No  → advance to 25 without firing (preserves the OS's rate-
-//         limited yearly quota for a later ask).
-// Advance runs on the user's click either way, not on the OS
-// sheet's promise resolution, so the sequencing is deterministic.
-function _onbV2CtaRatingYes() {
+//
+// Streak Continue fires the OS review sheet (SKStoreReviewController
+// on iOS, Play In-App Review on Android) and advances on the NEXT
+// document-level tap. Rationale: neither native API exposes a
+// dismissal callback, and the underlying promise resolves ~1ms
+// after fire, which raced with the advance and floated the sheet
+// over the next screen. iOS blocks touches directed at the app
+// while the OS sheet is up, so the first touch that reaches us
+// again is a reliable "sheet is gone" proxy.
+//
+// Ordering matters: fire the review call FIRST, attach the
+// listeners on the next tick — a slow plugin call must not delay
+// listener attachment. The `advanced` latch guards against
+// touchend + mouseup double-firing on the same tap. Step 24 is
+// a null slot; advance skips it via _onbAdvanceStep(23, 25).
+function _onbV2CtaStreak() {
   const platform = (window.Capacitor && Capacitor.getPlatform && Capacitor.getPlatform()) || 'web';
-  const advance = () => _onbAdvanceStep(24, 25);
-  try { _phCapture('onboarding_rating_prompt_response', { response: 'yes', platform }); } catch(e) {}
+  let advanced = false;
+  const onNextTouch = () => {
+    if (advanced) return;
+    advanced = true;
+    document.removeEventListener('touchend', onNextTouch, true);
+    document.removeEventListener('mouseup',   onNextTouch, true);
+    _onbAdvanceStep(23, 25);
+  };
+  const attachListeners = () => {
+    document.addEventListener('touchend', onNextTouch, true);
+    document.addEventListener('mouseup',   onNextTouch, true);
+  };
   try {
     _requestNativeReview().then((r) => {
       const path = (r && r.path) || 'unknown';
       try { _phCapture('onboarding_review_prompted', { platform, path, source: 'onboarding_step24' }); } catch(e) {}
-      advance();
-    }).catch(() => advance());
+      setTimeout(attachListeners, 0);
+    }).catch(() => setTimeout(attachListeners, 0));
   } catch(e) {
-    advance();
+    setTimeout(attachListeners, 0);
   }
-}
-function _onbV2CtaRatingNo() {
-  const platform = (window.Capacitor && Capacitor.getPlatform && Capacitor.getPlatform()) || 'web';
-  try { _phCapture('onboarding_rating_prompt_response', { response: 'no', platform }); } catch(e) {}
-  _onbAdvanceStep(24, 25);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -15502,18 +15466,20 @@ function _onbV2PreparePlanReady() {
 // screen (prepare hook _onbV2PrepareJourney, defined further down)
 // as the plan-detail beat.
 
-// Step 30 (your starting point) — three cards reflecting where the
-// user is now based on their answers.
+// Step 30 (what you've set for yourself) — three cards echoing the
+// commitments the user just made in this onboarding. Forward-looking
+// summary, not a snapshot of past behaviour.
 //
-// Card 1 — reading habit: readingFreq (0..4) mapped to 0..7 days
-//          per week via Math.round(rf * 7 / 4). Track with a
-//          marker; caption "N of 7 days". User who said "Never"
-//          sees 0; user who said "Every day" sees 7. Honest to
-//          their own pick.
-// Card 2 — projected monthly time: daily-goal minutes × 30,
-//          formatted in hours (integer if whole, one decimal
-//          otherwise). Caption labels the source.
-// Card 3 — commitment: bar filled to the tier's internal
+// Card 1 — Daily goal: dailyGoal answer as prose. one / two /
+//          own_pace map to the three goalValue* copy keys.
+// Card 2 — Time with ideas: derived from the goal.
+//            one      → "5 min a day" + "2.5 hrs a month"
+//            two      → "10 min a day" + "5 hrs a month"
+//            own_pace → single "At your own pace" line, no numbers
+//          For own_pace, both the daily and monthly text nodes
+//          receive the ownPace line — hiding numbers the user
+//          explicitly declined to commit to.
+// Card 3 — Commitment: bar filled to the tier's internal
 //          proportion. Caption is the level word from
 //          _ONB_COPY.commit.options[…].text. No percentage on the
 //          screen — a number invites the question "of what?" and
@@ -15522,54 +15488,46 @@ function _onbV2PrepareAddsUp() {
   const isEn = state.lang === 'en';
   const a = state.onbAnswers || {};
 
-  // ── Card 1: reading habit ─────────────────────────────────
-  const rf = (typeof a.readingFreq === 'number') ? a.readingFreq : 0;
-  const daysPerWeek = Math.round(rf * 7 / 4);   // 0→0, 1→2, 2→4, 3→5, 4→7
-  const habitPercent = daysPerWeek * 100 / 7;    // 0..100 for marker position
+  const cp = _ONB_COPY.addsUp;
+  const setEl = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
 
-  // ── Card 2: monthly time ──────────────────────────────────
+  // ── Card 1: daily goal ────────────────────────────────────
   const goal = a.dailyGoal || 'one';
-  const minPerDayMap = { one: 5, two: 10, own_pace: 3 };
-  const minPerDay = minPerDayMap[goal] || 5;
-  const monthlyMin = minPerDay * 30;
-  const monthlyHours = monthlyMin / 60;
-  // Integer when clean, one decimal otherwise. "2.5 hrs" / "5 hrs".
-  const hoursStr = (monthlyMin % 60 === 0)
-    ? String(Math.round(monthlyHours))
-    : monthlyHours.toFixed(1);
-  const monthlyValue = hoursStr + (isEn ? ' hrs' : ' שעות');
+  const goalKey = goal === 'two' ? 'goalValueTwo'
+                : goal === 'own_pace' ? 'goalValueOwnPace'
+                : 'goalValueOne';
+  setEl('onb-v2-adds-up-goal-title', isEn ? cp.cardGoalTitle.en : cp.cardGoalTitle.he);
+  setEl('onb-v2-adds-up-goal-value', isEn ? cp[goalKey].en : cp[goalKey].he);
+
+  // ── Card 2: time with ideas ───────────────────────────────
+  setEl('onb-v2-adds-up-time-title', isEn ? cp.cardTimeTitle.en : cp.cardTimeTitle.he);
+  if (goal === 'own_pace') {
+    // Own-pace users explicitly declined to commit to a rate.
+    // Fabricating "3 min a day" for them would contradict what
+    // they just told us; show only the qualitative line.
+    setEl('onb-v2-adds-up-time-value',   isEn ? cp.timeValueOwnPace.en : cp.timeValueOwnPace.he);
+    setEl('onb-v2-adds-up-time-caption', '');
+  } else {
+    const minPerDay = goal === 'two' ? 10 : 5;
+    const monthlyMin = minPerDay * 30;
+    const monthlyHours = monthlyMin / 60;
+    const hoursStr = (monthlyMin % 60 === 0)
+      ? String(Math.round(monthlyHours))
+      : monthlyHours.toFixed(1);
+    setEl('onb-v2-adds-up-time-value',
+      (isEn ? cp.timeValueDaily.en : cp.timeValueDaily.he).replace('{n}', String(minPerDay)));
+    setEl('onb-v2-adds-up-time-caption',
+      (isEn ? cp.timeValueMonthly.en : cp.timeValueMonthly.he).replace('{h}', hoursStr));
+  }
 
   // ── Card 3: commitment ────────────────────────────────────
   const commitment = a.commitment || 'somewhat';
   const commitPercentMap = { extreme: 92, very: 78, somewhat: 60, little: 42, trying: 28 };
   const commitPercent = commitPercentMap[commitment] || 60;
-  // Level word from the commit options — echoes their own pick.
-  // No comparison text.
   const commitOpts = (_ONB_COPY.commit && _ONB_COPY.commit.options) || [];
   const commitOpt = commitOpts.find(o => o.id === commitment) || commitOpts[2];
   const commitWord = commitOpt ? (isEn ? commitOpt.text.en : commitOpt.text.he) : '';
-
-  const cp = _ONB_COPY.addsUp;
-  const setEl = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
-
-  // Head/sub/CTA bind via _onbApplyLang — kept out of here so the
-  // prepare hook stays focused on the computed content.
-
-  // Card 1
-  setEl('onb-v2-adds-up-habit-title',   isEn ? cp.cardHabitTitle.en : cp.cardHabitTitle.he);
-  setEl('onb-v2-adds-up-habit-caption',
-    (isEn ? cp.cardHabitCaption.en : cp.cardHabitCaption.he).replace('{n}', String(daysPerWeek)));
-  const habitMarker = document.getElementById('onb-v2-adds-up-habit-marker');
-  if (habitMarker) habitMarker.style.left = habitPercent + '%';
-
-  // Card 2
-  setEl('onb-v2-adds-up-time-title',    isEn ? cp.cardTimeTitle.en : cp.cardTimeTitle.he);
-  setEl('onb-v2-adds-up-time-value',    monthlyValue);
-  setEl('onb-v2-adds-up-time-caption',
-    (isEn ? cp.cardTimeCaption.en : cp.cardTimeCaption.he).replace('{min}', String(minPerDay)));
-
-  // Card 3
-  setEl('onb-v2-adds-up-commit-title',  isEn ? cp.cardCommitTitle.en : cp.cardCommitTitle.he);
+  setEl('onb-v2-adds-up-commit-title',   isEn ? cp.cardCommitTitle.en : cp.cardCommitTitle.he);
   setEl('onb-v2-adds-up-commit-caption', commitWord);
   const commitFill = document.getElementById('onb-v2-adds-up-commit-fill');
   if (commitFill) commitFill.style.width = commitPercent + '%';
@@ -15824,7 +15782,7 @@ const _ONB_STEP_HOOKS = {
   27: _onbV2PrepareJourney,    // v4 dated outcome card + tiles + features
   28: _onbV2PrepareCommit,     // existing (unchanged from v4)
   29: _onbV2PrepareGoal,       // existing (unchanged from v4)
-  30: _onbV2PrepareAddsUp,     // starting-point snapshot (redesigned in this commit)
+  30: _onbV2PrepareAddsUp,     // "what you've set for yourself" — echoes their goal + commitment
   // 31-36 land in Commit 5 (Act 5).
 };
 
@@ -28138,7 +28096,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- Step 2 — Problem. Confrontation-lite; sets up the reframe on step 3. -->
-<div id="onb-v2-problem" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<div id="onb-v2-problem" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="1">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28153,7 +28111,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- Step 3 — Solution. Reframe against step 2. Anchor line, no subtitle. -->
-<div id="onb-v2-solution" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<div id="onb-v2-solution" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="1">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28169,7 +28127,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- Step 5 — Name capture. First input screen in the flow. Text input
      styling from .onb-v2-input (see CSS). Enter key submits when valid. -->
-<div id="onb-v2-name" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<div id="onb-v2-name" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="2">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28194,7 +28152,7 @@ document.addEventListener('DOMContentLoaded', function() {
      the language toggle at any moment re-renders labels correctly.
      Priming-only capture: nothing in the runtime app branches on
      state.onbAnswers.gender. -->
-<div id="onb-v2-gender" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<div id="onb-v2-gender" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="2">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28213,7 +28171,7 @@ document.addEventListener('DOMContentLoaded', function() {
      Optional greeting line above the head interpolates the captured
      name from step 4. Validation: 13..120; CTA disabled otherwise.
      Age is used visibly on the shock screen (step 7) as an eyebrow. -->
-<div id="onb-v2-age" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<div id="onb-v2-age" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="2">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28236,7 +28194,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 6 — Phone hours. Range slider 1..12 with live value display
      above the track. First slider in the app — component styling in
      .onb-v2-slider* CSS is reused by step 13 (reading frequency). -->
-<div id="onb-v2-hours" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<div id="onb-v2-hours" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="2">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28266,7 +28224,7 @@ document.addEventListener('DOMContentLoaded', function() {
      Both rendered in _onbV2PrepareShock from state.onbAnswers.age +
      phoneHours. Age is load-bearing on the projection, not just
      displayed. -->
-<div id="onb-v2-shock" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<div id="onb-v2-shock" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="3">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28286,7 +28244,7 @@ document.addEventListener('DOMContentLoaded', function() {
      that way."), sub offers the reframe + micro-commit ("You have
      five minutes. Let's build a plan."). Sub element added in the
      v11 rebuild — v4 head absorbed both beats in a single line. -->
-<div id="onb-v2-plan" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<div id="onb-v2-plan" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="3">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28378,7 +28336,7 @@ document.addEventListener('DOMContentLoaded', function() {
      sometimes / often / every day). Live label updates via the
      .onb-v2-slider-value display. Slider primitive reused from
      step 6. -->
-<div id="onb-v2-q4" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-q4" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28404,7 +28362,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 15 — Mirror. Reflects the user's picks back. Head + list
      rendered dynamically in _onbV2PrepareMirror from state.onbAnswers
      and state.subject. -->
-<div id="onb-v2-mirror" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-mirror" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28432,7 +28390,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 17 — How it works. Three-item timeline explaining the
      read → earn → collect loop. Head + CTA static; items rendered
      by _onbV2PrepareHowItWorks. -->
-<div id="onb-v2-how-it-works" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-how-it-works" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28450,7 +28408,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 19 — Taste, page 1. Pull-quote + source + page-1 prose.
      All content is subject-specific and rendered by
      _onbV2PrepareTaste1 from _ONB_COPY.taste[state.subject]. -->
-<div id="onb-v2-taste-1" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-taste-1" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-v2-inner">
     <div class="onb-v2-copy" style="text-align:start">
       <div class="onb-v2-quote-card">
@@ -28473,7 +28431,7 @@ document.addEventListener('DOMContentLoaded', function() {
      + optional punch line (only philosophy uses it in the current
      mockup — Smith / Kahneman leave it empty, prepare hook hides
      the element). -->
-<div id="onb-v2-taste-2" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-taste-2" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-v2-inner">
     <div class="onb-v2-copy" style="text-align:start">
       <h1 class="onb-v2-head" id="onb-v2-taste-2-head" style="text-align:center"></h1>
@@ -28494,7 +28452,7 @@ document.addEventListener('DOMContentLoaded', function() {
      Correct answer highlights green after ANY tap (reveal pattern,
      not a real quiz — the CTA enables regardless of right/wrong).
      Options rendered dynamically by _onbV2PrepareTasteQ. -->
-<div id="onb-v2-taste-q" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-taste-q" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-v2-inner">
     <div class="onb-v2-copy" style="text-align:start">
       <p class="onb-v2-sub" id="onb-v2-taste-q-scenario" style="text-align:start"></p>
@@ -28515,7 +28473,7 @@ document.addEventListener('DOMContentLoaded', function() {
      (icon + name + role) with subject-invariant head + sub. Preview
      ONLY — state.unlockedThinkers is not written; the user's actual
      first collectible lands on the first post-onboarding finishDay. -->
-<div id="onb-v2-first-card" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-first-card" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
       <p class="onb-v2-first-card-eyebrow" id="onb-v2-first-card-eyebrow"></p>
@@ -28551,7 +28509,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- Step 26 — Plan ready. Owl-fronted bridge into the plan detail. -->
-<div id="onb-v2-plan-ready" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-plan-ready" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-v2-inner">
     <div class="onb-v2-signup-hero" id="onb-v2-plan-ready-owl" aria-hidden="true"></div>
     <div class="onb-v2-copy">
@@ -28580,18 +28538,15 @@ document.addEventListener('DOMContentLoaded', function() {
       <h1 class="onb-v2-head" id="onb-v2-adds-up-head"></h1>
       <p class="onb-v2-sub"  id="onb-v2-adds-up-sub"></p>
       <div class="onb-v2-snapshot-cards">
-        <!-- Card 1 — Reading habit -->
+        <!-- Card 1 — Daily goal -->
         <div class="onb-v2-snapshot-card">
           <span class="onb-v2-snapshot-icon" aria-hidden="true">
-            <svg viewBox="0 0 64 64"><use href="#icon-openbook"/></svg>
+            <svg viewBox="0 0 64 64"><use href="#icon-bolt"/></svg>
           </span>
-          <div class="onb-v2-snapshot-title" id="onb-v2-adds-up-habit-title"></div>
-          <div class="onb-v2-snapshot-track">
-            <div class="onb-v2-snapshot-marker" id="onb-v2-adds-up-habit-marker"></div>
-          </div>
-          <div class="onb-v2-snapshot-caption" id="onb-v2-adds-up-habit-caption"></div>
+          <div class="onb-v2-snapshot-title" id="onb-v2-adds-up-goal-title"></div>
+          <div class="onb-v2-snapshot-value" id="onb-v2-adds-up-goal-value"></div>
         </div>
-        <!-- Card 2 — Monthly time with ideas -->
+        <!-- Card 2 — Time with ideas -->
         <div class="onb-v2-snapshot-card">
           <span class="onb-v2-snapshot-icon" aria-hidden="true">
             <svg viewBox="0 0 64 64"><use href="#icon-clock"/></svg>
@@ -28627,7 +28582,7 @@ document.addEventListener('DOMContentLoaded', function() {
      finishDay safety net in maybeRequestReminderPermission respects
      that flag so a "Not now"-er isn't surprise-prompted at lesson-1
      completion. Both paths advance to step 17 (paywall). -->
-<div id="onb-v2-notifications" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-notifications" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28692,7 +28647,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 18 (v11) — "Got five minutes?" bridge into the taste.
      Owl-fronted micro-commit. Owl injected by _onbV2PrepareLetsStart
      using _cloneOwlSvgHTML — same helper the signup screen uses. -->
-<div id="onb-v2-lets-start" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-lets-start" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28713,7 +28668,7 @@ document.addEventListener('DOMContentLoaded', function() {
      sub, CTA. Currently unreachable until Commit 3 (Act 3: Taste)
      lands — v11 renumbers streak from 20 → 23 and the null-slot
      mitigation catches any partial-ship advance at slot 23. -->
-<div id="onb-v2-streak" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-streak" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28735,34 +28690,12 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- Step 24 (v11) — Rating pre-prompt. Corpus-styled ask; the OS
-     review sheet only fires on Yes. Layout mirrors the
-     notification pre-prompt at step 31 (head + sub + primary +
-     skip). Nothing here mimics Apple's SKStoreReviewController
-     dialog — that would be a rejection risk, and the whole point
-     of a pre-prompt is that it's ours. -->
-<div id="onb-v2-rating-prompt" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
-  <div class="onb-progress" aria-hidden="true" data-step="5">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
-  </div>
-  <div class="onb-v2-inner">
-    <div class="onb-v2-copy">
-      <h1 class="onb-v2-head" id="onb-v2-rating-prompt-head"></h1>
-      <p class="onb-v2-sub"   id="onb-v2-rating-prompt-sub"></p>
-    </div>
-  </div>
-  <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-v2-rating-prompt-yes" onclick="_onbV2CtaRatingYes()"></button>
-    <button type="button" class="onb-v2-skip"    id="onb-v2-rating-prompt-no"  onclick="_onbV2CtaRatingNo()"></button>
-  </div>
-</div>
-
 <!-- Step 21 — daily goal. Three cards ('one' / 'two' / 'own_pace')
      with flame icons anchoring to the streak beat just before. Cards
      + CSS recovered verbatim from the v1 goal screen; _onbV2PrepareGoal
      preselects based on Q3 answer and writes state.dailyGoalHistory
      with the exact values the runtime goal-met consumers recognize. -->
-<div id="onb-v2-goal" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-goal" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28826,7 +28759,7 @@ document.addEventListener('DOMContentLoaded', function() {
      user's Q1/Q2/Q3 picks + stat row). Below: section head + two
      feature blocks explaining the mechanism. All dynamic content is
      rendered in _onbV2PrepareJourney. -->
-<div id="onb-v2-journey" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-journey" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="6">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
@@ -28874,7 +28807,7 @@ document.addEventListener('DOMContentLoaded', function() {
      guideline 4.8 (Sign in with Apple must be at least as prominent).
      Email is deliberately absent for this commit — see _onbSignupApple
      block comment. -->
-<div id="onb-v2-signup" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+<div id="onb-v2-signup" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <!-- v11 note: the top-right Skip corner was removed. Mockup rationale
        (screen 4): "No skip, so no justification. A required step should
        not argue its case." Skip handler _onbV2CtaSignupSkip remains
