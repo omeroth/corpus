@@ -25837,57 +25837,50 @@ function drawSpotlight(step) {
   ctx.restore();
 }
 
-// ─── Onboarding walkthrough (owl-guided, 7 screens) ─────────────
-// Fired once per install from the tail of _onbFinishGoal. Gated on
+// ─── Onboarding walkthrough (owl-guided, 2 screens) ─────────────
+// Fired once per install from the tail of _onbComplete. Gated on
 // corpus_walkthrough_done, no completedDays, no corpus_first_dialogue_
-// completed_at. Existing users never see it. Skippable at every screen
-// via #walkthrough-skip; a shortcut tap on a spotlighted element also
-// bails (see openReader guard). Ends on the closing CTA which opens
-// getW()[0] day 1 — same target the start card CTA uses.
+// completed_at (bypassCompletionGate is passed by v11 _onbComplete
+// because the v11 onboarding no longer completes a real dialogue).
+// Existing users never see it. Skippable at every screen via
+// #walkthrough-skip; a shortcut tap on a spotlighted element also
+// bails (see openReader guard for step 1's lesson-circle tap and
+// _walkthroughShortcutBail for step 2's pantheon-tab tap).
+//
+// Trimmed from seven screens to two on the v11 rebuild. Removed:
+//   - greeting (redundant on top of 36 onboarding steps)
+//   - chapters (v11 how-it-works screen 17 already teaches this)
+//   - carousel (v11 first-card screen 22 shows a card being earned)
+//   - streak (v11 streak screen 23 lands the "day one" idea)
+//   - closing "tomorrow's dialogue" (wrong for v11 — users no longer
+//     complete a real dialogue during onboarding, so lesson-1 IS
+//     today's, not tomorrow's)
+// Kept the two beats doing net-new work: WHERE the next-up lesson
+// lives on home, and WHERE the Pantheon tab is. v11 explains
+// concepts thoroughly but never points at physical UI locations.
 
 // spotlight — CSS selector to spotlight for the step.
-// allowChromeTop — set true when the target itself lives in the topbar
-//                  / stats-subheader band (streak step); prevents the
-//                  clamp from cropping it into oblivion.
-// allowChromeBottom — same idea for the bottom-nav band (pantheon step).
-// maxHeight — cap for tall targets so the punch-out doesn't slice past
-//             the visible fold (chapters step: the expanded card runs
-//             past 500px otherwise).
+// allowChromeBottom — set true when the target lives in the bottom-
+//                     nav band (pantheon step); prevents the clamp
+//                     from cropping it out of the visible interior.
+// isClosing — last-step marker: button reads "OK" instead of "Next"
+//             and its click fires _walkthroughFinish instead of
+//             _walkthroughNext. In the pre-trim seven-step version
+//             this also blocked shortcut-tap on the spotlight (the
+//             closing beat pointed at the next-up circle but said
+//             "tomorrow's dialogue", so tapping-through opened the
+//             reader against the copy). Neither trimmed step has
+//             that contradiction — step 2's tap-through switches
+//             to Pantheon, consistent with the copy — so the block
+//             is gone and both steps allow shortcut-tap cleanly.
 const WALKTHROUGH_STEPS = [
-  { id: 'greeting', expr: 'owl-neutral',   spotlight: null,
-    he: 'שלום. אני אלווה אתכם בצעדים הראשונים ב-Corpus.',
-    en: "Hello. I'll walk you through your first steps in Corpus." },
-  { id: 'chapters', expr: 'owl-neutral',   spotlight: '#home-levels .level-card.expanded, #home-levels .level-card:first-child',
-    maxHeight: 220,
-    he: 'כל נושא בנוי מפרקים, וכל פרק מקבץ כמה דיאלוגים סביב שאלה אחת.',
-    en: 'Each subject is built from chapters, and each chapter gathers a few dialogues around one question.' },
   { id: 'next_up', expr: 'owl-neutral',    spotlight: '.lesson-node:has(.lesson-circle.next-up)',
-    he: 'כאן מחכה הדיאלוג הבא בתור. לא צריך לבחור, הוא כבר מוכן.',
-    en: "The next dialogue in line waits here. Nothing to choose, it's already set." },
-  { id: 'carousel', expr: 'owl-admiring',  spotlight: '#thinker-carousel-wrap',
-    he: 'כל הוגה שפוגשים מצטרף לאוסף. הוא גדל לאט, לפי מה שקוראים.',
-    en: 'Every thinker you meet joins your collection. It grows slowly, with what you read.' },
+    he: 'הדיאלוג הראשון שלכם כאן, מחכה לכם.',
+    en: 'Your first dialogue is here, ready when you are.' },
   { id: 'pantheon', expr: 'owl-neutral',   spotlight: '#bnav-pantheon',
-    allowChromeBottom: true,
+    allowChromeBottom: true, isClosing: true,
     he: 'הפנתיאון הוא הבית של האוסף. אפשר לחזור אליו בכל רגע.',
     en: "The Pantheon is where your collection lives. It's there whenever you want it." },
-  { id: 'streak', expr: 'owl-determined',  spotlight: '.stats-subheader',
-    allowChromeTop: true,
-    he: 'הרצף גדל בכל יום שמשלימים בו דיאלוג. היום הוא מתחיל.',
-    en: 'Your streak grows on every day you complete a dialogue. Today it begins.' },
-  { id: 'closing', expr: 'owl-action',
-    // Spotlights the next-up lesson circle (same target as step 2's
-    // `next_up`) so the closing beat has something concrete to point
-    // at. Framing shifts from "next in line" (step 2) to "tomorrow's
-    // dialogue lands here" (step 7). v2 users have already completed
-    // today's dialogue during onboarding, so we don't auto-open a
-    // reader — _walkthroughFinish just tears down. The canvas click
-    // handler also suppresses the tap-shortcut on isClosing steps so
-    // a tap on the spotlighted circle doesn't contradict the copy by
-    // opening day 2 right now.
-    spotlight: '.lesson-node:has(.lesson-circle.next-up)', isClosing: true,
-    he: 'כאן יחכה הדיאלוג של מחר.',
-    en: "This is where tomorrow's dialogue will be waiting." },
 ];
 
 let _walkthroughStepIdx = 0;
@@ -25946,12 +25939,6 @@ function _walkthroughWireCanvas() {
   canvas.addEventListener('click', function(ev) {
     const step = WALKTHROUGH_STEPS[_walkthroughStepIdx];
     if (!step || !step.spotlight) return;             // no punch-out; no shortcut path
-    // The closing beat spotlights the next-up lesson as "here's where
-    // tomorrow's dialogue will land" — tapping it to open the reader
-    // right now would contradict the copy. Only the OK button (fires
-    // _walkthroughFinish) or Skip should end the walkthrough on this
-    // step.
-    if (step.isClosing) return;
     const info = _walkthroughSpotlightRect(step);
     if (!info) return;
     const pad = 8;                                    // match drawSpotlight padding
