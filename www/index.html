@@ -5937,10 +5937,11 @@
   }
 
   /* ── Multi-select / single-select card component ──
-     Base card shape shared by subject picker (step 9), Q1 (10),
-     Q2 (11), and Q3 (12). Selected state uses accent border + tinted
-     background. Q3 renders the same cards as Q1/Q2 (radio behavior
-     handled in the JS layer). */
+     Base card shape shared by v11 subject picker (step 11), Q1 (13),
+     Q2 (14), Q3 (15), commit (step 28) and gender (step 6). Selected
+     state uses accent border + tinted background. Q3/commit/gender
+     render the same cards as Q1/Q2 (radio behavior handled in the
+     JS layer via _onbV2MselTap / dedicated tap handlers). */
   .onb-screen.onb-v2 .onb-v2-cards {
     display: flex;
     flex-direction: column;
@@ -6029,7 +6030,8 @@
   }
   html.dark .onb-screen.onb-v2 .onb-v2-hint { color: var(--text); }
 
-  /* Mirror screen (step 13) — one card per pick, closing block below.
+  /* Mirror screen (v11 step 16 — Reflection) — one card per Q1/Q2/Q3
+     pick, sub line below.
      Card visual mirrors the .onb-v2-card question-screen shape so the
      mirror reads as "here's what you chose, presented back the same
      way." Cards are display-only (no cursor, no hover, no selected
@@ -12930,8 +12932,16 @@ const _ONB_STEP_TO_ID = {
   // mockup's warmer two-line "It doesn't have to go that way. / You
   // have five minutes. Let's build a plan." with a "Let's build it" CTA.
   10: 'onb-v2-plan',
-  // Act 2 — The Mirror. Built in Commit 2.
-  11: null, 12: null, 13: null, 14: null, 15: null, 16: null,
+  // Act 2 — The Mirror. Reuses v4's subject / Q1 / Q2 / Q3 / Q4 / mirror
+  // DOM nodes at new positions: subject moves to the front of Act 2,
+  // Q4 (renamed "Honesty" in the mockup) moves up before Q1, and the
+  // reflection screen is the closer. Icons/copy retuned in Commit 2.
+  11: 'onb-v2-subject',
+  12: 'onb-v2-q4',       // Honesty — Q4's reading-frequency slider under a v11 name
+  13: 'onb-v2-q1',
+  14: 'onb-v2-q2',
+  15: 'onb-v2-q3',
+  16: 'onb-v2-mirror',   // Reflection
   // Act 3 — The Taste. Built in Commit 3.
   17: null, 18: null, 19: null, 20: null, 21: null, 22: null, 23: null, 24: null,
   // Act 4 — The Plan. Built in Commit 4.
@@ -13029,8 +13039,12 @@ const _ONB_COPY = {
     cta:  { en: "Let's build it", he: 'בואו נבנה' },
   },
   subject: {
-    head: { en: 'Where would you like to start?', he: 'מאיפה תרצה להתחיל?' },
-    cta:  { en: 'Continue',                       he: 'המשך' },
+    // v11 — moves to Act 2 opener (step 11). Slight copy tweak to
+    // mockup's phrasing; picker mechanics unchanged (setSubject applies
+    // the theme immediately so every downstream Act 2 screen renders
+    // in the picked subject's accent color).
+    head: { en: 'Where do you want to start?', he: 'איפה תרצו להתחיל?' },
+    cta:  { en: 'Continue',                    he: 'המשך' },
     // Subject names, taglines, and thinker bylines. Names + taglines
     // + bylines match the v1 cinematic subject-select (see
     // _applyCinematicSubjectCopy) so the two selectors share the same
@@ -13052,14 +13066,20 @@ const _ONB_COPY = {
     },
   },
   q1: {
-    head: { en: 'What do you want to gain from <span class="onb-v2-em">Corpus</span>?',
-            he: 'מה תרצה להשיג מ-<span class="onb-v2-em">Corpus</span>?' },
-    hint: { en: 'The one that matters most.',             he: 'מה שהכי חשוב לך.' },
-    cta:  { en: 'Continue',                               he: 'המשך' },
-    // Options — stable ids for analytics; text is what the user sees
-    // on the picker (emoji-prefixed on both langs); support is the
-    // per-option line on the mirror card (step 15); tile is the very
-    // short label used in the journey card tiles (step 23).
+    // v11 step 13 — first of the three mirror-feeding Q-picks. Head
+    // aligns to the mockup ("What do you want from Corpus?"). Hint
+    // stays; _onbV2MselTap enforces single-select (stores a length-1
+    // array) so the "one that matters most" framing is accurate to
+    // the actual behavior.
+    head: { en: 'What do you want from Corpus?',
+            he: 'מה תרצו מ-Corpus?' },
+    hint: { en: 'The one that matters most.', he: 'מה שהכי חשוב לכם.' },
+    cta:  { en: 'Continue',                   he: 'המשך' },
+    // Options — stable ids for analytics; text is what the user sees;
+    // support surfaces on the mirror card (step 16); tile is the very
+    // short label used in later act plan / journey renderings.
+    // v11 dropped the 6th 'think-clearly' option to match the mockup's
+    // 5-option layout.
     options: [
       { id: 'understand-ideas',
         icon:    'icon-brain',
@@ -13075,79 +13095,85 @@ const _ONB_COPY = {
         tile:    { en: 'Worth reading', he: 'שווה לקרוא' } },
       { id: 'hold-own',
         icon:    'icon-speech',
-        text:    { en: 'Hold my own in a real conversation',       he: 'לעמוד על שלי בשיחה אמיתית' },
+        text:    { en: 'Hold my own in a real conversation',       he: 'להחזיק שיחה אמיתית' },
         support: { en: "You'll walk out of each lesson with one idea you can quote out loud.",
-                   he: 'מכל שיעור תצא עם רעיון אחד שאפשר לצטט בשיחה.' },
+                   he: 'מכל שיעור תצאו עם רעיון אחד שאפשר לצטט בשיחה.' },
         tile:    { en: 'Real talk', he: 'שיחה אמיתית' } },
       { id: 'read-thinkers',
         icon:    'icon-books',
-        text:    { en: "Finally read the thinkers I've heard about", he: 'סוף סוף לקרוא את ההוגים ששמעתי עליהם' },
+        text:    { en: "Finally read the thinkers I've heard about", he: 'סוף סוף לקרוא את ההוגים' },
         support: { en: "You'll meet the thinkers themselves, not just their summaries.",
-                   he: 'תפגוש את ההוגים עצמם, לא רק את התקצירים.' },
+                   he: 'תפגשו את ההוגים עצמם, לא רק את התקצירים.' },
         tile:    { en: 'The thinkers', he: 'ההוגים' } },
       { id: 'build-habit',
         icon:    'icon-streak',
-        text:    { en: 'Build a habit that actually sticks',       he: 'לבנות הרגל שבאמת נשאר' },
+        text:    { en: 'Build a habit that actually sticks',       he: 'לבנות הרגל שנשאר' },
         support: { en: 'Short daily lessons and a streak do the sticking for you.',
-                   he: 'שיעורים קצרים יומיים ורצף עושים את העבודה בשבילך.' },
+                   he: 'שיעורים קצרים יומיים ורצף עושים את העבודה בשבילכם.' },
         tile:    { en: 'Habit', he: 'הרגל' } },
-      { id: 'think-clearly',
-        icon:    'icon-magnifier',
-        text:    { en: 'Think more clearly about my own life',     he: 'לחשוב בצלילות על החיים שלי' },
-        support: { en: 'Every idea lands with a way to try it on your own week.',
-                   he: 'כל רעיון מגיע עם דרך לנסות אותו על השבוע שלך.' },
-        tile:    { en: 'Clarity', he: 'צלילות' } },
     ],
   },
   q2: {
-    head: { en: 'What would you want to be true about you?',
-            he: 'מה היית רוצה שיהיה נכון לגביך?' },
-    hint: { en: 'The one that matters most.', he: 'מה שהכי חשוב לך.' },
-    cta:  { en: 'Continue',                    he: 'המשך' },
+    // v11 step 14 — identity beat. Wording tightened per the mockup:
+    // "true of you" (not "about you"). Three option ids renamed to
+    // match new semantics — know-opinions → know-where, finish-hard →
+    // well-read, world-events → understand-world. No downstream code
+    // references these ids by string constant, so rename is safe;
+    // v4-persisted values on completed users are dead (they don't
+    // re-see the mirror). Support lines updated to match new text.
+    head: { en: 'What would you like to be true of you?',
+            he: 'מה הייתם רוצים שיהיה נכון לגביכם?' },
+    hint: { en: 'The one that matters most.', he: 'מה שהכי חשוב לכם.' },
+    cta:  { en: 'Continue',                   he: 'המשך' },
     options: [
       { id: 'own-ideas',
         icon:    'icon-bulb',
         text:    { en: 'That I have my own ideas',
-                   he: 'שיהיו לי רעיונות משלי' },
+                   he: 'שיש לי רעיונות משלי' },
         support: { en: "You'll practice reasoning from ideas, not just recognizing them.",
-                   he: 'תתרגל להסיק מרעיונות, לא רק לזהות אותם.' },
+                   he: 'תתרגלו להסיק מרעיונות, לא רק לזהות אותם.' },
         tile:    { en: 'Own ideas', he: 'משלי' } },
       { id: 'explain-clearly',
         icon:    'icon-figure',
-        text:    { en: 'That I can explain things clearly',
-                   he: 'שאני אדע להסביר דברים בבהירות' },
+        text:    { en: 'That I explain things clearly',
+                   he: 'שאני מסביר דברים בבהירות' },
         support: { en: 'Every lesson ends with the idea in one sentence you can say back.',
                    he: 'כל שיעור נגמר ברעיון במשפט אחד שאפשר לחזור עליו.' },
         tile:    { en: 'Clear speech', he: 'בבהירות' } },
-      { id: 'know-opinions',
+      { id: 'know-where',
         icon:    'icon-compass',
-        text:    { en: 'That I know where my opinions come from',
-                   he: 'שאני אדע מאיפה באות הדעות שלי' },
-        support: { en: "You'll see where the ideas you hold came from.",
-                   he: 'תראה מאיפה הגיעו הרעיונות שאתה מחזיק בהם.' },
-        tile:    { en: 'Opinion roots', he: 'שורשי דעות' } },
-      { id: 'finish-hard',
+        text:    { en: 'That I know where I stand',
+                   he: 'שאני יודע איפה אני עומד' },
+        support: { en: "You'll see where the ideas you hold came from — and where you land on them.",
+                   he: 'תראו מאיפה הגיעו הרעיונות שאתם מחזיקים בהם — ואיפה אתם עומדים.' },
+        tile:    { en: 'Where I stand', he: 'איפה אני עומד' } },
+      { id: 'well-read',
         icon:    'icon-openbook',
-        text:    { en: 'That I read hard things and finish them',
-                   he: 'שאני אקרא דברים קשים ואסיים אותם' },
-        support: { en: 'Hard books get broken into finishable pieces, one a day.',
-                   he: 'ספרים קשים מתפרקים לחתיכות שאפשר לסיים, אחת ביום.' },
-        tile:    { en: 'Finish hard books', he: 'לסיים ספרים קשים' } },
-      { id: 'world-events',
+        text:    { en: "That I'm well read",
+                   he: 'שאני בקיא' },
+        support: { en: "You'll meet the writers themselves, not just names people drop.",
+                   he: 'תפגשו את ההוגים עצמם, לא רק שמות שאנשים זורקים.' },
+        tile:    { en: 'Well read', he: 'בקיאות' } },
+      { id: 'understand-world',
         icon:    'icon-globe',
-        text:    { en: "That I understand what's happening in the world",
-                   he: 'שאני אבין אירועים שמתרחשים בעולם' },
+        text:    { en: 'That I understand the world',
+                   he: 'שאני מבין את העולם' },
         support: { en: "Each week's ideas connect to something happening right now.",
                    he: 'הרעיונות של השבוע מתחברים למשהו שקורה עכשיו.' },
-        tile:    { en: 'World events', he: 'אירועים בעולם' } },
+        tile:    { en: 'Understand world', he: 'הבנת העולם' } },
     ],
   },
   q3: {
-    head: { en: "What's your goal?", he: 'מה המטרה שלך?' },
-    cta:  { en: 'Continue',           he: 'המשך' },
+    // v11 step 15 — goal-flavor pick. Head aligned to the mockup
+    // ("with Corpus" tail added). Ids are stable: 'daily' /
+    // 'few-week' / 'finish' / 'longest-streak' are referenced by
+    // _onbV2PrepareGoal (index.html:14411) to map to a dailyGoal
+    // default when Act 4 lands the goal screen — do NOT rename.
+    head: { en: "What's your goal with Corpus?", he: 'מה המטרה שלכם ב-Corpus?' },
+    cta:  { en: 'Continue',                       he: 'המשך' },
     // Single choice. The picked id also drives state.dailyGoalHistory
     // (see _onbV2CtaQ3). Each option's support line surfaces on the
-    // mirror card for that pick (step 13).
+    // mirror card for that pick (step 16).
     options: [
       { id: 'daily',
         icon:    'icon-bolt',
@@ -13176,11 +13202,14 @@ const _ONB_COPY = {
     ],
   },
   q4: {
-    head: { en: "Be honest, how often do you read something worth your time?",
-            he: 'בכנות, כמה פעמים אתה קורא משהו ששווה את הזמן שלך?' },
-    // Q4 advances into the new "Let's start" statement screen (step 15),
-    // which is the beat that owns the "let's start" copy. Q4 CTA is
-    // therefore neutral — no narrative claim, just advance.
+    // v11 step 12 — the "Honesty" beat (mockup name). Q4's readingFreq
+    // slider mechanism is unchanged; the copy shift from "Be honest,
+    // how often…" to "Honestly — how often…" lands the tone the mockup
+    // asked for. Note: mockup's visual is a big-number + progress bar
+    // rather than a slider — that's a follow-up visual polish; the
+    // slider still captures the readingFreq value cleanly.
+    head: { en: "Honestly — how often do you read something worth your time?",
+            he: 'בכנות, כמה פעמים אתם קוראים משהו ששווה את הזמן?' },
     cta:  { en: 'Continue', he: 'המשך' },
     // Discrete 5-point Likert (0..4). Endpoints rendered as scale
     // labels under the track; the value display above shows the
@@ -13219,15 +13248,16 @@ const _ONB_COPY = {
   },
 
   mirror: {
-    // No head — the cards *are* the screen. Each user pick becomes a
+    // v11 step 16 — Reflection. Head added ("So this is you") per the
+    // mockup — v4 had no head, letting the cards be the screen. Sub
+    // replaces the previous closing.{head,line} pair with a single
+    // one-line reassurance below the cards. Each user pick becomes a
     // card with the option text + a per-option "here's what Corpus
-    // does about it" support line. Closing block below the cards
-    // adds a promise beat before the CTA that advances to Q4.
+    // does about it" support line (unchanged mechanism).
+    head: { en: 'So this is you',                         he: 'אז זה אתם' },
+    sub:  { en: "Five minutes is all it takes. We'll do the rest.",
+            he: 'חמש דקות זה כל מה שצריך. את השאר נעשה אנחנו.' },
     cta:  { en: 'Continue', he: 'המשך' },
-    closing: {
-      head: { en: "That's the plan.",     he: 'זו התוכנית' },
-      line: { en: "We'll get you there.", he: 'ואנחנו נדאג שתגיע לשם.' },
-    },
   },
   // v11 note: what used to sit here in v4 (a copy-block placeholder
   // for the reader-takeover first-dialogue step) is gone — the v11
@@ -13440,6 +13470,7 @@ function _onbApplyLang(lang) {
   setText('onb-v2-lets-start-cta','letsStart','cta');
   // Mirror head + card content are rendered dynamically in
   // _onbV2PrepareMirror from state.onbAnswers; only the CTA is static.
+  setText('onb-v2-mirror-head',   'mirror',   'head');
   setText('onb-v2-mirror-cta',    'mirror',   'cta');
   setText('onb-v2-streak-eyebrow','streak',   'eyebrow');
   setText('onb-v2-streak-head',   'streak',   'head');
@@ -13676,8 +13707,11 @@ function _onbV2CtaShock() { _onbAdvanceStep(9, 10); }
 // lands the user on home unmarked. Commit 2 fills in Act 2 slots.
 function _onbV2CtaPlan() { _onbAdvanceStep(10, 11); }
 
-// Screen 9 (subject picker) — single selection required; CTA disabled
-// otherwise (set in _onbV2PrepareSubject).
+// Screen 11 (v11 subject picker) — moved to Act 2 opener. Single
+// selection required; CTA disabled otherwise (set in
+// _onbV2PrepareSubject). setSubject persists to localStorage +
+// applies the theme class on <html> — so the accent color the user
+// picks here sticks into the rest of Act 2 (and post-onboarding).
 let _onbV2SubjectPick = null;
 function _onbV2SubjectTap(subjectId) {
   _onbV2SubjectPick = subjectId;
@@ -13693,10 +13727,10 @@ function _onbV2SubjectTap(subjectId) {
 function _onbV2CtaSubject() {
   if (!_onbV2SubjectPick) return;
   try { setSubject(_onbV2SubjectPick); } catch(e) {}
-  _onbAdvanceStep(10, 11);
+  _onbAdvanceStep(11, 12);
 }
 
-// Screens 10, 11 (Q1, Q2) — single-select. Tap replaces the previous
+// Screens 13, 14 (Q1, Q2) — single-select. Tap replaces the previous
 // pick. State shape stays as a single-element array in
 // state.onbAnswers.q1 / .q2 so the mirror renderer (which iterates
 // the array) doesn't need to know Q1/Q2 changed cardinality.
@@ -13710,11 +13744,11 @@ function _onbV2MselTap(question, optionId) {
 }
 function _onbV2CtaQ1() {
   if (!state.onbAnswers.q1 || !state.onbAnswers.q1.length) return;
-  _onbAdvanceStep(11, 12);
+  _onbAdvanceStep(13, 14);
 }
 function _onbV2CtaQ2() {
   if (!state.onbAnswers.q2 || !state.onbAnswers.q2.length) return;
-  _onbAdvanceStep(12, 13);
+  _onbAdvanceStep(14, 15);
 }
 
 // Screen 12 (Q3) — single choice + sets daily goal via the existing
@@ -13735,27 +13769,28 @@ function _onbV2CtaQ3() {
   const pick = _onbV2Q3Pick || state.onbAnswers.q3;
   if (!pick) return;
   // Q3 is captured to state.onbAnswers only. The dedicated goal screen
-  // (step 21) writes state.dailyGoalHistory with the exact 'one' | 'two'
-  // | 'own_pace' values the runtime consumers recognize; Q3's ids
-  // wouldn't match those.
-  _onbAdvanceStep(13, 14, { q3: pick });
+  // (v11 step 29) writes state.dailyGoalHistory with the exact
+  // 'one' | 'two' | 'own_pace' values the runtime consumers recognize;
+  // Q3's ids ('daily' / 'few-week' / 'finish' / 'longest-streak')
+  // wouldn't match those and _onbV2PrepareGoal maps between them.
+  _onbAdvanceStep(15, 16, { q3: pick });
 }
 
-// Screen 14 (Q4 slider) — 0..4 Likert (default 2 = "Sometimes").
-// Advances to step 15 (mirror). Q4 sits before mirror in flow v3 so
-// the reflection includes this last answer.
+// Screen 12 (v11 Honesty) — was Q4 in v4. Same readingFreq slider
+// (0..4 Likert, default 2 = "Sometimes"), just moved before Q1/Q2/Q3
+// per the v11 layout: honesty lands hardest right after the shock.
 function _onbV2CtaQ4() {
   const el = document.getElementById('onb-v2-q4-input');
   const val = parseInt((el && el.value) || '2', 10);
   const clamped = Math.max(0, Math.min(4, isNaN(val) ? 2 : val));
-  _onbAdvanceStep(14, 15, { readingFreq: clamped });
+  _onbAdvanceStep(12, 13, { readingFreq: clamped });
 }
 
-// Screen 15 (mirror) — display-only recap of every pick. Advances to
-// step 16 (notifications pre-prompt). Mirror is the emotional peak
-// before the ask; putting the notification pre-prompt immediately
-// after leverages the momentum.
-function _onbV2CtaMirror() { _onbAdvanceStep(15, 16); }
+// Screen 16 (v11 Reflection) — display-only recap of every pick.
+// Advances to step 17 (Act 3 opener). Reflection is the emotional
+// peak of Act 2 — the user sees their picks reflected back before
+// the taste screens land.
+function _onbV2CtaMirror() { _onbAdvanceStep(16, 17); }
 
 // Step 16 — notification pre-prompt. Custom in-app screen that asks
 // permission BEFORE the paywall (flow v4). Reason for the placement:
@@ -14338,23 +14373,13 @@ function _onbV2PrepareMirror() {
     list.appendChild(card);
   });
 
-  // Closing block — distinct from the cards. Head + line pulled from
-  // _ONB_COPY.mirror.closing.
-  const closing = document.createElement('div');
-  closing.className = 'onb-v2-mirror-closing';
-  const closingHead = document.createElement('div');
-  closingHead.className = 'onb-v2-mirror-closing-head';
-  closingHead.textContent = isEn
-    ? _ONB_COPY.mirror.closing.head.en
-    : _ONB_COPY.mirror.closing.head.he;
-  const closingLine = document.createElement('div');
-  closingLine.className = 'onb-v2-mirror-closing-line';
-  closingLine.textContent = isEn
-    ? _ONB_COPY.mirror.closing.line.en
-    : _ONB_COPY.mirror.closing.line.he;
-  closing.appendChild(closingHead);
-  closing.appendChild(closingLine);
-  list.appendChild(closing);
+  // v11 sub — one-line reassurance below the cards. Replaces the
+  // v4 closing.{head,line} pair. Uses the existing .onb-v2-mirror-
+  // closing-line CSS for visual continuity — no new stylesheet block.
+  const sub = document.createElement('div');
+  sub.className = 'onb-v2-mirror-closing-line';
+  sub.textContent = isEn ? _ONB_COPY.mirror.sub.en : _ONB_COPY.mirror.sub.he;
+  list.appendChild(sub);
 }
 
 // Counts unique thinkerIds a user would meet in the first `n`
@@ -14598,14 +14623,22 @@ function _onbV2PrepareGender() {
 // functions still exist and get re-wired at their v11 step numbers
 // (11, 13-16, 21, 27, 28) as later acts land.
 const _ONB_STEP_HOOKS = {
-  4: _onbV2PrepareSignup,
-  5: _onbV2PrepareName,
-  6: _onbV2PrepareGender,
-  7: _onbV2PrepareAge,
-  8: _onbV2PrepareHours,
-  9: _onbV2PrepareShock,
+  // Act 1 — The Hook
+  4:  _onbV2PrepareSignup,
+  5:  _onbV2PrepareName,
+  6:  _onbV2PrepareGender,
+  7:  _onbV2PrepareAge,
+  8:  _onbV2PrepareHours,
+  9:  _onbV2PrepareShock,
   // 10 (bridge) is static once _onbApplyLang runs.
-  // 11-36 land as later acts ship.
+  // Act 2 — The Mirror
+  11: _onbV2PrepareSubject,
+  12: _onbV2PrepareQ4,       // Honesty — v11 name for the readingFreq slider
+  13: _onbV2PrepareQ1,
+  14: _onbV2PrepareQ2,
+  15: _onbV2PrepareQ3,
+  16: _onbV2PrepareMirror,   // Reflection
+  // 17-36 land as later acts ship.
 };
 
 // Step 3 prepare hook — injects the owl SVG into the hero slot and
@@ -16783,6 +16816,26 @@ function loadState() {
   );
   if (!Array.isArray(state.onbAnswers.q1)) state.onbAnswers.q1 = [];
   if (!Array.isArray(state.onbAnswers.q2)) state.onbAnswers.q2 = [];
+  // v11 onboarding renamed three Q2 option ids and dropped one Q1
+  // option. Users mid-v4 onboarding at the version bump keep their
+  // persisted state.onbAnswers.q1 / .q2 across the flow-version
+  // reset — leaving stale ids means the Q2 prepare hook shows no
+  // highlight (indexOf never matches) but leaves CTA enabled (the
+  // gate is picks.length, not any-match), and the mirror renderer
+  // silently drops the card whose id is unknown. Map forward and
+  // filter out anything no longer in the option set. Idempotent
+  // for users already on new ids.
+  const _v11Q2Rename = {
+    'know-opinions':  'know-where',
+    'finish-hard':    'well-read',
+    'world-events':   'understand-world',
+  };
+  const _q1ValidIds = new Set(((_ONB_COPY.q1 && _ONB_COPY.q1.options) || []).map(o => o.id));
+  const _q2ValidIds = new Set(((_ONB_COPY.q2 && _ONB_COPY.q2.options) || []).map(o => o.id));
+  state.onbAnswers.q1 = state.onbAnswers.q1.filter(id => _q1ValidIds.has(id));
+  state.onbAnswers.q2 = state.onbAnswers.q2
+    .map(id => _v11Q2Rename[id] || id)
+    .filter(id => _q2ValidIds.has(id));
   if (state.guestSignupPromptShown) {
     // Ensure totalShown reflects "they've seen the welcome prompt before" so
     // first_completion doesn't re-fire. Leave lastShownDate EMPTY — the legacy
@@ -27154,9 +27207,12 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
-      <!-- Mirror has no screen heading — the cards *are* the screen.
-           Cards + closing block are rendered dynamically in
-           _onbV2PrepareMirror from state.onbAnswers. -->
+      <!-- v11 adds a head ("So this is you") above the cards and a
+           one-line sub below them ("Five minutes is all it takes…").
+           v4's closing head+line pair was replaced by the single sub —
+           _onbV2PrepareMirror renders it and reads copy from
+           _ONB_COPY.mirror.sub. -->
+      <h1 class="onb-v2-head" id="onb-v2-mirror-head"></h1>
       <div class="onb-v2-mirror-list" id="onb-v2-mirror-list"></div>
     </div>
   </div>
