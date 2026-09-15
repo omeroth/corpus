@@ -25746,6 +25746,28 @@ function _walkthroughSpotlightRect(step) {
   if (!el) return null;
   const rect = el.getBoundingClientRect();
   let top = rect.top, left = rect.left, right = rect.right, bottom = rect.bottom;
+  // Compensate for the scroll-lock's body-offset when the browser
+  // doesn't reflect it in descendants' getBoundingClientRect. The
+  // lock (see _walkthroughLockScroll and _walkthroughShiftLockedScroll)
+  // pins <body> to position:fixed with a negative top offset that
+  // preserves the visual scroll position — spec-compliant browsers
+  // report descendant rects relative to the SHIFTED body, so no
+  // adjustment is needed. WKWebView (iOS) reports them relative to
+  // the pre-shift document, so the raw rect ends up bodyTop px below
+  // where the target is actually painted, and the punch-out lands
+  // that far off. Detect by comparing body's own reported top to the
+  // value the lock intended — the drift is 0 on correct browsers
+  // (no-op) and equals the intended offset on the quirky ones.
+  const bodyEl = document.body;
+  if (bodyEl.style.position === 'fixed') {
+    const bodyTopIntended = parseFloat(bodyEl.style.top) || 0;
+    const bodyTopActual = bodyEl.getBoundingClientRect().top;
+    const drift = bodyTopIntended - bodyTopActual;
+    if (Math.abs(drift) > 0.5) {
+      top    += drift;
+      bottom += drift;
+    }
+  }
   // Clamp to visible interior. Topbar sits at y 0-56; stats bar 56-110
   // (per #screen-home .scroll-content padding-top:110). Bottom nav is
   // 64px tall + safe-area at the very bottom. Anything the spotlight
