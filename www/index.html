@@ -7431,6 +7431,18 @@
     color: var(--text-2);
     margin-top: 2px;
   }
+  /* Yearly-only footer showing the true annual charge underneath the
+     monthly-equivalent price. Smaller + de-emphasized so the primary
+     comparison unit reads first, but visible enough that the total
+     is never buried — omitting this footer while showing the monthly
+     equivalent is the version that gets flagged by store review. */
+  .paywall-card-billed {
+    font-size: 11px;
+    color: var(--text-2);
+    font-weight: 600;
+    opacity: 0.7;
+    margin-top: 4px;
+  }
   .paywall-card-trial {
     font-size: 12px;
     color: var(--accent);
@@ -12320,20 +12332,68 @@ function _paywallPrices() {
   const monthly = pkgs.find(p => p.identifier === '$rc_monthly' || p.packageType === 'MONTHLY');
   const yearly  = pkgs.find(p => p.identifier === '$rc_annual'  || p.packageType === 'ANNUAL');
   const isEn = state.lang === 'en';
+  // Numeric price is exposed alongside priceString so downstream
+  // formatters (e.g. the yearly card's monthly-equivalent display)
+  // can compute derived figures without parsing the localized string.
+  // Falls back to the USD fallback constant when RC hasn't loaded —
+  // paired with the priceString fallback that already uses the same
+  // constant, the two stay consistent even in pre-load renders.
   return {
     monthly: {
       priceString: (monthly && monthly.product && monthly.product.priceString)
                    || ('$' + PAYWALL_FALLBACK_MONTHLY_USD.toFixed(2)),
+      price:       (monthly && monthly.product && typeof monthly.product.price === 'number')
+                   ? monthly.product.price
+                   : PAYWALL_FALLBACK_MONTHLY_USD,
       periodLabel: isEn ? 'per month' : 'לחודש',
       pkg:         monthly || null,
     },
     yearly: {
       priceString: (yearly && yearly.product && yearly.product.priceString)
                    || ('$' + PAYWALL_FALLBACK_YEARLY_USD.toFixed(2)),
+      price:       (yearly && yearly.product && typeof yearly.product.price === 'number')
+                   ? yearly.product.price
+                   : PAYWALL_FALLBACK_YEARLY_USD,
       periodLabel: isEn ? 'per year' : 'לשנה',
       pkg:         yearly || null,
     },
   };
+}
+
+// Compute the monthly-equivalent display string for a yearly price,
+// preserving the storefront's exact formatting (currency symbol
+// placement, decimal separator, fractional-digit count). RC returns
+// priceString localized per storefront ("$89.99", "₪349.90",
+// "89,99 €", "¥8999") but doesn't expose a per-package price
+// formatter — this helper string-swaps the numeric core so
+// "$89.99" → "$7.49", "₪349.90" → "₪29.16", "89,99 €" → "7,49 €",
+// "¥8999" → "¥750". Kept currency-agnostic on purpose: hardcoding
+// symbols or Intl.NumberFormat with our app's language would drift
+// from the storefront's actual rendering when they disagree.
+//
+// Returns null when the source is unparseable or the price is
+// missing / zero; callers fall back to the plain yearly-per-year
+// display in that case.
+function _paywallMonthlyEquivalent(yearlyPriceString, yearlyPriceNumber) {
+  if (typeof yearlyPriceNumber !== 'number' || yearlyPriceNumber <= 0) return null;
+  if (typeof yearlyPriceString !== 'string' || !yearlyPriceString) return null;
+  const monthly = yearlyPriceNumber / 12;
+  const match = yearlyPriceString.match(/^([^\d]*)([\d.,]+)([^\d]*)$/);
+  if (!match) return null;
+  const coreStr = match[2];
+  // Detect the source's decimal separator + fractional-digit count
+  // so JPY renders without decimals and EUR-style keeps its comma.
+  const decMatch = coreStr.match(/[.,](\d+)$/);
+  let decSep = '.';
+  let fracLen = 0;
+  if (decMatch) {
+    fracLen = decMatch[1].length;
+    decSep = coreStr[coreStr.length - fracLen - 1];
+  }
+  const monthlyStr = fracLen === 0
+    ? String(Math.round(monthly))
+    : monthly.toFixed(fracLen).replace('.', decSep);
+  return match[1] + monthlyStr + match[3];
 }
 
 // Populates the paywall DOM from the current offering + language + trial
@@ -12509,11 +12569,32 @@ function _renderPaywall() {
   monthlyTrialEl.textContent = '';
   monthlyTrialEl.style.display = 'none';
 
-  // Yearly card (default emphasis)
+  // Yearly card (default emphasis). Shows the monthly-equivalent as
+  // the primary figure so the two plans compare in the same unit
+  // ($12.99 vs $7.49 per month) — showing $89.99 next to $12.99
+  // reads as apples-to-oranges. The real annual charge sits
+  // underneath as "$89.99 billed yearly" so the total is never
+  // hidden — omitting that footer is the version that gets flagged
+  // by store review. Falls back to the plain yearly display if the
+  // monthly-equivalent can't be computed (missing numeric price).
   q('.paywall-yearly-title').textContent = isEn ? 'Yearly' : 'שנתי';
-  q('.paywall-yearly-price').textContent = p.yearly.priceString;
-  q('.paywall-yearly-period').textContent = p.yearly.periodLabel;
   q('.paywall-yearly-badge').textContent = isEn ? 'Save 42%' : 'חיסכון 42%';
+  const monthlyEquiv = _paywallMonthlyEquivalent(p.yearly.priceString, p.yearly.price);
+  const billedEl = q('.paywall-yearly-billed');
+  if (monthlyEquiv) {
+    q('.paywall-yearly-price').textContent = monthlyEquiv;
+    q('.paywall-yearly-period').textContent = isEn ? 'per month' : 'לחודש';
+    if (billedEl) {
+      billedEl.textContent = isEn
+        ? p.yearly.priceString + ' billed yearly'
+        : p.yearly.priceString + ' בחיוב שנתי';
+      billedEl.style.display = '';
+    }
+  } else {
+    q('.paywall-yearly-price').textContent = p.yearly.priceString;
+    q('.paywall-yearly-period').textContent = p.yearly.periodLabel;
+    if (billedEl) billedEl.style.display = 'none';
+  }
   const yearlyTrialEl = q('.paywall-yearly-trial');
   yearlyTrialEl.textContent = '';
   yearlyTrialEl.style.display = 'none';
@@ -29204,6 +29285,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="paywall-card-title paywall-yearly-title"></div>
         <div class="paywall-card-price paywall-yearly-price"></div>
         <div class="paywall-card-period paywall-yearly-period"></div>
+        <div class="paywall-card-billed paywall-yearly-billed" style="display:none"></div>
         <div class="paywall-card-trial paywall-yearly-trial"></div>
       </button>
     </div>
@@ -29503,6 +29585,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="paywall-card-title paywall-yearly-title"></div>
         <div class="paywall-card-price paywall-yearly-price"></div>
         <div class="paywall-card-period paywall-yearly-period"></div>
+        <div class="paywall-card-billed paywall-yearly-billed" style="display:none"></div>
         <div class="paywall-card-trial paywall-yearly-trial"></div>
       </button>
     </div>
