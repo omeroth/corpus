@@ -6906,20 +6906,43 @@
      Base .onb-screen ships with `overflow-y: auto` on the outer frame,
      which lets the CTA scroll away below the fold on short viewports
      (e.g. Android with a small WebView height when the option list is
-     6+ items tall). This variant flips to the subject-select pattern
-     from commit b5390aa: outer non-scrolling, inner region scrolls,
-     CTA holder is a fixed-height sibling. Uses only Flexbox Level 1
-     primitives so it works on every WebView we support.
-     Add .onb-v2-scroll to any screen whose content might not fit. */
+     6+ items tall). This variant makes the inner region scrollable
+     while keeping the CTA holder a non-scrolling sibling.
+     Add .onb-v2-scroll to any screen whose content MIGHT not fit — the
+     class is a safety net, not a layout change.
+     Centering-when-fits + top-align-when-overflows without `safe center`:
+     f161ec6 tried `justify-content: safe center` and it silently
+     reverted to plain `center` on older Samsung WebView installs,
+     leaving the CTA unreachable. Structural fix from b5390aa was CTA
+     as non-scrolling sibling; here we also need the *inner* content
+     to center when it fits, which the subject-select pattern didn't
+     address.
+     Solution using only Flexbox Level 1 primitives (supported since
+     WebView 4.4 / iOS 9): drop `justify-content: center` inside the
+     scroll variant (it clips the top on overflow with no safe
+     fallback), and drive vertical centering via `margin-top: auto`
+     on the first flex child + `margin-bottom: auto` on the last.
+     Per Flexbox spec, auto margins consume leftover space (centering
+     when content fits) and resolve to 0 when space is exhausted (top-
+     alignment when content overflows). For single-child screens
+     (.onb-v2-inner > .onb-v2-copy) both autos land on that one
+     element. For two-child screens (owl-hero + copy on plan-ready /
+     lets-start / signup) auto-top on the owl + auto-bottom on the
+     copy centers the pair as a group. */
   .onb-screen.onb-v2.onb-v2-scroll {
     overflow: hidden;
   }
   .onb-screen.onb-v2.onb-v2-scroll .onb-v2-inner {
     justify-content: flex-start;
-    align-items: stretch;
     min-height: 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+  }
+  .onb-screen.onb-v2.onb-v2-scroll .onb-v2-inner > *:first-child {
+    margin-top: auto;
+  }
+  .onb-screen.onb-v2.onb-v2-scroll .onb-v2-inner > *:last-child {
+    margin-bottom: auto;
   }
   .onb-screen.onb-v2.onb-v2-scroll .onb-cta-holder {
     flex-shrink: 0;
