@@ -6520,6 +6520,183 @@
     border-color: rgba(255, 255, 255, 0.16);
   }
 
+  /* ── Act 3: The Taste ─────────────────────────────────────────
+     v11 screens 17-23. Timeline (how-it-works), quote card (taste-1),
+     taste-question correct-answer reveal (taste-q), first-card 3D
+     preview (first-card), streak big-number (streak). All colors
+     use var(--accent) / var(--ink) / var(--border) so they follow
+     the subject theme picked at step 11. */
+
+  /* How-it-works timeline (step 17) — three items, connector line
+     between successive dots. Last item's dot is hollow (aspirational
+     "not yet filled" cue). */
+  .onb-screen.onb-v2 .onb-v2-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    text-align: start;
+    margin-top: 8px;
+  }
+  .onb-screen.onb-v2 .onb-v2-timeline-step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .onb-screen.onb-v2 .onb-v2-timeline-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 6px;
+    position: relative;
+  }
+  .onb-screen.onb-v2 .onb-v2-timeline-dot.hollow {
+    background: var(--surface);
+    border: 2.5px solid var(--accent);
+  }
+  .onb-screen.onb-v2 .onb-v2-timeline-step:not(:last-child) .onb-v2-timeline-dot::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: 4.5px;
+    top: 12px;
+    width: 3px;
+    height: 32px;
+    background: var(--border);
+  }
+  .onb-screen.onb-v2 .onb-v2-timeline-body {
+    padding-bottom: 14px;
+    flex: 1;
+  }
+  .onb-screen.onb-v2 .onb-v2-timeline-title {
+    display: block;
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 900;
+    font-size: calc(15px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.3;
+    margin-bottom: 2px;
+  }
+  .onb-screen.onb-v2 .onb-v2-timeline-desc {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(13px * var(--text-scale));
+    color: var(--text-2);
+    line-height: 1.45;
+  }
+
+  /* Taste-1 quote card (step 19) — italic pull-quote in a bordered
+     surface tile, with a small accent-colored source cite below. */
+  .onb-screen.onb-v2 .onb-v2-quote-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(15px * var(--text-scale));
+    font-style: italic;
+    line-height: 1.5;
+    text-align: start;
+    color: var(--ink);
+    margin: 0 0 14px;
+  }
+  .onb-screen.onb-v2 .onb-v2-quote-source {
+    display: block;
+    font-style: normal;
+    font-weight: 900;
+    font-size: calc(11px * var(--text-scale));
+    letter-spacing: 0.02em;
+    color: var(--accent);
+    margin-top: 10px;
+  }
+
+  /* Taste-2 punch line (step 20) — bolded closer that only philosophy
+     uses in the current mockup. Hidden via inline style when empty. */
+  .onb-screen.onb-v2 .onb-v2-taste-2-punch {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 800;
+    color: var(--ink);
+    text-align: start;
+    margin-top: 12px;
+  }
+
+  /* Taste-q correct-answer reveal (step 21) — green border + tinted
+     fill on the correct option after ANY tap. Independent of the
+     user's actual pick. If the user tapped a wrong option, that
+     option gets a subtle .is-picked marker so they can see their
+     answer alongside the correct one. */
+  .onb-screen.onb-v2 .onb-v2-card.is-correct {
+    border-color: #2E9E5B;
+    background: #EAF7EE;
+  }
+  html.dark .onb-screen.onb-v2 .onb-v2-card.is-correct {
+    border-color: #4FBE81;
+    background: rgba(46, 158, 91, 0.14);
+  }
+  .onb-screen.onb-v2 .onb-v2-card.is-picked {
+    border-color: var(--text-muted);
+    opacity: 0.75;
+  }
+
+  /* First-card reveal (step 22) — 3D-styled collectible card preview.
+     Not the same as the app's real thinker card (which uses portraits
+     + flip animation); this is a lightweight preview to sell the
+     "you'll collect these" beat. */
+  .onb-screen.onb-v2 .onb-v2-first-card-eyebrow {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 900;
+    font-size: calc(12px * var(--text-scale));
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 12px;
+    text-align: center;
+  }
+  .onb-screen.onb-v2 .onb-v2-first-card-3d {
+    width: 140px;
+    margin: 0 auto 18px;
+    aspect-ratio: 67 / 120;
+    border-radius: 14px;
+    background: linear-gradient(160deg, var(--surface), var(--surface-2));
+    border: 3px solid var(--accent);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 12px 28px var(--accent-glow);
+  }
+  .onb-screen.onb-v2 .onb-v2-first-card-icon svg {
+    width: 44px;
+    height: 44px;
+    color: var(--accent);
+  }
+  .onb-screen.onb-v2 .onb-v2-first-card-name {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 900;
+    font-size: calc(13px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .onb-screen.onb-v2 .onb-v2-first-card-role {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(10.5px * var(--text-scale));
+    color: var(--text-2);
+    line-height: 1.1;
+  }
+
+  /* Streak big number (step 23) — v11 adds a big "1" between the
+     flame and the head. Amber to echo the flame; sized big enough
+     to carry the streak cue on its own (eyebrow was dropped). */
+  .onb-screen.onb-v2 .onb-v2-streak-number {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 900;
+    font-size: calc(60px * var(--text-scale));
+    line-height: 1;
+    color: var(--amber);
+    margin: 6px 0 2px;
+  }
+
   /* Progress-pill active fill on v2 uses the current subject accent
      (not the hardcoded philosophy fallback used by legacy v1 progress).
      Steps 1-8 all render as philosophy pre-subject-pick; from step 9
@@ -13005,7 +13182,21 @@ const _ONB_STEP_TO_ID = {
   15: 'onb-v2-q3',
   16: 'onb-v2-mirror',   // Reflection
   // Act 3 — The Taste. Built in Commit 3.
-  17: null, 18: null, 19: null, 20: null, 21: null, 22: null, 23: null, 24: null,
+  17: 'onb-v2-how-it-works',
+  18: 'onb-v2-lets-start',
+  19: 'onb-v2-taste-1',
+  20: 'onb-v2-taste-2',
+  21: 'onb-v2-taste-q',
+  22: 'onb-v2-first-card',
+  23: 'onb-v2-streak',
+  // Step 24 (rating) has no distinct DOM — the mockup labels it as
+  // a screen number, but in practice the native review sheet fires
+  // as an overlay from the streak (23) CTA and there's nothing to
+  // render underneath. _onbV2CtaStreak calls _requestNativeReview
+  // and advances 23 → 25 directly, bypassing 24. Leaving 24 as null
+  // means the partial-ladder mitigation would catch an accidental
+  // advance to 24, which is exactly the defensive behavior we want.
+  24: null,
   // Act 4 — The Plan. Built in Commit 4.
   25: null, 26: null, 27: null, 28: null, 29: null, 30: null,
   // Act 5 — The Ask. Built in Commit 5 (screens 34-36 blocked on RC
@@ -13300,14 +13491,143 @@ const _ONB_COPY = {
     skip: { en: 'Not now',             he: 'לא עכשיו' },
   },
 
-  // Step 18 — pre-dialogue statement screen. Same visual as welcome /
-  // problem / solution / plan: head + sub + CTA. Land here after
-  // paywall; CTA opens the reader on the first dialogue (step 19).
+  // Step 17 (v11) — How it works. Three-step timeline explaining
+  // the loop: read → earn a card → build the collection. Placed
+  // right before the taste so the mechanic is fresh when they
+  // experience it. Each item has b (bold headline) + t (body).
+  howItWorks: {
+    head: { en: 'How Corpus works', he: 'איך Corpus עובד' },
+    cta:  { en: 'Continue',        he: 'המשך' },
+    items: [
+      { icon: 'icon-openbook',
+        b: { en: 'Read one dialogue',      he: 'קוראים דיאלוג' },
+        t: { en: 'Five minutes with a real thinker.',
+             he: 'חמש דקות עם הוגה אמיתי.' } },
+      { icon: 'icon-streak',
+        b: { en: 'Earn their card',        he: 'מקבלים את הקלף' },
+        t: { en: 'One card for every mind you meet.',
+             he: 'קלף לכל הוגה שפגשתם.' } },
+      { icon: 'icon-books', hollow: true,
+        b: { en: 'Build the collection',   he: 'אוספים' },
+        t: { en: 'Your pantheon grows as you read.',
+             he: 'הפנתיאון שלכם גדל.' } },
+    ],
+  },
+  // Step 18 (v11) — "Got five minutes?" bridge to the taste. Owl-
+  // fronted micro-commit. Copy shift from v4's "Let's start / One
+  // dialogue, five minutes" to the mockup's warmer ask.
   letsStart: {
-    head: { en: "Let's start", he: 'בוא נתחיל' },
-    sub:  { en: 'One dialogue, five minutes',
-            he: 'דיאלוג אחד, חמש דקות' },
-    cta:  { en: "Let's start", he: 'בוא נתחיל' },
+    head: { en: 'Got five minutes?', he: 'יש לכם חמש דקות?' },
+    sub:  { en: "Then let's read one together.",
+            he: 'אז בואו נקרא אחד ביחד.' },
+    cta:  { en: "Let's read",        he: 'בואו נקרא' },
+  },
+  // Steps 19-22 (v11) — The Taste. Subject-specific quote + prose
+  // + question + first-card reveal. Content varies by state.subject
+  // (set at step 11); prepare hooks resolve the variant at render
+  // time. All three thinkers exist in content/thinkers.js — Socrates,
+  // Smith (economics primary), Kahneman (multi-subject; rendered
+  // here in psychology context via icon-brain). The taste is a
+  // stateless preview — nothing writes to state.completedDays,
+  // state.unlockedThinkers, or state.dailyStreak.
+  //
+  // Quotes verified:
+  //   Socrates — Apology, 38a (Stephanus cite, standard rendering)
+  //   Smith    — Wealth of Nations, I.2, Glasgow edition punctuation
+  //              (no comma before "that we expect")
+  //   Kahneman — Thinking, Fast and Slow, Ch. 38 (focusing illusion,
+  //              California-vs-elsewhere study is on the same page
+  //              the prose draws from)
+  taste: {
+    // Shared CTA across taste-1 / taste-2 / taste-q — all three
+    // read "Continue" in every subject, no reason to duplicate.
+    cta: { en: 'Continue', he: 'המשך' },
+    philosophy: {
+      thinkerName: 'Socrates',
+      role:  { en: 'The Questioner', he: 'השואל' },
+      icon:  'icon-building',
+      quote: { en: '"The unexamined life is not worth living."',
+               he: '"חיים שלא נבחנים אינם ראויים שיחיו אותם."' },
+      source: 'Socrates — Apology, 38a',
+      page1: { en: 'Athens, 399 BC. Socrates is on trial for corrupting the young. The jury offers him exile instead of death. He refuses.',
+               he: 'אתונה, 399 לפנה"ס. סוקרטס עומד למשפט. חבר המושבעים מציע לו גלות במקום מוות. הוא מסרב.' },
+      page2Head: { en: 'What he meant', he: 'למה הוא התכוון' },
+      page2: { en: 'Not that thinking makes life pleasant. That a life you never question is not really yours — you are living out answers someone else chose, without noticing.',
+               he: 'לא שחשיבה עושה את החיים נעימים. שחיים שלא שואלים עליהם שאלות הם לא באמת שלכם — אתם חיים תשובות שמישהו אחר בחר, בלי לשים לב.' },
+      page2Punch: { en: 'He chose the hemlock over the quiet life.',
+                    he: 'הוא בחר ברעל על פני החיים השקטים.' },
+      scenario: { en: 'Someone is told all their life that a safe job is what matters. They never ask why — they just take the predictable path, because everyone around them did.',
+                  he: 'מישהו שומע כל חייו שעבודה בטוחה זה מה שחשוב. הוא אף פעם לא שואל למה — פשוט הולך בדרך הצפויה, כי כולם סביבו הלכו בה.' },
+      question: { en: 'According to Socrates, what kind of life is that?',
+                  he: 'לפי סוקרטס, אילו חיים אלה?' },
+      options: [
+        { en: 'A rational, calculated life', he: 'חיים רציונליים ומחושבים' },
+        { en: 'A safe but limited life',      he: 'חיים בטוחים אבל מוגבלים' },
+        { en: 'The unexamined life',          he: 'חיים שלא נבחנו' },
+      ],
+      correctIndex: 2,
+    },
+    economics: {
+      thinkerName: 'Adam Smith',
+      role:  { en: 'The Observer', he: 'המתבונן' },
+      icon:  'icon-globe',
+      quote: { en: '"It is not from the benevolence of the butcher, the brewer, or the baker that we expect our dinner, but from their regard to their own interest."',
+               he: '"לא מרוב טוב לבו של הקצב, של מבשל השיכר או של האופה אנחנו מצפים לארוחת הערב שלנו, אלא מתוך התחשבותם באינטרס שלהם."' },
+      source: 'Adam Smith — The Wealth of Nations, I.2',
+      page1: { en: 'Glasgow, 1776. Smith is not praising greed. He is answering a question nobody had answered: how does a city of strangers feed itself every morning, with no one in charge?',
+               he: 'גלזגו, 1776. סמית לא משבח חמדנות. הוא עונה על שאלה שאיש לא ענה עליה: איך עיר של זרים מאכילה את עצמה כל בוקר, בלי שאף אחד מנהל?' },
+      page2Head: { en: 'What he meant', he: 'למה הוא התכוון' },
+      page2: { en: 'Nobody wakes up wanting to feed you. They wake up wanting to earn. The bread arrives anyway — that is the whole insight, and it is stranger than it sounds.',
+               he: 'אף אחד לא קם בבוקר כדי להאכיל אתכם. הם קמים כדי להתפרנס. הלחם מגיע בכל זאת — וזאת כל התובנה, והיא מוזרה יותר משהיא נשמעת.' },
+      page2Punch: { en: '', he: '' },  // no punch line in mockup for Smith
+      scenario: { en: 'A baker raises his prices in a shortage, and more flour starts arriving in town.',
+                  he: 'אופה מעלה מחירים במחסור, ופתאום מגיע לעיר יותר קמח.' },
+      question: { en: 'According to Smith, what made the flour move?',
+                  he: 'לפי סמית, מה הזיז את הקמח?' },
+      options: [
+        { en: 'Someone decided the town needed it',       he: 'מישהו החליט שהעיר צריכה אותו' },
+        { en: 'Kindness from another region',              he: 'אדיבות של אזור אחר' },
+        { en: 'Other people chasing the higher price',     he: 'אנשים אחרים שרדפו אחרי המחיר הגבוה' },
+      ],
+      correctIndex: 2,
+    },
+    psychology: {
+      thinkerName: 'Daniel Kahneman',
+      role:  { en: 'The Doubter', he: 'המפקפק' },
+      icon:  'icon-brain',
+      quote: { en: '"Nothing in life is as important as you think it is while you are thinking about it."',
+               he: '"שום דבר בחיים אינו חשוב כפי שאתם חושבים שהוא, בזמן שאתם חושבים עליו."' },
+      source: 'Daniel Kahneman — Thinking, Fast and Slow, Ch. 38',
+      page1: { en: 'Kahneman called this the focusing illusion. Ask someone how much happier they would be in California and they will tell you: much. Measure it, and Californians are no happier than anyone else.',
+               he: 'קהנמן קרא לזה אשליית המיקוד. שאלו מישהו כמה מאושר יותר הוא יהיה בקליפורניה — הוא יגיד: הרבה. תמדדו, והקליפורנים לא מאושרים יותר מאיש.' },
+      page2Head: { en: 'What he meant', he: 'למה הוא התכוון' },
+      page2: { en: 'The trick is in the asking. The moment you point at something, it fills the frame. Weather, salary, a new phone — each one looks decisive while you are looking straight at it.',
+               he: 'הטריק הוא בשאלה. ברגע שמצביעים על משהו, הוא ממלא את המסגרת. מזג אוויר, משכורת, טלפון חדש — כל אחד נראה מכריע כשמסתכלים עליו ישר.' },
+      page2Punch: { en: '', he: '' },
+      scenario: { en: 'You are sure the promotion will change everything. Six months after you get it, you feel about the same.',
+                  he: 'אתם בטוחים שהקידום ישנה הכל. חצי שנה אחרי שקיבלתם אותו, אתם מרגישים בערך אותו דבר.' },
+      question: { en: 'What does the focusing illusion predict here?',
+                  he: 'מה אשליית המיקוד חוזה כאן?' },
+      options: [
+        { en: 'The promotion was the wrong goal',                    he: 'הקידום היה המטרה הלא נכונה' },
+        { en: 'You overrated it precisely because you were thinking about it',
+          he: 'הערכתם אותו יתר על המידה דווקא כי חשבתם עליו' },
+        { en: 'You will adjust eventually',                          he: 'בסוף תסתגלו' },
+      ],
+      correctIndex: 1,
+    },
+  },
+  // Step 22 (v11) — First card reveal. Static preview only —
+  // state.unlockedThinkers is not written; the user's actual first
+  // card lands post-onboarding on their first real dialogue
+  // completion. Head/sub are subject-invariant; the card itself
+  // (name, role, icon) comes from _ONB_COPY.taste[subject].
+  firstCard: {
+    eyebrow: { en: 'Your first thinker',          he: 'ההוגה הראשון שלכם' },
+    head:    { en: "He's yours.",                 he: 'הוא שלכם.' },
+    sub:     { en: 'Every thinker you read joins your collection.',
+               he: 'כל הוגה שתקראו מצטרף לאוסף.' },
+    cta:     { en: 'Continue',                    he: 'המשך' },
   },
 
   mirror: {
@@ -13362,12 +13682,19 @@ const _ONB_COPY = {
 
   // Step 20 — day-1 streak celebration. Matches the endowment overlay
   // beat but as a v2 screen (no modal); flame + eyebrow + head + CTA.
+  // Step 23 (v11) — day-1 streak. Stateless preview: the big "1"
+  // is a visual promise, not a real streak. state.dailyStreak stays
+  // at 0 through the whole onboarding — the user's first real
+  // streak day fires on their first post-onboarding finishDay. Copy
+  // shift from v4's "You showed up. / Every day adds to your streak"
+  // to the mockup's warmer "Day one / Come back tomorrow and it
+  // becomes two." Eyebrow dropped per mockup (big number carries
+  // the "streak" cue).
   streak: {
-    eyebrow: { en: 'DAY 1 · STREAK',        he: 'יום 1 · רצף' },
-    head:    { en: 'You showed up.',        he: 'הרצף שלך התחיל.' },
-    sub:     { en: 'Every day adds to your streak. Miss one and it resets.',
-               he: 'כל יום מוסיף לרצף. יום שתפספס מאפס.' },
-    cta:     { en: 'Continue',              he: 'המשך' },
+    head:    { en: 'Day one', he: 'יום ראשון' },
+    sub:     { en: 'Come back tomorrow and it becomes two.',
+               he: 'חזרו מחר וזה יהפוך לשניים.' },
+    cta:     { en: 'Continue', he: 'המשך' },
   },
 
   // Step 22 — review request. No native prompt plugin wired in yet;
@@ -13534,11 +13861,28 @@ function _onbApplyLang(lang) {
   setText('onb-v2-lets-start-head','letsStart','head');
   setText('onb-v2-lets-start-sub','letsStart','sub');
   setText('onb-v2-lets-start-cta','letsStart','cta');
+  // How-it-works: head + CTA static, timeline items rendered
+  // dynamically by _onbV2PrepareHowItWorks (bilingual re-render on
+  // language toggle happens via the prepare hook, not here).
+  setText('onb-v2-how-it-works-head', 'howItWorks', 'head');
+  setText('onb-v2-how-it-works-cta',  'howItWorks', 'cta');
+  // Taste screens: heads / quote / prose / options are subject-
+  // specific and rendered by the prepare hooks (they read
+  // _ONB_COPY.taste[state.subject]). Shared CTAs bind here.
+  setText('onb-v2-taste-1-cta', 'taste', 'cta');
+  setText('onb-v2-taste-2-cta', 'taste', 'cta');
+  setText('onb-v2-taste-q-cta', 'taste', 'cta');
+  // First-card: eyebrow + head + sub + CTA are subject-invariant.
+  setText('onb-v2-first-card-eyebrow', 'firstCard', 'eyebrow');
+  setText('onb-v2-first-card-head',    'firstCard', 'head');
+  setText('onb-v2-first-card-sub',     'firstCard', 'sub');
+  setText('onb-v2-first-card-cta',     'firstCard', 'cta');
   // Mirror head + card content are rendered dynamically in
   // _onbV2PrepareMirror from state.onbAnswers; only the CTA is static.
   setText('onb-v2-mirror-head',   'mirror',   'head');
   setText('onb-v2-mirror-cta',    'mirror',   'cta');
-  setText('onb-v2-streak-eyebrow','streak',   'eyebrow');
+  // Streak (v11) — eyebrow was dropped in v11 (mockup lets the big
+  // number carry the streak cue); binding removed.
   setText('onb-v2-streak-head',   'streak',   'head');
   setText('onb-v2-streak-sub',    'streak',   'sub');
   setText('onb-v2-streak-cta',    'streak',   'cta');
@@ -13970,13 +14314,86 @@ function _onbV2PreparePaywall() {
 // 21000) on the user's first post-onboarding completion, which is
 // where it belongs.
 
-// Screen 18 (let's start) — bridge into the first dialogue in v4;
-// still present in v11 (steps renumber to 18 later). Wired up when
-// Act 3 lands in Commit 3.
+// ═══════════════════════════════════════════════════════════════════
+// Act 3 — The Taste (steps 17-24)
+// ═══════════════════════════════════════════════════════════════════
+// The taste is a stateless preview of what the app's daily loop
+// feels like: quote → prose → question → card → streak → rating ask.
+// None of it writes to state.completedDays, state.unlockedThinkers,
+// or state.dailyStreak — the user's first real values land on their
+// first post-onboarding finishDay. Subject-specific content (quote,
+// scenario, question, options, first-card name+role+icon) comes from
+// _ONB_COPY.taste[state.subject]; heads/subs/CTAs are subject-
+// invariant and bound via _onbApplyLang.
+
+// Step 17 (how-it-works) — advance to Let's start.
+function _onbV2CtaHowItWorks() { _onbAdvanceStep(17, 18); }
+
+// Step 18 (let's start / "Got five minutes?") — bridge into the
+// taste. v11 CTA text is "Let's read"; screen owns the copy shift
+// from v4's "One dialogue, five minutes" ask.
 function _onbV2CtaLetsStart() { _onbAdvanceStep(18, 19); }
 
-// Screen 20 (day-1 streak) — display-only celebration; advance to 21 (goal).
-function _onbV2CtaStreak() { _onbAdvanceStep(20, 21); }
+// Steps 19 & 20 (taste-1, taste-2) — display-only prose pages.
+function _onbV2CtaTaste1() { _onbAdvanceStep(19, 20); }
+function _onbV2CtaTaste2() { _onbAdvanceStep(20, 21); }
+
+// Step 21 (taste-q) — pick one of three options. Correct answer
+// highlights green on ANY tap (the mockup's "reveal" pattern —
+// user gets feedback, but the flow doesn't gate on right/wrong).
+// Fires posthog with correct/picked-index for cohort analysis;
+// state is not persisted (the taste is stateless).
+let _onbV2TasteQPicked = null;
+function _onbV2TasteQTap(idx) {
+  _onbV2TasteQPicked = idx;
+  const subj = state.subject || 'philosophy';
+  const cfg  = _ONB_COPY.taste[subj] || _ONB_COPY.taste.philosophy;
+  document.querySelectorAll('#onb-v2-taste-q .onb-v2-card').forEach(c => {
+    // Reveal the correct answer regardless of the user's pick; also
+    // mark the picked option (subtle border) if it's not the same.
+    const cIdx = parseInt(c.dataset.optionIdx, 10);
+    c.classList.toggle('is-correct', cIdx === cfg.correctIndex);
+    c.classList.toggle('is-picked',  cIdx === idx && cIdx !== cfg.correctIndex);
+  });
+  const cta = document.getElementById('onb-v2-taste-q-cta');
+  if (cta) cta.disabled = false;
+  try {
+    _phCapture('onboarding_taste_answered', {
+      subject:       subj,
+      correct:       idx === cfg.correctIndex,
+      picked_index:  idx,
+    });
+  } catch(e) {}
+}
+function _onbV2CtaTasteQ() {
+  if (_onbV2TasteQPicked === null) return;
+  _onbAdvanceStep(21, 22);
+}
+
+// Step 22 (first-card reveal) — advance to streak.
+function _onbV2CtaFirstCard() { _onbAdvanceStep(22, 23); }
+
+// Step 23 (streak) — fires the native review sheet as an overlay,
+// then advances directly to Act 4 (skipping step 24 which is the
+// rating "screen" in the mockup — it's an overlay from this CTA,
+// not a distinct screen). See STEP_TO_ID comment at 24. On web /
+// unavailable plugin, _requestNativeReview resolves quickly and
+// advance still fires. The .catch handles any promise-reject or
+// synchronous throw so the user is never stuck on the streak
+// screen if the plugin call fails.
+function _onbV2CtaStreak() {
+  const platform = (window.Capacitor && Capacitor.getPlatform && Capacitor.getPlatform()) || 'web';
+  const advance  = () => _onbAdvanceStep(23, 25);
+  try {
+    _requestNativeReview().then((r) => {
+      const path = (r && r.path) || 'unknown';
+      try { _phCapture('onboarding_review_prompted', { platform, path, source: 'onboarding_step24' }); } catch(e) {}
+      advance();
+    }).catch(() => advance());
+  } catch(e) {
+    advance();
+  }
+}
 
 // Screen 21 (daily goal) — single-select radio over three cards
 // ('one' / 'two' / 'own_pace'). Preselect logic maps the Q3 answer to
@@ -14473,6 +14890,138 @@ function _onbV2CountFirstThinkers(n) {
   } catch(e) { return 16; }
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// Act 3 — The Taste (prepare hooks)
+// ═══════════════════════════════════════════════════════════════════
+
+// Step 17 (how-it-works) — renders the 3-item timeline. Each item
+// has a bold headline + body, with the last item using a hollow
+// dot (visual cue that the collection is aspirational, not yet
+// filled). Bilingual re-render on every show.
+function _onbV2PrepareHowItWorks() {
+  const list = document.getElementById('onb-v2-how-it-works-list');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+  const items = (_ONB_COPY.howItWorks && _ONB_COPY.howItWorks.items) || [];
+  list.innerHTML = '';
+  items.forEach(item => {
+    const step = document.createElement('div');
+    step.className = 'onb-v2-timeline-step';
+    const dot = document.createElement('span');
+    dot.className = 'onb-v2-timeline-dot' + (item.hollow ? ' hollow' : '');
+    dot.setAttribute('aria-hidden', 'true');
+    const body = document.createElement('div');
+    body.className = 'onb-v2-timeline-body';
+    const title = document.createElement('div');
+    title.className = 'onb-v2-timeline-title';
+    title.textContent = isEn ? item.b.en : item.b.he;
+    const desc = document.createElement('div');
+    desc.className = 'onb-v2-timeline-desc';
+    desc.textContent = isEn ? item.t.en : item.t.he;
+    body.appendChild(title);
+    body.appendChild(desc);
+    step.appendChild(dot);
+    step.appendChild(body);
+    list.appendChild(step);
+  });
+}
+
+// Step 18 (let's-start) — inject owl into the hero slot. Neutral
+// (waving) expression matches the low-pressure "got five minutes?"
+// ask; same helper _onbV2PrepareSignup uses.
+function _onbV2PrepareLetsStart() {
+  const owlEl = document.getElementById('onb-v2-lets-start-owl');
+  if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
+}
+
+// Helper: read taste config for the current subject with a
+// philosophy fallback if state.subject is somehow unset (defensive
+// — shouldn't happen post-Commit-2 since step 11 calls setSubject).
+function _onbV2TasteCfg() {
+  const subj = state.subject || 'philosophy';
+  return (_ONB_COPY.taste && _ONB_COPY.taste[subj]) || _ONB_COPY.taste.philosophy;
+}
+
+// Step 19 (taste-1) — quote card + source + page-1 prose.
+function _onbV2PrepareTaste1() {
+  const isEn = state.lang === 'en';
+  const cfg = _onbV2TasteCfg();
+  const setEl = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  setEl('onb-v2-taste-1-quote',  isEn ? cfg.quote.en : cfg.quote.he);
+  setEl('onb-v2-taste-1-source', cfg.source);   // source cite doesn't localize
+  setEl('onb-v2-taste-1-page1',  isEn ? cfg.page1.en : cfg.page1.he);
+}
+
+// Step 20 (taste-2) — "what he meant" head + page-2 prose + optional
+// punch line. Punch line is only in the philosophy mockup ("He chose
+// the hemlock..."); hidden entirely when empty on Smith / Kahneman.
+function _onbV2PrepareTaste2() {
+  const isEn = state.lang === 'en';
+  const cfg = _onbV2TasteCfg();
+  const setEl = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  setEl('onb-v2-taste-2-head',  isEn ? cfg.page2Head.en : cfg.page2Head.he);
+  setEl('onb-v2-taste-2-page2', isEn ? cfg.page2.en     : cfg.page2.he);
+  const punchTxt = isEn ? (cfg.page2Punch && cfg.page2Punch.en) : (cfg.page2Punch && cfg.page2Punch.he);
+  const punchEl = document.getElementById('onb-v2-taste-2-punch');
+  if (punchEl) {
+    if (punchTxt) {
+      punchEl.textContent = punchTxt;
+      punchEl.style.display = '';
+    } else {
+      punchEl.style.display = 'none';
+    }
+  }
+}
+
+// Step 21 (taste-q) — scenario prose + question + 3 options. Resets
+// pick state and disables the CTA on every show, so re-entering the
+// step (via language toggle, or a v5-resumer's mid-flow re-open)
+// doesn't leave a stale highlight. Reveal happens in _onbV2TasteQTap.
+function _onbV2PrepareTasteQ() {
+  const isEn = state.lang === 'en';
+  const cfg = _onbV2TasteCfg();
+  const setEl = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  setEl('onb-v2-taste-q-scenario', isEn ? cfg.scenario.en : cfg.scenario.he);
+  setEl('onb-v2-taste-q-head',     isEn ? cfg.question.en : cfg.question.he);
+  _onbV2TasteQPicked = null;
+  const list = document.getElementById('onb-v2-taste-q-options');
+  if (list) {
+    list.innerHTML = '';
+    cfg.options.forEach((opt, idx) => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'onb-v2-card onb-v2-taste-q-option';
+      card.dataset.optionIdx = String(idx);
+      const label = document.createElement('span');
+      label.className = 'onb-v2-card-label';
+      label.textContent = isEn ? opt.en : opt.he;
+      card.appendChild(label);
+      card.onclick = () => _onbV2TasteQTap(idx);
+      list.appendChild(card);
+    });
+  }
+  const cta = document.getElementById('onb-v2-taste-q-cta');
+  if (cta) cta.disabled = true;
+}
+
+// Step 22 (first-card) — subject-specific card face (icon + name +
+// role). Head + sub + CTA bind via _onbApplyLang (subject-invariant).
+// STATELESS: state.unlockedThinkers is NOT written here — the user's
+// actual first collectible lands on the first post-onboarding
+// finishDay. This screen is purely a preview of the reward loop.
+function _onbV2PrepareFirstCard() {
+  const isEn = state.lang === 'en';
+  const cfg = _onbV2TasteCfg();
+  const nameEl = document.getElementById('onb-v2-first-card-name');
+  const roleEl = document.getElementById('onb-v2-first-card-role');
+  const iconEl = document.getElementById('onb-v2-first-card-icon');
+  if (nameEl) nameEl.textContent = cfg.thinkerName;
+  if (roleEl) roleEl.textContent = isEn ? cfg.role.en : cfg.role.he;
+  if (iconEl) iconEl.innerHTML = '<svg viewBox="0 0 64 64"><use href="#' + cfg.icon + '"/></svg>';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+
 // Screen 21 — goal. Renders three cards (recovered from the v1 goal
 // screen) and preselects one based on the user's Q3 answer. Preselect
 // map: 'daily'/'few-week'/'longest-streak' → 'one'; 'finish' → 'two'.
@@ -14704,7 +15253,16 @@ const _ONB_STEP_HOOKS = {
   14: _onbV2PrepareQ2,
   15: _onbV2PrepareQ3,
   16: _onbV2PrepareMirror,   // Reflection
-  // 17-36 land as later acts ship.
+  // Act 3 — The Taste
+  17: _onbV2PrepareHowItWorks,
+  18: _onbV2PrepareLetsStart, // injects owl into the hero slot
+  19: _onbV2PrepareTaste1,    // subject-specific quote + source + page-1 prose
+  20: _onbV2PrepareTaste2,    // subject-specific page-2 prose (+ optional punch line)
+  21: _onbV2PrepareTasteQ,    // subject-specific scenario + question + 3 options
+  22: _onbV2PrepareFirstCard, // subject-specific thinker card preview (stateless)
+  // 23 (streak) is static once _onbApplyLang runs.
+  // 24 (rating) has no DOM — see STEP_TO_ID note above.
+  // 25-36 land as later acts ship.
 };
 
 // Step 3 prepare hook — injects the owl SVG into the hero slot and
@@ -27293,6 +27851,103 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
+<!-- ═══════════════ Act 3 — The Taste (steps 17-23) ═══════════════
+     Screens 19-22 (taste-1, taste-2, taste-q, first-card) contain
+     subject-specific content — everything's rendered at prepare
+     time from _ONB_COPY.taste[state.subject]. -->
+
+<!-- Step 17 — How it works. Three-item timeline explaining the
+     read → earn → collect loop. Head + CTA static; items rendered
+     by _onbV2PrepareHowItWorks. -->
+<div id="onb-v2-how-it-works" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-progress" aria-hidden="true" data-step="5">
+    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
+  </div>
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-how-it-works-head"></h1>
+      <div class="onb-v2-timeline" id="onb-v2-how-it-works-list"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-how-it-works-cta" onclick="_onbV2CtaHowItWorks()"></button>
+  </div>
+</div>
+
+<!-- Step 19 — Taste, page 1. Pull-quote + source + page-1 prose.
+     All content is subject-specific and rendered by
+     _onbV2PrepareTaste1 from _ONB_COPY.taste[state.subject]. -->
+<div id="onb-v2-taste-1" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy" style="text-align:start">
+      <div class="onb-v2-quote-card">
+        <span id="onb-v2-taste-1-quote"></span>
+        <span class="onb-v2-quote-source" id="onb-v2-taste-1-source"></span>
+      </div>
+      <p class="onb-v2-sub" id="onb-v2-taste-1-page1" style="text-align:start"></p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-taste-1-cta" onclick="_onbV2CtaTaste1()"></button>
+  </div>
+</div>
+
+<!-- Step 20 — Taste, page 2. "What he meant" head + page-2 prose
+     + optional punch line (only philosophy uses it in the current
+     mockup — Smith / Kahneman leave it empty, prepare hook hides
+     the element). -->
+<div id="onb-v2-taste-2" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy" style="text-align:start">
+      <h1 class="onb-v2-head" id="onb-v2-taste-2-head" style="text-align:center"></h1>
+      <p class="onb-v2-sub" id="onb-v2-taste-2-page2" style="text-align:start"></p>
+      <p class="onb-v2-sub onb-v2-taste-2-punch" id="onb-v2-taste-2-punch"></p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-taste-2-cta" onclick="_onbV2CtaTaste2()"></button>
+  </div>
+</div>
+
+<!-- Step 21 — Taste, question. Scenario prose + question + 3 options.
+     Correct answer highlights green after ANY tap (reveal pattern,
+     not a real quiz — the CTA enables regardless of right/wrong).
+     Options rendered dynamically by _onbV2PrepareTasteQ. -->
+<div id="onb-v2-taste-q" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy" style="text-align:start">
+      <p class="onb-v2-sub" id="onb-v2-taste-q-scenario" style="text-align:start"></p>
+      <h1 class="onb-v2-head" id="onb-v2-taste-q-head" style="text-align:start;font-size:calc(18px * var(--text-scale));margin-top:6px"></h1>
+      <div class="onb-v2-cards" id="onb-v2-taste-q-options" style="margin-top:8px"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-taste-q-cta" onclick="_onbV2CtaTasteQ()" disabled></button>
+  </div>
+</div>
+
+<!-- Step 22 — First card reveal. Subject-specific 3D card preview
+     (icon + name + role) with subject-invariant head + sub. Preview
+     ONLY — state.unlockedThinkers is not written; the user's actual
+     first collectible lands on the first post-onboarding finishDay. -->
+<div id="onb-v2-first-card" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <p class="onb-v2-first-card-eyebrow" id="onb-v2-first-card-eyebrow"></p>
+      <div class="onb-v2-first-card-3d">
+        <span class="onb-v2-first-card-icon" id="onb-v2-first-card-icon" aria-hidden="true"></span>
+        <span class="onb-v2-first-card-name" id="onb-v2-first-card-name"></span>
+        <span class="onb-v2-first-card-role" id="onb-v2-first-card-role"></span>
+      </div>
+      <h1 class="onb-v2-head" id="onb-v2-first-card-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-first-card-sub"></p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-first-card-cta" onclick="_onbV2CtaFirstCard()"></button>
+  </div>
+</div>
+
 <!-- Step 16 — Notification pre-prompt (flow v4). Custom in-app screen
      that gates the native OS permission dialog. Placed BEFORE the
      paywall so the ask doesn't inherit a "no" frame from a paywall
@@ -27365,11 +28020,15 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 18 — Let's start. Statement screen bridging paywall → first
      dialogue. Standard v2 head + sub layout. CTA advances to step 19
      which hijacks the reader (openReader(1, 1)). -->
+<!-- Step 18 (v11) — "Got five minutes?" bridge into the taste.
+     Owl-fronted micro-commit. Owl injected by _onbV2PrepareLetsStart
+     using _cloneOwlSvgHTML — same helper the signup screen uses. -->
 <div id="onb-v2-lets-start" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
     <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
+    <div class="onb-v2-signup-hero" id="onb-v2-lets-start-owl" aria-hidden="true"></div>
     <div class="onb-v2-copy">
       <h1 class="onb-v2-head" id="onb-v2-lets-start-head"></h1>
       <p class="onb-v2-sub" id="onb-v2-lets-start-sub"></p>
@@ -27394,7 +28053,10 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="onb-v2-streak-flame" aria-hidden="true">
         <svg viewBox="0 0 64 64" width="88" height="88"><use href="#icon-streak"/></svg>
       </div>
-      <div class="onb-v2-streak-eyebrow" id="onb-v2-streak-eyebrow"></div>
+      <!-- v11 replaces the eyebrow ("DAY 1 · STREAK") with a big
+           amber "1" — the number carries the streak cue on its own.
+           Static text; never localized (a numeral). -->
+      <div class="onb-v2-streak-number" aria-hidden="true">1</div>
       <h1 class="onb-v2-head" id="onb-v2-streak-head"></h1>
       <p class="onb-v2-sub" id="onb-v2-streak-sub"></p>
     </div>
