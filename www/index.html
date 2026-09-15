@@ -5162,8 +5162,15 @@
     display: none;
     flex-direction: column;
     padding: calc(24px + var(--safe-top)) 20px calc(20px + var(--safe-bottom));
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    /* A full-screen onboarding step should never scroll. Base is
+       overflow: hidden; screens with legitimately-tall content
+       (option lists, paywall, commit ladder) opt in to inner-scroll
+       via .onb-v2-scroll (see 6475) or a screen-specific rule
+       (#onb-v2-paywall at 6494). Previous default of overflow-y:auto
+       + -webkit-overflow-scrolling:touch meant every screen showed
+       a scrollbar whenever safe-area padding, font metrics, or RTL
+       differences pushed content 1px past the viewport. */
+    overflow: hidden;
     color: var(--onb-text-primary, #2A1266);
     /* Opaque --surface layer beneath the radial gradient so screens sit on
        a solid base — the gradient's edge stop uses rgba() with low alpha,
@@ -5215,6 +5222,42 @@
     --onb-accent: #F59E0B;
     --onb-accent-shadow: rgba(245, 158, 11, 0.32);
     --onb-accent-shadow-soft: rgba(245, 158, 11, 0.20);
+  }
+  /* Welcome (v11 screen 1) — full purple field with white type, matching
+     the splash screen. Overrides the .onb-screen.onb-v2 radial-gradient
+     rule further down (5741) so no gradient / no white surface bleeds
+     through. Downstream inversions (below) flip pills, language toggle,
+     and CTA to a light-on-purple palette; the wordmark type styles are
+     defined once and inherit color via the parent's color:#fff. */
+  .onb-bg-purple-field {
+    background: var(--purple, #7B4FD4);
+    background-image: none;
+    color: #FFFFFF;
+  }
+  /* Screen 1 hides the progress pills — the mockup treats welcome as a
+     wordmark moment, not a numbered step. Pills DOM stays for structural
+     consistency; visibility is CSS-only. */
+  .onb-bg-purple-field .onb-progress { display: none; }
+  /* Language toggle on purple field — flip the pill background to a
+     translucent white + active state fills with white so the label
+     stays legible against the purple ground. */
+  .onb-bg-purple-field .onb-welcome-lang {
+    background: rgba(255, 255, 255, 0.10);
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+  .onb-bg-purple-field .onb-lang-btn           { color: rgba(255, 255, 255, 0.65); }
+  .onb-bg-purple-field .onb-lang-btn.is-active { color: var(--purple, #7B4FD4); }
+  .onb-bg-purple-field .onb-lang-indicator {
+    background: #FFFFFF;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.20);
+  }
+  /* CTA inversion — a purple-fill button on a purple field would be
+     invisible, so flip to white-fill with purple text. Overrides the
+     .onb-cta base fill at 5238. */
+  .onb-bg-purple-field .onb-cta {
+    background: #FFFFFF;
+    color: var(--purple, #7B4FD4);
+    border-bottom-color: rgba(0, 0, 0, 0.14);
   }
   /* Screen 5 (goal) — very soft brand tint, amber lights only on select. */
   .onb-bg-brand {
@@ -5771,6 +5814,25 @@
     /* Key-phrase accent. Same weight as the head so it reads as
        continuous type with a color shift, not a highlight label. */
     color: var(--accent);
+  }
+  /* Welcome (v11 screen 1) wordmark layout — small "Welcome to" line
+     above a big "Corpus" wordmark. Colors inherited from the parent
+     .onb-bg-purple-field (white on purple). Kept in .onb-screen.onb-v2
+     so text-scale + font-family propagate naturally. */
+  .onb-screen.onb-v2 .onb-v2-welcome-line {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(15px * var(--text-scale));
+    font-weight: 700;
+    opacity: 0.85;
+    margin: 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-welcome-mark {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(42px * var(--text-scale));
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin: 4px 0 0;
   }
   .onb-screen.onb-v2 .onb-v2-sub {
     font-family: 'Nunito', 'Assistant', sans-serif;
@@ -12964,11 +13026,12 @@ const _ONB_COPY = {
   // Hebrew copy. Same for every onboarding v2 surface, downstream and
   // upstream of these three screens.
   welcome: {
-    head: {
-      en: 'Welcome to <span class="onb-v2-em">Corpus</span>',
-      he: 'ברוך הבא ל-<span class="onb-v2-em">Corpus</span>',
-    },
-    cta: { en: 'Continue', he: 'המשך' },
+    // v11 screen 1 — full-purple wordmark screen. Two lines: small
+    // "Welcome to" over the "Corpus" wordmark. Latin-only "Corpus"
+    // per the brand rule (never transliterated), so no localization
+    // needed on the mark itself.
+    line: { en: 'Welcome to', he: 'ברוכים הבאים ל' },
+    cta:  { en: 'Begin',      he: 'שנתחיל' },
   },
   problem: {
     head: {
@@ -13431,7 +13494,10 @@ function _onbApplyLang(lang) {
       el.innerHTML = isEn ? _ONB_COPY[group][key].en : _ONB_COPY[group][key].he;
     }
   };
-  setHTML('onb-v2-welcome-head',  'welcome',  'head');
+  // Welcome renders as a wordmark: small "Welcome to" line + big
+  // static "Corpus" mark (hardcoded in DOM per brand rule; never
+  // localized). Only the line and CTA need language-driven bindings.
+  setText('onb-v2-welcome-line',  'welcome',  'line');
   setText('onb-v2-welcome-cta',   'welcome',  'cta');
   setHTML('onb-v2-problem-head',  'problem',  'head');
   setText('onb-v2-problem-cta',   'problem',  'cta');
@@ -26915,7 +26981,12 @@ document.addEventListener('DOMContentLoaded', function() {
      screen re-renders through _onbApplyLang whenever the toggle
      switches. Copy anchored on the Corpus mark rather than a specific
      thinker so this screen doesn't lock us into a single hero image. -->
-<div id="onb-v2-welcome" class="onb-screen onb-v2 onb-bg-philosophy" style="display:none">
+<!-- v11 screen 1 — Welcome. Full purple field with white type,
+     continuous with the splash. Pills hidden via .onb-bg-purple-
+     field CSS. Wordmark is two elements: a small "Welcome to" line
+     over a big Latin "Corpus" mark (mark is static — brand rule
+     never localizes the word). -->
+<div id="onb-v2-welcome" class="onb-screen onb-v2 onb-bg-purple-field" style="display:none">
   <div class="onb-welcome-lang" dir="ltr">
     <span class="onb-lang-indicator" id="onb-v2-lang-indicator"></span>
     <button type="button" class="onb-lang-btn" data-lang="he" onclick="_onbSetLang('he')">עברית</button>
@@ -26926,7 +26997,8 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
-      <h1 class="onb-v2-head" id="onb-v2-welcome-head"></h1>
+      <p class="onb-v2-welcome-line" id="onb-v2-welcome-line"></p>
+      <h1 class="onb-v2-welcome-mark">Corpus</h1>
     </div>
   </div>
   <div class="onb-cta-holder">
