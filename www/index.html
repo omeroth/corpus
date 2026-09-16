@@ -13812,8 +13812,10 @@ const _ONB_COPY = {
     cta:         { en: 'Continue',                  he: 'המשך' },
   },
   hours: {
-    head:      { en: 'How many hours a day are you on your phone?',
-                 he: 'כמה שעות ביום אתה בטלפון?' },
+    head:      { en:   'How many hours a day are you on your phone?',
+                 he:   'כמה שעות ביום אתם בטלפון?',
+                 he_m: 'כמה שעות ביום אתה בטלפון?',
+                 he_f: 'כמה שעות ביום את בטלפון?' },
     // Singular/plural unit for the slider's live-value display.
     // Hebrew uses "שעה" for 1, "שעות" for 2+; English "hour" vs "hours".
     unit_one:  { en: 'hour',                        he: 'שעה' },
@@ -14005,8 +14007,10 @@ const _ONB_COPY = {
       { id: 'daily',
         icon:    'icon-bolt',
         text:    { en: 'Five minutes a day, every day', he: 'חמש דקות ביום, כל יום' },
-        support: { en: 'A short daily reminder lands at a time you pick.',
-                   he: 'תזכורת יומית קצרה תגיע בשעה שתבחר.' },
+        support: { en:   'A short daily reminder lands at a time you pick.',
+                   he:   'תזכורת יומית קצרה תגיע בשעה שתבחרו.',
+                   he_m: 'תזכורת יומית קצרה תגיע בשעה שתבחר.',
+                   he_f: 'תזכורת יומית קצרה תגיע בשעה שתבחרי.' },
         tile:    { en: 'Daily', he: 'יומי' } },
       { id: 'few-week',
         icon:    'icon-calendar',
@@ -14406,10 +14410,14 @@ const _ONB_COPY = {
     // philosophy 16, economics 17, psychology 21 (psychology has only
     // 28 authored dialogues total, but the subject is currently
     // LOCKED_SUBJECTS-gated so users can't reach this screen on it).
-    card_head:          { en: "{name}, you'll have met {n} thinkers by",
-                          he: '{name}, תפגוש {n} הוגים עד' },
-    card_head_nameless: { en: "You'll have met {n} thinkers by",
-                          he: 'תפגוש {n} הוגים עד' },
+    card_head:          { en:   "{name}, you'll have met {n} thinkers by",
+                          he:   '{name}, תפגשו עד {n} הוגים',
+                          he_m: '{name}, תפגוש עד {n} הוגים',
+                          he_f: '{name}, תפגשי עד {n} הוגים' },
+    card_head_nameless: { en:   "You'll have met {n} thinkers by",
+                          he:   'תפגשו עד {n} הוגים',
+                          he_m: 'תפגוש עד {n} הוגים',
+                          he_f: 'תפגשי עד {n} הוגים' },
     card_stat_icon:     'icon-clock',
     card_stat:          { en: '30+ hours a year with the greatest minds',
                           he: '30+ שעות בשנה עם הוגי הדעות הגדולים' },
@@ -16113,8 +16121,8 @@ function _onbV2PrepareJourney() {
     const name = a.name || '';
     const nThinkers = _onbV2CountFirstThinkers(30);
     const tmpl = name
-      ? (isEn ? _ONB_COPY.journey.card_head.en          : _ONB_COPY.journey.card_head.he)
-      : (isEn ? _ONB_COPY.journey.card_head_nameless.en : _ONB_COPY.journey.card_head_nameless.he);
+      ? (isEn ? _ONB_COPY.journey.card_head.en          : _hePick(_ONB_COPY.journey.card_head))
+      : (isEn ? _ONB_COPY.journey.card_head_nameless.en : _hePick(_ONB_COPY.journey.card_head_nameless));
     headEl.textContent = tmpl
       .replace('{name}', name)
       .replace('{n}', String(nThinkers));
