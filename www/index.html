@@ -6872,15 +6872,19 @@
     transition: opacity 0.3s ease;
   }
 
-  /* First-card reveal (step 22) — first-edition-styled collectible
-     card preview. Not the same as the app's real thinker card
-     (which uses portraits + HTML name/era overlay); this is an
-     illustrated frame with everything — name, role, book stack,
-     quote scroll, fact strip — baked into the source image. Reads
-     as an authentic first-edition artifact rather than a UI card.
-     Baked banner is Latin on both language sides by design (see
-     _onbV2PrepareFirstCard's alt-text comment); the .onb-v2-first-
-     card-role line rendered underneath localizes for HE.
+  /* First-card reveal (step 22) — subject-specific portrait card
+     preview using the app's REAL thinker portrait (./images/<slug>.
+     webp resolved via _thinkerImage). Frame is a rounded rectangle
+     with a subtle themed border; name + role render as text labels
+     below the portrait (see the DOM at #onb-v2-first-card and the
+     _onbV2PrepareFirstCard prepare hook).
+
+     Prior implementation used illustrated "first-edition" WebPs with
+     everything — name, role, book stack, quote scroll, fact strip —
+     baked into the source image. Retired 2026-09-16: the taste is
+     stateless (state.unlockedThinkers is not written), so nothing is
+     taken away by previewing the real portrait, and the pale
+     illustrated variants read as disappointing rather than special.
 
      Reveal choreography (fires when .is-revealed lands via
      _onbV2PrepareFirstCard on a double-rAF):
@@ -6947,7 +6951,22 @@
     width: 100%;
     height: 100%;
     border-radius: 14px;             /* preserve corner curve now that parent is overflow:visible */
-    object-fit: cover;
+    /* contain (was cover) — standard thinker portraits are portrait-
+       oriented but not always the exact 9:16 the frame is; contain
+       keeps the whole face visible even when aspects mismatch. Also
+       matches the real thinker-card front's background-size: contain
+       at showThinkerCardScreen. */
+    object-fit: contain;
+    background: var(--surface-2);
+  }
+  .onb-screen.onb-v2 .onb-v2-first-card-name {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 900;
+    font-size: calc(18px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.15;
+    text-align: center;
+    margin: 0 0 2px;
   }
   .onb-screen.onb-v2 .onb-v2-first-card-role {
     font-family: 'Nunito', 'Assistant', sans-serif;
@@ -14169,7 +14188,14 @@ const _ONB_COPY = {
       thinkerName: 'Plato',
       role:  { en: 'The Escapee', he: 'היוצא' },
       icon:  'icon-bulb',
-      firstEditionImage: 'first-edition-plato',
+      // Standard thinker portrait (./images/plato.webp) resolved via
+      // _thinkerImage(THINKER, state.subject) — same asset the real
+      // post-completion card reveal uses at showThinkerCardScreen.
+      // Prior first-edition-plato.webp variant was retired: the taste
+      // is stateless, so nothing is taken away by previewing the real
+      // card, and the pale illustrated variants read as disappointing
+      // rather than special.
+      thinkerId: 'plato',
       quote: { en: '"Picture people living in an underground cave, with the entrance opening upward toward the light. They have been there since childhood, their legs and necks bound, unable to move or turn their heads."',
                he: '״תאר לעצמך בני אדם השרויים במעון תת-קרקעי כמו מערה, שפתחה רחב פונה אל האור. בני אדם אלה יושבים שם מילדותם, רגליהם וצווארם כבולים, כך שאינם יכולים לזוז ממקומם ואינם יכולים להפנות את ראשם.״' },
       source: 'Plato, The Republic, Book 7',
@@ -14205,7 +14231,9 @@ const _ONB_COPY = {
       thinkerName: 'Adam Smith',
       role:  { en: 'The Observer', he: 'המתבונן' },
       icon:  'icon-globe',
-      firstEditionImage: 'first-edition-smith',
+      // Standard thinker portrait — see the philosophy thinkerId
+      // comment above for why the first-edition variant was retired.
+      thinkerId: 'smith',
       quote: { en: '"It is not from the benevolence of the butcher, the brewer, or the baker that we expect our dinner, but from their regard to their own interest."',
                he: '"לא מרוב טוב לבו של הקצב, של מבשל השיכר או של האופה אנחנו מצפים לארוחת הערב שלנו, אלא מתוך התחשבותם באינטרס שלהם."' },
       source: 'Adam Smith, The Wealth of Nations, I.2',
@@ -14251,7 +14279,9 @@ const _ONB_COPY = {
       thinkerName: 'Freud',
       role:  { en: 'The Excavator', he: 'החוקר' },
       icon:  'icon-brain',
-      firstEditionImage: 'first-edition-freud',
+      // Standard thinker portrait — see the philosophy thinkerId
+      // comment above for why the first-edition variant was retired.
+      thinkerId: 'freud',
       quote: { en: '"These two discoveries amount to a single statement: that the ego is not master in its own house."',
                he: '"שתי התגליות האלה מסתכמות באמירה אחת: האני אינו אדון בביתו שלו."' },
       source: 'Freud, A Difficulty in the Path of Psycho-Analysis, 1917',
@@ -16007,30 +16037,48 @@ function _onbV2PrepareTasteQ() {
   if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
 }
 
-// Step 22 (first-card) — subject-specific card face (icon + name +
-// role). Head + sub + CTA bind via _onbApplyLang (subject-invariant).
+// Step 22 (first-card) — subject-specific card face using the real
+// thinker portrait. Head + sub + CTA bind via _onbApplyLang (subject-
+// invariant). Name + role render as text labels below the portrait so
+// the Hebrew reader gets a localized identifier (the portrait itself
+// is a language-neutral image, but the standard thinker-card front at
+// showThinkerCardScreen hides the name — for the taste preview we
+// want it visible so the user knows who they're meeting).
+//
 // STATELESS: state.unlockedThinkers is NOT written here — the user's
 // actual first collectible lands on the first post-onboarding
 // finishDay. This screen is purely a preview of the reward loop.
+// Nothing is taken away by previewing the real card; the real card
+// reveal (with flip-to-back bio+quote at showThinkerCardScreen) still
+// fires when the user reaches this thinker's actual dialogue.
 function _onbV2PrepareFirstCard() {
   const isEn = state.lang === 'en';
   const cfg = _onbV2TasteCfg();
   const imgEl  = document.getElementById('onb-v2-first-card-img');
+  const nameEl = document.getElementById('onb-v2-first-card-name');
   const roleEl = document.getElementById('onb-v2-first-card-role');
   const cardEl = document.querySelector('#onb-v2-first-card .onb-v2-first-card-3d');
   const eyebrowEl = document.getElementById('onb-v2-first-card-eyebrow');
-  if (imgEl && cfg.firstEditionImage) {
-    imgEl.src = './images/' + cfg.firstEditionImage + '.webp';
-    // Alt text stays Latin on both sides — the card is a first-edition
-    // physical artifact and the baked banner is Latin. Screen readers
-    // in Hebrew mode will read the Latin name, matching the visual.
-    imgEl.alt = cfg.thinkerName;
+  // Portrait: resolve via _thinkerImage(t, state.subject). All three
+  // taste thinkers (plato / smith / freud) are single-subject, so the
+  // subject argument is a no-op for them; passing state.subject anyway
+  // keeps the resolver consistent with every other call site and
+  // future-proofs against a multi-subject thinker moving into taste.
+  if (imgEl && cfg.thinkerId) {
+    const thinker = (typeof getT === 'function' ? getT() : []).find(t => t.id === cfg.thinkerId);
+    const src = thinker ? _thinkerImage(thinker, state.subject) : '';
+    if (src) imgEl.src = src;
+    // Alt: localized thinker name from the resolved thinker object,
+    // falling back to the Latin cfg.thinkerName if the lookup failed.
+    imgEl.alt = (thinker && thinker.name) || cfg.thinkerName;
   }
-  // Role line beneath the image, in the active language. The card
-  // itself is entirely English (baked into the JPEG-turned-WebP for
-  // authenticity to a first-edition artifact); a single Hebrew role
-  // line under it gives the Hebrew reader something in their own
-  // language at the moment they receive their first card.
+  // Name + role labels beneath the portrait, both in the active
+  // language. Name uses the thinker's own name field (localized in
+  // THINKERS / THINKERS_EN via getT()).
+  if (nameEl) {
+    const thinker = (typeof getT === 'function' ? getT() : []).find(t => t.id === cfg.thinkerId);
+    nameEl.textContent = (thinker && thinker.name) || cfg.thinkerName;
+  }
   if (roleEl) roleEl.textContent = isEn ? cfg.role.en : cfg.role.he;
   // Reveal choreography — remove any prior .is-revealed (so a return
   // visit via step cursor resume replays the pop instead of showing
@@ -29187,6 +29235,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="onb-v2-first-card-3d">
         <img id="onb-v2-first-card-img" class="onb-v2-first-card-img" alt="">
       </div>
+      <p class="onb-v2-first-card-name" id="onb-v2-first-card-name"></p>
       <p class="onb-v2-first-card-role" id="onb-v2-first-card-role"></p>
       <h1 class="onb-v2-head" id="onb-v2-first-card-head"></h1>
       <p class="onb-v2-sub" id="onb-v2-first-card-sub"></p>
