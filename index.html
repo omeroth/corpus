@@ -14199,11 +14199,11 @@ const _ONB_COPY = {
       quote: { en: '"Picture people living in an underground cave, with the entrance opening upward toward the light. They have been there since childhood, their legs and necks bound, unable to move or turn their heads."',
                he: '״תאר לעצמך בני אדם השרויים במעון תת-קרקעי כמו מערה, שפתחה רחב פונה אל האור. בני אדם אלה יושבים שם מילדותם, רגליהם וצווארם כבולים, כך שאינם יכולים לזוז ממקומם ואינם יכולים להפנות את ראשם.״' },
       source: 'Plato, The Republic, Book 7',
-      page1: { en: 'Athens, around 375 BC. Plato asks his reader to picture a cave: prisoners chained since childhood, facing the wall. Behind them, a fire. Between the fire and their backs, figures carrying objects pass by. All the prisoners have ever seen are the shadows on the wall in front of them.',
-               he: 'אתונה, סביבות 375 לפנה"ס. אפלטון מבקש מהקורא לדמיין מערה: אסירים כבולים מילדותם, פניהם אל הקיר. מאחוריהם, אש. בין האש לגבם, דמויות נושאות חפצים עוברות. כל מה שהאסירים ראו אי פעם הוא הצללים שעל הקיר שלפניהם.' },
+      page1: { en: 'Athens, around 375 BC. Plato asks his reader to picture a cave, then asks whether we are the ones inside it.',
+               he: 'אתונה, סביבות 375 לפנה"ס. אפלטון מבקש מהקורא לדמיין מערה, ואז שואל אם אנחנו הכלואים בה.' },
       page2Head: { en: 'What he meant', he: 'למה הוא התכוון' },
-      page2: { en: "The cave is the world of the senses. The shadows are the things we take for real. Leaving the cave — struggling toward the light — is philosophy. The first look at the sun is not joy; it is pain, blinding, and the pull is to return to the familiar dark.",
-               he: 'המערה היא עולם החושים. הצללים הם מה שאנחנו לוקחים כמציאות. היציאה מן המערה — המאבק לעבר האור — היא הפילוסופיה. המבט הראשון בשמש אינו שמחה, הוא כאב, הוא סנוור, והדחף הוא לחזור אל האפלה המוכרת.' },
+      page2: { en: "The cave is the world of the senses. The shadows are the things we take for real. Leaving the cave, struggling toward the light, is philosophy. The first look at the sun is not joy; it is pain, blinding, and the pull is to return to the familiar dark.",
+               he: 'המערה היא עולם החושים. הצללים הם מה שאנחנו לוקחים כמציאות. היציאה מן המערה, המאבק לעבר האור, היא הפילוסופיה. המבט הראשון בשמש אינו שמחה, הוא כאב, הוא סנוור, והדחף הוא לחזור אל האפלה המוכרת.' },
       // Page 2 punch — the Socrates connection. Lifted from the
       // dialogue's own depth section (content/philosophy.js:192-193).
       // Plato watched his teacher die for asking too many questions,
@@ -25750,33 +25750,34 @@ function launchConfetti() {
 // INIT
 // ═══════════════════════════════════════════════════════════
 
-// Measures a walkthrough target's viewport rect, compensating for the
-// scroll-lock's body-offset when the browser doesn't reflect it in
-// descendants' getBoundingClientRect.
+// Returns the effective spotlight rect for a given step, clamped to
+// the visible interior of the viewport so the punch-out never reveals
+// the topbar, stats-subheader, or bottom-nav areas. Per-step
+// allowChromeTop / allowChromeBottom flags disable the clamp on the
+// relevant edge for steps whose target lives in a chrome band. step.
+// maxHeight further shrinks the rect when the raw element extends
+// past the intended affordance (chapters step: the expanded card
+// runs 470+px tall and the halo would otherwise slice past the fold).
 //
-// The lock (see _walkthroughLockScroll and _walkthroughShiftLockedScroll)
-// pins <body> to position:fixed with a negative top offset that
-// preserves the visual scroll position — spec-compliant browsers
-// report descendant rects relative to the SHIFTED body, so no
-// adjustment is needed. WKWebView (iOS) reports them relative to the
-// pre-shift document, so the raw rect ends up bodyTop px below where
-// the target is actually painted — every downstream consumer (the
-// spotlight punch-out AND the scroll-target-into-view delta) would
-// aim at the wrong y without this compensation. Detect by comparing
-// body's own reported top to the value the lock intended — the drift
-// is 0 on correct browsers (no-op) and equals the intended offset on
-// the quirky ones.
-//
-// Chrome elements (.stats-subheader, .bottom-nav, #topbar) are
-// position:fixed against the viewport, so their containing block is
-// the initial containing block and the body:fixed shift doesn't
-// affect them. Callers measuring THOSE elements should keep using
-// getBoundingClientRect directly — the compensation here is only for
-// static/relative descendants of body.
-function _walkthroughMeasureTarget(el) {
+// WKWebView drift compensation (carried forward from commit 7812194):
+// the scroll-lock pins <body> to position:fixed with a negative top
+// offset that preserves the visual scroll position. Spec-compliant
+// browsers report descendant rects relative to the shifted body, so
+// no adjustment is needed. WKWebView (iOS) reports them relative to
+// the pre-shift document, so the raw rect is bodyTop px below where
+// the target is actually painted. Detect by comparing body's own
+// reported top to the value the lock intended: the drift is 0 on
+// correct browsers (no-op) and equals the intended offset on quirky
+// ones. Applied inline here rather than through a shared measurement
+// helper because the scroll-into-view function below intentionally
+// uses the raw rect (mismatched shift is a sub-optimal band position,
+// not a wrong punch-out).
+function _walkthroughSpotlightRect(step) {
+  if (!step || !step.spotlight) return null;
+  const el = document.querySelector(step.spotlight);
   if (!el) return null;
   const rect = el.getBoundingClientRect();
-  let top = rect.top, bottom = rect.bottom;
+  let top = rect.top, left = rect.left, right = rect.right, bottom = rect.bottom;
   const bodyEl = document.body;
   if (bodyEl.style.position === 'fixed') {
     const bodyTopIntended = parseFloat(bodyEl.style.top) || 0;
@@ -25787,26 +25788,21 @@ function _walkthroughMeasureTarget(el) {
       bottom += drift;
     }
   }
-  return { top, left: rect.left, right: rect.right, bottom, width: rect.width, height: rect.height };
-}
-
-// Returns the effective spotlight rect for a given step — clamped to
-// the visible interior of the viewport so the punch-out never reveals
-// the topbar, stats-subheader, or bottom-nav areas. The step's own
-// hint fields override this (max* keys) to further shrink the rect
-// when the raw element extends past the intended affordance (e.g. an
-// expanded chapter card runs to the bottom of the scroll list).
-function _walkthroughSpotlightRect(step) {
-  if (!step || !step.spotlight) return null;
-  const el = document.querySelector(step.spotlight);
-  if (!el) return null;
-  const m = _walkthroughMeasureTarget(el);
-  let { top, left, right, bottom } = m;
-  // Optional per-step ceiling on the rect's height — used by the
-  // chapters step where the expanded level card runs 470+px tall
-  // and the halo would otherwise draw around the entire card, which
-  // reads as "everything is important" rather than a focused
-  // spotlight.
+  // Clamp to visible interior. Topbar sits at y 0-56; stats bar 56-110
+  // (per #screen-home .scroll-content padding-top:110). Bottom nav is
+  // 64px tall + safe-area at the very bottom. Anything the spotlight
+  // extends into those chrome bands is chrome, not the affordance the
+  // step is teaching, so clip.
+  const chromeTop = step.allowChromeTop
+    ? 0
+    : (document.querySelector('.stats-subheader')?.getBoundingClientRect().bottom || 0);
+  const nav = document.querySelector('.bottom-nav');
+  const navRect = nav ? nav.getBoundingClientRect() : null;
+  const chromeBottom = step.allowChromeBottom
+    ? window.innerHeight
+    : (navRect ? navRect.top : window.innerHeight);
+  top    = Math.max(top,    chromeTop);
+  bottom = Math.min(bottom, chromeBottom);
   if (step.maxHeight && bottom - top > step.maxHeight) {
     bottom = top + step.maxHeight;
   }
@@ -25820,15 +25816,6 @@ function drawSpotlight(step) {
   canvas.height = window.innerHeight;
   const ctx = canvas.getContext('2d');
 
-  // Tint the entire viewport. Chrome bands (topbar, stats-subheader,
-  // bottom-nav) darken along with the scroll body — the punch-out is
-  // the only bright region, so a step that spotlights a tab inside
-  // the bottom-nav or the streak pill inside the stats-subheader
-  // still reads as pointing at ONE thing rather than "everything
-  // except this band." Prior model tinted only the interior band
-  // between stats-subheader.bottom and bottom-nav.top, which left
-  // chrome bands bright and defeated the spotlight whenever a step's
-  // target lived inside chrome.
   ctx.fillStyle = 'rgba(42, 27, 74, 0.75)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -25889,6 +25876,24 @@ function drawSpotlight(step) {
   ctx.restore();
 }
 
+// Reverted to the pre-rebuild state on 2026-09-16 (anchor commit
+// 4b6e789). A run of rebuild commits between 4b6e789 and this one
+// tried to trim, narrow, and re-copy the walkthrough over multiple
+// passes; each pass introduced a new regression on device. The
+// pre-rebuild version worked; restoring it wholesale with two
+// deliberate carry-forwards:
+//   1. Carousel step (id 'carousel', target #thinker-carousel-wrap)
+//      dropped, since that element has style="display:none" inline
+//      (the thinker gallery moved to #modal-library) and the halo
+//      drew at (0,0,0,0) silently. Broken before the rebuild too;
+//      dropping is honest, and the taste block (onboarding steps
+//      19-22) already teaches thinker collection cinematically.
+//      Result: 6 steps instead of the original 7.
+//   2. WKWebView body:fixed drift compensation carried forward from
+//      commit 7812194, inline in _walkthroughSpotlightRect above.
+//      Without it, iOS spotlights land bodyTop px off after any
+//      target-into-view shift.
+
 // ─── Onboarding walkthrough (owl-guided, 6 screens) ─────────────
 // Fired once per install from the tail of _onbComplete. Gated on
 // corpus_walkthrough_done, no completedDays, no corpus_first_dialogue_
@@ -25896,62 +25901,24 @@ function drawSpotlight(step) {
 // because the v11 onboarding no longer completes a real dialogue).
 // Existing users never see it. Skippable at every screen via
 // #walkthrough-skip; a shortcut tap on a spotlighted element also
-// bails (see openReader guard for the next-up target and
-// _walkthroughShortcutBail for the pantheon-tab target).
+// bails (see openReader guard).
 
 // spotlight — CSS selector to spotlight for the step.
-// maxHeight — cap for tall targets so the halo doesn't wrap the
-//             entire element (chapters step: the expanded level
-//             card runs 470+px which reads as "everything is
-//             important" instead of a focused spotlight).
+// allowChromeTop — set true when the target itself lives in the topbar
+//                  / stats-subheader band (streak step); prevents the
+//                  clamp from cropping it into oblivion.
+// allowChromeBottom — same idea for the bottom-nav band (pantheon step).
+// maxHeight — cap for tall targets so the punch-out doesn't slice past
+//             the visible fold (chapters step: the expanded card runs
+//             past 500px otherwise).
 // isClosing — last-step marker: button reads "OK" instead of "Next"
 //             and its click fires _walkthroughFinish instead of
 //             _walkthroughNext.
-//
-// Chrome-band targets (pantheon inside .bottom-nav, streak pill
-// inside .stats-subheader) need no special flag: drawSpotlight
-// tints the full viewport, so chrome bands darken along with the
-// scroll body and only the punch-out stays bright. _walkthroughScroll
-// TargetIntoView still skips the body-shift for any target whose
-// rect lies in chrome, since a fixed-position target doesn't move
-// with the shift and misplacing home content beneath it would be
-// pointless. Streak selector narrows to the streak PILL, not the
-// whole stats-subheader — a halo around a viewport-wide band isn't
-// pointing at anything specific.
-//
-// Trimmed to six screens on 2026-09-16. Dropped the "carousel"
-// step that pointed at #thinker-carousel-wrap — the element has
-// style="display:none" inline (the thinker gallery moved to
-// #modal-library) so the spotlight had been drawing at (0,0,0,0)
-// silently for every walkthrough runner. The taste block (steps
-// 19-22) already teaches thinker collection; pointing at nothing
-// on home was worse than not pointing at all.
-//
-// Hebrew copy is PLURAL throughout — no gender adaptation. Onboarding
-// steps route he/he_m/he_f through _hePick once state.onbAnswers.
-// gender is captured at step 7, so a woman gets adapted copy for the
-// full 36-screen onboarding. The walkthrough then reverts to plural
-// for its six screens, which is a rough seam worth closing eventually.
-// Fix requires converting each step's he: from a string to an entry-
-// object { he, he_m, he_f } and routing bubbleText through _hePick at
-// _walkthroughRenderStep (~26169). Left plural for now because six
-// coach-mark strings is a low return on the refactor.
 const WALKTHROUGH_STEPS = [
   { id: 'greeting', expr: 'owl-neutral',   spotlight: null,
     he: 'שלום. אני אלווה אתכם בצעדים הראשונים ב-Corpus.',
     en: "Hello. I'll walk you through your first steps in Corpus." },
-  // Chapters step: spotlight the .expanded card ONLY. Earlier fallback
-  // was `..., #home-levels .level-card:first-child` — but renderHome()
-  // places the subject's bonus chapter card at position 0 (index.html
-  // ~21162-21174) when a bonus exists, so :first-child returned the
-  // BONUS card instead of chapter 1. querySelector matches DOM-first
-  // across a selector list, so bonus (earlier in DOM) always beat
-  // .expanded (chapter 1). Bonus card is often .locked-week (dimmed)
-  // for a fresh user, so the halo looked like it was pointing at
-  // nothing. Chapter 1 is always auto-expanded on first render for a
-  // fresh user (_homeExpandedWeekId = nextUpWeekId = 1), so .expanded
-  // alone is a stable target — no fallback needed.
-  { id: 'chapters', expr: 'owl-neutral',   spotlight: '#home-levels .level-card.expanded',
+  { id: 'chapters', expr: 'owl-neutral',   spotlight: '#home-levels .level-card.expanded, #home-levels .level-card:first-child',
     maxHeight: 220,
     he: 'כל נושא בנוי מפרקים, וכל פרק מקבץ כמה דיאלוגים סביב שאלה אחת.',
     en: 'Each subject is built from chapters, and each chapter gathers a few dialogues around one question.' },
@@ -25959,20 +25926,25 @@ const WALKTHROUGH_STEPS = [
     he: 'כאן מחכה הדיאלוג הבא בתור. לא צריך לבחור, הוא כבר מוכן.',
     en: "The next dialogue in line waits here. Nothing to choose, it's already set." },
   { id: 'pantheon', expr: 'owl-neutral',   spotlight: '#bnav-pantheon',
-    he: 'הפנתיאון הוא הבית של האוסף. כל הוגה שתפגשו מצטרף לכאן.',
-    en: 'The Pantheon is where your collection lives. Every thinker you meet joins here.' },
-  { id: 'streak', expr: 'owl-determined',  spotlight: '.stats-subheader .topbar-stat[title="Streak"]',
+    allowChromeBottom: true,
+    he: 'הפנתיאון הוא הבית של האוסף. אפשר לחזור אליו בכל רגע.',
+    en: "The Pantheon is where your collection lives. It's there whenever you want it." },
+  { id: 'streak', expr: 'owl-determined',  spotlight: '.stats-subheader',
+    allowChromeTop: true,
     he: 'הרצף גדל בכל יום שמשלימים בו דיאלוג. היום הוא מתחיל.',
     en: 'Your streak grows on every day you complete a dialogue. Today it begins.' },
   { id: 'closing', expr: 'owl-action',
-    // Spotlights the next-up lesson circle (same target as the
-    // next_up step). next_up introduces it neutrally ("the next
-    // dialogue in line waits here"); closing closes on the user
-    // rather than restating the circle. Rewritten from the v4
-    // "tomorrow's dialogue" framing, which was wrong for v11 —
-    // v11 users don't complete a real dialogue during onboarding,
-    // so the lesson circle holds their FIRST dialogue, not
-    // tomorrow's.
+    // Spotlights the next-up lesson circle (same target as step 2's
+    // next_up) so the closing beat has something concrete to point
+    // at. Copy diverges from the pre-rebuild version ("This is where
+    // tomorrow's dialogue will be waiting"), which assumed the pre-v11
+    // flow where the user had completed today's dialogue during
+    // onboarding and the circle held day 2. Under v11 the user has
+    // not done a real dialogue yet, so the circle holds their FIRST
+    // dialogue, not tomorrow's; new copy avoids the factual error
+    // and puts the "when you're ready" agency on the user. isClosing
+    // suppresses the tap-shortcut and swaps the CTA to "OK" firing
+    // _walkthroughFinish.
     spotlight: '.lesson-node:has(.lesson-circle.next-up)', isClosing: true,
     he: 'כאן תתחילו, מתי שתהיו מוכנים.',
     en: "You'll begin right here, whenever you're ready." },
@@ -26072,26 +26044,15 @@ function _walkthroughScrollTargetIntoView(step) {
   const screenH = window.innerHeight;
   const statsBottom = document.querySelector('.stats-subheader')?.getBoundingClientRect().bottom || 0;
   const navTop = document.querySelector('.bottom-nav')?.getBoundingClientRect().top || screenH;
-  const safeMid = (statsBottom + navTop) / 2;
-  // Use the same drift-compensated measurement as _walkthroughSpotlight
-  // Rect so the shift delta is computed against the target's actual
-  // painted position on WKWebView under body:fixed. Without this the
-  // shift math uses a rect that's bodyTop px off; the target ends up
-  // shifted to the wrong y and (worst case) never scrolled into view.
-  const rect = _walkthroughMeasureTarget(target);
-  // Skip the shift for targets that live in chrome (e.g. the pantheon
-  // step's #bnav-pantheon inside the bottom-nav band). Chrome
-  // elements are position:fixed relative to the viewport, so shifting
-  // body doesn't move them anyway — the shift would only misplace
-  // home content beneath them for no gain. A target is in chrome
-  // when its rect sits entirely below navTop OR entirely above
-  // statsBottom.
-  if (rect.top >= navTop || rect.bottom <= statsBottom) return;
+  const safeTop = step.allowChromeTop    ? 0        : statsBottom;
+  const safeBot = step.allowChromeBottom ? screenH  : navTop;
+  const safeMid = (safeTop + safeBot) / 2;
+  const rect = target.getBoundingClientRect();
   const targetMid = (rect.top + rect.bottom) / 2;
   // If the target's midpoint is already inside the safe band's middle
   // half, no scroll needed. Otherwise shift the "locked" scroll so
   // target midpoint lands on safeMid.
-  const bandHalf = (navTop - statsBottom) / 4;
+  const bandHalf = (safeBot - safeTop) / 4;
   if (Math.abs(targetMid - safeMid) < bandHalf) return;
   const delta = targetMid - safeMid;
   _walkthroughShiftLockedScroll(delta);
