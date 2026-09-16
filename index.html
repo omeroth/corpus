@@ -7003,21 +7003,21 @@
   .onb-screen.onb-v2 .onb-v2-snapshot-cards {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-top: 18px;
+    gap: 8px;
+    margin-top: 12px;
   }
   .onb-screen.onb-v2 .onb-v2-snapshot-card {
     background: var(--surface);
     border: 1.5px solid var(--accent);
     border-radius: 16px;
-    padding: 16px 18px 18px;
+    padding: 10px 16px 12px;
     text-align: center;
   }
   .onb-screen.onb-v2 .onb-v2-snapshot-icon {
     display: block;
-    margin: 0 auto 6px;
-    width: 32px;
-    height: 32px;
+    margin: 0 auto 4px;
+    width: 24px;
+    height: 24px;
   }
   .onb-screen.onb-v2 .onb-v2-snapshot-icon svg {
     width: 100%;
@@ -7027,33 +7027,33 @@
   .onb-screen.onb-v2 .onb-v2-snapshot-title {
     font-family: 'Nunito', 'Assistant', sans-serif;
     font-weight: 900;
-    font-size: calc(14px * var(--text-scale));
+    font-size: calc(12px * var(--text-scale));
     color: var(--ink);
-    margin: 4px 0 10px;
+    margin: 2px 0 6px;
     letter-spacing: 0.01em;
   }
   .onb-screen.onb-v2 .onb-v2-snapshot-value {
     font-family: 'Nunito', 'Assistant', sans-serif;
     font-weight: 900;
-    font-size: calc(30px * var(--text-scale));
+    font-size: calc(22px * var(--text-scale));
     color: var(--accent);
     line-height: 1;
-    margin: 6px 0;
+    margin: 3px 0;
   }
   .onb-screen.onb-v2 .onb-v2-snapshot-caption {
     font-family: 'Nunito', 'Assistant', sans-serif;
     font-weight: 700;
-    font-size: calc(13px * var(--text-scale));
+    font-size: calc(12px * var(--text-scale));
     color: var(--text-2);
     line-height: 1.3;
-    margin-top: 8px;
+    margin-top: 4px;
   }
   /* Fill bar for card 3. Width set inline by the prepare hook. */
   .onb-screen.onb-v2 .onb-v2-snapshot-bar {
-    height: 10px;
+    height: 8px;
     background: var(--border);
     border-radius: 999px;
-    margin: 12px 12px 10px;
+    margin: 8px 12px 6px;
     overflow: hidden;
   }
   .onb-screen.onb-v2 .onb-v2-snapshot-bar i {
@@ -13958,24 +13958,33 @@ const _ONB_COPY = {
         tile:    { en: 'Own ideas', he: 'משלי' } },
       { id: 'explain-clearly',
         icon:    'icon-figure',
-        text:    { en: 'That I explain things clearly',
-                   he: 'שאני מסביר דברים בבהירות' },
+        text:    { en:   'That I explain things clearly',
+                   he:   'שאנחנו מסבירים דברים בבהירות',
+                   he_m: 'שאני מסביר דברים בבהירות',
+                   he_f: 'שאני מסבירה דברים בבהירות' },
         support: { en: 'Every lesson ends with the idea in one sentence you can say back.',
                    he: 'כל שיעור נגמר ברעיון במשפט אחד שאפשר לחזור עליו.' },
         tile:    { en: 'Clear speech', he: 'בבהירות' } },
       { id: 'know-where',
         icon:    'icon-compass',
-        text:    { en: 'That I know where I stand',
-                   he: 'שאני יודע איפה אני עומד' },
+        text:    { en:   'That I know where I stand',
+                   he:   'שאנחנו יודעים איפה אנחנו עומדים',
+                   he_m: 'שאני יודע איפה אני עומד',
+                   he_f: 'שאני יודעת איפה אני עומדת' },
         support: { en:   "You'll see where the ideas you hold came from, and where you land on them.",
                    he:   'תראו מאיפה הגיעו הרעיונות שאתם מחזיקים בהם, ואיפה אתם עומדים.',
                    he_m: 'תראה מאיפה הגיעו הרעיונות שאתה מחזיק בהם, ואיפה אתה עומד.',
                    he_f: 'תראי מאיפה הגיעו הרעיונות שאת מחזיקה בהם, ואיפה את עומדת.' },
-        tile:    { en: 'Where I stand', he: 'איפה אני עומד' } },
+        tile:    { en:   'Where I stand',
+                   he:   'איפה אנחנו עומדים',
+                   he_m: 'איפה אני עומד',
+                   he_f: 'איפה אני עומדת' } },
       { id: 'well-read',
         icon:    'icon-openbook',
-        text:    { en: "That I'm well read",
-                   he: 'שאני בקיא' },
+        text:    { en:   "That I'm well read",
+                   he:   'שאנחנו בקיאים',
+                   he_m: 'שאני בקיא',
+                   he_f: 'שאני בקיאה' },
         support: { en:   "You'll meet the writers themselves, not just names people drop.",
                    he:   'תפגשו את ההוגים עצמם, לא רק שמות שאנשים זורקים.',
                    he_m: 'תפגוש את ההוגים עצמם, לא רק שמות שאנשים זורקים.',
@@ -13983,8 +13992,10 @@ const _ONB_COPY = {
         tile:    { en: 'Well read', he: 'בקיאות' } },
       { id: 'understand-world',
         icon:    'icon-globe',
-        text:    { en: 'That I understand the world',
-                   he: 'שאני מבין את העולם' },
+        text:    { en:   'That I understand the world',
+                   he:   'שאנחנו מבינים את העולם',
+                   he_m: 'שאני מבין את העולם',
+                   he_f: 'שאני מבינה את העולם' },
         support: { en: "Each week's ideas connect to something happening right now.",
                    he: 'הרעיונות של השבוע מתחברים למשהו שקורה עכשיו.' },
         tile:    { en: 'Understand world', he: 'הבנת העולם' } },
@@ -14452,7 +14463,10 @@ const _ONB_COPY = {
   // is redundant when the whole screen is about commitment. Icons
   // and ids stay stable.
   commit: {
-    head: { en: 'How committed are you?', he: 'כמה אתם מחויבים?' },
+    head: { en:   'How committed are you?',
+            he:   'כמה אתם מחויבים?',
+            he_m: 'כמה אתה מחויב?',
+            he_f: 'כמה את מחויבת?' },
     cta:  { en: 'Continue',                he: 'המשך' },
     options: [
       { id: 'extreme',  icon: 'icon-streak',   text: { en: 'Extremely',      he: 'מאוד' } },
@@ -15847,6 +15861,14 @@ function _onbV2PrepareReviews() {
     stars.textContent = '★★★★★';
     const quote = document.createElement('p');
     quote.className = 'onb-v2-review-quote';
+    // Reviews are English-only for now (see reviews block TODO). In
+    // Hebrew locale the surrounding screen is RTL, which would flip
+    // the English quote's paragraph anchor to the right and leave
+    // punctuation orphaned on the wrong side. Force LTR on the quote
+    // element itself so the English text reads naturally; the rest of
+    // the screen chrome (head, name attribution) stays with the
+    // ambient direction.
+    quote.dir = 'ltr';
     quote.textContent = isEn ? item.quote.en : item.quote.he;
     const name = document.createElement('div');
     name.className = 'onb-v2-review-name';
@@ -16160,7 +16182,7 @@ function _onbV2PrepareJourney() {
       if (!opt) return;
       const tile = document.createElement('div');
       tile.className = 'onb-v2-journey-tile';
-      const label = isEn ? opt.tile.en : opt.tile.he;
+      const label = isEn ? opt.tile.en : _hePick(opt.tile);
       const iconEl = document.createElement('div');
       iconEl.className = 'onb-v2-journey-tile-icon';
       iconEl.innerHTML = '<svg viewBox="0 0 64 64"><use href="#' + opt.icon + '"/></svg>';
@@ -25700,24 +25722,17 @@ function drawSpotlight(step) {
   canvas.height = window.innerHeight;
   const ctx = canvas.getContext('2d');
 
-  // Tint only the interior band between the stats-subheader and the
-  // bottom-nav. The topbar / wordmark / stats / bottom-nav stay at
-  // full brightness for every step — darkening a chrome element that
-  // a walkthrough beat is pointing INTO (e.g. step 2's pantheon tab
-  // inside the bottom-nav) is self-defeating. Falls back to a full-
-  // viewport tint only when the chrome measurements are unavailable
-  // (defensive; both elements are static DOM and should always exist
-  // once the home screen is rendered).
-  const statsEl = document.querySelector('.stats-subheader');
-  const navEl   = document.querySelector('.bottom-nav');
-  const tintTop = statsEl ? statsEl.getBoundingClientRect().bottom : 0;
-  const tintBot = navEl   ? navEl.getBoundingClientRect().top      : canvas.height;
+  // Tint the entire viewport. Chrome bands (topbar, stats-subheader,
+  // bottom-nav) darken along with the scroll body — the punch-out is
+  // the only bright region, so a step that spotlights a tab inside
+  // the bottom-nav or the streak pill inside the stats-subheader
+  // still reads as pointing at ONE thing rather than "everything
+  // except this band." Prior model tinted only the interior band
+  // between stats-subheader.bottom and bottom-nav.top, which left
+  // chrome bands bright and defeated the spotlight whenever a step's
+  // target lived inside chrome.
   ctx.fillStyle = 'rgba(42, 27, 74, 0.75)';
-  if (tintBot > tintTop) {
-    ctx.fillRect(0, tintTop, canvas.width, tintBot - tintTop);
-  } else {
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  }
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   const info = _walkthroughSpotlightRect(step);
   if (!info) return;
@@ -25795,14 +25810,16 @@ function drawSpotlight(step) {
 //             and its click fires _walkthroughFinish instead of
 //             _walkthroughNext.
 //
-// Chrome-band targets (pantheon inside .bottom-nav, streak stats
+// Chrome-band targets (pantheon inside .bottom-nav, streak pill
 // inside .stats-subheader) need no special flag: drawSpotlight
-// tints only the interior band between stats-subheader.bottom and
-// bottom-nav.top, so chrome elements stay at full brightness and
-// their halo draws around them cleanly. _walkthroughScrollTarget
-// IntoView skips the body-shift for any target whose rect lies in
-// chrome, since a fixed-position target doesn't move with the
-// shift and misplacing home content beneath it would be pointless.
+// tints the full viewport, so chrome bands darken along with the
+// scroll body and only the punch-out stays bright. _walkthroughScroll
+// TargetIntoView still skips the body-shift for any target whose
+// rect lies in chrome, since a fixed-position target doesn't move
+// with the shift and misplacing home content beneath it would be
+// pointless. Streak selector narrows to the streak PILL, not the
+// whole stats-subheader — a halo around a viewport-wide band isn't
+// pointing at anything specific.
 //
 // Trimmed to six screens on 2026-09-16. Dropped the "carousel"
 // step that pointed at #thinker-carousel-wrap — the element has
@@ -25811,6 +25828,16 @@ function drawSpotlight(step) {
 // silently for every walkthrough runner. The taste block (steps
 // 19-22) already teaches thinker collection; pointing at nothing
 // on home was worse than not pointing at all.
+//
+// Hebrew copy is PLURAL throughout — no gender adaptation. Onboarding
+// steps route he/he_m/he_f through _hePick once state.onbAnswers.
+// gender is captured at step 7, so a woman gets adapted copy for the
+// full 36-screen onboarding. The walkthrough then reverts to plural
+// for its six screens, which is a rough seam worth closing eventually.
+// Fix requires converting each step's he: from a string to an entry-
+// object { he, he_m, he_f } and routing bubbleText through _hePick at
+// _walkthroughRenderStep (~26169). Left plural for now because six
+// coach-mark strings is a low return on the refactor.
 const WALKTHROUGH_STEPS = [
   { id: 'greeting', expr: 'owl-neutral',   spotlight: null,
     he: 'שלום. אני אלווה אתכם בצעדים הראשונים ב-Corpus.',
@@ -25823,9 +25850,9 @@ const WALKTHROUGH_STEPS = [
     he: 'כאן מחכה הדיאלוג הבא בתור. לא צריך לבחור, הוא כבר מוכן.',
     en: "The next dialogue in line waits here. Nothing to choose, it's already set." },
   { id: 'pantheon', expr: 'owl-neutral',   spotlight: '#bnav-pantheon',
-    he: 'הפנתיאון הוא הבית של האוסף. אפשר לחזור אליו בכל רגע.',
-    en: "The Pantheon is where your collection lives. It's there whenever you want it." },
-  { id: 'streak', expr: 'owl-determined',  spotlight: '.stats-subheader',
+    he: 'הפנתיאון הוא הבית של האוסף. כל הוגה שתפגשו מצטרף לכאן.',
+    en: 'The Pantheon is where your collection lives. Every thinker you meet joins here.' },
+  { id: 'streak', expr: 'owl-determined',  spotlight: '.stats-subheader .topbar-stat[title="Streak"]',
     he: 'הרצף גדל בכל יום שמשלימים בו דיאלוג. היום הוא מתחיל.',
     en: 'Your streak grows on every day you complete a dialogue. Today it begins.' },
   { id: 'closing', expr: 'owl-action',
