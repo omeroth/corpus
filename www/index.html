@@ -5315,109 +5315,145 @@
     box-shadow: none;
   }
 
-  /* ── Progress bar (v11 seven-section, Headway-style) ──
-     Seven numbered nodes on a horizontal line; the segment of line
-     between completed nodes is filled with the current subject's
-     accent, the active node scales up and glows, and the active
-     section's name renders underneath, clamped so it stays within
-     the container's inline bounds even when the active node is at
-     the first or last position.
-     DOM built once per container by _onbRenderProgress; on subsequent
-     step advances the same function updates node classes, fill width,
-     and label position. Bar is hidden entirely (display: none) when
-     the current step is outside a section — step 1 welcome and steps
-     17-22 (taste block). See _ONB_SECTIONS for the section layout.
-     Prior implementation was a 6-pill bar keyed off data-step; that
-     mapped five acts onto pills and left large stretches with no
-     visible advance. */
+  /* ── Progress bar (v11, windowed) ──
+     Headway-style stepped bar: three numbered nodes plus a star end
+     marker, four elements evenly spaced. The window slides as the
+     active section advances so the active node stays in the middle
+     slot (or at an edge when active = 1 or 7). Every advance either
+     lights a node, slides the strip, or fills more of the outgoing
+     segment — the "barely moves" complaint from the earlier bar is
+     solved by that combination.
+     Track structure: flex row with `justify-content: space-between`,
+     nodes are fixed-size flex-shrink 0, segments between them are
+     flex-grow 1. Nodes vertically centered on the track. Filled
+     segments carry a 3px accent line with rounded caps; unfilled
+     segments carry a 1.5px neutral line beneath — the thickness
+     difference is where the depth of the bar comes from.
+     Micro-progress: the segment coming out of the active node fills
+     partially based on the user's index within the section's step
+     list — so on the second of four screens in a section, that
+     segment sits at 25%. Handled by inline `inline-size` on the
+     fill overlay from _onbRenderProgress.
+     Bar is hidden (display: none) when the step maps to no section
+     (welcome moment, taste block, native/null slots). */
   .onb-screen.onb-v2 .onb-progress {
     width: 100%;
-    max-width: 320px;
-    margin: calc(20px + var(--safe-top)) auto 20px;
-    padding: 0 4px;
+    padding: 0 22px;
+    margin: calc(14px + var(--safe-top)) 0 0;
+    box-sizing: border-box;
     position: relative;
-    /* Reserves space below the track for the section-name label.
-       Height matches label line-height + 6px top margin. */
-    padding-bottom: 22px;
+    /* Reserves total height for the 20px bar + 5px gap + ~14px label
+       line-height so the container's box actually accommodates the
+       absolute-positioned label rather than letting it overflow onto
+       whatever renders below (screen head / hero). */
+    min-height: 40px;
   }
-  .onb-screen.onb-v2 .onb-progress-track {
-    position: relative;
+  .onb-screen.onb-v2 .onb-progress-bar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    height: 22px;
+    justify-content: space-between;
+    height: 20px;
+    width: 100%;
+    gap: 0;
   }
-  .onb-screen.onb-v2 .onb-progress-track-line,
-  .onb-screen.onb-v2 .onb-progress-track-fill {
-    position: absolute;
-    top: 50%;
-    height: 2px;
-    border-radius: 1px;
-    transform: translateY(-50%);
-    pointer-events: none;
-  }
-  .onb-screen.onb-v2 .onb-progress-track-line {
-    inset-inline-start: 10px;
-    inset-inline-end: 10px;
-    background: rgba(42, 18, 102, 0.14);
-    z-index: 0;
-  }
-  .onb-screen.onb-v2 .onb-progress-track-fill {
-    inset-inline-start: 10px;
-    /* Inline-size (was width) so the fill grows toward the inline-end
-       edge in both LTR and RTL rather than jumping to the left in RTL. */
-    inline-size: 0;
-    background: var(--accent);
-    z-index: 1;
-    transition: inline-size 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .onb-screen.onb-v2 .onb-progress-node {
-    position: relative;
-    z-index: 2;
+  /* Node — 20px circle, holds the section number for numbered nodes
+     or the Unicode star for the end marker. flex-shrink: 0 keeps it
+     rigid while segments consume the remaining space. */
+  .onb-screen.onb-v2 .onb-node {
+    flex: 0 0 20px;
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: rgba(42, 18, 102, 0.14);
-    color: var(--text-muted);
-    font-family: 'Nunito', 'Assistant', sans-serif;
-    font-size: calc(10px * var(--text-scale));
-    font-weight: 900;
-    line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    line-height: 1;
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    transition: background 0.25s ease, color 0.25s ease;
   }
-  .onb-screen.onb-v2 .onb-progress-node.completed {
+  .onb-screen.onb-v2 .onb-node-num {
+    background: var(--border);
+    color: transparent;
+    font-size: calc(11px * var(--text-scale));
+    font-weight: 600;
+  }
+  .onb-screen.onb-v2 .onb-node-num.completed,
+  .onb-screen.onb-v2 .onb-node-num.active {
     background: var(--accent);
-    color: var(--on-accent, #FFFFFF);
+    color: #FFFFFF;
   }
-  .onb-screen.onb-v2 .onb-progress-node.active {
+  /* Star end marker — Unicode glyph at 14px in the neutral tint used
+     by the unfilled track. Same font as body copy so the glyph
+     renders consistently across environments. Matches the star used
+     on the reviews screen (see _onbV2PrepareReviews). */
+  .onb-screen.onb-v2 .onb-node-star {
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1;
+  }
+  /* Segment between adjacent nodes. Layered structure: an inner ::before
+     draws the thin (1.5px) unfilled track that always fills the segment
+     end-to-end; a positioned <i> child on top draws the thick (3px)
+     accent fill, its inline-size set inline by _onbRenderProgress.
+     When the child's size is 100% the segment reads as fully filled
+     (the thick accent covers the thin track); when 0% only the thin
+     track shows; partial values give the micro-progress state, with
+     the transition between thick and thin happening at the fill's
+     inline-end edge. */
+  .onb-screen.onb-v2 .onb-seg {
+    flex: 1 1 0;
+    position: relative;
+    align-self: stretch;
+    min-width: 0;
+  }
+  .onb-screen.onb-v2 .onb-seg::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    top: 50%;
+    height: 1.5px;
+    background: var(--border);
+    transform: translateY(-50%);
+    border-radius: 0.75px;
+    pointer-events: none;
+  }
+  .onb-screen.onb-v2 .onb-seg-fill {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 50%;
+    height: 3px;
+    inline-size: 0;
     background: var(--accent);
-    color: var(--on-accent, #FFFFFF);
-    transform: scale(1.15);
-    box-shadow: 0 0 0 4px var(--accent-glow);
+    border-radius: 1.5px;
+    transform: translateY(-50%);
+    transition: inline-size 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
   }
+  /* Label under the active node. Absolute-positioned so the flex row
+     above stays a clean 20px height; JS sets inline `left` on every
+     render to center the label under the active node, clamped to the
+     container's inline bounds so long strings don't clip at either
+     edge. Transition on `left` gives a small slide as the window
+     shifts between sections. */
   .onb-screen.onb-v2 .onb-progress-label {
     position: absolute;
-    top: 100%;
-    margin-top: 6px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
-    font-weight: 700;
-    font-size: calc(11px * var(--text-scale));
-    color: var(--text-2);
-    white-space: nowrap;
-    /* left is set inline by _onbPositionProgressLabel so the label
-       centers under the active node and clamps within the container
-       bounds; default 0 keeps it visible before JS positions it. */
+    top: calc(20px + 5px);   /* below the bar + 5px gap */
     left: 0;
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 400;
+    font-size: calc(12px * var(--text-scale));
+    color: var(--text-2);
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  /* Dark-mode overrides — the unfilled node + line use a low-alpha
-     ink tint that has no dark contrast; swap to a low-alpha light
-     tint so both stay visible against dark backgrounds. */
-  html.dark .onb-screen.onb-v2 .onb-progress-track-line { background: rgba(245, 241, 255, 0.16); }
-  html.dark .onb-screen.onb-v2 .onb-progress-node       { background: rgba(245, 241, 255, 0.16); }
+  /* Dark-mode neutrals for the unfilled track + unfilled node — the
+     low-alpha ink used in light mode reads as invisible on dark. */
+  html.dark .onb-screen.onb-v2 .onb-seg::before { background: rgba(245, 241, 255, 0.16); }
+  html.dark .onb-screen.onb-v2 .onb-node-num    { background: rgba(245, 241, 255, 0.16); }
+  html.dark .onb-screen.onb-v2 .onb-node-star   { color: rgba(245, 241, 255, 0.40); }
   /* Subject-select drawer entry: hide the pill row when body is on subject
      screen via drawer (existing-user subject switch, not new onboarding). */
   body.drawer-open .subj-onb-progress { display: none; }
@@ -14872,58 +14908,110 @@ function _onbSetLang(lang) {
   _onbApplyLang(lang);
 }
 
-// Populates every .onb-v2 .onb-progress container with the seven-node
-// bar for the given step, or hides it if the step is outside a section.
-// Idempotent: builds the inner structure once per container on the
-// first call, then just updates node classes, fill width, and label
-// text/position on subsequent calls.
+// Populates every .onb-v2 .onb-progress container with the windowed
+// three-node-plus-star bar for the given step. Idempotent: builds the
+// inner DOM once per container on the first call, then just updates
+// node numbers, node classes, segment fill sizes, and label text on
+// subsequent calls.
+//
+// Windowing rule: three consecutive numbered nodes are visible with
+// the active section preferred at the middle slot. Window start
+// clamped to [1, TOTAL_SECTIONS - 2]:
+//   active 1 → [1, 2, 3] (active leftmost)
+//   active 2 → [1, 2, 3] (active middle)
+//   active 3 → [2, 3, 4] (active middle)
+//   active 4 → [3, 4, 5] (active middle)
+//   active 5 → [4, 5, 6] (active middle)
+//   active 6 → [5, 6, 7] (active middle)
+//   active 7 → [5, 6, 7] (active rightmost)
+// The strip visibly shifts as the user advances from section 2 to 3,
+// then 3 to 4, and so on — that sliding motion is half of the "the
+// bar is moving" feel; the other half is the micro-progress fill
+// within each section (see below).
+//
+// Micro-progress: the segment coming out of the active node fills
+// from 0% to (M-1)/M as the user walks through the section's M
+// screens. On advance to the next section, the fill snaps past the
+// next node (which lights up) and the strip slides if the window
+// shifts. Segments before the active node are always 100% filled;
+// segments after the outgoing segment are always 0%.
 function _onbRenderProgress(step) {
   const section = _ONB_STEP_TO_SECTION[step] || 0;
   const isEn = state.lang === 'en';
   document.querySelectorAll('.onb-v2 .onb-progress').forEach(container => {
     if (!section) { container.style.display = 'none'; return; }
     container.style.display = '';
-    if (!container.querySelector('.onb-progress-track')) {
-      const track = document.createElement('div');
-      track.className = 'onb-progress-track';
-      const bg = document.createElement('span');
-      bg.className = 'onb-progress-track-line';
-      const fill = document.createElement('span');
-      fill.className = 'onb-progress-track-fill';
-      track.appendChild(bg);
-      track.appendChild(fill);
-      for (let i = 1; i <= _ONB_TOTAL_SECTIONS; i++) {
+
+    // Windowing math.
+    const winStart  = Math.min(Math.max(section - 1, 1), _ONB_TOTAL_SECTIONS - 2);
+    const visible   = [winStart, winStart + 1, winStart + 2];
+    // Micro-progress within the active section.
+    const sectionData = _ONB_SECTIONS[section - 1];
+    const idxInSection = sectionData.steps.indexOf(step);
+    const M            = sectionData.steps.length;
+    const microFrac    = M > 0 ? Math.max(0, idxInSection) / M : 0;
+
+    // Idempotent DOM build: three numbered nodes + three segments in
+    // between + a star end marker. Nodes have `onb-node onb-node-num`
+    // classes; the star has `onb-node onb-node-star` so both share
+    // the base `.onb-node` sizing without needing the star to carry a
+    // number. Each segment holds an <i class="onb-seg-fill"> whose
+    // inline-size is set inline.
+    if (!container.querySelector('.onb-progress-bar')) {
+      const bar = document.createElement('div');
+      bar.className = 'onb-progress-bar';
+      for (let i = 0; i < 3; i++) {
         const node = document.createElement('span');
-        node.className = 'onb-progress-node';
-        node.textContent = String(i);
-        track.appendChild(node);
+        node.className = 'onb-node onb-node-num';
+        bar.appendChild(node);
+        const seg = document.createElement('span');
+        seg.className = 'onb-seg';
+        const fill = document.createElement('i');
+        fill.className = 'onb-seg-fill';
+        seg.appendChild(fill);
+        bar.appendChild(seg);
       }
+      const star = document.createElement('span');
+      star.className = 'onb-node onb-node-star';
+      star.setAttribute('aria-hidden', 'true');
+      star.textContent = '★';   // Unicode BLACK STAR — same glyph reviews use
+      bar.appendChild(star);
       const label = document.createElement('div');
       label.className = 'onb-progress-label';
-      container.appendChild(track);
+      container.appendChild(bar);
       container.appendChild(label);
     }
-    const nodes = container.querySelectorAll('.onb-progress-node');
+
+    // Update numbered nodes.
+    const nodes = container.querySelectorAll('.onb-node-num');
     nodes.forEach((node, idx) => {
-      const num = idx + 1;
+      const num = visible[idx];
+      node.textContent = String(num);
       node.classList.toggle('completed', num < section);
       node.classList.toggle('active',    num === section);
     });
-    const fill = container.querySelector('.onb-progress-track-fill');
-    if (fill) {
-      const denom = Math.max(1, _ONB_TOTAL_SECTIONS - 1);
-      fill.style.inlineSize = ((section - 1) / denom * 100) + '%';
-    }
+
+    // Update the three segments' fill inline-size. Segment i sits
+    // between node visible[i] and node visible[i+1] (or the star for
+    // segment index 2).
+    const fills = container.querySelectorAll('.onb-seg-fill');
+    fills.forEach((fill, idx) => {
+      const leftNum = visible[idx];
+      let pct;
+      if (leftNum < section)      pct = 100;                // behind active — fully filled
+      else if (leftNum === section) pct = microFrac * 100;  // outgoing from active — micro-progress
+      else                          pct = 0;                // beyond outgoing — unfilled
+      fill.style.inlineSize = pct + '%';
+    });
+
+    // Update label text + position.
     const label = container.querySelector('.onb-progress-label');
     if (label) {
-      const s = _ONB_SECTIONS[section - 1];
-      label.textContent = isEn ? s.en : s.he;
+      label.textContent = isEn ? sectionData.en : sectionData.he;
       requestAnimationFrame(() => _onbPositionProgressLabel(container));
     }
   });
-  // Wire the resize listener once so a rotation or viewport-width
-  // change (unlikely mid-onboarding on phone, but cheap insurance)
-  // re-runs label positioning against the new geometry.
+
   if (!_onbProgressResizeWired) {
     _onbProgressResizeWired = true;
     window.addEventListener('resize', () => {
@@ -14936,12 +15024,12 @@ function _onbRenderProgress(step) {
 let _onbProgressResizeWired = false;
 
 // Positions the active-node label so its horizontal center sits under
-// the active node, clamped to the container's inline bounds so it
-// doesn't clip at the first or last node. Called on every render and
-// on window resize.
+// the active node, clamped to the container's inline bounds so long
+// strings don't clip at either edge. Called on every render (after a
+// rAF so layout has settled) and on window resize.
 function _onbPositionProgressLabel(container) {
-  const active = container.querySelector('.onb-progress-node.active');
-  const label = container.querySelector('.onb-progress-label');
+  const active = container.querySelector('.onb-node-num.active');
+  const label  = container.querySelector('.onb-progress-label');
   if (!active || !label) return;
   const cRect = container.getBoundingClientRect();
   const nRect = active.getBoundingClientRect();
