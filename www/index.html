@@ -5338,8 +5338,21 @@
      (welcome moment, taste block, native/null slots). */
   .onb-screen.onb-v2 .onb-progress {
     width: 100%;
-    padding: 0 22px;
-    margin: calc(14px + var(--safe-top)) 0 0;
+    /* Symmetric 18px side padding — matches the "16 to 20px side
+       padding" spec. Container spans the full inner width of the
+       screen (which itself has 20px side padding), giving the bar
+       ~350px inner span on a 393px viewport. */
+    padding: 0 18px;
+    /* Negative 8px top margin pulls the bar UP into the screen's
+       own top padding (24 + safeTop from .onb-screen at 5158) so
+       the bar's top edge lands at ~safeTop + 16 = 16px below the
+       status bar. That matches the "16 to 20px below status bar"
+       spec. Without the negative shift, screen padding alone puts
+       the bar 24px below the status bar (4-8px lower than target).
+       The prior version stacked its own (14px + safeTop) margin on
+       top of the screen padding, doubling the safe-top and pushing
+       the bar ~132px from device top — well below the header zone. */
+    margin: -8px 0 0;
     box-sizing: border-box;
     position: relative;
     /* Reserves total height for the 20px bar + 5px gap + ~14px label
@@ -14982,18 +14995,30 @@ function _onbRenderProgress(step) {
       container.appendChild(label);
     }
 
-    // Update numbered nodes.
-    const nodes = container.querySelectorAll('.onb-node-num');
-    nodes.forEach((node, idx) => {
-      const num = visible[idx];
-      node.textContent = String(num);
-      node.classList.toggle('completed', num < section);
-      node.classList.toggle('active',    num === section);
-    });
+    // Only rewrite node numbers, node classes, and the label when the
+    // ACTIVE section (or language) actually changes. Within a section
+    // the visible window, node states, and label text are all stable
+    // — re-setting them every step re-measured label.offsetWidth and
+    // caused a 1-2px jitter in the JS-computed `left` from sub-pixel
+    // layout differences. Segment fills (micro-progress) always update
+    // because that's the whole point of the fill advancing per step.
+    const sectionChanged = container._onbLastSection !== section;
+    const langChanged    = container._onbLastLang    !== state.lang;
+
+    if (sectionChanged) {
+      const nodes = container.querySelectorAll('.onb-node-num');
+      nodes.forEach((node, idx) => {
+        const num = visible[idx];
+        node.textContent = String(num);
+        node.classList.toggle('completed', num < section);
+        node.classList.toggle('active',    num === section);
+      });
+    }
 
     // Update the three segments' fill inline-size. Segment i sits
     // between node visible[i] and node visible[i+1] (or the star for
-    // segment index 2).
+    // segment index 2). Runs every render — this is the micro-progress
+    // that advances mid-section.
     const fills = container.querySelectorAll('.onb-seg-fill');
     fills.forEach((fill, idx) => {
       const leftNum = visible[idx];
@@ -15004,12 +15029,17 @@ function _onbRenderProgress(step) {
       fill.style.inlineSize = pct + '%';
     });
 
-    // Update label text + position.
-    const label = container.querySelector('.onb-progress-label');
-    if (label) {
-      label.textContent = isEn ? sectionData.en : sectionData.he;
-      requestAnimationFrame(() => _onbPositionProgressLabel(container));
+    // Update label text + position ONLY on section or language change.
+    if (sectionChanged || langChanged) {
+      const label = container.querySelector('.onb-progress-label');
+      if (label) {
+        label.textContent = isEn ? sectionData.en : sectionData.he;
+        requestAnimationFrame(() => _onbPositionProgressLabel(container));
+      }
     }
+
+    container._onbLastSection = section;
+    container._onbLastLang    = state.lang;
   });
 
   if (!_onbProgressResizeWired) {
