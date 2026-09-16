@@ -5451,11 +5451,21 @@
     pointer-events: none;
   }
   /* Label under the active node. Absolute-positioned so the flex row
-     above stays a clean 20px height; JS sets inline `left` on every
-     render to center the label under the active node, clamped to the
-     container's inline bounds so long strings don't clip at either
-     edge. Transition on `left` gives a small slide as the window
-     shifts between sections. */
+     above stays a clean 20px height; JS sets inline `left` per section
+     (cached in _onbSectionLabelLeft, keyed by section + language) and
+     applies the same value to every container's label so all screens
+     within a section share the exact same position — no inter-screen
+     sub-pixel variance. No transition on `left`: the label position
+     is derived once per section entry from the visible container's
+     measurement and reused for every screen in that section, so the
+     value never changes during normal navigation. On section change
+     the value jumps to the new cached position; the small snap is
+     less noticeable than an animation would be, and animating a
+     one-frame update on newly-visible containers used to produce
+     unwanted slide-in effects on every step (see the item-2 analysis
+     in the commit that landed this — the slide from CSS default 0
+     to the measured position was the "jumps on every page change"
+     the prior label impl was doing). */
   .onb-screen.onb-v2 .onb-progress-label {
     position: absolute;
     top: calc(20px + 5px);   /* below the bar + 5px gap */
@@ -5466,7 +5476,6 @@
     color: var(--text-2);
     line-height: 1.2;
     white-space: nowrap;
-    transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   }
   /* Dark-mode neutrals for the unfilled track + unfilled node — the
      low-alpha ink used in light mode reads as invisible on dark. */
@@ -14957,6 +14966,11 @@ function _onbSetLang(lang) {
 function _onbRenderProgress(step) {
   const section = _ONB_STEP_TO_SECTION[step] || 0;
   const isEn = state.lang === 'en';
+  // Look up the cached label-left for this section + language before
+  // iterating containers, so the loop can apply it synchronously to
+  // each container's label (see the sectionChanged branch below).
+  const cacheKey = section + '-' + state.lang;
+  const cachedLeft = _onbSectionLabelLeft[cacheKey];
   document.querySelectorAll('.onb-v2 .onb-progress').forEach(container => {
     if (!section) { container.style.display = 'none'; return; }
     container.style.display = '';
@@ -15037,12 +15051,16 @@ function _onbRenderProgress(step) {
       fill.style.width = pct + '%';
     });
 
-    // Update label text + position ONLY on section or language change.
+    // Update label text on section/lang change; apply cached left
+    // synchronously if available so a newly-visible container renders
+    // with the correct position on first paint (no slide-in). If the
+    // cache is missing, the measurement rAF further down populates it
+    // and applies to every container.
     if (sectionChanged || langChanged) {
       const label = container.querySelector('.onb-progress-label');
       if (label) {
         label.textContent = isEn ? sectionData.en : sectionData.he;
-        requestAnimationFrame(() => _onbPositionProgressLabel(container));
+        if (cachedLeft != null) label.style.left = cachedLeft + 'px';
       }
     }
 
@@ -15050,34 +15068,72 @@ function _onbRenderProgress(step) {
     container._onbLastLang    = state.lang;
   });
 
+  // Cache miss: measure once from the currently-visible container's
+  // active node and apply the value to every container's label so all
+  // screens in this section share the same position (no per-container
+  // sub-pixel variance). Deferred to rAF so the label textContent set
+  // above has been laid out before we read offsetWidth.
+  if (section && cachedLeft == null) {
+    requestAnimationFrame(() => {
+      const active = document.querySelector('.onb-screen.onb-v2.onb-active .onb-progress');
+      const left = _onbMeasureLabelLeft(active);
+      if (left == null) return;
+      _onbSectionLabelLeft[cacheKey] = left;
+      document.querySelectorAll('.onb-v2 .onb-progress-label').forEach(l => {
+        l.style.left = left + 'px';
+      });
+    });
+  }
+
   if (!_onbProgressResizeWired) {
     _onbProgressResizeWired = true;
     window.addEventListener('resize', () => {
-      document.querySelectorAll('.onb-v2 .onb-progress').forEach(c => {
-        if (c.style.display !== 'none') _onbPositionProgressLabel(c);
+      // Viewport width changed — cached positions are invalid. Clear,
+      // then re-measure from the currently-visible container and apply
+      // to every label so the current section stays positioned.
+      Object.keys(_onbSectionLabelLeft).forEach(k => delete _onbSectionLabelLeft[k]);
+      const active = document.querySelector('.onb-screen.onb-v2.onb-active .onb-progress');
+      const left = _onbMeasureLabelLeft(active);
+      if (left == null) return;
+      const step = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
+      const s = _ONB_STEP_TO_SECTION[step] || 0;
+      if (s) _onbSectionLabelLeft[s + '-' + state.lang] = left;
+      document.querySelectorAll('.onb-v2 .onb-progress-label').forEach(l => {
+        l.style.left = left + 'px';
       });
     });
   }
 }
+// Module-level cache of measured label-left values, keyed by section +
+// language. Label text width differs between EN and HE so the cache
+// key includes language; on window resize (which changes container
+// dimensions) the whole cache is cleared and re-populated.
+const _onbSectionLabelLeft = {};
 let _onbProgressResizeWired = false;
 
-// Positions the active-node label so its horizontal center sits under
-// the active node, clamped to the container's inline bounds so long
-// strings don't clip at either edge. Called on every render (after a
-// rAF so layout has settled) and on window resize.
-function _onbPositionProgressLabel(container) {
+// Computes where the active-section label should sit, in px from the
+// container's padding-box inline-start, so it centers under the
+// container's active node and stays within the container's inline
+// bounds (clamped when the active node is near the first or last
+// window slot). Returns null when the container is hidden or the
+// active node is missing — callers should treat that as "measurement
+// unavailable, try again later". Reads offsetWidth and getBounding
+// ClientRect so it forces a layout pass; call from rAF, not from
+// synchronous render code.
+function _onbMeasureLabelLeft(container) {
+  if (!container) return null;
   const active = container.querySelector('.onb-node-num.active');
   const label  = container.querySelector('.onb-progress-label');
-  if (!active || !label) return;
+  if (!active || !label) return null;
   const cRect = container.getBoundingClientRect();
   const nRect = active.getBoundingClientRect();
-  if (!cRect.width || !nRect.width) return;
+  if (!cRect.width || !nRect.width) return null;
   const nodeCenter = nRect.left + nRect.width / 2 - cRect.left;
   const labelW = label.offsetWidth;
   let left = nodeCenter - labelW / 2;
   if (left < 0) left = 0;
   if (left + labelW > cRect.width) left = cRect.width - labelW;
-  label.style.left = left + 'px';
+  return left;
 }
 
 // Show step N. Applies current language, renders the seven-section
