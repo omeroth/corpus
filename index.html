@@ -14136,33 +14136,68 @@ const _ONB_COPY = {
     // Shared CTA across taste-1 / taste-2 / taste-q — all three
     // read "Continue" in every subject, no reason to duplicate.
     cta: { en: 'Continue', he: 'המשך' },
+    // Rebuilt from Philosophy Chapter 1 Day 3 "The Allegory of the Cave"
+    // (content/philosophy.js:162-231). Prior taste used Socrates, who
+    // is Chapter 1 Day 1 — the taste's first-card reward was stealing
+    // the reward from someone's genuine first dialogue. Plato is day 3,
+    // so days 1 (Socrates) and 2 keep their card rewards.
+    //
+    // Quote trimmed from the source section's full 150-word Republic
+    // passage to just the vivid scene-setting sentences. The rest of
+    // the cave setup (fire behind, wall, shadows) migrates into page1
+    // as prose so page 1 CARRIES the visualization the allegory needs
+    // rather than gesturing at it.
+    //
+    // Page 2 punch closes on the Socrates connection lifted from the
+    // dialogue's own depth section: Plato wrote this after his teacher
+    // was put to death, so "the one who returns is disbelieved,
+    // mocked, killed" is personal witness, not abstraction. Same
+    // pattern as the Socrates taste's page 2 punch (hemlock choice)
+    // and the Freud taste's page 2 punch (ego not master).
+    //
+    // Question drawn from the dialogue's own third quiz ("what do the
+    // remaining prisoners think of the returning liberator?"), so the
+    // taste is genuinely continuous with the shipping content.
+    //
+    // First-card preview shows Plato, thinker id 'plato'. Plato is
+    // Philosophy Chapter 1 Day 3 ("The Allegory of the Cave"), so
+    // the user meets him on their third real dialogue — the preview
+    // matches shipping content. Origin card asset lives at
+    // images/first-edition-plato.webp per convention (see also
+    // first-edition-socrates.webp / -smith.webp / -freud.webp).
     philosophy: {
-      thinkerName: 'Socrates',
-      role:  { en: 'The Questioner', he: 'השואל' },
-      icon:  'icon-building',
-      firstEditionImage: 'first-edition-socrates',
-      quote: { en: '"The unexamined life is not worth living."',
-               he: '"חיים שלא נבחנים אינם ראויים שיחיו אותם."' },
-      source: 'Socrates, Apology, 38a',
-      page1: { en: 'Athens, 399 BC. Socrates is on trial for corrupting the young. The jury offers him exile instead of death. He refuses.',
-               he: 'אתונה, 399 לפנה"ס. סוקרטס עומד למשפט. חבר המושבעים מציע לו גלות במקום מוות. הוא מסרב.' },
+      thinkerName: 'Plato',
+      role:  { en: 'The Escapee', he: 'היוצא' },
+      icon:  'icon-bulb',
+      firstEditionImage: 'first-edition-plato',
+      quote: { en: '"Picture people living in an underground cave, with the entrance opening upward toward the light. They have been there since childhood, their legs and necks bound, unable to move or turn their heads."',
+               he: '״תאר לעצמך בני אדם השרויים במעון תת-קרקעי כמו מערה, שפתחה רחב פונה אל האור. בני אדם אלה יושבים שם מילדותם, רגליהם וצווארם כבולים, כך שאינם יכולים לזוז ממקומם ואינם יכולים להפנות את ראשם.״' },
+      source: 'Plato, The Republic, Book 7',
+      page1: { en: 'Athens, around 375 BC. Plato asks his reader to picture a cave: prisoners chained since childhood, facing the wall. Behind them, a fire. Between the fire and their backs, figures carrying objects pass by. All the prisoners have ever seen are the shadows on the wall in front of them.',
+               he: 'אתונה, סביבות 375 לפנה"ס. אפלטון מבקש מהקורא לדמיין מערה: אסירים כבולים מילדותם, פניהם אל הקיר. מאחוריהם, אש. בין האש לגבם, דמויות נושאות חפצים עוברות. כל מה שהאסירים ראו אי פעם הוא הצללים שעל הקיר שלפניהם.' },
       page2Head: { en: 'What he meant', he: 'למה הוא התכוון' },
-      page2: { en: "Not that thinking makes life pleasant. What he meant is that a life you never question isn't really yours. You're living out answers someone else chose, without noticing.",
-               he: 'לא שחשיבה עושה את החיים נעימים. הכוונה היא שחיים שאתם לא בוחנים אינם באמת שלכם. אתם חיים תשובות שמישהו אחר בחר, בלי לשים לב.' },
-      // Punch line rewritten to make the whole story legible (user
-      // reported HE compression was disconnected from the reasoning):
-      // sentenced to death, offered exile as a way out, refused. Both
-      // languages now name the choice explicitly.
-      page2Punch: { en: "The jury offered him exile instead of death. He refused, and drank the hemlock rather than accept a life he had not examined.",
-                    he: 'המושבעים הציעו לו גלות במקום מוות. הוא סירב, ושתה את הרעל, ולא הסכים לחיים שלא בחן.' },
-      scenario: { en: "Someone is told all their life that a safe job is what matters. They never ask why. They just take the predictable path, because everyone around them did.",
-                  he: 'מישהו שומע כל חייו שעבודה בטוחה זה מה שחשוב. הוא אף פעם לא שואל למה. הוא פשוט הולך בדרך הצפויה, כי כולם סביבו הלכו בה.' },
-      question: { en: 'According to Socrates, what kind of life is that?',
-                  he: 'לפי סוקרטס, אילו חיים אלה?' },
+      page2: { en: "The cave is the world of the senses. The shadows are the things we take for real. Leaving the cave — struggling toward the light — is philosophy. The first look at the sun is not joy; it is pain, blinding, and the pull is to return to the familiar dark.",
+               he: 'המערה היא עולם החושים. הצללים הם מה שאנחנו לוקחים כמציאות. היציאה מן המערה — המאבק לעבר האור — היא הפילוסופיה. המבט הראשון בשמש אינו שמחה, הוא כאב, הוא סנוור, והדחף הוא לחזור אל האפלה המוכרת.' },
+      // Page 2 punch — the Socrates connection. Lifted from the
+      // dialogue's own depth section (content/philosophy.js:192-193).
+      // Plato watched his teacher die for asking too many questions,
+      // then wrote a story about the one who escapes and comes back to
+      // free the others — and gets killed for it. Naming the
+      // connection explicitly is the beat that makes the allegory
+      // stop feeling abstract.
+      page2Punch: { en: "Plato wrote this after his teacher Socrates was put to death for asking too many questions. The one who returns to the cave to free the others is not thanked. He is killed.",
+                    he: 'אפלטון כתב את זה אחרי שסוקרטס, מורו, הוצא להורג על ששאל יותר מדי שאלות. מי שחוזר למערה כדי לשחרר את היתר לא זוכה להערכה. הורגים אותו.' },
+      scenario: { en: "The freed prisoner returns to the cave and tells the others: the shadows are lies. Outside there is a sun. There is a world.",
+                  he: 'האסיר המשוחרר חוזר למערה ואומר לשאר: הצללים הם שקר. בחוץ יש שמש. יש עולם.' },
+      question: { en: 'According to Plato, how do the prisoners react?',
+                  he: 'לפי אפלטון, איך מגיבים האסירים?' },
       options: [
-        { en: 'A rational, calculated life', he: 'חיים רציונליים ומחושבים' },
-        { en: 'A safe but limited life',      he: 'חיים בטוחים אבל מוגבלים' },
-        { en: 'The unexamined life',          he: 'חיים שלא נבחנו' },
+        { en: 'They believe him and follow him out',
+          he: 'הם מאמינים לו והולכים אחריו החוצה' },
+        { en: 'They ignore him and go on watching the shadows',
+          he: 'הם מתעלמים ממנו וממשיכים לצפות בצללים' },
+        { en: "His truth threatens their whole world, so they attack back",
+          he: 'האמת שלו מאיימת על כל עולמם, אז הם תוקפים בחזרה' },
       ],
       correctIndex: 2,
     },
@@ -14421,14 +14456,25 @@ const _ONB_COPY = {
     // philosophy 16, economics 17, psychology 21 (psychology has only
     // 28 authored dialogues total, but the subject is currently
     // LOCKED_SUBJECTS-gated so users can't reach this screen on it).
+    // Head reads "…{n} thinkers by" and a date pill renders immediately
+    // after it (see _onbV2PrepareJourney below and the DOM in
+    // #onb-v2-journey). Hebrew must place "עד" as a TRAILING preposition
+    // that connects the count to the date pill — earlier "תפגשו עד {n}
+    // הוגים" collided the pill against the count with no linker,
+    // reading "תפגשו עד 16 הוגים 16 באוקטובר" (up-to-16 thinkers,
+    // 16 October — two numbers, no connector). Trailing "עד" mirrors
+    // the English "by" position and joins cleanly to the date pill.
+    // The pill itself is prefixed with "ה-" in Hebrew (see the pill
+    // block in _onbV2PrepareJourney) so the full read is
+    // "תפגשו 16 הוגים עד ה-16 באוקטובר".
     card_head:          { en:   "{name}, you'll have met {n} thinkers by",
-                          he:   '{name}, תפגשו עד {n} הוגים',
-                          he_m: '{name}, תפגוש עד {n} הוגים',
-                          he_f: '{name}, תפגשי עד {n} הוגים' },
+                          he:   '{name}, תפגשו {n} הוגים עד',
+                          he_m: '{name}, תפגוש {n} הוגים עד',
+                          he_f: '{name}, תפגשי {n} הוגים עד' },
     card_head_nameless: { en:   "You'll have met {n} thinkers by",
-                          he:   'תפגשו עד {n} הוגים',
-                          he_m: 'תפגוש עד {n} הוגים',
-                          he_f: 'תפגשי עד {n} הוגים' },
+                          he:   'תפגשו {n} הוגים עד',
+                          he_m: 'תפגוש {n} הוגים עד',
+                          he_f: 'תפגשי {n} הוגים עד' },
     card_stat_icon:     'icon-clock',
     card_stat:          { en: '30+ hours a year with the greatest minds',
                           he: '30+ שעות בשנה עם הוגי הדעות הגדולים' },
@@ -15851,6 +15897,14 @@ function _onbV2PrepareReviews() {
   items.forEach((item) => {
     const card = document.createElement('div');
     card.className = 'onb-v2-review-card';
+    // Reviews are English-only for now (see reviews block TODO). In
+    // Hebrew locale the surrounding screen is RTL, which would flip
+    // every line in the card — stars, quote, name — to the right and
+    // leave English punctuation orphaned. dir="ltr" on the whole card
+    // aligns all three lines left as one block since the content is
+    // all English; the surrounding screen chrome (head, CTA) stays
+    // with the ambient direction.
+    card.dir = 'ltr';
     // Stars are rendered as text characters rather than SVG so they
     // pick up the amber var(--gold) fill from CSS without needing a
     // filled-star icon in the sprite. aria-label carries the value
@@ -15861,14 +15915,6 @@ function _onbV2PrepareReviews() {
     stars.textContent = '★★★★★';
     const quote = document.createElement('p');
     quote.className = 'onb-v2-review-quote';
-    // Reviews are English-only for now (see reviews block TODO). In
-    // Hebrew locale the surrounding screen is RTL, which would flip
-    // the English quote's paragraph anchor to the right and leave
-    // punctuation orphaned on the wrong side. Force LTR on the quote
-    // element itself so the English text reads naturally; the rest of
-    // the screen chrome (head, name attribution) stays with the
-    // ambient direction.
-    quote.dir = 'ltr';
     quote.textContent = isEn ? item.quote.en : item.quote.he;
     const name = document.createElement('div');
     name.className = 'onb-v2-review-name';
@@ -16151,14 +16197,18 @@ function _onbV2PrepareJourney() {
   }
 
   // Date pill — 30 days from today, locale-formatted (long month +
-  // day; year omitted to keep the pill tight).
+  // day; year omitted to keep the pill tight). Hebrew prefixes "ה-"
+  // to the day so the card head's trailing "עד" joins as
+  // "…עד ה-16 באוקטובר" rather than "…עד 16 באוקטובר" (bare number
+  // reads as ordinal-less and colloquially wrong in this construction).
   const pillEl = document.getElementById('onb-v2-journey-date-pill');
   if (pillEl) {
     const d = new Date();
     d.setDate(d.getDate() + 30);
     const locale = isEn ? 'en-US' : 'he-IL';
     try {
-      pillEl.textContent = d.toLocaleDateString(locale, { month: 'long', day: 'numeric' });
+      const formatted = d.toLocaleDateString(locale, { month: 'long', day: 'numeric' });
+      pillEl.textContent = isEn ? formatted : ('ה-' + formatted);
     } catch(e) {
       pillEl.textContent = d.toDateString();
     }
@@ -25842,7 +25892,18 @@ const WALKTHROUGH_STEPS = [
   { id: 'greeting', expr: 'owl-neutral',   spotlight: null,
     he: 'שלום. אני אלווה אתכם בצעדים הראשונים ב-Corpus.',
     en: "Hello. I'll walk you through your first steps in Corpus." },
-  { id: 'chapters', expr: 'owl-neutral',   spotlight: '#home-levels .level-card.expanded, #home-levels .level-card:first-child',
+  // Chapters step: spotlight the .expanded card ONLY. Earlier fallback
+  // was `..., #home-levels .level-card:first-child` — but renderHome()
+  // places the subject's bonus chapter card at position 0 (index.html
+  // ~21162-21174) when a bonus exists, so :first-child returned the
+  // BONUS card instead of chapter 1. querySelector matches DOM-first
+  // across a selector list, so bonus (earlier in DOM) always beat
+  // .expanded (chapter 1). Bonus card is often .locked-week (dimmed)
+  // for a fresh user, so the halo looked like it was pointing at
+  // nothing. Chapter 1 is always auto-expanded on first render for a
+  // fresh user (_homeExpandedWeekId = nextUpWeekId = 1), so .expanded
+  // alone is a stable target — no fallback needed.
+  { id: 'chapters', expr: 'owl-neutral',   spotlight: '#home-levels .level-card.expanded',
     maxHeight: 220,
     he: 'כל נושא בנוי מפרקים, וכל פרק מקבץ כמה דיאלוגים סביב שאלה אחת.',
     en: 'Each subject is built from chapters, and each chapter gathers a few dialogues around one question.' },
