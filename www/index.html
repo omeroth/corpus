@@ -5436,12 +5436,18 @@
     position: absolute;
     inset-inline-start: 0;
     top: 50%;
+    /* width (not inline-size) — width is universally animatable across
+       WebKit / Blink / Gecko, whereas transition support for logical
+       properties like inline-size is inconsistent in older WKWebView.
+       For an absolute-positioned element anchored via inset-inline-start,
+       `width` extends inward from the start edge in both LTR and RTL,
+       so RTL correctness is preserved. */
+    width: 0;
     height: 3px;
-    inline-size: 0;
     background: var(--accent);
     border-radius: 1.5px;
     transform: translateY(-50%);
-    transition: inline-size 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     pointer-events: none;
   }
   /* Label under the active node. Absolute-positioned so the flex row
@@ -15015,10 +15021,12 @@ function _onbRenderProgress(step) {
       });
     }
 
-    // Update the three segments' fill inline-size. Segment i sits
-    // between node visible[i] and node visible[i+1] (or the star for
-    // segment index 2). Runs every render — this is the micro-progress
-    // that advances mid-section.
+    // Update the three segments' fill width. Segment i sits between
+    // node visible[i] and node visible[i+1] (or the star for segment
+    // index 2). Runs every render — this is the micro-progress that
+    // advances mid-section. `width` (not `inline-size`) so the CSS
+    // transition fires reliably on WKWebView; the CSS block on
+    // .onb-seg-fill explains the direction-safety reasoning.
     const fills = container.querySelectorAll('.onb-seg-fill');
     fills.forEach((fill, idx) => {
       const leftNum = visible[idx];
@@ -15026,7 +15034,7 @@ function _onbRenderProgress(step) {
       if (leftNum < section)      pct = 100;                // behind active — fully filled
       else if (leftNum === section) pct = microFrac * 100;  // outgoing from active — micro-progress
       else                          pct = 0;                // beyond outgoing — unfilled
-      fill.style.inlineSize = pct + '%';
+      fill.style.width = pct + '%';
     });
 
     // Update label text + position ONLY on section or language change.
@@ -15118,6 +15126,17 @@ function _onbShowStep(n) {
   if (!el) { _onbComplete(); return; }
   el.style.display = 'flex';
   el.classList.add('onb-active');
+  // Force a layout on the newly-visible screen BEFORE updating any
+  // transitioned values inside it. Without this, the progress bar's
+  // segment-fill widths look like they snap between steps: the
+  // container was inside a display:none screen a moment ago, so its
+  // prior computed styles weren't in the render tree — when we set
+  // width to the new value synchronously, WKWebView treats the new
+  // value as the initial state and skips the transition. Reading a
+  // layout property (offsetHeight) forces the browser to compute
+  // initial styles from the current inline width; the subsequent
+  // width change then reads as a transition from prior→new value.
+  void el.offsetHeight;
   // Update progress: seven-section bar. Renderer decides whether the
   // bar shows for this step (via _ONB_STEP_TO_SECTION) and populates
   // node states, filled-line width, and the active-section label.
