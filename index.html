@@ -14155,75 +14155,46 @@ const _ONB_COPY = {
     // Shared CTA across taste-1 / taste-2 / taste-q — all three
     // read "Continue" in every subject, no reason to duplicate.
     cta: { en: 'Continue', he: 'המשך' },
-    // Rebuilt from Philosophy Chapter 1 Day 3 "The Allegory of the Cave"
-    // (content/philosophy.js:162-231). Prior taste used Socrates, who
-    // is Chapter 1 Day 1 — the taste's first-card reward was stealing
-    // the reward from someone's genuine first dialogue. Plato is day 3,
-    // so days 1 (Socrates) and 2 keep their card rewards.
-    //
-    // Quote trimmed from the source section's full 150-word Republic
-    // passage to just the vivid scene-setting sentences. The rest of
-    // the cave setup (fire behind, wall, shadows) migrates into page1
-    // as prose so page 1 CARRIES the visualization the allegory needs
-    // rather than gesturing at it.
-    //
-    // Page 2 punch closes on the Socrates connection lifted from the
-    // dialogue's own depth section: Plato wrote this after his teacher
-    // was put to death, so "the one who returns is disbelieved,
-    // mocked, killed" is personal witness, not abstraction. Same
-    // pattern as the Socrates taste's page 2 punch (hemlock choice)
-    // and the Freud taste's page 2 punch (ego not master).
-    //
-    // Question drawn from the dialogue's own third quiz ("what do the
-    // remaining prisoners think of the returning liberator?"), so the
-    // taste is genuinely continuous with the shipping content.
-    //
-    // First-card preview shows Plato, thinker id 'plato'. Plato is
-    // Philosophy Chapter 1 Day 3 ("The Allegory of the Cave"), so
-    // the user meets him on their third real dialogue — the preview
-    // matches shipping content. Origin card asset lives at
-    // images/first-edition-plato.webp per convention (see also
-    // first-edition-socrates.webp / -smith.webp / -freud.webp).
+    // Switched back to Socrates on 2026-09-16 after briefly moving to
+    // Plato. The Plato swap (commit e603f2e) was motivated by a
+    // collision that turned out not to matter: the taste is stateless
+    // (see _onbV2PrepareFirstCard), so day 1 still fires Socrates'
+    // real card reveal with the portrait flip and the state.
+    // unlockedThinkers write. Only repeat is seeing the portrait twice,
+    // which economics already has with Smith at day 2. Socrates is the
+    // better opening — the unexamined-life claim is a claim about the
+    // reader, which lands cleanly on page 1. The Cave is an allegory
+    // that needs the reader to picture the scene before the meaning
+    // arrives, which was harder to compress into two pages.
     philosophy: {
-      thinkerName: 'Plato',
-      role:  { en: 'The Escapee', he: 'היוצא' },
-      icon:  'icon-bulb',
-      // Standard thinker portrait (./images/plato.webp) resolved via
-      // _thinkerImage(THINKER, state.subject) — same asset the real
-      // post-completion card reveal uses at showThinkerCardScreen.
-      // Prior first-edition-plato.webp variant was retired: the taste
-      // is stateless, so nothing is taken away by previewing the real
-      // card, and the pale illustrated variants read as disappointing
-      // rather than special.
-      thinkerId: 'plato',
-      quote: { en: '"Picture people living in an underground cave, with the entrance opening upward toward the light. They have been there since childhood, their legs and necks bound, unable to move or turn their heads."',
-               he: '״תאר לעצמך בני אדם השרויים במעון תת-קרקעי כמו מערה, שפתחה רחב פונה אל האור. בני אדם אלה יושבים שם מילדותם, רגליהם וצווארם כבולים, כך שאינם יכולים לזוז ממקומם ואינם יכולים להפנות את ראשם.״' },
-      source: 'Plato, The Republic, Book 7',
-      page1: { en: 'Athens, around 375 BC. Plato asks his reader to picture a cave, then asks whether we are the ones inside it.',
-               he: 'אתונה, סביבות 375 לפנה"ס. אפלטון מבקש מהקורא לדמיין מערה, ואז שואל אם אנחנו הכלואים בה.' },
+      thinkerName: 'Socrates',
+      role:  { en: 'The Questioner', he: 'השואל' },
+      icon:  'icon-building',
+      // Standard thinker portrait (./images/socrates.webp) resolved
+      // via _thinkerImage(THINKER, state.subject) — same asset the
+      // real post-completion card reveal uses at showThinkerCardScreen.
+      thinkerId: 'socrates',
+      quote: { en: '"The unexamined life is not worth living."',
+               he: '"חיים שלא נבחנים אינם ראויים שיחיו אותם."' },
+      source: 'Socrates, Apology, 38a',
+      page1: { en: 'Athens, 399 BC. Socrates is on trial for corrupting the young. The jury offers him exile instead of death. He refuses.',
+               he: 'אתונה, 399 לפנה"ס. סוקרטס עומד למשפט. חבר המושבעים מציע לו גלות במקום מוות. הוא מסרב.' },
       page2Head: { en: 'What he meant', he: 'למה הוא התכוון' },
-      page2: { en: "The cave is the world of the senses. The shadows are the things we take for real. Leaving the cave, struggling toward the light, is philosophy. The first look at the sun is not joy; it is pain, blinding, and the pull is to return to the familiar dark.",
-               he: 'המערה היא עולם החושים. הצללים הם מה שאנחנו לוקחים כמציאות. היציאה מן המערה, המאבק לעבר האור, היא הפילוסופיה. המבט הראשון בשמש אינו שמחה, הוא כאב, הוא סנוור, והדחף הוא לחזור אל האפלה המוכרת.' },
-      // Page 2 punch — the Socrates connection. Lifted from the
-      // dialogue's own depth section (content/philosophy.js:192-193).
-      // Plato watched his teacher die for asking too many questions,
-      // then wrote a story about the one who escapes and comes back to
-      // free the others — and gets killed for it. Naming the
-      // connection explicitly is the beat that makes the allegory
-      // stop feeling abstract.
-      page2Punch: { en: "Plato wrote this after his teacher Socrates was put to death for asking too many questions. The one who returns to the cave to free the others is not thanked. He is killed.",
-                    he: 'אפלטון כתב את זה אחרי שסוקרטס, מורו, הוצא להורג על ששאל יותר מדי שאלות. מי שחוזר למערה כדי לשחרר את היתר לא זוכה להערכה. הורגים אותו.' },
-      scenario: { en: "The freed prisoner returns to the cave and tells the others: the shadows are lies. Outside there is a sun. There is a world.",
-                  he: 'האסיר המשוחרר חוזר למערה ואומר לשאר: הצללים הם שקר. בחוץ יש שמש. יש עולם.' },
-      question: { en: 'According to Plato, how do the prisoners react?',
-                  he: 'לפי אפלטון, איך מגיבים האסירים?' },
+      page2: { en: "Not that thinking makes life pleasant. What he meant is that a life you never question isn't really yours. You're living out answers someone else chose, without noticing.",
+               he: 'לא שחשיבה עושה את החיים נעימים. הכוונה היא שחיים שאתם לא בוחנים אינם באמת שלכם. אתם חיים תשובות שמישהו אחר בחר, בלי לשים לב.' },
+      // Punch line names the choice explicitly: sentenced to death,
+      // offered exile, refused. Both languages spell the whole story
+      // out so the compression stays legible.
+      page2Punch: { en: "The jury offered him exile instead of death. He refused, and drank the hemlock rather than accept a life he had not examined.",
+                    he: 'המושבעים הציעו לו גלות במקום מוות. הוא סירב, ושתה את הרעל, ולא הסכים לחיים שלא בחן.' },
+      scenario: { en: "Someone is told all their life that a safe job is what matters. They never ask why. They just take the predictable path, because everyone around them did.",
+                  he: 'מישהו שומע כל חייו שעבודה בטוחה זה מה שחשוב. הוא אף פעם לא שואל למה. הוא פשוט הולך בדרך הצפויה, כי כולם סביבו הלכו בה.' },
+      question: { en: 'According to Socrates, what kind of life is that?',
+                  he: 'לפי סוקרטס, אילו חיים אלה?' },
       options: [
-        { en: 'They believe him and follow him out',
-          he: 'הם מאמינים לו והולכים אחריו החוצה' },
-        { en: 'They ignore him and go on watching the shadows',
-          he: 'הם מתעלמים ממנו וממשיכים לצפות בצללים' },
-        { en: "His truth threatens their whole world, so they attack back",
-          he: 'האמת שלו מאיימת על כל עולמם, אז הם תוקפים בחזרה' },
+        { en: 'A rational, calculated life', he: 'חיים רציונליים ומחושבים' },
+        { en: 'A safe but limited life',      he: 'חיים בטוחים אבל מוגבלים' },
+        { en: 'The unexamined life',          he: 'חיים שלא נבחנו' },
       ],
       correctIndex: 2,
     },
