@@ -13774,13 +13774,15 @@ const _ONB_COPY = {
   solution: {
     head: {
       en: '<span class="onb-v2-em">Corpus</span> gives you the ideas you care about, in <span class="onb-v2-em">five minutes a day</span>',
-      he: '<span class="onb-v2-em">Corpus</span> נותן לך את הרעיונות שמעניינים אותך, <span class="onb-v2-em">בחמש דקות ביום</span>',
+      he: '<span class="onb-v2-em">Corpus</span> נותן לכם את הרעיונות שמעניינים אתכם, <span class="onb-v2-em">בחמש דקות ביום</span>',
     },
     cta: { en: 'Continue', he: 'המשך' },
   },
+  // Name renders on step 5 — before the gender screen at step 7 —
+  // so it always uses the plural form. No he_m / he_f siblings.
   name: {
-    head:        { en: 'What should we call you?', he: 'איך לקרוא לך?' },
-    placeholder: { en: 'Your name',                he: 'השם שלך' },
+    head:        { en: 'What should we call you?', he: 'איך לקרוא לכם?' },
+    placeholder: { en: 'Your name',                he: 'השם שלכם' },
     cta:         { en: 'Continue',                 he: 'המשך' },
   },
   // Step 6 (v11-new) — Gender. Priming-only: no downstream flow reads
@@ -13802,7 +13804,10 @@ const _ONB_COPY = {
     // Greeting sits above the head — first personal-address moment
     // after name capture. Interpolated in _onbV2PrepareAge.
     greeting:    { en: 'Nice to meet you, {name}.', he: 'נעים להכיר, {name}.' },
-    head:        { en: 'How old are you?',          he: 'בן כמה אתה?' },
+    head:        { en:   'How old are you?',
+                   he:   'בני כמה אתם?',
+                   he_m: 'בן כמה אתה?',
+                   he_f: 'בת כמה את?' },
     placeholder: { en: 'Age',                       he: 'גיל' },
     cta:         { en: 'Continue',                  he: 'המשך' },
   },
@@ -13829,15 +13834,23 @@ const _ONB_COPY = {
     head: { en: "It doesn't have to go that way.",
             he: 'זה לא חייב להיות ככה.' },
     sub:  { en: "You have five minutes. Let's build a plan.",
-            he: 'יש לכם חמש דקות. בואו נבנה תוכנית.' },
-    cta:  { en: "Let's build it", he: 'בואו נבנה' },
+            he:   'יש לכם חמש דקות. בואו נבנה תוכנית.',
+            he_m: 'יש לך חמש דקות. בוא נבנה תוכנית.',
+            he_f: 'יש לך חמש דקות. בואי נבנה תוכנית.' },
+    cta:  { en: "Let's build it",
+            he:   'בואו נבנה',
+            he_m: 'בוא נבנה',
+            he_f: 'בואי נבנה' },
   },
   subject: {
     // v11 — moves to Act 2 opener (step 11). Slight copy tweak to
     // mockup's phrasing; picker mechanics unchanged (setSubject applies
     // the theme immediately so every downstream Act 2 screen renders
     // in the picked subject's accent color).
-    head: { en: 'Where do you want to start?', he: 'איפה תרצו להתחיל?' },
+    head: { en:   'Where do you want to start?',
+            he:   'איפה תרצו להתחיל?',
+            he_m: 'איפה תרצה להתחיל?',
+            he_f: 'איפה תרצי להתחיל?' },
     cta:  { en: 'Continue',                    he: 'המשך' },
     // Subject names, taglines, and thinker bylines. Names + taglines
     // + bylines match the v1 cinematic subject-select (see
@@ -13865,9 +13878,13 @@ const _ONB_COPY = {
     // stays; _onbV2MselTap enforces single-select (stores a length-1
     // array) so the "one that matters most" framing is accurate to
     // the actual behavior.
-    head: { en: 'What do you want from Corpus?',
-            he: 'מה תרצו מ-Corpus?' },
-    hint: { en: 'The one that matters most.', he: 'מה שהכי חשוב לכם.' },
+    head: { en:   'What do you want from Corpus?',
+            he:   'מה תרצו מ-Corpus?',
+            he_m: 'מה תרצה מ-Corpus?',
+            he_f: 'מה תרצי מ-Corpus?' },
+    hint: { en:    'The one that matters most.',
+            he:    'מה שהכי חשוב לכם.',
+            he_sg: 'מה שהכי חשוב לך.' },
     cta:  { en: 'Continue',                   he: 'המשך' },
     // Options — stable ids for analytics; text is what the user sees;
     // support surfaces on the mirror card (step 16); tile is the very
@@ -13890,20 +13907,25 @@ const _ONB_COPY = {
       { id: 'hold-own',
         icon:    'icon-speech',
         text:    { en: 'Hold my own in a real conversation',       he: 'להחזיק שיחה אמיתית' },
-        support: { en: "You'll walk out of each lesson with one idea you can quote out loud.",
-                   he: 'מכל שיעור תצאו עם רעיון אחד שאפשר לצטט בשיחה.' },
+        support: { en:   "You'll walk out of each lesson with one idea you can quote out loud.",
+                   he:   'מכל שיעור תצאו עם רעיון אחד שאפשר לצטט בשיחה.',
+                   he_m: 'מכל שיעור תצא עם רעיון אחד שאפשר לצטט בשיחה.',
+                   he_f: 'מכל שיעור תצאי עם רעיון אחד שאפשר לצטט בשיחה.' },
         tile:    { en: 'Real talk', he: 'שיחה אמיתית' } },
       { id: 'read-thinkers',
         icon:    'icon-books',
         text:    { en: "Finally read the thinkers I've heard about", he: 'סוף סוף לקרוא את ההוגים' },
-        support: { en: "You'll meet the thinkers themselves, not just their summaries.",
-                   he: 'תפגשו את ההוגים עצמם, לא רק את התקצירים.' },
+        support: { en:   "You'll meet the thinkers themselves, not just their summaries.",
+                   he:   'תפגשו את ההוגים עצמם, לא רק את התקצירים.',
+                   he_m: 'תפגוש את ההוגים עצמם, לא רק את התקצירים.',
+                   he_f: 'תפגשי את ההוגים עצמם, לא רק את התקצירים.' },
         tile:    { en: 'The thinkers', he: 'ההוגים' } },
       { id: 'build-habit',
         icon:    'icon-streak',
         text:    { en: 'Build a habit that actually sticks',       he: 'לבנות הרגל שנשאר' },
-        support: { en: 'Short daily lessons and a streak do the sticking for you.',
-                   he: 'שיעורים קצרים יומיים ורצף עושים את העבודה בשבילכם.' },
+        support: { en:    'Short daily lessons and a streak do the sticking for you.',
+                   he:    'שיעורים קצרים יומיים ורצף עושים את העבודה בשבילכם.',
+                   he_sg: 'שיעורים קצרים יומיים ורצף עושים את העבודה בשבילך.' },
         tile:    { en: 'Habit', he: 'הרגל' } },
     ],
   },
@@ -13915,17 +13937,22 @@ const _ONB_COPY = {
     // references these ids by string constant, so rename is safe;
     // v4-persisted values on completed users are dead (they don't
     // re-see the mirror). Support lines updated to match new text.
-    head: { en: 'What would you like to be true of you?',
-            he: 'מה הייתם רוצים שיהיה נכון לגביכם?' },
-    hint: { en: 'The one that matters most.', he: 'מה שהכי חשוב לכם.' },
+    head: { en:    'What would you like to be true of you?',
+            he:    'מה הייתם רוצים שיהיה נכון לגביכם?',
+            he_sg: 'מה היית רוצה שיהיה נכון לגביך?' },
+    hint: { en:    'The one that matters most.',
+            he:    'מה שהכי חשוב לכם.',
+            he_sg: 'מה שהכי חשוב לך.' },
     cta:  { en: 'Continue',                   he: 'המשך' },
     options: [
       { id: 'own-ideas',
         icon:    'icon-bulb',
         text:    { en: 'That I have my own ideas',
                    he: 'שיש לי רעיונות משלי' },
-        support: { en: "You'll practice reasoning from ideas, not just recognizing them.",
-                   he: 'תתרגלו להסיק מרעיונות, לא רק לזהות אותם.' },
+        support: { en:   "You'll practice reasoning from ideas, not just recognizing them.",
+                   he:   'תתרגלו להסיק מרעיונות, לא רק לזהות אותם.',
+                   he_m: 'תתרגל להסיק מרעיונות, לא רק לזהות אותם.',
+                   he_f: 'תתרגלי להסיק מרעיונות, לא רק לזהות אותם.' },
         tile:    { en: 'Own ideas', he: 'משלי' } },
       { id: 'explain-clearly',
         icon:    'icon-figure',
@@ -13938,15 +13965,19 @@ const _ONB_COPY = {
         icon:    'icon-compass',
         text:    { en: 'That I know where I stand',
                    he: 'שאני יודע איפה אני עומד' },
-        support: { en: "You'll see where the ideas you hold came from, and where you land on them.",
-                   he: 'תראו מאיפה הגיעו הרעיונות שאתם מחזיקים בהם, ואיפה אתם עומדים.' },
+        support: { en:   "You'll see where the ideas you hold came from, and where you land on them.",
+                   he:   'תראו מאיפה הגיעו הרעיונות שאתם מחזיקים בהם, ואיפה אתם עומדים.',
+                   he_m: 'תראה מאיפה הגיעו הרעיונות שאתה מחזיק בהם, ואיפה אתה עומד.',
+                   he_f: 'תראי מאיפה הגיעו הרעיונות שאת מחזיקה בהם, ואיפה את עומדת.' },
         tile:    { en: 'Where I stand', he: 'איפה אני עומד' } },
       { id: 'well-read',
         icon:    'icon-openbook',
         text:    { en: "That I'm well read",
                    he: 'שאני בקיא' },
-        support: { en: "You'll meet the writers themselves, not just names people drop.",
-                   he: 'תפגשו את ההוגים עצמם, לא רק שמות שאנשים זורקים.' },
+        support: { en:   "You'll meet the writers themselves, not just names people drop.",
+                   he:   'תפגשו את ההוגים עצמם, לא רק שמות שאנשים זורקים.',
+                   he_m: 'תפגוש את ההוגים עצמם, לא רק שמות שאנשים זורקים.',
+                   he_f: 'תפגשי את ההוגים עצמם, לא רק שמות שאנשים זורקים.' },
         tile:    { en: 'Well read', he: 'בקיאות' } },
       { id: 'understand-world',
         icon:    'icon-globe',
@@ -13963,7 +13994,9 @@ const _ONB_COPY = {
     // 'few-week' / 'finish' / 'longest-streak' are referenced by
     // _onbV2PrepareGoal (index.html:14411) to map to a dailyGoal
     // default when Act 4 lands the goal screen — do NOT rename.
-    head: { en: "What's your goal with Corpus?", he: 'מה המטרה שלכם ב-Corpus?' },
+    head: { en:    "What's your goal with Corpus?",
+            he:    'מה המטרה שלכם ב-Corpus?',
+            he_sg: 'מה המטרה שלך ב-Corpus?' },
     cta:  { en: 'Continue',                       he: 'המשך' },
     // Single choice. The picked id also drives state.dailyGoalHistory
     // (see _onbV2CtaQ3). Each option's support line surfaces on the
@@ -13984,8 +14017,9 @@ const _ONB_COPY = {
       { id: 'finish',
         icon:    'icon-building',
         text:    { en: 'Finish a whole subject',        he: 'לסיים תחום שלם' },
-        support: { en: 'Your path is planned to complete your subject end to end.',
-                   he: 'המסלול שלך מתוכנן לסיים את התחום מקצה לקצה.' },
+        support: { en:    'Your path is planned to complete your subject end to end.',
+                   he:    'המסלול שלכם מתוכנן לסיים את התחום מקצה לקצה.',
+                   he_sg: 'המסלול שלך מתוכנן לסיים את התחום מקצה לקצה.' },
         tile:    { en: 'Complete subject', he: 'לסיים תחום' } },
       { id: 'longest-streak',
         icon:    'icon-streak',
@@ -14002,8 +14036,10 @@ const _ONB_COPY = {
     // asked for. Note: mockup's visual is a big-number + progress bar
     // rather than a slider — that's a follow-up visual polish; the
     // slider still captures the readingFreq value cleanly.
-    head: { en: "Honestly, how often do you read something worth your time?",
-            he: 'בכנות, כמה פעמים אתם קוראים משהו ששווה את הזמן?' },
+    head: { en:   "Honestly, how often do you read something worth your time?",
+            he:   'בכנות, כמה פעמים אתם קוראים משהו ששווה את הזמן?',
+            he_m: 'בכנות, כמה פעמים אתה קורא משהו ששווה את הזמן?',
+            he_f: 'בכנות, כמה פעמים את קוראת משהו ששווה את הזמן?' },
     cta:  { en: 'Continue', he: 'המשך' },
     // Discrete 5-point Likert (0..4). Endpoints rendered as scale
     // labels under the track; the value display above shows the
@@ -14220,7 +14256,10 @@ const _ONB_COPY = {
     // one-line reassurance below the cards. Each user pick becomes a
     // card with the option text + a per-option "here's what Corpus
     // does about it" support line (unchanged mechanism).
-    head: { en: 'So this is you',                         he: 'אז זה אתם' },
+    head: { en:   'So this is you',
+            he:   'אז זה אתם',
+            he_m: 'אז זה אתה',
+            he_f: 'אז זה את' },
     sub:  { en: "Five minutes is all it takes. We'll do the rest.",
             he: 'חמש דקות זה כל מה שצריך. את השאר נעשה אנחנו.' },
     cta:  { en: 'Continue', he: 'המשך' },
@@ -14498,12 +14537,39 @@ const _ONB_COPY = {
   },
 };
 
+// Hebrew gender-agreed variant picker for _ONB_COPY entries.
+//
+// Copy entries default to `{ en, he }` — plural (or the only form
+// that exists). When a string has different masc-sg and fem-sg
+// forms, add `he_m` + `he_f`. When masc-sg and fem-sg are visually
+// identical (unvocalised Hebrew renders לך / שלך / אותך the same
+// for both), collapse to a single `he_sg` sibling so a future edit
+// can't drift the two apart. Callers never touch these fields
+// directly — go through _hePick so the picker's fallback logic
+// stays in one place.
+//
+// Gender is captured on step 7 and stored at state.onbAnswers.gender
+// as 'man' | 'woman' | 'other' | 'prefer_not_to_say'. Strings that
+// render BEFORE step 7 (welcome, problem, solution, signup, name)
+// pass an unset gender and always fall through to `he` (plural).
+// Strings that render at step 7 or later respect the picked gender:
+// 'man' → he_m (or he_sg), 'woman' → he_f (or he_sg), other/skip →
+// he (plural). Every path terminates in `he` so no entry is
+// missing a fallback.
+function _hePick(entry) {
+  if (!entry) return '';
+  const gender = (typeof state !== 'undefined' && state.onbAnswers) ? state.onbAnswers.gender : null;
+  if (gender === 'man')   return entry.he_m || entry.he_sg || entry.he || '';
+  if (gender === 'woman') return entry.he_f || entry.he_sg || entry.he || '';
+  return entry.he || '';
+}
+
 function _onbApplyLang(lang) {
   const isEn = lang === 'en';
   const setText = (id, group, key) => {
     const el = document.getElementById(id);
     if (el && _ONB_COPY[group] && _ONB_COPY[group][key]) {
-      el.textContent = isEn ? _ONB_COPY[group][key].en : _ONB_COPY[group][key].he;
+      el.textContent = isEn ? _ONB_COPY[group][key].en : _hePick(_ONB_COPY[group][key]);
     }
   };
   // All three heads carry a <span class="onb-v2-em"> for the accent
@@ -14512,7 +14578,7 @@ function _onbApplyLang(lang) {
   const setHTML = (id, group, key) => {
     const el = document.getElementById(id);
     if (el && _ONB_COPY[group] && _ONB_COPY[group][key]) {
-      el.innerHTML = isEn ? _ONB_COPY[group][key].en : _ONB_COPY[group][key].he;
+      el.innerHTML = isEn ? _ONB_COPY[group][key].en : _hePick(_ONB_COPY[group][key]);
     }
   };
   // Welcome renders as a wordmark: small "Welcome to" line + big
@@ -15535,7 +15601,7 @@ function _onbV2PrepareSubject() {
 // composing innerHTML around a user-visible option string. Direction
 // falls out of flex-row via <html dir> — no per-icon RTL handling.
 function _onbV2CardHTML(opt, isEn) {
-  const label = String(isEn ? opt.text.en : opt.text.he);
+  const label = String(isEn ? opt.text.en : _hePick(opt.text));
   const safe  = label.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   return '<span class="onb-v2-card-icon" aria-hidden="true">' +
            '<svg viewBox="0 0 64 64"><use href="#' + opt.icon + '"/></svg>' +
@@ -15654,7 +15720,7 @@ function _onbV2PrepareMirror() {
     // Title: smaller icon variant + text. Uses innerHTML because a
     // <use href> can't be created from a textContent path; option
     // labels are static config, no injection risk.
-    const label = String(isEn ? opt.text.en : opt.text.he);
+    const label = String(isEn ? opt.text.en : _hePick(opt.text));
     const safe  = label.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const title = document.createElement('div');
     title.className = 'onb-v2-mirror-card-title';
@@ -15664,7 +15730,7 @@ function _onbV2PrepareMirror() {
                       '<span class="onb-v2-mirror-label">' + safe + '</span>';
     const support = document.createElement('div');
     support.className = 'onb-v2-mirror-card-support';
-    support.textContent = isEn ? opt.support.en : opt.support.he;
+    support.textContent = isEn ? opt.support.en : _hePick(opt.support);
     card.appendChild(title);
     card.appendChild(support);
     list.appendChild(card);
