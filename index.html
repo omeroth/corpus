@@ -6715,135 +6715,89 @@
     margin-top: 12px;
   }
 
-  /* Trial intro (step 34) — three-item benefit list. Icon-left rows
-     on surface tiles, matching the visual weight of the mirror cards
-     but simpler (no dedicated title/support split — one line per
-     benefit). Gated by TRIAL_ENABLED at the flow level; CSS ships
-     unconditionally so a locale flip that lands the user here after
-     the flag is enabled renders cleanly. */
-  .onb-screen.onb-v2 .onb-v2-trial-benefits {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 16px;
-  }
-  .onb-screen.onb-v2 .onb-v2-trial-benefit {
-    background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: 14px;
-    padding: 12px 14px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    text-align: start;
-  }
-  .onb-screen.onb-v2 .onb-v2-trial-benefit-icon {
-    width: 28px;
-    height: 28px;
-    flex-shrink: 0;
-    color: var(--accent);
-    margin-top: 2px;
-  }
-  .onb-screen.onb-v2 .onb-v2-trial-benefit-icon svg {
-    width: 100%;
-    height: 100%;
-  }
-  .onb-screen.onb-v2 .onb-v2-trial-benefit-text {
-    font-family: 'Nunito', 'Assistant', sans-serif;
-    font-size: calc(15px * var(--text-scale));
-    font-weight: 600;
-    line-height: 1.4;
-    color: var(--ink);
-  }
-
-  /* Reminder promise (step 35) — 82px amber bell hero above the head
-     and sub. Bell is deliberately amber, not accent, so it reads as
-     the app's "streak / alert" family rather than the paid-block
-     accent — matching the mockup and the tone of the promise itself
-     (a reminder, not another CTA). */
-  .onb-screen.onb-v2 .onb-v2-reminder-hero {
+  /* Notification screen (step 31, Headway pattern) — 82px amber
+     bell hero, then head + sub, then a single toggle row with the
+     label on the start side and the switch on the end side, then
+     Continue below. Bell is amber (not accent) because it reads as
+     the app's "streak / alert" family. The whole layout is
+     interior-only; safe-area padding lives on the base .onb-screen. */
+  .onb-screen.onb-v2 .onb-v2-notif-hero {
     width: 82px;
     height: 82px;
     margin: 0 auto 16px;
     color: var(--amber);
   }
-  .onb-screen.onb-v2 .onb-v2-reminder-hero svg {
+  .onb-screen.onb-v2 .onb-v2-notif-hero svg {
     width: 100%;
     height: 100%;
   }
-
-  /* Paywall trial-mode extras (step 36 with TRIAL_ENABLED on).
-     Timeline + no-payment pill live inside #onb-v2-paywall only —
-     the modal paywall doesn't own the DOM. Selectors are #-scoped
-     so the modal paywall doesn't accidentally inherit these rules
-     if the class names ever spread there. */
-  #onb-v2-paywall .paywall-timeline {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin: 4px 0 8px;
-    padding-inline-start: 6px;
-    border-inline-start: 2px solid var(--border);
-  }
-  #onb-v2-paywall .paywall-timeline-step {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    position: relative;
-  }
-  #onb-v2-paywall .paywall-timeline-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 999px;
-    background: var(--accent);
-    flex-shrink: 0;
-    margin-top: 4px;
-    margin-inline-start: -13px;
-    border: 2px solid var(--surface);
-  }
-  #onb-v2-paywall .paywall-timeline-dot.hollow {
-    background: var(--surface);
-    border: 2px solid var(--accent);
-  }
-  #onb-v2-paywall .paywall-timeline-body {
-    font-family: 'Nunito', 'Assistant', sans-serif;
-    font-size: calc(14px * var(--text-scale));
-    line-height: 1.4;
-    color: var(--text);
-    text-align: start;
-  }
-  #onb-v2-paywall .paywall-timeline-title {
-    display: block;
-    font-weight: 900;
-    color: var(--ink);
-    margin-bottom: 2px;
-  }
-
-  /* No-payment-due pill (trial mode). Green outline strip with a
-     checkmark, colours from the app-wide success token so it reads
-     as reassurance ("nothing charged now") rather than an accent-
-     coloured CTA. Hidden inline when the flag is off. */
-  #onb-v2-paywall .paywall-no-payment-due {
+  /* Toggle row — full-width, label on the start side, switch on the
+     end side. The <label> element wraps everything so tapping the
+     text also toggles the checkbox. Uses inline-flex + logical
+     properties so it flips cleanly under RTL. */
+  .onb-screen.onb-v2 .onb-v2-toggle-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: rgba(34, 197, 94, 0.10);
-    border: 2px solid rgba(34, 197, 94, 0.30);
-    border-radius: 12px;
-    padding: 8px 12px;
-    margin: 6px 0 8px;
+    justify-content: space-between;
+    gap: 14px;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin: 22px 0 0;
+    cursor: pointer;
+    user-select: none;
   }
-  #onb-v2-paywall .paywall-no-payment-due svg {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-  }
-  #onb-v2-paywall .paywall-no-payment-label {
+  .onb-screen.onb-v2 .onb-v2-toggle-label {
     font-family: 'Nunito', 'Assistant', sans-serif;
-    font-size: calc(13px * var(--text-scale));
-    font-weight: 900;
-    color: var(--auth-success);
+    font-weight: 700;
+    font-size: calc(15px * var(--text-scale));
+    color: var(--ink);
+    line-height: 1.2;
+    flex: 1;
+    text-align: start;
+  }
+  /* Hide the native checkbox but keep it focusable. */
+  .onb-screen.onb-v2 .onb-v2-toggle-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+  /* The visual track + thumb. Track background flips accent when
+     the checkbox is on; thumb slides via translateX. Under RTL the
+     thumb translates in the opposite direction so "on" always sits
+     on the end side. */
+  .onb-screen.onb-v2 .onb-v2-toggle-track {
+    display: inline-block;
+    position: relative;
+    width: 46px;
+    height: 26px;
+    border-radius: 999px;
+    background: var(--border-deep);
+    flex-shrink: 0;
+    transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .onb-screen.onb-v2 .onb-v2-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    inset-inline-start: 2px;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--surface);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .onb-screen.onb-v2 .onb-v2-toggle-input:checked ~ .onb-v2-toggle-track {
+    background: var(--accent);
+  }
+  html[dir="ltr"] .onb-screen.onb-v2 .onb-v2-toggle-input:checked ~ .onb-v2-toggle-track .onb-v2-toggle-thumb {
+    transform: translateX(20px);
+  }
+  html[dir="rtl"] .onb-screen.onb-v2 .onb-v2-toggle-input:checked ~ .onb-v2-toggle-track .onb-v2-toggle-thumb {
+    transform: translateX(-20px);
   }
 
   /* Reviews (step 33) — social-proof cards, three vertically stacked.
@@ -6918,10 +6872,28 @@
     transition: opacity 0.3s ease;
   }
 
-  /* First-card reveal (step 22) — 3D-styled collectible card preview.
-     Not the same as the app's real thinker card (which uses portraits
-     + flip animation); this is a lightweight preview to sell the
-     "you'll collect these" beat. */
+  /* First-card reveal (step 22) — first-edition-styled collectible
+     card preview. Not the same as the app's real thinker card
+     (which uses portraits + HTML name/era overlay); this is an
+     illustrated frame with everything — name, role, book stack,
+     quote scroll, fact strip — baked into the source image. Reads
+     as an authentic first-edition artifact rather than a UI card.
+     Baked banner is Latin on both language sides by design (see
+     _onbV2PrepareFirstCard's alt-text comment); the .onb-v2-first-
+     card-role line rendered underneath localizes for HE.
+
+     Reveal choreography (fires when .is-revealed lands via
+     _onbV2PrepareFirstCard on a double-rAF):
+       - Card pops in with p3-pop (0.9s spring), then idles with a
+         gentle p3-float bob.
+       - Accent-coloured ring flourish (fp-ring) sweeps out from the
+         card once, timed to coincide with the pop's overshoot.
+       - Eyebrow ("A first from your collection") delay-fades in
+         AFTER the card lands via fp-eyebrow-in, so the sequence
+         reads: card lands → text confirms what happened.
+     Reuses the same p3-pop/p3-float/p3-rise keyframes as the
+     bonus-unlock chest reveal so the celebration reads as the same
+     visual family. */
   .onb-screen.onb-v2 .onb-v2-first-card-eyebrow {
     font-family: 'Nunito', 'Assistant', sans-serif;
     font-weight: 900;
@@ -6931,39 +6903,60 @@
     color: var(--accent);
     margin: 0 0 12px;
     text-align: center;
+    opacity: 0;
+  }
+  .onb-screen.onb-v2 .is-revealed .onb-v2-first-card-eyebrow,
+  .onb-screen.onb-v2 .onb-v2-first-card-eyebrow.is-revealed {
+    animation: p3-rise 0.5s ease-out 0.75s both;
   }
   .onb-screen.onb-v2 .onb-v2-first-card-3d {
-    width: 140px;
-    margin: 0 auto 18px;
-    aspect-ratio: 67 / 120;
+    width: 200px;
+    margin: 0 auto 12px;
+    aspect-ratio: 9 / 16;
     border-radius: 14px;
-    background: linear-gradient(160deg, var(--surface), var(--surface-2));
-    border: 3px solid var(--accent);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+    overflow: visible;               /* let the ring flourish escape the frame */
     box-shadow: 0 12px 28px var(--accent-glow);
+    position: relative;
+    opacity: 0;
   }
-  .onb-screen.onb-v2 .onb-v2-first-card-icon svg {
-    width: 44px;
-    height: 44px;
-    color: var(--accent);
+  .onb-screen.onb-v2 .onb-v2-first-card-3d.is-revealed {
+    animation: p3-pop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 0s both,
+               p3-float 3s ease-in-out 1.05s infinite;
   }
-  .onb-screen.onb-v2 .onb-v2-first-card-name {
-    font-family: 'Nunito', 'Assistant', sans-serif;
-    font-weight: 900;
-    font-size: calc(13px * var(--text-scale));
-    color: var(--ink);
-    line-height: 1.1;
+  /* Ring flourish — a pseudo-element that scales out from the card's
+     centre once, opacity fading to 0. Sized to overlap the frame by
+     a small amount so the ring reads as emanating from the card. */
+  .onb-screen.onb-v2 .onb-v2-first-card-3d::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 18px;
+    border: 3px solid var(--accent);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .onb-screen.onb-v2 .onb-v2-first-card-3d.is-revealed::after {
+    animation: fp-ring 0.7s ease-out 0.55s both;
+  }
+  @keyframes fp-ring {
+    0%   { transform: scale(0.7); opacity: 0.9; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
+  .onb-screen.onb-v2 .onb-v2-first-card-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 14px;             /* preserve corner curve now that parent is overflow:visible */
+    object-fit: cover;
   }
   .onb-screen.onb-v2 .onb-v2-first-card-role {
     font-family: 'Nunito', 'Assistant', sans-serif;
     font-weight: 700;
-    font-size: calc(10.5px * var(--text-scale));
+    font-size: calc(13px * var(--text-scale));
     color: var(--text-2);
-    line-height: 1.1;
+    line-height: 1.2;
+    text-align: center;
+    margin: 0 0 18px;
   }
 
   /* Streak big number (step 23) — v11 adds a big "1" between the
@@ -11295,30 +11288,6 @@ const RC_ANDROID_API_KEY = '';
 // supabase/migrations/20260901170000_grandfathering.sql).
 const PAYWALL_ENABLED = true;
 
-// Trial gate. False in this build because the Introductory Offers
-// section is missing from App Store Connect — an Apple support case
-// is open, but it could take days. When it flips true:
-//
-//   - Steps 34 (trial intro) and 35 (reminder promise) enter the
-//     Act 5 flow. With the flag off, step 33 (reviews) skips both
-//     and advances straight to step 36 (paywall).
-//   - The paywall shows the trial framing from the mockup:
-//     "Start your free days" head, a Today / Day 2 / Day 3 timeline,
-//     a "No payment due now" reassurance pill, "Start my free trial"
-//     CTA, and the "Free for 3 days, then …" legal fine print. With
-//     the flag off, the paywall shows the plain "Ready to go deeper?"
-//     framing, no timeline, no pill, "Subscribe" CTA, and the
-//     standard auto-renew legal — no trial language, no "3 days free"
-//     card footers, no "$0.00" button anywhere.
-//   - is_trial + trial_enabled analytics props follow the flag.
-//
-// The flow is fully testable in the flag-off state and enabling the
-// trial later is one line — flipping this to true reveals the two
-// gated screens and the paywall's trial framing without any further
-// changes. Previously called PAYWALL_TRIAL_ENABLED; renamed here
-// because the gate now controls more than the paywall itself.
-const TRIAL_ENABLED = true;
-
 // Legal links required by Apple + Google in every paywall. Terms is
 // currently 404 — MUST be published at this URL before App Store
 // review or the paywall gets rejected.
@@ -12440,7 +12409,6 @@ function showPaywall(opts) {
       subject: opts.subject || state.subject || null,
       week_id: typeof opts.weekId !== 'undefined' ? opts.weekId : null,
       day_id:  typeof opts.dayId  !== 'undefined' ? opts.dayId  : null,
-      trial_enabled: TRIAL_ENABLED,
     });
   } catch(e) {}
 }
@@ -12511,57 +12479,7 @@ function _renderPaywall() {
     ctx.sub || (isEn ? 'Every chapter, every subject, every bonus dialogue.'
                      : 'כל פרק, בכל תחום, כולל דיאלוגי הבונוס.');
 
-  // Trial-mode extras. Only present on the onboarding paywall DOM
-  // (#onb-v2-paywall); the modal paywall lives without them, so the
-  // querySelectors return null and every branch below is a defensive
-  // no-op. Timeline + no-payment pill are hidden inline when
-  // TRIAL_ENABLED is false so the plain paywall shows no trial UI at
-  // all — the load-bearing point of the flag. Populated from the
-  // paywallTrial copy block so a locale flip re-renders correctly.
-  const trialOn = TRIAL_ENABLED && _paywallMode === 'onboarding';
-  const timelineEl = q('.paywall-timeline');
-  if (timelineEl) {
-    timelineEl.style.display = trialOn ? '' : 'none';
-    if (trialOn) {
-      const tp = _ONB_COPY.paywallTrial;
-      const steps = (tp && tp.timeline) || [];
-      timelineEl.innerHTML = '';
-      steps.forEach((step) => {
-        const row = document.createElement('div');
-        row.className = 'paywall-timeline-step';
-        const dot = document.createElement('span');
-        dot.className = 'paywall-timeline-dot' + (step.hollow ? ' hollow' : '');
-        dot.setAttribute('aria-hidden', 'true');
-        const body = document.createElement('div');
-        body.className = 'paywall-timeline-body';
-        const title = document.createElement('b');
-        title.className = 'paywall-timeline-title';
-        title.textContent = isEn ? step.title.en : step.title.he;
-        const text = document.createTextNode(isEn ? step.text.en : step.text.he);
-        body.appendChild(title);
-        body.appendChild(text);
-        row.appendChild(dot);
-        row.appendChild(body);
-        timelineEl.appendChild(row);
-      });
-    }
-  }
-  const noPayEl = q('.paywall-no-payment-due');
-  if (noPayEl) {
-    noPayEl.style.display = trialOn ? '' : 'none';
-    if (trialOn) {
-      const label = noPayEl.querySelector('.paywall-no-payment-label');
-      if (label) {
-        const tp = _ONB_COPY.paywallTrial;
-        label.textContent = isEn ? tp.noPaymentDue.en : tp.noPaymentDue.he;
-      }
-    }
-  }
-
-  // Monthly card. Per-card trial footer ("7 days free") is trial-off
-  // only when the flag is off (empty string + display:none). Under
-  // trial-mode the timeline above already tells the story, so we
-  // keep the card footers empty too — no visual duplication.
+  // Monthly card.
   q('.paywall-monthly-title').textContent = isEn ? 'Monthly' : 'חודשי';
   q('.paywall-monthly-price').textContent = p.monthly.priceString;
   q('.paywall-monthly-period').textContent = p.monthly.periodLabel;
@@ -12638,12 +12556,7 @@ function _renderPaywall() {
   // button; the tap-time handler in startPurchase surfaces a clear
   // toast if no real RC package is available yet.
   const cta = q('.paywall-cta');
-  if (trialOn) {
-    const tp = _ONB_COPY.paywallTrial;
-    cta.textContent = isEn ? tp.cta.en : tp.cta.he;
-  } else {
-    cta.textContent = isEn ? 'Subscribe' : 'הרשמה';
-  }
+  cta.textContent = isEn ? 'Subscribe' : 'הרשמה';
   cta.disabled = _paywallPurchasing;
 
   // Restore link
@@ -12652,11 +12565,7 @@ function _renderPaywall() {
   // Legal fine print. Dynamic price + period reflect the selected package.
   const sel = _paywallSelectedPkg === 'monthly' ? p.monthly : p.yearly;
   const legalEl = q('.paywall-legal');
-  if (trialOn) {
-    const tp = _ONB_COPY.paywallTrial;
-    const tmpl = isEn ? tp.legal.en : tp.legal.he;
-    legalEl.textContent = tmpl.replace('{price}', sel.priceString).replace('{period}', sel.periodLabel);
-  } else if (isEn) {
+  if (isEn) {
     legalEl.textContent = 'Auto-renews for ' + sel.priceString + ' ' + sel.periodLabel + ' until canceled. Cancel anytime in App Store settings.';
   } else {
     legalEl.textContent = 'מתחדש אוטומטית ב-' + sel.priceString + ' ' + sel.periodLabel + ' עד ביטול. אפשר לבטל בכל עת בהגדרות ה-App Store.';
@@ -12852,7 +12761,6 @@ async function startPurchase() {
       saveStateLocal();
       try { posthog.capture('paywall_purchase_succeeded', {
         package_id: sel.pkg.identifier,
-        is_trial: TRIAL_ENABLED,
       }); } catch(e) {}
       // Meta App Events: fb_mobile_subscribe with the purchase value so
       // SKAdNetwork attribution can credit the campaign that drove the
@@ -13823,14 +13731,16 @@ const _ONB_STEP_TO_ID = {
   // no-ops — making the tap look broken three screens before the
   // paywall. Keeping the two beats separate avoids that.
   33: 'onb-v2-reviews',
-  // Trial-gated screens 34 and 35. When TRIAL_ENABLED is false, step
-  // 33 routes directly to 36 and neither DOM is reached (partial-
-  // ladder mitigation catches any stray navigation). When the flag
-  // flips true, these enter the flow as trial intro → reminder
-  // promise → trial paywall. See the TRIAL_ENABLED comment for the
-  // full gate contract.
-  34: 'onb-v2-trial',
-  35: 'onb-v2-reminder-promise',
+  // Steps 34 and 35 are null slots: reviews advances directly to
+  // step 36 (paywall). The earlier flow gated a trial-intro screen
+  // at 34 and a reminder-promise screen at 35 behind TRIAL_ENABLED,
+  // but that whole subset was dropped on 2026-09-16 — Apple's
+  // Introductory Offers section is missing from the account, and
+  // shipping steps that promise a trial the paywall doesn't deliver
+  // is worse than not offering one. The paywall at 36 is the plain
+  // "Ready to go deeper?" subscription paywall, no trial framing.
+  34: null,
+  35: null,
   36: 'onb-v2-paywall',
 };
 
@@ -14106,19 +14016,22 @@ const _ONB_COPY = {
       { en: 'Every day',  he: 'כל יום' },       // 4
     ],
   },
-  // Step 16 — notification pre-prompt. Custom in-app screen shown
-  // BEFORE the paywall (flow v4). Primary CTA triggers the native OS
-  // permission dialog; secondary CTA sets prePromptDeferred so the OS
-  // ask remains unspent for a later re-attempt (Profile toggle).
+  // Step 31 — notification pre-prompt (Headway pattern). Amber bell
+  // hero + head + sub + single labelled toggle switched on by
+  // default + Continue. Tapping Continue with the toggle ON fires
+  // the native OS permission dialog; with it OFF, skips the OS ask
+  // and sets prePromptDeferred so a later finishDay safety net
+  // (maybeRequestReminderPermission) doesn't surprise-prompt the
+  // "no thanks"-er. One toggle only — we send one kind of reminder.
   // Copy deliberately omits the fire time — the time picker lives on
   // the Profile toggle; keeping the ask abstract avoids implying a
   // commitment the user can't easily change here.
   notifications: {
-    head: { en: 'Stay on track',       he: 'שלא תשכחו' },
-    sub:  { en: 'A daily reminder is what turns a plan into a habit.',
-            he: 'תזכורת יומית היא מה שהופכת תוכנית להרגל.' },
-    cta:  { en: 'Turn on reminders',   he: 'הפעילו תזכורות' },
-    skip: { en: 'Not now',             he: 'לא עכשיו' },
+    head:        { en: 'Stay on track',        he: 'שלא תשכחו' },
+    sub:         { en: 'A daily reminder is what turns a plan into a habit.',
+                   he: 'תזכורת יומית היא מה שהופכת תוכנית להרגל.' },
+    toggleLabel: { en: 'Daily reminder',        he: 'תזכורת יומית' },
+    cta:         { en: 'Continue',              he: 'המשך' },
   },
 
   // Step 17 (v11) — How it works. Three-step timeline explaining
@@ -14176,6 +14089,7 @@ const _ONB_COPY = {
       thinkerName: 'Socrates',
       role:  { en: 'The Questioner', he: 'השואל' },
       icon:  'icon-building',
+      firstEditionImage: 'first-edition-socrates',
       quote: { en: '"The unexamined life is not worth living."',
                he: '"חיים שלא נבחנים אינם ראויים שיחיו אותם."' },
       source: 'Socrates, Apology, 38a',
@@ -14205,6 +14119,7 @@ const _ONB_COPY = {
       thinkerName: 'Adam Smith',
       role:  { en: 'The Observer', he: 'המתבונן' },
       icon:  'icon-globe',
+      firstEditionImage: 'first-edition-smith',
       quote: { en: '"It is not from the benevolence of the butcher, the brewer, or the baker that we expect our dinner, but from their regard to their own interest."',
                he: '"לא מרוב טוב לבו של הקצב, של מבשל השיכר או של האופה אנחנו מצפים לארוחת הערב שלנו, אלא מתוך התחשבותם באינטרס שלהם."' },
       source: 'Adam Smith, The Wealth of Nations, I.2',
@@ -14250,6 +14165,7 @@ const _ONB_COPY = {
       thinkerName: 'Freud',
       role:  { en: 'The Excavator', he: 'החוקר' },
       icon:  'icon-brain',
+      firstEditionImage: 'first-edition-freud',
       quote: { en: '"These two discoveries amount to a single statement: that the ego is not master in its own house."',
                he: '"שתי התגליות האלה מסתכמות באמירה אחת: האני אינו אדון בביתו שלו."' },
       source: 'Freud, A Difficulty in the Path of Psycho-Analysis, 1917',
@@ -14409,8 +14325,8 @@ const _ONB_COPY = {
   // ║ someone has to have answered question 1 or 2 first.           ║
   // ╚═══════════════════════════════════════════════════════════════╝
   reviews: {
-    head: { en: 'What readers say',  he: 'מה קוראים אומרים' },
-    cta:  { en: 'Continue',          he: 'המשך' },
+    head: { en: 'What users say',  he: 'מה משתמשים אומרים' },
+    cta:  { en: 'Continue',        he: 'המשך' },
     items: [
       // TODO(honesty): replace he: with reviewer's Hebrew original OR
       // a translation they've approved. Until then, en: mirrored below.
@@ -14419,8 +14335,12 @@ const _ONB_COPY = {
         name:  { en: 'Yoni',  he: 'Yoni' } },
       // TODO(honesty): replace he: with reviewer's Hebrew original OR
       // a translation they've approved. Until then, en: mirrored below.
-      { quote: { en: "A lovely way to show people who don't think philosophy is for them that it clearly is.",
-                 he: "A lovely way to show people who don't think philosophy is for them that it clearly is." },
+      // Noga's quote uses the full two-sentence version from
+      // get.corpusapp.io — the earlier one-sentence variant dropped
+      // the "grounds them in everyday life" framing that anchors the
+      // "for them that it clearly is" payoff.
+      { quote: { en: 'It takes complex ideas and grounds them in everyday life. A lovely way to show people who don\'t think philosophy is for them that it clearly is.',
+                 he: 'It takes complex ideas and grounds them in everyday life. A lovely way to show people who don\'t think philosophy is for them that it clearly is.' },
         name:  { en: 'Noga',  he: 'Noga' } },
       // TODO(honesty): replace he: with reviewer's Hebrew original OR
       // a translation they've approved. Until then, en: mirrored below.
@@ -14428,76 +14348,6 @@ const _ONB_COPY = {
                  he: 'What a joy to learn heavy subjects in a way this light and fun.' },
         name:  { en: 'Ido',   he: 'Ido' } },
     ],
-  },
-
-  // Step 34 (v11) — Trial intro. Warmer framing than a legal-style
-  // trial disclosure — an invitation. The list names only what
-  // payment actually unlocks: cards are earned by reading and streak
-  // repair is already free, so neither belongs here. Gated by
-  // TRIAL_ENABLED; when the flag is off, step 33 skips straight to
-  // the paywall and this copy block goes unread.
-  trial: {
-    head: { en: 'Open everything, free for three days',
-            he: 'פתחו הכל, שלושה ימים בחינם' },
-    cta:  { en: 'Try it for $0.00', he: 'נסו ב-$0.00' },
-    items: [
-      { icon: 'icon-books',
-        text: { en: 'Every chapter in every subject — philosophy, psychology, economics',
-                he: 'כל פרק בכל תחום — פילוסופיה, פסיכולוגיה וכלכלה' } },
-      { icon: 'icon-openbook',
-        text: { en: 'Bonus chapters that turn the ideas into something you can use',
-                he: 'פרקי בונוס שהופכים את הרעיונות למשהו שאפשר להשתמש בו' } },
-      { icon: 'icon-figure',
-        text: { en: 'Every thinker, there to collect',
-                he: 'כל ההוגים, פתוחים לאיסוף' } },
-    ],
-  },
-
-  // Step 35 (v11) — Reminder promise. The single screen that turns a
-  // trial from a trap into an offer — everyone who has ever forgotten
-  // to cancel something is watching for this beat. Amber bell hero;
-  // no owl. Trial-gated (TRIAL_ENABLED); skipped alongside step 34
-  // when the flag is off.
-  reminderPromise: {
-    head: { en: "We'll remind you a day before it ends",
-            he: 'נזכיר לכם יום לפני שזה נגמר' },
-    sub:  { en: "No surprise charge. You'll know before anything happens.",
-            he: 'בלי חיוב מפתיע. תדעו לפני שקורה משהו.' },
-    cta:  { en: 'Continue for free', he: 'המשיכו בחינם' },
-  },
-
-  // Step 36 (v11) — Paywall trial-mode copy. Read by _renderPaywall
-  // when TRIAL_ENABLED is true AND _paywallMode is 'onboarding'
-  // (never in the modal upsell paywall — trial belongs to the
-  // onboarding entry point). Timeline block, no-payment-due pill,
-  // trial CTA, trial legal. The base paywall copy (Monthly/Yearly
-  // titles, Save badge, restore, terms/privacy) stays in
-  // _renderPaywall's inline strings — those don't change in trial
-  // mode. Legal fine print interpolates the SELECTED package's price
-  // and period at render time; the mockup only shows yearly selected
-  // but if the user taps monthly, "then $12.99 per month" reads
-  // honest, which is the point.
-  paywallTrial: {
-    head: { en: 'Start your free days', he: 'התחילו בחינם' },
-    timeline: [
-      { title: { en: 'Today', he: 'היום' },
-        text:  { en: 'Everything unlocks. You pay nothing.',
-                 he: 'הכל נפתח. לא משלמים כלום.' } },
-      { title: { en: 'Day 2', he: 'יום 2' },
-        text:  { en: "We remind you it's nearly up.",
-                 he: 'נזכיר לכם שזה כמעט נגמר.' } },
-      { title: { en: 'Day 3', he: 'יום 3' },
-        text:  { en: 'Your subscription starts, unless you cancelled.',
-                 he: 'המנוי מתחיל, אלא אם ביטלתם.' },
-        hollow: true },
-    ],
-    noPaymentDue: { en: 'No payment due now', he: 'אין חיוב עכשיו' },
-    cta:          { en: 'Start my free trial', he: 'להתחיל את הניסיון' },
-    // {price} and {period} interpolated at render time from the
-    // selected package. "Free for 3 days" is hardcoded to match the
-    // introductory-offer terms Apple / Google expect.
-    legal: { en: 'Free for 3 days, then {price} {period}. Cancel any time in App Store settings.',
-             he: 'חינם ל-3 ימים, אחר כך {price} {period}. אפשר לבטל בכל עת בהגדרות ה-App Store.' },
   },
 
   // Step 23 — journey summary. An accent-bordered card at the top
@@ -14698,10 +14548,10 @@ function _onbApplyLang(lang) {
   setText('onb-v2-q3-cta',        'q3',       'cta');
   setText('onb-v2-q4-head',       'q4',       'head');
   setText('onb-v2-q4-cta',        'q4',       'cta');
-  setText('onb-v2-notifications-head','notifications','head');
-  setText('onb-v2-notifications-sub', 'notifications','sub');
-  setText('onb-v2-notifications-cta', 'notifications','cta');
-  setText('onb-v2-notifications-skip','notifications','skip');
+  setText('onb-v2-notifications-head',         'notifications','head');
+  setText('onb-v2-notifications-sub',          'notifications','sub');
+  setText('onb-v2-notifications-toggle-label', 'notifications','toggleLabel');
+  setText('onb-v2-notifications-cta',          'notifications','cta');
   setText('onb-v2-lets-start-head','letsStart','head');
   setText('onb-v2-lets-start-sub','letsStart','sub');
   setText('onb-v2-lets-start-cta','letsStart','cta');
@@ -14751,17 +14601,6 @@ function _onbApplyLang(lang) {
   // (bilingual re-render on every show).
   setText('onb-v2-reviews-head', 'reviews', 'head');
   setText('onb-v2-reviews-cta',  'reviews', 'cta');
-  // Trial intro (step 34) — head + CTA are subject-invariant. The
-  // three benefit rows are rendered by _onbV2PrepareTrial. Only
-  // reached when TRIAL_ENABLED is true; bindings are cheap and safe
-  // to run regardless of flag state.
-  setText('onb-v2-trial-head', 'trial', 'head');
-  setText('onb-v2-trial-cta',  'trial', 'cta');
-  // Reminder promise (step 35) — static head + sub + CTA. Bell hero
-  // is injected by _onbV2PrepareReminderPromise.
-  setText('onb-v2-reminder-promise-head', 'reminderPromise', 'head');
-  setText('onb-v2-reminder-promise-sub',  'reminderPromise', 'sub');
-  setText('onb-v2-reminder-promise-cta',  'reminderPromise', 'cta');
   // Journey screen: card + tiles + features rendered dynamically in
   // _onbV2PrepareJourney. Screen-level head and CTA are static.
   setText('onb-v2-journey-head',  'journey',  'head');
@@ -15105,53 +14944,67 @@ function _onbV2CtaMirror() { _onbAdvanceStep(16, 17); }
 // frame of mind and the next ask inherits it. Anyone who drops at the
 // paywall has already been asked here on the way past.
 //
+// Headway pattern (2026-09-16): illustration + head + single labelled
+// toggle switched ON by default + Continue. One toggle only, since
+// Corpus sends one kind of reminder.
+//
 // UX contract:
-//   - Primary CTA calls the native OS permission dialog exactly once
-//     and flips permissionAsked=true regardless of grant result.
-//   - "Not now" sets prePromptDeferred=true and leaves the OS ask
-//     unspent. maybeRequestReminderPermission (finishDay safety net)
-//     respects that flag so a later "Not now"-er isn't OS-prompted
-//     out of nowhere at lesson-1 completion.
+//   - Toggle default: on. Prepare hook resets the checkbox to true
+//     on every show (survives back-and-forth navigation).
+//   - Continue with toggle ON calls the native OS permission dialog
+//     exactly once and flips permissionAsked=true regardless of the
+//     grant result.
+//   - Continue with toggle OFF sets prePromptDeferred=true and
+//     leaves the OS ask unspent. maybeRequestReminderPermission
+//     (finishDay safety net) respects that flag so a later
+//     toggle-off user isn't OS-prompted out of nowhere at lesson-1
+//     completion.
 //   - Both paths advance to step 33 (reviews / testimonials),
 //     skipping the null slot 32 which represents the OS dialog in
 //     flight.
 function _onbV2PrepareNotifications() {
+  const hero = document.getElementById('onb-v2-notifications-hero');
+  if (hero) hero.innerHTML = '<svg viewBox="0 0 64 64"><use href="#icon-bell"/></svg>';
+  // Reset toggle to on on every show. Survives a back-and-forth via
+  // step cursor resume without inheriting a stale off-state.
+  const toggle = document.getElementById('onb-v2-notifications-toggle');
+  if (toggle) toggle.checked = true;
   try { _phCapture('notification_prompt_shown', { source: 'onboarding_step31' }); } catch(e) {}
 }
 
-async function _onbV2CtaNotifYes() {
-  try { _phCapture('notification_prompt_response', { response: 'yes', source: 'onboarding_step31' }); } catch(e) {}
-  state.dailyReminder = Object.assign(
-    { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
-    state.dailyReminder || {},
-    { enabled: true, prePromptDeferred: false }
-  );
-  let osResult = 'unavailable';
-  if (_isNotifPluginAvailable()) {
-    osResult = await _requestNotifPermission();
-    state.dailyReminder.permissionAsked = true;
-    if (osResult === 'granted') {
-      // Fire-and-forget reconcile — schedules the 14-day window. Today's
-      // notif gets cancelled when finishDay runs after the first dialogue
-      // completes.
-      _reconcileReminders().catch(e => console.warn('[Reminder] onboarding-grant reconcile failed:', e));
-    } else {
-      state.dailyReminder.enabled = false;
+async function _onbV2CtaNotifContinue() {
+  const toggle = document.getElementById('onb-v2-notifications-toggle');
+  const wantsReminder = !toggle || toggle.checked;
+  try { _phCapture('notification_prompt_response', { response: wantsReminder ? 'yes' : 'not_now', source: 'onboarding_step31' }); } catch(e) {}
+  if (wantsReminder) {
+    state.dailyReminder = Object.assign(
+      { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
+      state.dailyReminder || {},
+      { enabled: true, prePromptDeferred: false }
+    );
+    let osResult = 'unavailable';
+    if (_isNotifPluginAvailable()) {
+      osResult = await _requestNotifPermission();
+      state.dailyReminder.permissionAsked = true;
+      if (osResult === 'granted') {
+        // Fire-and-forget reconcile — schedules the 14-day window.
+        // Today's notif gets cancelled when finishDay runs after the
+        // first dialogue completes.
+        _reconcileReminders().catch(e => console.warn('[Reminder] onboarding-grant reconcile failed:', e));
+      } else {
+        state.dailyReminder.enabled = false;
+      }
     }
+    try { saveState(); } catch(e) { try { saveStateLocal(); } catch(e2) {} }
+    try { _phCapture('notification_os_result', { result: osResult, source: 'onboarding_step31' }); } catch(e) {}
+  } else {
+    state.dailyReminder = Object.assign(
+      { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
+      state.dailyReminder || {},
+      { enabled: false, prePromptDeferred: true }
+    );
+    try { saveState(); } catch(e) { try { saveStateLocal(); } catch(e2) {} }
   }
-  try { saveState(); } catch(e) { try { saveStateLocal(); } catch(e2) {} }
-  try { _phCapture('notification_os_result', { result: osResult, source: 'onboarding_step31' }); } catch(e) {}
-  _onbAdvanceStep(31, 33);
-}
-
-function _onbV2CtaNotifNotNow() {
-  try { _phCapture('notification_prompt_response', { response: 'not_now', source: 'onboarding_step31' }); } catch(e) {}
-  state.dailyReminder = Object.assign(
-    { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
-    state.dailyReminder || {},
-    { enabled: false, prePromptDeferred: true }
-  );
-  try { saveState(); } catch(e) { try { saveStateLocal(); } catch(e2) {} }
   _onbAdvanceStep(31, 33);
 }
 
@@ -15169,32 +15022,25 @@ function _onbV2CtaNotifNotNow() {
 //     corpus_onboarding_done set. Every exit path (skip, purchase
 //     success, restore success) routes through _exitPaywall so the
 //     onClose always runs after the paywall.
-//   - Context (eyebrow / headline / sub) switches on TRIAL_ENABLED:
-//     trial mode uses the mockup's "Start your free days" head with
-//     no eyebrow or sub (the timeline + no-payment pill below carry
-//     the framing); plain mode keeps the v4 "Ready to go deeper?"
-//     framing with its "UNLOCK EVERYTHING" eyebrow.
+//   - Sets the v4 "Ready to go deeper?" context (eyebrow +
+//     headline + sub). No trial framing — Corpus does not offer
+//     an introductory offer, and the earlier trial subset of Act 5
+//     (steps 34 trial-intro + 35 reminder-promise + the paywall's
+//     timeline + no-payment-due pill) was dropped on 2026-09-16
+//     when the App Store Connect Introductory Offers section
+//     turned out to be missing from the account.
 function _onbV2PreparePaywall() {
   const isEn = state.lang === 'en';
   _paywallActiveRoot = document.getElementById('onb-v2-paywall');
   _paywallMode = 'onboarding';
   _paywallReturnTo = null;
-  if (TRIAL_ENABLED) {
-    const tp = _ONB_COPY.paywallTrial;
-    _paywallContext = {
-      eyebrow:  '',
-      headline: isEn ? tp.head.en : tp.head.he,
-      sub:      '',
-    };
-  } else {
-    _paywallContext = {
-      eyebrow:  isEn ? 'UNLOCK EVERYTHING' : 'לפתוח הכל',
-      headline: isEn ? 'Ready to go deeper?' : 'מוכנים להעמיק?',
-      sub:      isEn
-                  ? 'Every chapter, every subject, every bonus dialogue.'
-                  : 'כל פרק, כל נושא, כל דיאלוג בונוס.',
-    };
-  }
+  _paywallContext = {
+    eyebrow:  isEn ? 'UNLOCK EVERYTHING' : 'לפתוח הכל',
+    headline: isEn ? 'Ready to go deeper?' : 'מוכנים להעמיק?',
+    sub:      isEn
+                ? 'Every chapter, every subject, every bonus dialogue.'
+                : 'כל פרק, כל נושא, כל דיאלוג בונוס.',
+  };
   // Advance past total steps triggers _onbComplete() in _onbAdvanceStep.
   _paywallOnClose = () => _onbAdvanceStep(36, 37);
   _paywallSelectedPkg = 'yearly';
@@ -15209,7 +15055,6 @@ function _onbV2PreparePaywall() {
     posthog.capture('paywall_shown', {
       source:        'onboarding',
       subject:       state.subject || null,
-      trial_enabled: TRIAL_ENABLED,
     });
   } catch(e) {}
 }
@@ -15411,26 +15256,12 @@ function _onbV2CtaGoal() {
 
 // Step 33 (v11) — Reviews / testimonials. Read-only social-proof
 // screen with three real quotes from get.corpusapp.io. Single
-// Continue CTA advances into Act 5's paid block. NOT a rating ask —
-// that fires at step 23 (streak) via SKStoreReviewController; a
-// second fire here would hit Apple's per-user quota and silently
-// no-op, making the tap look inert three screens before the paywall.
-//
-// Routing gate: when TRIAL_ENABLED is true, advance to step 34
-// (trial intro → reminder promise → paywall). When it's false, skip
-// steps 34 and 35 entirely and land on step 36 (paywall) in its
-// plain, non-trial framing — no dead null-slot advance in between.
-function _onbV2CtaReviews() {
-  _onbAdvanceStep(33, TRIAL_ENABLED ? 34 : 36);
-}
-
-// Step 34 (v11) — Trial intro. Owl-fronted invitation with a three-
-// item benefit list. Only reachable when TRIAL_ENABLED is true.
-function _onbV2CtaTrial() { _onbAdvanceStep(34, 35); }
-
-// Step 35 (v11) — Reminder promise. Amber bell hero + head + sub +
-// "Continue for free" CTA. Only reachable when TRIAL_ENABLED is true.
-function _onbV2CtaReminderPromise() { _onbAdvanceStep(35, 36); }
+// Continue CTA advances directly to the paywall at step 36. NOT
+// a rating ask — that fires at step 23 (streak) via
+// SKStoreReviewController; a second fire here would hit Apple's
+// per-user quota and silently no-op, making the tap look inert
+// three screens before the paywall.
+function _onbV2CtaReviews() { _onbAdvanceStep(33, 36); }
 
 // Screen 23 (journey summary) — display-only; advance to commit.
 // v11: journey is step 27 (was step 23 in v4 as the terminal
@@ -15953,45 +15784,6 @@ function _onbV2PrepareReviews() {
   });
 }
 
-// Step 34 (trial intro) — injects the owl into the hero slot and
-// renders the three benefit rows from _ONB_COPY.trial.items. Only
-// reachable when TRIAL_ENABLED is true; when the flag is off, step
-// 33's advance skips this hook entirely. Static owl expression
-// (neutral / waving) matches the low-pressure invitation framing.
-function _onbV2PrepareTrial() {
-  const owlEl = document.getElementById('onb-v2-trial-owl');
-  if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
-  const list = document.getElementById('onb-v2-trial-benefits');
-  if (!list) return;
-  const isEn = state.lang === 'en';
-  const items = (_ONB_COPY.trial && _ONB_COPY.trial.items) || [];
-  list.innerHTML = '';
-  items.forEach((item) => {
-    const row = document.createElement('div');
-    row.className = 'onb-v2-trial-benefit';
-    const iconWrap = document.createElement('span');
-    iconWrap.className = 'onb-v2-trial-benefit-icon';
-    iconWrap.setAttribute('aria-hidden', 'true');
-    iconWrap.innerHTML = '<svg viewBox="0 0 64 64"><use href="#' + item.icon + '"/></svg>';
-    const text = document.createElement('span');
-    text.className = 'onb-v2-trial-benefit-text';
-    text.textContent = isEn ? item.text.en : item.text.he;
-    row.appendChild(iconWrap);
-    row.appendChild(text);
-    list.appendChild(row);
-  });
-}
-
-// Step 35 (reminder promise) — head + sub are static (bound in
-// _onbApplyLang). The prepare hook exists only to inject the bell
-// SVG into the amber hero slot — kept out of the DOM template so
-// the hero size doesn't fight the base .onb-v2-signup-hero styling
-// used for owl heroes on the neighbouring screens.
-function _onbV2PrepareReminderPromise() {
-  const hero = document.getElementById('onb-v2-reminder-promise-hero');
-  if (hero) hero.innerHTML = '<svg viewBox="0 0 64 64"><use href="#icon-bell"/></svg>';
-}
-
 // Helper: read taste config for the current subject with a
 // philosophy fallback if state.subject is somehow unset (defensive
 // — shouldn't happen post-Commit-2 since step 11 calls setSubject).
@@ -16081,12 +15873,36 @@ function _onbV2PrepareTasteQ() {
 function _onbV2PrepareFirstCard() {
   const isEn = state.lang === 'en';
   const cfg = _onbV2TasteCfg();
-  const nameEl = document.getElementById('onb-v2-first-card-name');
+  const imgEl  = document.getElementById('onb-v2-first-card-img');
   const roleEl = document.getElementById('onb-v2-first-card-role');
-  const iconEl = document.getElementById('onb-v2-first-card-icon');
-  if (nameEl) nameEl.textContent = cfg.thinkerName;
+  const cardEl = document.querySelector('#onb-v2-first-card .onb-v2-first-card-3d');
+  const eyebrowEl = document.getElementById('onb-v2-first-card-eyebrow');
+  if (imgEl && cfg.firstEditionImage) {
+    imgEl.src = './images/' + cfg.firstEditionImage + '.webp';
+    // Alt text stays Latin on both sides — the card is a first-edition
+    // physical artifact and the baked banner is Latin. Screen readers
+    // in Hebrew mode will read the Latin name, matching the visual.
+    imgEl.alt = cfg.thinkerName;
+  }
+  // Role line beneath the image, in the active language. The card
+  // itself is entirely English (baked into the JPEG-turned-WebP for
+  // authenticity to a first-edition artifact); a single Hebrew role
+  // line under it gives the Hebrew reader something in their own
+  // language at the moment they receive their first card.
   if (roleEl) roleEl.textContent = isEn ? cfg.role.en : cfg.role.he;
-  if (iconEl) iconEl.innerHTML = '<svg viewBox="0 0 64 64"><use href="#' + cfg.icon + '"/></svg>';
+  // Reveal choreography — remove any prior .is-revealed (so a return
+  // visit via step cursor resume replays the pop instead of showing
+  // the mid-idle-float state), then add on a double-rAF so the class
+  // change lands AFTER the screen's own fadeInUp settles. See the
+  // .onb-v2-first-card-3d CSS block for the choreography contract.
+  if (cardEl) cardEl.classList.remove('is-revealed');
+  if (eyebrowEl) eyebrowEl.classList.remove('is-revealed');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (cardEl)    cardEl.classList.add('is-revealed');
+      if (eyebrowEl) eyebrowEl.classList.add('is-revealed');
+    });
+  });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -16430,11 +16246,7 @@ const _ONB_STEP_HOOKS = {
   31: _onbV2PrepareNotifications,  // fires prompt-shown telemetry
   // 32 is a null slot (OS notif dialog).
   33: _onbV2PrepareReviews,        // renders three testimonial cards
-  // 34 + 35 only ever run when TRIAL_ENABLED is true — step 33's
-  // advance skips both when the flag is off. Registered here
-  // regardless; the hooks are inert until the DOM is shown.
-  34: _onbV2PrepareTrial,          // owl + three benefit rows
-  35: _onbV2PrepareReminderPromise,// bell icon into the hero slot
+  // 34 + 35 are null slots — trial subset was dropped 2026-09-16.
   36: _onbV2PreparePaywall,        // shared _renderPaywall machinery
 };
 
@@ -25744,30 +25556,33 @@ function launchConfetti() {
 // INIT
 // ═══════════════════════════════════════════════════════════
 
-// Returns the effective spotlight rect for a given step — clamped to
-// the visible interior of the viewport so the punch-out never reveals
-// the topbar, stats-subheader, or bottom-nav areas. The step's own
-// hint fields override this (max* keys) to further shrink the rect
-// when the raw element extends past the intended affordance (e.g. an
-// expanded chapter card runs to the bottom of the scroll list).
-function _walkthroughSpotlightRect(step) {
-  if (!step || !step.spotlight) return null;
-  const el = document.querySelector(step.spotlight);
+// Measures a walkthrough target's viewport rect, compensating for the
+// scroll-lock's body-offset when the browser doesn't reflect it in
+// descendants' getBoundingClientRect.
+//
+// The lock (see _walkthroughLockScroll and _walkthroughShiftLockedScroll)
+// pins <body> to position:fixed with a negative top offset that
+// preserves the visual scroll position — spec-compliant browsers
+// report descendant rects relative to the SHIFTED body, so no
+// adjustment is needed. WKWebView (iOS) reports them relative to the
+// pre-shift document, so the raw rect ends up bodyTop px below where
+// the target is actually painted — every downstream consumer (the
+// spotlight punch-out AND the scroll-target-into-view delta) would
+// aim at the wrong y without this compensation. Detect by comparing
+// body's own reported top to the value the lock intended — the drift
+// is 0 on correct browsers (no-op) and equals the intended offset on
+// the quirky ones.
+//
+// Chrome elements (.stats-subheader, .bottom-nav, #topbar) are
+// position:fixed against the viewport, so their containing block is
+// the initial containing block and the body:fixed shift doesn't
+// affect them. Callers measuring THOSE elements should keep using
+// getBoundingClientRect directly — the compensation here is only for
+// static/relative descendants of body.
+function _walkthroughMeasureTarget(el) {
   if (!el) return null;
   const rect = el.getBoundingClientRect();
-  let top = rect.top, left = rect.left, right = rect.right, bottom = rect.bottom;
-  // Compensate for the scroll-lock's body-offset when the browser
-  // doesn't reflect it in descendants' getBoundingClientRect. The
-  // lock (see _walkthroughLockScroll and _walkthroughShiftLockedScroll)
-  // pins <body> to position:fixed with a negative top offset that
-  // preserves the visual scroll position — spec-compliant browsers
-  // report descendant rects relative to the SHIFTED body, so no
-  // adjustment is needed. WKWebView (iOS) reports them relative to
-  // the pre-shift document, so the raw rect ends up bodyTop px below
-  // where the target is actually painted, and the punch-out lands
-  // that far off. Detect by comparing body's own reported top to the
-  // value the lock intended — the drift is 0 on correct browsers
-  // (no-op) and equals the intended offset on the quirky ones.
+  let top = rect.top, bottom = rect.bottom;
   const bodyEl = document.body;
   if (bodyEl.style.position === 'fixed') {
     const bodyTopIntended = parseFloat(bodyEl.style.top) || 0;
@@ -25778,6 +25593,21 @@ function _walkthroughSpotlightRect(step) {
       bottom += drift;
     }
   }
+  return { top, left: rect.left, right: rect.right, bottom, width: rect.width, height: rect.height };
+}
+
+// Returns the effective spotlight rect for a given step — clamped to
+// the visible interior of the viewport so the punch-out never reveals
+// the topbar, stats-subheader, or bottom-nav areas. The step's own
+// hint fields override this (max* keys) to further shrink the rect
+// when the raw element extends past the intended affordance (e.g. an
+// expanded chapter card runs to the bottom of the scroll list).
+function _walkthroughSpotlightRect(step) {
+  if (!step || !step.spotlight) return null;
+  const el = document.querySelector(step.spotlight);
+  if (!el) return null;
+  const m = _walkthroughMeasureTarget(el);
+  let { top, left, right, bottom } = m;
   // Optional per-step ceiling on the rect's height — used by the
   // chapters step where the expanded level card runs 470+px tall
   // and the halo would otherwise draw around the entire card, which
@@ -25872,7 +25702,7 @@ function drawSpotlight(step) {
   ctx.restore();
 }
 
-// ─── Onboarding walkthrough (owl-guided, 7 screens) ─────────────
+// ─── Onboarding walkthrough (owl-guided, 6 screens) ─────────────
 // Fired once per install from the tail of _onbComplete. Gated on
 // corpus_walkthrough_done, no completedDays, no corpus_first_dialogue_
 // completed_at (bypassCompletionGate is passed by v11 _onbComplete
@@ -25899,6 +25729,14 @@ function drawSpotlight(step) {
 // IntoView skips the body-shift for any target whose rect lies in
 // chrome, since a fixed-position target doesn't move with the
 // shift and misplacing home content beneath it would be pointless.
+//
+// Trimmed to six screens on 2026-09-16. Dropped the "carousel"
+// step that pointed at #thinker-carousel-wrap — the element has
+// style="display:none" inline (the thinker gallery moved to
+// #modal-library) so the spotlight had been drawing at (0,0,0,0)
+// silently for every walkthrough runner. The taste block (steps
+// 19-22) already teaches thinker collection; pointing at nothing
+// on home was worse than not pointing at all.
 const WALKTHROUGH_STEPS = [
   { id: 'greeting', expr: 'owl-neutral',   spotlight: null,
     he: 'שלום. אני אלווה אתכם בצעדים הראשונים ב-Corpus.',
@@ -25910,9 +25748,6 @@ const WALKTHROUGH_STEPS = [
   { id: 'next_up', expr: 'owl-neutral',    spotlight: '.lesson-node:has(.lesson-circle.next-up)',
     he: 'כאן מחכה הדיאלוג הבא בתור. לא צריך לבחור, הוא כבר מוכן.',
     en: "The next dialogue in line waits here. Nothing to choose, it's already set." },
-  { id: 'carousel', expr: 'owl-admiring',  spotlight: '#thinker-carousel-wrap',
-    he: 'כל הוגה שפוגשים מצטרף לאוסף. הוא גדל לאט, לפי מה שקוראים.',
-    en: 'Every thinker you meet joins your collection. It grows slowly, with what you read.' },
   { id: 'pantheon', expr: 'owl-neutral',   spotlight: '#bnav-pantheon',
     he: 'הפנתיאון הוא הבית של האוסף. אפשר לחזור אליו בכל רגע.',
     en: "The Pantheon is where your collection lives. It's there whenever you want it." },
@@ -25920,13 +25755,14 @@ const WALKTHROUGH_STEPS = [
     he: 'הרצף גדל בכל יום שמשלימים בו דיאלוג. היום הוא מתחיל.',
     en: 'Your streak grows on every day you complete a dialogue. Today it begins.' },
   { id: 'closing', expr: 'owl-action',
-    // Spotlights the next-up lesson circle (same target as step 3).
-    // Step 3 introduces it neutrally ("the next dialogue in line
-    // waits here"); step 7 closes on the user rather than restating
-    // the circle. Rewritten from the v4 "tomorrow's dialogue"
-    // framing, which was wrong for v11 — v11 users don't complete
-    // a real dialogue during onboarding, so the lesson circle
-    // holds their FIRST dialogue, not tomorrow's.
+    // Spotlights the next-up lesson circle (same target as the
+    // next_up step). next_up introduces it neutrally ("the next
+    // dialogue in line waits here"); closing closes on the user
+    // rather than restating the circle. Rewritten from the v4
+    // "tomorrow's dialogue" framing, which was wrong for v11 —
+    // v11 users don't complete a real dialogue during onboarding,
+    // so the lesson circle holds their FIRST dialogue, not
+    // tomorrow's.
     spotlight: '.lesson-node:has(.lesson-circle.next-up)', isClosing: true,
     he: 'כאן תתחילו, מתי שתהיו מוכנים.',
     en: "You'll begin right here, whenever you're ready." },
@@ -26027,13 +25863,19 @@ function _walkthroughScrollTargetIntoView(step) {
   const statsBottom = document.querySelector('.stats-subheader')?.getBoundingClientRect().bottom || 0;
   const navTop = document.querySelector('.bottom-nav')?.getBoundingClientRect().top || screenH;
   const safeMid = (statsBottom + navTop) / 2;
-  const rect = target.getBoundingClientRect();
-  // Skip the shift for targets that live in chrome (e.g. step 2's
-  // #bnav-pantheon inside the bottom-nav band). Chrome elements are
-  // position:fixed relative to the viewport, so shifting body doesn't
-  // move them anyway — the shift would only misplace home content
-  // beneath them for no gain. A target is in chrome when its rect
-  // sits entirely below navTop OR entirely above statsBottom.
+  // Use the same drift-compensated measurement as _walkthroughSpotlight
+  // Rect so the shift delta is computed against the target's actual
+  // painted position on WKWebView under body:fixed. Without this the
+  // shift math uses a rect that's bodyTop px off; the target ends up
+  // shifted to the wrong y and (worst case) never scrolled into view.
+  const rect = _walkthroughMeasureTarget(target);
+  // Skip the shift for targets that live in chrome (e.g. the pantheon
+  // step's #bnav-pantheon inside the bottom-nav band). Chrome
+  // elements are position:fixed relative to the viewport, so shifting
+  // body doesn't move them anyway — the shift would only misplace
+  // home content beneath them for no gain. A target is in chrome
+  // when its rect sits entirely below navTop OR entirely above
+  // statsBottom.
   if (rect.top >= navTop || rect.bottom <= statsBottom) return;
   const targetMid = (rect.top + rect.bottom) / 2;
   // If the target's midpoint is already inside the safe band's middle
@@ -29181,10 +29023,9 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="onb-v2-copy">
       <p class="onb-v2-first-card-eyebrow" id="onb-v2-first-card-eyebrow"></p>
       <div class="onb-v2-first-card-3d">
-        <span class="onb-v2-first-card-icon" id="onb-v2-first-card-icon" aria-hidden="true"></span>
-        <span class="onb-v2-first-card-name" id="onb-v2-first-card-name"></span>
-        <span class="onb-v2-first-card-role" id="onb-v2-first-card-role"></span>
+        <img id="onb-v2-first-card-img" class="onb-v2-first-card-img" alt="">
       </div>
+      <p class="onb-v2-first-card-role" id="onb-v2-first-card-role"></p>
       <h1 class="onb-v2-head" id="onb-v2-first-card-head"></h1>
       <p class="onb-v2-sub" id="onb-v2-first-card-sub"></p>
     </div>
@@ -29290,50 +29131,20 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
+      <div class="onb-v2-notif-hero" id="onb-v2-notifications-hero" aria-hidden="true"></div>
       <h1 class="onb-v2-head" id="onb-v2-notifications-head"></h1>
       <p class="onb-v2-sub" id="onb-v2-notifications-sub"></p>
+      <label class="onb-v2-toggle-row" for="onb-v2-notifications-toggle">
+        <span class="onb-v2-toggle-label" id="onb-v2-notifications-toggle-label"></span>
+        <input type="checkbox" id="onb-v2-notifications-toggle" class="onb-v2-toggle-input" checked>
+        <span class="onb-v2-toggle-track" aria-hidden="true">
+          <span class="onb-v2-toggle-thumb"></span>
+        </span>
+      </label>
     </div>
   </div>
   <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-v2-notifications-cta" onclick="_onbV2CtaNotifYes()"></button>
-    <button type="button" class="onb-v2-skip" id="onb-v2-notifications-skip" onclick="_onbV2CtaNotifNotNow()"></button>
-  </div>
-</div>
-
-<!-- Step 34 (v11) — Trial intro. Owl hero + head + three benefit
-     rows + primary CTA. Gated by TRIAL_ENABLED at the flow level;
-     the DOM is always present so a flag flip requires no HTML
-     changes, just JS. Benefit rows rendered by _onbV2PrepareTrial
-     from _ONB_COPY.trial.items. -->
-<div id="onb-v2-trial" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
-  <div class="onb-v2-inner">
-    <div class="onb-v2-signup-hero" id="onb-v2-trial-owl" aria-hidden="true"></div>
-    <div class="onb-v2-copy">
-      <h1 class="onb-v2-head" id="onb-v2-trial-head"></h1>
-      <div class="onb-v2-trial-benefits" id="onb-v2-trial-benefits"></div>
-    </div>
-  </div>
-  <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-v2-trial-cta" onclick="_onbV2CtaTrial()"></button>
-  </div>
-</div>
-
-<!-- Step 35 (v11) — Reminder promise. Amber bell hero + head + sub
-     + "Continue for free" CTA. Bell injected by
-     _onbV2PrepareReminderPromise; head/sub/CTA bound in
-     _onbApplyLang. The single screen that turns a trial from a trap
-     into an offer — everyone who has forgotten to cancel something
-     is watching for it. -->
-<div id="onb-v2-reminder-promise" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
-  <div class="onb-v2-inner">
-    <div class="onb-v2-copy">
-      <div class="onb-v2-reminder-hero" id="onb-v2-reminder-promise-hero" aria-hidden="true"></div>
-      <h1 class="onb-v2-head" id="onb-v2-reminder-promise-head"></h1>
-      <p class="onb-v2-sub" id="onb-v2-reminder-promise-sub"></p>
-    </div>
-  </div>
-  <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-v2-reminder-promise-cta" onclick="_onbV2CtaReminderPromise()"></button>
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-notifications-cta" onclick="_onbV2CtaNotifContinue()"></button>
   </div>
 </div>
 
@@ -29344,14 +29155,7 @@ document.addEventListener('DOMContentLoaded', function() {
      route through _exitPaywall, which fires the onClose set by
      _onbV2PreparePaywall. No close X and no modal backdrop — Skip
      means "skip this step" (matches the signup step); X on the
-     modal shell means "close the overlay".
-
-     Trial mode (TRIAL_ENABLED = true): the .paywall-timeline and
-     .paywall-no-payment-due elements below are populated + shown by
-     _renderPaywall from _ONB_COPY.paywallTrial. When the flag is
-     false, both are hidden inline and the plain paywall renders
-     with no trial UI at all — no timeline, no pill, no per-card
-     "3 days free" footer, no "$0.00" button. -->
+     modal shell means "close the overlay". -->
 <div id="onb-v2-paywall" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-paywall-skip" onclick="_exitPaywall('skip')"></button>
   <div class="onb-progress" aria-hidden="true" data-step="5">
@@ -29362,17 +29166,6 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="paywall-eyebrow"></div>
     <h1 class="paywall-headline"></h1>
     <p class="paywall-sub"></p>
-    <!-- Trial-mode elements — hidden by default, populated + shown
-         by _renderPaywall when TRIAL_ENABLED is on AND the paywall
-         is in onboarding mode. -->
-    <div class="paywall-timeline" style="display:none" aria-hidden="true"></div>
-    <div class="paywall-no-payment-due" style="display:none" aria-hidden="true">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="12" r="10" fill="#22C55E"/>
-        <path d="M7 12.5 L10.5 16 L17 9" stroke="#FFFFFF" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span class="paywall-no-payment-label"></span>
-    </div>
     <div class="paywall-cards">
       <button type="button" class="paywall-card paywall-card-monthly" onclick="_selectPaywallPackage('monthly')">
         <div class="paywall-card-title paywall-monthly-title"></div>
@@ -29662,8 +29455,7 @@ document.addEventListener('DOMContentLoaded', function() {
      into a paid chapter, from bonus tap, from chapter-complete overlay,
      etc. Populated by _renderPaywall() using .paywall-* class selectors
      scoped by _paywallActiveRoot — the same render logic drives the
-     onboarding paywall step (#onb-v2-paywall below). Trial framing
-     controlled by TRIAL_ENABLED in the JS block. -->
+     onboarding paywall step (#onb-v2-paywall below). -->
 <div class="modal-overlay" id="modal-paywall">
   <div class="modal-box paywall-box">
     <div class="paywall-topbar">
