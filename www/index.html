@@ -15541,6 +15541,48 @@ function _onbV2PreparePaywall() {
   const skipEl = document.getElementById('onb-v2-paywall-skip');
   if (skipEl && _ONB_COPY.signup && _ONB_COPY.signup.skip) {
     skipEl.textContent = isEn ? _ONB_COPY.signup.skip.en : _ONB_COPY.signup.skip.he;
+    // Progress-bar / Skip-button collision fix. The progress bar's
+    // star is pinned to the bar's inline-end padding edge (~28px in
+    // from the screen's right edge with the default 18px container
+    // padding + 10px node radius). The Skip button sits at the same
+    // top offset (safeTop + 16) with inset-inline-end: 20px, taking
+    // its own text width + 8px padding. Star and button overlap in
+    // both languages.
+    //
+    // Fix: measure the Skip button's actual rendered width (localised
+    // text, current font metrics) and extend the paywall's progress
+    // container padding-inline-end by (skip inset + width + 8px gap)
+    // so the star sits clear of the button. Measured every paywall
+    // entry so a language change (welcome-only today but future-safe)
+    // or a font-metrics shift is picked up automatically. Reading
+    // offsetWidth right after textContent set forces layout to
+    // include the new text — no rAF needed.
+    //
+    // The section-7 label cache (populated on the first section-7
+    // screen visited — notif or reviews) was computed against the
+    // default bar layout, so it points the label to a spot ~55px to
+    // the right of where the shifted star now sits. Invalidate the
+    // section-7 cache entries and re-measure from the visible paywall
+    // container so the label under the active node stays right. Only
+    // touches paywall's container — no back-nav in onboarding, so
+    // notif/reviews are never re-rendered after this point.
+    const skipW = skipEl.offsetWidth;
+    if (skipW > 0) {
+      const clearW = 20 + skipW + 8;  // skip inset + measured width + gap
+      const p = document.querySelector('#onb-v2-paywall .onb-progress');
+      if (p) p.style.paddingInlineEnd = clearW + 'px';
+      Object.keys(_onbSectionLabelLeft).forEach(k => {
+        if (k.startsWith('7-')) delete _onbSectionLabelLeft[k];
+      });
+      const active = document.querySelector('.onb-screen.onb-v2.onb-active .onb-progress');
+      const left = _onbMeasureLabelLeft(active);
+      if (left != null) {
+        _onbSectionLabelLeft['7-' + state.lang] = left;
+        document.querySelectorAll('.onb-v2 .onb-progress-label').forEach(l => {
+          l.style.left = left + 'px';
+        });
+      }
+    }
   }
   _renderPaywall();
   try {
