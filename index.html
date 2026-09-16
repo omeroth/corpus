@@ -570,7 +570,6 @@
      flow through those tokens. Each swaps the same alpha value with a
      light-ink base (245, 241, 255 ≈ --ink in dark). */
   html.dark .onb-cta.nav-btn:disabled          { background: rgba(245, 241, 255, 0.08); color: rgba(245, 241, 255, 0.4); }
-  html.dark .onb-progress .onb-pill            { background: rgba(245, 241, 255, 0.16); }
   html.dark .onb-welcome-lang                  { background: rgba(245, 241, 255, 0.08); border-color: rgba(245, 241, 255, 0.12); }
   html.dark .onb-lang-btn                      { color: rgba(245, 241, 255, 0.60); }
   /* Language toggle in dark mode: active button's background comes
@@ -647,15 +646,6 @@
      WCAG explicitly exempts disabled UI controls from contrast anyway
      (1.4.3 note 2), so we leave it. */
   html.dark body.on-subject-screen:not(.drawer-open) .subj-subtitle { color: rgba(245, 241, 255, 0.62); }
-
-  /* Onboarding progress pills — the "completed past" state (4914-4918).
-     Base state at 432 already flips; the higher-specificity data-step
-     nth-child selectors do not. Same 0.42 alpha, light-ink base. */
-  html.dark .onb-progress[data-step="2"] .onb-pill:nth-child(-n+1),
-  html.dark .onb-progress[data-step="3"] .onb-pill:nth-child(-n+2),
-  html.dark .onb-progress[data-step="4"] .onb-pill:nth-child(-n+3),
-  html.dark .onb-progress[data-step="5"] .onb-pill:nth-child(-n+4),
-  html.dark .onb-progress[data-step="6"] .onb-pill:nth-child(-n+5) { background: rgba(245, 241, 255, 0.42); }
 
   /* Walkthrough progress dot ACTIVE state. Source at 5962 uses
      var(--surface) which flips dark → dark dot on dark backdrop is
@@ -5241,10 +5231,13 @@
     background-image: none;
     color: #FFFFFF;
   }
-  /* Screen 1 hides the progress pills — the mockup treats welcome as
-     a wordmark moment, not a numbered step. Pills DOM stays for
-     structural consistency; visibility is CSS-only. */
-  .onb-screen.onb-bg-purple-field .onb-progress { display: none; }
+  /* Welcome screen (step 1) hides the progress bar entirely — treats
+     the wordmark as a moment, not a numbered step. Prior implementation
+     was a CSS rule targeting .onb-bg-purple-field .onb-progress;
+     replaced by the JS-driven _onbRenderProgress which hides the bar
+     for any step whose _ONB_STEP_TO_SECTION lookup returns 0. That
+     also handles steps 17-22 (taste block) which never had a CSS
+     hide rule and previously showed a stale pill state. */
   /* Language toggle on purple field — flip the pill background to a
      translucent white + active state fills with white so the label
      stays legible against the purple ground. */
@@ -5322,41 +5315,109 @@
     box-shadow: none;
   }
 
-  /* ── Progress pills (5-step: beat → streak → welcome → subject → goal) ──
-     Light-bg variant: unfilled pills are ink at low alpha, filled pills
-     take the screen's accent. Current step is wider. */
-  .onb-progress {
+  /* ── Progress bar (v11 seven-section, Headway-style) ──
+     Seven numbered nodes on a horizontal line; the segment of line
+     between completed nodes is filled with the current subject's
+     accent, the active node scales up and glows, and the active
+     section's name renders underneath, clamped so it stays within
+     the container's inline bounds even when the active node is at
+     the first or last position.
+     DOM built once per container by _onbRenderProgress; on subsequent
+     step advances the same function updates node classes, fill width,
+     and label position. Bar is hidden entirely (display: none) when
+     the current step is outside a section — step 1 welcome and steps
+     17-22 (taste block). See _ONB_SECTIONS for the section layout.
+     Prior implementation was a 6-pill bar keyed off data-step; that
+     mapped five acts onto pills and left large stretches with no
+     visible advance. */
+  .onb-screen.onb-v2 .onb-progress {
+    width: 100%;
+    max-width: 320px;
+    margin: calc(20px + var(--safe-top)) auto 20px;
+    padding: 0 4px;
+    position: relative;
+    /* Reserves space below the track for the section-name label.
+       Height matches label line-height + 6px top margin. */
+    padding-bottom: 22px;
+  }
+  .onb-screen.onb-v2 .onb-progress-track {
+    position: relative;
     display: flex;
-    justify-content: center;
-    gap: 6px;
+    justify-content: space-between;
     align-items: center;
-    padding: 4px 20px 20px;
-    max-width: 240px;
-    margin: 0 auto;
+    height: 22px;
   }
-  .onb-progress .onb-pill {
-    height: 5px;
-    width: 22px;
-    border-radius: 999px;
-    background: rgba(42, 18, 102, 0.12);
-    transition: background 0.25s ease, width 0.25s ease;
+  .onb-screen.onb-v2 .onb-progress-track-line,
+  .onb-screen.onb-v2 .onb-progress-track-fill {
+    position: absolute;
+    top: 50%;
+    height: 2px;
+    border-radius: 1px;
+    transform: translateY(-50%);
+    pointer-events: none;
   }
-  .onb-progress[data-step="2"] .onb-pill:nth-child(-n+1),
-  .onb-progress[data-step="3"] .onb-pill:nth-child(-n+2),
-  .onb-progress[data-step="4"] .onb-pill:nth-child(-n+3),
-  .onb-progress[data-step="5"] .onb-pill:nth-child(-n+4),
-  .onb-progress[data-step="6"] .onb-pill:nth-child(-n+5) {
-    background: rgba(42, 18, 102, 0.42);
+  .onb-screen.onb-v2 .onb-progress-track-line {
+    inset-inline-start: 10px;
+    inset-inline-end: 10px;
+    background: rgba(42, 18, 102, 0.14);
+    z-index: 0;
   }
-  .onb-progress[data-step="1"] .onb-pill:nth-child(1),
-  .onb-progress[data-step="2"] .onb-pill:nth-child(2),
-  .onb-progress[data-step="3"] .onb-pill:nth-child(3),
-  .onb-progress[data-step="4"] .onb-pill:nth-child(4),
-  .onb-progress[data-step="5"] .onb-pill:nth-child(5),
-  .onb-progress[data-step="6"] .onb-pill:nth-child(6) {
-    background: var(--onb-accent, #7B4FD4);
-    width: 32px;
+  .onb-screen.onb-v2 .onb-progress-track-fill {
+    inset-inline-start: 10px;
+    /* Inline-size (was width) so the fill grows toward the inline-end
+       edge in both LTR and RTL rather than jumping to the left in RTL. */
+    inline-size: 0;
+    background: var(--accent);
+    z-index: 1;
+    transition: inline-size 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   }
+  .onb-screen.onb-v2 .onb-progress-node {
+    position: relative;
+    z-index: 2;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(42, 18, 102, 0.14);
+    color: var(--text-muted);
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(10px * var(--text-scale));
+    font-weight: 900;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .onb-screen.onb-v2 .onb-progress-node.completed {
+    background: var(--accent);
+    color: var(--on-accent, #FFFFFF);
+  }
+  .onb-screen.onb-v2 .onb-progress-node.active {
+    background: var(--accent);
+    color: var(--on-accent, #FFFFFF);
+    transform: scale(1.15);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+  }
+  .onb-screen.onb-v2 .onb-progress-label {
+    position: absolute;
+    top: 100%;
+    margin-top: 6px;
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(11px * var(--text-scale));
+    color: var(--text-2);
+    white-space: nowrap;
+    /* left is set inline by _onbPositionProgressLabel so the label
+       centers under the active node and clamps within the container
+       bounds; default 0 keeps it visible before JS positions it. */
+    left: 0;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  /* Dark-mode overrides — the unfilled node + line use a low-alpha
+     ink tint that has no dark contrast; swap to a low-alpha light
+     tint so both stay visible against dark backgrounds. */
+  html.dark .onb-screen.onb-v2 .onb-progress-track-line { background: rgba(245, 241, 255, 0.16); }
+  html.dark .onb-screen.onb-v2 .onb-progress-node       { background: rgba(245, 241, 255, 0.16); }
   /* Subject-select drawer entry: hide the pill row when body is on subject
      screen via drawer (existing-user subject switch, not new onboarding). */
   body.drawer-open .subj-onb-progress { display: none; }
@@ -6648,17 +6709,22 @@
     width: 48px; height: 48px;
     transform: rotate(-5deg);
   }
-  /* Page 20 (taste-2) — bottom-inline-start. Top → bottom, and
-     end → start; largest of the three, sits below the prose. */
+  /* Page 20 (taste-2) — largest of the three. Position properties
+     (top/bottom/inset-inline-*) are FALLBACK values only; runtime
+     placement via _onbV2PlaceTasteOwl overrides them inline on
+     every prepare-hook run, picking the first of four candidate
+     slots that keeps 12px+ clear of every text block. Width /
+     height / transform / opacity stay class-based. */
   .onb-screen.onb-v2 .onb-v2-taste-owl.owl-t2 {
     bottom: calc(112px + var(--safe-bottom));
     inset-inline-start: 38px;
     width: 54px; height: 54px;
     transform: rotate(4deg);
   }
-  /* Page 21 (taste-q) — top-inline-start. Bottom → top; stays on
-     the start side so the top-corner motion echoes but doesn't
-     repeat page 19's corner. Smallest of the three. */
+  /* Page 21 (taste-q) — smallest of the three. Same runtime
+     placement contract as .owl-t2: the position values here are
+     fallbacks, _onbV2PlaceTasteOwl overrides them inline. Width /
+     height / transform / opacity stay class-based. */
   .onb-screen.onb-v2 .onb-v2-taste-owl.owl-t3 {
     top: calc(64px + var(--safe-top));
     inset-inline-start: 26px;
@@ -7183,15 +7249,6 @@
     letter-spacing: 0;
     margin-top: 8px;
     margin-bottom: 12px;
-  }
-
-  .onb-screen.onb-v2 .onb-progress[data-step="1"] .onb-pill:nth-child(1),
-  .onb-screen.onb-v2 .onb-progress[data-step="2"] .onb-pill:nth-child(2),
-  .onb-screen.onb-v2 .onb-progress[data-step="3"] .onb-pill:nth-child(3),
-  .onb-screen.onb-v2 .onb-progress[data-step="4"] .onb-pill:nth-child(4),
-  .onb-screen.onb-v2 .onb-progress[data-step="5"] .onb-pill:nth-child(5),
-  .onb-screen.onb-v2 .onb-progress[data-step="6"] .onb-pill:nth-child(6) {
-    background: var(--accent);
   }
 
   .onb-goal-card {
@@ -13631,28 +13688,51 @@ function _onbShowScreen(screenId) {
 const _ONB_FLOW_VERSION = '5';
 
 const _ONB_TOTAL_STEPS = 36;
-// Which phase (1..6) each step belongs to. Drives the 6-pill progress.
-// v11 layout: five acts fold into six pills the way the mockup pill
-// counts do — the mockup's own pill values are the source of truth
-// (some Act 3/5 screens deliberately omit pills for flow moments).
+// Which phase (1..6) each step belongs to. Retained for the
+// onboarding_step_shown telemetry event; the visible progress bar is
+// now driven by _ONB_SECTIONS (below) — this map is analytics-only.
 const _ONB_STEP_TO_PHASE = {
-  1: 1,                            // welcome (no pills rendered)
-  2: 1, 3: 1, 4: 1,                // problem / solution / signup
-  5: 2, 6: 2, 7: 2, 8: 2,          // name / gender / age / hours
-  9: 3, 10: 3,                     // shock / bridge
-  11: 4,                           // subject (Act 2 opener)
-  12: 3,                           // honesty — pill 3 per mockup: this
-                                   // MOVED beat still reads as a shock-
-                                   // adjacent screen visually
-  13: 4, 14: 4, 15: 4,             // Q1 / Q2 / Q3
-  16: 5, 17: 5,                    // reflection / how-it-works
-                                   // 18–22: taste block, pills hidden
-  23: 5, 24: 5,                    // streak / rating
-                                   // 25–26: building / plan-ready, pills hidden
-  27: 6, 28: 6, 29: 6, 30: 6,      // plan / commitment / daily goal / adds-up
-  31: 6, 32: 6,                    // notif pre-prompt / OS dialog
-                                   // 33–36: reviews / trial / promise / paywall, pills hidden
+  1: 1,
+  2: 1, 3: 1, 4: 1,
+  5: 2, 6: 2, 7: 2, 8: 2,
+  9: 3, 10: 3,
+  11: 4,
+  12: 3,
+  13: 4, 14: 4, 15: 4,
+  16: 5, 17: 5,
+  23: 5, 24: 5,
+  27: 6, 28: 6, 29: 6, 30: 6,
+  31: 6, 32: 6,
 };
+
+// v11 seven-section progress model — replaces the earlier 5-act pill
+// count. Rationale: five acts of 7-8 screens each meant a pill sat
+// unchanged too long, and telling a user they're in "act 3 of 5"
+// says nothing about what act 3 is. Seven sections at ~3-4 screens
+// each let the active node advance often enough to feel like progress,
+// and each section has a named chapter the user can recognize.
+//
+// The map from step number to section (0 = bar hidden) is derived
+// below; each section lists its member steps here as the source of
+// truth. Steps outside any section render no bar: step 1 (welcome
+// moment), 17-22 (taste block — counting the taste would make it
+// feel like a test), plus the four native/null slots (24 OS review
+// sheet, 32 OS notif dialog, 34-35 retired trial subset).
+const _ONB_SECTIONS = [
+  { en: 'Welcome',             he: 'ברוכים הבאים',       steps: [2, 3, 4] },
+  { en: 'About you',           he: 'עליכם',              steps: [5, 6, 7, 8] },
+  { en: 'Where you are now',   he: 'איפה אתם עכשיו',     steps: [9, 10, 11, 12] },
+  { en: 'What matters to you', he: 'מה חשוב לכם',        steps: [13, 14, 15, 16] },
+  { en: 'Your plan',           he: 'התוכנית שלכם',       steps: [23, 25, 26, 27] },
+  { en: 'Your commitment',     he: 'המחויבות שלכם',      steps: [28, 29, 30] },
+  { en: 'Getting set up',      he: 'מסדרים הכל',         steps: [31, 33, 36] },
+];
+const _ONB_TOTAL_SECTIONS = _ONB_SECTIONS.length;
+const _ONB_STEP_TO_SECTION = (() => {
+  const m = {};
+  _ONB_SECTIONS.forEach((s, i) => s.steps.forEach(n => { m[n] = i + 1; }));
+  return m;
+})();
 // DOM ids in step order. Steps not yet built map to null; _onbShowStep
 // treats a null slot as "not built yet" and lands on home WITHOUT
 // marking corpus_onboarding_done — see the partial-ladder mitigation
@@ -14792,10 +14872,92 @@ function _onbSetLang(lang) {
   _onbApplyLang(lang);
 }
 
-// Show step N. Applies current language, sets the 6-pill progress to
-// the appropriate phase, and toggles the .onb-active class on the
-// step's DOM node. If the step's DOM id is null, treats it as a
-// partial-ladder ship — see the mitigation below.
+// Populates every .onb-v2 .onb-progress container with the seven-node
+// bar for the given step, or hides it if the step is outside a section.
+// Idempotent: builds the inner structure once per container on the
+// first call, then just updates node classes, fill width, and label
+// text/position on subsequent calls.
+function _onbRenderProgress(step) {
+  const section = _ONB_STEP_TO_SECTION[step] || 0;
+  const isEn = state.lang === 'en';
+  document.querySelectorAll('.onb-v2 .onb-progress').forEach(container => {
+    if (!section) { container.style.display = 'none'; return; }
+    container.style.display = '';
+    if (!container.querySelector('.onb-progress-track')) {
+      const track = document.createElement('div');
+      track.className = 'onb-progress-track';
+      const bg = document.createElement('span');
+      bg.className = 'onb-progress-track-line';
+      const fill = document.createElement('span');
+      fill.className = 'onb-progress-track-fill';
+      track.appendChild(bg);
+      track.appendChild(fill);
+      for (let i = 1; i <= _ONB_TOTAL_SECTIONS; i++) {
+        const node = document.createElement('span');
+        node.className = 'onb-progress-node';
+        node.textContent = String(i);
+        track.appendChild(node);
+      }
+      const label = document.createElement('div');
+      label.className = 'onb-progress-label';
+      container.appendChild(track);
+      container.appendChild(label);
+    }
+    const nodes = container.querySelectorAll('.onb-progress-node');
+    nodes.forEach((node, idx) => {
+      const num = idx + 1;
+      node.classList.toggle('completed', num < section);
+      node.classList.toggle('active',    num === section);
+    });
+    const fill = container.querySelector('.onb-progress-track-fill');
+    if (fill) {
+      const denom = Math.max(1, _ONB_TOTAL_SECTIONS - 1);
+      fill.style.inlineSize = ((section - 1) / denom * 100) + '%';
+    }
+    const label = container.querySelector('.onb-progress-label');
+    if (label) {
+      const s = _ONB_SECTIONS[section - 1];
+      label.textContent = isEn ? s.en : s.he;
+      requestAnimationFrame(() => _onbPositionProgressLabel(container));
+    }
+  });
+  // Wire the resize listener once so a rotation or viewport-width
+  // change (unlikely mid-onboarding on phone, but cheap insurance)
+  // re-runs label positioning against the new geometry.
+  if (!_onbProgressResizeWired) {
+    _onbProgressResizeWired = true;
+    window.addEventListener('resize', () => {
+      document.querySelectorAll('.onb-v2 .onb-progress').forEach(c => {
+        if (c.style.display !== 'none') _onbPositionProgressLabel(c);
+      });
+    });
+  }
+}
+let _onbProgressResizeWired = false;
+
+// Positions the active-node label so its horizontal center sits under
+// the active node, clamped to the container's inline bounds so it
+// doesn't clip at the first or last node. Called on every render and
+// on window resize.
+function _onbPositionProgressLabel(container) {
+  const active = container.querySelector('.onb-progress-node.active');
+  const label = container.querySelector('.onb-progress-label');
+  if (!active || !label) return;
+  const cRect = container.getBoundingClientRect();
+  const nRect = active.getBoundingClientRect();
+  if (!cRect.width || !nRect.width) return;
+  const nodeCenter = nRect.left + nRect.width / 2 - cRect.left;
+  const labelW = label.offsetWidth;
+  let left = nodeCenter - labelW / 2;
+  if (left < 0) left = 0;
+  if (left + labelW > cRect.width) left = cRect.width - labelW;
+  label.style.left = left + 'px';
+}
+
+// Show step N. Applies current language, renders the seven-section
+// progress bar via _onbRenderProgress, and toggles the .onb-active
+// class on the step's DOM node. If the step's DOM id is null, treats
+// it as a partial-ladder ship — see the mitigation below.
 function _onbShowStep(n) {
   if (n < 1 || n > _ONB_TOTAL_STEPS) { _onbComplete(); return; }
   const id = _ONB_STEP_TO_ID[n];
@@ -14838,11 +15000,13 @@ function _onbShowStep(n) {
   if (!el) { _onbComplete(); return; }
   el.style.display = 'flex';
   el.classList.add('onb-active');
-  // Update progress: which phase is this step in.
+  // Update progress: seven-section bar. Renderer decides whether the
+  // bar shows for this step (via _ONB_STEP_TO_SECTION) and populates
+  // node states, filled-line width, and the active-section label.
+  // Also compute the analytics phase (retained for the
+  // onboarding_step_shown event's `phase` field).
   const phase = _ONB_STEP_TO_PHASE[n] || 1;
-  document.querySelectorAll('.onb-v2 .onb-progress').forEach(p => {
-    p.setAttribute('data-step', String(phase));
-  });
+  _onbRenderProgress(n);
   // Per-screen prepare hook — runs after the DOM node is visible so
   // input focus + slider live-update wiring can happen. Any screen
   // with dynamic content (age greeting, hours display, shock math)
@@ -15950,10 +16114,100 @@ function _onbV2PrepareTaste1() {
   if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
 }
 
+// Places the taste-page owl in the first of a few candidate slots
+// that keeps 12px+ clear of every text block on the page. Pages 20
+// and 21 use this — page 19's owl stays anchored to the quote card
+// via its .owl-t1 class since it's positioned against the card's
+// own coordinate system (perched on the corner) and already reads
+// as deliberate. This helper is for the two full-screen taste pages
+// where the owl was fighting for space with the prose and options.
+//
+// Candidate order (bottom-* preferred because the CTA row's own
+// white-space beside the button rarely collides with anything):
+//   bottom-end → bottom-start → top-end → top-start
+// Direction-aware via state.lang: 'start' = left in LTR / right in
+// RTL. Fallback: last candidate (bottom-end position, matches the
+// original owl-t2 idea of sitting above the CTA).
+//
+// Runs on a double-rAF from each prepare hook so layout has settled
+// before rects are measured. Re-runs on every entry into the step
+// (the prepare hook is the entry point for both step-advance and
+// step-cursor-resume paths), so a locale flip or content change is
+// picked up automatically on the next step render.
+function _onbV2PlaceTasteOwl(owlEl, screenEl, textEls, owlSize) {
+  if (!owlEl || !screenEl) return;
+  const isRTL = document.documentElement.dir === 'rtl';
+  const screen = screenEl.getBoundingClientRect();
+  const cs = getComputedStyle(document.documentElement);
+  const safeTop    = parseFloat(cs.getPropertyValue('--safe-top'))    || 0;
+  const safeBottom = parseFloat(cs.getPropertyValue('--safe-bottom')) || 0;
+  const ctaHolder = screenEl.querySelector('.onb-cta-holder');
+  const ctaRect   = ctaHolder ? ctaHolder.getBoundingClientRect() : null;
+  // Bottom offset baseline = CTA-row height + small breathing room.
+  // Top baseline = progress-pill row (~44px) + safe-area.
+  const bottomBase = (ctaRect ? (screen.bottom - ctaRect.top) : (80 + safeBottom)) + 20;
+  const topBase    = 60 + safeTop;
+  const edgeInset  = 20;
+  const MIN_DIST   = 12;
+
+  const rects = (textEls || [])
+    .map(el => el && el.getBoundingClientRect && el.getBoundingClientRect())
+    .filter(r => r && r.width > 0 && r.height > 0);
+  // Also treat the CTA holder as a collision target so the owl can't
+  // land on top of the button when it slides into the CTA-row band.
+  if (ctaRect) rects.push(ctaRect);
+
+  const candidates = [
+    { anchor: 'bottom', side: 'end',   v: bottomBase, h: edgeInset },
+    { anchor: 'bottom', side: 'start', v: bottomBase, h: edgeInset },
+    { anchor: 'top',    side: 'end',   v: topBase,    h: edgeInset },
+    { anchor: 'top',    side: 'start', v: topBase,    h: edgeInset },
+  ];
+
+  function candidateRect(c) {
+    const top = c.anchor === 'top' ? screen.top + c.v : screen.bottom - c.v - owlSize;
+    const wantsStart = c.side === 'start';
+    const leftAnchored = (wantsStart && !isRTL) || (!wantsStart && isRTL);
+    const left = leftAnchored
+      ? screen.left + c.h
+      : screen.right - c.h - owlSize;
+    return { top, left, right: left + owlSize, bottom: top + owlSize };
+  }
+  function collides(a, b) {
+    // Inflate b by MIN_DIST on all sides so an owl flush against text
+    // reads as a collision even when strictly non-overlapping.
+    return !(
+      a.right  < b.left   - MIN_DIST ||
+      a.left   > b.right  + MIN_DIST ||
+      a.bottom < b.top    - MIN_DIST ||
+      a.top    > b.bottom + MIN_DIST
+    );
+  }
+  let winner = candidates[candidates.length - 1];
+  for (const c of candidates) {
+    const r = candidateRect(c);
+    if (!rects.some(tr => collides(r, tr))) { winner = c; break; }
+  }
+
+  // Apply the winning position inline. Clear both axes' opposite
+  // properties so the class-based defaults from .owl-t2 / .owl-t3
+  // don't leak through (e.g. .owl-t3 sets `top`; if we pick bottom-
+  // anchored we need to blank the `top` value).
+  owlEl.style.top             = 'auto';
+  owlEl.style.bottom          = 'auto';
+  owlEl.style.insetInlineStart = 'auto';
+  owlEl.style.insetInlineEnd   = 'auto';
+  if (winner.anchor === 'top') owlEl.style.top    = winner.v + 'px';
+  else                          owlEl.style.bottom = winner.v + 'px';
+  if (winner.side === 'start')  owlEl.style.insetInlineStart = winner.h + 'px';
+  else                          owlEl.style.insetInlineEnd   = winner.h + 'px';
+}
+
 // Step 20 (taste-2) — "what he meant" head + page-2 prose + optional
 // punch line. Punch line is only in the philosophy config; hidden
-// entirely when empty on Smith / Freud. One companion owl (bottom-
-// inline-start, largest of the three).
+// entirely when empty on Smith / Freud. One companion owl, placed
+// dynamically by _onbV2PlaceTasteOwl to avoid colliding with the
+// prose or the punch line whichever locale is active.
 function _onbV2PrepareTaste2() {
   const isEn = state.lang === 'en';
   const cfg = _onbV2TasteCfg();
@@ -15972,6 +16226,18 @@ function _onbV2PrepareTaste2() {
       punchEl.style.display = 'none';
     }
   }
+  // Dynamic owl placement — double-rAF so head/prose/punch layout
+  // has settled before rects are read. Owl width is 54px (matches
+  // .owl-t2 CSS class).
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const screenEl = document.getElementById('onb-v2-taste-2');
+    const textEls = [
+      document.getElementById('onb-v2-taste-2-head'),
+      document.getElementById('onb-v2-taste-2-page2'),
+      punchEl && punchEl.style.display !== 'none' ? punchEl : null,
+    ].filter(Boolean);
+    _onbV2PlaceTasteOwl(owlEl, screenEl, textEls, 54);
+  }));
 }
 
 // Step 21 (taste-q) — scenario prose + question + 3 options. Resets
@@ -16003,9 +16269,21 @@ function _onbV2PrepareTasteQ() {
   }
   const cta = document.getElementById('onb-v2-taste-q-cta');
   if (cta) cta.disabled = true;
-  // One companion owl (top-inline-start, smallest of the three).
+  // One companion owl, placed dynamically by _onbV2PlaceTasteOwl to
+  // clear the scenario prose, question head, and the three option
+  // cards. Owl width 46px (matches .owl-t3 CSS class).
   const owlEl = document.getElementById('onb-v2-taste-q-owl');
   if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const screenEl = document.getElementById('onb-v2-taste-q');
+    const optionCards = Array.from(document.querySelectorAll('#onb-v2-taste-q-options .onb-v2-card'));
+    const textEls = [
+      document.getElementById('onb-v2-taste-q-scenario'),
+      document.getElementById('onb-v2-taste-q-head'),
+      ...optionCards,
+    ].filter(Boolean);
+    _onbV2PlaceTasteOwl(owlEl, screenEl, textEls, 46);
+  }));
 }
 
 // Step 22 (first-card) — subject-specific card face using the real
@@ -28768,7 +29046,6 @@ document.addEventListener('DOMContentLoaded', function() {
     <button type="button" class="onb-lang-btn" data-lang="en" onclick="_onbSetLang('en')">English</button>
   </div>
   <div class="onb-progress" aria-hidden="true" data-step="1">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <p class="onb-v2-welcome-line" id="onb-v2-welcome-line"></p>
   <h1 class="onb-v2-welcome-mark">Corpus</h1>
@@ -28781,7 +29058,6 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 2 — Problem. Confrontation-lite; sets up the reframe on step 3. -->
 <div id="onb-v2-problem" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="1">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -28796,7 +29072,6 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 3 — Solution. Reframe against step 2. Anchor line, no subtitle. -->
 <div id="onb-v2-solution" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="1">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -28812,7 +29087,6 @@ document.addEventListener('DOMContentLoaded', function() {
      styling from .onb-v2-input (see CSS). Enter key submits when valid. -->
 <div id="onb-v2-name" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="2">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -28837,7 +29111,6 @@ document.addEventListener('DOMContentLoaded', function() {
      state.onbAnswers.gender. -->
 <div id="onb-v2-gender" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="2">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -28856,7 +29129,6 @@ document.addEventListener('DOMContentLoaded', function() {
      Age is used visibly on the shock screen (step 7) as an eyebrow. -->
 <div id="onb-v2-age" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="2">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -28879,7 +29151,6 @@ document.addEventListener('DOMContentLoaded', function() {
      .onb-v2-slider* CSS is reused by step 13 (reading frequency). -->
 <div id="onb-v2-hours" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="2">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -28909,7 +29180,6 @@ document.addEventListener('DOMContentLoaded', function() {
      displayed. -->
 <div id="onb-v2-shock" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="3">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy onb-v2-shock">
@@ -28929,7 +29199,6 @@ document.addEventListener('DOMContentLoaded', function() {
      v11 rebuild — v4 head absorbed both beats in a single line. -->
 <div id="onb-v2-plan" class="onb-screen onb-v2 onb-bg-philosophy onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="3">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -28948,7 +29217,6 @@ document.addEventListener('DOMContentLoaded', function() {
      which flips the app-wide theme for every downstream v2 screen. -->
 <div id="onb-v2-subject" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="4">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -28966,7 +29234,6 @@ document.addEventListener('DOMContentLoaded', function() {
      disabled until at least one pick, tap caps at 3. -->
 <div id="onb-v2-q1" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="4">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -28983,7 +29250,6 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Step 11 — Q2 multi-select. Same component + shape as Q1. -->
 <div id="onb-v2-q2" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="4">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -29002,7 +29268,6 @@ document.addEventListener('DOMContentLoaded', function() {
      intent without a separate migration prompt. -->
 <div id="onb-v2-q3" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="4">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -29021,7 +29286,6 @@ document.addEventListener('DOMContentLoaded', function() {
      step 6. -->
 <div id="onb-v2-q4" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -29047,7 +29311,6 @@ document.addEventListener('DOMContentLoaded', function() {
      and state.subject. -->
 <div id="onb-v2-mirror" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -29075,7 +29338,6 @@ document.addEventListener('DOMContentLoaded', function() {
      by _onbV2PrepareHowItWorks. -->
 <div id="onb-v2-how-it-works" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -29218,7 +29480,6 @@ document.addEventListener('DOMContentLoaded', function() {
      head + sub + CTA at large font scale push past the fold. -->
 <div id="onb-v2-adds-up" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="6">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -29270,7 +29531,6 @@ document.addEventListener('DOMContentLoaded', function() {
      completion. Both paths advance to step 33 (reviews). -->
 <div id="onb-v2-notifications" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -29302,7 +29562,6 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="onb-v2-paywall" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-paywall-skip" onclick="_exitPaywall('skip')"></button>
   <div class="onb-progress" aria-hidden="true" data-step="5">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner onb-v2-paywall-inner">
     <div class="paywall-brand">Corpus</div>
@@ -29344,7 +29603,6 @@ document.addEventListener('DOMContentLoaded', function() {
      using _cloneOwlSvgHTML — same helper the signup screen uses. -->
 <div id="onb-v2-lets-start" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-signup-hero" id="onb-v2-lets-start-owl" aria-hidden="true"></div>
@@ -29365,7 +29623,6 @@ document.addEventListener('DOMContentLoaded', function() {
      mitigation catches any partial-ship advance at slot 23. -->
 <div id="onb-v2-streak" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy onb-v2-streak-copy">
@@ -29392,7 +29649,6 @@ document.addEventListener('DOMContentLoaded', function() {
      with the exact values the runtime goal-met consumers recognize. -->
 <div id="onb-v2-goal" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="5">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-goal-inner">
     <div class="onb-goal-copy">
@@ -29457,7 +29713,6 @@ document.addEventListener('DOMContentLoaded', function() {
      rendered in _onbV2PrepareJourney. -->
 <div id="onb-v2-journey" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="6">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -29483,7 +29738,6 @@ document.addEventListener('DOMContentLoaded', function() {
      anything downstream. CTA runs _onbComplete → home. -->
 <div id="onb-v2-commit" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
   <div class="onb-progress" aria-hidden="true" data-step="6">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-copy">
@@ -29511,7 +29765,6 @@ document.addEventListener('DOMContentLoaded', function() {
        would require re-doing the "the taste replaces the first
        dialogue" argument, so keep it dead. -->
   <div class="onb-progress" aria-hidden="true" data-step="2">
-    <span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span><span class="onb-pill"></span>
   </div>
   <div class="onb-v2-inner">
     <div class="onb-v2-signup-hero" id="onb-v2-signup-owl" aria-hidden="true"></div>
