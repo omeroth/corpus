@@ -11424,12 +11424,19 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // project + platform. Real gating happens server-side via the webhook +
 // Supabase RLS.
 //
-// Android is intentionally empty until Google credential validation
-// finishes. _configureRC skips the entire configure when the key is
-// empty (logs "no API key for platform android"), so Android users get
-// no paywall until this flips — one-line edit here, no other changes.
+// Both platforms are wired. Do NOT reintroduce an empty-string
+// placeholder here: _configureRC short-circuits silently when the key
+// is falsy (logs "no API key for platform <plat> — skipping configure"),
+// which means the SDK never configures, offerings stay empty, and
+// nobody on that platform can complete a purchase. Android sat empty
+// from a8a689a (2026-08-30 RC wire-up) until 2026-09-18 for exactly
+// this reason — the placeholder outlived the Google credential
+// validation that had motivated it, and Android purchase failures
+// were invisible because RC never got far enough to error. If a
+// future platform ever needs temporary neutralisation, flip
+// PAYWALL_ENABLED below instead of blanking the key.
 const RC_IOS_API_KEY     = 'appl_ALVuRtIPTDlncRpGeAJfgwLLlaY';
-const RC_ANDROID_API_KEY = '';
+const RC_ANDROID_API_KEY = 'goog_LemNQZsoXhkKzOlVeMtqxDYyXen';
 
 // Master paywall kill-switch. FALSE ships the release with subscriptions
 // dark — no gate ever locks content, no paywall modal ever appears —
