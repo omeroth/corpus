@@ -40,6 +40,12 @@
     source: 'app',
     app_platform: (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || 'web'
   });
+  // app_version is registered further down as a second posthog.register
+  // call right after the APP_VERSION const is declared (main script
+  // body, ~line 11447). Can't be registered here because the head
+  // script runs before the main body's const declarations are in
+  // scope; register() merges super-properties, so the second call
+  // updates in place without clobbering source / app_platform above.
   posthog.capture('$pageview');
   console.log("PostHog ready");
 
@@ -11416,6 +11422,22 @@ if (typeof corpusData === 'undefined' || typeof economicsData === 'undefined'
 // user to grab the newest App Store build.
 const APP_VERSION = '1.4.3';
 
+// Register app_version as a PostHog super-property so every event
+// carries the shipped build. Deferred here rather than at the
+// head-script's initial register call because APP_VERSION isn't in
+// scope up there — head runs before this const is declared. register()
+// merges super-properties, so this only ADDS app_version alongside
+// source and app_platform already registered at the head; nothing
+// gets clobbered. Effect: PostHog insights can segment funnels /
+// errors / hangs by version without waiting for a client rollout to
+// backfill (auth_hang by app_version was returning a single NULL
+// bucket before this).
+try {
+  if (typeof posthog !== 'undefined' && posthog.register) {
+    posthog.register({ app_version: APP_VERSION });
+  }
+} catch(e) {}
+
 const SUPABASE_URL = 'https://xcoikjoatcrjqxzykwlt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhjb2lram9hdGNyanF4enlrd2x0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjc5NjYsImV4cCI6MjA4OTcwMzk2Nn0.5EhOsN9M4_kLYoRKO97dPGof8RN7PteXQrtKyx4CcKI';
 
@@ -13502,11 +13524,23 @@ async function _authProviderStart(provider, ctx) {
       // resolves immediately. Guarded so the auth flow can't run before
       // the plugin is registered.
       try { if (_socialLoginReady) await _socialLoginReady; } catch(e) {}
-      if (provider === 'google') {
-        // Log out of the plugin's cached Google session first so the
-        // account picker always appears (otherwise iOS silently reuses
-        // the last account).
-        try { await window.Capacitor.Plugins.SocialLogin.logout({ provider: 'google' }); } catch(e) {}
+      if (provider === 'google' && window.Capacitor.getPlatform() === 'ios') {
+        // iOS-only: log out of the plugin's cached Google session
+        // first so the account picker always appears (otherwise iOS
+        // silently reuses the last account, which reads as broken UX
+        // to anyone with multiple Google accounts).
+        //
+        // NOT applied on Android because the modern Google Sign-In
+        // path there uses Credential Manager, which has no session
+        // concept in the same way and treats logout as either a no-op
+        // or a state-invalidating call that can leave Credential
+        // Manager wedged. Suspected contributor to the 60s hangs on
+        // Android — logout succeeds silently but leaves Credential
+        // Manager in a state where the subsequent login sits waiting
+        // for a picker that never appears. See auth_hang telemetry:
+        // ~20 events at budget 60000 in the last 7 days on Android
+        // vs 1 on iOS. Sequence gated here on 2026-09-18; measuring
+        // if the Android rate drops after ship.
       }
       // Android: the Capgo plugin throws if `options.scopes` is passed for
       // Google without a matching MainActivity modification. The default
