@@ -6454,6 +6454,49 @@
   }
   html.dark .onb-screen.onb-v2 .onb-v2-signup-error { color: #FF8574; }
 
+  /* Email fallback (revealed after first Apple/Google failure or
+     hang on step 4). Hidden by default via inline style; JS flips
+     to display: '' and scrolls into view. Sits inside the
+     .onb-v2-signup-actions flex column, so the container's own
+     gap (10px) separates it from the Google button above; the
+     lead line then holds the eye before the inputs. */
+  .onb-screen.onb-v2 .onb-v2-signup-email-fallback {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 6px;
+  }
+  .onb-screen.onb-v2 .onb-v2-signup-email-lead {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-weight: 600;
+    font-size: calc(14px * var(--text-scale));
+    color: var(--text-2);
+    text-align: center;
+    margin: 0 0 4px;
+    line-height: 1.35;
+  }
+  .onb-screen.onb-v2 .onb-v2-signup-email-input {
+    /* Overrides .onb-v2-input's centered text alignment — email +
+       password read more conventionally with left/start alignment,
+       and text-align:start matches native input behavior in both
+       LTR and RTL. Also widens to fill the CTA-holder box rather
+       than the 320px max-width the name/age inputs use. */
+    text-align: start;
+    max-width: none;
+  }
+  .onb-screen.onb-v2 .onb-v2-signup-email-error {
+    color: #C0392B;
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(13px * var(--text-scale));
+    font-weight: 500;
+    text-align: center;
+    margin: 4px 0 0;
+    line-height: 1.35;
+    min-height: 0;
+  }
+  .onb-screen.onb-v2 .onb-v2-signup-email-error:empty { display: none; }
+  html.dark .onb-screen.onb-v2 .onb-v2-signup-email-error { color: #FF8574; }
+
   /* Step 3 — Headway signup elements. Owl hero at the top, small
      grey Skip in the top-right corner (not in the CTA holder), legal
      disclosure line above the buttons, Apple as the primary full-
@@ -13509,12 +13552,23 @@ async function _authProviderStart(provider, ctx) {
         : 'ההתחברות לא הושלמה. נסו שוב.');
   const genericFailMsg = isEn ? 'Sign in failed. Please try again.' : 'ההתחברות נכשלה. נסו שוב.';
   const showErr = (msg) => { if (errorEl) errorEl.textContent = msg; };
+  // Both cap helpers optionally notify the caller (via ctx.onFailOrHang)
+  // in addition to firing telemetry — callers that need to react to
+  // the failure (e.g., onboarding step 4 revealing the email fallback
+  // after ANY provider failure) hook in there. Try/catch around the
+  // callback so a caller bug can't break the auth teardown.
+  const notifyFailOrHang = (kind, phase) => {
+    if (typeof ctx.onFailOrHang !== 'function') return;
+    try { ctx.onFailOrHang(kind, phase); } catch(e) {}
+  };
   const capFail = (phase, err) => {
     const info = _extractAuthError(err);
     _phCapture('auth_failure', { method: provider, intent: 'signin', phase, error_code: info.code, error_message: info.message });
+    notifyFailOrHang('failure', phase);
   };
   const capHang = (phase) => {
     _phCapture('auth_hang', { method: provider, intent: 'signin', phase, budget_ms: _AUTH_PHASE_BUDGETS_MS[phase] });
+    notifyFailOrHang('hang', phase);
   };
   try {
     if (_isNative) {
@@ -14844,6 +14898,40 @@ const _ONB_COPY = {
     },
     legalTerms:   { en: 'Terms',          he: 'תנאי השימוש' },
     legalPrivacy: { en: 'Privacy Policy', he: 'מדיניות הפרטיות' },
+    // Email fallback block — hidden by default on step 4, revealed on
+    // the first Apple/Google failure or hang so a stuck user has a
+    // second path. Copy strings are deliberately neutral about whether
+    // an email is already registered (see emailAlreadyKnown below).
+    emailFallbackLead: {
+      en: 'Trouble signing in? Continue with email.',
+      he: 'בעיה בהרשמה? המשיכו עם אימייל.',
+    },
+    emailPlaceholder:    { en: 'Email',    he: 'אימייל' },
+    passwordPlaceholder: { en: 'Password', he: 'סיסמה' },
+    emailContinue:       { en: 'Continue', he: 'המשך' },
+    emailSignInContinue: { en: 'Sign in',  he: 'התחברות' },
+    // Neutral wording — used when Supabase returns an empty identities
+    // array (email is already registered). Never CONFIRMS the account
+    // exists; just tells the user to try their password. This avoids
+    // email enumeration disclosure — anyone who taps signup with a
+    // random address gets the same message they'd get with their own
+    // registered address, so scraping the endpoint gives no signal.
+    emailAlreadyKnown: {
+      en: 'Try your password to sign in.',
+      he: 'נסו את הסיסמה שלכם כדי להתחבר.',
+    },
+    emailMissing: {
+      en: 'Please enter your email and password.',
+      he: 'הכניסו אימייל וסיסמה.',
+    },
+    emailWrongPassword: {
+      en: 'Wrong password. Try again.',
+      he: 'סיסמה שגויה. נסו שוב.',
+    },
+    emailGenericFail: {
+      en: 'Something went wrong. Please try again.',
+      he: 'משהו השתבש. נסו שוב.',
+    },
   },
 };
 
@@ -15013,6 +15101,36 @@ function _onbApplyLang(lang) {
   };
   setPlaceholder('onb-v2-name-input', 'name');
   setPlaceholder('onb-v2-age-input',  'age');
+  // Step 4 email fallback — lead line + placeholders + CTA. Bindings
+  // fire on every lang change; button label uses signup.emailContinue
+  // by default, swaps to signup.emailSignInContinue after the
+  // signup-attempt-returned-empty-identities response (see the
+  // handler for the two-tap flow).
+  (function bindSignupEmailFallback() {
+    const leadEl  = document.getElementById('onb-v2-signup-email-lead');
+    const emailEl = document.getElementById('onb-v2-signup-email-input');
+    const passEl  = document.getElementById('onb-v2-signup-password-input');
+    const ctaEl   = document.getElementById('onb-v2-signup-email-cta');
+    const s = _ONB_COPY.signup || {};
+    if (leadEl && s.emailFallbackLead) {
+      leadEl.textContent = isEn ? s.emailFallbackLead.en : s.emailFallbackLead.he;
+    }
+    if (emailEl && s.emailPlaceholder) {
+      emailEl.placeholder = isEn ? s.emailPlaceholder.en : s.emailPlaceholder.he;
+    }
+    if (passEl && s.passwordPlaceholder) {
+      passEl.placeholder = isEn ? s.passwordPlaceholder.en : s.passwordPlaceholder.he;
+    }
+    if (ctaEl && s.emailContinue) {
+      // Two-tap mode may have swapped the label to emailSignInContinue.
+      // If we're mid-flow with mode=signin, keep that label; otherwise
+      // reset to emailContinue.
+      const label = (_onbSignupEmailMode === 'signin' && s.emailSignInContinue)
+        ? (isEn ? s.emailSignInContinue.en : s.emailSignInContinue.he)
+        : (isEn ? s.emailContinue.en       : s.emailContinue.he);
+      ctaEl.textContent = label;
+    }
+  })();
   // Lang toggle on screen 1 — sliding indicator retired; the
   // active button carries the pill treatment via .is-active
   // directly, so we just flip the class on whichever button
@@ -15955,6 +16073,147 @@ function _onbV2CtaCommit() {
 //     Profile later.
 //   * OAuth failure surfaces the error in the step 4 error slot; the
 //     button re-enables so the user can retry or tap Skip.
+// Step-4 email-fallback mode. Starts as 'signup' — first submit tries
+// sb.auth.signUp. If Supabase returns a data.user with an empty
+// identities array (which is how Supabase signals "email already
+// registered" without disclosing it explicitly), mode flips to
+// 'signin' and the button label swaps to signup.emailSignInContinue.
+// Second tap runs signInWithPassword. Reset back to 'signup' when the
+// step first mounts (see _onbV2PrepareSignup below? — currently no
+// dedicated prepare hook for signup, so reset happens inline in the
+// reveal helper — which is fine because the reveal fires exactly once
+// per screen mount from an Apple/Google failure).
+let _onbSignupEmailMode = 'signup';
+
+// Reveals the email fallback beneath the Apple/Google buttons on step
+// 4 and scrolls it into view. Fired from _authProviderStart's fail /
+// hang path via ctx.onFailOrHang; also idempotent — once visible, a
+// second failure doesn't re-scroll or re-fire telemetry. Onboarding
+// step-4 stuck-user rescue: someone who has already waited 60s on a
+// Google hang shouldn't have to wait another 60 to discover there's
+// a third way in.
+let _onbSignupEmailShownTrigger = null;
+function _onbShowSignupEmailFallback(trigger) {
+  const box = document.getElementById('onb-v2-signup-email-fallback');
+  if (!box) return;
+  const alreadyVisible = box.style.display !== 'none';
+  box.style.display = '';
+  if (alreadyVisible) return;
+  // First reveal in this mount — fire telemetry + scroll into view.
+  _onbSignupEmailShownTrigger = trigger || 'unknown';
+  try {
+    _phCapture('onboarding_signup_email_shown', { trigger: _onbSignupEmailShownTrigger });
+  } catch(e) {}
+  // Scroll the fallback into view — the CTA holder sits at the bottom
+  // of the step and on iPhone SE the newly-revealed inputs land below
+  // the fold. Deferred one rAF so layout settles after the reveal.
+  requestAnimationFrame(() => {
+    try { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
+  });
+}
+
+// Called from the fallback CTA. Two-tap flow:
+//   Tap 1: mode = 'signup' → sb.auth.signUp. If success with real
+//          identities, complete onboarding step 4. If success with
+//          empty identities (email already registered), flip mode to
+//          'signin', swap button label, show neutral message. Don't
+//          confirm the account exists — the message just asks user to
+//          try their password (email-enumeration hygiene).
+//   Tap 2: mode = 'signin' → sb.auth.signInWithPassword. Success
+//          completes step 4; failure shows a "wrong password" message
+//          and stays in signin mode for retry.
+async function _onbSignupEmail() {
+  const isEn = state.lang === 'en';
+  const s = _ONB_COPY.signup || {};
+  const emailEl = document.getElementById('onb-v2-signup-email-input');
+  const passEl  = document.getElementById('onb-v2-signup-password-input');
+  const ctaEl   = document.getElementById('onb-v2-signup-email-cta');
+  const errEl   = document.getElementById('onb-v2-signup-email-error');
+  const email = (emailEl && emailEl.value || '').trim();
+  const password = (passEl && passEl.value) || '';
+  const showErr = (msg) => { if (errEl) errEl.textContent = msg || ''; };
+  const restoreBtn = () => {
+    if (!ctaEl) return;
+    ctaEl.disabled = false;
+    const label = (_onbSignupEmailMode === 'signin' && s.emailSignInContinue)
+      ? (isEn ? s.emailSignInContinue.en : s.emailSignInContinue.he)
+      : (isEn ? s.emailContinue.en       : s.emailContinue.he);
+    ctaEl.textContent = label;
+  };
+  showErr('');
+  if (!email || !password) {
+    showErr(isEn ? s.emailMissing.en : s.emailMissing.he);
+    return;
+  }
+  if (ctaEl) {
+    ctaEl.disabled = true;
+    ctaEl.textContent = isEn ? 'Working…' : 'עובד…';
+  }
+  try {
+    if (_onbSignupEmailMode === 'signup') {
+      const { data, error } = await _authRace(sb.auth.signUp({ email, password }), _AUTH_PHASE_BUDGETS_MS.supabase_signup || 10000);
+      if (error) {
+        _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'supabase_signup', error_code: (error.code || error.status || null), error_message: error.message || String(error) });
+        showErr(error.message || (isEn ? s.emailGenericFail.en : s.emailGenericFail.he));
+        restoreBtn();
+        return;
+      }
+      // Supabase email-enumeration protection: identities === [] means
+      // the address is already registered. Flip to signin mode and
+      // prompt the user to try their password. Copy is deliberately
+      // neutral — does NOT say "account exists".
+      const identities = data && data.user && Array.isArray(data.user.identities) ? data.user.identities : null;
+      if (identities && identities.length === 0) {
+        _onbSignupEmailMode = 'signin';
+        showErr(isEn ? s.emailAlreadyKnown.en : s.emailAlreadyKnown.he);
+        restoreBtn();
+        return;
+      }
+      // Real new user.
+      const user = data && data.user;
+      if (!user) {
+        showErr(isEn ? s.emailGenericFail.en : s.emailGenericFail.he);
+        restoreBtn();
+        return;
+      }
+      await enterAppState(user);
+      try { _phCapture('onboarding_signup_completed', { method: 'email' }); } catch(e) {}
+      _onbAdvanceStep(4, 5);
+      return;
+    }
+    // mode === 'signin'
+    const { data, error } = await _authRace(sb.auth.signInWithPassword({ email, password }), _AUTH_PHASE_BUDGETS_MS.supabase_signin || 10000);
+    if (error) {
+      _phCapture('auth_failure', { method: 'email', intent: 'signin', phase: 'supabase_signin', error_code: (error.code || error.status || null), error_message: error.message || String(error) });
+      // Most common cause here: wrong password. Show a targeted
+      // message; keep mode in 'signin' so a retry uses the same path.
+      const code = error.code || error.status || '';
+      const wrong = /invalid.*credentials|invalid.*password|wrong.*password/i.test(String(error.message || '')) || String(code).toLowerCase().includes('invalid');
+      showErr(wrong ? (isEn ? s.emailWrongPassword.en : s.emailWrongPassword.he) : (error.message || (isEn ? s.emailGenericFail.en : s.emailGenericFail.he)));
+      restoreBtn();
+      return;
+    }
+    const user = data && data.user;
+    if (!user) {
+      showErr(isEn ? s.emailGenericFail.en : s.emailGenericFail.he);
+      restoreBtn();
+      return;
+    }
+    await enterAppState(user);
+    try { _phCapture('onboarding_signup_completed', { method: 'email' }); } catch(e) {}
+    _onbAdvanceStep(4, 5);
+  } catch (e) {
+    if (e === _AUTH_HANG_SENTINEL) {
+      const phase = _onbSignupEmailMode === 'signup' ? 'supabase_signup' : 'supabase_signin';
+      _phCapture('auth_hang', { method: 'email', intent: _onbSignupEmailMode, phase, budget_ms: _AUTH_PHASE_BUDGETS_MS[phase] || 10000 });
+      showErr(isEn ? s.emailGenericFail.en : s.emailGenericFail.he);
+    } else {
+      showErr(isEn ? s.emailGenericFail.en : s.emailGenericFail.he);
+    }
+    restoreBtn();
+  }
+}
+
 async function _onbSignupApple() {
   try { _phCapture('onboarding_signup_prompt_action', { action: 'apple' }); } catch(e) {}
   const isEn = state.lang === 'en';
@@ -15963,6 +16222,11 @@ async function _onbSignupApple() {
     textEl: document.getElementById('onb-signup-apple-text'),
     errorEl: document.getElementById('onb-v2-signup-error'),
     defaultLabel: isEn ? 'Continue with Apple' : 'המשך עם Apple',
+    // Reveal the email fallback on first failure or hang — stuck-user
+    // rescue for the mandatory step 4 (no Skip in v11).
+    onFailOrHang: (kind, phase) => {
+      try { _onbShowSignupEmailFallback(kind + ':apple:' + phase); } catch(e) {}
+    },
     postAuthContinue: async (user) => {
       // State-only enter: load progress + subscription + telemetry
       // + mark-auth-resolved, but DON'T route UI to home. Then
@@ -15982,6 +16246,9 @@ async function _onbSignupGoogle() {
     textEl: document.getElementById('onb-signup-google-text'),
     errorEl: document.getElementById('onb-v2-signup-error'),
     defaultLabel: isEn ? 'Continue with Google' : 'המשך עם Google',
+    onFailOrHang: (kind, phase) => {
+      try { _onbShowSignupEmailFallback(kind + ':google:' + phase); } catch(e) {}
+    },
     postAuthContinue: async (user) => {
       await enterAppState(user);
       try { _phCapture('onboarding_signup_completed', { method: 'google' }); } catch(e) {}
@@ -30128,6 +30395,18 @@ document.addEventListener('DOMContentLoaded', function() {
     <button type="button" class="auth-btn auth-btn-social onb-v2-signup-secondary" id="onb-signup-google-btn" onclick="_onbSignupGoogle()">
       <span class="auth-social-icon">G</span> <span id="onb-signup-google-text"></span>
     </button>
+    <!-- Email fallback. Hidden by default; revealed by _onbShowSignup
+         EmailFallback on the first Apple/Google failure or hang. Sits
+         inside .onb-v2-signup-actions so it inherits the same gap /
+         width constraints as the buttons above; the container's own
+         padding-top separates it visually from the Google button. -->
+    <div class="onb-v2-signup-email-fallback" id="onb-v2-signup-email-fallback" style="display:none">
+      <p class="onb-v2-signup-email-lead" id="onb-v2-signup-email-lead"></p>
+      <input type="email" class="onb-v2-input onb-v2-signup-email-input" id="onb-v2-signup-email-input" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false">
+      <input type="password" class="onb-v2-input onb-v2-signup-email-input" id="onb-v2-signup-password-input" autocomplete="new-password">
+      <button type="button" class="nav-btn onb-cta onb-v2-signup-email-cta" id="onb-v2-signup-email-cta" onclick="_onbSignupEmail()"></button>
+      <p class="onb-v2-signup-email-error" id="onb-v2-signup-email-error"></p>
+    </div>
   </div>
 </div>
 
