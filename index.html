@@ -12302,19 +12302,49 @@ async function loadProgressFromSupabase() {
   }
 }
 
+// Returns true when the user is inside the post-purchase optimistic
+// window — a 24h grace period set by the purchase-success handler
+// (and by the restore path) to cover the gap between a real IAP
+// completing and the Supabase entitlement row landing via the
+// RevenueCat webhook. Two callers depend on this rule:
+//
+//   1. loadSubscription's no-row branch — if the row hasn't arrived
+//      yet AND we're in the window, isPaid must stay true so a fresh
+//      purchaser isn't demoted to free while the webhook is in flight.
+//   2. canAccessWeek's paid-tier check — belt-and-braces for any
+//      moment state.isPaid might be stale-false (e.g., between the
+//      purchase-success handler firing and the first loadSubscription
+//      returning).
+//
+// The rule was previously inlined in both places. In one of them
+// (loadSubscription) the check was omitted — the row-not-yet branch
+// set isPaid = false while explicitly preserving subscriptionOptimistic
+// with a comment saying not to lock the user out, but the derived
+// isPaid still got stomped anyway. Every downstream consumer of
+// state.isPaid then saw the wrong value until the webhook landed.
+// One helper, one rule, both call sites.
+function _isInSubscriptionOptimisticWindow() {
+  const opt = state && state.subscriptionOptimistic;
+  return !!(opt && opt.until && new Date(opt.until).getTime() > Date.now());
+}
+
 async function loadSubscription() {
   if (!currentUser) return;
   try {
     // maybeSingle: 0 rows returns { data: null } without a 406 status,
     // which was noisy for the vast majority of users who have never
-    // subscribed. Empty result = free user.
+    // subscribed. Empty result = free user, UNLESS the post-purchase
+    // optimistic window is still open (see helper above).
     const _fetchT0 = performance.now();
     const { data } = await sb.from('subscriptions')
       .select('user_id, entitlement, product_id, platform, status, current_period_end, trial_end, will_renew, originally_purchased_at')
       .eq('user_id', currentUser.id).maybeSingle();
     console.log('[Sync] subscriptions fetch:', Math.round(performance.now() - _fetchT0), 'ms — data:', !!data);
     if (!data) {
-      state.isPaid = false;
+      // No row yet. If we're still inside the optimistic window from a
+      // recent purchase, honor it — the row will materialize when the
+      // webhook lands. Otherwise this is a genuinely-free user.
+      state.isPaid = _isInSubscriptionOptimisticWindow();
       state.grandfathered = false;
       state.subscription = null;
       // Do NOT clear subscriptionOptimistic here — a webhook lag after
@@ -20881,8 +20911,15 @@ function canAccessWeek(subject, weekId) {
   if (weekId === 1) return true;                              // free tier
   if (state.grandfathered) return true;
   if (state.isPaid) return true;
-  const opt = state.subscriptionOptimistic;
-  if (opt && opt.until && new Date(opt.until).getTime() > Date.now()) return true;
+  // Belt-and-braces: loadSubscription's no-row branch already respects
+  // the optimistic window (sets isPaid = true when we're inside it),
+  // so this branch normally isn't the one covering post-purchase gaps.
+  // But there's a small window between the purchase-success handler
+  // firing (which sets subscriptionOptimistic + isPaid = true) and the
+  // first loadSubscription completing — and there's the resume-boot
+  // path where subscriptionOptimistic is loaded from persisted state
+  // before loadSubscription runs. Both paths lean on this check.
+  if (_isInSubscriptionOptimisticWindow()) return true;
   // Started-this-chapter clause: any completed day in this chapter —
   // including the auto-completing Day 0 preamble — grants full access
   // to it. Protects lapsed subscribers from losing mid-chapter access
