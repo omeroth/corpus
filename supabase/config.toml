@@ -27,3 +27,23 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/backfill-loops-progress/deno.json"
 entrypoint = "./functions/backfill-loops-progress/index.ts"
+
+# revenuecat-webhook: verify_jwt MUST be false. RevenueCat doesn't send a
+# Supabase JWT — it sends a static bearer token that the function verifies
+# against REVENUECAT_WEBHOOK_SECRET (see verifyAuth in index.ts). If the
+# Supabase gateway's JWT check is left on, every RC request is rejected at
+# the edge before the function ever runs — silent in the function logs,
+# 100% delivery failure at RC's end.
+#
+# Missing this block was the cause of the 2026-09-16 outage: the function
+# had been deployed with --no-verify-jwt as a CLI flag; a redeploy after
+# 2026-09-14 dropped the flag, Supabase defaulted the function to
+# verify_jwt = true, and every RC delivery got rejected at the gateway
+# for 3 days. Fix: verify_jwt in config wins over the CLI flag, so a
+# future redeploy that omits the flag no longer regresses.
+#
+# No import_map because the function doesn't use one — only index.ts.
+[functions.revenuecat-webhook]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/revenuecat-webhook/index.ts"
