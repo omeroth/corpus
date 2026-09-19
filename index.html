@@ -13353,7 +13353,7 @@ async function handleAuthSubmit() {
           return;
         }
         const info = _extractAuthError(e);
-        _phCapture('auth_failure', { method: 'email', intent: 'signin', phase: 'supabase_signin', error_code: info.code, error_message: info.message });
+        _phCapture('auth_failure', { method: 'email', intent: 'signin', phase: 'supabase_signin', error_code: info.code, error_message: info.message, error_native_code: info.nativeCode, error_raw: info.raw });
         errEl.textContent = info.message;
         restoreLabel();
         return;
@@ -13361,7 +13361,7 @@ async function handleAuthSubmit() {
       const { data, error } = res;
       if (error) {
         const info = _extractAuthError(error);
-        _phCapture('auth_failure', { method: 'email', intent: 'signin', phase: 'supabase_signin', error_code: info.code, error_message: info.message });
+        _phCapture('auth_failure', { method: 'email', intent: 'signin', phase: 'supabase_signin', error_code: info.code, error_message: info.message, error_native_code: info.nativeCode, error_raw: info.raw });
         errEl.textContent = error.message;
         restoreLabel();
         return;
@@ -13406,7 +13406,7 @@ async function handleAuthSubmit() {
           return;
         }
         const info = _extractAuthError(e);
-        _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'supabase_signup', error_code: info.code, error_message: info.message });
+        _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'supabase_signup', error_code: info.code, error_message: info.message, error_native_code: info.nativeCode, error_raw: info.raw });
         errEl.textContent = info.message;
         restoreLabel();
         return;
@@ -13414,7 +13414,7 @@ async function handleAuthSubmit() {
       const { data, error } = res;
       if (error) {
         const info = _extractAuthError(error);
-        _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'supabase_signup', error_code: info.code, error_message: info.message });
+        _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'supabase_signup', error_code: info.code, error_message: info.message, error_native_code: info.nativeCode, error_raw: info.raw });
         errEl.textContent = error.message;
         restoreLabel();
         return;
@@ -13563,7 +13563,18 @@ async function _authProviderStart(provider, ctx) {
   };
   const capFail = (phase, err) => {
     const info = _extractAuthError(err);
-    _phCapture('auth_failure', { method: provider, intent: 'signin', phase, error_code: info.code, error_message: info.message });
+    // error_native_code and error_raw added for the Apple sign-in
+    // investigation: Apple's ASAuthorizationError 1000 covers both
+    // "user cancelled" AND "system dismissed the sheet due to
+    // misconfig" — indistinguishable from err.code alone (Capgo
+    // surfaces both as the string 'USER_CANCELLED'). The native
+    // NSError code + raw error object give the distinguishing
+    // signal in PostHog.
+    _phCapture('auth_failure', {
+      method: provider, intent: 'signin', phase,
+      error_code: info.code, error_message: info.message,
+      error_native_code: info.nativeCode, error_raw: info.raw,
+    });
     notifyFailOrHang('failure', phase);
   };
   const capHang = (phase) => {
@@ -13774,10 +13785,47 @@ async function _authRace(promise, ms) {
   finally { clearTimeout(_t); }
 }
 function _extractAuthError(err) {
-  if (!err) return { code: null, message: 'unknown' };
+  if (!err) return { code: null, message: 'unknown', nativeCode: null, raw: null };
+  // Primary code — first hit across the common shapes. Capgo's
+  // Capacitor plugin exposes err.code as a STRING enum (e.g.
+  // 'USER_CANCELLED'); Supabase auth errors expose err.code as a
+  // string or numeric HTTP status; DOMExceptions expose err.name.
   const code = err.code || err.name || err.status || null;
   const message = (err.message || String(err)).slice(0, 300);
-  return { code: code == null ? null : String(code), message: message };
+  // Native error code (numeric) — Apple's ASAuthorizationError comes
+  // through Capgo with the numeric NSError code in err.errorCode
+  // (1000 = cancelled/dismissed, 1001 = failed, 1002 = invalidResponse,
+  // 1003 = notHandled, 1004 = unknown). The distinction between a real
+  // user cancel and a system dismissal for misconfig is invisible
+  // from err.code alone because both surface as 'USER_CANCELLED' or
+  // similar plugin-level enum; the raw NSError code sometimes carries
+  // extra context in the message. Capacitor error-data path
+  // (err.data.errorCode) is also checked for plugin wrappers that
+  // hide the native error one layer deeper.
+  const nativeCode = err.errorCode
+                  || (err.data && err.data.errorCode)
+                  || (err.data && err.data.code)
+                  || null;
+  // Raw dump — bounded stringify so a completely unfamiliar error
+  // shape at least reaches PostHog verbatim. Serializes own props
+  // only (no prototype chain, no functions). Truncated to 400 chars
+  // so a huge Supabase error object doesn't blow past PostHog's
+  // property size limits.
+  let raw = null;
+  try {
+    const pick = {};
+    for (const k of ['code', 'name', 'status', 'errorCode', 'message', 'error', 'error_description', 'hint']) {
+      if (err[k] !== undefined) pick[k] = err[k];
+    }
+    if (err.data && typeof err.data === 'object') pick.data = err.data;
+    raw = JSON.stringify(pick).slice(0, 400);
+  } catch (e) { /* circular / non-serializable — leave raw = null */ }
+  return {
+    code:       code == null ? null : String(code),
+    message:    message,
+    nativeCode: nativeCode == null ? null : String(nativeCode),
+    raw:        raw,
+  };
 }
 
 function _phPlatform() {
@@ -16153,7 +16201,8 @@ async function _onbSignupEmail() {
     if (_onbSignupEmailMode === 'signup') {
       const { data, error } = await _authRace(sb.auth.signUp({ email, password }), _AUTH_PHASE_BUDGETS_MS.supabase_signup || 10000);
       if (error) {
-        _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'supabase_signup', error_code: (error.code || error.status || null), error_message: error.message || String(error) });
+        const info = _extractAuthError(error);
+        _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'supabase_signup', error_code: info.code, error_message: info.message, error_native_code: info.nativeCode, error_raw: info.raw });
         showErr(error.message || (isEn ? s.emailGenericFail.en : s.emailGenericFail.he));
         restoreBtn();
         return;
@@ -16184,7 +16233,8 @@ async function _onbSignupEmail() {
     // mode === 'signin'
     const { data, error } = await _authRace(sb.auth.signInWithPassword({ email, password }), _AUTH_PHASE_BUDGETS_MS.supabase_signin || 10000);
     if (error) {
-      _phCapture('auth_failure', { method: 'email', intent: 'signin', phase: 'supabase_signin', error_code: (error.code || error.status || null), error_message: error.message || String(error) });
+      const info = _extractAuthError(error);
+      _phCapture('auth_failure', { method: 'email', intent: 'signin', phase: 'supabase_signin', error_code: info.code, error_message: info.message, error_native_code: info.nativeCode, error_raw: info.raw });
       // Most common cause here: wrong password. Show a targeted
       // message; keep mode in 'signin' so a retry uses the same path.
       const code = error.code || error.status || '';
@@ -27373,12 +27423,12 @@ async function handleEmailVerification() {
       }
       if (error) {
         const info = _extractAuthError(error);
-        _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'email_verification', error_code: info.code, error_message: info.message });
+        _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'email_verification', error_code: info.code, error_message: info.message, error_native_code: info.nativeCode, error_raw: info.raw });
       }
     } catch(e) {
       console.error('[Auth] Email verification error:', e);
       const info = _extractAuthError(e);
-      _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'email_verification', error_code: info.code, error_message: info.message });
+      _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'email_verification', error_code: info.code, error_message: info.message, error_native_code: info.nativeCode, error_raw: info.raw });
     }
   }
   return false;
