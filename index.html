@@ -15124,10 +15124,15 @@ function _onbApplyLang(lang) {
   // binding retired.
   setText('onb-signup-apple-text',  'signup', 'apple');
   setText('onb-signup-google-text', 'signup', 'google');
-  // onb-v2-signup-skip: element removed in v11 (no skip on signup).
-  // Copy string _ONB_COPY.signup.skip stays because the paywall
-  // localizer at _onbV2PreparePaywall (index.html:13795-13797) still
-  // reads it for the paywall's own skip corner.
+  // onb-v2-signup-skip: element restored 2026-09-19 after evidence
+  // some users can't complete either Apple or Google. The copy
+  // string _ONB_COPY.signup.skip is also read by the paywall
+  // localizer (_onbV2PreparePaywall) for the paywall's own skip
+  // corner — same string, same shape.
+  const skipEl = document.getElementById('onb-v2-signup-skip');
+  if (skipEl && _ONB_COPY.signup && _ONB_COPY.signup.skip) {
+    skipEl.textContent = isEn ? _ONB_COPY.signup.skip.en : _ONB_COPY.signup.skip.he;
+  }
   // Legal disclosure line — splices in Terms + Privacy anchor tags at
   // the { terms } / { privacy } placeholders. Uses innerHTML so the
   // link markup lands as real anchors rather than escaped text.
@@ -30420,12 +30425,15 @@ document.addEventListener('DOMContentLoaded', function() {
      Email is deliberately absent for this commit — see _onbSignupApple
      block comment. -->
 <div id="onb-v2-signup" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
-  <!-- v11 note: the top-right Skip corner was removed. Mockup rationale
-       (screen 4): "No skip, so no justification. A required step should
-       not argue its case." Skip handler _onbV2CtaSignupSkip remains
-       defined in the JS for now — dead in v11 — but adding it back
-       would require re-doing the "the taste replaces the first
-       dialogue" argument, so keep it dead. -->
+  <!-- Skip corner: restored 2026-09-19 after evidence that some users
+       cannot complete Apple or Google auth on this screen at all
+       (Apple ASAuthorizationError 1000 immediate, Google 60s hang).
+       Without an escape, a mandatory signup step where BOTH providers
+       fail = user stuck. Also a Guideline 2.1 rejection risk on App
+       Review. Skip lands the user on step 5 (name) as a guest;
+       they can sign in later from Profile. Handler already exists
+       (_onbV2CtaSignupSkip). -->
+  <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-signup-skip" onclick="_onbV2CtaSignupSkip()"></button>
   <div class="onb-progress" aria-hidden="true" data-step="2">
   </div>
   <div class="onb-v2-inner">
@@ -30445,12 +30453,19 @@ document.addEventListener('DOMContentLoaded', function() {
     <button type="button" class="auth-btn auth-btn-social onb-v2-signup-secondary" id="onb-signup-google-btn" onclick="_onbSignupGoogle()">
       <span class="auth-social-icon">G</span> <span id="onb-signup-google-text"></span>
     </button>
-    <!-- Email fallback. Hidden by default; revealed by _onbShowSignup
-         EmailFallback on the first Apple/Google failure or hang. Sits
-         inside .onb-v2-signup-actions so it inherits the same gap /
-         width constraints as the buttons above; the container's own
-         padding-top separates it visually from the Google button. -->
-    <div class="onb-v2-signup-email-fallback" id="onb-v2-signup-email-fallback" style="display:none">
+    <!-- Email form: visible by default 2026-09-19 (previously hidden
+         and revealed on first provider failure via _onbShowSignup
+         EmailFallback). Reveal-on-failure fell apart in exactly the
+         scenario that motivated it — a user with a completely broken
+         Apple/Google path (evidence: 8 immediate 1000s + 2 60s Google
+         hangs in one session) waits 60+ seconds before the fallback
+         appears, if they wait at all. Showing by default costs the
+         57% who succeed on first tap ~200px of vertical space but
+         gives the remaining 43% an immediate path. Reveal helper +
+         onboarding_signup_email_shown telemetry retained for the
+         cases where the form was NOT already visible (defensive; a
+         no-op in the always-visible model). -->
+    <div class="onb-v2-signup-email-fallback" id="onb-v2-signup-email-fallback">
       <p class="onb-v2-signup-email-lead" id="onb-v2-signup-email-lead"></p>
       <input type="email" class="onb-v2-input onb-v2-signup-email-input" id="onb-v2-signup-email-input" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false">
       <input type="password" class="onb-v2-input onb-v2-signup-email-input" id="onb-v2-signup-password-input" autocomplete="new-password">
