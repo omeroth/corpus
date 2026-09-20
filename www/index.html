@@ -6454,49 +6454,6 @@
   }
   html.dark .onb-screen.onb-v2 .onb-v2-signup-error { color: #FF8574; }
 
-  /* Email fallback (revealed after first Apple/Google failure or
-     hang on step 4). Hidden by default via inline style; JS flips
-     to display: '' and scrolls into view. Sits inside the
-     .onb-v2-signup-actions flex column, so the container's own
-     gap (10px) separates it from the Google button above; the
-     lead line then holds the eye before the inputs. */
-  .onb-screen.onb-v2 .onb-v2-signup-email-fallback {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding-top: 6px;
-  }
-  .onb-screen.onb-v2 .onb-v2-signup-email-lead {
-    font-family: 'Nunito', 'Assistant', sans-serif;
-    font-weight: 600;
-    font-size: calc(14px * var(--text-scale));
-    color: var(--text-2);
-    text-align: center;
-    margin: 0 0 4px;
-    line-height: 1.35;
-  }
-  .onb-screen.onb-v2 .onb-v2-signup-email-input {
-    /* Overrides .onb-v2-input's centered text alignment — email +
-       password read more conventionally with left/start alignment,
-       and text-align:start matches native input behavior in both
-       LTR and RTL. Also widens to fill the CTA-holder box rather
-       than the 320px max-width the name/age inputs use. */
-    text-align: start;
-    max-width: none;
-  }
-  .onb-screen.onb-v2 .onb-v2-signup-email-error {
-    color: #C0392B;
-    font-family: 'Nunito', 'Assistant', sans-serif;
-    font-size: calc(13px * var(--text-scale));
-    font-weight: 500;
-    text-align: center;
-    margin: 4px 0 0;
-    line-height: 1.35;
-    min-height: 0;
-  }
-  .onb-screen.onb-v2 .onb-v2-signup-email-error:empty { display: none; }
-  html.dark .onb-screen.onb-v2 .onb-v2-signup-email-error { color: #FF8574; }
-
   /* Step 3 — Headway signup elements. Owl hero at the top, small
      grey Skip in the top-right corner (not in the CTA holder), legal
      disclosure line above the buttons, Apple as the primary full-
@@ -7003,6 +6960,137 @@
   }
   html[dir="rtl"] .onb-screen.onb-v2 .onb-v2-toggle-input:checked ~ .onb-v2-toggle-track .onb-v2-toggle-thumb {
     transform: translateX(-20px);
+  }
+
+  /* Trial intro (step 34) — three-item benefit list. Icon-left rows
+     on surface tiles, matching the visual weight of the mirror cards
+     but simpler (no dedicated title/support split — one line per
+     benefit). Gated by TRIAL_ENABLED at the flow level; CSS ships
+     unconditionally so a locale flip that lands the user here after
+     the flag is enabled renders cleanly. */
+  .onb-screen.onb-v2 .onb-v2-trial-benefits {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .onb-screen.onb-v2 .onb-v2-trial-benefit {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    text-align: start;
+  }
+  .onb-screen.onb-v2 .onb-v2-trial-benefit-icon {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+    color: var(--accent);
+    margin-top: 2px;
+  }
+  .onb-screen.onb-v2 .onb-v2-trial-benefit-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+  .onb-screen.onb-v2 .onb-v2-trial-benefit-text {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(15px * var(--text-scale));
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  /* Reminder promise (step 35) — 82px amber bell hero above the head
+     and sub. Bell is deliberately amber, not accent, so it reads as
+     the app's "streak / alert" family rather than the paid-block
+     accent — matching the mockup and the tone of the promise itself
+     (a reminder, not another CTA). */
+  .onb-screen.onb-v2 .onb-v2-reminder-hero {
+    width: 82px;
+    height: 82px;
+    margin: 0 auto 16px;
+    color: var(--amber);
+  }
+  .onb-screen.onb-v2 .onb-v2-reminder-hero svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Paywall trial-mode extras (step 36 with TRIAL_ENABLED on).
+     Timeline + no-payment pill live inside #onb-v2-paywall only —
+     the modal paywall doesn't own the DOM. Selectors are #-scoped
+     so the modal paywall doesn't accidentally inherit these rules
+     if the class names ever spread there. */
+  #onb-v2-paywall .paywall-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 4px 0 8px;
+    padding-inline-start: 6px;
+    border-inline-start: 2px solid var(--border);
+  }
+  #onb-v2-paywall .paywall-timeline-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    position: relative;
+  }
+  #onb-v2-paywall .paywall-timeline-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--accent);
+    flex-shrink: 0;
+    margin-top: 4px;
+    margin-inline-start: -13px;
+    border: 2px solid var(--surface);
+  }
+  #onb-v2-paywall .paywall-timeline-dot.hollow {
+    background: var(--surface);
+    border: 2px solid var(--accent);
+  }
+  #onb-v2-paywall .paywall-timeline-body {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(14px * var(--text-scale));
+    line-height: 1.4;
+    color: var(--text);
+    text-align: start;
+  }
+  #onb-v2-paywall .paywall-timeline-title {
+    display: block;
+    font-weight: 900;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  /* No-payment-due pill (trial mode). Green outline strip with a
+     checkmark, colours from the app-wide success token so it reads
+     as reassurance ("nothing charged now") rather than an accent-
+     coloured CTA. Hidden inline when the flag is off. */
+  #onb-v2-paywall .paywall-no-payment-due {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(34, 197, 94, 0.10);
+    border: 2px solid rgba(34, 197, 94, 0.30);
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin: 6px 0 8px;
+  }
+  #onb-v2-paywall .paywall-no-payment-due svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  #onb-v2-paywall .paywall-no-payment-label {
+    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-size: calc(13px * var(--text-scale));
+    font-weight: 900;
+    color: var(--auth-success);
   }
 
   /* Reviews (step 33) — social-proof cards, three vertically stacked.
@@ -11526,6 +11614,28 @@ const RC_ANDROID_API_KEY = 'goog_LemNQZsoXhkKzOlVeMtqxDYyXen';
 // supabase/migrations/20260901170000_grandfathering.sql).
 const PAYWALL_ENABLED = true;
 
+// Trial gate. Controls the trial-intro (step 34), reminder-promise
+// (step 35), and paywall trial-framing subset. Restored 2026-09-20
+// after Apple + Google both configured a 7-day free trial for anyone
+// who has never subscribed. When true:
+//
+//   - Steps 34 (trial intro) and 35 (reminder promise) enter the
+//     Act 5 flow. With the flag off, step 33 (reviews) skips both
+//     and advances straight to step 36 (paywall).
+//   - The paywall shows the trial framing from the mockup:
+//     "Start your free days" head, a Today / Day 6 / Day 7 timeline,
+//     a "No payment due now" reassurance pill, "Start my free trial"
+//     CTA, and the "Free for 7 days, then …" legal fine print. With
+//     the flag off, the paywall shows the plain "Ready to go deeper?"
+//     framing, no timeline, no pill, "Subscribe" CTA, and the
+//     standard auto-renew legal — no trial language, no "7 days free"
+//     card footers, no "$0.00" button anywhere.
+//   - is_trial + trial_enabled analytics props follow the flag.
+//
+// Flipping the flag toggles both the two gated onboarding screens and
+// the paywall's trial framing in one line.
+const TRIAL_ENABLED = true;
+
 // Legal links required by Apple + Google in every paywall. Terms is
 // currently 404 — MUST be published at this URL before App Store
 // review or the paywall gets rejected.
@@ -12677,6 +12787,7 @@ function showPaywall(opts) {
       subject: opts.subject || state.subject || null,
       week_id: typeof opts.weekId !== 'undefined' ? opts.weekId : null,
       day_id:  typeof opts.dayId  !== 'undefined' ? opts.dayId  : null,
+      trial_enabled: TRIAL_ENABLED,
     });
   } catch(e) {}
 }
@@ -12746,6 +12857,53 @@ function _renderPaywall() {
   q('.paywall-sub').textContent =
     ctx.sub || (isEn ? 'Every chapter, every subject, every bonus dialogue.'
                      : 'כל פרק, בכל תחום, כולל דיאלוגי הבונוס.');
+
+  // Trial-mode extras. Only present on the onboarding paywall DOM
+  // (#onb-v2-paywall); the modal paywall lives without them, so the
+  // querySelectors return null and every branch below is a defensive
+  // no-op. Timeline + no-payment pill are hidden inline when
+  // TRIAL_ENABLED is false so the plain paywall shows no trial UI at
+  // all — the load-bearing point of the flag. Populated from the
+  // paywallTrial copy block so a locale flip re-renders correctly.
+  const trialOn = TRIAL_ENABLED && _paywallMode === 'onboarding';
+  const timelineEl = q('.paywall-timeline');
+  if (timelineEl) {
+    timelineEl.style.display = trialOn ? '' : 'none';
+    if (trialOn) {
+      const tp = _ONB_COPY.paywallTrial;
+      const steps = (tp && tp.timeline) || [];
+      timelineEl.innerHTML = '';
+      steps.forEach((step) => {
+        const row = document.createElement('div');
+        row.className = 'paywall-timeline-step';
+        const dot = document.createElement('span');
+        dot.className = 'paywall-timeline-dot' + (step.hollow ? ' hollow' : '');
+        dot.setAttribute('aria-hidden', 'true');
+        const body = document.createElement('div');
+        body.className = 'paywall-timeline-body';
+        const title = document.createElement('b');
+        title.className = 'paywall-timeline-title';
+        title.textContent = isEn ? step.title.en : step.title.he;
+        const text = document.createTextNode(isEn ? step.text.en : step.text.he);
+        body.appendChild(title);
+        body.appendChild(text);
+        row.appendChild(dot);
+        row.appendChild(body);
+        timelineEl.appendChild(row);
+      });
+    }
+  }
+  const noPayEl = q('.paywall-no-payment-due');
+  if (noPayEl) {
+    noPayEl.style.display = trialOn ? '' : 'none';
+    if (trialOn) {
+      const label = noPayEl.querySelector('.paywall-no-payment-label');
+      if (label) {
+        const tp = _ONB_COPY.paywallTrial;
+        label.textContent = isEn ? tp.noPaymentDue.en : tp.noPaymentDue.he;
+      }
+    }
+  }
 
   // Monthly card.
   q('.paywall-monthly-title').textContent = isEn ? 'Monthly' : 'חודשי';
@@ -12824,7 +12982,12 @@ function _renderPaywall() {
   // button; the tap-time handler in startPurchase surfaces a clear
   // toast if no real RC package is available yet.
   const cta = q('.paywall-cta');
-  cta.textContent = isEn ? 'Subscribe' : 'הרשמה';
+  if (trialOn) {
+    const tp = _ONB_COPY.paywallTrial;
+    cta.textContent = isEn ? tp.cta.en : tp.cta.he;
+  } else {
+    cta.textContent = isEn ? 'Subscribe' : 'הרשמה';
+  }
   cta.disabled = _paywallPurchasing;
 
   // Restore link
@@ -12833,7 +12996,11 @@ function _renderPaywall() {
   // Legal fine print. Dynamic price + period reflect the selected package.
   const sel = _paywallSelectedPkg === 'monthly' ? p.monthly : p.yearly;
   const legalEl = q('.paywall-legal');
-  if (isEn) {
+  if (trialOn) {
+    const tp = _ONB_COPY.paywallTrial;
+    const tmpl = isEn ? tp.legal.en : tp.legal.he;
+    legalEl.textContent = tmpl.replace('{price}', sel.priceString).replace('{period}', sel.periodLabel);
+  } else if (isEn) {
     legalEl.textContent = 'Auto-renews for ' + sel.priceString + ' ' + sel.periodLabel + ' until canceled. Cancel anytime in App Store settings.';
   } else {
     legalEl.textContent = 'מתחדש אוטומטית ב-' + sel.priceString + ' ' + sel.periodLabel + ' עד ביטול. אפשר לבטל בכל עת בהגדרות ה-App Store.';
@@ -13029,6 +13196,7 @@ async function startPurchase() {
       saveStateLocal();
       try { posthog.capture('paywall_purchase_succeeded', {
         package_id: sel.pkg.identifier,
+        is_trial: TRIAL_ENABLED,
       }); } catch(e) {}
       // Meta App Events: fb_mobile_subscribe with the purchase value so
       // SKAdNetwork attribution can credit the campaign that drove the
@@ -14071,7 +14239,7 @@ const _ONB_STEP_TO_ID = {
   // Act 5 — The Ask. Notification pre-prompt (31), OS dialog wiring
   // (null slot 32), and reviews / testimonials (33) built in Commit
   // 5. The remaining three screens — trial intro (34), reminder
-  // promise (35), paywall (36) — stay null until the RC 3-day intro
+  // promise (35), paywall (36) — stay null until the RC intro
   // offer is configured on both stores. Partial-ladder mitigation
   // catches step 34 for now and lands the user on home without
   // marking corpus_onboarding_done, so they can complete when
@@ -14093,16 +14261,13 @@ const _ONB_STEP_TO_ID = {
   // no-ops — making the tap look broken three screens before the
   // paywall. Keeping the two beats separate avoids that.
   33: 'onb-v2-reviews',
-  // Steps 34 and 35 are null slots: reviews advances directly to
-  // step 36 (paywall). The earlier flow gated a trial-intro screen
-  // at 34 and a reminder-promise screen at 35 behind TRIAL_ENABLED,
-  // but that whole subset was dropped on 2026-09-16 — Apple's
-  // Introductory Offers section is missing from the account, and
-  // shipping steps that promise a trial the paywall doesn't deliver
-  // is worse than not offering one. The paywall at 36 is the plain
-  // "Ready to go deeper?" subscription paywall, no trial framing.
-  34: null,
-  35: null,
+  // Trial-gated screens 34 and 35. When TRIAL_ENABLED is false, step
+  // 33 (reviews) advances directly to 36 (paywall) and these two DOM
+  // ids are never mounted. With the flag on: reviews → trial intro →
+  // reminder promise → trial paywall. See the TRIAL_ENABLED comment
+  // for the full behaviour contract.
+  34: 'onb-v2-trial',
+  35: 'onb-v2-reminder-promise',
   36: 'onb-v2-paywall',
 };
 
@@ -14783,6 +14948,83 @@ const _ONB_COPY = {
     ],
   },
 
+  // Step 34 (v11) — Trial intro. Warmer framing than a legal-style
+  // trial disclosure — an invitation. The list names only what
+  // payment actually unlocks: cards are earned by reading and streak
+  // repair is already free, so neither belongs here. Gated by
+  // TRIAL_ENABLED; when the flag is off, step 33 skips straight to
+  // the paywall and this copy block goes unread.
+  trial: {
+    head: { en: 'Open everything, free for seven days',
+            he: 'פתחו הכל, שבעה ימים בחינם' },
+    cta:  { en: 'Try it for $0.00', he: 'נסו ב-$0.00' },
+    items: [
+      { icon: 'icon-books',
+        text: { en: 'Every chapter in every subject — philosophy, psychology, economics',
+                he: 'כל פרק בכל תחום — פילוסופיה, פסיכולוגיה וכלכלה' } },
+      { icon: 'icon-openbook',
+        text: { en: 'Bonus chapters that turn the ideas into something you can use',
+                he: 'פרקי בונוס שהופכים את הרעיונות למשהו שאפשר להשתמש בו' } },
+      { icon: 'icon-figure',
+        text: { en: 'Every thinker, there to collect',
+                he: 'כל ההוגים, פתוחים לאיסוף' } },
+    ],
+  },
+
+  // Step 35 (v11) — Reminder promise. The single screen that turns a
+  // trial from a trap into an offer — everyone who has ever forgotten
+  // to cancel something is watching for this beat. Amber bell hero;
+  // no owl. Trial-gated (TRIAL_ENABLED); skipped alongside step 34
+  // when the flag is off.
+  // Reminder-promise copy: "a day before". Deliberately matches the
+  // ~24h renewal-reminder Apple + Google send natively at the platform
+  // level — the app doesn't send its own reminder, so promising a
+  // different cadence would be a promise we don't control. The
+  // paywall timeline further down uses Day 6 (not Day 5) on the
+  // middle step for the same reason.
+  reminderPromise: {
+    head: { en: "We'll remind you a day before it ends",
+            he: 'נזכיר לכם יום לפני שזה נגמר' },
+    sub:  { en: "No surprise charge. You'll know before anything happens.",
+            he: 'בלי חיוב מפתיע. תדעו לפני שקורה משהו.' },
+    cta:  { en: 'Continue for free', he: 'המשיכו בחינם' },
+  },
+
+  // Step 36 (v11) — Paywall trial-mode copy. Read by _renderPaywall
+  // when TRIAL_ENABLED is true AND _paywallMode is 'onboarding'
+  // (never in the modal upsell paywall — trial belongs to the
+  // onboarding entry point). Timeline block, no-payment-due pill,
+  // trial CTA, trial legal. The base paywall copy (Monthly/Yearly
+  // titles, Save badge, restore, terms/privacy) stays in
+  // _renderPaywall's inline strings — those don't change in trial
+  // mode. Legal fine print interpolates the SELECTED package's price
+  // and period at render time; the mockup only shows yearly selected
+  // but if the user taps monthly, "then $12.99 per month" reads
+  // honest, which is the point.
+  paywallTrial: {
+    head: { en: 'Start your free days', he: 'התחילו בחינם' },
+    timeline: [
+      { title: { en: 'Today', he: 'היום' },
+        text:  { en: 'Everything unlocks. You pay nothing.',
+                 he: 'הכל נפתח. לא משלמים כלום.' } },
+      { title: { en: 'Day 6', he: 'יום 6' },
+        text:  { en: "We remind you it's nearly up.",
+                 he: 'נזכיר לכם שזה כמעט נגמר.' } },
+      { title: { en: 'Day 7', he: 'יום 7' },
+        text:  { en: 'Your subscription starts, unless you cancelled.',
+                 he: 'המנוי מתחיל, אלא אם ביטלתם.' },
+        hollow: true },
+    ],
+    noPaymentDue: { en: 'No payment due now', he: 'אין חיוב עכשיו' },
+    cta:          { en: 'Start my free trial', he: 'להתחיל את הניסיון' },
+    // {price} and {period} interpolated at render time from the
+    // selected package. "Free for 7 days" is hardcoded to match the
+    // introductory-offer terms Apple / Google are both configured
+    // with (7-day free trial for anyone who has never subscribed).
+    legal: { en: 'Free for 7 days, then {price} {period}. Cancel any time in App Store settings.',
+             he: 'חינם ל-7 ימים, אחר כך {price} {period}. אפשר לבטל בכל עת בהגדרות ה-App Store.' },
+  },
+
   // Step 23 — journey summary. An accent-bordered card at the top
   // projects the user's next 30 days (name + date pill + three tiles
   // drawn from their Q1/Q2/Q3 picks + a stat row), then two feature
@@ -14946,40 +15188,6 @@ const _ONB_COPY = {
     },
     legalTerms:   { en: 'Terms',          he: 'תנאי השימוש' },
     legalPrivacy: { en: 'Privacy Policy', he: 'מדיניות הפרטיות' },
-    // Email fallback block — hidden by default on step 4, revealed on
-    // the first Apple/Google failure or hang so a stuck user has a
-    // second path. Copy strings are deliberately neutral about whether
-    // an email is already registered (see emailAlreadyKnown below).
-    emailFallbackLead: {
-      en: 'Trouble signing in? Continue with email.',
-      he: 'בעיה בהרשמה? המשיכו עם אימייל.',
-    },
-    emailPlaceholder:    { en: 'Email',    he: 'אימייל' },
-    passwordPlaceholder: { en: 'Password', he: 'סיסמה' },
-    emailContinue:       { en: 'Continue', he: 'המשך' },
-    emailSignInContinue: { en: 'Sign in',  he: 'התחברות' },
-    // Neutral wording — used when Supabase returns an empty identities
-    // array (email is already registered). Never CONFIRMS the account
-    // exists; just tells the user to try their password. This avoids
-    // email enumeration disclosure — anyone who taps signup with a
-    // random address gets the same message they'd get with their own
-    // registered address, so scraping the endpoint gives no signal.
-    emailAlreadyKnown: {
-      en: 'Try your password to sign in.',
-      he: 'נסו את הסיסמה שלכם כדי להתחבר.',
-    },
-    emailMissing: {
-      en: 'Please enter your email and password.',
-      he: 'הכניסו אימייל וסיסמה.',
-    },
-    emailWrongPassword: {
-      en: 'Wrong password. Try again.',
-      he: 'סיסמה שגויה. נסו שוב.',
-    },
-    emailGenericFail: {
-      en: 'Something went wrong. Please try again.',
-      he: 'משהו השתבש. נסו שוב.',
-    },
   },
 };
 
@@ -15113,6 +15321,17 @@ function _onbApplyLang(lang) {
   // (bilingual re-render on every show).
   setText('onb-v2-reviews-head', 'reviews', 'head');
   setText('onb-v2-reviews-cta',  'reviews', 'cta');
+  // Trial intro (step 34) — head + CTA are subject-invariant. The
+  // three benefit rows are rendered by _onbV2PrepareTrial. Only
+  // reached when TRIAL_ENABLED is true; bindings are cheap and safe
+  // to run regardless of flag state.
+  setText('onb-v2-trial-head', 'trial', 'head');
+  setText('onb-v2-trial-cta',  'trial', 'cta');
+  // Reminder promise (step 35) — static head + sub + CTA. Bell hero
+  // is injected by _onbV2PrepareReminderPromise.
+  setText('onb-v2-reminder-promise-head', 'reminderPromise', 'head');
+  setText('onb-v2-reminder-promise-sub',  'reminderPromise', 'sub');
+  setText('onb-v2-reminder-promise-cta',  'reminderPromise', 'cta');
   // Journey screen: card + tiles + features rendered dynamically in
   // _onbV2PrepareJourney. Screen-level head and CTA are static.
   setText('onb-v2-journey-head',  'journey',  'head');
@@ -15154,36 +15373,6 @@ function _onbApplyLang(lang) {
   };
   setPlaceholder('onb-v2-name-input', 'name');
   setPlaceholder('onb-v2-age-input',  'age');
-  // Step 4 email fallback — lead line + placeholders + CTA. Bindings
-  // fire on every lang change; button label uses signup.emailContinue
-  // by default, swaps to signup.emailSignInContinue after the
-  // signup-attempt-returned-empty-identities response (see the
-  // handler for the two-tap flow).
-  (function bindSignupEmailFallback() {
-    const leadEl  = document.getElementById('onb-v2-signup-email-lead');
-    const emailEl = document.getElementById('onb-v2-signup-email-input');
-    const passEl  = document.getElementById('onb-v2-signup-password-input');
-    const ctaEl   = document.getElementById('onb-v2-signup-email-cta');
-    const s = _ONB_COPY.signup || {};
-    if (leadEl && s.emailFallbackLead) {
-      leadEl.textContent = isEn ? s.emailFallbackLead.en : s.emailFallbackLead.he;
-    }
-    if (emailEl && s.emailPlaceholder) {
-      emailEl.placeholder = isEn ? s.emailPlaceholder.en : s.emailPlaceholder.he;
-    }
-    if (passEl && s.passwordPlaceholder) {
-      passEl.placeholder = isEn ? s.passwordPlaceholder.en : s.passwordPlaceholder.he;
-    }
-    if (ctaEl && s.emailContinue) {
-      // Two-tap mode may have swapped the label to emailSignInContinue.
-      // If we're mid-flow with mode=signin, keep that label; otherwise
-      // reset to emailContinue.
-      const label = (_onbSignupEmailMode === 'signin' && s.emailSignInContinue)
-        ? (isEn ? s.emailSignInContinue.en : s.emailSignInContinue.he)
-        : (isEn ? s.emailContinue.en       : s.emailContinue.he);
-      ctaEl.textContent = label;
-    }
-  })();
   // Lang toggle on screen 1 — sliding indicator retired; the
   // active button carries the pill treatment via .is-active
   // directly, so we just flip the class on whichever button
@@ -15861,6 +16050,7 @@ function _onbV2PreparePaywall() {
     posthog.capture('paywall_shown', {
       source:        'onboarding',
       subject:       state.subject || null,
+      trial_enabled: TRIAL_ENABLED,
     });
   } catch(e) {}
 }
@@ -16067,7 +16257,21 @@ function _onbV2CtaGoal() {
 // SKStoreReviewController; a second fire here would hit Apple's
 // per-user quota and silently no-op, making the tap look inert
 // three screens before the paywall.
-function _onbV2CtaReviews() { _onbAdvanceStep(33, 36); }
+// Routing gate: when TRIAL_ENABLED is true, advance to step 34
+// (trial intro → reminder promise → paywall). When it's false, skip
+// steps 34 and 35 entirely and land on step 36 (paywall) in its
+// plain, non-trial framing — no dead null-slot advance in between.
+function _onbV2CtaReviews() {
+  _onbAdvanceStep(33, TRIAL_ENABLED ? 34 : 36);
+}
+
+// Step 34 (v11) — Trial intro. Owl-fronted invitation with a three-
+// item benefit list. Only reachable when TRIAL_ENABLED is true.
+function _onbV2CtaTrial() { _onbAdvanceStep(34, 35); }
+
+// Step 35 (v11) — Reminder promise. Amber bell hero + head + sub +
+// "Continue for free" CTA. Only reachable when TRIAL_ENABLED is true.
+function _onbV2CtaReminderPromise() { _onbAdvanceStep(35, 36); }
 
 // Screen 23 (journey summary) — display-only; advance to commit.
 // v11: journey is step 27 (was step 23 in v4 as the terminal
@@ -16126,147 +16330,24 @@ function _onbV2CtaCommit() {
 //     Profile later.
 //   * OAuth failure surfaces the error in the step 4 error slot; the
 //     button re-enables so the user can retry or tap Skip.
-// Step-4 email-fallback mode. Starts as 'signup' — first submit tries
-// sb.auth.signUp. If Supabase returns a data.user with an empty
-// identities array (which is how Supabase signals "email already
-// registered" without disclosing it explicitly), mode flips to
-// 'signin' and the button label swaps to signup.emailSignInContinue.
-// Second tap runs signInWithPassword. Reset back to 'signup' when the
-// step first mounts (see _onbV2PrepareSignup below? — currently no
-// dedicated prepare hook for signup, so reset happens inline in the
-// reveal helper — which is fine because the reveal fires exactly once
-// per screen mount from an Apple/Google failure).
-let _onbSignupEmailMode = 'signup';
-
-// Reveals the email fallback beneath the Apple/Google buttons on step
-// 4 and scrolls it into view. Fired from _authProviderStart's fail /
-// hang path via ctx.onFailOrHang; also idempotent — once visible, a
-// second failure doesn't re-scroll or re-fire telemetry. Onboarding
-// step-4 stuck-user rescue: someone who has already waited 60s on a
-// Google hang shouldn't have to wait another 60 to discover there's
-// a third way in.
-let _onbSignupEmailShownTrigger = null;
-function _onbShowSignupEmailFallback(trigger) {
-  const box = document.getElementById('onb-v2-signup-email-fallback');
-  if (!box) return;
-  const alreadyVisible = box.style.display !== 'none';
-  box.style.display = '';
+// Reveals the corner Skip button on step 4 after a failed Apple or
+// Google attempt. Fired from _authProviderStart's fail / hang path
+// via ctx.onFailOrHang. Idempotent — once visible a subsequent
+// failure doesn't re-fire telemetry. Replaces the earlier email-
+// fallback reveal (retired 2026-09-20): Skip is the simpler and less
+// friction-y escape when both providers fail. Corner position matches
+// the paywall's own Skip pattern.
+let _onbSignupSkipShownTrigger = null;
+function _onbShowSignupSkip(trigger) {
+  const btn = document.getElementById('onb-v2-signup-skip');
+  if (!btn) return;
+  const alreadyVisible = btn.style.display !== 'none';
+  btn.style.display = '';
   if (alreadyVisible) return;
-  // First reveal in this mount — fire telemetry + scroll into view.
-  _onbSignupEmailShownTrigger = trigger || 'unknown';
+  _onbSignupSkipShownTrigger = trigger || 'unknown';
   try {
-    _phCapture('onboarding_signup_email_shown', { trigger: _onbSignupEmailShownTrigger });
+    _phCapture('onboarding_signup_skip_shown', { trigger: _onbSignupSkipShownTrigger });
   } catch(e) {}
-  // Scroll the fallback into view — the CTA holder sits at the bottom
-  // of the step and on iPhone SE the newly-revealed inputs land below
-  // the fold. Deferred one rAF so layout settles after the reveal.
-  requestAnimationFrame(() => {
-    try { box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {}
-  });
-}
-
-// Called from the fallback CTA. Two-tap flow:
-//   Tap 1: mode = 'signup' → sb.auth.signUp. If success with real
-//          identities, complete onboarding step 4. If success with
-//          empty identities (email already registered), flip mode to
-//          'signin', swap button label, show neutral message. Don't
-//          confirm the account exists — the message just asks user to
-//          try their password (email-enumeration hygiene).
-//   Tap 2: mode = 'signin' → sb.auth.signInWithPassword. Success
-//          completes step 4; failure shows a "wrong password" message
-//          and stays in signin mode for retry.
-async function _onbSignupEmail() {
-  const isEn = state.lang === 'en';
-  const s = _ONB_COPY.signup || {};
-  const emailEl = document.getElementById('onb-v2-signup-email-input');
-  const passEl  = document.getElementById('onb-v2-signup-password-input');
-  const ctaEl   = document.getElementById('onb-v2-signup-email-cta');
-  const errEl   = document.getElementById('onb-v2-signup-email-error');
-  const email = (emailEl && emailEl.value || '').trim();
-  const password = (passEl && passEl.value) || '';
-  const showErr = (msg) => { if (errEl) errEl.textContent = msg || ''; };
-  const restoreBtn = () => {
-    if (!ctaEl) return;
-    ctaEl.disabled = false;
-    const label = (_onbSignupEmailMode === 'signin' && s.emailSignInContinue)
-      ? (isEn ? s.emailSignInContinue.en : s.emailSignInContinue.he)
-      : (isEn ? s.emailContinue.en       : s.emailContinue.he);
-    ctaEl.textContent = label;
-  };
-  showErr('');
-  if (!email || !password) {
-    showErr(isEn ? s.emailMissing.en : s.emailMissing.he);
-    return;
-  }
-  if (ctaEl) {
-    ctaEl.disabled = true;
-    ctaEl.textContent = isEn ? 'Working…' : 'עובד…';
-  }
-  try {
-    if (_onbSignupEmailMode === 'signup') {
-      const { data, error } = await _authRace(sb.auth.signUp({ email, password }), _AUTH_PHASE_BUDGETS_MS.supabase_signup || 10000);
-      if (error) {
-        const info = _extractAuthError(error);
-        _phCapture('auth_failure', { method: 'email', intent: 'signup', phase: 'supabase_signup', error_code: info.code, error_message: info.message, error_native_code: info.nativeCode, error_raw: info.raw });
-        showErr(error.message || (isEn ? s.emailGenericFail.en : s.emailGenericFail.he));
-        restoreBtn();
-        return;
-      }
-      // Supabase email-enumeration protection: identities === [] means
-      // the address is already registered. Flip to signin mode and
-      // prompt the user to try their password. Copy is deliberately
-      // neutral — does NOT say "account exists".
-      const identities = data && data.user && Array.isArray(data.user.identities) ? data.user.identities : null;
-      if (identities && identities.length === 0) {
-        _onbSignupEmailMode = 'signin';
-        showErr(isEn ? s.emailAlreadyKnown.en : s.emailAlreadyKnown.he);
-        restoreBtn();
-        return;
-      }
-      // Real new user.
-      const user = data && data.user;
-      if (!user) {
-        showErr(isEn ? s.emailGenericFail.en : s.emailGenericFail.he);
-        restoreBtn();
-        return;
-      }
-      await enterAppState(user);
-      try { _phCapture('onboarding_signup_completed', { method: 'email' }); } catch(e) {}
-      _onbAdvanceStep(4, 5);
-      return;
-    }
-    // mode === 'signin'
-    const { data, error } = await _authRace(sb.auth.signInWithPassword({ email, password }), _AUTH_PHASE_BUDGETS_MS.supabase_signin || 10000);
-    if (error) {
-      const info = _extractAuthError(error);
-      _phCapture('auth_failure', { method: 'email', intent: 'signin', phase: 'supabase_signin', error_code: info.code, error_message: info.message, error_native_code: info.nativeCode, error_raw: info.raw });
-      // Most common cause here: wrong password. Show a targeted
-      // message; keep mode in 'signin' so a retry uses the same path.
-      const code = error.code || error.status || '';
-      const wrong = /invalid.*credentials|invalid.*password|wrong.*password/i.test(String(error.message || '')) || String(code).toLowerCase().includes('invalid');
-      showErr(wrong ? (isEn ? s.emailWrongPassword.en : s.emailWrongPassword.he) : (error.message || (isEn ? s.emailGenericFail.en : s.emailGenericFail.he)));
-      restoreBtn();
-      return;
-    }
-    const user = data && data.user;
-    if (!user) {
-      showErr(isEn ? s.emailGenericFail.en : s.emailGenericFail.he);
-      restoreBtn();
-      return;
-    }
-    await enterAppState(user);
-    try { _phCapture('onboarding_signup_completed', { method: 'email' }); } catch(e) {}
-    _onbAdvanceStep(4, 5);
-  } catch (e) {
-    if (e === _AUTH_HANG_SENTINEL) {
-      const phase = _onbSignupEmailMode === 'signup' ? 'supabase_signup' : 'supabase_signin';
-      _phCapture('auth_hang', { method: 'email', intent: _onbSignupEmailMode, phase, budget_ms: _AUTH_PHASE_BUDGETS_MS[phase] || 10000 });
-      showErr(isEn ? s.emailGenericFail.en : s.emailGenericFail.he);
-    } else {
-      showErr(isEn ? s.emailGenericFail.en : s.emailGenericFail.he);
-    }
-    restoreBtn();
-  }
 }
 
 async function _onbSignupApple() {
@@ -16277,10 +16358,10 @@ async function _onbSignupApple() {
     textEl: document.getElementById('onb-signup-apple-text'),
     errorEl: document.getElementById('onb-v2-signup-error'),
     defaultLabel: isEn ? 'Continue with Apple' : 'המשך עם Apple',
-    // Reveal the email fallback on first failure or hang — stuck-user
-    // rescue for the mandatory step 4 (no Skip in v11).
+    // Reveal Skip on first failure or hang — user with a broken
+    // provider path needs an escape.
     onFailOrHang: (kind, phase) => {
-      try { _onbShowSignupEmailFallback(kind + ':apple:' + phase); } catch(e) {}
+      try { _onbShowSignupSkip(kind + ':apple:' + phase); } catch(e) {}
     },
     postAuthContinue: async (user) => {
       // State-only enter: load progress + subscription + telemetry
@@ -16302,7 +16383,7 @@ async function _onbSignupGoogle() {
     errorEl: document.getElementById('onb-v2-signup-error'),
     defaultLabel: isEn ? 'Continue with Google' : 'המשך עם Google',
     onFailOrHang: (kind, phase) => {
-      try { _onbShowSignupEmailFallback(kind + ':google:' + phase); } catch(e) {}
+      try { _onbShowSignupSkip(kind + ':google:' + phase); } catch(e) {}
     },
     postAuthContinue: async (user) => {
       await enterAppState(user);
@@ -16749,6 +16830,45 @@ function _onbV2PrepareReviews() {
     card.appendChild(name);
     list.appendChild(card);
   });
+}
+
+// Step 34 (trial intro) — injects the owl into the hero slot and
+// renders the three benefit rows from _ONB_COPY.trial.items. Only
+// reachable when TRIAL_ENABLED is true; when the flag is off, step
+// 33's advance skips this hook entirely. Static owl expression
+// (neutral / waving) matches the low-pressure invitation framing.
+function _onbV2PrepareTrial() {
+  const owlEl = document.getElementById('onb-v2-trial-owl');
+  if (owlEl) owlEl.innerHTML = _cloneOwlSvgHTML('owl-neutral');
+  const list = document.getElementById('onb-v2-trial-benefits');
+  if (!list) return;
+  const isEn = state.lang === 'en';
+  const items = (_ONB_COPY.trial && _ONB_COPY.trial.items) || [];
+  list.innerHTML = '';
+  items.forEach((item) => {
+    const row = document.createElement('div');
+    row.className = 'onb-v2-trial-benefit';
+    const iconWrap = document.createElement('span');
+    iconWrap.className = 'onb-v2-trial-benefit-icon';
+    iconWrap.setAttribute('aria-hidden', 'true');
+    iconWrap.innerHTML = '<svg viewBox="0 0 64 64"><use href="#' + item.icon + '"/></svg>';
+    const text = document.createElement('span');
+    text.className = 'onb-v2-trial-benefit-text';
+    text.textContent = isEn ? item.text.en : item.text.he;
+    row.appendChild(iconWrap);
+    row.appendChild(text);
+    list.appendChild(row);
+  });
+}
+
+// Step 35 (reminder promise) — head + sub are static (bound in
+// _onbApplyLang). The prepare hook exists only to inject the bell
+// SVG into the amber hero slot — kept out of the DOM template so
+// the hero size doesn't fight the base .onb-v2-signup-hero styling
+// used for owl heroes on the neighbouring screens.
+function _onbV2PrepareReminderPromise() {
+  const hero = document.getElementById('onb-v2-reminder-promise-hero');
+  if (hero) hero.innerHTML = '<svg viewBox="0 0 64 64"><use href="#icon-bell"/></svg>';
 }
 
 // Helper: read taste config for the current subject with a
@@ -17349,7 +17469,8 @@ const _ONB_STEP_HOOKS = {
   31: _onbV2PrepareNotifications,  // fires prompt-shown telemetry
   // 32 is a null slot (OS notif dialog).
   33: _onbV2PrepareReviews,        // renders three testimonial cards
-  // 34 + 35 are null slots — trial subset was dropped 2026-09-16.
+  34: _onbV2PrepareTrial,          // owl + three benefit rows
+  35: _onbV2PrepareReminderPromise,// bell icon into the hero slot
   36: _onbV2PreparePaywall,        // shared _renderPaywall machinery
 };
 
@@ -30218,6 +30339,43 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
+<!-- Step 34 (v11) — Trial intro. Owl hero + head + three benefit
+     rows + primary CTA. Gated by TRIAL_ENABLED at the flow level;
+     the DOM is always present so a flag flip requires no HTML
+     changes, just JS. Benefit rows rendered by _onbV2PrepareTrial
+     from _ONB_COPY.trial.items. -->
+<div id="onb-v2-trial" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
+  <div class="onb-v2-inner">
+    <div class="onb-v2-signup-hero" id="onb-v2-trial-owl" aria-hidden="true"></div>
+    <div class="onb-v2-copy">
+      <h1 class="onb-v2-head" id="onb-v2-trial-head"></h1>
+      <div class="onb-v2-trial-benefits" id="onb-v2-trial-benefits"></div>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-trial-cta" onclick="_onbV2CtaTrial()"></button>
+  </div>
+</div>
+
+<!-- Step 35 (v11) — Reminder promise. Amber bell hero + head + sub
+     + "Continue for free" CTA. Bell injected by
+     _onbV2PrepareReminderPromise; head/sub/CTA bound in
+     _onbApplyLang. The single screen that turns a trial from a trap
+     into an offer — everyone who has forgotten to cancel something
+     is watching for it. -->
+<div id="onb-v2-reminder-promise" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
+  <div class="onb-v2-inner">
+    <div class="onb-v2-copy">
+      <div class="onb-v2-reminder-hero" id="onb-v2-reminder-promise-hero" aria-hidden="true"></div>
+      <h1 class="onb-v2-head" id="onb-v2-reminder-promise-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-reminder-promise-sub"></p>
+    </div>
+  </div>
+  <div class="onb-cta-holder">
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-reminder-promise-cta" onclick="_onbV2CtaReminderPromise()"></button>
+  </div>
+</div>
+
 <!-- Step 36 (v11) — Paywall (onboarding shell). Shares .paywall-*
      class contracts with #modal-paywall above so a single
      _renderPaywall() drives both, scoped by _paywallActiveRoot.
@@ -30225,7 +30383,14 @@ document.addEventListener('DOMContentLoaded', function() {
      route through _exitPaywall, which fires the onClose set by
      _onbV2PreparePaywall. No close X and no modal backdrop — Skip
      means "skip this step" (matches the signup step); X on the
-     modal shell means "close the overlay". -->
+     modal shell means "close the overlay".
+
+     Trial mode (TRIAL_ENABLED = true): the .paywall-timeline and
+     .paywall-no-payment-due elements below are populated + shown by
+     _renderPaywall from _ONB_COPY.paywallTrial. When the flag is
+     false, both are hidden inline and the plain paywall renders
+     with no trial UI at all — no timeline, no pill, no per-card
+     "7 days free" footer, no "$0.00" button. -->
 <div id="onb-v2-paywall" class="onb-screen onb-v2 onb-bg-themed" style="display:none">
   <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-paywall-skip" onclick="_exitPaywall('skip')"></button>
   <div class="onb-progress" aria-hidden="true" data-step="5">
@@ -30235,6 +30400,16 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="paywall-eyebrow"></div>
     <h1 class="paywall-headline"></h1>
     <p class="paywall-sub"></p>
+    <!-- Trial-mode Today / Day 6 / Day 7 timeline. Populated + shown
+         by _renderPaywall when TRIAL_ENABLED is true; hidden inline
+         when the flag is off (see _renderPaywall's trialOn branch). -->
+    <div class="paywall-timeline" style="display:none" aria-hidden="true"></div>
+    <!-- Trial-mode "No payment due now" reassurance pill. Green
+         outline, checkmark, hidden inline when the flag is off. -->
+    <div class="paywall-no-payment-due" style="display:none" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+      <span class="paywall-no-payment-label"></span>
+    </div>
     <div class="paywall-cards">
       <button type="button" class="paywall-card paywall-card-monthly" onclick="_selectPaywallPackage('monthly')">
         <div class="paywall-card-title paywall-monthly-title"></div>
@@ -30425,15 +30600,19 @@ document.addEventListener('DOMContentLoaded', function() {
      Email is deliberately absent for this commit — see _onbSignupApple
      block comment. -->
 <div id="onb-v2-signup" class="onb-screen onb-v2 onb-bg-themed onb-v2-scroll" style="display:none">
-  <!-- Skip corner: restored 2026-09-19 after evidence that some users
-       cannot complete Apple or Google auth on this screen at all
-       (Apple ASAuthorizationError 1000 immediate, Google 60s hang).
-       Without an escape, a mandatory signup step where BOTH providers
-       fail = user stuck. Also a Guideline 2.1 rejection risk on App
-       Review. Skip lands the user on step 5 (name) as a guest;
-       they can sign in later from Profile. Handler already exists
-       (_onbV2CtaSignupSkip). -->
-  <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-signup-skip" onclick="_onbV2CtaSignupSkip()"></button>
+  <!-- Skip corner: hidden by default; revealed by _onbShowSignupSkip on
+       the first Apple/Google failure or hang. Behaviour tuned
+       2026-09-20 — visible-by-default (2026-09-19) invited users to
+       skip past a screen most of them can actually complete, dropping
+       the signup rate for no reason. Reveal-on-failure keeps the screen
+       clean for users who succeed on first tap and adds a real escape
+       for those who don't. The email-fallback that previously occupied
+       this failure-reveal slot was removed same day — it introduced an
+       email-confirmation session bug on top of the friction it added,
+       and Apple + Google now stand as the only two paths (with Skip
+       as the guest escape). Handler already exists (_onbV2CtaSignup
+       Skip). -->
+  <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-signup-skip" onclick="_onbV2CtaSignupSkip()" style="display:none"></button>
   <div class="onb-progress" aria-hidden="true" data-step="2">
   </div>
   <div class="onb-v2-inner">
@@ -30453,25 +30632,17 @@ document.addEventListener('DOMContentLoaded', function() {
     <button type="button" class="auth-btn auth-btn-social onb-v2-signup-secondary" id="onb-signup-google-btn" onclick="_onbSignupGoogle()">
       <span class="auth-social-icon">G</span> <span id="onb-signup-google-text"></span>
     </button>
-    <!-- Email form: visible by default 2026-09-19 (previously hidden
-         and revealed on first provider failure via _onbShowSignup
-         EmailFallback). Reveal-on-failure fell apart in exactly the
-         scenario that motivated it — a user with a completely broken
-         Apple/Google path (evidence: 8 immediate 1000s + 2 60s Google
-         hangs in one session) waits 60+ seconds before the fallback
-         appears, if they wait at all. Showing by default costs the
-         57% who succeed on first tap ~200px of vertical space but
-         gives the remaining 43% an immediate path. Reveal helper +
-         onboarding_signup_email_shown telemetry retained for the
-         cases where the form was NOT already visible (defensive; a
-         no-op in the always-visible model). -->
-    <div class="onb-v2-signup-email-fallback" id="onb-v2-signup-email-fallback">
-      <p class="onb-v2-signup-email-lead" id="onb-v2-signup-email-lead"></p>
-      <input type="email" class="onb-v2-input onb-v2-signup-email-input" id="onb-v2-signup-email-input" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false">
-      <input type="password" class="onb-v2-input onb-v2-signup-email-input" id="onb-v2-signup-password-input" autocomplete="new-password">
-      <button type="button" class="nav-btn onb-cta onb-v2-signup-email-cta" id="onb-v2-signup-email-cta" onclick="_onbSignupEmail()"></button>
-      <p class="onb-v2-signup-email-error" id="onb-v2-signup-email-error"></p>
-    </div>
+    <!-- Email fallback removed 2026-09-20. Was:
+         (a) visible by default briefly (2026-09-19), which added
+             friction on the screen already losing the most users, and
+         (b) hit by a session bug on signUp when Supabase's email-
+             confirmation is on — the returned user has no session, so
+             advancing past step 4 with currentUser set in-memory
+             produced a "guest" state on the next app open.
+         The standalone auth screen still has an email form (email is
+         genuinely useful there for returning users); step 4 sticks to
+         Apple + Google, with the corner Skip as the escape when
+         both providers fail. -->
   </div>
 </div>
 
