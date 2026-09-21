@@ -6462,8 +6462,15 @@
     transform-origin: 50% 80%;
   }
   .onb-screen.onb-v2 .onb-v2-signup-hero svg { width: 100%; height: 100%; }
-  /* Skip corner — matches the walkthrough Skip pattern: fixed top-
-     right, safe-area-inset aware, text-only, low visual weight. */
+  /* Skip corner — matches the walkthrough Skip pattern: top-right,
+     safe-area-inset aware, text-only, low visual weight. Base top
+     offset is 16px + safeTop; the signup-screen instance ships its
+     own top override below (44px + safeTop) so it clears the
+     progress bar's end-star. The paywall X (#onb-v2-paywall-skip)
+     reuses this class and keeps the base 16px offset — the paywall
+     solved the same star collision by padding its own progress
+     bar's inline end instead (see _paywallOnClose in the paywall
+     step, which sets paddingInlineEnd = skip inset + icon + gap). */
   .onb-screen.onb-v2 .onb-v2-signup-skip-corner {
     position: absolute;
     top: calc(16px + var(--safe-top));
@@ -6493,6 +6500,17 @@
     display: block;
     width: 24px;
     height: 24px;
+  }
+  /* Signup-screen instance: push the Skip button below the progress
+     bar's end-star. Bar top edge at safeTop + 16 (screen pad 24 +
+     bar margin -8), bar height 20 → star bottom at safeTop + 36;
+     44 + safeTop leaves an 8px gap. Only revealed after a failed
+     sign-in (_onbShowSignupSkip), so the collision only shows in
+     that revealed state — but the offset applies unconditionally
+     because a hidden absolute-positioned element can't move the
+     star anyway. Paywall X keeps the base 16px offset. */
+  .onb-screen.onb-v2 #onb-v2-signup-skip {
+    top: calc(44px + var(--safe-top));
   }
   /* Legal disclosure — small, muted, centered above the buttons.
      Anchor tags inherit the accent link color. */
