@@ -7484,14 +7484,18 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     text-align: center;
-    /* padding-top reduced 52px → 8px on 2026-09-20. The 52px was
-       reserving space for a header/progress-bar band that no longer
-       exists in this position; on trial-mode paywall the content
-       stack + progress bar + this padding was overshooting the fold
-       and forcing scroll on both platforms. Safe-top stays included
-       so the top row (brand + progress bar + X) clears the notch/
-       Dynamic Island. */
-    padding-top: calc(8px + var(--safe-top));
+    /* padding-top: plain 8px, no safe-top. Corrected 2026-09-21 after
+       the 2026-09-20 fix left a large gap on Android. Both the fix
+       and its predecessor (calc(52px + safe-top)) were counting the
+       safe-area inset TWICE — once here, once on the .onb-screen
+       parent which already reserves `calc(24px + safe-top)` for the
+       notch/Dynamic Island. The inner sits below that parent
+       padding + the progress bar, so it doesn't need to reserve
+       another safe-top of its own. 8px is the intended gap between
+       the progress bar and the first paywall element (brand
+       wordmark). Previous comment claimed safe-top was needed for
+       notch clearance — the parent handles that. */
+    padding-top: 8px;
   }
   #onb-v2-paywall .paywall-brand {
     margin-bottom: 12px;
@@ -7719,6 +7723,18 @@
   }
   .paywall-card {
     flex: 1;
+    /* min-width:0 forces the card to honour its flex-basis instead
+       of expanding to fit intrinsic content width. Without this,
+       flex items default to min-width:auto (= min-content), which
+       lets a card grow past (flex-container-width - gap) / 2 when
+       any child element's intrinsic width exceeds the ideal
+       flex-basis — pushing the two cards past their container.
+       On the trial-mode onboarding paywall this was reported as
+       the yearly card's accent border being visually cut off at
+       the right edge of the screen on Android; the card's border
+       was rendering past .onb-screen's 20px right padding. Cheap,
+       standard flex-overflow fix. */
+    min-width: 0;
     background: var(--surface);
     border: 2px solid var(--border);
     border-radius: 14px;
