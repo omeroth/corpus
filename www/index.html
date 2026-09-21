@@ -12661,10 +12661,26 @@ async function loadSubscription() {
 // Set true once Purchases.configure has run in this JS session.
 // Subsequent user changes flow through logIn/logOut, not reconfigure.
 let _rcConfigured = false;
-// Warmed by _fetchOfferings after configure/logIn succeeds. Reset per
-// session — offerings can change server-side and a stale cache is worse
-// than a re-fetch. Paywall (when it exists) reads availablePackages.
-let _rcOfferings = null;
+// Two offerings, split so the free trial only applies to purchases made
+// during onboarding:
+//   _rcOfferingTrial    (from res.current)      → onboarding paywall.
+//                        Products carry a 7-day intro offer on both
+//                        stores; purchasePackage lets RC pick it.
+//   _rcOfferingStandard (from res.all.standard) → in-app modal paywall.
+//                        On iOS the packaged products are the
+//                        `_standard` SKUs with no intro offer. On
+//                        Android the package points at the same
+//                        product ID as the trial offering (Google's
+//                        one-product-many-offers model), and the
+//                        purchase path calls purchaseSubscriptionOption
+//                        against isBasePlan so RC bypasses the trial
+//                        offer even for eligible users. Falls back to
+//                        the trial offering if standard hasn't loaded
+//                        yet (partial-rollout safety; logged loudly).
+// Both reset per session — offerings can change server-side and a
+// stale cache is worse than a re-fetch.
+let _rcOfferingTrial = null;
+let _rcOfferingStandard = null;
 
 async function _configureRC(userId) {
   if (!window.Capacitor || !window.Capacitor.isNativePlatform || !window.Capacitor.isNativePlatform()) return;
@@ -12716,12 +12732,48 @@ async function _fetchOfferings() {
   if (!P) return;
   try {
     const res = await P.getOfferings();
-    _rcOfferings = (res && res.current) || null;
-    const pkgIds = (_rcOfferings && _rcOfferings.availablePackages || []).map(p => p.identifier);
-    console.log('[RC] offering:', (_rcOfferings && _rcOfferings.identifier) || 'none', 'packages:', pkgIds);
+    _rcOfferingTrial    = (res && res.current) || null;
+    _rcOfferingStandard = (res && res.all && res.all.standard) || null;
+    const trialPkgs = (_rcOfferingTrial    && _rcOfferingTrial.availablePackages    || []).map(p => p.identifier);
+    const stdPkgs   = (_rcOfferingStandard && _rcOfferingStandard.availablePackages || []).map(p => p.identifier);
+    console.log('[RC] trial offering:',    (_rcOfferingTrial    && _rcOfferingTrial.identifier)    || 'none', 'packages:', trialPkgs);
+    console.log('[RC] standard offering:', (_rcOfferingStandard && _rcOfferingStandard.identifier) || 'none', 'packages:', stdPkgs);
+    if (!_rcOfferingStandard) {
+      console.warn('[RC] standard offering missing from getOfferings() — modal paywall will fall back to trial offering until the RC config lands');
+    } else if (stdPkgs.length === 0) {
+      // Standard offering exists but empty on this platform. iOS
+      // hits this during the Apple review window for the new
+      // _standard SKUs: RC returns the offering shell but strips
+      // packages whose products aren't yet Ready-to-Sell. Android
+      // shouldn't hit this since its standard packages map to the
+      // same products as the trial offering. Either way, fall back
+      // to the trial offering so the modal paywall still renders
+      // prices (accepting the price of possibly granting a trial
+      // that shouldn't be granted — better than a broken paywall).
+      console.warn('[RC] standard offering has zero packages on this platform — modal paywall will fall back to trial offering until products go Ready-to-Sell');
+    }
   } catch (e) {
     console.warn('[RC] getOfferings failed', e);
   }
+}
+
+// Which offering the current paywall should render + purchase from.
+// Onboarding paywall → trial offering (7-day intro on both stores).
+// Modal paywall → standard offering (iOS: no-intro SKUs; Android:
+// same SKU but the purchase call picks the base-plan option). Falls
+// back to trial when standard is missing OR has zero packages on this
+// platform (iOS review window: the _standard SKUs are still Pending
+// Apple's review, and RC's iOS response returns the offering with an
+// empty availablePackages array until products go Ready-to-Sell).
+// The stray trial grant this fallback risks is bad but survivable —
+// far better than a modal paywall with no visible prices for the
+// weeks Apple takes to approve the products.
+function _paywallActiveOffering() {
+  if (_paywallMode === 'onboarding') return _rcOfferingTrial;
+  const stdHasPkgs = _rcOfferingStandard
+    && _rcOfferingStandard.availablePackages
+    && _rcOfferingStandard.availablePackages.length > 0;
+  return stdHasPkgs ? _rcOfferingStandard : _rcOfferingTrial;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -12757,7 +12809,8 @@ let _paywallMode = 'modal';
 // live in App Store Connect / Play. When falling back, pkg is null and
 // the CTA is disabled — you can't purchase without a real RC package.
 function _paywallPrices() {
-  const pkgs = (_rcOfferings && _rcOfferings.availablePackages) || [];
+  const off = _paywallActiveOffering();
+  const pkgs = (off && off.availablePackages) || [];
   const monthly = pkgs.find(p => p.identifier === '$rc_monthly' || p.packageType === 'MONTHLY');
   const yearly  = pkgs.find(p => p.identifier === '$rc_annual'  || p.packageType === 'ANNUAL');
   const isEn = state.lang === 'en';
@@ -12870,6 +12923,7 @@ function showPaywall(opts) {
       week_id: typeof opts.weekId !== 'undefined' ? opts.weekId : null,
       day_id:  typeof opts.dayId  !== 'undefined' ? opts.dayId  : null,
       trial_enabled: TRIAL_ENABLED,
+      offering_id: (_paywallActiveOffering() && _paywallActiveOffering().identifier) || null,
     });
   } catch(e) {}
 }
@@ -13171,8 +13225,10 @@ async function _resumePurchaseAfterSignIn(user) {
   try { await _configureRC(user.id); } catch(e) { console.warn('[Sub/resume] _configureRC failed', e); }
   console.log('[Sub/resume] after _configureRC — _rcConfigured:', _rcConfigured);
   try { await _fetchOfferings(); }    catch(e) { console.warn('[Sub/resume] _fetchOfferings failed', e); }
-  const pkgs = (_rcOfferings && _rcOfferings.availablePackages) || [];
-  console.log('[Sub/resume] after _fetchOfferings — offering:', _rcOfferings && _rcOfferings.identifier,
+  const activeOff = _paywallActiveOffering();
+  const pkgs = (activeOff && activeOff.availablePackages) || [];
+  console.log('[Sub/resume] after _fetchOfferings — mode:', _paywallMode,
+              'active offering:', activeOff && activeOff.identifier,
               'packages:', pkgs.map(p => p.identifier));
   const intent = _signInGateIntent;
   _signInGateIntent = null;
@@ -13248,10 +13304,49 @@ async function startPurchase() {
 
   _paywallPurchasing = true;
   _renderPaywall();
-  try { posthog.capture('paywall_purchase_started', { package_id: sel.pkg.identifier }); } catch(e) {}
+  const _offeringId = (_paywallActiveOffering() && _paywallActiveOffering().identifier) || null;
+  try { posthog.capture('paywall_purchase_started', {
+    package_id: sel.pkg.identifier,
+    offering_id: _offeringId,
+    source_mode: _paywallMode,
+  }); } catch(e) {}
 
   try {
-    const result = await P.purchasePackage({ aPackage: sel.pkg });
+    // Purchase call branches by platform + mode. On Android in modal
+    // mode we bypass the trial offer even for eligible users by
+    // purchasing the base-plan SubscriptionOption directly — Google's
+    // subscription model attaches the free trial as an offer on the
+    // base plan, so purchasePackage's default (RC picks the "best"
+    // eligible offer, i.e. the trial) is wrong for users who already
+    // consumed their free chapter. iOS doesn't need this branch:
+    // the modal paywall's package resolves to the `_standard` SKU,
+    // which has no intro offer configured. Onboarding paywall on
+    // both platforms uses purchasePackage so RC applies the intro
+    // offer to eligible users.
+    const _platform = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || 'web';
+    const _useAndroidBasePlan = _platform === 'android' && _paywallMode === 'modal';
+    let result;
+    if (_useAndroidBasePlan) {
+      const _opts = (sel.pkg.product && sel.pkg.product.subscriptionOptions) || [];
+      const _basePlan = _opts.find(o => o && o.isBasePlan);
+      if (_basePlan) {
+        console.log('[Sub/purchase] Android modal → purchaseSubscriptionOption(basePlan)',
+                    'option id:', _basePlan.id, 'productId:', sel.pkg.identifier);
+        result = await P.purchaseSubscriptionOption({ subscriptionOption: _basePlan });
+      } else {
+        // No base-plan option surfaced on the product. Shouldn't
+        // happen for a Play subscription, but if the plugin ever
+        // returns a null subscriptionOptions array we don't want
+        // the paywall to hang — fall back to purchasePackage. May
+        // grant the user a trial they shouldn't get; loud console
+        // warning so this doesn't slip past.
+        console.warn('[Sub/purchase] Android base-plan option missing on', sel.pkg.identifier,
+                     '— falling back to purchasePackage (may grant trial)');
+        result = await P.purchasePackage({ aPackage: sel.pkg });
+      }
+    } else {
+      result = await P.purchasePackage({ aPackage: sel.pkg });
+    }
     // Log every identifier RC returned on success. If PAYWALL_ENTITLEMENT_ID
     // ever drifts from what's actually configured in the RC dashboard,
     // the mismatch is silent (paid stays false, success branch never
@@ -13278,7 +13373,9 @@ async function startPurchase() {
       saveStateLocal();
       try { posthog.capture('paywall_purchase_succeeded', {
         package_id: sel.pkg.identifier,
-        is_trial: TRIAL_ENABLED,
+        is_trial: TRIAL_ENABLED && _paywallMode === 'onboarding',
+        offering_id: _offeringId,
+        source_mode: _paywallMode,
       }); } catch(e) {}
       // Meta App Events: fb_mobile_subscribe with the purchase value so
       // SKAdNetwork attribution can credit the campaign that drove the
@@ -16118,6 +16215,7 @@ function _onbV2PreparePaywall() {
       source:        'onboarding',
       subject:       state.subject || null,
       trial_enabled: TRIAL_ENABLED,
+      offering_id:   (_paywallActiveOffering() && _paywallActiveOffering().identifier) || null,
     });
   } catch(e) {}
 }
