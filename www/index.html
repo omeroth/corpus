@@ -15010,13 +15010,13 @@ const _ONB_COPY = {
   // TRIAL_ENABLED; when the flag is off, step 33 skips straight to
   // the paywall and this copy block goes unread.
   trial: {
-    head: { en: 'Open everything, free for seven days',
-            he: 'פתחו הכל, שבעה ימים בחינם' },
+    head: { en: 'Open everything, free for a week',
+            he: 'פתחו הכל, שבוע חינם' },
     cta:  { en: 'Try it for $0.00', he: 'נסו ב-$0.00' },
     items: [
       { icon: 'icon-books',
-        text: { en: 'Every chapter in every subject — philosophy, psychology, economics',
-                he: 'כל פרק בכל תחום — פילוסופיה, פסיכולוגיה וכלכלה' } },
+        text: { en: 'Every chapter in every subject: philosophy, psychology, economics',
+                he: 'כל פרק בכל תחום: פילוסופיה, פסיכולוגיה וכלכלה' } },
       { icon: 'icon-openbook',
         text: { en: 'Bonus chapters that turn the ideas into something you can use',
                 he: 'פרקי בונוס שהופכים את הרעיונות למשהו שאפשר להשתמש בו' } },
@@ -15067,17 +15067,17 @@ const _ONB_COPY = {
                  he: 'נזכיר לכם שזה כמעט נגמר.' } },
       { title: { en: 'Day 7', he: 'יום 7' },
         text:  { en: 'Your subscription starts, unless you cancelled.',
-                 he: 'המנוי מתחיל, אלא אם ביטלתם.' },
-        hollow: true },
+                 he: 'המנוי מתחיל, אלא אם ביטלתם.' } },
     ],
     noPaymentDue: { en: 'No payment due now', he: 'אין חיוב עכשיו' },
     cta:          { en: 'Start my free trial', he: 'להתחיל את הניסיון' },
     // {price} and {period} interpolated at render time from the
-    // selected package. "Free for 7 days" is hardcoded to match the
-    // introductory-offer terms Apple / Google are both configured
-    // with (7-day free trial for anyone who has never subscribed).
-    legal: { en: 'Free for 7 days, then {price} {period}. Cancel any time in App Store settings.',
-             he: 'חינם ל-7 ימים, אחר כך {price} {period}. אפשר לבטל בכל עת בהגדרות ה-App Store.' },
+    // selected package. Legal line uses "a week" phrasing (rather
+    // than "7 days") to match the trial-intro copy. The underlying
+    // introductory-offer term configured with Apple + Google is
+    // still 7 calendar days.
+    legal: { en: 'Free for a week, then {price} {period}. Cancel any time in App Store settings.',
+             he: 'חינם לשבוע, אחר כך {price} {period}. אפשר לבטל בכל עת בהגדרות ה-App Store.' },
   },
 
   // Step 23 — journey summary. An accent-bordered card at the top
