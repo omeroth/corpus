@@ -3226,37 +3226,11 @@
     background: transparent;
   }
 
-  /* Segmented progress pills — reuse #section-dots with new geometry.
-     Completed: filled --accent, small. Active: filled --accent, wider (flex:
-     2.5) + taller + subtle glow so "you are here" reads at a glance.
-     Upcoming: --border, small. */
+  /* Editorial mode: #section-dots is superseded by #reader-progress
+     (Instagram-stories segmented bar with reading/questions phase
+     split + scroll-driven fill). Section-dots stays in the DOM so
+     renderSectionDots() keeps working, but it's hidden here. */
   .reader-editorial #screen-reader #section-dots {
-    gap: 6px;
-    padding: 12px 20px 16px;
-    align-items: center;
-  }
-  .reader-editorial #screen-reader #section-dots .section-dot {
-    flex: 1;
-    height: 6px;
-    width: auto;
-    border-radius: 999px;
-    background: var(--border);
-    transition: background 0.3s ease;
-  }
-  .reader-editorial #screen-reader #section-dots .section-dot.completed {
-    background: var(--accent);
-    width: auto;
-  }
-  .reader-editorial #screen-reader #section-dots .section-dot.active {
-    background: var(--accent);
-    flex: 2.5;
-    height: 10px;
-    width: auto;
-    box-shadow: 0 0 8px var(--accent-glow);
-  }
-
-  /* Hide the top scroll progress bar — segmented pills carry the load */
-  .reader-editorial #screen-reader .reading-progress-bar {
     display: none;
   }
 
@@ -9248,19 +9222,44 @@
     padding-top: 12px;
   }
 
-  /* DEPRECATED (editorial rollout): 3px top scroll-progress bar. Shadowed
-     (hidden) by .reader-editorial #screen-reader .reading-progress-bar {
-     display: none } — segmented section pills carry progress instead. */
-  .reading-progress-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
+  /* Segmented progress bar (Instagram-stories pattern) — replaces the
+     old single-bar .reading-progress-bar (retired 2026-09-21). One
+     bar visible at a time: during reading sections, one segment per
+     reading section; during question sections, one segment per
+     question section. Container regenerated on every renderReader
+     pass by _renderReaderProgress; current segment's fill grows with
+     scroll position via _updateReaderProgressScroll. */
+  .reader-progress {
+    display: flex;
+    gap: 4px;
+    padding: 0 16px;
+    margin: 8px 0;
     height: 3px;
-    width: 0%;
-    background: linear-gradient(90deg, var(--accent), var(--purple-light));
-    z-index: 2000;
-    transition: width 0.1s ease;
-    border-radius: 0 2px 2px 0;
+    box-sizing: content-box;
+  }
+  .reader-progress-seg {
+    flex: 1;
+    height: 100%;
+    background: rgba(42, 18, 102, 0.14);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+  }
+  .reader-progress-seg.completed {
+    background: var(--accent);
+  }
+  .reader-progress-fill {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--accent);
+    border-radius: 999px;
+    /* Fast width transition so scroll-driven changes feel live but
+       don't jitter. Instagram's own segment fills use ~150ms too. */
+    transition: width 0.15s linear;
+  }
+  html.dark .reader-progress-seg {
+    background: rgba(245, 241, 255, 0.16);
   }
 
   /* ── Section Dots ── */
@@ -11263,7 +11262,6 @@
        READER SCREEN
   ═══════════════════════════════ -->
   <div id="screen-reader" class="screen reader-screen-shell">
-    <div class="reading-progress-bar" id="reading-progress-bar"></div>
     <div class="reader-header-unit">
     <div class="reader-topbar">
       <button class="reader-back-btn" onclick="goBack()">
@@ -11280,6 +11278,17 @@
         </svg>
       </button>
     </div>
+    <!-- Segmented progress bar (Instagram-stories pattern). One
+         container that regenerates its children on every renderReader
+         pass: during reading sections it renders N segments where N =
+         number of reading sections; during question sections it
+         renders M segments where M = number of question sections.
+         Completed segments fill solid; the current segment fills
+         continuously with scroll position; upcoming segments stay
+         empty. Supersedes #section-dots (kept hidden in editorial
+         mode for backwards-compat) and the old top scroll bar.
+         See _renderReaderProgress + _updateReaderProgressScroll. -->
+    <div class="reader-progress" id="reader-progress"></div>
     <div class="section-dots" id="section-dots"></div>
     </div>
     <div class="reader-scroll-area" id="reader-content"></div>
@@ -23066,14 +23075,50 @@ function _updateThinkerIntroReopenBtn(day) {
 // READER
 // ═══════════════════════════════════════════════════════════
 
-function updateReadingProgress() {
-  const scrollArea = document.getElementById('reader-content') || document.querySelector('.reader-scroll-area');
+// Section types split into two phases so the segmented progress bar
+// shows one bar per phase (Instagram-stories pattern). Reading phase:
+// content-delivery types. Question phase: answer-required types.
+// User sees a reading bar, then a fresh questions bar — never a
+// single bar spanning both.
+const _READER_QUESTION_TYPES = new Set(['quiz', 'quiz_summary', 'reflection']);
+function _readerPhaseOf(section) {
+  return _READER_QUESTION_TYPES.has(section && section.type) ? 'questions' : 'reading';
+}
+
+// Regenerates #reader-progress children for the current phase. Segments
+// = all sections in the same phase as `sections[currentIndex]`, in
+// their normalized order. Completed segments render solid; the current
+// segment starts empty (its inner .reader-progress-fill fills on
+// scroll via _updateReaderProgressScroll); upcoming stay empty.
+function _renderReaderProgress(sections, currentIndex) {
+  const bar = document.getElementById('reader-progress');
+  if (!bar) return;
+  const currentPhase = _readerPhaseOf(sections[currentIndex]);
+  const phaseIndices = [];
+  for (let i = 0; i < sections.length; i++) {
+    if (_readerPhaseOf(sections[i]) === currentPhase) phaseIndices.push(i);
+  }
+  const currentPos = phaseIndices.indexOf(currentIndex);
+  bar.innerHTML = phaseIndices.map((_, pos) => {
+    if (pos < currentPos) return '<div class="reader-progress-seg completed"></div>';
+    if (pos === currentPos) return '<div class="reader-progress-seg current"><span class="reader-progress-fill"></span></div>';
+    return '<div class="reader-progress-seg"></div>';
+  }).join('');
+}
+
+// Drives the current segment's fill on scroll. Ratio of scrollTop /
+// (scrollHeight - clientHeight) → width%. Clamped to [0,1] to avoid
+// overshoot from iOS rubber-banding. When the content isn't tall
+// enough to scroll (denom<=0), the segment is treated as fully read
+// so quiz pages don't sit at 0%.
+function _updateReaderProgressScroll() {
+  const scrollArea = document.getElementById('reader-content');
   if (!scrollArea) return;
-  const scrollTop = scrollArea.scrollTop;
-  const scrollHeight = scrollArea.scrollHeight - scrollArea.clientHeight;
-  const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
-  const bar = document.getElementById('reading-progress-bar');
-  if (bar) bar.style.width = progress + '%';
+  const fill = document.querySelector('#reader-progress .reader-progress-seg.current .reader-progress-fill');
+  if (!fill) return;
+  const denom = scrollArea.scrollHeight - scrollArea.clientHeight;
+  const pct = denom > 0 ? Math.max(0, Math.min(1, scrollArea.scrollTop / denom)) : 1;
+  fill.style.width = (pct * 100) + '%';
 }
 
 function renderSectionDots() {
@@ -23114,15 +23159,18 @@ function renderReader() {
 
   renderSectionDots();
   _updateThinkerIntroReopenBtn(day);
+  _renderReaderProgress(sections, state.currentSection);
 
   const content = document.getElementById('reader-content');
   content.innerHTML = '';
 
-  // Reset scroll progress bar and re-attach scroll listener
-  const bar = document.getElementById('reading-progress-bar');
-  if (bar) bar.style.width = '0%';
-  content.removeEventListener('scroll', updateReadingProgress);
-  content.addEventListener('scroll', updateReadingProgress);
+  // Segmented bar: reset the current segment's fill on section change,
+  // then track scroll. Explicit zero-fill call handles the case where
+  // the new section has no scrollable content (denom<=0 → treated as
+  // fully read inside _updateReaderProgressScroll).
+  content.removeEventListener('scroll', _updateReaderProgressScroll);
+  content.addEventListener('scroll', _updateReaderProgressScroll);
+  _updateReaderProgressScroll();
 
   const card = document.createElement('div');
   card.className = 'section-card learning-card-body';
