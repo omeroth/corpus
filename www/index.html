@@ -15951,6 +15951,33 @@ function _onbComplete() {
   try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
   try { localStorage.removeItem('corpus_onboarding_step'); } catch(e) {}
   try { _phCapture('onboarding_completed', { platform: _phPlatform(), lang: state.lang || 'he' }); } catch(e) {}
+  // Defensive seed of user_progress so Loops's re-engagement pipeline
+  // has a row for this user even when saveState above was blocked by
+  // the _progressLoaded guard (boot pull timed out / errored). Without
+  // this, guard-blocked completions leave no row, notify_loops_progress
+  // never fires, and Loops can't target 7-/14-day inactivity emails.
+  // INSERT (not upsert) so a 23505 unique_violation on the PK is our
+  // "row already exists, don't touch it" signal — this write must never
+  // clobber a completed row's other columns. Bypasses _progressLoaded
+  // because the payload is client-authoritative (state.subject, state.
+  // onbAnswers, state.lang) and doesn't include the columns the guard
+  // exists to protect (xp / streak / completed_days). Fire-and-forget;
+  // any real error is logged but not surfaced (the user's onboarding
+  // finished successfully — a Loops-plumbing hiccup shouldn't derail).
+  if (currentUser) {
+    sb.from('user_progress').insert({
+      user_id:            currentUser.id,
+      last_subject:       state.subject || null,
+      last_active_at:     new Date().toISOString(),
+      onboarding_answers: state.onbAnswers || {},
+      onboarding_done:    true,
+      lang:               state.lang || null,
+    }).then(({ error }) => {
+      if (error && error.code !== '23505') {
+        console.warn('[Onb] user_progress seed insert failed:', error.message);
+      }
+    });
+  }
   document.querySelectorAll('.onb-screen.onb-v2').forEach(s => {
     s.style.display = 'none';
     s.classList.remove('onb-active');
