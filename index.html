@@ -12372,6 +12372,54 @@ async function syncProgressToSupabase() {
   } catch(e) { _reportSyncFailure('onboarding_answers', e); }
 }
 
+// Narrow "last_active_at" bump for the Loops re-engagement pipeline.
+// Fires from enterAppState on every signed-in app entry: at most once
+// per UTC day, PATCHes user_progress.last_active_at so the
+// notify_loops_progress trigger forwards a fresh lastActiveAt to
+// Loops. Without this, a user who opens the app without completing a
+// dialogue never signals Loops after signup — the sync path only
+// writes on finishDay, so 7-day / 14-day inactivity campaigns have
+// no per-user "last seen" to gate on.
+//
+// UPDATE (not upsert): if the row doesn't exist yet (fresh signup
+// pre-first-dialogue), this is a silent no-op. Those users stay
+// covered by the loops-signup snapshot and can be targeted as a
+// separate Loops segment ("no lastActiveAt AND subscriptionStatus =
+// none"). This is deliberate — a first-open upsert here could race
+// with the boot pull and clobber real progress the merge hasn't
+// read yet.
+//
+// Only touches last_active_at, so it doesn't clobber any other
+// column even if local state is degraded. That's why it bypasses
+// the _progressLoaded guard: the guard protects against multi-
+// column pushes based on stale local state, and this write has no
+// such payload to be stale about.
+//
+// Bucket: UTC calendar day, keyed via localStorage. Belt-and-braces
+// with the trigger's own 30-second debounce, mostly to keep the
+// network chatter down. UTC (not local) so users on opposite sides
+// of the date line collapse to the same "day" — matches how Loops
+// evaluates campaign delays.
+async function _bumpLastActiveIfNeeded() {
+  if (!currentUser) return;
+  const todayUtc = new Date().toISOString().slice(0, 10);
+  let stored = null;
+  try { stored = localStorage.getItem('corpus_last_active_bumped_utc'); } catch(_) {}
+  if (stored === todayUtc) return;
+  try {
+    const { error } = await sb.from('user_progress')
+      .update({ last_active_at: new Date().toISOString() })
+      .eq('user_id', currentUser.id);
+    if (error) {
+      console.warn('[Loops] last_active_at bump failed:', error.message);
+      return;
+    }
+    try { localStorage.setItem('corpus_last_active_bumped_utc', todayUtc); } catch(_) {}
+  } catch(e) {
+    console.warn('[Loops] last_active_at bump threw:', e && e.message);
+  }
+}
+
 async function loadProgressFromSupabase() {
   if (!currentUser) return;
   try {
@@ -28409,6 +28457,12 @@ async function enterAppState(user) {
   // setTimeout(0) before invoking enterApp), so it's safe to touch
   // native plugins here.
   if (user) _configureRC(user.id).catch(() => {});
+  // Loops re-engagement: bump last_active_at once per UTC day so the
+  // notify_loops_progress trigger delivers a fresh lastActiveAt to
+  // Loops even for sessions that complete no dialogue. Fire-and-
+  // forget; UPDATE-only; bypasses _progressLoaded by design. See
+  // _bumpLastActiveIfNeeded for the full rationale.
+  if (user) _bumpLastActiveIfNeeded().catch(e => console.warn('[Loops] _bumpLastActiveIfNeeded failed:', e));
   // Reset per-session pull-completed flag. Set true inside
   // loadProgressFromSupabase's try block only if all merges finished.
   // syncProgressToSupabase gates every push on this — see the guard at

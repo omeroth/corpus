@@ -87,12 +87,14 @@ function deriveProgressProps(record: Record<string, unknown> | null | undefined)
   const rec = record || {};
   const completedDays = Array.isArray(rec.completed_days) ? (rec.completed_days as string[]) : [];
   const chapterCompleteShown = Array.isArray(rec.chapter_complete_shown) ? (rec.chapter_complete_shown as string[]) : [];
-  const hasPhilosophy = completedDays.some((k) => typeof k === "string" && k.startsWith("philosophy-"));
-  const hasEconomics  = completedDays.some((k) => typeof k === "string" && k.startsWith("economics-"));
-  let subjectsStarted: "philosophy" | "economics" | "both" | null = null;
-  if (hasPhilosophy && hasEconomics) subjectsStarted = "both";
-  else if (hasPhilosophy)            subjectsStarted = "philosophy";
-  else if (hasEconomics)             subjectsStarted = "economics";
+  // Same shape as loops-progress: sorted comma-joined slug list.
+  // See that file's deriveProgressProps for the rationale on why
+  // the two-of-three "both" enum was retired when psychology went live.
+  const subjects: string[] = [];
+  if (completedDays.some((k) => typeof k === "string" && k.startsWith("economics-")))  subjects.push("economics");
+  if (completedDays.some((k) => typeof k === "string" && k.startsWith("philosophy-"))) subjects.push("philosophy");
+  if (completedDays.some((k) => typeof k === "string" && k.startsWith("psychology-"))) subjects.push("psychology");
+  const subjectsStarted: string | null = subjects.length > 0 ? subjects.join(",") : null;
   // firstName: pulled from user_progress.onboarding_answers.name (jsonb,
   // migration 20260826150000). Validated by cleanFirstName above. Omitted
   // when invalid so the spread at the callsite doesn't clear an existing
@@ -108,9 +110,12 @@ function deriveProgressProps(record: Record<string, unknown> | null | undefined)
   const props: Record<string, unknown> = {
     lastActiveAt:      typeof rec.last_active_at === "string" ? rec.last_active_at : null,
     // Fallback for users whose last_subject was never written: infer from
-    // subjectsStarted when unambiguous; leave null when both were touched.
+    // subjectsStarted only when there's exactly one subject in the list.
+    // Multi-subject values (e.g. "economics,philosophy") stay null so
+    // Loops keeps the previously-set lastSubject rather than get a
+    // meaningless composite string in a single-subject field.
     lastSubject:       (typeof rec.last_subject === "string" && rec.last_subject)
-                    || (subjectsStarted === "both" ? null : subjectsStarted),
+                    || (subjects.length === 1 ? subjects[0] : null),
     subjectsStarted,
     bonusUnlocked:     completedDays.some((k) => typeof k === "string" && k.startsWith("bonus")),
     chaptersCompleted: chapterCompleteShown.length,

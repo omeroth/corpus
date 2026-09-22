@@ -14,9 +14,18 @@
 //
 // Derived Loops contact properties written per call:
 //   lastActiveAt      : ISO from user_progress.last_active_at
-//   lastSubject       : 'philosophy' | 'economics' (from user_progress.last_subject)
-//   subjectsStarted   : 'philosophy' | 'economics' | 'both'
-//                       (any completed_days key with that subject prefix)
+//   lastSubject       : 'philosophy' | 'economics' | 'psychology'
+//                       (from user_progress.last_subject)
+//   subjectsStarted   : sorted comma-joined slug list of every subject
+//                       the user has completed a dialogue in — e.g.
+//                       'philosophy', 'economics', 'psychology',
+//                       'economics,philosophy', 'philosophy,psychology',
+//                       'economics,philosophy,psychology'. Loops "contains"
+//                       filters answer "who has started X?"; "equals"
+//                       filters answer "who has ONLY started X?".
+//                       (Was 'philosophy' | 'economics' | 'both' before
+//                       psychology went live — the two-of-three "both"
+//                       enum couldn't represent psychology-touching users.)
 //   bonusUnlocked     : boolean (any completed_days key starts with 'bonus')
 //   chaptersCompleted : number (length of chapter_complete_shown)
 //
@@ -103,12 +112,17 @@ function deriveProgressProps(record: Record<string, unknown>) {
     ? (record.chapter_complete_shown as string[])
     : [];
 
-  const hasPhilosophy = completedDays.some((k) => typeof k === "string" && k.startsWith("philosophy-"));
-  const hasEconomics  = completedDays.some((k) => typeof k === "string" && k.startsWith("economics-"));
-  let subjectsStarted: "philosophy" | "economics" | "both" | null = null;
-  if (hasPhilosophy && hasEconomics) subjectsStarted = "both";
-  else if (hasPhilosophy)            subjectsStarted = "philosophy";
-  else if (hasEconomics)             subjectsStarted = "economics";
+  // Any subject the user has completed at least one dialogue in.
+  // Collected in a stable alphabetical order (economics < philosophy
+  // < psychology) so the same set of subjects always renders as the
+  // same string — a user who started philosophy then economics
+  // shouldn't cache-bust "economics,philosophy" into "philosophy,
+  // economics" on the next sync.
+  const subjects: string[] = [];
+  if (completedDays.some((k) => typeof k === "string" && k.startsWith("economics-")))  subjects.push("economics");
+  if (completedDays.some((k) => typeof k === "string" && k.startsWith("philosophy-"))) subjects.push("philosophy");
+  if (completedDays.some((k) => typeof k === "string" && k.startsWith("psychology-"))) subjects.push("psychology");
+  const subjectsStarted: string | null = subjects.length > 0 ? subjects.join(",") : null;
 
   const bonusUnlocked = completedDays.some((k) => typeof k === "string" && k.startsWith("bonus"));
 
