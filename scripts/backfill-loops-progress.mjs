@@ -80,6 +80,14 @@ function deriveProgressProps(record) {
   // Kept out of the returned object when the value is null / empty so the
   // spread at the callsite (body = { email, ...props }) omits the property
   // entirely — sending "" or null would clear Loops' language field.
+  // Inactivity flags — computed here from last_active_at so a local
+  // backfill run produces the same shape the daily loops-inactive-sweep
+  // edge function would. 7-to-60 and 14-to-60 day windows match the
+  // sweep's bounds.
+  const lastActive = typeof record.last_active_at === 'string' ? Date.parse(record.last_active_at) : NaN;
+  const daysSince  = Number.isFinite(lastActive) ? (Date.now() - lastActive) / 86400000 : null;
+  const inactive7d  = daysSince !== null && daysSince >= 7  && daysSince <= 60;
+  const inactive14d = daysSince !== null && daysSince >= 14 && daysSince <= 60;
   const props = {
     lastActiveAt:      typeof record.last_active_at === 'string' ? record.last_active_at : null,
     // Fallback for users whose last_subject was never written: infer
@@ -91,6 +99,8 @@ function deriveProgressProps(record) {
     subjectsStarted,
     bonusUnlocked:     completedDays.some(k => typeof k === 'string' && k.startsWith('bonus')),
     chaptersCompleted: chapterCompleteShown.length,
+    inactive7d,
+    inactive14d,
   };
   if (typeof record.lang === 'string' && record.lang) props.language = record.lang;
   return props;
@@ -173,6 +183,7 @@ async function main() {
     id:    u.id,
     props: u.progress ? deriveProgressProps(u.progress) : {
       lastActiveAt: null, lastSubject: null, subjectsStarted: null, bonusUnlocked: false, chaptersCompleted: 0,
+      inactive7d: false, inactive14d: false,
     },
   }));
 

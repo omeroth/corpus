@@ -28,6 +28,18 @@ verify_jwt = false
 import_map = "./functions/backfill-loops-progress/deno.json"
 entrypoint = "./functions/backfill-loops-progress/index.ts"
 
+# loops-inactive-sweep: daily-scheduled sweep that flips inactive7d /
+# inactive14d = true for users whose last_active_at falls between 7-60
+# and 14-60 days ago. Scheduled via pg_cron (see the corresponding
+# migration). verify_jwt = false because pg_cron authenticates via the
+# X-Loops-Webhook-Secret header, same pattern as the sibling Loops
+# functions — the Vault entry loops_webhook_secret gates all four.
+[functions.loops-inactive-sweep]
+enabled = true
+verify_jwt = false
+import_map = "./functions/loops-inactive-sweep/deno.json"
+entrypoint = "./functions/loops-inactive-sweep/index.ts"
+
 # revenuecat-webhook: verify_jwt MUST be false. RevenueCat doesn't send a
 # Supabase JWT — it sends a static bearer token that the function verifies
 # against REVENUECAT_WEBHOOK_SECRET (see verifyAuth in index.ts). If the

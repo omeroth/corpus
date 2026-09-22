@@ -28,6 +28,11 @@
 //                       enum couldn't represent psychology-touching users.)
 //   bonusUnlocked     : boolean (any completed_days key starts with 'bonus')
 //   chaptersCompleted : number (length of chapter_complete_shown)
+//   inactive7d        : always false. Real activity resets the flag; the
+//                       daily loops-inactive-sweep function sets it back
+//                       to true when the user's last_active_at falls
+//                       between 7 and 60 days ago.
+//   inactive14d       : same shape, 14-to-60-day window.
 //
 // Required env vars (auto-populated by Supabase Edge Functions runtime):
 //   - SUPABASE_URL
@@ -150,6 +155,11 @@ function deriveProgressProps(record: Record<string, unknown>) {
     subjectsStarted,
     bonusUnlocked,
     chaptersCompleted: chapterCompleteShown.length,
+    // Reset the two inactivity flags every time the user does something
+    // real. The daily loops-inactive-sweep function flips them back to
+    // true when last_active_at re-crosses the corresponding threshold.
+    inactive7d:  false,
+    inactive14d: false,
   };
   if (typeof record.lang === "string" && record.lang) props.language = record.lang;
   if (typeof record.platform === "string" && record.platform) props.platform = record.platform;
@@ -218,6 +228,8 @@ serve(async (req: Request): Promise<Response> => {
     subjectsStarted:   derived.subjectsStarted,
     bonusUnlocked:     derived.bonusUnlocked,
     chaptersCompleted: derived.chaptersCompleted,
+    inactive7d:        derived.inactive7d,
+    inactive14d:       derived.inactive14d,
   };
   // language / platform / firstName: forwarded only when deriveProgressProps
   // included them. Omitting on null keeps a previously-set Loops value from

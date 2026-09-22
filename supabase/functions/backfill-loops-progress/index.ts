@@ -107,6 +107,15 @@ function deriveProgressProps(record: Record<string, unknown> | null | undefined)
   // Kept out of the returned object when the value is null / empty so the
   // spread at the callsite (body = { email, ...props }) omits the property
   // entirely — sending "" or null would clear Loops' language field.
+  // Inactivity flags — computed at backfill time from last_active_at so the
+  // one-shot script leaves each contact with the same shape a live
+  // loops-inactive-sweep run would produce. 7d and 14d thresholds bounded
+  // above by 60 days to match the sweep's upper cap (protects sender
+  // reputation from long-dormant contacts).
+  const lastActive = typeof rec.last_active_at === "string" ? Date.parse(rec.last_active_at) : NaN;
+  const daysSince  = Number.isFinite(lastActive) ? (Date.now() - lastActive) / 86400000 : null;
+  const inactive7d  = daysSince !== null && daysSince >= 7  && daysSince <= 60;
+  const inactive14d = daysSince !== null && daysSince >= 14 && daysSince <= 60;
   const props: Record<string, unknown> = {
     lastActiveAt:      typeof rec.last_active_at === "string" ? rec.last_active_at : null,
     // Fallback for users whose last_subject was never written: infer from
@@ -119,6 +128,8 @@ function deriveProgressProps(record: Record<string, unknown> | null | undefined)
     subjectsStarted,
     bonusUnlocked:     completedDays.some((k) => typeof k === "string" && k.startsWith("bonus")),
     chaptersCompleted: chapterCompleteShown.length,
+    inactive7d,
+    inactive14d,
   };
   if (typeof rec.lang === "string" && rec.lang) props.language = rec.lang;
   if (typeof rec.platform === "string" && rec.platform) props.platform = rec.platform;
@@ -157,13 +168,24 @@ serve(async (req: Request): Promise<Response> => {
 
   const dryRun = new URL(req.url).searchParams.get("dry_run") === "1";
 
-  // Fetch every auth user + their (optional) progress row.
-  const { data: rawUsers, error: usersErr } = await admin.auth.admin.listUsers({ perPage: 1000 });
-  if (usersErr) {
-    console.error("[backfill] listUsers failed:", usersErr);
-    return jsonResponse({ ok: false, error: "Users fetch failed" }, 500);
+  // Fetch every auth user + their (optional) progress row. listUsers
+  // caps at 1000 rows per call regardless of the total, so paginate
+  // until a page comes back short — without this, past 1,000 users
+  // the backfill silently skips the tail.
+  const users: any[] = [];
+  const PER_PAGE = 1000;
+  for (let page = 1; ; page += 1) {
+    const { data: rawUsers, error: usersErr } = await admin.auth.admin.listUsers({ page, perPage: PER_PAGE });
+    if (usersErr) {
+      console.error("[backfill] listUsers page", page, "failed:", usersErr);
+      return jsonResponse({ ok: false, error: "Users fetch failed" }, 500);
+    }
+    const batch = (rawUsers?.users || []) as any[];
+    for (const u of batch) {
+      if (u && u.email) users.push(u);
+    }
+    if (batch.length < PER_PAGE) break;
   }
-  const users = (rawUsers?.users || []).filter((u: any) => !!u.email);
 
   const { data: progressRows, error: progressErr } = await admin
     .from("user_progress")
