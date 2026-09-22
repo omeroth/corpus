@@ -67,24 +67,27 @@ if (!DRY_RUN && !LOOPS_API_KEY) {
 function deriveProgressProps(record) {
   const completedDays        = Array.isArray(record.completed_days)        ? record.completed_days        : [];
   const chapterCompleteShown = Array.isArray(record.chapter_complete_shown) ? record.chapter_complete_shown : [];
-  const hasPhilosophy = completedDays.some(k => typeof k === 'string' && k.startsWith('philosophy-'));
-  const hasEconomics  = completedDays.some(k => typeof k === 'string' && k.startsWith('economics-'));
-  let subjectsStarted = null;
-  if (hasPhilosophy && hasEconomics) subjectsStarted = 'both';
-  else if (hasPhilosophy)            subjectsStarted = 'philosophy';
-  else if (hasEconomics)             subjectsStarted = 'economics';
+  // Sorted comma-joined slug list. Same shape as the edge functions
+  // (loops-progress + backfill-loops-progress). Retired the two-of-
+  // three "both" enum when psychology went live — see the loops-
+  // progress file's docblock for the full rationale.
+  const subjects = [];
+  if (completedDays.some(k => typeof k === 'string' && k.startsWith('economics-')))  subjects.push('economics');
+  if (completedDays.some(k => typeof k === 'string' && k.startsWith('philosophy-'))) subjects.push('philosophy');
+  if (completedDays.some(k => typeof k === 'string' && k.startsWith('psychology-'))) subjects.push('psychology');
+  const subjectsStarted = subjects.length > 0 ? subjects.join(',') : null;
   // language: forwarded from user_progress.lang (migration 20260730120000).
   // Kept out of the returned object when the value is null / empty so the
   // spread at the callsite (body = { email, ...props }) omits the property
   // entirely — sending "" or null would clear Loops' language field.
   const props = {
     lastActiveAt:      typeof record.last_active_at === 'string' ? record.last_active_at : null,
-    // Fallback for users whose last_subject was never written (never synced
-    // since the migration): if we can prove they only touched one subject,
-    // infer from that; if they touched both, we can't tell without a per-day
-    // timestamp, so leave null.
+    // Fallback for users whose last_subject was never written: infer
+    // from subjectsStarted only when there's exactly one subject.
+    // Multi-subject rows stay null so Loops keeps the previously-set
+    // lastSubject rather than get a composite in a single-subject field.
     lastSubject:       (typeof record.last_subject === 'string' && record.last_subject)
-                    || (subjectsStarted === 'both' ? null : subjectsStarted),
+                    || (subjects.length === 1 ? subjects[0] : null),
     subjectsStarted,
     bonusUnlocked:     completedDays.some(k => typeof k === 'string' && k.startsWith('bonus')),
     chaptersCompleted: chapterCompleteShown.length,
