@@ -141,25 +141,27 @@ serve(async (req: Request): Promise<Response> => {
     if (batch.length < PER_PAGE) break;
   }
 
-  // Two disjoint target sets by last-active window. inactive14d is a
-  // subset of inactive7d (any user 14+ days inactive is also 7+), so
-  // the second PATCH lands after the first for the overlap — Loops
-  // resolves the final state as { inactive7d: true, inactive14d: true }.
-  const sevenTargets: Array<{ email: string; user_id: string }> = [];
-  const fourteenTargets: Array<{ email: string; user_id: string }> = [];
+  // One target list; both flags decided per contact and shipped in a
+  // single PATCH. Two separate passes would let the day-7 Loops
+  // workflow fire and evaluate inactive14d BEFORE the second pass
+  // set it, so a "day 7 email only when inactive14d = false" filter
+  // would never catch a 7-13 day user. Bundling both flags into one
+  // request removes the race.
+  //   7 to 14 days:  { inactive7d: true, inactive14d: false }
+  //   14 to 60 days: { inactive7d: true, inactive14d: true }
+  const targets: Array<{ email: string; inactive14d: boolean }> = [];
   for (const r of rows) {
     const email = emailById.get((r as any).user_id);
     if (!email) continue;
-    sevenTargets.push({ email, user_id: (r as any).user_id });
-    if (typeof (r as any).last_active_at === "string" && (r as any).last_active_at < fourteen) {
-      fourteenTargets.push({ email, user_id: (r as any).user_id });
-    }
+    const lastActive = (r as any).last_active_at;
+    const is14 = typeof lastActive === "string" && lastActive < fourteen;
+    targets.push({ email, inactive14d: is14 });
   }
 
   const t0 = Date.now();
-  let sevenUpdated = 0, sevenFailed = 0;
-  let fourteenUpdated = 0, fourteenFailed = 0;
-  const errors: Array<{ email: string; kind: string; status: number; error: string }> = [];
+  let updated = 0, failed = 0;
+  let sevenOnlyCount = 0, fourteenCount = 0;
+  const errors: Array<{ email: string; status: number; error: string }> = [];
 
   async function patch(email: string, body: Record<string, unknown>): Promise<{ ok: boolean; status: number; error: string }> {
     let attempt = 0;
@@ -190,19 +192,17 @@ serve(async (req: Request): Promise<Response> => {
     return { ok: false, status: 0, error: "retries exhausted" };
   }
 
-  // 7d pass. ~10 req/s; a 300-user day finishes in 30 seconds.
-  for (const t of sevenTargets) {
-    const r = await patch(t.email, { inactive7d: true });
-    if (r.ok) sevenUpdated += 1;
-    else { sevenFailed += 1; errors.push({ email: t.email, kind: "7d", status: r.status, error: r.error }); }
-    await sleep(100);
-  }
-
-  // 14d pass — subset of the 7d pass.
-  for (const t of fourteenTargets) {
-    const r = await patch(t.email, { inactive14d: true });
-    if (r.ok) fourteenUpdated += 1;
-    else { fourteenFailed += 1; errors.push({ email: t.email, kind: "14d", status: r.status, error: r.error }); }
+  // ~10 req/s; a 300-user day finishes in 30 seconds. Half the API
+  // calls of the previous two-pass version.
+  for (const t of targets) {
+    const r = await patch(t.email, { inactive7d: true, inactive14d: t.inactive14d });
+    if (r.ok) {
+      updated += 1;
+      if (t.inactive14d) fourteenCount += 1; else sevenOnlyCount += 1;
+    } else {
+      failed += 1;
+      errors.push({ email: t.email, status: r.status, error: r.error });
+    }
     await sleep(100);
   }
 
@@ -210,8 +210,11 @@ serve(async (req: Request): Promise<Response> => {
     ok: true,
     mode: "live",
     totals: {
-      seven_day:    { candidates: sevenTargets.length,    updated: sevenUpdated,    failed: sevenFailed },
-      fourteen_day: { candidates: fourteenTargets.length, updated: fourteenUpdated, failed: fourteenFailed },
+      candidates:      targets.length,
+      updated,
+      failed,
+      seven_day_only:  sevenOnlyCount,   // { inactive7d: true, inactive14d: false }
+      fourteen_day:    fourteenCount,    // { inactive7d: true, inactive14d: true  }
       elapsed_seconds: Math.round((Date.now() - t0) / 1000),
     },
     errors_sample: errors.slice(0, 10),
