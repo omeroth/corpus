@@ -15443,12 +15443,17 @@ const _ONB_COPY = {
   // first) matches the auth screen and is enforced for App Store
   // guideline 4.8 compliance.
   signup: {
-    // v11: no skip on signup means no justification needed — a
-    // required step shouldn't argue its case. Sub was dropped;
-    // the DOM element was removed too so the head sits at the
-    // natural centered position.
-    head:   { en: "Let's set you up",
-              he: 'בואו נסדר לכם חשבון' },
+    // v6 (2026-09-25): signup moved from step 4 to step 23 (post-
+    // streak). The screen now has to justify the ask — the head
+    // and sub together tell the user why signup is worth doing at
+    // this moment: they've just earned a card and a streak, and
+    // those artifacts live with the account. Head+sub replaces the
+    // earlier "Let's set you up" head-only copy (which worked at
+    // step 4 because signup was mandatory and needed no rationale).
+    head:   { en: "Save what you've earned",
+              he: 'שמרו את מה שצברתם' },
+    sub:    { en: 'Your card and your streak live with your account.',
+              he: 'הקלף והרצף שלכם נשמרים עם החשבון.' },
     apple:  { en: 'Continue with Apple',  he: 'המשך עם Apple' },
     google: { en: 'Continue with Google', he: 'המשך עם Google' },
     skip:   { en: 'Skip',                 he: 'דלגו' },
@@ -15614,8 +15619,10 @@ function _onbApplyLang(lang) {
   setText('onb-v2-commit-head',   'commit',   'head');
   setText('onb-v2-commit-cta',    'commit',   'cta');
   setText('onb-v2-signup-head',   'signup',   'head');
-  // Signup sub DOM was removed in v11 (no skip, no justification);
-  // binding retired.
+  // Signup sub restored 2026-09-25 alongside the v6 flow reshuffle
+  // that moved signup from step 4 (mandatory, no argument needed)
+  // to step 23 (post-streak, "save what you just earned").
+  setText('onb-v2-signup-sub',    'signup',   'sub');
   setText('onb-signup-apple-text',  'signup', 'apple');
   setText('onb-signup-google-text', 'signup', 'google');
   // onb-v2-signup-skip: element restored 2026-09-19 after evidence
@@ -31024,9 +31031,12 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="onb-v2-inner">
     <div class="onb-v2-signup-hero" id="onb-v2-signup-owl" aria-hidden="true"></div>
     <div class="onb-v2-copy">
-      <!-- v11: no sub. Mockup rationale — a required step shouldn't
-           argue its case. -->
+      <!-- v6: sub restored. Signup now lands at step 23 (post-streak)
+           rather than step 4, so the copy argues for saving what the
+           user has just earned rather than treating auth as a
+           gate they must pass through. -->
       <h1 class="onb-v2-head" id="onb-v2-signup-head"></h1>
+      <p class="onb-v2-sub" id="onb-v2-signup-sub"></p>
     </div>
   </div>
   <div class="onb-cta-holder onb-v2-signup-actions">
