@@ -19696,6 +19696,89 @@ function _thinkerImage(t, subject) {
   return t.image || '';
 }
 
+// ── Thinker points + tier math (commit 1 of thinker-frames work) ──
+// Point source: one point per completed dialogue featuring the
+// thinker, counted across every subject that day appears in.
+// Derived on every read from state.completedDays — no separate
+// counter, no server-sync field, nothing to migrate.
+//
+// Ceiling note (2026-09-27): at current content depth (Freud caps
+// at 4 dialogues, Smith at 4, everyone else ≤ 3) nobody reaches
+// silver + gold + diamond organically. This is temporary and
+// deliberate — the ceiling rises as new chapters ship, not through
+// a mechanic change. If you're reading this and wondering why the
+// top three tiers seem unreachable: they will be, once the content
+// catalogue is deep enough. Don't add rereads or quiz-based points
+// to compensate; the mechanic is one point per unique dialogue.
+//
+// If the mechanic ever DOES need to fold in non-completion signals,
+// swap this derivation for a stored counter without changing the
+// interface — every reader downstream calls thinkerPoints(id) and
+// picks up the new value transparently.
+//
+// Cross-subject thinkers (Kahneman appears in both economics and
+// psychology): the iteration sums across subjects, so the total is
+// one point per unique dialogue completion regardless of subject.
+// Portrait resolution still goes through _thinkerImage per subject.
+//
+// Debug override: window._debugThinkerPoints(id, n) sets a runtime
+// override on state._debugThinkerPoints[id]. persists through
+// saveStateLocal but NEVER pushes to the server —
+// syncProgressToSupabase writes explicit keys (see the upsert list
+// near line 12225), and _debugThinkerPoints isn't in that list.
+// Clear a single override with _debugThinkerPoints(id, null).
+const POINTS_PER_TIER = 3;
+const TIERS = ['plain', 'bronze', 'silver', 'gold', 'diamond'];
+function thinkerPoints(thinkerId) {
+  if (!thinkerId) return 0;
+  if (state && state._debugThinkerPoints && state._debugThinkerPoints[thinkerId] != null) {
+    const v = state._debugThinkerPoints[thinkerId];
+    return (typeof v === 'number' && v >= 0) ? v : 0;
+  }
+  let count = 0;
+  const sources = [
+    ['philosophy', typeof corpusData     !== 'undefined' ? corpusData     : null],
+    ['economics',  typeof economicsData  !== 'undefined' ? economicsData  : null],
+    ['psychology', typeof psychologyData !== 'undefined' ? psychologyData : null],
+  ];
+  for (const [subject, data] of sources) {
+    if (!data || !Array.isArray(data.weeks)) continue;
+    for (const week of data.weeks) {
+      if (!week || !Array.isArray(week.days)) continue;
+      for (const day of week.days) {
+        if (!day || day.thinkerId !== thinkerId) continue;
+        const key = dayKey(week.id, day.id, subject);
+        if (state.completedDays && state.completedDays[key]) count += 1;
+      }
+    }
+  }
+  return count;
+}
+function thinkerTier(thinkerId) {
+  return Math.min(TIERS.length - 1, Math.floor(thinkerPoints(thinkerId) / POINTS_PER_TIER));
+}
+function thinkerPlateFilled(thinkerId) {
+  const p = thinkerPoints(thinkerId);
+  const tier = Math.min(TIERS.length - 1, Math.floor(p / POINTS_PER_TIER));
+  return tier === TIERS.length - 1 ? POINTS_PER_TIER : p % POINTS_PER_TIER;
+}
+window._debugThinkerPoints = function(thinkerId, n) {
+  if (!state._debugThinkerPoints) state._debugThinkerPoints = {};
+  if (n == null) delete state._debugThinkerPoints[thinkerId];
+  else state._debugThinkerPoints[thinkerId] = Math.max(0, parseInt(n, 10) || 0);
+  // Commit 1 renders nothing new; later commits will re-render the
+  // plate and the framed card from this call site. For now the
+  // helper's job is to make the next thinkerPoints / thinkerTier /
+  // thinkerPlateFilled read return the new value, which the console
+  // can verify directly.
+  return {
+    points: thinkerPoints(thinkerId),
+    tier: thinkerTier(thinkerId),
+    tierName: TIERS[thinkerTier(thinkerId)],
+    filled: thinkerPlateFilled(thinkerId),
+  };
+};
+
 // Single source of truth for the app's default state shape. Called on cold
 // boot (initial declaration), from loadState() to hydrate defaults for any
 // keys the persisted blob is missing, and from every reset path (authLogout
