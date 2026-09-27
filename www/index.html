@@ -2046,6 +2046,147 @@
     position: relative;
     z-index: 2;
   }
+
+  /* ── Framed card (commit 3 of thinker-frames work) ──
+     Three layers stacked in one relative box (spec §4.2): portrait
+     webp, inset-shadow div over the card window, frame PNG on top.
+     Gold gets a fourth layer for the subject-tinted crest gem so we
+     ship one gold.png rather than gold-per-subject.
+     Positioning is percentages of the frame's own 230×376 unit box
+     (SVG viewBox 0 -16 230 376 — includes the ornament overflow):
+       card window (40, 44+16=60, 150, 268) → (17.39%, 15.96%, 65.22%, 71.28%)
+       gold gem centre (115, 31+16=47) → (50%, 12.5%)
+     .thinker-frame's own aspect-ratio locks 230:376 (~0.612), which
+     is narrower than the pantheon-card default 3:4 (0.75). Framed
+     pantheon-cards get .framed on the outer div and override the
+     aspect there — a plain card in the same grid keeps 3:4. */
+  .thinker-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 230 / 376;
+    overflow: visible;
+  }
+  .thinker-frame .frame-portrait {
+    position: absolute;
+    left: 17.39%;
+    top: 15.96%;
+    width: 65.22%;
+    height: 71.28%;
+    object-fit: cover;
+    /* Matches _thinkerImage's crop convention across pantheon /
+       reader / share-card so the same portrait file frames its face
+       identically wherever it appears. */
+    object-position: center 22%;
+    border-radius: 3px;
+    display: block;
+  }
+  .thinker-frame .frame-inset-shadow {
+    position: absolute;
+    left: 17.39%;
+    top: 15.96%;
+    width: 65.22%;
+    height: 71.28%;
+    pointer-events: none;
+    box-shadow: inset 3px 4px 8px rgba(0, 0, 0, 0.55),
+                inset -1px -1px 2px rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    z-index: 1;
+  }
+  /* Diamond's frame uses a slightly bluer inset shadow per reference
+     line 230; the tier's overall lighting is cooler + more violet. */
+  .thinker-frame[data-tier="diamond"] .frame-inset-shadow {
+    box-shadow: inset 3px 4px 8px rgba(58, 42, 102, 0.55),
+                inset -1px -1px 2px rgba(255, 255, 255, 0.45);
+  }
+  .thinker-frame .frame-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    display: block;
+  }
+  /* Gold-tier crest gem — subject-tinted radial gradient placed at
+     the gem's coordinate in the frame's SVG box. Uses the tone
+     tokens introduced in commit 2. Aspect-ratio matches the outer
+     gold ellipse in the reference (rx=10, ry=7.5 → 20:15). */
+  .thinker-frame[data-tier="gold"] .frame-gold-gem {
+    position: absolute;
+    left: 50%;
+    top: 12.5%;
+    width: 8.7%;             /* 20 units / 230 = 8.7% */
+    aspect-ratio: 20 / 15;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px solid;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .thinker-frame[data-tier="gold"][data-subject="philosophy"] .frame-gold-gem {
+    background: radial-gradient(circle at 35% 30%,
+      rgba(255, 255, 255, 0.95) 0%,
+      var(--frame-philosophy-field) 22%,
+      var(--frame-philosophy-deep) 70%,
+      var(--frame-philosophy-line) 100%);
+    border-color: var(--frame-philosophy-line);
+  }
+  .thinker-frame[data-tier="gold"][data-subject="economics"] .frame-gold-gem {
+    background: radial-gradient(circle at 35% 30%,
+      rgba(255, 255, 255, 0.95) 0%,
+      var(--frame-economics-field) 22%,
+      var(--frame-economics-deep) 70%,
+      var(--frame-economics-line) 100%);
+    border-color: var(--frame-economics-line);
+  }
+  .thinker-frame[data-tier="gold"][data-subject="psychology"] .frame-gold-gem {
+    background: radial-gradient(circle at 35% 30%,
+      rgba(255, 255, 255, 0.95) 0%,
+      var(--frame-psychology-field) 22%,
+      var(--frame-psychology-deep) 70%,
+      var(--frame-psychology-line) 100%);
+    border-color: var(--frame-psychology-line);
+  }
+
+  /* Pantheon variant — 3:4 frame set (spec §10). Same three-layer
+     stack (portrait + inset-shadow + frame PNG) with 3:4 geometry:
+       frame box 300×400 (aspect 0.75)
+       card window x=36, y=46, 228×304 → (12%, 11.5%, 76%, 76%)
+       gold gem centre (150, 38), size 15×11.2 → (50%, 9.5%, 5%, 15:11)
+     Card portrait uses object-position: center 20% to match the plain
+     pantheon-card crop (see .pantheon-card img at ~1794) — plain and
+     framed cards in the same grid show the same visible slice of the
+     670×1200 portrait, no shift when a frame is earned. */
+  .thinker-frame[data-variant="pantheon"] { aspect-ratio: 3 / 4; }
+  .thinker-frame[data-variant="pantheon"] .frame-portrait,
+  .thinker-frame[data-variant="pantheon"] .frame-inset-shadow {
+    left: 12%;
+    top: 11.5%;
+    width: 76%;
+    height: 76%;
+  }
+  .thinker-frame[data-variant="pantheon"] .frame-portrait {
+    object-position: center 20%;
+  }
+  .thinker-frame[data-variant="pantheon"][data-tier="gold"] .frame-gold-gem {
+    left: 50%;
+    top: 9.5%;
+    width: 5%;               /* 15 units / 300 = 5% */
+    aspect-ratio: 15 / 11;   /* mask ellipse rx=7.5 ry=5.6 */
+  }
+
+  /* Pantheon-card framed variant — the 3:4 frame set matches the
+     card slot's 3:4 aspect so no aspect override is needed. Border-
+     radius is dropped because the frame's outer band is a hard
+     rectangle by design; a rounded card corner would eat into the
+     frame ornaments (corner circles on bronze, rosettes on silver,
+     acanthus on gold, faceted keyline on diamond). The subject
+     ring (::after) is hidden because the frame itself is the border. */
+  .pantheon-card.framed,
+  .pantheon-card.framed .pantheon-card-front { border-radius: 0; }
+  .pantheon-card.framed:not(.locked)::after { display: none; }
+  .pantheon-card.framed .pantheon-card-info { display: none; }
+  .pantheon-card.framed .pantheon-card-overlay { display: none; }
   .pantheon-card.locked .pantheon-card-name {
     color: #6B5A8A;
   }
@@ -19956,6 +20097,39 @@ function renderThinkerPlate(thinkerId, subject) {
   return '<div class="thinker-plate tier-' + tier + '" data-subject="' + subj + '" data-tier="' + tier + '" data-filled="' + filled + '" role="img" aria-label="' + label + '">' + sockets + '</div>';
 }
 
+// ── Framed-card renderer (commit 3 of thinker-frames work) ──
+// Returns the HTML for a framed thinker card at the thinker's current
+// tier: three stacked layers (portrait + inset-shadow + frame PNG),
+// plus a fourth CSS gem overlay for the gold tier. Returns null for
+// the plain tier — the caller keeps its existing plain rendering
+// (full-bleed portrait, no frame) since NO frame is the plain state.
+//
+// portraitUrl is passed explicitly rather than computed here so the
+// caller controls which subject-specific image to use for
+// cross-subject thinkers (Kahneman) — matches how the app resolves
+// the portrait via _thinkerImage(t, subject) everywhere else.
+//
+// Positioning constants match the CSS above (17.39%, 15.96% etc);
+// changing one requires changing the other. See the .thinker-frame
+// block comment for the coordinate arithmetic.
+function renderThinkerFrame(thinkerId, subject, portraitUrl, variant) {
+  const tierIdx = thinkerTier(thinkerId);
+  const tier = TIERS[tierIdx];
+  if (tier === 'plain') return null;
+  const subj = subject || 'philosophy';
+  const v = variant === 'pantheon' ? 'pantheon' : 'reveal';
+  const gemHtml = tier === 'gold' ? '<div class="frame-gold-gem" aria-hidden="true"></div>' : '';
+  const framePng = v === 'pantheon'
+    ? 'images/thinker-frames/3x4/' + tier + '.png'
+    : 'images/thinker-frames/' + tier + '.png';
+  return '<div class="thinker-frame" data-tier="' + tier + '" data-subject="' + subj + '" data-variant="' + v + '">'
+       +   '<img class="frame-portrait" src="' + portraitUrl + '" alt="" onerror="this.style.display=\'none\'">'
+       +   '<div class="frame-inset-shadow" aria-hidden="true"></div>'
+       +   '<img class="frame-overlay" src="' + framePng + '" alt="" aria-hidden="true">'
+       +   gemHtml
+       + '</div>';
+}
+
 // Single source of truth for the app's default state shape. Called on cold
 // boot (initial declaration), from loadState() to hydrate defaults for any
 // keys the persisted blob is missing, and from every reset path (authLogout
@@ -24294,7 +24468,16 @@ function showThinkerCardScreen(thinker, chapter, day) {
   // dialogue in state.subject, so that's the correct portrait
   // context for a multi-subject thinker.
   const _unlockImg = _thinkerImage(thinker, state.subject);
-  if (_unlockImg) {
+  // If the user has earned a frame (bronze+), swap the front's
+  // portrait-as-background rendering for the three-layer framed
+  // structure. Plain tier keeps the existing background-image path
+  // — no frame is what plain means.
+  const _revealFrameHtml = renderThinkerFrame(thinker.id, state.subject, _unlockImg);
+  if (_revealFrameHtml) {
+    front.style.backgroundImage = '';
+    front.style.backgroundColor = 'transparent';
+    portrait.innerHTML = _revealFrameHtml;
+  } else if (_unlockImg) {
     front.style.backgroundImage = `url("${_unlockImg}")`;
     front.style.backgroundSize = 'contain';
     front.style.backgroundPosition = 'center';
@@ -29770,18 +29953,29 @@ function renderPantheon() {
     // misleading (the plate implies "in progress" state, and a
     // locked slot has no progress to represent).
     const plateHtml = isUnlocked ? renderThinkerPlate(t.id, subject) : '';
-    if (isUnlocked) {
-      return `
-        <div class="pantheon-slot">
-          <div class="pantheon-card" data-subject="${subject}" onclick="flipThinkerCard(this, '${t.id}')">
-            <div class="pantheon-card-inner">
-              <div class="pantheon-card-front">
+    // Framed front — only when the user has earned bronze or above.
+    // Plain tier keeps the existing full-bleed portrait rendering
+    // (no frame is what plain means). Framed uses the 3:4 pantheon
+    // frame set (spec §10) so the card slot stays 3:4 like plain
+    // cards, no shrinkage. Front info + overlay are hidden — frame
+    // ornaments occupy those bands; the name still shows on the
+    // flip-back.
+    const frameHtml = isUnlocked ? renderThinkerFrame(t.id, subject, imgUrl, 'pantheon') : null;
+    const framedClass = frameHtml ? ' framed' : '';
+    const frontInner = frameHtml || (`
                 <img src="${imgUrl}" alt="${t.name}" onerror="this.style.display='none'">
                 <div class="pantheon-card-overlay"></div>
                 <div class="pantheon-card-info">
                   <div class="pantheon-card-name">${displayName}</div>
                   <div class="pantheon-card-era">${t.era || ''}</div>
-                </div>
+                </div>`);
+    if (isUnlocked) {
+      return `
+        <div class="pantheon-slot">
+          <div class="pantheon-card${framedClass}" data-subject="${subject}" onclick="flipThinkerCard(this, '${t.id}')">
+            <div class="pantheon-card-inner">
+              <div class="pantheon-card-front">
+                ${frontInner}
               </div>
               <div class="pantheon-card-back">
                 <div class="pantheon-card-back-star">✦</div>
