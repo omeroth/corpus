@@ -2199,18 +2199,6 @@
     height: 100%;
     display: block;
   }
-  /* Lock icon on locked cards — 28-px symbol at centre, 60% opacity,
-     drawing from the shared #ic-lock sprite. */
-  .pth-lock {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 28px;
-    height: 28px;
-    transform: translate(-50%, -50%);
-    opacity: 0.6;
-    pointer-events: none;
-  }
 
   /* Progress bar. A capsule the full width of the card in the grid,
      ~86% of the framed card's width in the hall. Three large gems
@@ -13001,6 +12989,7 @@ async function loadProgressFromSupabase() {
       }
     });
     migrateCompletedDaysKeys();
+    _pruneUnlockedThinkers();
     saveStateLocal();
     // All merges ran to completion — mark this session as safe to push.
     // Placed as the LAST statement so a throw in any merge above leaves
@@ -20166,6 +20155,36 @@ function thinkerPlateFilled(thinkerId) {
   const tier = Math.min(TIERS.length - 1, Math.floor(p / POINTS_PER_TIER));
   return tier === TIERS.length - 1 ? POINTS_PER_TIER : p % POINTS_PER_TIER;
 }
+
+// "Unlocked" is derived from completedDays via thinkerPoints, not
+// read from state.unlockedThinkers. That array is still populated
+// (finishDay push + server merge) and still shipped to the server,
+// but no UI code trusts it — a content rename that removes a day
+// (e.g. the Economics Ch1/Ch2 overhauls that dropped `locke`,
+// `mill-econ`, `walras`; the `audi` fix in Philosophy Ch3) could
+// otherwise leave orphan ids showing as unlocked with zero points
+// on affected users' pantheons. See _pruneUnlockedThinkers below
+// for the one-shot cleanup that keeps the stored array from drifting.
+function isThinkerUnlocked(thinkerId) {
+  return thinkerId ? thinkerPoints(thinkerId) > 0 : false;
+}
+function getUnlockedThinkerIds() {
+  return getT().filter(t => t && thinkerPoints(t.id) > 0).map(t => t.id);
+}
+// Migration: rebuild state.unlockedThinkers from the derived set so
+// the next server sync ships a pruned array. Runs at every app load
+// (after completedDays is populated); idempotent when there's no
+// drift so a clean boot doesn't trigger a spurious saveState.
+function _pruneUnlockedThinkers() {
+  if (!Array.isArray(state.unlockedThinkers)) { state.unlockedThinkers = []; return; }
+  const pruned = getUnlockedThinkerIds();
+  const before = state.unlockedThinkers.slice().sort().join(',');
+  const after  = pruned.slice().sort().join(',');
+  if (before === after) return;
+  state.unlockedThinkers = pruned;
+  try { saveStateLocal(); } catch(e) {}
+}
+
 window._debugThinkerPoints = function(thinkerId, n) {
   if (!state._debugThinkerPoints) state._debugThinkerPoints = {};
   if (n == null) delete state._debugThinkerPoints[thinkerId];
@@ -23035,11 +23054,16 @@ function renderHome() {
   // Library / thinker gallery (in modal)
   const gallery = document.getElementById('thinker-gallery');
   gallery.innerHTML = '';
+  // Snapshot the derived unlocked set once per render pass; each
+  // getUnlockedThinkerIds call iterates all THINKERS × all data
+  // days, so caching in the outer scope beats calling it inside
+  // the forEach.
+  const _libraryUnlockedSet = new Set(getUnlockedThinkerIds());
   try {
     getT().forEach(t => {
       if (!t || !t.id) return;
       try {
-        const unlocked = state.unlockedThinkers.includes(t.id);
+        const unlocked = _libraryUnlockedSet.has(t.id);
         const card = document.createElement('div');
         // Library modal is a global list (no per-section render), so
         // each thinker uses their primary — fall through to t.image.
@@ -23525,8 +23549,9 @@ function populateCarousel() {
   // + helpers (showBonusPicker, showBonusTooltip, openBonusChapter)
   // were removed alongside this branch. See renderHome for the
   // replacement discovery surface.
+  const _carouselUnlockedSet = new Set(getUnlockedThinkerIds());
   thinkers.forEach(t => {
-    const unlocked = state.unlockedThinkers.includes(t.id);
+    const unlocked = _carouselUnlockedSet.has(t.id);
     const card = document.createElement('div');
     card.className = 'thinker-carousel-card ' + (unlocked ? 'unlocked' : 'locked');
     // Frame color follows the CAROUSEL's subject, not the thinker's
@@ -23729,7 +23754,7 @@ function _renderThinkerIntro(day, opts) {
 
   const t = getT().find(x => x.id === day.thinkerId);
   const isEn = state.lang === 'en';
-  const isUnlocked = !!(t && state.unlockedThinkers && state.unlockedThinkers.includes(t.id));
+  const isUnlocked = !!(t && isThinkerUnlocked(t.id));
   const isReopen = !!(opts && opts.reopen);
 
   const eyebrow = document.getElementById('thinker-intro-eyebrow');
@@ -23844,7 +23869,7 @@ function _updateThinkerIntroReopenBtn(day) {
     return;
   }
   const t = getT().find(x => x.id === day.thinkerId);
-  const isUnlocked = !!(t && state.unlockedThinkers && state.unlockedThinkers.includes(t.id));
+  const isUnlocked = !!(t && isThinkerUnlocked(t.id));
   const _topbarImg = t ? _thinkerImage(t, state.subject) : '';
   if (isUnlocked && t && _topbarImg) {
     btn.innerHTML = `<div class="rt-portrait"><img src="${_topbarImg}" alt="${t.name}"></div>`;
@@ -29590,6 +29615,7 @@ function initUI() {
     // Fire-and-forget iOS update check. No-op on Android and web.
     try { checkForUpdate(); } catch(e) {}
     migrateCompletedDaysKeys();
+    _pruneUnlockedThinkers();
     migrateDayQuizResults();
     recalculateStreak();
     applyTheme(state.subject);
@@ -30125,9 +30151,11 @@ function _pthPortraitHtml(t, imgUrl) {
 
 function renderPantheon() {
   const allThinkers = getT();
-  const unlocked = state.unlockedThinkers || [];
-  const validUnlocked = unlocked.filter(id => allThinkers.some(t => t.id === id));
-  const unlockedCount = validUnlocked.length;
+  // Derive the unlocked set from completedDays via thinkerPoints —
+  // state.unlockedThinkers is no longer read here. Cached into a
+  // Set so per-cell lookups stay O(1) inside the cardHtml loop.
+  const unlockedSet = new Set(getUnlockedThinkerIds());
+  const unlockedCount = unlockedSet.size;
   const totalCount = allThinkers.length;
   const isEn = state.lang === 'en';
 
@@ -30151,7 +30179,7 @@ function renderPantheon() {
   // rendered — matters for multi-subject thinkers (Kahneman) so each
   // section renders them with that section's palette.
   function gridCellHtml(t, sectionSubject) {
-    const isUnlocked = validUnlocked.includes(t.id);
+    const isUnlocked = unlockedSet.has(t.id);
     const subject = sectionSubject || t.subject || 'philosophy';
     const imgUrl = _thinkerImage(t, subject);
     const tier = isUnlocked ? TIERS[thinkerTier(t.id)] : 'plain';
@@ -30176,9 +30204,11 @@ function renderPantheon() {
       : `openThinkerModal('${t.id}', {locked: true, subject: '${subject}'})`;
 
     // Front-face content. Portrait always renders; overlay always
-    // renders (locked cards keep the dark bottom gradient too).
-    // Unlocked adds name+era at the bottom; locked adds a lock icon
-    // at centre using the shared #ic-lock symbol from the sprite.
+    // renders (locked cards keep the dark bottom gradient too, so
+    // the dimmed portrait carries the same visual weight as an
+    // unlocked one). Unlocked adds name+era at the bottom; locked
+    // shows nothing extra — the greyscale + brightness filter on
+    // the portrait is enough to signal locked, no icon needed.
     const portraitHtml = _pthPortraitHtml(t, imgUrl);
     const overlayHtml = '<div class="pth-overlay"></div>';
     const infoHtml = isUnlocked
@@ -30186,7 +30216,7 @@ function renderPantheon() {
         + `<div class="pth-name">${_esc(displayName)}</div>`
         + (displayDates ? `<div class="pth-era">${_esc(displayDates)}</div>` : '')
         + `</div>`
-      : `<svg class="pth-lock" viewBox="0 0 64 64" aria-hidden="true"><use href="#ic-lock"/></svg>`;
+      : '';
 
     // Back-face content (unlocked cards only — locked doesn't flip).
     // Star + name + era, pre-rebuild pattern; no tier line.
