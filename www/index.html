@@ -232,17 +232,15 @@
     --frame-psychology-line:   #4D2211;
     --frame-psychology-ground: #FCE4CC;
 
-    /* ── Pantheon grid tokens (section 11) ──
-       Parchment mount + mat-cut ring: the plain card's CSS mount
-       matches the frame PNGs' outer band tone so plain and framed
-       cards read as the same object at different tiers. Locked
-       tokens desaturate every ground/field/line for one lock state
-       (dimmed mount, no colour). */
+    /* ── Pantheon spotlight tokens (spec §11) ──
+       Parchment tones drive the Hall's warm band background and the
+       flip-back's cream card, plus the empty-state invitation's
+       dashed border. Locked tokens desaturate the subject palette
+       so a locked cell reads as "not yet earned" without losing the
+       subject identity behind the lock icon. */
     --pantheon-mount-hi:        #FFFCF6;
     --pantheon-mount-lo:        #F2EADC;
     --pantheon-mount-edge:      #D8CDBB;
-    --pantheon-mat-inner:       #FFFDF8;
-    --pantheon-mat-inner-edge:  #D3C7B3;
     --pantheon-locked-ground:   #E9E2D6;
     --pantheon-locked-field:    #DCD2C4;
     --pantheon-locked-line:     #8A8076;
@@ -257,25 +255,6 @@
     --tier-silver-cap:  var(--plate-silver-recess);
     --tier-gold-cap:    #8A6A12;
     --tier-diamond-cap: #6B4FA8;
-
-    /* Subject-frame ("tier 0") gradient stops per subject — spec §11.
-       Same 4-stop pattern as the metal frames (light / mid / shine /
-       dark) but tuned to the subject's own family. Renders inline as
-       an SVG frame in .pth-frame-subj with the same geometry as the
-       metal PNGs, so forging a real frame swaps the SVG for a PNG
-       without moving anything else. */
-    --sf-philosophy-1: #C9A3DD;
-    --sf-philosophy-2: #8E6BBE;
-    --sf-philosophy-3: #DCC2EA;
-    --sf-philosophy-4: #6A4A9C;
-    --sf-economics-1:  #94B3EA;
-    --sf-economics-2:  #5A7CC2;
-    --sf-economics-3:  #B3CBF0;
-    --sf-economics-4:  #3B5699;
-    --sf-psychology-1: #E3A677;
-    --sf-psychology-2: #B8743F;
-    --sf-psychology-3: #F2C39C;
-    --sf-psychology-4: #8E4E22;
 
     /* ── Tier material tokens for the points plate ──
        Plate background + edge + empty-socket colour, one triplet per
@@ -2010,65 +1989,39 @@
     border-color: var(--frame-psychology-line);
   }
 
-  /* ── Pantheon grid (spec §11) ──
-     Every thinker is mounted. Plain cards get a parchment mount
-     cut exactly to the frame PNG's window (228×304 at x36 y46 in
-     a 300×400 slot) and a plate seat at (150, 375). Framed cards
-     swap the mount for the frame PNG. Portrait size, plate line
-     and grid gaps never change. Ornaments stay inside the box —
-     no overhang, no conditional gap.
+  /* ── Pantheon: light grid with in-place frames (spec §11) ──
+     The grid is the Pantheon as it was before frames — plain 3:4
+     cards, three per row, grouped by subject, tap to flip. When a
+     thinker earns a metal frame (bronze / silver / gold / diamond),
+     the frame PNG is laid over their card at the card's own size,
+     covering the card art's ornamental border. The portrait scale,
+     the slot size and the progress bar's line all stay put.
 
-     Sizing pattern: every internal length is a percentage of the
-     slot, so the slot alone drives all geometry (no --s scalar,
-     no JS-set custom prop). Slot is `width: 100%` inside its grid
-     column with `aspect-ratio: 3/4`, so the whole cell responds
-     to the viewport as one unit. Pip minimum floor comes from
-     `max(5.5px, …)` clamps so pips stay legible on narrow phones.
+     Every unlocked card gets a progress bar under it. Before the
+     first frame it's parchment with subject-coloured gems; once
+     framed it takes the frame's material. Locked cards keep an
+     empty bar row of the same height so grid rows stay aligned.
 
-     Naming: `.pth-*` prefix everywhere to avoid collision with
-     other portrait surfaces (.thinker-card, .thinker-frame). */
+     Naming: `.pth-*` prefix throughout. Subject + material tokens
+     come from an inline `style="…"` on each cell, computed from
+     the subject and the thinker's current tier by _pthVars(). */
 
-  /* Cell = one grid slot: the 3:4 tap-through slot, a fixed-height
-     plate row sitting below the slot (empty on locked cards so row
-     baselines still line up across the grid — spec §11), and the
-     name caption below that. Subject tokens live here so every
-     descendant reads --pth-field/-deep/-line/-ground from the same
-     source. --pip is defined here too so both .pth-plate-row (row
-     height) and .pth-plate (padding, radius, gap) share one value. */
+  /* Cell = one grid slot: the 3:4 tap-through flip button, a fixed-
+     height bar row below it (empty on locked cards for alignment),
+     and the name caption at the bottom. */
   .pth-cell {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    --pip: max(5.5px, calc((100vw - 56px) / 3 * 0.055));
+    gap: 7px;
+    min-width: 0;
+    /* Every cell (framed or not) reserves 6 px above the card so the
+       slim frame's top crest, which overhangs the card by 7.5% of
+       card height, has room without pushing into the section header
+       or the row-gap above. Locked and plain cells pay the same
+       6 px so row baselines stay level across a mixed row. */
+    padding-block-start: 6px;
   }
-  .pth-cell[data-subject="philosophy"] {
-    --pth-field:  var(--frame-philosophy-field);
-    --pth-deep:   var(--frame-philosophy-deep);
-    --pth-line:   var(--frame-philosophy-line);
-    --pth-ground: var(--frame-philosophy-ground);
-  }
-  .pth-cell[data-subject="economics"] {
-    --pth-field:  var(--frame-economics-field);
-    --pth-deep:   var(--frame-economics-deep);
-    --pth-line:   var(--frame-economics-line);
-    --pth-ground: var(--frame-economics-ground);
-  }
-  .pth-cell[data-subject="psychology"] {
-    --pth-field:  var(--frame-psychology-field);
-    --pth-deep:   var(--frame-psychology-deep);
-    --pth-line:   var(--frame-psychology-line);
-    --pth-ground: var(--frame-psychology-ground);
-  }
-  .pth-cell.locked {
-    --pth-field:  var(--pantheon-locked-field);
-    --pth-line:   var(--pantheon-locked-line);
-    --pth-ground: var(--pantheon-locked-ground);
-  }
-
-  /* Slot: the tappable 3:4 button. All layout inside is absolute-
-     positioned relative to the slot; every measurement is a % of
-     slot size so the whole thing scales with the grid column. */
   .pth-slot {
     position: relative;
     width: 100%;
@@ -2081,11 +2034,17 @@
     perspective: 700px;
     font: inherit;
     color: inherit;
+    /* Slim frame overhangs the card on all four sides via negative
+       offsets on .pth-frame; the slot needs overflow visible so the
+       overhang isn't clipped. No-op on plain / locked cards — they
+       have no overflowing children. */
+    overflow: visible;
   }
   .pth-slot:disabled { cursor: default; }
   .pth-slot:focus-visible {
     outline: 2px solid var(--pth-line, currentColor);
     outline-offset: 3px;
+    border-radius: 7px;
   }
   .pth-flipper {
     position: absolute;
@@ -2101,251 +2060,130 @@
     inset: 0;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-  }
-  .pth-back { transform: rotateY(180deg); }
-
-  /* Mount = parchment CSS card behind plain portraits. Framed cards
-     swap it out for the frame PNG. Inner .mount::after paints the
-     subject-line inset frame that gives plain cards their identity
-     ring (matches the frame band's outer keyline). */
-  .pth-mount {
-    position: absolute;
-    inset: 0;
-    border-radius: 3px;
-    background: linear-gradient(160deg, var(--pantheon-mount-hi), var(--pantheon-mount-lo));
-    border: 1px solid var(--pantheon-mount-edge);
-    box-shadow: 0 1px 2px rgba(34, 26, 20, 0.12),
-                0 4px 10px rgba(34, 26, 20, 0.08);
-  }
-  .pth-mount::after {
-    content: "";
-    position: absolute;
-    inset: 3.33%;                          /* 10 / 300 in slot units */
-    border: 1px solid var(--pth-line);
-    opacity: 0.8;
-  }
-
-  /* Portrait window (36, 46, 228, 304) as % of slot (300 × 400):
-     left 12%, top 11.5%, width 76%, height 76%.
-     Inside, the source art (670 × 1200) is scaled so art x115..555
-     fills the window width, anchored at art y=140 (head + shoulders).
-     Vertical top offset is % of window height:
-       -(140/440) × (window_w / window_h) × 100%
-       = -140/440 × 228/304 × 100% ≈ -23.87% */
-  .pth-portrait {
-    position: absolute;
-    left: 12%;
-    top: 11.5%;
-    width: 76%;
-    height: 76%;
+    border-radius: 7px;
     overflow: hidden;
+  }
+  /* Front face: subject-tinted gradient background with a raised
+     shadow. Full-bleed portrait sits on top; if no portrait art
+     exists, the subject silhouette SVG lets the gradient show. */
+  .pth-front {
     background: linear-gradient(180deg, var(--pth-ground), var(--pth-field));
+    box-shadow: 0 2px 6px rgba(34, 26, 20, 0.18),
+                0 8px 18px rgba(34, 26, 20, 0.1);
   }
-  .pth-portrait img {
-    position: absolute;
-    max-width: none;
-    width: calc(670 / 440 * 100%);         /* 152.27% of window width */
-    height: auto;
-    left: calc(-115 / 440 * 100%);         /* -26.14% */
-    top: -23.87%;
-  }
-  .pth-portrait svg.pth-sil {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  /* Mat cut on plain cards: keyline + parchment inner ring around
-     the window, matching the frame PNG's inner window keyline so
-     the swap-in is smooth. Rings are max()'d so they never fall
-     below 2.5 px at very small grid sizes. */
-  .pth-mat-cut {
-    position: absolute;
-    left: 12%;
-    top: 11.5%;
-    width: 76%;
-    height: 76%;
-    pointer-events: none;
-    box-shadow: 0 0 0 1px var(--pth-line),
-                0 0 0 max(2.5px, 2.33%) var(--pantheon-mat-inner),
-                0 0 0 calc(max(2.5px, 2.33%) + 0.8px) var(--pantheon-mat-inner-edge),
-                inset 1px 1px 3px rgba(0, 0, 0, 0.3);
-  }
-  /* Recess = inset shadow on framed cards, sits inside the frame's
-     transparent window (the frame PNG doesn't include the inner
-     shadow; it's drawn here so the portrait reads recessed). */
-  .pth-recess {
-    position: absolute;
-    left: 12%;
-    top: 11.5%;
-    width: 76%;
-    height: 76%;
-    pointer-events: none;
-    box-shadow: inset 2px 3px 6px rgba(0, 0, 0, 0.55);
-  }
-  .pth-frame {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-  }
-
-  /* Gold gem: transparent hole in the PNG at (150, 38) size (15, 11.2)
-     in slot units. In %: left 142.5/300 = 47.5%, top 32.4/400 = 8.1%,
-     width 15/300 = 5%, height 11.2/400 = 2.8%. */
-  .pth-gem {
-    position: absolute;
-    left: 47.5%;
-    top: 8.1%;
-    width: 5%;
-    height: 2.8%;
-    border-radius: 50%;
-    background: radial-gradient(ellipse at 35% 30%,
-      rgba(255, 255, 255, 0.95) 0%,
-      var(--pth-field) 22%,
-      var(--pth-deep) 70%,
-      var(--pth-line) 100%);
-    pointer-events: none;
-  }
-
-  /* Plate row = a fixed-height sibling of the slot inside .pth-cell.
-     Height is derived from --pip so locked cells (empty row) and
-     unlocked cells (row + plate) reserve the same vertical space,
-     keeping plate baselines aligned across the grid.
-       row height ≈ plate height = padding × 2 + pip
-                                 = (pip × 0.6) × 2 + pip × 1.42 + 6-px buffer
-     The 1.42 factor accounts for the pip's 45° rotation increasing
-     its bounding-box height by √2 ≈ 1.414. */
-  .pth-plate-row {
-    width: 100%;
-    height: calc(var(--pip) * 1.42 + var(--pip) * 1.2 + 6px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  /* Plate style — matches the reveal-time plate (spec §11 "styled
-     like the reveal plate, raised shadow"). Gap 0.9× pip, padding
-     0.6× / 1.3× pip, double inset shadow for the raised metal look. */
-  .pth-plate {
-    display: flex;
-    gap: calc(var(--pip) * 0.9);
-    align-items: center;
-    padding: calc(var(--pip) * 0.6) calc(var(--pip) * 1.3);
-    border-radius: calc(var(--pip) * 0.4);
-    background: var(--pth-plate-bg);
-    border: 1px solid var(--pth-plate-edge);
-    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.55),
-                inset -1px -2px 0 rgba(0, 0, 0, 0.22),
-                0 3px 5px rgba(34, 26, 20, 0.35);
-  }
-  .pth-pip {
-    width: var(--pip);
-    height: var(--pip);
-    transform: rotate(45deg);
-    border: 1px solid var(--pth-plate-edge);
-    background: var(--pth-plate-recess);
-    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.6);
-  }
-  .pth-pip.on {
-    background: var(--pth-pip-bg);
-    border-color: var(--pth-pip-edge);
-    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.85),
-                0 1px 1px rgba(0, 0, 0, 0.4);
-  }
-
-  /* Tier plate tokens per cell — sourced from the shared --plate-*
-     tokens (commit 2). Plain tier (the subject frame): parchment
-     plate with the subject-line edge and subject-colour gems. The
-     plate reads as a warm cream shelf that lets the subject gems
-     carry the colour instead of stacking two metals. */
-  .pth-cell[data-tier="plain"] {
-    --pth-plate-bg:     var(--plate-plain-bg);
-    --pth-plate-edge:   var(--pth-line);
-    --pth-plate-recess: var(--plate-plain-recess);
-    --pth-pip-bg:       linear-gradient(135deg, var(--pth-field), var(--pth-deep));
-    --pth-pip-edge:     var(--pth-line);
-  }
-  .pth-cell[data-tier="bronze"] {
-    --pth-plate-bg:     var(--plate-bronze-bg);
-    --pth-plate-edge:   var(--plate-bronze-edge);
-    --pth-plate-recess: var(--plate-bronze-recess);
-    --pth-pip-bg:       var(--plate-bronze-bg);
-    --pth-pip-edge:     var(--plate-bronze-edge);
-  }
-  .pth-cell[data-tier="silver"] {
-    --pth-plate-bg:     var(--plate-silver-bg);
-    --pth-plate-edge:   var(--plate-silver-edge);
-    --pth-plate-recess: var(--plate-silver-recess);
-    --pth-pip-bg:       var(--plate-silver-bg);
-    --pth-pip-edge:     var(--plate-silver-edge);
-  }
-  .pth-cell[data-tier="gold"] {
-    --pth-plate-bg:     var(--plate-gold-bg);
-    --pth-plate-edge:   var(--plate-gold-edge);
-    --pth-plate-recess: var(--plate-gold-recess);
-    --pth-pip-bg:       var(--plate-gold-bg);
-    --pth-pip-edge:     var(--plate-gold-edge);
-  }
-  .pth-cell[data-tier="diamond"] {
-    --pth-plate-bg:     var(--plate-diamond-bg);
-    --pth-plate-edge:   var(--plate-diamond-edge);
-    --pth-plate-recess: var(--plate-diamond-recess);
-    --pth-pip-bg:       var(--plate-diamond-bg);
-    --pth-pip-edge:     var(--plate-diamond-edge);
-  }
-
-  /* Back face: parchment card with name, dates, one line, and a
-     tier label whose colour matches the tier metal. Sizes scale
-     off --cap (the caption size) which is the only fixed anchor
-     for text scale on the cell. */
-  .pth-back-face {
-    border-radius: 3px;
+  .pth-cell.locked .pth-front { opacity: 0.55; filter: saturate(0.3); }
+  .pth-back {
+    transform: rotateY(180deg);
     background: linear-gradient(160deg, var(--pantheon-mount-hi), var(--pantheon-mount-lo));
     border: 1px solid var(--pantheon-mount-edge);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: max(3px, 4%);
-    padding: max(8px, 8.5%);
+    gap: 5px;
+    padding: 10px;
     text-align: center;
   }
   .pth-back-name {
     font-family: 'Frank Ruhl Libre', Georgia, serif;
     font-weight: 700;
-    font-size: calc(var(--pth-cap) + 1px);
-    line-height: 1.15;
+    font-size: 13px;
     color: var(--pth-line);
   }
   .pth-back-dates,
   .pth-back-line {
-    font-size: max(9px, calc(var(--pth-cap) - 1.5px));
+    font-size: 10.5px;
     font-weight: 500;
     color: var(--text-2);
   }
   .pth-back-line { font-weight: 400; line-height: 1.35; }
   .pth-back-tier {
-    font-size: max(7.5px, calc(var(--pth-cap) - 3.5px));
+    font-size: 9px;
     font-weight: 700;
     letter-spacing: 0.14em;
     color: var(--pth-tier-col, var(--pth-line));
   }
-  .pth-cell[data-tier="bronze"]  { --pth-tier-col: var(--tier-bronze-cap); }
-  .pth-cell[data-tier="silver"]  { --pth-tier-col: var(--tier-silver-cap); }
-  .pth-cell[data-tier="gold"]    { --pth-tier-col: var(--tier-gold-cap); }
-  .pth-cell[data-tier="diamond"] { --pth-tier-col: var(--tier-diamond-cap); }
 
-  /* Caption below the slot — the name (or "Locked"). Fixed height
-     to keep row baselines aligned regardless of tier or content. */
-  .pth-cell { --pth-cap: 11px; }
+  /* Portrait art fills the front face top-anchored. Silhouette SVG
+     is a subject-deep tinted head-and-shoulders used when a thinker
+     has no image. The lock icon overlays a dimmed front face on
+     locked cards; the subject silhouette still shows behind it so
+     locked cards read as "in the family". */
+  .pth-cell img.pth-art {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 0;
+    display: block;
+  }
+  .pth-cell svg.pth-sil {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .pth-cell svg.pth-lock {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 22px;
+    height: 22px;
+    transform: translate(-50%, -50%);
+    stroke: var(--pantheon-locked-line);
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Progress bar. A capsule the full width of the card in the grid,
+     ~86% of the framed card's width in the hall. Three large gems
+     at 11.5 px (grid) or 13.5 px (hall). Bar and gems all use CSS
+     vars set inline on the cell/framed element via vars() in JS. */
+  .pth-bar-row {
+    width: 100%;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pth-bar {
+    width: 100%;
+    height: 22px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 0 7px;
+    background: var(--pth-bar-bg);
+    border: 1px solid var(--pth-bar-edge);
+    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.6),
+                inset -1px -2px 0 rgba(0, 0, 0, 0.18),
+                0 2px 5px rgba(34, 26, 20, 0.25);
+  }
+  .pth-gemp {
+    width: 11.5px;
+    height: 11.5px;
+    transform: rotate(45deg);
+    border: 1px solid var(--pth-bar-edge);
+    background: var(--pth-bar-recess);
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.6),
+                0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+  .pth-gemp.on {
+    background: var(--pth-gem-bg);
+    border-color: var(--pth-gem-edge);
+    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.85),
+                inset -1px -1px 1px rgba(0, 0, 0, 0.25),
+                0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+  /* Name caption below the bar row. Fixed line-height so locked
+     ("Locked" / "נעול") cells align to the same baseline as named
+     ones and rows across the grid stay level. */
   .pth-caption {
     width: 100%;
-    height: calc(var(--pth-cap) * 1.35);
-    line-height: calc(var(--pth-cap) * 1.35);
     font-family: 'Frank Ruhl Libre', Georgia, serif;
-    font-size: var(--pth-cap);
+    font-size: 12px;
+    line-height: 16px;
     font-weight: 700;
     text-align: center;
     white-space: nowrap;
@@ -2353,20 +2191,54 @@
     text-overflow: ellipsis;
     color: var(--ink);
   }
-  .pth-cell.locked .pth-face.pth-front { opacity: 0.6; filter: saturate(0.3); }
   .pth-cell.locked .pth-caption { color: var(--pantheon-locked-caption); }
-  .pth-lock {
+
+  /* Framed card overlay — the slim frame PNG wraps the card at
+     card-native size and overhangs the outer edge (spec §11).
+     Geometry: PNG is 680×900 = 340×450 in card units, with the
+     300×400 card sitting at (20, 30) inside it. As percentages
+     of the card slot: left = -20/300 = -6.667%, top = -30/400 =
+     -7.5%, width = 340/300 = 113.333%, height = 450/400 = 112.5%.
+     The band's inner edge covers the card art's outermost ~16 SVG
+     units (~5% of card width per side); the crest and corner
+     accents overhang outward by up to 30 units at the top (7.5%
+     of card height). Slot has overflow: visible so the overhang
+     draws. Card keeps its 7 px radius — the frame's outer edge is
+     the overhang's own shape, not the card's. Gem below sits just
+     above the card's top edge (top: -0.625%) at (48%, 4%, 2.25%).
+     Positioned absolute inside .pth-slot (not inside .pth-front,
+     which is overflow: hidden) so the overhang isn't clipped. */
+  .pth-frame {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    width: max(16px, 20%);
-    height: max(16px, 20%);
-    transform: translate(-50%, -50%);
-    stroke: var(--pth-line);
-    fill: none;
-    stroke-width: 1.8;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    left: -6.667%;
+    top: -7.5%;
+    width: 113.333%;
+    height: 112.5%;
+    pointer-events: none;
+    /* Sits as a sibling of .pth-face inside .pth-flipper so its
+       overhang isn't clipped by the face's overflow: hidden. When
+       the flipper rotates to show the back, the frame rotates with
+       it; backface-visibility: hidden lets the back face read as
+       a clean parchment card without the frame's mirror showing
+       through. */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .pth-gem {
+    position: absolute;
+    left: 48%;
+    top: -0.625%;
+    width: 4%;
+    height: 2.25%;
+    border-radius: 50%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: radial-gradient(ellipse at 35% 30%,
+      rgba(255, 255, 255, 0.95) 0%,
+      var(--pth-field) 22%,
+      var(--pth-deep) 70%,
+      var(--pth-line) 100%);
+    pointer-events: none;
   }
 
   .thinker-card {
@@ -9920,7 +9792,7 @@
   .topbar, .bottom-nav, .stats-subheader,
   .week-row, .hero-continue-card, .cc-a,
   #screen-home, #screen-pantheon, #screen-profile,
-  .pf-card, .thinker-card, .pth-cell, .pth-mount, .pth-back-face {
+  .pf-card, .thinker-card, .pth-cell, .pth-back {
     transition: background-color 350ms ease, border-color 350ms ease, color 350ms ease, box-shadow 350ms ease;
   }
 
@@ -30109,45 +29981,75 @@ function _pthTierLabel(tier, filled, isEn, subject) {
   return label + (isEn ? ' · ' + filled + ' OF ' + total : ' · ' + filled + ' מתוך ' + total);
 }
 
-// Subject-frame inline SVG — tier-0 "subject metal" for unlocked
-// cards. Same geometry as the metal PNGs (box 300×400, window
-// x36 y46 228×304, plate seat 100,360 100×30), painted from four
-// SF gradient stops per subject. Ported from pantheon-grid/index.html
-// §subjectFrame. The gradient id needs to be unique per rendered
-// SVG (multiple cells on the page would otherwise share one <defs>
-// entry with the same id and the first-defined wins), so the caller
-// passes a per-cell suffix (typically the thinker id).
-// Static bevel highlights use pure white / black at reduced opacity;
-// those are lighting effects, not subject palette, so they stay as
-// raw values matching the reference and the metal-frame PNGs.
-function subjectFrame(subject, cellId) {
-  const id = 'sf-grad-' + cellId;
-  const line = 'var(--frame-' + subject + '-line)';
-  const c1 = 'var(--sf-' + subject + '-1)';
-  const c2 = 'var(--sf-' + subject + '-2)';
-  const c3 = 'var(--sf-' + subject + '-3)';
-  const c4 = 'var(--sf-' + subject + '-4)';
-  return `<svg class="pth-frame pth-frame-subj" viewBox="0 0 300 400" aria-hidden="true">
-    <defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="${c1}"/>
-      <stop offset=".45" stop-color="${c2}"/>
-      <stop offset=".55" stop-color="${c3}"/>
-      <stop offset="1" stop-color="${c4}"/>
-    </linearGradient></defs>
-    <path fill-rule="evenodd" d="M4 4H296V396H4ZM36 46H264V350H36Z" fill="url(#${id})" style="filter:drop-shadow(1px 2px 2px rgba(34,26,20,.35))"/>
-    <path d="M4 4H296L264 46H36Z" fill="#fff" opacity=".26"/>
-    <path d="M4 4V396L36 350V46Z" fill="#fff" opacity=".12"/>
-    <path d="M296 4V396L264 350V46Z" fill="#000" opacity=".14"/>
-    <path d="M4 396H296L264 350H36Z" fill="#000" opacity=".26"/>
-    <path d="M4 4H296V396H4ZM36 46H264V350H36Z" fill="none" stroke="${line}"/>
-    <rect x="13.2" y="13.2" width="275" height="375" fill="none" stroke="#fff" stroke-width=".8" opacity=".45"/>
-    <rect x="12.5" y="12.5" width="275" height="375" fill="none" stroke="${line}" stroke-width=".8" opacity=".7"/>
-    <rect x="34.5" y="44.5" width="231" height="307" fill="none" stroke="url(#${id})" stroke-width="4"/>
-    <rect x="32.5" y="42.5" width="235" height="311" fill="none" stroke="${line}" stroke-width=".7" opacity=".6"/>
-    <rect x="36.5" y="46.5" width="227" height="303" fill="none" stroke="${line}" stroke-width=".7" opacity=".8"/>
-    <path d="M150 366L158 375L150 384L142 375Z" fill="url(#${id})" stroke="${line}"/>
-    <path d="M150 370.5L153.5 375L150 379.5L146.5 375Z" fill="${line}" opacity=".7"/>
-  </svg>`;
+// Lookup for the 3:4 slim pantheon frame PNGs, keyed by tier.
+// Plain tier maps to null — plain cards render as bare portraits
+// in the grid, with no frame overlay. The slim set (spec §11)
+// overhangs the card via negative offsets (see .pth-frame CSS)
+// so the card, portrait and bar don't shift under it.
+const FRAME_PNGS_SLIM = {
+  plain:   null,
+  bronze:  'images/thinker-frames/3x4-slim/bronze.png',
+  silver:  'images/thinker-frames/3x4-slim/silver.png',
+  gold:    'images/thinker-frames/3x4-slim/gold.png',
+  diamond: 'images/thinker-frames/3x4-slim/diamond.png',
+};
+
+// Inline CSS custom properties per cell. Encodes the
+// subject palette, the locked-state neutrals, and the material
+// (bar background / edge / recess / gem / tier caption colour)
+// for the thinker's current tier. Metal tiers pull from --plate-*
+// tokens (commit 2); plain tier reads a parchment bar with subject-
+// coloured gems (spec §11 "parchment capsule with gems in the
+// subject's colour"). All resolved through tokens — no hardcoded
+// hex here so a subject palette tweak touches one place.
+function _pthVars(subject, tier, isLocked) {
+  const bronze = tier === 'bronze', silver = tier === 'silver',
+        gold = tier === 'gold',     diamond = tier === 'diamond';
+  const isMetal = bronze || silver || gold || diamond;
+  const barBg     = isMetal ? `var(--plate-${tier}-bg)`     : `var(--plate-plain-bg)`;
+  const barEdge   = isMetal ? `var(--plate-${tier}-edge)`   : `var(--frame-${subject}-line)`;
+  const barRecess = isMetal ? `var(--plate-${tier}-recess)` : `var(--plate-plain-recess)`;
+  const gemBg     = isMetal ? `var(--plate-${tier}-bg)`     : `linear-gradient(135deg, var(--frame-${subject}-field), var(--frame-${subject}-deep))`;
+  const gemEdge   = isMetal ? `var(--plate-${tier}-edge)`   : `var(--frame-${subject}-line)`;
+  const tierCol   = isMetal ? `var(--tier-${tier}-cap)`     : `var(--frame-${subject}-line)`;
+  const ground = isLocked ? 'var(--pantheon-locked-ground)' : `var(--frame-${subject}-ground)`;
+  const field  = isLocked ? 'var(--pantheon-locked-field)'  : `var(--frame-${subject}-field)`;
+  return `--pth-ground:${ground};--pth-field:${field};`
+       + `--pth-deep:var(--frame-${subject}-deep);--pth-line:var(--frame-${subject}-line);`
+       + `--pth-bar-bg:${barBg};--pth-bar-edge:${barEdge};--pth-bar-recess:${barRecess};`
+       + `--pth-gem-bg:${gemBg};--pth-gem-edge:${gemEdge};--pth-tier-col:${tierCol}`;
+}
+
+// Progress bar with three gems. Diamond always shows all three
+// filled (there's no further progress after diamond).
+function _pthBarHtml(tier, filled, isEn) {
+  const total = POINTS_PER_TIER;
+  const on = tier === 'diamond' ? total : filled;
+  const gems = [0, 1, 2].map(k =>
+    `<span class="pth-gemp${k < on ? ' on' : ''}"></span>`
+  ).join('');
+  const label = `${on}${isEn ? ' of ' : ' מתוך '}${total}`;
+  return `<div class="pth-bar" role="img" aria-label="${label}">${gems}</div>`;
+}
+
+// Portrait / silhouette / lock — three ways the front face fills.
+// Unlocked with image: full-bleed art top-anchored (the source art
+// includes the thinker's name at the bottom, which the 3:4 cover-
+// crop hides at 50% 0%). Unlocked without art: subject-tinted
+// silhouette lets the background gradient show through. Locked:
+// a small lock icon over the dimmed subject-tinted front.
+function _pthArtHtml(t, isLocked, imgUrl) {
+  if (isLocked) {
+    return '<svg class="pth-lock" viewBox="0 0 24 24" aria-hidden="true">'
+      + '<rect x="5" y="11" width="14" height="9" rx="2"/>'
+      + '<path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  }
+  if (imgUrl) {
+    return `<img class="pth-art" src="${imgUrl}" alt="" onerror="this.style.display='none'">`;
+  }
+  return '<svg class="pth-sil" viewBox="0 0 100 133" preserveAspectRatio="none" aria-hidden="true">'
+    + '<circle cx="50" cy="50" r="17" fill="var(--pth-deep)" opacity=".32"/>'
+    + '<path d="M16 133C16 99 33 83 50 83S84 99 84 133Z" fill="var(--pth-deep)" opacity=".32"/></svg>';
 }
 
 function renderPantheon() {
@@ -30168,89 +30070,47 @@ function renderPantheon() {
   const container = document.getElementById('pantheon-container');
   if (!container) return;
 
-  // sectionSubject is the SUBJECTS[i].id the cell is being rendered
-  // under, not the thinker's primary — a multi-subject thinker
-  // (Kahneman) appears in both the economics and psychology sections
-  // and gets each section's field/deep/line tones respectively.
-  function cellHtml(t, sectionSubject) {
+  // Grid cell — the 3:4 card, framed in-place when the thinker
+  // has forged bronze+. sectionSubject is the SUBJECTS[i].id under
+  // which this cell is rendered (matters for multi-subject thinkers
+  // like Kahneman: they appear in every subject section they belong
+  // to, each render picking up that section's palette).
+  //
+  // Layer stack on the front face:
+  //   plain unlocked  → portrait only
+  //   framed unlocked → portrait, frame PNG overlay, gold gem if gold
+  //   locked          → subject silhouette bg + lock icon (no frame)
+  // Frame PNG overlays the whole front at inset:0. Its own transparent
+  // window at (36, 46, 228, 304) SVG units reveals the portrait behind;
+  // its metal band covers the card's outermost 12/12/11.5/12.5%.
+  function gridCellHtml(t, sectionSubject) {
     const isUnlocked = validUnlocked.includes(t.id);
     const subject = sectionSubject || t.subject || 'philosophy';
     const imgUrl = _thinkerImage(t, subject);
     const tier = isUnlocked ? TIERS[thinkerTier(t.id)] : 'plain';
     const filled = isUnlocked ? thinkerPlateFilled(t.id) : 0;
-    const total = POINTS_PER_TIER;
     const displayName = t.name;
     const displayDates = t.era || '';
-    // Optional short line — trimmed bio if available. Falls back
-    // to empty so the parchment back centres nicely without it.
+    // First sentence of the bio for the flip-back's "one line".
+    // Empty fallback centres the back cleanly when a thinker has no bio.
     const line = (t.bio || '').split('.')[0].trim();
-
-    // Front-face layers depend on state:
-    //   locked         → mount + portrait(lock) + mat-cut, no plate
-    //   unlocked plain → portrait + recess + subject SVG frame + plate
-    //   unlocked metal → portrait + recess + frame PNG + gem-if-gold + plate
-    // Plain and metal share the same layer count and geometry, so
-    // forging a real tier only swaps the frame layer — the portrait
-    // and plate never shift.
-    const framePng = (tier !== 'plain' && isUnlocked) ? FRAME_PNGS_3X4[tier] : null;
-    const framed = !!framePng;
-    const isSubj = isUnlocked && tier === 'plain';
-
-    const portraitInner = !isUnlocked
-      ? '<svg class="pth-lock" viewBox="0 0 24 24" aria-hidden="true">'
-        + '<rect x="5" y="11" width="14" height="9" rx="2"/>'
-        + '<path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'
-      : imgUrl
-        ? `<img src="${imgUrl}" alt="" onerror="this.style.display='none'">`
-        : '<svg class="pth-sil" viewBox="0 0 100 133" preserveAspectRatio="none" aria-hidden="true">'
-          + '<circle cx="50" cy="50" r="17" fill="var(--pth-deep)" opacity=".32"/>'
-          + '<path d="M16 133C16 99 33 83 50 83S84 99 84 133Z" fill="var(--pth-deep)" opacity=".32"/></svg>';
-
-    const pips = Array.from({ length: total }, (_, k) =>
-      `<span class="pth-pip${k < filled ? ' on' : ''}"></span>`
-    ).join('');
-    // Plate lives BELOW the slot as its own row (spec §11 update).
-    // The row div is always present so locked slots reserve the
-    // same vertical space; only the plate inside is conditional.
-    const plateHtml = isUnlocked
-      ? `<span class="pth-plate" data-tier="${tier}">${pips}</span>`
-      : '';
-
-    const gemHtml = (tier === 'gold' && isUnlocked) ? '<span class="pth-gem"></span>' : '';
     const captionText = isUnlocked ? displayName : (isEn ? 'Locked' : 'נעול');
 
-    // Aria label: name + tier + progress for unlocked; "Locked thinker" otherwise.
-    // For plain tier, use the subject name (matches the tier label
-    // on the flip-back). Diamond aria drops the count since there's
-    // no further progress after diamond.
-    const tierWord = tier === 'plain'
-      ? (SUBJECTS.find(s => s.id === subject) || { name: 'Plain', nameHe: 'רגיל' })[isEn ? 'name' : 'nameHe']
-      : _pthTierLabel(tier, filled, isEn, subject).replace(/ · .*/, '');
+    const framePng = (tier !== 'plain' && isUnlocked) ? FRAME_PNGS_SLIM[tier] : null;
+    const isFramed = !!framePng;
+    const frameHtml = isFramed
+      ? `<img class="pth-frame" src="${framePng}" alt="" aria-hidden="true">`
+        + (tier === 'gold' ? '<span class="pth-gem"></span>' : '')
+      : '';
+
     const aria = !isUnlocked
       ? (isEn ? 'Locked thinker' : 'הוגה נעול')
-      : `${displayName}, ${tierWord}, ${filled}${isEn ? ' of ' : ' מתוך '}${total}`;
+      : `${displayName}, ${_pthTierLabel(tier, filled, isEn, subject).replace(/ · .*/, '')}, ${(tier === 'diamond' ? POINTS_PER_TIER : filled)}${isEn ? ' of ' : ' מתוך '}${POINTS_PER_TIER}`;
 
-    // Click handler: unlocked flips; locked opens the teaser modal
-    // (existing openThinkerModal, which handles both explored and
-    // locked teaser modes).
+    // Click: unlocked flips; locked opens the teaser modal.
     const onclick = isUnlocked
       ? `flipThinkerCard(this)`
       : `openThinkerModal('${t.id}', {locked: true, subject: '${subject}'})`;
-
-    const frameLayer = framed
-      ? `<img class="pth-frame" src="${framePng}" alt="" aria-hidden="true">`
-      : isSubj
-        ? subjectFrame(subject, t.id)
-        : '';
-
-    const frontHtml = isUnlocked
-      ? `<span class="pth-portrait">${portraitInner}</span>`
-        + `<span class="pth-recess"></span>`
-        + frameLayer
-        + gemHtml
-      : `<span class="pth-mount"></span>`
-        + `<span class="pth-portrait">${portraitInner}</span>`
-        + `<span class="pth-mat-cut"></span>`;
 
     const backHtml = isUnlocked
       ? `<span class="pth-back-name">${_esc(displayName)}</span>`
@@ -30260,29 +30120,29 @@ function renderPantheon() {
       : '';
 
     return `
-      <div class="pth-cell${isUnlocked ? '' : ' locked'}" data-subject="${subject}" data-tier="${tier}">
+      <div class="pth-cell${isUnlocked ? ' unlocked' : ' locked'}" style="${_pthVars(subject, tier, !isUnlocked)}">
         <button type="button" class="pth-slot" aria-pressed="false" aria-label="${_esc(aria)}"${isUnlocked ? '' : ' disabled'} onclick="${onclick}">
           <span class="pth-flipper">
-            <span class="pth-face pth-front">${frontHtml}</span>
-            <span class="pth-face pth-back pth-back-face">${backHtml}</span>
+            <span class="pth-face pth-front">${_pthArtHtml(t, !isUnlocked, imgUrl)}</span>
+            <span class="pth-face pth-back">${backHtml}</span>
+            ${frameHtml}
           </span>
         </button>
-        <div class="pth-plate-row">${plateHtml}</div>
+        <div class="pth-bar-row">${isUnlocked ? _pthBarHtml(tier, filled, isEn) : ''}</div>
         <div class="pth-caption">${_esc(captionText)}</div>
       </div>`;
   }
 
-  // Sections are derived from the global SUBJECTS list so adding a
-  // fourth subject only requires updating that one array. Ordering
-  // within a section comes from CAROUSEL_ORDER[id]; empty array or
-  // missing entry falls back to the raw pool (bucketed by t.subject,
-  // with the philosophy-default rule for records that omit .subject).
-  // A section with no thinkers is dropped entirely so pre-launch
-  // subjects don't render an empty header.
-  container.innerHTML = SUBJECTS.map(subj => {
+  // Grid sections. Sections are derived from the global SUBJECTS
+  // list so adding a fourth subject only requires updating that
+  // one array. Ordering within a section comes from CAROUSEL_ORDER;
+  // empty array or missing entry falls back to the pool (bucketed
+  // by t.subject with the philosophy-default rule). A section with
+  // no thinkers is dropped entirely so pre-launch subjects don't
+  // render an empty header.
+  const gridHtml = SUBJECTS.map(subj => {
     const order = CAROUSEL_ORDER[subj.id] || [];
-    // Multi-subject: t.subjects[] extends membership beyond primary
-    // t.subject bucket. See thinkers.js note on Kahneman.
+    // Multi-subject: t.subjects[] extends membership beyond t.subject.
     const pool = allThinkers.filter(t =>
       (t.subject || 'philosophy') === subj.id ||
       (Array.isArray(t.subjects) && t.subjects.includes(subj.id))
@@ -30295,20 +30155,12 @@ function renderPantheon() {
     return `
       <div class="pantheon-section">
         <div class="pantheon-section-title">${label}</div>
-        <div class="pantheon-grid">${subjectThinkers.map(t => cellHtml(t, subj.id)).join('')}</div>
+        <div class="pantheon-grid">${subjectThinkers.map(t => gridCellHtml(t, subj.id)).join('')}</div>
       </div>`;
   }).join('');
-}
 
-// Lookup for the 3:4 pantheon frame PNGs, keyed by tier. Plain
-// tier maps to null — plain cells use the CSS mount, not a PNG.
-const FRAME_PNGS_3X4 = {
-  plain:   null,
-  bronze:  'images/thinker-frames/3x4/bronze.png',
-  silver:  'images/thinker-frames/3x4/silver.png',
-  gold:    'images/thinker-frames/3x4/gold.png',
-  diamond: 'images/thinker-frames/3x4/diamond.png',
-};
+  container.innerHTML = gridHtml;
+}
 
 // Basic HTML escape for values interpolated into templates.
 // Same shape as the reference's esc() (spec §11 reference).
