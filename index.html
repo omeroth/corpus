@@ -223,14 +223,17 @@
     --frame-philosophy-deep:   #8460B4;
     --frame-philosophy-line:   #3D144E;
     --frame-philosophy-ground: #F1E8F9;
+    --frame-philosophy-glow:   rgba(216, 180, 228, 0.95);
     --frame-economics-field:   #84A8E4;
     --frame-economics-deep:    #243060;
     --frame-economics-line:    #0F1A46;
     --frame-economics-ground:  #C9D8F0;
+    --frame-economics-glow:    rgba(160, 190, 240, 0.95);
     --frame-psychology-field:  #F0B484;
     --frame-psychology-deep:   #784830;
     --frame-psychology-line:   #4D2211;
     --frame-psychology-ground: #FCE4CC;
+    --frame-psychology-glow:   rgba(240, 180, 132, 0.95);
 
     /* ── Pantheon spotlight tokens (spec §11) ──
        Parchment tones drive the Hall's warm band background and the
@@ -278,6 +281,16 @@
     --plate-diamond-bg:     linear-gradient(135deg, #E9DDF7, #FFFFFF 20%, #C7B3EC 38%, #F6F0FF 55%, #A98BDB 72%, #D6ECF7 88%, #FFFFFF);
     --plate-diamond-edge:   #5B4A8A;
     --plate-diamond-recess: #4A3A78;
+    /* Per-tier glow: semi-transparent tint used by the reveal Fly
+       animation (halo, ring stroke, spark drop-shadow, and the
+       glow ring on the flying gem). One glow per tier, matching
+       the material's lightest highlight so the flash reads as an
+       extension of the frame's shine. Plain tier uses the subject
+       family (--frame-{subject}-glow, defined below). */
+    --plate-bronze-glow:  rgba(232, 178, 116, 0.95);
+    --plate-silver-glow:  rgba(240, 246, 252, 0.95);
+    --plate-gold-glow:    rgba(246, 222, 132, 0.95);
+    --plate-diamond-glow: rgba(206, 186, 242, 0.95);
     --red: #EF5350;
     --red-light: #FFEBEE;
     /* Semantic status tokens — added for dark-mode phase 1. Values match the
@@ -1873,6 +1886,94 @@
   .thinker-plate.tier-diamond .thinker-plate-socket.empty  { background: var(--plate-diamond-recess); border-color: var(--plate-diamond-edge); }
   .thinker-plate.tier-diamond .thinker-plate-socket.filled { background: var(--plate-diamond-bg);     border-color: var(--plate-diamond-edge); }
 
+  /* ── Reveal Fly animation (commit 4 of thinker-frames work) ──
+     Fires from _playThinkerCardFly (JS) when a new point lands
+     during the end-of-dialogue reveal. A gem in the current tier's
+     material rises from the portrait centre, spins 405° along an
+     arc, and lands in the k-th socket. Halo, ring, and 8 sparks
+     burst from the socket at 0.66s (via the animation-delay set
+     inline on those elements). All keyframes are verbatim from
+     thinker-frames-handoff/reference/animations.dc.html — do not
+     retune without regenerating the reference.
+
+     Element positioning: _playThinkerCardFly builds a .dc-fly-
+     overlay div positioned absolute at the socket centre inside
+     .dc-card-zone (which is position:relative). The gem/halo/
+     ring/sparks are absolutely positioned INSIDE that overlay,
+     offset by their half-size so they render centred on (0, 0).
+     --dx and --dy on the overlay carry the delta from socket to
+     portrait centre (computed from getBoundingClientRect at fire
+     time — regardless of scale). */
+  @keyframes gemFly {
+    0%   { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(45deg) scale(0.3); }
+    15%  { opacity: 1; transform: translate(var(--dx), var(--dy)) rotate(45deg) scale(1.7); }
+    55%  { transform: translate(calc(var(--dx) * 0.35), calc(var(--dy) * 0.45)) rotate(225deg) scale(1.3); }
+    100% { opacity: 1; transform: translate(0, 0) rotate(405deg) scale(1); }
+  }
+  @keyframes flyHalo {
+    0%   { opacity: 0; transform: scale(0.2); }
+    30%  { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.9); }
+  }
+  @keyframes flyRing {
+    0%   { opacity: 0; transform: scale(0.2); }
+    1%   { opacity: 1; }
+    100% { opacity: 0; transform: scale(2.6); }
+  }
+  @keyframes flySpark {
+    0%   { opacity: 0; transform: rotate(var(--a)) translateY(0); }
+    1%   { opacity: 1; }
+    100% { opacity: 0; transform: rotate(var(--a)) translateY(-32px); }
+  }
+  .dc-fly-overlay {
+    position: absolute;
+    pointer-events: none;
+    z-index: 10;
+  }
+  .dc-fly-gem {
+    position: absolute;
+    left: -8px; top: -8px;
+    width: 16px; height: 16px;
+    box-sizing: border-box;
+    border: 1px solid var(--fly-edge);
+    background: var(--fly-bg);
+    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.85),
+                0 0 8px var(--fly-glow);
+    animation: gemFly 0.85s cubic-bezier(0.5, 0, 0.3, 1) both;
+  }
+  .dc-fly-halo {
+    position: absolute;
+    left: -24px; top: -24px;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--fly-glow) 0%, transparent 70%);
+    animation: flyHalo 0.8s ease-out 0.66s both;
+  }
+  .dc-fly-ring {
+    position: absolute;
+    left: -14px; top: -14px;
+    width: 28px; height: 28px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    border: 2px solid var(--fly-glow);
+    animation: flyRing 0.6s ease-out 0.66s both;
+  }
+  .dc-fly-spark {
+    position: absolute;
+    left: -2px; top: -2px;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    box-shadow: 0 0 4px var(--fly-glow);
+    animation: flySpark 0.6s ease-out 0.66s both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dc-fly-gem, .dc-fly-halo, .dc-fly-ring, .dc-fly-spark {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0s !important;
+    }
+  }
+
 
   /* Reveal-time plate — sits below the flip-card. Scoped to the
      thinker sub-screen so the stats sub-screen's own .dc-card-zone
@@ -1887,6 +1988,20 @@
     justify-content: center;
     position: relative;
     z-index: 2;
+  }
+  /* Reveal plate is ~1.6× the pantheon-grid default so the Fly
+     moment reads clearly at reveal scale. Sockets and gap scale
+     together; Fly primitives (gem/halo/ring/spark sizes above)
+     match the new socket. Pantheon grid's small plates are
+     untouched — the small size works there and would waste room
+     scaled up. */
+  .dc-thinker-screen .thinker-plate {
+    gap: 13px;
+    padding: 10px 21px 11px;
+  }
+  .dc-thinker-screen .thinker-plate-socket {
+    width: 16px;
+    height: 16px;
   }
 
   /* ── Framed card for the end-of-dialogue reveal (spec §4.2) ──
@@ -20219,11 +20334,19 @@ window._debugThinkerPoints = function(thinkerId, n) {
 // and integers, so no injection surface. Subject + tier are drawn
 // from a fixed vocabulary and go through data-attributes with quoted
 // values — nothing to sanitise.
-function renderThinkerPlate(thinkerId, subject) {
+function renderThinkerPlate(thinkerId, subject, filledOverride) {
   const subj = subject || 'philosophy';
   const tierIdx = thinkerTier(thinkerId);
   const tier = TIERS[tierIdx];
-  const filled = thinkerPlateFilled(thinkerId);
+  // filledOverride lets the reveal render the plate at its PRE-FLY
+  // state (one fewer socket filled) so the fly lands into a real
+  // empty socket, rather than the fragile "render at post-state,
+  // then classList-swap one socket to empty" pattern that used to
+  // live in showThinkerCardScreen. Clamped to [0, POINTS_PER_TIER]
+  // so callers can pass filled - 1 without underflow guards.
+  const filled = (typeof filledOverride === 'number')
+    ? Math.max(0, Math.min(POINTS_PER_TIER, filledOverride))
+    : thinkerPlateFilled(thinkerId);
   let sockets = '';
   for (let k = 0; k < POINTS_PER_TIER; k++) {
     sockets += k < filled
@@ -20232,6 +20355,120 @@ function renderThinkerPlate(thinkerId, subject) {
   }
   const label = filled + ' of ' + POINTS_PER_TIER + ' points, ' + tier + ' tier';
   return '<div class="thinker-plate tier-' + tier + '" data-subject="' + subj + '" data-tier="' + tier + '" data-filled="' + filled + '" role="img" aria-label="' + label + '">' + sockets + '</div>';
+}
+
+// ── Reveal Fly animation (commit 4 of thinker-frames work) ──
+// Decides whether the reveal should play a Fly for the just-earned
+// point. Returns { flies, k, delay, flipAt } so showThinkerCardScreen
+// can (a) fire the animation on the right socket, (b) defer the
+// auto-flip until after the gem lands.
+//
+// Fly plays for within-tier increments — points 1/2, 4/5, 7/8, 10/11.
+// Skips tier boundaries (3, 6, 9, 12): those transitions are Forge's
+// job (commit 5). Also skips at diamond capped (points >= 12) since
+// diamond stays 3/3.
+//
+// Timing: Fly fires 700 ms after showThinkerCardScreen runs — right
+// after the card's 600-ms opacity fade completes, so the gem rises
+// from a fully-visible portrait. The auto-flip shifts to 2 s (from
+// the default 1.5 s) so the gem lands and rests in its socket for
+// ~450 ms before the card flips to the bio side.
+function _shouldPlayThinkerCardFly(thinkerId) {
+  const points = thinkerPoints(thinkerId);
+  const withinTier = points > 0 && points < 12 && points % 3 !== 0;
+  if (!withinTier) return { flies: false, k: -1, delay: 0, flipAt: 1500 };
+  return { flies: true, k: (points - 1) % 3, delay: 700, flipAt: 2000 };
+}
+
+// Play the Fly animation for socket k. The plate must already be
+// rendered inside #dc-thinker-plate at its PRE-FLY state — socket
+// k in the "empty" position, all previously-earned sockets filled
+// (see showThinkerCardScreen — it calls renderThinkerPlate with a
+// filledOverride of currentFilled - 1). At the end of the fly
+// duration this function re-renders the plate at its true derived
+// state, so the socket flips empty → filled as the gem lands.
+function _playThinkerCardFly(thinkerId, subject, k) {
+  const zone = document.querySelector('#dc-thinker-screen .dc-card-zone');
+  const plate = document.getElementById('dc-thinker-plate');
+  const card = document.getElementById('thinker-unlock-box');
+  if (!zone || !plate || !card) return;
+  const socket = plate.querySelectorAll('.thinker-plate-socket')[k];
+  if (!socket) return;
+
+  // Position math — read live rects so we don't have to know the
+  // CSS scale. Overlay is positioned at the socket centre inside
+  // .dc-card-zone (which is position: relative). Elements inside
+  // the overlay offset by their own half-size so they render
+  // centred on (0, 0), matching the reference's socket-anchored
+  // coord system.
+  const sr = socket.getBoundingClientRect();
+  const cr = card.getBoundingClientRect();
+  const zr = zone.getBoundingClientRect();
+  const socketCx = sr.left + sr.width / 2 - zr.left;
+  const socketCy = sr.top  + sr.height / 2 - zr.top;
+  const portraitCx = cr.left + cr.width / 2 - zr.left;
+  const portraitCy = cr.top  + cr.height / 2 - zr.top;
+  const dx = portraitCx - socketCx;
+  const dy = portraitCy - socketCy;
+
+  // Tier material for the gem + glow. Plain tier scopes to the
+  // subject family; metal tiers use the plate tokens.
+  const tierIdx = thinkerTier(thinkerId);
+  const tier = TIERS[tierIdx];
+  const subj = subject || 'philosophy';
+  const flyBg = tierIdx === 0
+    ? `linear-gradient(135deg, var(--frame-${subj}-field), var(--frame-${subj}-deep))`
+    : `var(--plate-${tier}-bg)`;
+  const flyEdge = tierIdx === 0
+    ? `var(--frame-${subj}-line)`
+    : `var(--plate-${tier}-edge)`;
+  const flyGlow = tierIdx === 0
+    ? `var(--frame-${subj}-glow)`
+    : `var(--plate-${tier}-glow)`;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'dc-fly-overlay';
+  overlay.style.left = socketCx + 'px';
+  overlay.style.top  = socketCy + 'px';
+  overlay.style.setProperty('--fly-bg',   flyBg);
+  overlay.style.setProperty('--fly-edge', flyEdge);
+  overlay.style.setProperty('--fly-glow', flyGlow);
+  overlay.style.setProperty('--dx', dx + 'px');
+  overlay.style.setProperty('--dy', dy + 'px');
+  // Sparks fan out at 8 rotations spaced 45° apart. --a per spark.
+  const sparkAngles = [0, 45, 90, 135, 180, 225, 270, 315];
+  overlay.innerHTML =
+    '<div class="dc-fly-halo"></div>'
+    + '<div class="dc-fly-ring"></div>'
+    + sparkAngles.map(a => `<div class="dc-fly-spark" style="--a: ${a}deg"></div>`).join('')
+    + '<div class="dc-fly-gem"></div>';
+  zone.appendChild(overlay);
+
+  // Land the gem in the socket + fire a light haptic tick right as
+  // the animation ends (matches spec §5 "haptic tick on the gem
+  // landing (light)"). Capacitor haptics import lives on window
+  // via corpus-review or the standard @capacitor/haptics wrapper;
+  // guarded so the try/catch swallows the missing case on web.
+  //
+  // Safety net: re-render the plate at its true derived state
+  // rather than mutating the specific socket's classList. This
+  // is idempotent (on the happy path, plate goes from N-1 filled
+  // to N filled — same as a classList swap would achieve) but
+  // bulletproof against a stale socket reference, a mid-fly DOM
+  // reflow, or any inconsistency introduced upstream. If the fly
+  // itself failed to render, the plate still ends in the correct
+  // state at the end of the fly's duration.
+  const FLY_MS = 850;
+  setTimeout(() => {
+    const _plateEnd = document.getElementById('dc-thinker-plate');
+    if (_plateEnd) _plateEnd.innerHTML = renderThinkerPlate(thinkerId, subject);
+    overlay.remove();
+    try {
+      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics) {
+        window.Capacitor.Plugins.Haptics.impact({ style: 'LIGHT' });
+      }
+    } catch (e) {}
+  }, FLY_MS + 20);
 }
 
 // ── Framed-card renderer (commit 3 of thinker-frames work) ──
@@ -24643,9 +24880,64 @@ function showThinkerCardScreen(thinker, chapter, day) {
   // reveal fires in the context of the just-completed dialogue's
   // subject; matches the portrait rendered via _thinkerImage above).
   const _plateEl = document.getElementById('dc-thinker-plate');
-  if (_plateEl) _plateEl.innerHTML = renderThinkerPlate(thinker.id, state.subject);
-  document.getElementById('dc-thinker-title').textContent =
-    isEn ? 'A new thinker joins the pantheon' : 'הוגה חדש מצטרף לפנתאון';
+  // Fly animation (commit 4 of thinker-frames work). Within-tier
+  // increments — points 1/2, 4/5, 7/8, 10/11 — animate a gem rising
+  // from the portrait and landing in the new socket. Tier boundaries
+  // and diamond-cap are skipped (Forge in commit 5 will own those).
+  //
+  // Render the plate at its PRE-FLY state directly (one fewer filled
+  // socket) so the fly lands into a real empty socket. Previously
+  // this used a "render at post-state, then classList-swap one
+  // socket to empty" pattern which was fragile — a mid-render
+  // reflow or a stale reference could leave the plate in a half-
+  // state. Now the pre-fly HTML matches exactly what the fly needs.
+  const _fly = _shouldPlayThinkerCardFly(thinker.id);
+  const _filledNow = thinkerPlateFilled(thinker.id);
+  const _preFlyFilled = _fly.flies ? Math.max(0, _filledNow - 1) : _filledNow;
+  if (_plateEl) _plateEl.innerHTML = renderThinkerPlate(thinker.id, state.subject, _preFlyFilled);
+  // Diagnostic: capture the actual DOM state at reveal time so a
+  // future report of "empty plate + no fly" can be diagnosed from
+  // the log rather than by reverse-engineering. Cheap; runs once
+  // per reveal; keep until the Fly feature has enough production
+  // reps to be considered stable.
+  try {
+    console.log('[reveal]', {
+      thinkerId: thinker.id,
+      subject: state.subject,
+      points: thinkerPoints(thinker.id),
+      filledNow: _filledNow,
+      preFlyFilled: _preFlyFilled,
+      fly: _fly,
+      plateHtml: _plateEl ? _plateEl.innerHTML : '(no plate)',
+    });
+  } catch(e) {}
+  if (_fly.flies) {
+    setTimeout(() => _playThinkerCardFly(thinker.id, state.subject, _fly.k), _fly.delay);
+  }
+  // Title: first unlock (points === 1) keeps its original "new
+  // thinker" copy. Repeats within a tier name the tier the user is
+  // working toward — bronze/silver/gold/diamond — since the frame
+  // system is otherwise silent about that goal until Forge lands.
+  // Diamond-capped (points >= 13) drops to the bare tier name; the
+  // diamond plate speaks for itself. Boundaries (3, 6, 9, 12) don't
+  // reach here — finishDay gates them out for Forge (commit 5).
+  const _points = thinkerPoints(thinker.id);
+  let _titleEn, _titleHe;
+  if (_points === 1) {
+    _titleEn = 'A new thinker joins the pantheon';
+    _titleHe = 'הוגה חדש מצטרף לפנתאון';
+  } else if (_points === 2) {
+    _titleEn = 'On the way to bronze';   _titleHe = 'בדרך לארד';
+  } else if (_points === 4 || _points === 5) {
+    _titleEn = 'On the way to silver';   _titleHe = 'בדרך לכסף';
+  } else if (_points === 7 || _points === 8) {
+    _titleEn = 'On the way to gold';     _titleHe = 'בדרך לזהב';
+  } else if (_points === 10 || _points === 11) {
+    _titleEn = 'On the way to diamond';  _titleHe = 'בדרך ליהלום';
+  } else {
+    _titleEn = 'Diamond';                _titleHe = 'יהלום';
+  }
+  document.getElementById('dc-thinker-title').textContent = isEn ? _titleEn : _titleHe;
   // Share-thinker button label (bilingual). The onclick is bound in HTML
   // and reads state.currentWeek/Day to resolve the thinker at tap time.
   const shareBtnLabel = document.getElementById('dc-share-thinker-btn-label');
@@ -24695,10 +24987,17 @@ function showThinkerCardScreen(thinker, chapter, day) {
     card.style.opacity = '1';
     card.style.transform = 'scale(1) translateY(0)';
   }, 50);
-  // Auto-flip after arrival settles
-  setTimeout(() => {
-    document.getElementById('thinker-unlock-box').classList.add('flipped');
-  }, 1500);
+  // Auto-flip after arrival settles. Only on first unlock — repeats
+  // keep the front face visible so the plate + landed gem stays as
+  // the last thing the user sees. Tap-to-flip still works via the
+  // onclick on #thinker-unlock-box. On first unlock _fly.flipAt is
+  // 2 s (Fly plays at point 1, giving the gem ~450 ms to rest in
+  // the socket before the flip).
+  if (_points === 1) {
+    setTimeout(() => {
+      document.getElementById('thinker-unlock-box').classList.add('flipped');
+    }, _fly.flipAt);
+  }
 }
 
 
@@ -24961,7 +25260,16 @@ function finishDay() {
   };
 
   const thinker = getT().find(t => t.id === thinkerId);
-  const showThinker = !!(thinker && isNewThinker);
+  // Reveal fires on any completion that earns a point for the
+  // thinker, not only the first unlock. state.completedDays[key]
+  // was written above, so thinkerPoints reflects the incremented
+  // count here. Forge boundaries (points 3, 6, 9, 12) are skipped
+  // — those are Forge's moment in commit 5 and don't use this
+  // reveal's tier-goal copy.
+  const _thinkerPointsNow = thinker ? thinkerPoints(thinker.id) : 0;
+  const _isForgeBoundary = _thinkerPointsNow === 3 || _thinkerPointsNow === 6
+    || _thinkerPointsNow === 9 || _thinkerPointsNow === 12;
+  const showThinker = !!(thinker && !_isForgeBoundary);
 
   const dayXpEarned = state.readerXP + (completedInWeek === totalDays ? 100 : 0);
   _showDcStats(
@@ -24970,7 +25278,16 @@ function finishDay() {
     dayXpEarned,
     state.correctInRow,
     showThinker
-      ? { label: isEn ? 'A new thinker awaits →' : 'הוגה חדש מחכה ←', fn: () => showThinkerCardScreen(thinker, chapter, day), thinker: true }
+      ? {
+          // First unlock keeps its "new thinker" CTA; repeats read
+          // as a quieter Continue since the reveal is no longer a
+          // meeting.
+          label: isNewThinker
+            ? (isEn ? 'A new thinker awaits →' : 'הוגה חדש מחכה ←')
+            : (isEn ? 'Continue' : 'המשיכו'),
+          fn: () => showThinkerCardScreen(thinker, chapter, day),
+          thinker: true,
+        }
       : { label: isEn ? 'Back to Home' : 'חזרה לבית', fn: closeCompleteModal },
     _dcRibbons
   );
