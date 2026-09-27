@@ -211,6 +211,46 @@
     --frame-economics:  #1B4BB5;
     --frame-psychology: #AD510B;
     --thinker-frame: var(--frame-philosophy);
+
+    /* ── Thinker-frames tone triplets (light/mid/dark) per subject ──
+       Values verbatim from thinker-frames-handoff/reference/frame-
+       tiers.dc.html §renderVals's S table. Kept in one place so any
+       subject-accent adjustment touches ONE token set — the spec
+       flags per-subject hex drift as a four-time offender. Used by
+       the points-plate plain-tier gem (commit 2) and, later, by the
+       gold-tier subject-coloured crest gem (commit 3+). */
+    --frame-philosophy-field: #D8B4E4;
+    --frame-philosophy-deep:  #8460B4;
+    --frame-philosophy-line:  #3D144E;
+    --frame-economics-field:  #84A8E4;
+    --frame-economics-deep:   #243060;
+    --frame-economics-line:   #0F1A46;
+    --frame-psychology-field: #F0B484;
+    --frame-psychology-deep:  #784830;
+    --frame-psychology-line:  #4D2211;
+
+    /* ── Tier material tokens for the points plate ──
+       Plate background + edge + empty-socket colour, one triplet per
+       tier. Values verbatim from the reference §renderVals's M table.
+       The plain tier is subject-tinted (border uses the subject's
+       line tone, gem uses the subject's field→deep gradient) so
+       every unstarted thinker's plate reads in the thinker's own
+       colour; retrieved via .tier-plain[data-subject="…"] rules
+       below rather than hardcoded per subject here. */
+    --plate-plain-bg:       linear-gradient(180deg, #FBF6EC, #EDE3D2);
+    --plate-plain-recess:   #CFC4B2;
+    --plate-bronze-bg:      linear-gradient(135deg, #7A4A22, #C8894A 45%, #E0A86A 55%, #8C5A2B);
+    --plate-bronze-edge:    #3E220C;
+    --plate-bronze-recess:  #4A2A10;
+    --plate-silver-bg:      linear-gradient(135deg, #8A9098, #E8ECEF 45%, #FFFFFF 52%, #9EA4AB);
+    --plate-silver-edge:    #4A5058;
+    --plate-silver-recess:  #5A6068;
+    --plate-gold-bg:        linear-gradient(135deg, #A8841C, #E3C868 45%, #F3DE8E 52%, #C9A227);
+    --plate-gold-edge:      #5E4608;
+    --plate-gold-recess:    #6E5410;
+    --plate-diamond-bg:     linear-gradient(135deg, #E9DDF7, #FFFFFF 20%, #C7B3EC 38%, #F6F0FF 55%, #A98BDB 72%, #D6ECF7 88%, #FFFFFF);
+    --plate-diamond-edge:   #5B4A8A;
+    --plate-diamond-recess: #4A3A78;
     --red: #EF5350;
     --red-light: #FFEBEE;
     /* Semantic status tokens — added for dark-mode phase 1. Values match the
@@ -1906,6 +1946,105 @@
     text-align: center;
     position: relative;
     z-index: 1;
+  }
+
+  /* ── Thinker-frames points plate (commit 2) ──
+     Ported from thinker-frames-handoff/reference/frame-tiers.dc.html
+     verbatim (plate outer at reference lines 263, sockets at 265).
+     Static in this commit — no fly animation, no forge transition;
+     just the current tier's plate at its current fill count. Later
+     commits add per-slot animation and hook it into the celebration
+     chain. The render helper is renderThinkerPlate(thinkerId, subject)
+     in the JS section; every visible instance goes through it so a
+     future geometry change touches one function. */
+  .thinker-plate {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 13px 7px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.55),
+                inset -1px -2px 0 rgba(0, 0, 0, 0.22),
+                0 3px 5px rgba(34, 26, 20, 0.35);
+  }
+  .thinker-plate-socket {
+    width: 10px;
+    height: 10px;
+    box-sizing: border-box;
+    transform: rotate(45deg);
+    border: 1px solid transparent;
+  }
+  .thinker-plate-socket.empty {
+    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.65),
+                0 1px 0 rgba(255, 255, 255, 0.45);
+  }
+  .thinker-plate-socket.filled {
+    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.85),
+                inset -1px -1px 1px rgba(0, 0, 0, 0.3),
+                0 1px 2px rgba(0, 0, 0, 0.45);
+  }
+
+  /* Plain tier — parchment plate, subject-tinted gems.
+     Border + gem edge come from the subject's line tone; gem
+     background is the subject's field→deep gradient. Empty sockets
+     share the neutral --plate-plain-recess across subjects (there's
+     no reason for an empty socket to change colour by thinker). */
+  .thinker-plate.tier-plain { background: var(--plate-plain-bg); }
+  .thinker-plate.tier-plain .thinker-plate-socket.empty { background: var(--plate-plain-recess); }
+  .thinker-plate.tier-plain[data-subject="philosophy"] { border-color: var(--frame-philosophy-line); }
+  .thinker-plate.tier-plain[data-subject="philosophy"] .thinker-plate-socket.empty  { border-color: var(--frame-philosophy-line); }
+  .thinker-plate.tier-plain[data-subject="philosophy"] .thinker-plate-socket.filled { background: linear-gradient(135deg, var(--frame-philosophy-field), var(--frame-philosophy-deep)); border-color: var(--frame-philosophy-line); }
+  .thinker-plate.tier-plain[data-subject="economics"]  { border-color: var(--frame-economics-line); }
+  .thinker-plate.tier-plain[data-subject="economics"]  .thinker-plate-socket.empty  { border-color: var(--frame-economics-line); }
+  .thinker-plate.tier-plain[data-subject="economics"]  .thinker-plate-socket.filled { background: linear-gradient(135deg, var(--frame-economics-field), var(--frame-economics-deep)); border-color: var(--frame-economics-line); }
+  .thinker-plate.tier-plain[data-subject="psychology"] { border-color: var(--frame-psychology-line); }
+  .thinker-plate.tier-plain[data-subject="psychology"] .thinker-plate-socket.empty  { border-color: var(--frame-psychology-line); }
+  .thinker-plate.tier-plain[data-subject="psychology"] .thinker-plate-socket.filled { background: linear-gradient(135deg, var(--frame-psychology-field), var(--frame-psychology-deep)); border-color: var(--frame-psychology-line); }
+
+  /* Bronze / silver / gold / diamond — plate + edge + sockets share
+     the tier's own material. Same shadow stack; only the metals
+     change. Filled gems on these tiers use the same tier gradient
+     as the plate (metal on metal, per reference §renderVals). */
+  .thinker-plate.tier-bronze  { background: var(--plate-bronze-bg);  border-color: var(--plate-bronze-edge); }
+  .thinker-plate.tier-bronze  .thinker-plate-socket.empty  { background: var(--plate-bronze-recess);  border-color: var(--plate-bronze-edge); }
+  .thinker-plate.tier-bronze  .thinker-plate-socket.filled { background: var(--plate-bronze-bg);      border-color: var(--plate-bronze-edge); }
+  .thinker-plate.tier-silver  { background: var(--plate-silver-bg);  border-color: var(--plate-silver-edge); }
+  .thinker-plate.tier-silver  .thinker-plate-socket.empty  { background: var(--plate-silver-recess);  border-color: var(--plate-silver-edge); }
+  .thinker-plate.tier-silver  .thinker-plate-socket.filled { background: var(--plate-silver-bg);      border-color: var(--plate-silver-edge); }
+  .thinker-plate.tier-gold    { background: var(--plate-gold-bg);    border-color: var(--plate-gold-edge); }
+  .thinker-plate.tier-gold    .thinker-plate-socket.empty  { background: var(--plate-gold-recess);    border-color: var(--plate-gold-edge); }
+  .thinker-plate.tier-gold    .thinker-plate-socket.filled { background: var(--plate-gold-bg);        border-color: var(--plate-gold-edge); }
+  .thinker-plate.tier-diamond { background: var(--plate-diamond-bg); border-color: var(--plate-diamond-edge); }
+  .thinker-plate.tier-diamond .thinker-plate-socket.empty  { background: var(--plate-diamond-recess); border-color: var(--plate-diamond-edge); }
+  .thinker-plate.tier-diamond .thinker-plate-socket.filled { background: var(--plate-diamond-bg);     border-color: var(--plate-diamond-edge); }
+
+  /* Pantheon integration — a slot wrapper stacks card + plate.
+     Grid children swap from bare .pantheon-card to .pantheon-slot,
+     so each slot column-slot keeps the 1fr/1fr/1fr width and the
+     card inside still holds its 3/4 aspect ratio. Plate sits below
+     with natural height, centred. */
+  .pantheon-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .pantheon-slot .pantheon-card { width: 100%; }
+
+  /* Reveal-time plate — sits below the flip-card. Scoped to the
+     thinker sub-screen so the stats sub-screen's own .dc-card-zone
+     usage is untouched. Flex-column with a gap between the card
+     and the plate. */
+  .dc-thinker-screen .dc-card-zone {
+    flex-direction: column;
+    gap: 14px;
+  }
+  .dc-thinker-plate {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
   }
   .pantheon-card.locked .pantheon-card-name {
     color: #6B5A8A;
@@ -11392,6 +11531,12 @@
           </div>
         </div>
       </div>
+      <!-- Points plate — populated by showThinkerCardScreen with
+           renderThinkerPlate(thinker.id, state.subject). Static in
+           this commit; later commits animate the newly-earned socket
+           via the Fly keyframe and slot in the Forge transition when
+           a plate fills. See thinker-frames-handoff/THINKER_FRAMES_SPEC.md. -->
+      <div id="dc-thinker-plate" class="dc-thinker-plate" aria-live="polite"></div>
     </div>
     <div class="dc-actions">
       <button class="next-lesson-btn" id="modal-next-btn" style="display:none"></button>
@@ -19766,11 +19911,16 @@ window._debugThinkerPoints = function(thinkerId, n) {
   if (!state._debugThinkerPoints) state._debugThinkerPoints = {};
   if (n == null) delete state._debugThinkerPoints[thinkerId];
   else state._debugThinkerPoints[thinkerId] = Math.max(0, parseInt(n, 10) || 0);
-  // Commit 1 renders nothing new; later commits will re-render the
-  // plate and the framed card from this call site. For now the
-  // helper's job is to make the next thinkerPoints / thinkerTier /
-  // thinkerPlateFilled read return the new value, which the console
-  // can verify directly.
+  // Re-render the pantheon so a plate override reflects immediately.
+  // Guarded on the container element existing so early debug calls
+  // (before renderPantheon has ever run) don't throw. Reveal-time
+  // plates are populated by showThinkerCardScreen at that moment and
+  // don't need a global re-render trigger here.
+  try {
+    if (typeof renderPantheon === 'function' && document.getElementById('pantheon-container')) {
+      renderPantheon();
+    }
+  } catch(e) {}
   return {
     points: thinkerPoints(thinkerId),
     tier: thinkerTier(thinkerId),
@@ -19778,6 +19928,33 @@ window._debugThinkerPoints = function(thinkerId, n) {
     filled: thinkerPlateFilled(thinkerId),
   };
 };
+
+// ── Points-plate renderer (commit 2 of thinker-frames work) ──
+// Produces the plate HTML for a thinker at their current tier and
+// fill. Pure HTML string — no listeners, no state, safe to inject
+// anywhere. `subject` is the rendering-context subject (matches
+// _thinkerImage's arg): for a cross-subject thinker (Kahneman) the
+// plate colour follows the section it's shown in, but the point
+// count is thinker-wide.
+//
+// Escaping: aria-label composes user-visible strings from constants
+// and integers, so no injection surface. Subject + tier are drawn
+// from a fixed vocabulary and go through data-attributes with quoted
+// values — nothing to sanitise.
+function renderThinkerPlate(thinkerId, subject) {
+  const subj = subject || 'philosophy';
+  const tierIdx = thinkerTier(thinkerId);
+  const tier = TIERS[tierIdx];
+  const filled = thinkerPlateFilled(thinkerId);
+  let sockets = '';
+  for (let k = 0; k < POINTS_PER_TIER; k++) {
+    sockets += k < filled
+      ? '<span class="thinker-plate-socket filled" aria-hidden="true"></span>'
+      : '<span class="thinker-plate-socket empty" aria-hidden="true"></span>';
+  }
+  const label = filled + ' of ' + POINTS_PER_TIER + ' points, ' + tier + ' tier';
+  return '<div class="thinker-plate tier-' + tier + '" data-subject="' + subj + '" data-tier="' + tier + '" data-filled="' + filled + '" role="img" aria-label="' + label + '">' + sockets + '</div>';
+}
 
 // Single source of truth for the app's default state shape. Called on cold
 // boot (initial declaration), from loadState() to hydrate defaults for any
@@ -24133,6 +24310,14 @@ function showThinkerCardScreen(thinker, chapter, day) {
   document.getElementById('unlock-quote').textContent =
     (isEn ? (thinker.quoteEn || thinker.quote) : thinker.quote) || '';
   document.getElementById('thinker-unlock-box').classList.remove('flipped');
+  // Points plate — thinker points count reflects the completion that
+  // just finished (finishDay writes state.completedDays[key] = true
+  // before the celebration chain starts, so the derived count here
+  // is already up to date). Subject drawn from state.subject (the
+  // reveal fires in the context of the just-completed dialogue's
+  // subject; matches the portrait rendered via _thinkerImage above).
+  const _plateEl = document.getElementById('dc-thinker-plate');
+  if (_plateEl) _plateEl.innerHTML = renderThinkerPlate(thinker.id, state.subject);
   document.getElementById('dc-thinker-title').textContent =
     isEn ? 'A new thinker joins the pantheon' : 'הוגה חדש מצטרף לפנתאון';
   // Share-thinker button label (bilingual). The onclick is bound in HTML
@@ -29579,33 +29764,44 @@ function renderPantheon() {
     const displayName = t.name;
     const subject = sectionSubject || t.subject || 'philosophy';
     const imgUrl = _thinkerImage(t, subject);
+    // Every unlocked thinker gets a points plate under the card.
+    // Locked thinkers omit the plate — showing an empty plate on a
+    // card the user hasn't earned yet would be visually loud and
+    // misleading (the plate implies "in progress" state, and a
+    // locked slot has no progress to represent).
+    const plateHtml = isUnlocked ? renderThinkerPlate(t.id, subject) : '';
     if (isUnlocked) {
       return `
-        <div class="pantheon-card" data-subject="${subject}" onclick="flipThinkerCard(this, '${t.id}')">
+        <div class="pantheon-slot">
+          <div class="pantheon-card" data-subject="${subject}" onclick="flipThinkerCard(this, '${t.id}')">
+            <div class="pantheon-card-inner">
+              <div class="pantheon-card-front">
+                <img src="${imgUrl}" alt="${t.name}" onerror="this.style.display='none'">
+                <div class="pantheon-card-overlay"></div>
+                <div class="pantheon-card-info">
+                  <div class="pantheon-card-name">${displayName}</div>
+                  <div class="pantheon-card-era">${t.era || ''}</div>
+                </div>
+              </div>
+              <div class="pantheon-card-back">
+                <div class="pantheon-card-back-star">✦</div>
+                <div class="pantheon-card-back-name">${displayName}</div>
+                <div class="pantheon-card-back-era">${t.era || ''}</div>
+              </div>
+            </div>
+          </div>
+          ${plateHtml}
+        </div>`;
+    }
+    return `
+      <div class="pantheon-slot">
+        <div class="pantheon-card locked" data-subject="${subject}" onclick="openThinkerModal('${t.id}', {locked: true, subject: '${subject}'})">
           <div class="pantheon-card-inner">
             <div class="pantheon-card-front">
               <img src="${imgUrl}" alt="${t.name}" onerror="this.style.display='none'">
               <div class="pantheon-card-overlay"></div>
-              <div class="pantheon-card-info">
-                <div class="pantheon-card-name">${displayName}</div>
-                <div class="pantheon-card-era">${t.era || ''}</div>
-              </div>
+              <div class="pantheon-lock-icon"><svg viewBox="0 0 64 64" width="28" height="28"><use href="#ic-lock"/></svg></div>
             </div>
-            <div class="pantheon-card-back">
-              <div class="pantheon-card-back-star">✦</div>
-              <div class="pantheon-card-back-name">${displayName}</div>
-              <div class="pantheon-card-back-era">${t.era || ''}</div>
-            </div>
-          </div>
-        </div>`;
-    }
-    return `
-      <div class="pantheon-card locked" data-subject="${subject}" onclick="openThinkerModal('${t.id}', {locked: true, subject: '${subject}'})">
-        <div class="pantheon-card-inner">
-          <div class="pantheon-card-front">
-            <img src="${imgUrl}" alt="${t.name}" onerror="this.style.display='none'">
-            <div class="pantheon-card-overlay"></div>
-            <div class="pantheon-lock-icon"><svg viewBox="0 0 64 64" width="28" height="28"><use href="#ic-lock"/></svg></div>
           </div>
         </div>
       </div>`;
