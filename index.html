@@ -2184,30 +2184,6 @@
     z-index: 1;
   }
 
-  /* Locked-card back — muted parchment variant. Same layout as the
-     unlocked back (name + era) but stripped of every celebratory
-     signal: no ✦ (not emitted for locked), no gold hairline (border
-     becomes the neutral mount edge), no ink drop-shadow glow, no
-     radial gold ::before. The "Unlocks in Chapter X" line sits
-     under the dates in --text-muted. Together this reads clearly
-     as "not yet earned" — the tap tells you who's waiting, without
-     any of the visual reward the unlocked back carries. */
-  .pth-cell.locked .pth-back {
-    border-color: var(--pantheon-mount-edge);
-    box-shadow: 0 2px 6px rgba(34, 26, 20, 0.08);
-  }
-  .pth-cell.locked .pth-back::before { display: none; }
-  .pth-back-lock-line {
-    margin-top: 6px;
-    font-size: 11px;
-    color: var(--text-muted);
-    font-weight: 500;
-    letter-spacing: 0.02em;
-    text-align: center;
-    position: relative;
-    z-index: 1;
-  }
-
   /* Portrait art fills the card with a head-and-shoulders crop
      (object-position center 20% matches the pre-rebuild focal point
      that hides the source art's baked-in name banner). */
@@ -30222,13 +30198,16 @@ function renderPantheon() {
       ? (isEn ? 'Locked thinker' : 'הוגה נעול')
       : `${displayName}, ${_pthTierLabel(tier, filled, isEn, subject).replace(/ · .*/, '')}, ${(tier === 'diamond' ? POINTS_PER_TIER : filled)}${isEn ? ' of ' : ' מתוך '}${POINTS_PER_TIER}`;
 
-    // Every card flips on tap now — locked cards flip to a muted
-    // parchment back showing name + era + "Unlocks in Chapter X".
-    // The teaser modal (openThinkerModal { locked: true }) is still
-    // used by the library gallery and the subject carousel, but the
-    // pantheon deliberately shows less: browsing is those surfaces,
-    // the pantheon is the collection.
-    const onclick = `flipThinkerCard(this)`;
+    // Unlocked cards flip in place (celebratory ✦ back). Locked
+    // cards open the shared teaser modal — same call the library
+    // gallery (line ~23091) and the subject carousel (line ~23568)
+    // already make — so all three surfaces show the same details
+    // for a locked thinker: name + era + full bio + "Unlocks in
+    // Chapter X". Locked cards therefore emit no back face — they
+    // don't flip.
+    const onclick = isUnlocked
+      ? `flipThinkerCard(this)`
+      : `openThinkerModal('${t.id}', {locked: true, subject: '${subject}'})`;
 
     // Front-face content. Portrait always renders; overlay always
     // renders (locked cards keep the dark bottom gradient too, so
@@ -30245,24 +30224,13 @@ function renderPantheon() {
         + `</div>`
       : '';
 
-    // Back-face content differs by state. Unlocked = celebratory
-    // (✦ + name + era). Locked = muted parchment with name + era
-    // + "Unlocks in Chapter X" so a tap tells the user who's
-    // waiting without spoiling the bio. _chapterForThinker returns
-    // null for thinkers in subjects it doesn't currently scan
-    // (psychology), in which case we fall back to a generic line —
-    // same fallback the modal uses.
-    const chapterId = !isUnlocked ? _chapterForThinker(t.id) : null;
-    const chapterText = chapterId
-      ? (isEn ? `Unlocks in Chapter ${chapterId}` : `נפתח בפרק ${chapterId}`)
-      : (isEn ? 'Unlocks later' : 'ייפתח בהמשך');
+    // Back-face content (unlocked cards only — locked opens the
+    // teaser modal instead of flipping). Star + name + era.
     const backHtml = isUnlocked
       ? `<div class="pth-back-star" aria-hidden="true">✦</div>`
         + `<div class="pth-back-name">${_esc(displayName)}</div>`
         + (displayDates ? `<div class="pth-back-era">${_esc(displayDates)}</div>` : '')
-      : `<div class="pth-back-name">${_esc(displayName)}</div>`
-        + (displayDates ? `<div class="pth-back-era">${_esc(displayDates)}</div>` : '')
-        + `<div class="pth-back-lock-line">${_esc(chapterText)}</div>`;
+      : '';
 
     const cellClass = isUnlocked
       ? (isFramed ? 'pth-cell unlocked framed' : 'pth-cell unlocked')
@@ -30273,7 +30241,7 @@ function renderPantheon() {
         <button type="button" class="pth-slot" aria-pressed="false" aria-label="${_esc(aria)}" onclick="${onclick}">
           <span class="pth-flipper">
             <span class="pth-face pth-front">${portraitHtml}${overlayHtml}${infoHtml}</span>
-            <span class="pth-face pth-back">${backHtml}</span>
+            ${isUnlocked ? `<span class="pth-face pth-back">${backHtml}</span>` : ''}
             ${frameHtml}
           </span>
         </button>
