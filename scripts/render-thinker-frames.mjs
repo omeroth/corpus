@@ -375,8 +375,13 @@ const BRONZE_SVG_3X4 = `
 <rect x="92" y="14" width="116" height="20" rx="1" fill="none" stroke="#3E220C" stroke-width="0.7" opacity="0.8"/>
 <text x="150.7" y="29.2" text-anchor="middle" font-family="'Frank Ruhl Libre', Georgia, serif" font-size="11.5" font-weight="700" letter-spacing="2.2" fill="#F0BE85">SAPERE AUDE</text>
 <text x="150" y="28.5" text-anchor="middle" font-family="'Frank Ruhl Libre', Georgia, serif" font-size="11.5" font-weight="700" letter-spacing="2.2" fill="#2A1406">SAPERE AUDE</text>
-<rect x="100" y="360" width="100" height="30" rx="4" fill="#2A1406" opacity="0.45"/>
-<path d="M102 390 H198" stroke="#F0BE85" stroke-width="1" opacity="0.6"/>
+<!-- Seat rect + hairline removed in the 2026-09-27 spec update: the
+     plate now sits below the card, not inside the frame. Per spec
+     §10 the bottom band should carry "a small centre ornament where
+     the seat used to be" — the designer-authored PNG committed in
+     images/thinker-frames/3x4/bronze.png contains that ornament;
+     until it's ported to this SVG source, re-running the script
+     will produce a bronze frame with a plain bottom band. -->
 `.trim();
 
 // Silver 3:4 — full engraved scrollwork on all four sides, rosettes at
@@ -414,8 +419,9 @@ const SILVER_SVG_3X4 = `
 <path d="M107 15.5 H193 C200 15.5 200 25 206 25 C200 25 200 34.5 193 34.5 H107 C100 34.5 100 25 94 25 C100 25 100 15.5 107 15.5 Z" fill="none" stroke="#4A5058" stroke-width="0.8"/>
 <path d="M150 18.5 L155 25 L150 31.5 L145 25 Z" fill="#4A5058"/>
 <path d="M118 25 H138 M162 25 H182" stroke="#4A5058" stroke-width="0.8"/>
-<rect x="100" y="360" width="100" height="30" rx="4" fill="#23282E" opacity="0.4"/>
-<path d="M102 390 H198" stroke="#FFFFFF" stroke-width="1" opacity="0.7"/>
+<!-- Seat rect + hairline removed (silver, 2026-09-27 spec update).
+     See bronze note above. Committed PNG carries the ornament that
+     replaces the seat; SVG source doesn't yet. -->
 `.trim();
 
 // Gold 3:4 — every layer inside the frame is masked by p-m-gem, which
@@ -445,8 +451,8 @@ const GOLD_SVG_3X4 = `
   <g stroke="#6E5410" stroke-width="1"><path d="M150 46 L119.5 33.4 M150 46 L126.7 22.7 M150 46 L137.4 15.5 M150 46 L150.0 13.0 M150 46 L162.6 15.5 M150 46 L173.3 22.7 M150 46 L180.5 33.4"/></g>
   <g stroke="#FBEFB8" stroke-width="0.6" opacity="0.8" transform="translate(-0.8 0)"><path d="M150 46 L119.5 33.4 M150 46 L126.7 22.7 M150 46 L137.4 15.5 M150 46 L150.0 13.0 M150 46 L162.6 15.5 M150 46 L173.3 22.7 M150 46 L180.5 33.4"/></g>
   <ellipse filter="url(#p-f-small)" cx="150" cy="38" rx="10.5" ry="8.2" fill="url(#p-gold)"/>
-  <rect x="100" y="360" width="100" height="30" rx="4" fill="#3A2C04" opacity="0.4"/>
-  <path d="M102 390 H198" stroke="#FBEFB8" stroke-width="1" opacity="0.7"/>
+  <!-- Seat rect + hairline removed (gold, 2026-09-27 spec update).
+       See bronze note above. -->
 </g>
 `.trim();
 
@@ -480,8 +486,8 @@ const DIAMOND_SVG_3X4 = `
   <path d="M150 34 L141.3 39 L141.3 29 Z" fill="#F6F0FF"/>
 </g>
 <g filter="url(#p-f-small)" fill="url(#p-diamond)" stroke="#5B4A8A" stroke-width="0.8"><path d="M84 367 L92 375 L84 383 L76 375 Z M216 367 L224 375 L216 383 L208 375 Z"/></g>
-<rect x="100" y="360" width="100" height="30" rx="4" fill="#2E1F5A" opacity="0.35"/>
-<path d="M102 390 H198" stroke="#FFFFFF" stroke-width="1" opacity="0.8"/>
+<!-- Seat rect + hairline removed (diamond, 2026-09-27 spec update).
+     See bronze note above. -->
 `.trim();
 
 const TIERS_PANTHEON = {
