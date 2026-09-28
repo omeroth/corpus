@@ -1839,6 +1839,23 @@
     width: 100%;
     height: auto;
     overflow: visible;
+    /* Promote the SVG itself to its own compositor layer so it
+       rasterises at its natural CSS box, not at the parent div's
+       currently-transformed size. Without this, during the p3-pop
+       entry the SVG paint pipeline re-renders the whole card
+       (image + gradients + filters + shine) at whatever scale the
+       parent's transform is at that frame — starting at 0.2 → the
+       SVG raster is 53 × 104 px, which the compositor then upscales
+       to natural size = blur. With translateZ(0), the SVG's layer
+       is rasterised once at natural size and the parent's transform
+       scales that texture cleanly.
+       will-change tells both engines to keep the layer at natural
+       size for the entire animation window; backface-visibility is
+       a WebKit reliability hint that pairs with translateZ. */
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
   .dc-thinker-screen #rv-art { transition: none; }
 
