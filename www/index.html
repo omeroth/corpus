@@ -13699,15 +13699,6 @@ let _paywallActiveRoot = null;
 // openReader after purchase) so the onboarding path doesn't fire either.
 let _paywallMode = 'modal';
 
-// Session-scoped: set by showPaywall (modal mode only) so the frames
-// explainer doesn't chase a paywall close in the same session. The
-// onboarding paywall (_onbV2PreparePaywall, mode 'onboarding') does
-// NOT set this flag — it fires before every new user has a chance to
-// see the explainer, and gating on it would block them permanently
-// on their first session. Reset naturally on page load (cold start
-// on iOS/Android since Capacitor kills the webview between launches).
-let _paywallShownThisSession = false;
-
 // Reads current package data from RC's offering, or falls back to the
 // hardcoded USD values so the paywall is renderable before products are
 // live in App Store Connect / Play. When falling back, pkg is null and
@@ -13806,7 +13797,6 @@ function showPaywall(opts) {
   opts = opts || {};
   _paywallActiveRoot = document.getElementById('modal-paywall');
   _paywallMode = 'modal';
-  _paywallShownThisSession = true;
   _paywallReturnTo = (typeof opts.weekId !== 'undefined' && typeof opts.dayId !== 'undefined')
     ? { weekId: opts.weekId, dayId: opts.dayId }
     : null;
@@ -21168,11 +21158,6 @@ const _FE_SUBJ_TONES = {
   psychology: { field: 'var(--frame-psychology-field)', deep: 'var(--frame-psychology-deep)', line: 'var(--frame-psychology-line)' },
 };
 
-// Pending-open flag: set by _maybeShowFramesExplainerAtLaunch when
-// welcome-back is currently open. closeWelcomeBackModal reads this
-// after dismissing and chains the explainer in the same session.
-let _pendingExplainerAfterWelcomeBack = false;
-
 // Analytics.
 function _feCapture(evt, props) {
   try { posthog.capture(evt, props || {}); } catch (e) {}
@@ -21378,19 +21363,42 @@ function _showFramesExplainer(trigger) {
   });
 }
 
-// Debug helper for on-device testing. Clears the seen flag + any
-// pending WB chain so a re-open of the app / renderHome will run
-// the gate fresh. Exposed on window so it's callable from Safari
-// Web Inspector's console.
+// Debug helper for on-device testing. Clears the seen flag so the
+// next walkthrough-finish (or a plate tap) opens the explainer with
+// its flag-set path fresh. Exposed on window so it's callable from
+// Safari Web Inspector's console.
 window._resetFramesExplainer = function () {
   state.framesExplainerSeen = false;
-  _pendingExplainerAfterWelcomeBack = false;
   try { saveStateLocal(); } catch (e) {}
   return {
     framesExplainerSeen: state.framesExplainerSeen,
     completedDays: Object.keys(state.completedDays || {}).length,
     onboardingDone: !!localStorage.getItem('corpus_onboarding_done'),
+    walkthroughDone: !!localStorage.getItem('corpus_walkthrough_done'),
     currentScreen: state.currentScreen,
+  };
+};
+
+// On-device replay helper: clears the walkthrough-done flag and the
+// seen flag, then re-runs the tour from the greeting step. Tapping
+// "OK" on the closing step re-fires _walkthroughFinish, which opens
+// the explainer just like it does for a real new user. Bypasses the
+// completion gate so an existing user's completed dialogues don't
+// block the replay. Only useful from Safari Web Inspector while
+// on-device — no-op if not currently on home (the tour requires
+// home for its spotlights).
+window._replayWalkthrough = function () {
+  try { localStorage.removeItem('corpus_walkthrough_done'); } catch (e) {}
+  state.framesExplainerSeen = false;
+  try { saveStateLocal(); } catch (e) {}
+  const fe = document.getElementById('modal-frames-explainer');
+  if (fe) { fe.classList.remove('fe-open'); fe.innerHTML = ''; }
+  try { _walkthroughStartIfEligible({ bypassCompletionGate: true }); } catch (e) {}
+  return {
+    framesExplainerSeen: state.framesExplainerSeen,
+    walkthroughDone: !!localStorage.getItem('corpus_walkthrough_done'),
+    currentScreen: state.currentScreen,
+    tourStarted: document.documentElement.classList.contains('walkthrough-active'),
   };
 };
 
@@ -21437,14 +21445,13 @@ function _feCtaTap() {
 // Guards match spec §14: onboarding done, not already seen, no
 // pending celebrations, no visible streak-repair card. If welcome-
 // back is currently active, DON'T defer to the next open — chain
-// the explainer to fire when welcome-back closes, in the same session.
+// the explainer to fire when the walkthrough closes.
 // Returns true only when nothing else is on screen: no pending
 // celebrations, no active reveal, no chapter-complete overlay, no
-// other modal-overlay. Called from every hook point so we open at
-// the FIRST quiet moment and stay quiet during the reader / any
-// stacked modal. Welcome-back is handled separately via the
-// _pendingExplainerAfterWelcomeBack chain; we still refuse to open
-// on top of it here.
+// other modal-overlay. Defensive against a stacked-modal edge case
+// (a welcome-back that somehow slipped up on the same tick as the
+// walkthrough closing); in the real new-user flow the walkthrough
+// runs on a quiet home.
 //
 // Detection depends on the overlay check because _playNextCelebration
 // shifts an item off pendingCelebrations before displaying it — so
@@ -21482,37 +21489,17 @@ function _feEverythingClosed() {
   return true;
 }
 
-function _maybeShowFramesExplainerAtLaunch() {
+// Called from exactly one automatic site: _walkthroughFinish, right
+// after the closing-step CTA teardown. All other automatic triggers
+// (renderHome, welcome-back, reveal, celebrations) were removed on
+// 2026-09-29 — the explainer now fires as if it were the last step
+// of the tour and nowhere else. Plate taps on the reveal / pantheon
+// call _showFramesExplainer directly (see _feWirePlateTaps), so
+// they don't go through this gate.
+function _maybeShowFramesExplainerAtTourEnd() {
   if (state.framesExplainerSeen) return;
-  if (!localStorage.getItem('corpus_onboarding_done')) return;
-  // Paywall gate: if a locked-content-tap paywall opened at any point
-  // in this session, defer to next cold start. Prevents the explainer
-  // from chasing a paywall close (which felt like a stack of modals on
-  // device). Onboarding paywall does NOT set this flag — see
-  // _paywallShownThisSession's declaration.
-  if (_paywallShownThisSession) return;
-  // New-user gate: at least one completed dialogue OR the walkthrough
-  // is done. The walkthrough path lets us open the explainer right
-  // after the tour ends — the user has 0 points but the explainer's
-  // job is to teach them about the frame system, not celebrate an
-  // unlock. Legacy users (pre-walkthrough era) still fall through
-  // completedDays > 0.
-  if (Object.keys(state.completedDays || {}).length === 0
-      && !localStorage.getItem('corpus_walkthrough_done')) return;
-  // Screen check: never open over the reader. If the user tapped
-  // "Next dialogue" on the reveal, the celebration queue can drain
-  // while they're inside a dialogue — this catches that case. The
-  // next renderHome (on return to home) picks it up.
-  if (state.currentScreen === 'reader') return;
-  const repairHolder = document.getElementById('streak-repair-card-holder');
-  if (repairHolder && repairHolder.style.display !== 'none' && repairHolder.innerHTML.trim()) return;
-  const wb = document.getElementById('welcome-back-modal');
-  if (wb && wb.classList.contains('active')) {
-    _pendingExplainerAfterWelcomeBack = true;
-    return;
-  }
   if (!_feEverythingClosed()) return;
-  _showFramesExplainer('launch');
+  _showFramesExplainer('tour_end');
 }
 
 // Plate-tap delegation. Capture-phase so we run BEFORE the pantheon
@@ -23015,17 +23002,6 @@ function closeWelcomeBackModal() {
       dwell_ms: dwellMs,
     });
   } catch(e) {}
-  // Chain-open the frames explainer if it was deferred at launch
-  // because welcome-back was in the way. Same session, right after
-  // dismiss — not on next open. Re-runs the full gate rather than
-  // calling _showFramesExplainer directly so reader/celebration/other
-  // overlay guards still apply if the user's state changed while WB
-  // was up (e.g. a queued celebration surfaced, or they navigated
-  // into the reader from a nested action).
-  if (_pendingExplainerAfterWelcomeBack) {
-    _pendingExplainerAfterWelcomeBack = false;
-    try { _maybeShowFramesExplainerAtLaunch(); } catch (e) {}
-  }
 }
 // === End welcome-back modal ==========================================
 
@@ -23792,14 +23768,6 @@ function _onCelebrationDismissed() {
   }
   // Small settle between overlays so animations don't collide.
   setTimeout(_playNextCelebration, 250);
-  // Frames explainer hook (spec §14): if that was the last celebration
-  // and everything else is closed, this is the quiet moment. The
-  // 300 ms defer gives the outgoing overlay a moment to actually
-  // remove its .active class before _feEverythingClosed samples it,
-  // and gives _playNextCelebration a chance to no-op the empty queue.
-  setTimeout(() => {
-    try { _maybeShowFramesExplainerAtLaunch(); } catch (e) {}
-  }, 300);
 }
 
 function _onCelebrationQueueEmpty() {
@@ -24348,10 +24316,6 @@ function renderHome() {
   // Fires at most once per streak-day; internal guards handle all
   // other cases. Blocks tap-through by design (see design report).
   try { showWelcomeBackModal(); } catch (e) {}
-  // Frames explainer (spec §14). Own guards; if welcome-back is
-  // currently active, this flags a chain so it fires when welcome-
-  // back closes (in the same session, not on next open).
-  try { _maybeShowFramesExplainerAtLaunch(); } catch (e) {}
   // Wire plate-tap delegation on rv-svg + pantheon-container so
   // tapping any points plate reopens the explainer. Idempotent —
   // attach-once guarded by ._feWired on the target.
@@ -26579,11 +26543,6 @@ function finishDay() {
 // on top of an active reader.
 function closeCompleteModal(opts) {
   document.getElementById('modal-complete').classList.remove('active');
-  // Frames explainer hook (spec §14): reveal has just closed. If the
-  // celebration queue is also empty, this is the quiet moment to open.
-  // If it isn't, the check bails and the queue's dismiss handlers pick
-  // it up later. Idempotent — bounces off framesExplainerSeen.
-  try { _maybeShowFramesExplainerAtLaunch(); } catch (e) {}
   const continuation = (opts && typeof opts.continuation === 'function') ? opts.continuation : goHome;
 
   const _guestCompletionCount = Object.keys(state.completedDays)
@@ -29957,14 +29916,15 @@ function _walkthroughFinish() {
     lang:    state.lang || null,
   });
   _walkthroughTeardown({ setFlag: true });
-  // Frames explainer (spec §14): the tour just ended — the quiet moment
-  // for new users. Deferred one frame past teardown so the walkthrough
-  // overlay's display:none commits before _feEverythingClosed samples
-  // the DOM. Gate handles the once-per-user + reader/celebration/other
-  // overlay guards; corpus_walkthrough_done (just set by teardown) is
-  // the alternative-pass for a new user with completedDays == {}.
+  // Frames explainer (spec §14): the tour just ended — the ONLY moment
+  // it opens automatically. Deferred one frame past teardown so the
+  // walkthrough overlay's display:none commits before _feEverythingClosed
+  // samples the DOM. Existing users past the tour never reach this path
+  // (their corpus_walkthrough_done was set on some earlier launch, so
+  // _walkthroughShouldStart short-circuits and this function is never
+  // called); they only see the explainer via plate taps.
   requestAnimationFrame(() => {
-    try { _maybeShowFramesExplainerAtLaunch(); } catch (e) {}
+    try { _maybeShowFramesExplainerAtTourEnd(); } catch (e) {}
   });
 }
 
