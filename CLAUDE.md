@@ -202,4 +202,16 @@ It's cheaper to ask than to redo.
 
 ---
 
-*Last updated: 2026-05-10*
+## Complex work — before you touch anything
+
+For anything with more than a few surfaces or a handoff spec (reveal-card rebuild, pantheon overhaul, onboarding restructure), run this loop **before writing code**:
+
+1. **Blast radius report.** Enumerate every file/function/CSS token/class the change will move, delete, or wire. Stop and wait for approval — the list is the plan.
+2. **Survivor list.** Name what must NOT change (settled UI, analytics events, persistence fields, tokens with other callers) and where it lives (`renderPantheon`, `_pthBarHtml`, `--plate-*` still driving the bars). Grep before deleting; keep any token that still has callers.
+3. **Read the reference against your DOM.** If a handoff assumes fixed dimensions, a full-viewport SVG, or a specific viewBox, note it before porting. Don't retune reference values to fit your container — resize the container.
+4. **Baseline the survivors.** Playwright dump of geometry + computed styles for surfaces that must not shift. Save it. That's what "no regression" means at push time.
+5. **Verify twice.** Against the reference (does it look like the handoff?) and against the baseline (did anything else move?). Both must pass before push.
+
+---
+
+*Last updated: 2026-09-28*
