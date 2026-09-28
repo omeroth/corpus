@@ -1974,34 +1974,114 @@
     }
   }
 
+  /* ── Reveal card + Forge (spec §12) ──
+     The frame wraps the art; it never shrinks it. Art is native
+     670:1200 and stays the same size in every state (plain →
+     bronze → silver → gold → diamond). ONE svg per spec §5.1: the
+     art is 300×537 at (0,0) in card units, the frame image at
+     (-40,-50) 380×630, and the plate is a capsule at (21.5,591)
+     257×40. Both frame and plate live inside the same <g class
+     ="rv-layer"> — one keyframe drives them together.
 
-  /* Reveal-time plate — sits below the flip-card. Scoped to the
-     thinker sub-screen so the stats sub-screen's own .dc-card-zone
-     usage is untouched. Flex-column with a gap between the card
-     and the plate. */
+     Everything below the "ANIMATION" comment is verbatim from
+     thinker-frames-handoff/reveal/forge.html with an rv- prefix on
+     class and keyframe names (SVG ids too, in the HTML above).
+     Do NOT retune values here — regenerate from the reference. */
+
+  /* --rv-slow = 1 by default. Override to 4 in DevTools to inspect
+     every phase at 1/4 speed. All rv- animation durations are
+     `calc(<t>s * var(--rv-slow))`. */
+  :root { --rv-slow: 1; }
+
+  .dc-thinker-screen #rv-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .dc-thinker-screen #rv-art { transition: none; }
+
+  /* ===== ANIMATION (verbatim from reveal/forge.html, rv- prefixed) ===== */
+  .rv-fx-origin { transform-box: fill-box; transform-origin: center; }
+
+  /* FLY: the gem rises from the portrait centre and spins into its socket */
+  .rv-gem-fly { animation: rv-gemFly calc(.85s * var(--rv-slow)) cubic-bezier(.5,0,.3,1) both; }
+  @keyframes rv-gemFly {
+    0%   { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(45deg) scale(.3); }
+    15%  { opacity: 1; transform: translate(var(--dx), var(--dy)) rotate(45deg) scale(1.7); }
+    55%  {              transform: translate(calc(var(--dx)*.35), calc(var(--dy)*.45)) rotate(225deg) scale(1.3); }
+    100% { opacity: 1; transform: translate(0, 0) rotate(405deg) scale(1); }
+  }
+  .rv-halo  { animation: rv-halo  calc(.8s * var(--rv-slow)) ease-out both; animation-delay: calc(.66s * var(--rv-slow)); }
+  @keyframes rv-halo { 0% { opacity: 0; transform: scale(.2); } 30% { opacity: 1; } 100% { opacity: 0; transform: scale(1.9); } }
+  .rv-ring  { animation: rv-ring  calc(.6s * var(--rv-slow)) ease-out both; animation-delay: calc(.66s * var(--rv-slow)); }
+  @keyframes rv-ring { 0% { opacity: 0; transform: scale(.2); } 1% { opacity: 1; } 100% { opacity: 0; transform: scale(2.6); } }
+  .rv-spark { animation: rv-spark calc(.6s * var(--rv-slow)) ease-out both; animation-delay: calc(.66s * var(--rv-slow)); }
+  @keyframes rv-spark { 0% { opacity: 0; transform: rotate(var(--a)) translateY(0); } 1% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--a)) translateY(-40px); } }
+
+  /* FORGE: old frame+plate cool and leave, a line traces the new frame, the new frame+plate arrive overbright */
+  .rv-old-forge { animation: rv-oldForge calc(2.2s * var(--rv-slow)) ease both; }
+  @keyframes rv-oldForge {
+    0%   { filter: none;                            opacity: 1; }
+    30%  { filter: grayscale(1) brightness(.55);    opacity: 1; }
+    62%  { filter: grayscale(1) brightness(.4);     opacity: 1; }
+    76%  { opacity: 0; }
+    100% { opacity: 0; }
+  }
+  .rv-new-forge { animation: rv-newForge calc(2.2s * var(--rv-slow)) ease both; }
+  @keyframes rv-newForge {
+    0%   { opacity: 0; }
+    62%  { opacity: 0; filter: brightness(2.2); }
+    86%  { opacity: 1; filter: brightness(1.3); }
+    100% { opacity: 1; filter: brightness(1);   }
+  }
+  .rv-art-forge { animation: rv-artForge calc(2.2s * var(--rv-slow)) ease both; }
+  @keyframes rv-artForge {
+    0%   { filter: none; }
+    30%  { filter: grayscale(1) brightness(.55); }
+    62%  { filter: grayscale(1) brightness(.4);  }
+    74%  { filter: grayscale(0) brightness(1.9); }
+    86%  { filter: grayscale(0) brightness(1.2); }
+    100% { filter: none; }
+  }
+  .rv-trace { stroke-dasharray: 1000; animation: rv-trace calc(2.2s * var(--rv-slow)) ease-in-out both; }
+  @keyframes rv-trace {
+    0%   { stroke-dashoffset: 1000; opacity: 0; }
+    12%  { opacity: 1; }
+    64%  { stroke-dashoffset: 0;    opacity: 1; }
+    84%  { opacity: 0; }
+    100% { stroke-dashoffset: 0;    opacity: 0; }
+  }
+  .rv-shock { animation: rv-shock calc(2.2s * var(--rv-slow)) ease-out both; }
+  @keyframes rv-shock {
+    0%, 68% { opacity: 0; transform: scale(.6);   }
+    74%     { opacity: 1; }
+    100%    { opacity: 0; transform: scale(1.35); }
+  }
+  .rv-banner { animation: rv-banner calc(2.6s * var(--rv-slow)) ease both; }
+  @keyframes rv-banner {
+    0%, 40% { opacity: 0; transform: translateY(20px); }
+    55%     { opacity: 1; transform: translateY(0);    }
+    85%     { opacity: 1; }
+    100%    { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rv-gem-fly, .rv-halo, .rv-ring, .rv-spark,
+    .rv-old-forge, .rv-new-forge, .rv-art-forge,
+    .rv-trace, .rv-shock, .rv-banner {
+      animation-duration: .01ms !important;
+      animation-delay: 0s !important;
+    }
+  }
+
+
+  /* Reveal-time card zone. Vertical stack: slot + read-more pill.
+     Plate moved INSIDE the slot (per Option A refactor) so it
+     cross-fades with the frame as one movement during Forge. */
   .dc-thinker-screen .dc-card-zone {
     flex-direction: column;
     gap: 14px;
-  }
-  .dc-thinker-plate {
-    display: flex;
-    justify-content: center;
-    position: relative;
-    z-index: 2;
-  }
-  /* Reveal plate is ~1.6× the pantheon-grid default so the Fly
-     moment reads clearly at reveal scale. Sockets and gap scale
-     together; Fly primitives (gem/halo/ring/spark sizes above)
-     match the new socket. Pantheon grid's small plates are
-     untouched — the small size works there and would waste room
-     scaled up. */
-  .dc-thinker-screen .thinker-plate {
-    gap: 13px;
-    padding: 10px 21px 11px;
-  }
-  .dc-thinker-screen .thinker-plate-socket {
-    width: 16px;
-    height: 16px;
   }
 
   /* ── Framed card for the end-of-dialogue reveal (spec §4.2) ──
@@ -9527,64 +9607,43 @@
     filter: blur(35px);
     animation: halo-breathe-bg 3.5s ease-in-out infinite;
   }
-  .dc-thinker-screen .flip-card {
+  /* Reveal card slot (RevealCard component, rebuild). Wraps the
+     single SVG at viewBox -40 -100 380 745 (aspect 380:745). SVG
+     dictates aspect via width:100% + height:auto; no aspect-ratio
+     on the wrapper. Width capped by (a) 266 px reference native,
+     (b) viewport minus padding, (c) available height scaled by
+     the SVG's own 380:745 aspect so tall SVG fits inside short
+     viewports. Fallback: .dc-thinker-screen has overflow-y:auto. */
+  .dc-thinker-screen #thinker-unlock-box {
     position: relative;
     z-index: 2;
-    width: min(320px, calc(100vw - 48px));
-    height: min(520px, calc(100vh - 240px));
-    max-height: 560px;
-    min-height: 440px;
-    perspective: 1200px;
-    -webkit-perspective: 1200px;
+    width: min(266px, calc(100vw - 48px), calc((100vh - 260px) * 380 / 745));
     flex-shrink: 0;
     background: transparent;
-    border: none;
-    /* opacity/transform/filter driven by JS */
+    /* opacity/transform driven by JS for arrival */
   }
-  .dc-thinker-screen .flip-card-inner {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    transform-style: preserve-3d;
-    -webkit-transform-style: preserve-3d;
-    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .dc-thinker-screen .flip-card.flipped .flip-card-inner {
-    transform: rotateY(180deg);
-  }
-  .dc-thinker-screen .flip-card-front,
-  .dc-thinker-screen .flip-card-back {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  /* Read more pill — shown on first-unlock only. Opens the pantheon
+     modal for the just-met thinker (bio + quote + full portrait).
+     Subtle: sits below the plate, doesn't compete with the main
+     CTAs (Next Dialogue / Back to Home) that live in .dc-actions. */
+  .dc-thinker-screen .dc-read-more-btn {
+    align-self: center;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
     background: transparent;
-    border: none !important;
-    box-shadow: none !important;
-    border-radius: 0;
+    color: var(--text-2);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.15s, color 0.15s;
   }
-  .dc-thinker-screen .flip-card-front {
-    /* background-image, size, position set inline by JS */
-    background-color: transparent;
+  .dc-thinker-screen .dc-read-more-btn:active {
+    background: var(--surface-2);
+    color: var(--text);
   }
-  .dc-thinker-screen .flip-card-back {
-    transform: rotateY(180deg);
-    padding: 32px 24px;
-    gap: 16px;
-    justify-content: center;
-    background: linear-gradient(160deg, rgba(255,255,255,0.85) 0%, rgba(254,240,138,0.2) 100%);
-  }
-  .dc-thinker-screen .thinker-unlock-name { display: none; }
   .dc-actions {
     flex-shrink: 0;
     display: flex;
@@ -9628,8 +9687,49 @@
     transition: transform 0.15s, background 0.15s;
   }
   .dc-actions .btn-back-home:active { transform: scale(0.97); background: var(--accent-glow); }
-  .dc-thinker-screen .flip-card-back-bio { font-size: 15px; line-height: 1.6; }
-  .dc-thinker-screen .flip-card-back-quote { font-size: 15px; line-height: 1.5; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.2); }
+  .dc-actions {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+    padding-bottom: max(8px, var(--safe-bottom));
+    opacity: 0;
+    transform: translateY(20px);
+    animation: dc-fade-up 0.5s ease-out 1.3s forwards;
+  }
+  .dc-actions .next-lesson-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 800;
+    background: var(--accent);
+    color: var(--on-accent);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: filter 0.15s;
+  }
+  .dc-actions .next-lesson-btn:active { filter: brightness(0.88); }
+  .dc-actions .btn-back-home {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 800;
+    background: transparent;
+    color: var(--accent-text);
+    border: 1.5px solid var(--accent);
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.15s, background 0.15s;
+  }
+  .dc-actions .btn-back-home:active { transform: scale(0.97); background: var(--accent-glow); }
   /* Animations */
   @keyframes dc-fade-in { to { opacity: 1; } }
   @keyframes dc-fade-down { to { opacity: 1; transform: translateY(0); } }
@@ -11881,24 +11981,46 @@
   <div class="dc-screen dc-thinker-screen" id="dc-thinker-screen" style="display:none">
     <div class="dc-thinker-title" id="dc-thinker-title"></div>
     <div class="dc-card-zone">
-      <div class="thinker-unlock flip-card" id="thinker-unlock-box" onclick="this.classList.toggle('flipped')">
-        <div class="flip-card-inner">
-          <div class="flip-card-front">
-            <div id="unlock-portrait"></div>
-            <div class="thinker-unlock-name" id="unlock-name"></div>
-          </div>
-          <div class="flip-card-back">
-            <div class="flip-card-back-bio" id="unlock-bio"></div>
-            <div class="flip-card-back-quote" id="unlock-quote"></div>
-          </div>
-        </div>
+      <!-- Reveal card (RevealCard component, rebuild per spec §5.1).
+           ONE SVG. viewBox in card units where the art is 300×537 at
+           (0,0). Layers, bottom to top:
+             1. rv-artWrap: the ONE <image>. Never re-rendered.
+             2. rv-layers: the current tier layer (frame + plate in
+                the same <g>). During Forge, becomes old-layer +
+                new-layer stacked.
+             3. rv-fx: fly / halo / ring / sparks / trace / shock /
+                banner. Cleared between animations.
+           Materials, geometry and state machine come from
+           thinker-frames-handoff/reveal/forge.html verbatim
+           (rv- prefix on class/keyframe/id names to avoid
+           collisions). Bio + quote live in the pantheon modal
+           (openThinkerModal), surfaced on first-unlock via the
+           Read more pill below. -->
+      <div id="thinker-unlock-box">
+        <svg id="rv-svg" viewBox="-40 -100 380 745" role="img" aria-label="Thinker card" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="rv-m-bronze" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7A4A22"/><stop offset=".45" stop-color="#C8894A"/><stop offset=".55" stop-color="#E0A86A"/><stop offset="1" stop-color="#8C5A2B"/></linearGradient>
+            <linearGradient id="rv-m-silver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8A9098"/><stop offset=".45" stop-color="#E8ECEF"/><stop offset=".52" stop-color="#FFFFFF"/><stop offset="1" stop-color="#9EA4AB"/></linearGradient>
+            <linearGradient id="rv-m-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A8841C"/><stop offset=".45" stop-color="#E3C868"/><stop offset=".52" stop-color="#F3DE8E"/><stop offset="1" stop-color="#C9A227"/></linearGradient>
+            <linearGradient id="rv-m-diamond" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E9DDF7"/><stop offset=".2" stop-color="#FFFFFF"/><stop offset=".38" stop-color="#C7B3EC"/><stop offset=".55" stop-color="#F6F0FF"/><stop offset=".72" stop-color="#A98BDB"/><stop offset=".88" stop-color="#D6ECF7"/><stop offset="1" stop-color="#FFFFFF"/></linearGradient>
+            <linearGradient id="rv-m-plain" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFCF6"/><stop offset="1" stop-color="#EFE6D6"/></linearGradient>
+            <linearGradient id="rv-m-subj" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--field)"/><stop offset="1" style="stop-color:var(--deep)"/></linearGradient>
+            <radialGradient id="rv-m-gem" cx=".35" cy=".3" r=".85"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".22" style="stop-color:var(--field)"/><stop offset=".7" style="stop-color:var(--deep)"/><stop offset="1" style="stop-color:var(--line)"/></radialGradient>
+            <radialGradient id="rv-m-halo"><stop offset="0" style="stop-color:var(--glow)"/><stop offset="1" style="stop-color:var(--glow);stop-opacity:0"/></radialGradient>
+            <filter id="rv-f-glow" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            <filter id="rv-f-plate" x="-10%" y="-30%" width="120%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#221A14" flood-opacity=".25"/></filter>
+            <filter id="rv-f-art" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#221A14" flood-opacity=".22"/></filter>
+            <clipPath id="rv-c-plain"><rect x="0" y="0" width="300" height="537" rx="14"/></clipPath>
+          </defs>
+          <g id="rv-artWrap" filter="url(#rv-f-art)"><image id="rv-art" href="" x="0" y="0" width="300" height="537" preserveAspectRatio="xMidYMid slice" clip-path="url(#rv-c-plain)"/></g>
+          <g id="rv-layers"></g>
+          <g id="rv-fx"></g>
+        </svg>
       </div>
-      <!-- Points plate — populated by showThinkerCardScreen with
-           renderThinkerPlate(thinker.id, state.subject). Static in
-           this commit; later commits animate the newly-earned socket
-           via the Fly keyframe and slot in the Forge transition when
-           a plate fills. See thinker-frames-handoff/THINKER_FRAMES_SPEC.md. -->
-      <div id="dc-thinker-plate" class="dc-thinker-plate" aria-live="polite"></div>
+      <!-- Read more pill — shown on first-unlock only (points === 1).
+           Opens the pantheon modal for the thinker (bio + quote +
+           full portrait). Wired in showThinkerCardScreen. -->
+      <button type="button" id="dc-read-more-btn" class="dc-read-more-btn" style="display:none"></button>
     </div>
     <div class="dc-actions">
       <button class="next-lesson-btn" id="modal-next-btn" style="display:none"></button>
@@ -20334,9 +20456,16 @@ window._debugThinkerPoints = function(thinkerId, n) {
 // and integers, so no injection surface. Subject + tier are drawn
 // from a fixed vocabulary and go through data-attributes with quoted
 // values — nothing to sanitise.
-function renderThinkerPlate(thinkerId, subject, filledOverride) {
+function renderThinkerPlate(thinkerId, subject, filledOverride, tierOverride) {
   const subj = subject || 'philosophy';
-  const tierIdx = thinkerTier(thinkerId);
+  // tierOverride lets the boundary reveal render the OLD tier's plate
+  // for the pre-Fly state (e.g. plain 2/3 at points=3), even though
+  // the derived tier is now the new one (bronze at points=3). Forge
+  // then transitions the plate from old-tier 3/3 to new-tier 0/3
+  // (or 3/3 for diamond). Clamped to [0, TIERS.length-1].
+  const tierIdx = (typeof tierOverride === 'number')
+    ? Math.max(0, Math.min(TIERS.length - 1, tierOverride))
+    : thinkerTier(thinkerId);
   const tier = TIERS[tierIdx];
   // filledOverride lets the reveal render the plate at its PRE-FLY
   // state (one fewer socket filled) so the fly lands into a real
@@ -20359,116 +20488,361 @@ function renderThinkerPlate(thinkerId, subject, filledOverride) {
 
 // ── Reveal Fly animation (commit 4 of thinker-frames work) ──
 // Decides whether the reveal should play a Fly for the just-earned
-// point. Returns { flies, k, delay, flipAt } so showThinkerCardScreen
-// can (a) fire the animation on the right socket, (b) defer the
-// auto-flip until after the gem lands.
+// point. Returns { flies, k, delay }.
 //
-// Fly plays for within-tier increments — points 1/2, 4/5, 7/8, 10/11.
-// Skips tier boundaries (3, 6, 9, 12): those transitions are Forge's
-// job (commit 5). Also skips at diamond capped (points >= 12) since
-// diamond stays 3/3.
+// Commit 5 broadened the range: Fly now plays for every point earned
+// in [1, 12], including boundaries (3, 6, 9, 12) where Forge follows
+// 200 ms after Fly lands. Skips only diamond-capped (points >= 13,
+// diamond stays 3/3) and suppressed boundaries (tier-seen flag set;
+// a re-cross via debug or state wipe shouldn't fake the moment).
 //
 // Timing: Fly fires 700 ms after showThinkerCardScreen runs — right
 // after the card's 600-ms opacity fade completes, so the gem rises
-// from a fully-visible portrait. The auto-flip shifts to 2 s (from
-// the default 1.5 s) so the gem lands and rests in its socket for
-// ~450 ms before the card flips to the bio side.
-function _shouldPlayThinkerCardFly(thinkerId) {
+// from a fully-visible portrait.
+function _shouldPlayThinkerCardFly(thinkerId, suppressForgeBoundary) {
   const points = thinkerPoints(thinkerId);
-  const withinTier = points > 0 && points < 12 && points % 3 !== 0;
-  if (!withinTier) return { flies: false, k: -1, delay: 0, flipAt: 1500 };
-  return { flies: true, k: (points - 1) % 3, delay: 700, flipAt: 2000 };
+  const isBoundary = points > 0 && points <= 12 && points % 3 === 0;
+  const withinRange = points > 0 && points <= 12;
+  if (!withinRange) return { flies: false, k: -1, delay: 0 };
+  if (isBoundary && suppressForgeBoundary) return { flies: false, k: -1, delay: 0 };
+  return { flies: true, k: (points - 1) % 3, delay: 700 };
+}
+
+// ── Reveal Forge animation (commit 5 of thinker-frames work) ──
+// Decides whether the reveal should play a Forge (tier promotion).
+// Returns { forges, oldTier, newTier, suppressed }.
+//
+// Forge fires at boundary points 3/6/9/12 (plain→bronze, bronze→
+// silver, silver→gold, gold→diamond). Once per (thinkerId, newTier)
+// in a lifetime — persisted in state.thinkerTierSeen. Suppression
+// is animation-only: whether the user "has" a tier is derived from
+// thinkerPoints via completedDays. A missing flag with points still
+// grants the frame (renderThinkerFrame reads the derived tier); a
+// flag with no points doesn't fake ownership.
+function _shouldPlayForge(thinkerId) {
+  const points = thinkerPoints(thinkerId);
+  const isBoundary = points === 3 || points === 6 || points === 9 || points === 12;
+  if (!isBoundary) return { forges: false, oldTier: -1, newTier: -1, suppressed: false };
+  const newTier = thinkerTier(thinkerId); // 1, 2, 3, or 4
+  const oldTier = newTier - 1;
+  const seenMap = (state.thinkerTierSeen && state.thinkerTierSeen[thinkerId]) || {};
+  const suppressed = !!seenMap[TIERS[newTier]];
+  if (suppressed) return { forges: false, oldTier, newTier, suppressed: true };
+  return { forges: true, oldTier, newTier, suppressed: false };
 }
 
 // Play the Fly animation for socket k. The plate must already be
-// rendered inside #dc-thinker-plate at its PRE-FLY state — socket
-// k in the "empty" position, all previously-earned sockets filled
-// (see showThinkerCardScreen — it calls renderThinkerPlate with a
-// filledOverride of currentFilled - 1). At the end of the fly
-// duration this function re-renders the plate at its true derived
-// state, so the socket flips empty → filled as the gem lands.
-function _playThinkerCardFly(thinkerId, subject, k) {
-  const zone = document.querySelector('#dc-thinker-screen .dc-card-zone');
-  const plate = document.getElementById('dc-thinker-plate');
+// rendered inside the currently-.on tier layer at its PRE-FLY
+// state (see showThinkerCardScreen — it calls _renderRevealCardInner
+// with filledOverride = currentFilled - 1). At the end of the fly
+// duration this function re-renders the on-layer's plate at its
+// landing state, so the socket flips empty → filled as the gem lands.
+//
+// renderTier: the tier at which the plate is currently rendered.
+// At non-boundary points this is thinkerTier(thinkerId); at
+// boundaries (points 3/6/9/12) it's the OLD tier so the gem lands
+// into the old tier's socket 2, and Forge follows 380 ms later.
+//
+// landPlate: { tier, filled } — override the plate re-render at
+// fly end. At boundaries this stays at OLD tier 3/3 (waiting for
+// Forge to transition). At non-boundaries it's the final state.
+// ── RevealCard (rebuild per spec §5.1) ──
+// Ported verbatim from thinker-frames-handoff/reveal/forge.html
+// with rv- prefix on identifiers. Materials + geometry + timings
+// are the reference's constants; builders (plate/frame/layer/
+// tracePath) match line-for-line. The demo's `read()` state
+// machine is NOT ported — showThinkerCardScreen drives fly() and
+// forge() directly, using the _finalTier/_finalFilled snapshot.
+
+const _RV_MAT = {
+  plain:  {fill:'url(#rv-m-plain)',  edge:'var(--line)', recess:'#D3C8B6', gem:'url(#rv-m-subj)',   glow:'var(--glow)',           ink:'var(--line)'},
+  bronze: {fill:'url(#rv-m-bronze)', edge:'#3E220C',     recess:'#4A2A10', gem:'url(#rv-m-bronze)', glow:'rgba(232,178,116,.95)', ink:'#2A1406'},
+  silver: {fill:'url(#rv-m-silver)', edge:'#4A5058',     recess:'#5A6068', gem:'url(#rv-m-silver)', glow:'rgba(240,246,252,.95)', ink:'#23282E'},
+  gold:   {fill:'url(#rv-m-gold)',   edge:'#5E4608',     recess:'#6E5410', gem:'url(#rv-m-gold)',   glow:'rgba(246,222,132,.95)', ink:'#3A2C04'},
+  diamond:{fill:'url(#rv-m-diamond)',edge:'#5B4A8A',     recess:'#4A3A78', gem:'url(#rv-m-diamond)',glow:'rgba(206,186,242,.95)', ink:'#2E1F5A'}
+};
+
+const _RV_G = {
+  art:      {x:0,    y:0,    w:300, h:537, cx:150, cy:268},
+  frameImg: {x:-40,  y:-50,  w:380, h:630},
+  goldGem:  {cx:150, cy:-16, rx:8,  ry:6},
+  plate:    {x:21.5, y:591,  w:257, h:40,  r:20},
+  socket:   {size:20, y:611, x:[86, 150, 214]},
+  trace:    {x:-14,  y:-14,  w:328, h:565, chamfer:12},
+  shock:    {x:-24,  y:-24,  w:348, h:585, r:14},
+  banner:   {cx:150, y:-92,  w:190, h:32}
+};
+
+const _RV_T = { fly: 850, forgeDelay: 200, forge: 2200, banner: 2600 };
+
+// Read --rv-slow from :root. Multiplies every rv- setTimeout duration
+// so JS-scheduled events stay in phase with the CSS animations
+// (which are `calc(<t>s * var(--rv-slow))`). Production: 1. Inspect
+// at 1/4 speed: document.documentElement.style.setProperty('--rv-slow', 4).
+const _rvSlow = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--rv-slow')) || 1;
+
+const _RV_FRAME_PNGS = {
+  bronze:  'images/thinker-frames/reveal/reveal_bronze.png',
+  silver:  'images/thinker-frames/reveal/reveal_silver.png',
+  gold:    'images/thinker-frames/reveal/reveal_gold.png',
+  diamond: 'images/thinker-frames/reveal/reveal_diamond.png',
+};
+
+const _rvSq = (cx, cy, s, fill, edge, extra = '') =>
+  `<rect x="${cx - s/2}" y="${cy - s/2}" width="${s}" height="${s}" transform="rotate(45 ${cx} ${cy})" fill="${fill}" stroke="${edge}" stroke-width="1.4" ${extra}/>`;
+
+function _rvPlate(tierName, filled) {
+  const m = _RV_MAT[tierName], p = _RV_G.plate, s = _RV_G.socket;
+  let h = `<rect x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="${p.r}" fill="${m.fill}" stroke="${m.edge}" stroke-width="1.4" filter="url(#rv-f-plate)"/>`;
+  h += `<rect x="${p.x+3}" y="${p.y+2}" width="${p.w-6}" height="${p.h/2-2}" rx="${p.r-3}" fill="#FFFFFF" opacity=".28"/>`;
+  s.x.forEach((x, k) => {
+    h += k < filled
+      ? _rvSq(x, s.y, s.size, m.gem, m.edge) + `<path d="M${x} ${s.y-12} L${x+12} ${s.y} L${x} ${s.y}Z" fill="#FFFFFF" opacity=".45"/>`
+      : _rvSq(x, s.y, s.size, m.recess, m.edge, 'opacity=".95"');
+  });
+  return `<g class="rv-plate">${h}</g>`;
+}
+
+function _rvFrame(tierName) {
+  if (tierName === 'plain') return '';
+  const f = _RV_G.frameImg;
+  let h = `<image href="${_RV_FRAME_PNGS[tierName]}" x="${f.x}" y="${f.y}" width="${f.w}" height="${f.h}"/>`;
+  if (tierName === 'gold') {
+    const g = _RV_G.goldGem;
+    h += `<ellipse cx="${g.cx}" cy="${g.cy}" rx="${g.rx}" ry="${g.ry}" fill="url(#rv-m-gem)" stroke="var(--line)" stroke-width=".8"/>`;
+    h += `<ellipse cx="${g.cx-2.6}" cy="${g.cy-2.2}" rx="2.4" ry="1.5" fill="#FFFFFF" opacity=".85"/>`;
+  }
+  return `<g class="rv-frame">${h}</g>`;
+}
+
+const _rvLayer = (tierName, filled, cls) =>
+  `<g class="rv-layer ${cls || ''}" data-tier="${tierName}">${_rvFrame(tierName)}${_rvPlate(tierName, filled)}</g>`;
+
+function _rvTracePath(tierName) {
+  const t = _RV_G.trace, c = tierName === 'diamond' ? t.chamfer : 0;
+  const x0 = t.x, y0 = t.y, x1 = t.x + t.w, y1 = t.y + t.h;
+  return c
+    ? `M${x0+c} ${y0}H${x1-c}L${x1} ${y0+c}V${y1-c}L${x1-c} ${y1}H${x0+c}L${x0} ${y1-c}V${y0+c}Z`
+    : `M${x0} ${y0}H${x1}V${y1}H${x0}Z`;
+}
+
+// Set subject-colour vars on the card so the SVG gradients + gem
+// resolve. Called on every paint/forge/fly since they may reset.
+function _rvSetSubjectVars(subject) {
+  const S = {
+    philosophy: {field:'#D8B4E4', deep:'#8460B4', line:'#3D144E', glow:'rgba(216,180,228,.95)'},
+    economics:  {field:'#84A8E4', deep:'#243060', line:'#0F1A46', glow:'rgba(160,190,240,.95)'},
+    psychology: {field:'#F0B484', deep:'#784830', line:'#4D2211', glow:'rgba(240,180,132,.95)'},
+  }[subject] || {field:'#D8B4E4', deep:'#8460B4', line:'#3D144E', glow:'rgba(216,180,228,.95)'};
   const card = document.getElementById('thinker-unlock-box');
-  if (!zone || !plate || !card) return;
-  const socket = plate.querySelectorAll('.thinker-plate-socket')[k];
-  if (!socket) return;
+  if (!card) return;
+  card.style.setProperty('--field', S.field);
+  card.style.setProperty('--deep',  S.deep);
+  card.style.setProperty('--line',  S.line);
+  card.style.setProperty('--glow',  S.glow);
+}
 
-  // Position math — read live rects so we don't have to know the
-  // CSS scale. Overlay is positioned at the socket centre inside
-  // .dc-card-zone (which is position: relative). Elements inside
-  // the overlay offset by their own half-size so they render
-  // centred on (0, 0), matching the reference's socket-anchored
-  // coord system.
-  const sr = socket.getBoundingClientRect();
-  const cr = card.getBoundingClientRect();
-  const zr = zone.getBoundingClientRect();
-  const socketCx = sr.left + sr.width / 2 - zr.left;
-  const socketCy = sr.top  + sr.height / 2 - zr.top;
-  const portraitCx = cr.left + cr.width / 2 - zr.left;
-  const portraitCy = cr.top  + cr.height / 2 - zr.top;
-  const dx = portraitCx - socketCx;
-  const dy = portraitCy - socketCy;
+// Bilingual "FORGED IN X" banner copy (Hebrew agreed with Omer:
+// gender-neutral, no em-dash).
+function _rvBannerText(tierName, isEn) {
+  const en = { bronze:'FORGED IN BRONZE', silver:'FORGED IN SILVER', gold:'FORGED IN GOLD', diamond:'FORGED IN DIAMOND' };
+  const he = { bronze:'משובץ ארד',        silver:'משובץ כסף',        gold:'משובץ זהב',       diamond:'משובץ יהלום' };
+  return (isEn ? en : he)[tierName] || '';
+}
 
-  // Tier material for the gem + glow. Plain tier scopes to the
-  // subject family; metal tiers use the plate tokens.
-  const tierIdx = thinkerTier(thinkerId);
-  const tier = TIERS[tierIdx];
+// Paint the reveal card at the given tier + filled state. Sets the
+// art href, the plain clip-path, and #rv-layers to the current tier
+// layer. Idempotent — safe to call repeatedly. Called on reveal open
+// (with the pre-fly state at a boundary, current state otherwise)
+// and by the skip handler (with the final snapshotted state).
+function _renderRevealCardInner(thinker, subject, tierOverride, filledOverride) {
+  const art = document.getElementById('rv-art');
+  const layers = document.getElementById('rv-layers');
+  if (!art || !layers) return;
   const subj = subject || 'philosophy';
-  const flyBg = tierIdx === 0
-    ? `linear-gradient(135deg, var(--frame-${subj}-field), var(--frame-${subj}-deep))`
-    : `var(--plate-${tier}-bg)`;
-  const flyEdge = tierIdx === 0
-    ? `var(--frame-${subj}-line)`
-    : `var(--plate-${tier}-edge)`;
-  const flyGlow = tierIdx === 0
-    ? `var(--frame-${subj}-glow)`
-    : `var(--plate-${tier}-glow)`;
+  const unlockImg = _thinkerImage(thinker, subj);
+  const tierIdx = (typeof tierOverride === 'number')
+    ? Math.max(0, Math.min(TIERS.length - 1, tierOverride))
+    : thinkerTier(thinker.id);
+  const tierName = TIERS[tierIdx];
+  const filled = (typeof filledOverride === 'number')
+    ? Math.max(0, Math.min(POINTS_PER_TIER, filledOverride))
+    : thinkerPlateFilled(thinker.id);
 
-  const overlay = document.createElement('div');
-  overlay.className = 'dc-fly-overlay';
-  overlay.style.left = socketCx + 'px';
-  overlay.style.top  = socketCy + 'px';
-  overlay.style.setProperty('--fly-bg',   flyBg);
-  overlay.style.setProperty('--fly-edge', flyEdge);
-  overlay.style.setProperty('--fly-glow', flyGlow);
-  overlay.style.setProperty('--dx', dx + 'px');
-  overlay.style.setProperty('--dy', dy + 'px');
-  // Sparks fan out at 8 rotations spaced 45° apart. --a per spark.
-  const sparkAngles = [0, 45, 90, 135, 180, 225, 270, 315];
-  overlay.innerHTML =
-    '<div class="dc-fly-halo"></div>'
-    + '<div class="dc-fly-ring"></div>'
-    + sparkAngles.map(a => `<div class="dc-fly-spark" style="--a: ${a}deg"></div>`).join('')
-    + '<div class="dc-fly-gem"></div>';
-  zone.appendChild(overlay);
+  _rvSetSubjectVars(subj);
+  if (unlockImg) {
+    art.setAttribute('href', unlockImg);
+    art.setAttribute('xlink:href', unlockImg); // WebKit fallback
+  } else {
+    art.removeAttribute('href');
+    art.removeAttribute('xlink:href');
+  }
+  // Plain gets a rounded clip; framed tiers show square corners
+  // (the frame's own inner lining takes over the corner shape).
+  art.setAttribute('clip-path', tierIdx === 0 ? 'url(#rv-c-plain)' : '');
+  layers.innerHTML = _rvLayer(tierName, filled);
+}
 
-  // Land the gem in the socket + fire a light haptic tick right as
-  // the animation ends (matches spec §5 "haptic tick on the gem
-  // landing (light)"). Capacitor haptics import lives on window
-  // via corpus-review or the standard @capacitor/haptics wrapper;
-  // guarded so the try/catch swallows the missing case on web.
-  //
-  // Safety net: re-render the plate at its true derived state
-  // rather than mutating the specific socket's classList. This
-  // is idempotent (on the happy path, plate goes from N-1 filled
-  // to N filled — same as a classList swap would achieve) but
-  // bulletproof against a stale socket reference, a mid-fly DOM
-  // reflow, or any inconsistency introduced upstream. If the fly
-  // itself failed to render, the plate still ends in the correct
-  // state at the end of the fly's duration.
-  const FLY_MS = 850;
-  setTimeout(() => {
-    const _plateEnd = document.getElementById('dc-thinker-plate');
-    if (_plateEnd) _plateEnd.innerHTML = renderThinkerPlate(thinkerId, subject);
-    overlay.remove();
+// Fly (spec §5.2). Render the current layer with socket k empty,
+// then the gem animates from the art centre into socket k. At 0.85 s
+// the layer is re-rendered with socket k filled and the effects are
+// removed. `renderTier` is the tier at which the fly plays (equals
+// thinker's tier for non-boundary, OLD tier for boundary). landPlate
+// { tier, filled } overrides the final state (at boundary the plate
+// stays at OLD-tier 3/3 waiting for Forge; otherwise it's the final
+// captured state).
+function _playThinkerCardFly(thinkerId, subject, k, renderTier, landPlate) {
+  const layers = document.getElementById('rv-layers');
+  const fx = document.getElementById('rv-fx');
+  if (!layers || !fx) return;
+  fx._rvSkipped = false;
+  const subj = subject || 'philosophy';
+  const tierIdx = (typeof renderTier === 'number') ? renderTier : thinkerTier(thinkerId);
+  const tierName = TIERS[tierIdx];
+  const m = _RV_MAT[tierName];
+  const sx = _RV_G.socket.x[k];
+  const sy = _RV_G.socket.y;
+  const s  = _RV_G.socket.size;
+  const dx = _RV_G.art.cx - sx;
+  const dy = _RV_G.art.cy - sy;
+
+  _rvSetSubjectVars(subj);
+
+  // Layer with socket k empty (filled = k, so sockets 0..k-1 are
+  // filled and socket k is empty).
+  layers.innerHTML = _rvLayer(tierName, k);
+
+  // Effects (halo + gem + ring + 8 sparks) — verbatim from reference.
+  let h = `<circle class="rv-halo rv-fx-origin" cx="${sx}" cy="${sy}" r="30" fill="url(#rv-m-halo)" style="--glow:${m.glow}"/>`;
+  h += `<rect class="rv-gem-fly rv-fx-origin" x="${sx - s/2}" y="${sy - s/2}" width="${s}" height="${s}" fill="${m.gem}" stroke="${m.edge}" stroke-width="1.4" style="--dx:${dx}px;--dy:${dy}px;filter:drop-shadow(0 0 6px ${m.glow})"/>`;
+  h += `<circle class="rv-ring rv-fx-origin" cx="${sx}" cy="${sy}" r="16" fill="none" stroke="${m.glow}" stroke-width="3"/>`;
+  [0,45,90,135,180,225,270,315].forEach(a => {
+    h += `<circle class="rv-spark rv-fx-origin" cx="${sx}" cy="${sy}" r="2.6" fill="#FFFFFF" style="--a:${a}deg"/>`;
+  });
+  fx.innerHTML = h;
+
+  // At 0.85 s: fill the socket, clear the effects, LIGHT haptic.
+  // Skip check: if fx was cleared by _rvSkipAll before this fires,
+  // don't touch anything. Scaled by --rv-slow so slow-motion
+  // inspection stays in phase with the CSS animations.
+  const _slow = _rvSlow();
+  const _landT = setTimeout(() => {
+    if (fx._rvSkipped) return;
+    const landTierIdx = landPlate ? landPlate.tier : tierIdx;
+    const landFilled  = landPlate ? landPlate.filled : thinkerPlateFilled(thinkerId);
+    layers.innerHTML = _rvLayer(TIERS[landTierIdx], landFilled);
+    fx.innerHTML = '';
     try {
       if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics) {
         window.Capacitor.Plugins.Haptics.impact({ style: 'LIGHT' });
       }
-    } catch (e) {}
-  }, FLY_MS + 20);
+    } catch(e) {}
+  }, _RV_T.fly * _slow);
+
+  // Expose timers to the skip handler for cancellation.
+  fx._rvFlyTimers = [_landT];
+}
+
+// Forge (spec §5.3). Called T.forgeDelay after Fly lands. Stacks
+// two layers (old+new) inside #rv-layers, animates the one art
+// with a filter (no second copy), and plays trace + shock + banner
+// as effects. At 2.2 s the old layer is removed, at 2.6 s the fx
+// are cleared.
+function _playThinkerCardForge(thinker, subject, oldTier, newTier, newFilled) {
+  const layers = document.getElementById('rv-layers');
+  const fx = document.getElementById('rv-fx');
+  const art = document.getElementById('rv-art');
+  if (!layers || !fx || !art) return;
+  fx._rvSkipped = false;
+  const subj = subject || 'philosophy';
+  const oldTierName = TIERS[oldTier];
+  const newTierName = TIERS[newTier];
+  const m = _RV_MAT[newTierName];
+  const isEn = state.lang === 'en';
+
+  _rvSetSubjectVars(subj);
+
+  // Two layers stacked: old at 3/3 with rv-old-forge, new at
+  // newFilled with rv-new-forge. Because frame + plate are inside
+  // the same <g>, they change on the same keyframe.
+  layers.innerHTML = _rvLayer(oldTierName, 3, 'rv-old-forge') + _rvLayer(newTierName, newFilled, 'rv-new-forge');
+
+  // Art gets the art-forge filter animation. Force a reflow to
+  // restart the animation cleanly if this fires twice in a row.
+  art.classList.remove('rv-art-forge');
+  void art.getBBox();
+  art.classList.add('rv-art-forge');
+
+  // Plain clip-path leaves at 70% so its rounded corners go under
+  // the new frame's cover. All setTimeouts scale with --rv-slow
+  // to stay in phase with the CSS animations.
+  const _slow = _rvSlow();
+  const _plainClipT = setTimeout(() => art.setAttribute('clip-path', ''), _RV_T.forge * 0.7 * _slow);
+
+  // Effects: trace on the new frame's outline, shock ring, banner
+  // above the crest.
+  const s = _RV_G.shock;
+  const b = _RV_G.banner;
+  const bannerText = _rvBannerText(newTierName, isEn);
+  fx.innerHTML =
+      `<path class="rv-trace" d="${_rvTracePath(newTierName)}" pathLength="1000" fill="none" stroke="${m.glow}" stroke-width="6" stroke-linejoin="round" filter="url(#rv-f-glow)"/>`
+    + `<g class="rv-shock rv-fx-origin">`
+      + `<rect x="${s.x}" y="${s.y}" width="${s.w}" height="${s.h}" rx="${s.r}" fill="none" stroke="${m.glow}" stroke-width="16" opacity=".3"/>`
+      + `<rect x="${s.x}" y="${s.y}" width="${s.w}" height="${s.h}" rx="${s.r}" fill="none" stroke="${m.glow}" stroke-width="5"/>`
+    + `</g>`
+    + `<g class="rv-banner">`
+      + `<rect x="${b.cx - b.w/2}" y="${b.y}" width="${b.w}" height="${b.h}" rx="4" fill="${m.fill}" stroke="${m.edge}" stroke-width="1.2"/>`
+      + `<text x="${b.cx}" y="${b.y + b.h/2 + 6}" text-anchor="middle" font-family="Frank Ruhl Libre, Georgia, serif" font-size="17" font-weight="700" letter-spacing="3" fill="${m.ink}">${bannerText}</text>`
+    + `</g>`;
+
+  // Diagnostic (temporary — remove after phase 3 verification).
+  try {
+    console.log('[rv-forge]', { subject: subj, oldTier: oldTierName, newTier: newTierName, newFilled: newFilled });
+  } catch(e) {}
+
+  // Haptic MEDIUM at the shock peak (~74% of 2.2 s = 1628 ms).
+  const _hapticT = setTimeout(() => {
+    if (fx._rvSkipped) return;
+    try {
+      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics) {
+        window.Capacitor.Plugins.Haptics.impact({ style: 'MEDIUM' });
+      }
+    } catch(e) {}
+  }, Math.round(_RV_T.forge * 0.74 * _slow));
+
+  // At 2.2 s: remove old layer, remove art filter (settle to
+  // "new tier only").
+  const _forgeEndT = setTimeout(() => {
+    if (fx._rvSkipped) return;
+    layers.innerHTML = _rvLayer(newTierName, newFilled);
+    art.classList.remove('rv-art-forge');
+  }, _RV_T.forge * _slow);
+
+  // At 2.6 s: clear effects.
+  const _bannerEndT = setTimeout(() => {
+    if (fx._rvSkipped) return;
+    fx.innerHTML = '';
+  }, _RV_T.banner * _slow);
+
+  fx._rvForgeTimers = [_plainClipT, _hapticT, _forgeEndT, _bannerEndT];
+}
+
+// Clear every rv- animation timer and effect. Called by the skip
+// handler in showThinkerCardScreen. After this returns, no haptic,
+// sound or timer may fire — the caller (skip) then paints the
+// final state via _renderRevealCardInner.
+function _rvSkipAll() {
+  const fx = document.getElementById('rv-fx');
+  const art = document.getElementById('rv-art');
+  if (fx) {
+    fx._rvSkipped = true;
+    if (fx._rvFlyTimers)   fx._rvFlyTimers.forEach(t => clearTimeout(t));
+    if (fx._rvForgeTimers) fx._rvForgeTimers.forEach(t => clearTimeout(t));
+    fx._rvFlyTimers = null;
+    fx._rvForgeTimers = null;
+    fx.innerHTML = '';
+  }
+  if (art) art.classList.remove('rv-art-forge');
 }
 
 // ── Framed-card renderer (commit 3 of thinker-frames work) ──
@@ -20486,8 +20860,14 @@ function _playThinkerCardFly(thinkerId, subject, k) {
 // Positioning constants match the CSS above (17.39%, 15.96% etc);
 // changing one requires changing the other. See the .thinker-frame
 // block comment for the coordinate arithmetic.
-function renderThinkerFrame(thinkerId, subject, portraitUrl, variant) {
-  const tierIdx = thinkerTier(thinkerId);
+function renderThinkerFrame(thinkerId, subject, portraitUrl, variant, tierOverride) {
+  // tierOverride lets the boundary reveal render the OLD tier's frame
+  // for the pre-Fly state (e.g. no frame at points=3, since the OLD
+  // tier there is plain). Forge then transitions to the new frame.
+  // Same clamping as renderThinkerPlate.
+  const tierIdx = (typeof tierOverride === 'number')
+    ? Math.max(0, Math.min(TIERS.length - 1, tierOverride))
+    : thinkerTier(thinkerId);
   const tier = TIERS[tierIdx];
   if (tier === 'plain') return null;
   const subj = subject || 'philosophy';
@@ -20518,6 +20898,14 @@ function defaultState() {
     correctInRow: 0,
     completedDays: {}, // { "1-1": true }
     unlockedThinkers: [],
+    // thinkerTierSeen: { [thinkerId]: { bronze: true, silver: true, ... } }
+    // Set at Forge time (commit 5 of thinker-frames work) so a re-cross of
+    // the same boundary — only reachable via _debugThinkerPoints or a full
+    // state wipe — doesn't re-fire the animation. Suppression is animation-
+    // only: whether a user "has" a tier is derived from thinkerPoints via
+    // completedDays, so a missing flag with points intact still gives the
+    // user their frame; a flag with points missing doesn't grant one.
+    thinkerTierSeen: {},
     lang: 'en',
     currentScreen: 'home',
     currentWeek: null,
@@ -24840,104 +25228,95 @@ function _showDcStats(titleText, subtitleText, xpAmount, streakCount, onContinue
 function showThinkerCardScreen(thinker, chapter, day) {
   const isEn = state.lang === 'en';
   const card = document.getElementById('thinker-unlock-box');
-
-  // Populate thinker data
-  const portrait = document.getElementById('unlock-portrait');
-  const front = card.querySelector('.flip-card-front');
-  // End-of-dialogue unlock reveal. The user just completed a
-  // dialogue in state.subject, so that's the correct portrait
-  // context for a multi-subject thinker.
-  const _unlockImg = _thinkerImage(thinker, state.subject);
-  // If the user has earned a frame (bronze+), swap the front's
-  // portrait-as-background rendering for the three-layer framed
-  // structure. Plain tier keeps the existing background-image path
-  // — no frame is what plain means.
-  const _revealFrameHtml = renderThinkerFrame(thinker.id, state.subject, _unlockImg);
-  if (_revealFrameHtml) {
-    front.style.backgroundImage = '';
-    front.style.backgroundColor = 'transparent';
-    portrait.innerHTML = _revealFrameHtml;
-  } else if (_unlockImg) {
-    front.style.backgroundImage = `url("${_unlockImg}")`;
-    front.style.backgroundSize = 'contain';
-    front.style.backgroundPosition = 'center';
-    front.style.backgroundRepeat = 'no-repeat';
-    front.style.backgroundColor = 'transparent';
-    portrait.innerHTML = '';
+  const subj = state.subject;
+  const _points = thinkerPoints(thinker.id);
+  // Snapshot the target end-state at reveal open. All downstream
+  // renders (Forge end handler, skip handler, Fly's plate re-render)
+  // must reach this same state regardless of what thinkerPoints
+  // returns later — a state mutation mid-animation (debug clear,
+  // test reset, whatever) would otherwise strand the card in the
+  // wrong tier. See end-handler bug diagnosis for the full story.
+  const _finalTier = thinkerTier(thinker.id);
+  const _finalFilled = thinkerPlateFilled(thinker.id);
+  // Commit 5: reveal orchestration for boundary (Forge) and non-
+  // boundary (Fly-only) points. _forge is checked first so _fly can
+  // suppress at a boundary where the tier has already been seen.
+  const _forge = _shouldPlayForge(thinker.id);
+  const _fly = _shouldPlayThinkerCardFly(thinker.id, _forge.suppressed);
+  // Pre-fly render state (tier + filled).
+  //  - Boundary Forge: render OLD tier with 2 filled (fly into socket 2).
+  //  - Non-boundary Fly: current tier with N-1 filled.
+  //  - No animation (diamond capped, suppressed boundary): derived state.
+  let _renderTier, _renderFilled;
+  if (_forge.forges) {
+    _renderTier = _forge.oldTier;
+    _renderFilled = 2;
+  } else if (_fly.flies) {
+    _renderTier = thinkerTier(thinker.id);
+    _renderFilled = Math.max(0, thinkerPlateFilled(thinker.id) - 1);
   } else {
-    front.style.backgroundImage = '';
-    portrait.innerHTML = `<div class="unlock-portrait-emoji">${thinker.emoji}</div>`;
+    _renderTier = thinkerTier(thinker.id);
+    _renderFilled = thinkerPlateFilled(thinker.id);
   }
-  document.getElementById('unlock-name').textContent = thinker.name;
-  document.getElementById('unlock-bio').textContent = thinker.bio || '';
-  document.getElementById('unlock-quote').textContent =
-    (isEn ? (thinker.quoteEn || thinker.quote) : thinker.quote) || '';
-  document.getElementById('thinker-unlock-box').classList.remove('flipped');
-  // Points plate — thinker points count reflects the completion that
-  // just finished (finishDay writes state.completedDays[key] = true
-  // before the celebration chain starts, so the derived count here
-  // is already up to date). Subject drawn from state.subject (the
-  // reveal fires in the context of the just-completed dialogue's
-  // subject; matches the portrait rendered via _thinkerImage above).
-  const _plateEl = document.getElementById('dc-thinker-plate');
-  // Fly animation (commit 4 of thinker-frames work). Within-tier
-  // increments — points 1/2, 4/5, 7/8, 10/11 — animate a gem rising
-  // from the portrait and landing in the new socket. Tier boundaries
-  // and diamond-cap are skipped (Forge in commit 5 will own those).
-  //
-  // Render the plate at its PRE-FLY state directly (one fewer filled
-  // socket) so the fly lands into a real empty socket. Previously
-  // this used a "render at post-state, then classList-swap one
-  // socket to empty" pattern which was fragile — a mid-render
-  // reflow or a stale reference could leave the plate in a half-
-  // state. Now the pre-fly HTML matches exactly what the fly needs.
-  const _fly = _shouldPlayThinkerCardFly(thinker.id);
-  const _filledNow = thinkerPlateFilled(thinker.id);
-  const _preFlyFilled = _fly.flies ? Math.max(0, _filledNow - 1) : _filledNow;
-  if (_plateEl) _plateEl.innerHTML = renderThinkerPlate(thinker.id, state.subject, _preFlyFilled);
-  // Diagnostic: capture the actual DOM state at reveal time so a
-  // future report of "empty plate + no fly" can be diagnosed from
-  // the log rather than by reverse-engineering. Cheap; runs once
-  // per reveal; keep until the Fly feature has enough production
-  // reps to be considered stable.
+
+  // Card content at pre-fly tier + filled. Art, frame layer, plate
+  // holder, tier class, and framed flag all go through
+  // _renderRevealCardInner in one call. Per Option A: the plate
+  // lives inside the tier layer, so this call sets the whole visual
+  // state including the plate.
+  _renderRevealCardInner(thinker, subj, _renderTier, _renderFilled);
+  // Clear any stray flash / fly overlays from a prior reveal that
+  // didn't reach its end (paranoid — normal exit removes these).
+  // Paranoid cleanup — a prior reveal that didn't reach its end
+  // leaves rv-fx populated; _rvSkipAll clears timers + effects.
+  _rvSkipAll();
+
+  // Diagnostic: kept from commit 4 for the Fly path; now also logs
+  // the Forge decision. Cheap; runs once per reveal.
   try {
     console.log('[reveal]', {
-      thinkerId: thinker.id,
-      subject: state.subject,
-      points: thinkerPoints(thinker.id),
-      filledNow: _filledNow,
-      preFlyFilled: _preFlyFilled,
-      fly: _fly,
-      plateHtml: _plateEl ? _plateEl.innerHTML : '(no plate)',
+      thinkerId: thinker.id, subject: subj, points: _points,
+      renderTier: _renderTier, renderFilled: _renderFilled,
+      fly: _fly, forge: _forge,
     });
   } catch(e) {}
-  if (_fly.flies) {
-    setTimeout(() => _playThinkerCardFly(thinker.id, state.subject, _fly.k), _fly.delay);
-  }
-  // Title: first unlock (points === 1) keeps its original "new
-  // thinker" copy. Repeats within a tier name the tier the user is
-  // working toward — bronze/silver/gold/diamond — since the frame
-  // system is otherwise silent about that goal until Forge lands.
-  // Diamond-capped (points >= 13) drops to the bare tier name; the
-  // diamond plate speaks for itself. Boundaries (3, 6, 9, 12) don't
-  // reach here — finishDay gates them out for Forge (commit 5).
-  const _points = thinkerPoints(thinker.id);
-  let _titleEn, _titleHe;
-  if (_points === 1) {
-    _titleEn = 'A new thinker joins the pantheon';
-    _titleHe = 'הוגה חדש מצטרף לפנתאון';
-  } else if (_points === 2) {
-    _titleEn = 'On the way to bronze';   _titleHe = 'בדרך לארד';
-  } else if (_points === 4 || _points === 5) {
-    _titleEn = 'On the way to silver';   _titleHe = 'בדרך לכסף';
-  } else if (_points === 7 || _points === 8) {
-    _titleEn = 'On the way to gold';     _titleHe = 'בדרך לזהב';
-  } else if (_points === 10 || _points === 11) {
-    _titleEn = 'On the way to diamond';  _titleHe = 'בדרך ליהלום';
-  } else {
-    _titleEn = 'Diamond';                _titleHe = 'יהלום';
+
+  // Title copy — blanked during Forge (banner "FORGED IN X" carries
+  // the moment; competing eyebrow text distracts). All other cases
+  // use the commit-4 tier-goal copy.
+  let _titleEn = '', _titleHe = '';
+  if (!_forge.forges) {
+    if (_points === 1) {
+      _titleEn = 'A new thinker joins the pantheon';
+      _titleHe = 'הוגה חדש מצטרף לפנתאון';
+    } else if (_points === 2) {
+      _titleEn = 'On the way to bronze';   _titleHe = 'בדרך לארד';
+    } else if (_points === 4 || _points === 5) {
+      _titleEn = 'On the way to silver';   _titleHe = 'בדרך לכסף';
+    } else if (_points === 7 || _points === 8) {
+      _titleEn = 'On the way to gold';     _titleHe = 'בדרך לזהב';
+    } else if (_points === 10 || _points === 11) {
+      _titleEn = 'On the way to diamond';  _titleHe = 'בדרך ליהלום';
+    } else {
+      _titleEn = 'Diamond';                _titleHe = 'יהלום';
+    }
   }
   document.getElementById('dc-thinker-title').textContent = isEn ? _titleEn : _titleHe;
+  // Read more pill: first-unlock only. Meeting a thinker earns the
+  // bio moment; on repeats + boundaries the frame + Forge are the
+  // moment, and a pill would compete with them. Opens the pantheon
+  // modal, which holds bio + quote + full portrait + share.
+  const readMoreBtn = document.getElementById('dc-read-more-btn');
+  if (readMoreBtn) {
+    if (_points === 1) {
+      readMoreBtn.textContent = isEn ? 'Read more' : 'קראו עוד';
+      readMoreBtn.onclick = () => { try { openThinkerModal(thinker.id); } catch(e) {} };
+      readMoreBtn.style.display = '';
+    } else {
+      readMoreBtn.style.display = 'none';
+      readMoreBtn.onclick = null;
+    }
+  }
   // Share-thinker button label (bilingual). The onclick is bound in HTML
   // and reads state.currentWeek/Day to resolve the thinker at tap time.
   const shareBtnLabel = document.getElementById('dc-share-thinker-btn-label');
@@ -24987,17 +25366,92 @@ function showThinkerCardScreen(thinker, chapter, day) {
     card.style.opacity = '1';
     card.style.transform = 'scale(1) translateY(0)';
   }, 50);
-  // Auto-flip after arrival settles. Only on first unlock — repeats
-  // keep the front face visible so the plate + landed gem stays as
-  // the last thing the user sees. Tap-to-flip still works via the
-  // onclick on #thinker-unlock-box. On first unlock _fly.flipAt is
-  // 2 s (Fly plays at point 1, giving the gem ~450 ms to rest in
-  // the socket before the flip).
-  if (_points === 1) {
-    setTimeout(() => {
-      document.getElementById('thinker-unlock-box').classList.add('flipped');
-    }, _fly.flipAt);
+
+  // ── Animation orchestration ────────────────────────────────────
+  // Timeline:
+  //   0 ms      : card arrival begins (fade + spring, 900 ms transform)
+  //   700 ms    : Fly starts (gem rises from portrait)
+  //   1550 ms   : Fly lands (700 + 850)
+  //   1930 ms   : Forge starts if boundary (Fly lands + 380 gap, spec §12)
+  //   2830 ms   : Forge flash + layer cross-fade ends (1930 + 900)
+  //
+  // Total reveal duration ≈ 2.83 s at boundaries; ≈ 1.55 s at
+  // within-tier points; instant when suppressed or diamond-capped.
+  //
+  // Tap-to-skip: any tap on the card during the animation snaps
+  // straight to the end state (art + on-layer at derived tier).
+  // No transition — a temporary `no-transition` class disables
+  // the layer's CSS transition for the swap frame.
+  const _timers = [];
+  let _skipped = false;
+
+  function _skipRevealAnimation() {
+    if (_skipped) return;
+    _skipped = true;
+    // Cancel any scheduled fly/forge kickoff.
+    _timers.forEach(t => clearTimeout(t));
+    // Clear every rv- animation timer + effect (spec: after skip,
+    // no haptic/sound/timer may fire).
+    _rvSkipAll();
+    // Paint the final snapshot state on the SVG. Explicit
+    // tier/filled — not derived — so a state shift during the
+    // animation window still lands in the right end state.
+    _renderRevealCardInner(thinker, subj, _finalTier, _finalFilled);
+    // Eyebrow stays blank on a skipped Forge — the newly-forged
+    // frame speaks for itself and the moment is behind them.
   }
+
+  // Card tap: skip the animation if it's still running. After skip
+  // (or if the reveal has no animation, e.g. suppressed), the card is
+  // inert — bio/quote lives in the pantheon modal, reachable via the
+  // Read more pill on first-unlock or via the pantheon tab otherwise.
+  card.onclick = function() {
+    if (!_skipped) _skipRevealAnimation();
+  };
+
+  // Schedule Fly. At boundary, its landing state stays at OLD tier
+  // 3/3 (Forge follows). At non-boundary, land at the captured
+  // final state — explicit rather than derived, for the same
+  // state-shift-mid-animation reasons as the Forge end handler.
+  // All kickoff delays scale with --rv-slow so slow-motion
+  // inspection stays in phase.
+  const _rvSlowNow = _rvSlow();
+  if (_fly.flies) {
+    const _flyLand = _forge.forges
+      ? { tier: _renderTier, filled: 3 }
+      : { tier: _finalTier, filled: _finalFilled };
+    _timers.push(setTimeout(() => {
+      if (_skipped) return;
+      _playThinkerCardFly(thinker.id, subj, _fly.k, _renderTier, _flyLand);
+    }, _fly.delay * _rvSlowNow));
+  }
+
+  // Schedule Forge. Fires T.forgeDelay after Fly lands (spec §5.3).
+  // Mark tier-seen and fire analytics NOW (rather than at Forge
+  // start) so a mid-flow crash or skip still records the moment —
+  // the user has the frame regardless of whether the animation
+  // completed.
+  if (_forge.forges) {
+    if (!state.thinkerTierSeen) state.thinkerTierSeen = {};
+    if (!state.thinkerTierSeen[thinker.id]) state.thinkerTierSeen[thinker.id] = {};
+    state.thinkerTierSeen[thinker.id][TIERS[_forge.newTier]] = true;
+    try { saveStateLocal(); } catch(e) {}
+    try {
+      posthog.capture('thinker_frame_forged', {
+        thinker_id: thinker.id,
+        subject: subj,
+        tier: TIERS[_forge.newTier],
+        points: _points,
+      });
+    } catch(e) {}
+    const _forgeDelay = (_fly.delay + _RV_T.fly + _RV_T.forgeDelay) * _rvSlowNow;
+    _timers.push(setTimeout(() => {
+      if (_skipped) return;
+      _playThinkerCardForge(thinker, subj, _forge.oldTier, _forge.newTier, _finalFilled);
+    }, _forgeDelay));
+  }
+  // Auto-flip removed (flip retired). First-unlock's bio + quote now
+  // surface via the Read more pill above; no auto-reveal beat.
 }
 
 
@@ -25118,12 +25572,37 @@ function finishDay() {
     const secsSinceDismiss = (typeof _welcomeBackDismissedAtMs === 'number')
       ? Math.round((Date.now() - _welcomeBackDismissedAtMs) / 1000)
       : null;
+    // Spec §7: add `tier` to any existing card-reveal event. The
+    // reveal fires as a follow-up to day_completed via the CTA,
+    // so we stamp the earned-thinker's tier here alongside the
+    // completion signal. Null when the day has no thinker.
+    const _thinkerAt = day && day.thinkerId ? day.thinkerId : null;
+    const _tierAt = _thinkerAt ? TIERS[thinkerTier(_thinkerAt)] : null;
     posthog.capture('day_completed', {
       chapter: state.currentWeek,
       day: state.currentDay,
+      thinker_id: _thinkerAt,
+      thinker_tier: _tierAt,
       has_seen_welcome_back_today: sawWB,
       seconds_since_welcome_back_dismissed: secsSinceDismiss,
     });
+    // Spec §7 thinker_point_earned: one event per point earned.
+    // Fires when the completion adds to the thinker's point count.
+    // Suppressed when day has no thinkerId (dialogue not thinker-
+    // owned). Filled reflects the plate socket count AFTER this
+    // point lands (thinkerPlateFilled is derived from completed
+    // days, which was written just above).
+    if (_thinkerAt) {
+      try {
+        posthog.capture('thinker_point_earned', {
+          thinker_id: _thinkerAt,
+          subject: state.subject,
+          points: thinkerPoints(_thinkerAt),
+          tier: _tierAt,
+          filled: thinkerPlateFilled(_thinkerAt),
+        });
+      } catch(e) {}
+    }
     if (completedInWeek === totalDays) posthog.capture('week_completed', { chapter: state.currentWeek });
   } catch(e) {}
   // Funnel: first_dialogue_completed. Once per install. Includes
@@ -25261,15 +25740,12 @@ function finishDay() {
 
   const thinker = getT().find(t => t.id === thinkerId);
   // Reveal fires on any completion that earns a point for the
-  // thinker, not only the first unlock. state.completedDays[key]
-  // was written above, so thinkerPoints reflects the incremented
-  // count here. Forge boundaries (points 3, 6, 9, 12) are skipped
-  // — those are Forge's moment in commit 5 and don't use this
-  // reveal's tier-goal copy.
+  // thinker. state.completedDays[key] was written above, so
+  // thinkerPoints reflects the incremented count. Commit 5 wires
+  // Forge at boundaries (points 3, 6, 9, 12) into the same reveal
+  // — Fly plays first, Forge follows 200 ms after Fly lands.
   const _thinkerPointsNow = thinker ? thinkerPoints(thinker.id) : 0;
-  const _isForgeBoundary = _thinkerPointsNow === 3 || _thinkerPointsNow === 6
-    || _thinkerPointsNow === 9 || _thinkerPointsNow === 12;
-  const showThinker = !!(thinker && !_isForgeBoundary);
+  const showThinker = !!thinker;
 
   const dayXpEarned = state.readerXP + (completedInWeek === totalDays ? 100 : 0);
   _showDcStats(
