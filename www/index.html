@@ -1907,12 +1907,69 @@
     100%    { opacity: 0; }
   }
 
+  /* SHINE (spec §12: "The reference has a moving sheen and diamond
+     twinkles. These are allowed on the reveal only, never in the
+     grid."). Permanent state of the framed reveal card. Starts after
+     Forge settles; on re-open of an already-earned tier, starts
+     shortly after card arrival. Never on plain. Pause-in-grid is
+     structural: the pantheon uses .pth-frame PNGs, no rv- SVG,
+     nothing to animate. Tier ladder — bronze: sheen only. Silver /
+     gold: sheen + a few twinkles. Diamond: sheen + more twinkles,
+     violet colour.
+
+     Sheen: a rotated rect sweeping across the card, filled with a
+     linear gradient matching the reference's p-sheen* stops.
+     Duration + colour per tier via CSS var. --rv-slow scales.
+     Twinkles: SVG diamond paths at fixed positions in card units,
+     scale+opacity beat, staggered animation-delay per twinkle.
+
+     Coord translation from reference (5:8 frame-tiers.dc.html at
+     viewBox 230×376) to our reveal card (viewBox -40 -100 380 745):
+     the reference art fits in the middle of its box; ours is 300×537
+     at (0,0) with the frame band around it. Twinkle positions below
+     are hand-placed on the frame ornaments (corners, crest, plate
+     zone) — not a scaled copy, since our frame art differs. */
+  .rv-sheen-wrap {
+    /* rotate around the art centre so the sweep sits diagonally
+       across the whole framed area. Origin in svg user units. */
+    transform: rotate(20deg);
+    transform-origin: 150px 268px;
+    animation: rv-sheenSweep calc(var(--rv-sheen-dur, 5s) * var(--rv-slow)) linear infinite;
+  }
+  @keyframes rv-sheenSweep {
+    0%           { transform: translate(-320px, 0) rotate(20deg); opacity: 0; }
+    10%          { opacity: 1; }
+    45%          { transform: translate(320px, 0)  rotate(20deg); opacity: 1; }
+    46%, 100%    { transform: translate(320px, 0)  rotate(20deg); opacity: 0; }
+  }
+  .rv-twinkle {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: rv-twinkle calc(2.4s * var(--rv-slow)) ease-in-out infinite;
+    animation-delay: calc(var(--rv-tw-delay, 0s) * var(--rv-slow));
+    opacity: 0;
+  }
+  @keyframes rv-twinkle {
+    0%, 100% { opacity: 0; transform: scale(.5)  rotate(0deg); }
+    50%      { opacity: 1; transform: scale(1.1) rotate(180deg); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .rv-gem-fly, .rv-halo, .rv-ring, .rv-spark,
     .rv-old-forge, .rv-new-forge, .rv-art-forge,
-    .rv-trace, .rv-shock, .rv-banner {
+    .rv-trace, .rv-shock, .rv-banner,
+    .rv-sheen-wrap, .rv-twinkle {
       animation-duration: .01ms !important;
       animation-delay: 0s !important;
+    }
+    /* Shine loops forever, so clamping duration to 0.01ms with
+       animation-iteration-count: infinite still cycles ~100k times
+       per second — visually a shimmering static. Stop the loop
+       entirely: iteration-count: 1 + fill-mode: both means the sweep
+       ends after one 0.01ms tick, settled at the 100% keyframe. */
+    .rv-sheen-wrap, .rv-twinkle {
+      animation-iteration-count: 1 !important;
+      animation-fill-mode: both !important;
     }
   }
 
@@ -11642,9 +11699,25 @@
             <filter id="rv-f-plate" x="-10%" y="-30%" width="120%" height="170%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#221A14" flood-opacity=".25"/></filter>
             <filter id="rv-f-art" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#221A14" flood-opacity=".22"/></filter>
             <clipPath id="rv-c-plain"><rect x="0" y="0" width="300" height="537" rx="14"/></clipPath>
+            <!-- Sheen gradients — verbatim colour stops from reference
+                 frame-tiers.dc.html (l-sheen, l-sheen-warm,
+                 l-sheen-violet). Populated onto a rotated <rect>
+                 in #rv-shine at shine time. -->
+            <linearGradient id="rv-sheen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/><stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.8"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+            <linearGradient id="rv-sheen-warm" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFF6D0" stop-opacity="0"/><stop offset="0.5" stop-color="#FFF6D0" stop-opacity="0.85"/><stop offset="1" stop-color="#FFF6D0" stop-opacity="0"/></linearGradient>
+            <linearGradient id="rv-sheen-violet" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F3ECFF" stop-opacity="0"/><stop offset="0.35" stop-color="#E2D4FA" stop-opacity="0.6"/><stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0.95"/><stop offset="0.65" stop-color="#D6ECF7" stop-opacity="0.6"/><stop offset="1" stop-color="#F3ECFF" stop-opacity="0"/></linearGradient>
+            <!-- Sheen clip: covers the frame band area (art extent
+                 plus the frame's ornament margins), so the sweep
+                 stays on the card even during rotation/translate. -->
+            <clipPath id="rv-c-sheen"><rect x="-40" y="-50" width="380" height="630" rx="14"/></clipPath>
           </defs>
           <g id="rv-artWrap" filter="url(#rv-f-art)"><image id="rv-art" href="" x="0" y="0" width="300" height="537" preserveAspectRatio="xMidYMid slice" clip-path="url(#rv-c-plain)"/></g>
           <g id="rv-layers"></g>
+          <!-- Shine layer: permanent state of a framed reveal card
+               (sheen + twinkles). Populated by _playThinkerShine
+               after Forge settles (or shortly after card arrival on
+               re-open of an already-earned tier). Empty on plain. -->
+          <g id="rv-shine"></g>
           <g id="rv-fx"></g>
         </svg>
       </div>
@@ -20422,16 +20495,104 @@ function _playThinkerCardForge(thinker, subject, oldTier, newTier, newFilled) {
 // final state via _renderRevealCardInner.
 function _rvSkipAll() {
   const fx = document.getElementById('rv-fx');
+  const shine = document.getElementById('rv-shine');
   const art = document.getElementById('rv-art');
   if (fx) {
     fx._rvSkipped = true;
     if (fx._rvFlyTimers)   fx._rvFlyTimers.forEach(t => clearTimeout(t));
     if (fx._rvForgeTimers) fx._rvForgeTimers.forEach(t => clearTimeout(t));
+    if (fx._rvShineTimer)  clearTimeout(fx._rvShineTimer);
     fx._rvFlyTimers = null;
     fx._rvForgeTimers = null;
+    fx._rvShineTimer = null;
     fx.innerHTML = '';
   }
+  if (shine) shine.innerHTML = '';
   if (art) art.classList.remove('rv-art-forge');
+}
+
+// Shine (spec §12 sheen + twinkles). Permanent state of a framed
+// reveal card. Populates #rv-shine with a rotated sheen rect + tier-
+// specific twinkles, both animated via CSS (durations scale with
+// --rv-slow). Bronze: sheen only. Silver / gold: sheen + a few
+// twinkles. Diamond: sheen + more twinkles, violet gradient. Plain:
+// no-op (the card has no frame to shine on).
+//
+// Per-tier params tuned to reference frame-tiers.dc.html sheen
+// durations (bronze 6s slow / silver 5s / gold 4.5s / diamond 3.6s)
+// and colour ladder (warm / white / warm / violet).
+//
+// Twinkles use hand-placed coords in the reveal viewBox
+// (-40 -100 380 745) — dropped along the frame's crest, corners
+// and plate zone. Sizes match the reference's 4/5/6/7-unit range.
+// Path is the same four-point star (M0 -N Ln n·0.22 -n·0.22 L n 0
+// Ln·0.22 n·0.22 …), scaled per twinkle.
+const _RV_SHINE = {
+  bronze:  { grad: 'rv-sheen-warm',   width: 44, dur: 6.0, twinkles: [] },
+  silver:  { grad: 'rv-sheen',        width: 48, dur: 5.0, twinkles: [
+    { x: 260, y:  10, size: 5, delay: 0.4 },
+    { x:  40, y: 470, size: 5, delay: 1.4 },
+  ] },
+  gold:    { grad: 'rv-sheen-warm',   width: 52, dur: 4.5, twinkles: [
+    { x:  30, y:  20, size: 6, delay: 0.0 },
+    { x: 270, y:  20, size: 5, delay: 0.7 },
+    { x: 150, y: 460, size: 5, delay: 1.1 },
+  ] },
+  diamond: { grad: 'rv-sheen-violet', width: 64, dur: 3.6, twinkles: [
+    { x:  20, y:  30, size: 7, delay: 0.0, stroke: '#6B4FA8' },
+    { x: 280, y: 410, size: 7, delay: 0.6, stroke: '#6B4FA8' },
+    { x: 150, y:  -8, size: 4, delay: 1.2 },
+    { x: 280, y: 110, size: 5, delay: 0.3, fill: '#F3ECFF', stroke: '#8E6CC8' },
+    { x:  20, y: 270, size: 5, delay: 1.6, fill: '#E6F6FB', stroke: '#8E6CC8' },
+    { x: 210, y: 490, size: 4, delay: 0.9 },
+  ] },
+};
+
+function _rvTwinklePath(s) {
+  // Four-point star, unit-size s. Same shape family as reference
+  // twinkles: two long spikes on each axis, short cross arms at
+  // s * 0.22 units. Fill-box origin lets the CSS animation scale +
+  // rotate around the star's centre.
+  const t = s * 0.22;
+  return `M0 -${s} L${t} -${t} L${s} 0 L${t} ${t} L0 ${s} L-${t} ${t} L-${s} 0 L-${t} -${t} Z`;
+}
+
+function _playThinkerShine(subject, tier) {
+  const shine = document.getElementById('rv-shine');
+  if (!shine) return;
+  const cfg = _RV_SHINE[tier];
+  if (!cfg) { shine.innerHTML = ''; return; } // plain / unknown → no shine
+  const subj = subject || 'philosophy';
+  _rvSetSubjectVars(subj);
+
+  // Sheen: a tall rotated rect sweeping horizontally across the
+  // card. Wrap in a <g class="rv-sheen-wrap"> so CSS translation
+  // (translateX 0 → sweep width) plays on the group; the inner rect
+  // carries the gradient fill. clip-path keeps the sweep on the
+  // framed area so it doesn't bleed onto the modal parchment.
+  let html = ''
+    + `<g clip-path="url(#rv-c-sheen)">`
+    +   `<g class="rv-sheen-wrap" style="--rv-sheen-dur:${cfg.dur}s">`
+    +     `<rect x="-160" y="-160" width="${cfg.width}" height="900" fill="url(#${cfg.grad})"/>`
+    +   `</g>`
+    + `</g>`;
+
+  // Twinkles.
+  for (const t of cfg.twinkles) {
+    const stroke = t.stroke ? ` stroke="${t.stroke}" stroke-width="0.7"` : '';
+    const fill = t.fill || '#FFFFFF';
+    html += `<path class="rv-twinkle" style="--rv-tw-delay:${t.delay}s"`
+         +  ` transform="translate(${t.x} ${t.y})"`
+         +  ` d="${_rvTwinklePath(t.size)}"`
+         +  ` fill="${fill}"${stroke}/>`;
+  }
+
+  shine.innerHTML = html;
+}
+
+function _rvClearShine() {
+  const shine = document.getElementById('rv-shine');
+  if (shine) shine.innerHTML = '';
 }
 
 // Single source of truth for the app's default state shape. Called on cold
@@ -24947,6 +25108,10 @@ function showThinkerCardScreen(thinker, chapter, day) {
     // tier/filled — not derived — so a state shift during the
     // animation window still lands in the right end state.
     _renderRevealCardInner(thinker, subj, _finalTier, _finalFilled);
+    // Shine is the permanent state of a framed card, so a skip that
+    // lands on bronze+ should still show it. Plain skips get nothing
+    // (_rvSkipAll already cleared #rv-shine).
+    if (_finalTier >= 1) _playThinkerShine(subj, TIERS[_finalTier]);
     // Eyebrow stays blank on a skipped Forge — the newly-forged
     // frame speaks for itself and the moment is behind them.
   }
@@ -24999,6 +25164,24 @@ function showThinkerCardScreen(thinker, chapter, day) {
       if (_skipped) return;
       _playThinkerCardForge(thinker, subj, _forge.oldTier, _forge.newTier, _finalFilled);
     }, _forgeDelay));
+  }
+
+  // Schedule shine (spec §12 sheen + twinkles). Never on plain; on
+  // framed tiers (bronze+), fire after the whole reveal timeline
+  // settles. Case A: Forge just played — start after the banner
+  // clears (forge kickoff + banner duration). Case B: no Forge —
+  // start ~500 ms after card arrival, letting the spring settle
+  // before a permanent motion joins the frame. Shine stays on until
+  // the modal closes or the user skips.
+  if (_finalTier >= 1) {
+    const _finalTierName = TIERS[_finalTier];
+    const _shineDelayMs = _forge.forges
+      ? ((_fly.delay + _RV_T.fly + _RV_T.forgeDelay + _RV_T.banner) * _rvSlowNow + 100)
+      : 500;
+    _timers.push(setTimeout(() => {
+      if (_skipped) return;
+      _playThinkerShine(subj, _finalTierName);
+    }, _shineDelayMs));
   }
   // Auto-flip removed (flip retired). First-unlock's bio + quote now
   // surface via the Read more pill above; no auto-reveal beat.
