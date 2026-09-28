@@ -1954,6 +1954,31 @@
     50%      { opacity: 1; transform: scale(1.1) rotate(180deg); }
   }
 
+  /* Card arrival — p3-pop + ring flourish, matched to the onboarding
+     first-card entry (step 21). Triggered by adding .rv-arrive to
+     #thinker-unlock-box in showThinkerCardScreen; the JS toggles the
+     class off, forces a reflow, then adds it back so the animation
+     re-fires on every reveal open. The ring's ::after uses the
+     onboarding fp-ring keyframes at a shorter 0.4 s duration so it
+     clears exactly as the card settles (0.9 s), then Fly kicks in at
+     0.7 s — the same delay as before this change, so the whole rv-
+     timeline downstream of card arrival is unchanged.
+     No idle bob (p3-float): the shine layer (sheen + twinkles)
+     provides the card's living state post-Forge. */
+  .dc-thinker-screen #thinker-unlock-box.rv-arrive {
+    animation: p3-pop calc(0.9s * var(--rv-slow)) cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .dc-thinker-screen #thinker-unlock-box.rv-arrive::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 18px;
+    border: 3px solid var(--accent);
+    opacity: 0;
+    pointer-events: none;
+    animation: fp-ring calc(0.4s * var(--rv-slow)) ease-out calc(0.5s * var(--rv-slow)) both;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .rv-gem-fly, .rv-halo, .rv-ring, .rv-spark,
     .rv-old-forge, .rv-new-forge, .rv-art-forge,
@@ -1970,6 +1995,13 @@
     .rv-sheen-wrap, .rv-twinkle {
       animation-iteration-count: 1 !important;
       animation-fill-mode: both !important;
+    }
+    /* Card arrival + ring flourish: same clamp so reduced-motion
+       users get the settled card immediately. */
+    .dc-thinker-screen #thinker-unlock-box.rv-arrive,
+    .dc-thinker-screen #thinker-unlock-box.rv-arrive::after {
+      animation-duration: .01ms !important;
+      animation-delay: 0s !important;
     }
   }
 
@@ -25195,28 +25227,36 @@ function showThinkerCardScreen(thinker, chapter, day) {
   document.getElementById('dc-stats-screen').style.display = 'none';
   document.getElementById('dc-thinker-screen').style.display = 'flex';
 
-  // Drive card arrival with JS transitions (reliable across browsers)
-  card.style.animation = 'none';
-  card.style.transition = 'none';
-  card.style.opacity = '0';
-  card.style.transform = 'scale(0.7) translateY(40px)';
+  // Card arrival — CSS-driven p3-pop (0.9s spring, scale 0.2→1.18→1,
+  // rotate -12°→3°→0°) plus a one-shot ring flourish (.rv-arrive
+  // ::after). Toggle the class off, force a reflow, toggle it back
+  // on so the animation re-fires on every reveal open — otherwise a
+  // second reveal in the same session would sit at the settled 100%
+  // state with no motion. Inline styles from the previous JS-driven
+  // transition are cleared for parity (skip/re-open safety).
+  card.style.animation = '';
+  card.style.transition = '';
+  card.style.opacity = '';
+  card.style.transform = '';
+  card.classList.remove('rv-arrive');
   void card.offsetWidth;
-  setTimeout(() => {
-    card.style.transition = 'opacity 0.6s ease-out, transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1)';
-    card.style.opacity = '1';
-    card.style.transform = 'scale(1) translateY(0)';
-  }, 50);
+  card.classList.add('rv-arrive');
 
   // ── Animation orchestration ────────────────────────────────────
-  // Timeline:
-  //   0 ms      : card arrival begins (fade + spring, 900 ms transform)
-  //   700 ms    : Fly starts (gem rises from portrait)
+  // Timeline (unslowed):
+  //   0 ms      : Card p3-pop starts (0.9 s spring, scale 0.2→1.18→1,
+  //               rotate -12°→3°→0°). Matches onboarding first-card.
+  //   500 ms    : Ring flourish (fp-ring ::after) starts, 0.4 s ease-out
+  //   700 ms    : Fly kicks off (ring is 50 % through, fading past 0.45)
+  //   900 ms    : Card entry ends AND ring flourish ends (clean settle)
   //   1550 ms   : Fly lands (700 + 850)
-  //   1930 ms   : Forge starts if boundary (Fly lands + 380 gap, spec §12)
-  //   2830 ms   : Forge flash + layer cross-fade ends (1930 + 900)
+  //   1750 ms   : Forge starts if boundary (Fly lands + 200 ms per spec §5.3)
+  //   3950 ms   : Forge settles (1750 + 2200)
+  //   4350 ms   : Banner clears (1750 + 2600)
+  //   4450 ms   : Shine starts (banner + 100 ms)
   //
-  // Total reveal duration ≈ 2.83 s at boundaries; ≈ 1.55 s at
-  // within-tier points; instant when suppressed or diamond-capped.
+  // Total reveal ≈ 4.45 s at boundaries; ≈ 1.55 s at within-tier
+  // points; instant when suppressed or diamond-capped.
   //
   // Tap-to-skip: any tap on the card during the animation snaps
   // straight to the end state (art + on-layer at derived tier).
