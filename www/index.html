@@ -13699,6 +13699,15 @@ let _paywallActiveRoot = null;
 // openReader after purchase) so the onboarding path doesn't fire either.
 let _paywallMode = 'modal';
 
+// Session-scoped: set by showPaywall (modal mode only) so the retro
+// frames owl-beat doesn't chase a paywall close in the same session.
+// The onboarding paywall (_onbV2PreparePaywall, mode 'onboarding')
+// does NOT set this flag — it fires before every new user has a
+// chance to see the tour + explainer. Reset naturally on page load
+// (cold start on iOS/Android since Capacitor kills the webview
+// between launches).
+let _paywallShownThisSession = false;
+
 // Reads current package data from RC's offering, or falls back to the
 // hardcoded USD values so the paywall is renderable before products are
 // live in App Store Connect / Play. When falling back, pkg is null and
@@ -13797,6 +13806,7 @@ function showPaywall(opts) {
   opts = opts || {};
   _paywallActiveRoot = document.getElementById('modal-paywall');
   _paywallMode = 'modal';
+  _paywallShownThisSession = true;
   _paywallReturnTo = (typeof opts.weekId !== 'undefined' && typeof opts.dayId !== 'undefined')
     ? { weekId: opts.weekId, dayId: opts.dayId }
     : null;
@@ -21502,6 +21512,161 @@ function _maybeShowFramesExplainerAtTourEnd() {
   _showFramesExplainer('tour_end');
 }
 
+// ─── Retro owl-beat for existing users ──────────────────────────
+// A one-time coach-mark for users who finished (or skipped) the owl
+// walkthrough before the frames feature shipped. Reuses the exact
+// walkthrough chrome (#onboarding-overlay + spotlight canvas + owl
+// SVG + speech bubble + CTA button) via the same helpers the bonus-
+// unlock coach mark uses (_positionOwlAndBubble / drawSpotlight /
+// lock-scroll). Spotlights the Pantheon bnav tab. Tapping the CTA
+// closes the beat and opens the explainer, mirroring the tour-end
+// path. Any dismiss route (CTA or otherwise) marks
+// framesExplainerSeen so the beat never fires twice.
+//
+// Cohort: has corpus_walkthrough_done OR completedDays > 0, AND
+// framesExplainerSeen is false. New users (no walkthrough done + no
+// completions) get the tour → explainer path in _walkthroughFinish
+// instead, never this beat.
+let _framesOwlBeatStep = null;
+function _showFramesOwlBeat() {
+  const overlay = document.getElementById('onboarding-overlay');
+  const target  = document.getElementById('bnav-pantheon');
+  if (!overlay || !target) return;
+  if (_framesOwlBeatStep) return; // idempotency
+  const isEn = state.lang === 'en';
+
+  _framesOwlBeatStep = {
+    id: 'frames_owl_beat',
+    expr: 'owl-admiring',
+    spotlight: '#bnav-pantheon',
+    allowChromeBottom: true,
+    en: 'Something new in the Pantheon: your cards can now earn frames.',
+    he: 'משהו חדש בפנתיאון: הקלפים שלך יכולים עכשיו לקבל מסגרות.',
+  };
+
+  document.documentElement.classList.add('walkthrough-active');
+  overlay.style.display = 'block';
+  _walkthroughWireCanvas();
+  _walkthroughLockScroll();
+
+  const owl = document.querySelector('.onboarding-owl-float svg');
+  if (owl) {
+    owl.classList.remove('owl-neutral', 'owl-determined', 'owl-admiring', 'owl-action');
+    owl.classList.add('owl-svg', _framesOwlBeatStep.expr);
+  }
+
+  const bubbleText = document.getElementById('onboarding-bubble');
+  const nextBtn    = document.getElementById('onboarding-btn');
+  if (bubbleText) bubbleText.textContent = isEn ? _framesOwlBeatStep.en : _framesOwlBeatStep.he;
+  if (nextBtn) {
+    nextBtn.textContent = isEn ? 'Show me' : 'לראות';
+    nextBtn.onclick     = _framesOwlBeatCta;
+    nextBtn.style.display = '';
+  }
+
+  const dots    = document.getElementById('onboarding-dots');
+  const skipBtn = document.getElementById('walkthrough-skip');
+  if (dots)    dots.style.display    = 'none';
+  if (skipBtn) skipBtn.style.display = 'none';
+
+  try {
+    _phCapture('frames_owl_beat_shown', {
+      subject: state.subject || null,
+      lang:    state.lang || null,
+    });
+  } catch (e) {}
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      _positionOwlAndBubble(_framesOwlBeatStep);
+      setTimeout(() => drawSpotlight(_framesOwlBeatStep), 100);
+    });
+  });
+}
+
+function _framesOwlBeatTeardown() {
+  _walkthroughUnlockScroll();
+  const overlay = document.getElementById('onboarding-overlay');
+  if (overlay) overlay.style.display = 'none';
+  document.documentElement.classList.remove('walkthrough-active');
+  const dots    = document.getElementById('onboarding-dots');
+  const skipBtn = document.getElementById('walkthrough-skip');
+  if (dots)    dots.style.display    = '';
+  if (skipBtn) skipBtn.style.display = '';
+  _framesOwlBeatStep = null;
+}
+
+function _closeFramesOwlBeat(source) {
+  _framesOwlBeatTeardown();
+  // Mark seen unconditionally on any dismissal path so the beat
+  // never repeats. The CTA path also sets seen via the explainer's
+  // own rAF, but that's a duplicate write; the "close without
+  // tapping" path (back button, force-quit + reopen, etc.) needs
+  // this write to keep the seen contract.
+  if (!state.framesExplainerSeen) {
+    state.framesExplainerSeen = true;
+    try { saveStateLocal(); } catch (e) {}
+  }
+  try {
+    _phCapture('frames_owl_beat_dismissed', {
+      source: source || 'unknown',
+    });
+  } catch (e) {}
+}
+
+function _framesOwlBeatCta() {
+  _closeFramesOwlBeat('cta');
+  // rAF so the overlay's display flip commits before we open the
+  // explainer — same pattern the tour-end path uses.
+  requestAnimationFrame(() => {
+    try { _showFramesExplainer('owl_beat_cta'); } catch (e) {}
+  });
+}
+
+function _maybeShowFramesOwlBeat() {
+  if (state.framesExplainerSeen) return;
+  // Cohort gate: existing user only. A brand-new user has neither
+  // signal and will get the tour → explainer path via
+  // _walkthroughFinish instead.
+  const isExistingUser = !!localStorage.getItem('corpus_walkthrough_done')
+    || Object.keys(state.completedDays || {}).length > 0;
+  if (!isExistingUser) return;
+  if (state.currentScreen !== 'home') return;
+  // Never during / immediately-after a modal paywall (locked-content
+  // tap). Onboarding paywall doesn't set this flag.
+  if (_paywallShownThisSession) return;
+  // Never while the walkthrough is currently painting (belt-and-
+  // braces — the cohort gate above already excludes tour-in-progress
+  // users, but a user replay could hit this).
+  if (document.documentElement.classList.contains('walkthrough-active')) return;
+  // Streak-repair card wins the top-of-home slot; wait for its
+  // dismiss (same intuition as the pre-remove _maybeShow gate).
+  const repairHolder = document.getElementById('streak-repair-card-holder');
+  if (repairHolder && repairHolder.style.display !== 'none' && repairHolder.innerHTML.trim()) return;
+  if (!_feEverythingClosed()) return;
+  _showFramesOwlBeat();
+}
+
+// On-device replay: clears the seen flag and re-runs the gate.
+// Useful for testing the beat itself; distinct from
+// _replayWalkthrough (which re-runs the full tour → explainer).
+window._replayOwlBeat = function () {
+  state.framesExplainerSeen = false;
+  try { saveStateLocal(); } catch (e) {}
+  _framesOwlBeatTeardown(); // in case a stale beat is up
+  const fe = document.getElementById('modal-frames-explainer');
+  if (fe) { fe.classList.remove('fe-open'); fe.innerHTML = ''; }
+  try { _maybeShowFramesOwlBeat(); } catch (e) {}
+  return {
+    framesExplainerSeen: state.framesExplainerSeen,
+    walkthroughDone: !!localStorage.getItem('corpus_walkthrough_done'),
+    completedDays: Object.keys(state.completedDays || {}).length,
+    currentScreen: state.currentScreen,
+    beatOpen: document.documentElement.classList.contains('walkthrough-active')
+              && !!_framesOwlBeatStep,
+  };
+};
+
 // Plate-tap delegation. Capture-phase so we run BEFORE the pantheon
 // .pth-slot button's flip onclick (which fires in bubble). Attached
 // once at boot on containers that persist for the app lifetime.
@@ -24316,6 +24481,10 @@ function renderHome() {
   // Fires at most once per streak-day; internal guards handle all
   // other cases. Blocks tap-through by design (see design report).
   try { showWelcomeBackModal(); } catch (e) {}
+  // Retro frames owl-beat: one-time coach mark for existing users
+  // introducing the frames feature. Own guards; skips new users
+  // (they get the tour → explainer path from _walkthroughFinish).
+  try { _maybeShowFramesOwlBeat(); } catch (e) {}
   // Wire plate-tap delegation on rv-svg + pantheon-container so
   // tapping any points plate reopens the explainer. Idempotent —
   // attach-once guarded by ._feWired on the target.
@@ -30074,6 +30243,12 @@ window.addEventListener('resize', () => {
     _walkthroughScrollTargetIntoView(_bonusUnlockCoachAdStep);
     _positionOwlAndBubble(_bonusUnlockCoachAdStep);
     setTimeout(() => drawSpotlight(_bonusUnlockCoachAdStep), 100);
+    return;
+  }
+  // Same for the retro frames owl-beat.
+  if (_framesOwlBeatStep) {
+    _positionOwlAndBubble(_framesOwlBeatStep);
+    setTimeout(() => drawSpotlight(_framesOwlBeatStep), 100);
     return;
   }
   _walkthroughRenderStep();
