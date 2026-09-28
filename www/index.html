@@ -13699,6 +13699,15 @@ let _paywallActiveRoot = null;
 // openReader after purchase) so the onboarding path doesn't fire either.
 let _paywallMode = 'modal';
 
+// Session-scoped: set by showPaywall (modal mode only) so the frames
+// explainer doesn't chase a paywall close in the same session. The
+// onboarding paywall (_onbV2PreparePaywall, mode 'onboarding') does
+// NOT set this flag — it fires before every new user has a chance to
+// see the explainer, and gating on it would block them permanently
+// on their first session. Reset naturally on page load (cold start
+// on iOS/Android since Capacitor kills the webview between launches).
+let _paywallShownThisSession = false;
+
 // Reads current package data from RC's offering, or falls back to the
 // hardcoded USD values so the paywall is renderable before products are
 // live in App Store Connect / Play. When falling back, pkg is null and
@@ -13797,6 +13806,7 @@ function showPaywall(opts) {
   opts = opts || {};
   _paywallActiveRoot = document.getElementById('modal-paywall');
   _paywallMode = 'modal';
+  _paywallShownThisSession = true;
   _paywallReturnTo = (typeof opts.weekId !== 'undefined' && typeof opts.dayId !== 'undefined')
     ? { weekId: opts.weekId, dayId: opts.dayId }
     : null;
@@ -21475,11 +21485,20 @@ function _feEverythingClosed() {
 function _maybeShowFramesExplainerAtLaunch() {
   if (state.framesExplainerSeen) return;
   if (!localStorage.getItem('corpus_onboarding_done')) return;
-  // New-user gate: at least one completed dialogue. For a user who
-  // just finished onboarding but hasn't done the owl's first real
-  // dialogue yet, state.completedDays is still {} and the explainer
-  // waits. Existing users pass this gate immediately.
-  if (Object.keys(state.completedDays || {}).length === 0) return;
+  // Paywall gate: if a locked-content-tap paywall opened at any point
+  // in this session, defer to next cold start. Prevents the explainer
+  // from chasing a paywall close (which felt like a stack of modals on
+  // device). Onboarding paywall does NOT set this flag — see
+  // _paywallShownThisSession's declaration.
+  if (_paywallShownThisSession) return;
+  // New-user gate: at least one completed dialogue OR the walkthrough
+  // is done. The walkthrough path lets us open the explainer right
+  // after the tour ends — the user has 0 points but the explainer's
+  // job is to teach them about the frame system, not celebrate an
+  // unlock. Legacy users (pre-walkthrough era) still fall through
+  // completedDays > 0.
+  if (Object.keys(state.completedDays || {}).length === 0
+      && !localStorage.getItem('corpus_walkthrough_done')) return;
   // Screen check: never open over the reader. If the user tapped
   // "Next dialogue" on the reveal, the celebration queue can drain
   // while they're inside a dialogue — this catches that case. The
@@ -29938,6 +29957,15 @@ function _walkthroughFinish() {
     lang:    state.lang || null,
   });
   _walkthroughTeardown({ setFlag: true });
+  // Frames explainer (spec §14): the tour just ended — the quiet moment
+  // for new users. Deferred one frame past teardown so the walkthrough
+  // overlay's display:none commits before _feEverythingClosed samples
+  // the DOM. Gate handles the once-per-user + reader/celebration/other
+  // overlay guards; corpus_walkthrough_done (just set by teardown) is
+  // the alternative-pass for a new user with completedDays == {}.
+  requestAnimationFrame(() => {
+    try { _maybeShowFramesExplainerAtLaunch(); } catch (e) {}
+  });
 }
 
 function _walkthroughTeardown(opts) {
