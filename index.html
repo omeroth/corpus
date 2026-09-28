@@ -2023,35 +2023,46 @@
   }
 
   /* ── Frames explainer (spec §14) ──
-     Full-screen light modal shown once per user at launch (and on
-     any points-plate tap). Ported from thinker-frames-handoff/
-     explainer/index.html with .fe- prefix so nothing collides with
-     .pth- (pantheon), .rv- (reveal) or .tc- (carousel). Fits
-     360 × 640 without scrolling in both languages. */
+     Centred pop-up card over a scrim. Shown once per user (chained
+     to the first quiet moment after their first dialogue's
+     celebration queue drains) and again on any points-plate tap.
+     Ported from thinker-frames-handoff/explainer/index.html with
+     .fe- prefix so nothing collides with .pth- (pantheon), .rv-
+     (reveal) or .tc- (carousel). Fits 360 × 640 with visible scrim
+     above and below the card. */
   .fe-overlay {
     position: fixed;
     inset: 0;
     z-index: 1600;
     display: none;
-    background: rgba(47, 33, 80, 0.30);
-    align-items: stretch;
+    background: rgba(47, 33, 80, 0.5);
+    align-items: center;
     justify-content: center;
+    padding: 0 12px;
   }
   .fe-overlay.fe-open {
     display: flex;
   }
   .fe-mx {
     position: relative;
-    flex: 1;
+    flex: 0 1 auto;
+    width: 100%;
     max-width: 480px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: calc(14px + var(--safe-top)) 16px calc(16px + var(--safe-bottom));
+    padding: 14px 16px 16px;
     color: #2F2150;
     overflow: hidden;
+    border-radius: 28px;
     background: radial-gradient(110% 60% at 50% 26%, #FFFFFF 0%, #F6F0FF 45%, #EFE7FB 100%);
+    box-shadow: 0 24px 60px rgba(47, 33, 80, 0.35);
     font-family: 'Nunito', 'Assistant', sans-serif;
+    animation: fe-enter 0.38s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+  @keyframes fe-enter {
+    0%   { opacity: 0; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1);    }
   }
   [dir="rtl"] .fe-mx { font-family: 'Assistant', 'Nunito', sans-serif; }
   .fe-close {
@@ -2087,8 +2098,16 @@
     position: relative;
     width: 328px;
     height: 212px;
-    margin-top: 26px;
+    margin-top: 18px;
     flex: none;
+    /* 0.86 scale keeps the reference fan geometry (positions,
+       rotations, hero card size) but shrinks the whole cluster to
+       fit inside the centred card. Negative margin-bottom claws back
+       the vertical space the transform doesn't remove from layout,
+       so track + copy below sit right under the visible fan. */
+    transform: scale(0.86);
+    transform-origin: 50% 0;
+    margin-bottom: -30px;
   }
   .fe-rays {
     position: absolute;
@@ -2313,7 +2332,7 @@
     text-align: center;
   }
   @media (prefers-reduced-motion: reduce) {
-    .fe-card, .fe-gm.fe-on, .fe-flash, .fe-rays, .fe-stars i, .fe-spk, .fe-card.fe-hero::after {
+    .fe-mx, .fe-card, .fe-gm.fe-on, .fe-flash, .fe-rays, .fe-stars i, .fe-spk, .fe-card.fe-hero::after {
       animation: none !important;
     }
     .fe-flash { opacity: 0; }
@@ -21225,7 +21244,7 @@ function _feBuildHtml(lang) {
     tiers: { bronze: ['Bronze', 'Classical'], silver: ['Silver', 'Renaissance'], gold: ['Gold', 'Baroque'], diamond: ['Diamond', 'Modern'] },
     dare:  'First goal: a <em>bronze frame</em>. Three dialogues with one thinker.',
     cta:   'Next dialogue',
-    hint:  'Tap the points under any card to see this again.',
+    hint:  'Tap a card’s points to reopen this.',
   } : {
     close: 'סגירה',
     title: 'שלושה דיאלוגים, <em>מסגרת חדשה</em>',
@@ -21315,9 +21334,14 @@ function _showFramesExplainer(trigger) {
   overlay.classList.add('fe-open');
   overlay.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
+  // Scrim tap closes. Wired once per open on the overlay itself;
+  // e.target === overlay filters bubbles from the card so tapping
+  // inside the pop-up doesn't dismiss.
+  overlay.onclick = function (e) {
+    if (e.target === overlay) _closeFramesExplainer('scrim');
+  };
   // Mark seen the moment we're visible — a mid-animation kill still
-  // counts. Only persist for the "launch" trigger; plate-tap reopens
-  // shouldn't touch a flag that's already true, but this is a no-op.
+  // counts.
   if (!state.framesExplainerSeen) {
     state.framesExplainerSeen = true;
     try { saveStateLocal(); } catch (e) {}
@@ -21374,10 +21398,63 @@ function _feCtaTap() {
 // pending celebrations, no visible streak-repair card. If welcome-
 // back is currently active, DON'T defer to the next open — chain
 // the explainer to fire when welcome-back closes, in the same session.
+// Returns true only when nothing else is on screen: no pending
+// celebrations, no active reveal, no chapter-complete overlay, no
+// other modal-overlay. Called from every hook point so we open at
+// the FIRST quiet moment and stay quiet during the reader / any
+// stacked modal. Welcome-back is handled separately via the
+// _pendingExplainerAfterWelcomeBack chain; we still refuse to open
+// on top of it here.
+//
+// Detection depends on the overlay check because _playNextCelebration
+// shifts an item off pendingCelebrations before displaying it — so
+// the last celebration is visible while the queue length is already
+// 0. Both signals matter: queue length AND whichever overlay the
+// celebration renders into.
+function _feEverythingClosed() {
+  if ((state.pendingCelebrations || []).length > 0) return false;
+  // Reveal / dc-stats / dc-thinker: all share #modal-complete.
+  const complete = document.getElementById('modal-complete');
+  if (complete && complete.classList.contains('active')) return false;
+  // Chapter-complete overlay uses inline display:flex rather than
+  // .active — check both.
+  const chapter = document.getElementById('chapter-complete-overlay');
+  if (chapter) {
+    const cs = getComputedStyle(chapter);
+    if (cs.display !== 'none') return false;
+  }
+  // Endowment + goal-met overlays share the .modal-overlay class +
+  // .active gating with the rest of the modal soup, so the generic
+  // sweep below catches them; explicitly named for defence in depth.
+  const endowment = document.getElementById('endowment-overlay');
+  if (endowment && endowment.classList.contains('active')) return false;
+  const goalMet = document.getElementById('goal-met-overlay');
+  if (goalMet && goalMet.classList.contains('active')) return false;
+  const levelUp = document.getElementById('modal-levelup');
+  if (levelUp && levelUp.classList.contains('active')) return false;
+  // Any other visible .modal-overlay (welcome-back, thinker detail,
+  // library, share, guest-signup, NPS, paywall, streak repair modal).
+  // Excludes our own overlay so a plate-tap reopen doesn't self-gate.
+  const overlays = document.querySelectorAll('.modal-overlay.active');
+  for (const el of overlays) {
+    if (el.id !== 'modal-frames-explainer') return false;
+  }
+  return true;
+}
+
 function _maybeShowFramesExplainerAtLaunch() {
   if (state.framesExplainerSeen) return;
   if (!localStorage.getItem('corpus_onboarding_done')) return;
-  if ((state.pendingCelebrations || []).length > 0) return;
+  // New-user gate: at least one completed dialogue. For a user who
+  // just finished onboarding but hasn't done the owl's first real
+  // dialogue yet, state.completedDays is still {} and the explainer
+  // waits. Existing users pass this gate immediately.
+  if (Object.keys(state.completedDays || {}).length === 0) return;
+  // Screen check: never open over the reader. If the user tapped
+  // "Next dialogue" on the reveal, the celebration queue can drain
+  // while they're inside a dialogue — this catches that case. The
+  // next renderHome (on return to home) picks it up.
+  if (state.currentScreen === 'reader') return;
   const repairHolder = document.getElementById('streak-repair-card-holder');
   if (repairHolder && repairHolder.style.display !== 'none' && repairHolder.innerHTML.trim()) return;
   const wb = document.getElementById('welcome-back-modal');
@@ -21385,6 +21462,7 @@ function _maybeShowFramesExplainerAtLaunch() {
     _pendingExplainerAfterWelcomeBack = true;
     return;
   }
+  if (!_feEverythingClosed()) return;
   _showFramesExplainer('launch');
 }
 
@@ -23661,6 +23739,14 @@ function _onCelebrationDismissed() {
   }
   // Small settle between overlays so animations don't collide.
   setTimeout(_playNextCelebration, 250);
+  // Frames explainer hook (spec §14): if that was the last celebration
+  // and everything else is closed, this is the quiet moment. The
+  // 300 ms defer gives the outgoing overlay a moment to actually
+  // remove its .active class before _feEverythingClosed samples it,
+  // and gives _playNextCelebration a chance to no-op the empty queue.
+  setTimeout(() => {
+    try { _maybeShowFramesExplainerAtLaunch(); } catch (e) {}
+  }, 300);
 }
 
 function _onCelebrationQueueEmpty() {
@@ -26440,6 +26526,11 @@ function finishDay() {
 // on top of an active reader.
 function closeCompleteModal(opts) {
   document.getElementById('modal-complete').classList.remove('active');
+  // Frames explainer hook (spec §14): reveal has just closed. If the
+  // celebration queue is also empty, this is the quiet moment to open.
+  // If it isn't, the check bails and the queue's dismiss handlers pick
+  // it up later. Idempotent — bounces off framesExplainerSeen.
+  try { _maybeShowFramesExplainerAtLaunch(); } catch (e) {}
   const continuation = (opts && typeof opts.continuation === 'function') ? opts.continuation : goHome;
 
   const _guestCompletionCount = Object.keys(state.completedDays)
