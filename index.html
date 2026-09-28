@@ -20350,7 +20350,13 @@ function _shouldPlayThinkerCardFly(thinkerId, suppressForgeBoundary) {
   const withinRange = points > 0 && points <= 12;
   if (!withinRange) return { flies: false, k: -1, delay: 0 };
   if (isBoundary && suppressForgeBoundary) return { flies: false, k: -1, delay: 0 };
-  return { flies: true, k: (points - 1) % 3, delay: 700 };
+  // 1200 ms: card p3-pop settles at 900 ms + ring flourish ends at
+  // 900 ms + a 300 ms dead pause. That pause is what separates the
+  // card's arrival from the point landing so they read as two
+  // distinct beats instead of one crowded event. Every downstream
+  // timing (Fly land, Forge start, banner clear, shine start) is
+  // computed from this delay, so shifting here shifts them together.
+  return { flies: true, k: (points - 1) % 3, delay: 1200 };
 }
 
 // ── Reveal Forge animation (commit 5 of thinker-frames work) ──
@@ -25275,15 +25281,19 @@ function showThinkerCardScreen(thinker, chapter, day) {
   //   0 ms      : Card p3-pop starts (0.9 s spring, scale 0.2→1.18→1,
   //               rotate -12°→3°→0°). Matches onboarding first-card.
   //   500 ms    : Ring flourish (fp-ring ::after) starts, 0.4 s ease-out
-  //   700 ms    : Fly kicks off (ring is 50 % through, fading past 0.45)
+  //   540 ms    : Card overshoot peak
   //   900 ms    : Card entry ends AND ring flourish ends (clean settle)
-  //   1550 ms   : Fly lands (700 + 850)
-  //   1750 ms   : Forge starts if boundary (Fly lands + 200 ms per spec §5.3)
-  //   3950 ms   : Forge settles (1750 + 2200)
-  //   4350 ms   : Banner clears (1750 + 2600)
-  //   4450 ms   : Shine starts (banner + 100 ms)
+  //   900-1200  : 300 ms pause — nothing moves. The card's arrival
+  //               and the point landing are two events; the pause is
+  //               what makes them read as two instead of one.
+  //   1200 ms   : Fly kicks off (gem rises from portrait centre)
+  //   2050 ms   : Fly lands (1200 + 850)
+  //   2250 ms   : Forge starts if boundary (Fly lands + 200 ms per spec §5.3)
+  //   4450 ms   : Forge settles (2250 + 2200)
+  //   4850 ms   : Banner clears (2250 + 2600)
+  //   4950 ms   : Shine starts (banner + 100 ms)
   //
-  // Total reveal ≈ 4.45 s at boundaries; ≈ 1.55 s at within-tier
+  // Total reveal ≈ 4.95 s at boundaries; ≈ 2.05 s at within-tier
   // points; instant when suppressed or diamond-capped.
   //
   // Tap-to-skip: any tap on the card during the animation snaps
