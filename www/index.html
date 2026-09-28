@@ -2519,7 +2519,13 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    padding: 50px 16px 50px;
+    /* Spec §13 sets 18 px as the MINIMUM top padding for the tier
+       crest. We use 44 px — 6 px less than the historical 50 px —
+       to offset the item block growing by 6 (item 64→68 from the
+       content-box img fix + gap 6→8). Net wrap height unchanged, so
+       the home screen doesn't shift when tiers appear. The crest
+       (24 px above the avatar) still fits comfortably in 44 px. */
+    padding: 44px 16px 50px;
     cursor: grab;
   }
   .thinker-carousel::-webkit-scrollbar { display: none; }
@@ -2529,11 +2535,30 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    /* Spec §13: 8 px between the circle and the name (was 6). */
+    gap: 8px;
     cursor: pointer;
     transition: transform 0.3s ease;
   }
+  /* Positioned wrapper around the img — same 68×68 footprint as the
+     bare <img> (64 + 2 px border × 2) so item centres and the scroll
+     don't move. Bronze+ items add the tier PNG + gold gem as
+     absolutely-positioned children; plain and locked leave the
+     wrapper empty around the img. */
+  .thinker-carousel-card .tc-av {
+    position: relative;
+    display: block;
+    width: 68px;
+    height: 68px;
+  }
   .thinker-carousel-card img {
+    /* Override the universal border-box reset (line 747) so `width:
+       64px` sizes the CONTENT (the portrait crop). Outer is 64 + 4
+       (border) = 68 px, matching the .tc-av wrapper and the spec §13
+       "68 px avatar" the tier setting was drawn around. The 2 px
+       subject ring sits outside the 64 px portrait rather than
+       eating into it. */
+    box-sizing: content-box;
     width: 64px;
     height: 64px;
     border-radius: 50%;
@@ -2556,6 +2581,55 @@
     filter: grayscale(100%) brightness(0.6);
     opacity: 0.45;
     border-color: transparent;
+  }
+  /* Tier setting (spec §13). One static PNG per tier, drawn around
+     the avatar with its origin (0,0) at the portrait centre — placed
+     at left -16, top -24 relative to the 68 px avatar, sized 100 × 110.
+     The bezel sits 5.5 px past the avatar on each side; the row's
+     16 px inline padding gives ample clearance at the first / last
+     item. Pointer-events: none so tap still targets the button. */
+  .thinker-carousel-card .tc-set {
+    position: absolute;
+    left: -16px;
+    top: -24px;
+    width: 100px;
+    height: 110px;
+    pointer-events: none;
+    display: block;
+  }
+  /* Gold gem: CSS on top of the PNG in the subject colours (same
+     radial gradient as the Pantheon gem, driven by the frame tone
+     tokens). Position + size relative to the 68 px avatar per spec. */
+  .thinker-carousel-card .tc-gem {
+    position: absolute;
+    left: 30.9px;
+    top: -11.4px;
+    width: 6.2px;
+    height: 4.8px;
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow: 0 0 0 .4px var(--frame-philosophy-line);
+    background: radial-gradient(ellipse at 35% 30%,
+      #FFFFFF 0%,
+      var(--frame-philosophy-field) 22%,
+      var(--frame-philosophy-deep) 70%,
+      var(--frame-philosophy-line) 100%);
+  }
+  .thinker-carousel-card[data-subject="economics"] .tc-gem {
+    box-shadow: 0 0 0 .4px var(--frame-economics-line);
+    background: radial-gradient(ellipse at 35% 30%,
+      #FFFFFF 0%,
+      var(--frame-economics-field) 22%,
+      var(--frame-economics-deep) 70%,
+      var(--frame-economics-line) 100%);
+  }
+  .thinker-carousel-card[data-subject="psychology"] .tc-gem {
+    box-shadow: 0 0 0 .4px var(--frame-psychology-line);
+    background: radial-gradient(ellipse at 35% 30%,
+      #FFFFFF 0%,
+      var(--frame-psychology-field) 22%,
+      var(--frame-psychology-deep) 70%,
+      var(--frame-psychology-line) 100%);
   }
   .thinker-carousel-name {
     font-size: 10px;
@@ -23896,8 +23970,20 @@ function populateCarousel() {
     // carousel, as economics. Same principle as the intro-portrait
     // fix in _renderThinkerIntro.
     card.dataset.subject = subject;
+    // Tier gate: locked never shows a setting even if a points override
+    // would otherwise put the thinker at bronze+. Plain (unlocked, 0 <
+    // points < 3) also gets no setting per spec §13 — plain is exactly
+    // as today.
+    const _cTier = unlocked ? thinkerTier(t.id) : 0;
+    const _cTierName = TIERS[_cTier];
+    const _cSetting = (_cTier >= 1)
+      ? `<img class="tc-set" src="images/thinker-frames/carousel/carousel_${_cTierName}.png" alt="" aria-hidden="true">${_cTier === 3 ? '<span class="tc-gem" aria-hidden="true"></span>' : ''}`
+      : '';
     card.innerHTML = `
-      <img src="${_thinkerImage(t, subject)}" alt="${t.name}" loading="lazy">
+      <span class="tc-av">
+        <img src="${_thinkerImage(t, subject)}" alt="${t.name}" loading="lazy">
+        ${_cSetting}
+      </span>
       <div class="thinker-carousel-name">${t.name}</div>
     `;
     // Both variants clickable — locked opens the teaser modal, unlocked opens the full view.
