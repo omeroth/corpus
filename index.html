@@ -9437,21 +9437,26 @@
   .dc-share-btn svg { flex-shrink: 0; }
   /* Thinker-card share sits inside `.dc-actions` alongside the full-
      width primary buttons; align-self centers it so it doesn't try to
-     stretch to the container width like next-lesson-btn / btn-back-home. */
-  .dc-share-thinker-btn { align-self: center; margin-top: 4px; }
+     stretch to the container width like next-lesson-btn / btn-back-home.
+     margin-top removed — the .dc-actions gap handles separation now. */
+  .dc-share-thinker-btn { align-self: center; }
   /* Pantheon modal share button — same visual as dc-share-btn but
      shifted onto its own row above the close button, centered. */
   .thinker-modal-share-btn { margin-top: 12px; align-self: center; }
   /* Thinker screen */
   .dc-thinker-screen {
     justify-content: flex-start;
-    /* Override the tighter thinker padding but keep the safe-area contribution
-       — otherwise the 'A NEW THINKER…' title renders behind the notch. */
-    padding: calc(16px + var(--safe-top)) 16px calc(20px + var(--safe-bottom));
-    gap: 8px;
-    /* No scrollbar on the reveal. Content fits ≥ 320 × 568 via the
-       card's height cap and the tightened .dc-actions block. Sheen
-       overflow is clipped by the inherited overflow-x: hidden. */
+    /* Padding kept above safe-area for notches but the base numbers
+       are tight (8 top, 8 bottom) so an iPhone 15/16 with 59 + 34 px
+       of insets doesn't push .dc-actions off the fold. gap 8 → 4
+       shaves another 8 px across the three children (title, card
+       zone, actions). */
+    padding: calc(8px + var(--safe-top)) 16px calc(8px + var(--safe-bottom));
+    gap: 4px;
+    /* No scrollbar on the reveal. Content fits notched iPhone 15/16
+       (393 × 852 with safe 59/34) and every non-notch viewport we
+       support. Sheen overflow is clipped by the inherited
+       overflow-x: hidden on .dc-screen. */
     overflow-y: hidden;
   }
   .dc-thinker-title {
@@ -9459,7 +9464,11 @@
     font-size: 13px;
     color: var(--accent-muted);
     text-align: center;
-    margin-bottom: 8px;
+    /* 8 → 4: subtle change, title still visually separated from
+       card. Combined with .dc-thinker-screen gap: 4 (also reduced
+       from 8), title-to-card is 8 px total — one flex-gap + one
+       margin-bottom. */
+    margin-bottom: 4px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     font-weight: 700;
@@ -9473,7 +9482,11 @@
     align-items: center;
     justify-content: center;
     margin: 0 auto;
-    padding: 16px;
+    /* padding 16 → 8: recovers 16 px vertically without changing
+       the card size. Halo (::before) is positioned 120 % × 110 %
+       relative to this box so a smaller padding just moves the halo
+       slightly closer to the card edge — still reads as a glow. */
+    padding: 8px;
     flex-shrink: 0;
   }
   .dc-card-zone::before {
@@ -9542,15 +9555,16 @@
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    /* Gap 8 (was 10) and padding-bottom min 4 (was 8) reclaim 8 px
-       for the no-scroll fit on 375 × 667 and smaller. Safe-area still
-       respected — max() keeps the pad ≥ safe-bottom on notched
-       devices. */
-    gap: 8px;
+    /* gap 8 → 6: two gaps × 2 px = 4 px reclaimed.
+       padding-bottom removed entirely: .dc-thinker-screen already
+       adds calc(8px + safe-bottom) at its own padding-bottom, so
+       any padding here was a double-count of the home-indicator
+       inset — on iPhone 15/16 that meant 34 px of extra space
+       below the share button, pushing it off the fold. */
+    gap: 6px;
     width: 100%;
     max-width: 360px;
     margin: 0 auto;
-    padding-bottom: max(4px, var(--safe-bottom));
     opacity: 0;
     transform: translateY(20px);
     animation: dc-fade-up 0.5s ease-out 1.3s forwards;
@@ -9589,15 +9603,16 @@
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    /* Gap 8 (was 10) and padding-bottom min 4 (was 8) reclaim 8 px
-       for the no-scroll fit on 375 × 667 and smaller. Safe-area still
-       respected — max() keeps the pad ≥ safe-bottom on notched
-       devices. */
-    gap: 8px;
+    /* gap 8 → 6: two gaps × 2 px = 4 px reclaimed.
+       padding-bottom removed entirely: .dc-thinker-screen already
+       adds calc(8px + safe-bottom) at its own padding-bottom, so
+       any padding here was a double-count of the home-indicator
+       inset — on iPhone 15/16 that meant 34 px of extra space
+       below the share button, pushing it off the fold. */
+    gap: 6px;
     width: 100%;
     max-width: 360px;
     margin: 0 auto;
-    padding-bottom: max(4px, var(--safe-bottom));
     opacity: 0;
     transform: translateY(20px);
     animation: dc-fade-up 0.5s ease-out 1.3s forwards;
