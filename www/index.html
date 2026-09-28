@@ -9219,6 +9219,16 @@
        completion modal, chapter-complete overlay, and any future .dc-*
        full-screen surface clear device chrome without hardcoded offsets. */
     padding: calc(32px + var(--safe-top)) 24px calc(32px + var(--safe-bottom));
+    /* overflow-x: hidden kills the horizontal scrollbar that the
+       reveal's shine layer would otherwise trigger — #rv-svg uses
+       overflow: visible so the sheen can sweep past the frame, and
+       any ancestor with overflow-{x,y}: auto (implicit or explicit)
+       would offer that overflow as scrollable content. overflow-y
+       stays default (visible) here so dc-stats — which has more
+       content than dc-thinker and can genuinely need to scroll on
+       short viewports — still gets a scrollbar when it needs one.
+       dc-thinker overrides overflow-y to hidden (no-scroll rule). */
+    overflow-x: hidden;
     overflow-y: auto;
   }
   /* Bare `justify-content: center` symmetrically overflows content into the
@@ -9422,7 +9432,10 @@
        — otherwise the 'A NEW THINKER…' title renders behind the notch. */
     padding: calc(16px + var(--safe-top)) 16px calc(20px + var(--safe-bottom));
     gap: 8px;
-    overflow-y: auto;
+    /* No scrollbar on the reveal. Content fits ≥ 320 × 568 via the
+       card's height cap and the tightened .dc-actions block. Sheen
+       overflow is clipped by the inherited overflow-x: hidden. */
+    overflow-y: hidden;
   }
   .dc-thinker-title {
     flex-shrink: 0;
@@ -9474,11 +9487,14 @@
      on the wrapper. Width capped by (a) 266 px reference native,
      (b) viewport minus padding, (c) available height scaled by
      the SVG's own 380:745 aspect so tall SVG fits inside short
-     viewports. Fallback: .dc-thinker-screen has overflow-y:auto. */
+     viewports. The 280 px constant in (c) reserves room for the
+     title, actions and safe-area on 375 × 667 and below; increase
+     if a future action needs more vertical space. On 844+ the
+     266 px cap dominates and the card is unaffected. */
   .dc-thinker-screen #thinker-unlock-box {
     position: relative;
     z-index: 2;
-    width: min(266px, calc(100vw - 48px), calc((100vh - 260px) * 380 / 745));
+    width: min(266px, calc(100vw - 48px), calc((100vh - 280px) * 380 / 745));
     flex-shrink: 0;
     background: transparent;
     /* opacity/transform driven by JS for arrival */
@@ -9509,11 +9525,15 @@
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    /* Gap 8 (was 10) and padding-bottom min 4 (was 8) reclaim 8 px
+       for the no-scroll fit on 375 × 667 and smaller. Safe-area still
+       respected — max() keeps the pad ≥ safe-bottom on notched
+       devices. */
+    gap: 8px;
     width: 100%;
     max-width: 360px;
     margin: 0 auto;
-    padding-bottom: max(8px, var(--safe-bottom));
+    padding-bottom: max(4px, var(--safe-bottom));
     opacity: 0;
     transform: translateY(20px);
     animation: dc-fade-up 0.5s ease-out 1.3s forwards;
@@ -9552,11 +9572,15 @@
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    /* Gap 8 (was 10) and padding-bottom min 4 (was 8) reclaim 8 px
+       for the no-scroll fit on 375 × 667 and smaller. Safe-area still
+       respected — max() keeps the pad ≥ safe-bottom on notched
+       devices. */
+    gap: 8px;
     width: 100%;
     max-width: 360px;
     margin: 0 auto;
-    padding-bottom: max(8px, var(--safe-bottom));
+    padding-bottom: max(4px, var(--safe-bottom));
     opacity: 0;
     transform: translateY(20px);
     animation: dc-fade-up 0.5s ease-out 1.3s forwards;
