@@ -21340,11 +21340,25 @@ function _showFramesExplainer(trigger) {
   overlay.onclick = function (e) {
     if (e.target === overlay) _closeFramesExplainer('scrim');
   };
-  // Mark seen the moment we're visible — a mid-animation kill still
-  // counts.
+  // Flag: defer to a double rAF after .fe-open lands. That way we
+  // only mark seen once at least one paint has actually rendered the
+  // modal. Setting the flag synchronously with the class-add would
+  // burn the once-per-user credit even if a CSS collision or
+  // compositor hiccup prevented the pop-up from being visible.
+  // Guard: if the overlay is no longer open by the time the rAF
+  // callback fires (skip / scrim tap / _closeFramesExplainer during
+  // the same tick), don't set the flag — the user never saw the
+  // rendered pop-up either.
   if (!state.framesExplainerSeen) {
-    state.framesExplainerSeen = true;
-    try { saveStateLocal(); } catch (e) {}
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const still = document.getElementById('modal-frames-explainer');
+        if (!still || !still.classList.contains('fe-open')) return;
+        if (state.framesExplainerSeen) return;
+        state.framesExplainerSeen = true;
+        try { saveStateLocal(); } catch (e) {}
+      });
+    });
   }
   const current = _feCurrentThinker();
   _feCapture('frames_explainer_shown', {
@@ -21353,6 +21367,22 @@ function _showFramesExplainer(trigger) {
     thinker_id: current ? current.id : null,
   });
 }
+
+// Debug helper for on-device testing. Clears the seen flag + any
+// pending WB chain so a re-open of the app / renderHome will run
+// the gate fresh. Exposed on window so it's callable from Safari
+// Web Inspector's console.
+window._resetFramesExplainer = function () {
+  state.framesExplainerSeen = false;
+  _pendingExplainerAfterWelcomeBack = false;
+  try { saveStateLocal(); } catch (e) {}
+  return {
+    framesExplainerSeen: state.framesExplainerSeen,
+    completedDays: Object.keys(state.completedDays || {}).length,
+    onboardingDone: !!localStorage.getItem('corpus_onboarding_done'),
+    currentScreen: state.currentScreen,
+  };
+};
 
 function _closeFramesExplainer(source) {
   const overlay = document.getElementById('modal-frames-explainer');
@@ -22968,10 +22998,14 @@ function closeWelcomeBackModal() {
   } catch(e) {}
   // Chain-open the frames explainer if it was deferred at launch
   // because welcome-back was in the way. Same session, right after
-  // dismiss — not on next open.
+  // dismiss — not on next open. Re-runs the full gate rather than
+  // calling _showFramesExplainer directly so reader/celebration/other
+  // overlay guards still apply if the user's state changed while WB
+  // was up (e.g. a queued celebration surfaced, or they navigated
+  // into the reader from a nested action).
   if (_pendingExplainerAfterWelcomeBack) {
     _pendingExplainerAfterWelcomeBack = false;
-    try { _showFramesExplainer('launch'); } catch (e) {}
+    try { _maybeShowFramesExplainerAtLaunch(); } catch (e) {}
   }
 }
 // === End welcome-back modal ==========================================
