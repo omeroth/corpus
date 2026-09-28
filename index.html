@@ -9554,14 +9554,25 @@
      notched viewports where (a) would otherwise dominate, the card
      shrinks to leave real breathing room above the home indicator.
      Non-notch: the safe vars are 0, so the calc collapses to
-     (100vh - 280) * 380 / 745 — unchanged. */
+     (100vh - 280) * 380 / 745 — unchanged.
+
+     will-change + backface-visibility: forces both Chromium and
+     WebKit to rasterise this element's compositor layer at its
+     natural layout size, not at its currently-transformed size.
+     Without these hints, the p3-pop entry starts at scale 0.2 and
+     the browser rasterises the layer at that tiny size, then blurs
+     as it scales up to 1. The hint pair keeps the raster crisp
+     through the whole spring. The element only exists while the
+     reveal modal is open, so the compositor-memory cost is scoped. */
   .dc-thinker-screen #thinker-unlock-box {
     position: relative;
     z-index: 2;
     width: min(266px, calc(100vw - 48px), calc((100vh - 280px - var(--safe-top) - var(--safe-bottom)) * 380 / 745));
     flex-shrink: 0;
     background: transparent;
-    /* opacity/transform driven by JS for arrival */
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
   .dc-actions {
     flex-shrink: 0;
