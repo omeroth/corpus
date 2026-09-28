@@ -2587,7 +2587,14 @@
      at left -16, top -24 relative to the 68 px avatar, sized 100 × 110.
      The bezel sits 5.5 px past the avatar on each side; the row's
      16 px inline padding gives ample clearance at the first / last
-     item. Pointer-events: none so tap still targets the button. */
+     item. Pointer-events: none so tap still targets the button.
+
+     The tier PNG is an <img>, so the general `.thinker-carousel-card
+     img` rule would otherwise apply the portrait's 2 px border, its
+     circular clip and its box-shadow to it — producing a phantom
+     purple ring hugging the bezel AND offsetting the bezel from the
+     portrait centre (border-box shift under content-box sizing).
+     Explicit resets below strip those. */
   .thinker-carousel-card .tc-set {
     position: absolute;
     left: -16px;
@@ -2596,6 +2603,16 @@
     height: 110px;
     pointer-events: none;
     display: block;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    box-sizing: content-box;
+  }
+  /* Framed thinkers: no outer glow on the portrait. The 2 px subject
+     ring stays inside the bezel; anything past the bezel is the
+     setting's job. Plain unlocked keeps its current soft glow. */
+  .thinker-carousel-card.framed img {
+    box-shadow: none;
   }
   /* Gold gem: CSS on top of the PNG in the subject colours (same
      radial gradient as the Pantheon gem, driven by the frame tone
@@ -23979,6 +23996,10 @@ function populateCarousel() {
     const _cSetting = (_cTier >= 1)
       ? `<img class="tc-set" src="images/thinker-frames/carousel/carousel_${_cTierName}.png" alt="" aria-hidden="true">${_cTier === 3 ? '<span class="tc-gem" aria-hidden="true"></span>' : ''}`
       : '';
+    // Add .framed only when a setting is actually rendered — CSS uses
+    // this to suppress the portrait's outer glow (the bezel is the
+    // outer element now, no glow past it).
+    if (_cTier >= 1) card.classList.add('framed');
     card.innerHTML = `
       <span class="tc-av">
         <img src="${_thinkerImage(t, subject)}" alt="${t.name}" loading="lazy">
