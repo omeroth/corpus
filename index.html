@@ -2022,6 +2022,310 @@
     }
   }
 
+  /* ── Frames explainer (spec §14) ──
+     Full-screen light modal shown once per user at launch (and on
+     any points-plate tap). Ported from thinker-frames-handoff/
+     explainer/index.html with .fe- prefix so nothing collides with
+     .pth- (pantheon), .rv- (reveal) or .tc- (carousel). Fits
+     360 × 640 without scrolling in both languages. */
+  .fe-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1600;
+    display: none;
+    background: rgba(47, 33, 80, 0.30);
+    align-items: stretch;
+    justify-content: center;
+  }
+  .fe-overlay.fe-open {
+    display: flex;
+  }
+  .fe-mx {
+    position: relative;
+    flex: 1;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: calc(14px + var(--safe-top)) 16px calc(16px + var(--safe-bottom));
+    color: #2F2150;
+    overflow: hidden;
+    background: radial-gradient(110% 60% at 50% 26%, #FFFFFF 0%, #F6F0FF 45%, #EFE7FB 100%);
+    font-family: 'Nunito', 'Assistant', sans-serif;
+  }
+  [dir="rtl"] .fe-mx { font-family: 'Assistant', 'Nunito', sans-serif; }
+  .fe-close {
+    position: absolute;
+    inset-block-start: calc(12px + var(--safe-top));
+    inset-inline-end: 12px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(47, 33, 80, 0.07);
+    color: #2F2150;
+    font-size: 18px;
+    line-height: 34px;
+    cursor: pointer;
+    z-index: 5;
+    padding: 0;
+  }
+  .fe-stars { position: absolute; inset: 0; pointer-events: none; }
+  .fe-stars i {
+    position: absolute;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: #F59E0B;
+    opacity: .5;
+    animation: fe-tw 2.8s ease-in-out infinite;
+  }
+  @keyframes fe-tw {
+    0%, 100% { opacity: .15; transform: scale(.6); }
+    50% { opacity: .9; transform: scale(1.1); }
+  }
+  .fe-fan {
+    position: relative;
+    width: 328px;
+    height: 212px;
+    margin-top: 26px;
+    flex: none;
+  }
+  .fe-rays {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 340px; height: 340px;
+    margin: -150px 0 0 -170px;
+    border-radius: 50%;
+    background: repeating-conic-gradient(rgba(245, 158, 11, 0.22) 0deg 6deg, transparent 6deg 18deg);
+    -webkit-mask: radial-gradient(circle, #000 10%, transparent 62%);
+    mask: radial-gradient(circle, #000 10%, transparent 62%);
+    animation: fe-spin 40s linear infinite;
+  }
+  @keyframes fe-spin { to { transform: rotate(360deg); } }
+  .fe-glow {
+    position: absolute;
+    left: 50%; top: 44%;
+    width: 220px; height: 220px;
+    margin: -110px 0 0 -110px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 236, 190, 0.9), rgba(245, 158, 11, 0) 65%);
+  }
+  .fe-card {
+    position: absolute;
+    left: 50%; top: 40px;
+    width: 66px; height: 118px;
+    margin-left: -33px;
+    transform-origin: 50% 140%;
+    transform: translateX(var(--x)) rotate(var(--r)) scale(var(--s));
+    z-index: var(--z);
+    animation: fe-deal .7s cubic-bezier(.2, .9, .3, 1.2) both;
+    animation-delay: var(--d);
+  }
+  @keyframes fe-deal {
+    0%   { opacity: 0; transform: translateX(0) translateY(120px) rotate(0) scale(.7); }
+    100% { opacity: 1; transform: translateX(var(--x)) rotate(var(--r)) scale(var(--s)); }
+  }
+  .fe-card .fe-a {
+    width: 66px; height: 118px;
+    display: block;
+    border-radius: 5px;
+    object-fit: cover;
+    object-position: center 20%;
+    box-shadow: 0 8px 18px rgba(47, 33, 80, 0.28);
+  }
+  .fe-card .fe-f {
+    position: absolute;
+    left: -8.8px; top: -11px;
+    width: 83.6px; height: 138.6px;
+    max-width: none;
+    filter: drop-shadow(0 5px 8px rgba(47, 33, 80, 0.25));
+  }
+  .fe-card .fe-g {
+    position: absolute;
+    left: 31.2px; top: -4.8px;
+    width: 3.5px; height: 2.7px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff, var(--cf) 30%, var(--cd));
+  }
+  .fe-card.fe-hero .fe-a { box-shadow: 0 14px 30px rgba(47, 33, 80, 0.35); }
+  .fe-card.fe-hero::after {
+    content: '';
+    position: absolute;
+    inset: -12px -10px;
+    border-radius: 10px;
+    background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.75) 50%, transparent 65%);
+    background-size: 250% 100%;
+    background-position: 120% 0;
+    mix-blend-mode: screen;
+    animation: fe-sheen 2.6s ease-in-out 1.3s infinite;
+    pointer-events: none;
+  }
+  @keyframes fe-sheen {
+    0%       { background-position: 120% 0; }
+    45%, 100% { background-position: -60% 0; }
+  }
+  .fe-flash {
+    position: absolute;
+    left: 50%; top: 44%;
+    width: 260px; height: 260px;
+    margin: -130px 0 0 -130px;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(255, 255, 255, 1), rgba(255, 236, 190, 0.6) 25%, rgba(245, 158, 11, 0) 60%);
+    opacity: 0;
+    animation: fe-flash .9s ease-out .95s both;
+  }
+  @keyframes fe-flash {
+    0%   { opacity: 0; transform: scale(.3); }
+    30%  { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.2); }
+  }
+  .fe-spk {
+    position: absolute;
+    width: 12px; height: 12px;
+    animation: fe-tw 2.2s ease-in-out infinite;
+  }
+  .fe-spk path { fill: #F59E0B; }
+  .fe-tt {
+    margin: 10px 0 0;
+    text-align: center;
+    font-size: 25px;
+    line-height: 1.15;
+    font-weight: 900;
+    letter-spacing: -0.01em;
+  }
+  .fe-tt em { font-style: normal; color: #7B4FD4; }
+  .fe-sub {
+    margin: 8px 0 0;
+    text-align: center;
+    font-size: 14.5px;
+    line-height: 1.45;
+    color: #5E5578;
+    font-weight: 700;
+    max-width: 310px;
+  }
+  .fe-you {
+    font-size: 10px;
+    font-weight: 900;
+    color: #2F2150;
+    background: #FCD34D;
+    border-radius: 999px;
+    padding: 2px 8px;
+    margin: 16px 0 6px;
+    align-self: flex-start;
+    margin-inline-start: 6px;
+  }
+  .fe-you.fe-hidden { visibility: hidden; }
+  .fe-track {
+    width: 100%;
+    margin-top: 0;
+    background: #FFFFFF;
+    border: 1px solid #E4DAF5;
+    box-shadow: 0 4px 14px rgba(47, 33, 80, 0.08);
+    border-radius: 16px;
+    padding: 12px 8px 9px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .fe-seg {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .fe-gems { display: flex; align-items: center; gap: 5px; }
+  .fe-gm {
+    width: 9px; height: 9px;
+    transform: rotate(45deg);
+    border: 1px solid #CFC3E4;
+    background: #F3EEFA;
+    box-shadow: inset 1px 1px 2px rgba(47, 33, 80, 0.15);
+  }
+  .fe-gm.fe-on {
+    background: linear-gradient(135deg, #F3E8FF, var(--fe-subj-field) 40%, var(--fe-subj-deep));
+    border-color: var(--fe-subj-line);
+    box-shadow: 0 0 8px rgba(123, 79, 212, 0.6);
+    animation: fe-pop .5s cubic-bezier(.3, 1.6, .5, 1) both;
+    animation-delay: var(--d);
+  }
+  @keyframes fe-pop {
+    0%   { transform: rotate(45deg) scale(0); }
+    100% { transform: rotate(45deg) scale(1); }
+  }
+  .fe-med {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--m);
+    border: 1.5px solid var(--e);
+    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.7), 0 3px 6px rgba(0, 0, 0, 0.35);
+    margin-inline-start: 4px;
+  }
+  .fe-row { display: flex; align-items: center; }
+  .fe-seg .fe-n {
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .fe-seg .fe-a2 {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #8A80A6;
+    line-height: 1;
+    margin-top: -2px;
+  }
+  .fe-dare {
+    margin: auto 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    line-height: 1.35;
+    font-weight: 900;
+    color: #2F2150;
+    text-align: start;
+  }
+  .fe-dare svg {
+    width: 22px; height: 22px;
+    flex: none;
+    filter: drop-shadow(0 2px 3px rgba(91, 74, 138, 0.35));
+  }
+  .fe-dare em { font-style: normal; color: #9A5B24; }
+  .fe-cta {
+    margin-top: 0;
+    width: 100%;
+    height: 50px;
+    border: 0;
+    border-radius: 16px;
+    background: #7B4FD4;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 900;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 6px 18px rgba(123, 79, 212, 0.35);
+  }
+  .fe-hint {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: #8A80A6;
+    font-weight: 700;
+    text-align: center;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fe-card, .fe-gm.fe-on, .fe-flash, .fe-rays, .fe-stars i, .fe-spk, .fe-card.fe-hero::after {
+      animation: none !important;
+    }
+    .fe-flash { opacity: 0; }
+  }
+
+  /* Plate tap affordance — cursor only. No layout change. Handlers
+     are wired via capture-phase delegation so they run before the
+     pantheon .pth-slot button's flip onclick. */
+  .rv-plate, .pth-bar {
+    cursor: pointer;
+  }
+
 
   /* Reveal-time card zone. Vertical stack: slot + read-more pill.
      Plate moved INSIDE the slot (per Option A refactor) so it
@@ -12020,6 +12324,13 @@
   </div>
 </div>
 
+<!-- Frames explainer (spec §14). Full-screen light modal. Populated by
+     _showFramesExplainer; the .fe-mx inner is built as an HTML string so
+     the fan / track / copy all localise + pick up the current thinker's
+     progress in one pass. Fires once per user at launch (guarded); reopens
+     on any points-plate tap (reveal .rv-plate or pantheon .pth-bar). -->
+<div class="fe-overlay" id="modal-frames-explainer" aria-hidden="true"></div>
+
 <div class="modal-overlay" id="modal-guest-signup">
   <div class="modal-box">
     <div class="modal-title" id="guest-signup-title">Save your progress</div>
@@ -20784,6 +21095,330 @@ function _rvClearShine() {
   if (shine) shine.innerHTML = '';
 }
 
+// ── Frames explainer (spec §14) ────────────────────────────────────
+// Full-screen light modal shown once per user at launch, and again on
+// any points-plate tap (reveal .rv-plate or pantheon .pth-bar).
+// Populates the fan (fixed 5-thinker roster), the copy, the yellow
+// progress tag if the user has any points, and the 12-socket track.
+// Ported verbatim from thinker-frames-handoff/explainer/index.html
+// with .fe- prefix on class + keyframe names to avoid collision.
+
+// Fan: 5 thinkers in fixed order. Position + rotation + scale + z per
+// the reference (pos array). Frames come from images/thinker-frames/
+// reveal/reveal_{tier}.png. Portraits via _thinkerImage(t, subject),
+// each thinker's own subject so the gold gem tints match.
+const _FE_FAN = [
+  { id: 'marx',      tier: 'plain'   },
+  { id: 'freud',     tier: 'bronze'  },
+  { id: 'socrates',  tier: 'diamond' },
+  { id: 'smith',     tier: 'silver'  },
+  { id: 'aurelius',  tier: 'gold'    },
+];
+const _FE_POS = [
+  { x: -110, r: -16, s: 0.8,  z: 1 },
+  { x:  -58, r:  -8, s: 0.9,  z: 2 },
+  { x:    0, r:   0, s: 1.16, z: 5 },  // diamond, hero
+  { x:   58, r:   8, s: 0.9,  z: 3 },
+  { x:  110, r:  16, s: 0.8,  z: 2 },
+];
+const _FE_MAT = {
+  bronze:  ['linear-gradient(135deg,#7A4A22,#C8894A 45%,#E0A86A 55%,#8C5A2B)', '#3E220C'],
+  silver:  ['linear-gradient(135deg,#8A9098,#E8ECEF 45%,#FFFFFF 52%,#9EA4AB)', '#4A5058'],
+  gold:    ['linear-gradient(135deg,#A8841C,#E3C868 45%,#F3DE8E 52%,#C9A227)', '#5E4608'],
+  diamond: ['linear-gradient(135deg,#E9DDF7,#FFFFFF 20%,#C7B3EC 38%,#F6F0FF 55%,#A98BDB 72%,#D6ECF7 88%,#FFFFFF)', '#5B4A8A'],
+};
+const _FE_FRAME_PNGS = {
+  bronze:  'images/thinker-frames/reveal/reveal_bronze.png',
+  silver:  'images/thinker-frames/reveal/reveal_silver.png',
+  gold:    'images/thinker-frames/reveal/reveal_gold.png',
+  diamond: 'images/thinker-frames/reveal/reveal_diamond.png',
+};
+const _FE_SUBJ_TONES = {
+  philosophy: { field: 'var(--frame-philosophy-field)', deep: 'var(--frame-philosophy-deep)', line: 'var(--frame-philosophy-line)' },
+  economics:  { field: 'var(--frame-economics-field)',  deep: 'var(--frame-economics-deep)',  line: 'var(--frame-economics-line)'  },
+  psychology: { field: 'var(--frame-psychology-field)', deep: 'var(--frame-psychology-deep)', line: 'var(--frame-psychology-line)' },
+};
+
+// Pending-open flag: set by _maybeShowFramesExplainerAtLaunch when
+// welcome-back is currently open. closeWelcomeBackModal reads this
+// after dismissing and chains the explainer in the same session.
+let _pendingExplainerAfterWelcomeBack = false;
+
+// Analytics.
+function _feCapture(evt, props) {
+  try { posthog.capture(evt, props || {}); } catch (e) {}
+}
+
+// Pick the "current" thinker for the yellow progress tag. Spec: the
+// thinker with the most points in their current plate; on a tie, the
+// most recently read. We approximate "most recently read" via
+// insertion order of state.completedDays (which is chronological in JS
+// objects) — walk the keys back-to-front and return the first thinker
+// whose plate has any fill.
+function _feCurrentThinker() {
+  const keys = Object.keys(state.completedDays || {});
+  if (!keys.length) return null;
+  // Newest-first: iterate reverse.
+  for (let i = keys.length - 1; i >= 0; i--) {
+    const key = keys[i];
+    // key is "weekId-dayId[-subject]"; find the corresponding day.
+    const [wStr, dStr] = key.split('-');
+    const w = parseInt(wStr, 10);
+    const dNum = parseInt(dStr, 10);
+    // Search across every subject's data for the matching day.
+    const sources = [
+      typeof corpusData     !== 'undefined' ? corpusData     : null,
+      typeof economicsData  !== 'undefined' ? economicsData  : null,
+      typeof psychologyData !== 'undefined' ? psychologyData : null,
+    ];
+    for (const data of sources) {
+      if (!data || !Array.isArray(data.weeks)) continue;
+      const week = data.weeks.find(x => x && x.id === w);
+      if (!week || !Array.isArray(week.days)) continue;
+      const day = week.days.find(x => x && x.id === dNum);
+      if (day && day.thinkerId) {
+        const filled = thinkerPlateFilled(day.thinkerId);
+        if (filled > 0) return { id: day.thinkerId, filled };
+      }
+    }
+  }
+  // Fallback: any thinker with a non-empty plate, first found.
+  for (const t of (getT() || [])) {
+    if (!t || !t.id) continue;
+    const f = thinkerPlateFilled(t.id);
+    if (f > 0) return { id: t.id, filled: f };
+  }
+  return null;
+}
+
+function _feThinkerName(id) {
+  const t = (typeof getT === 'function' ? getT() : []).find(x => x && x.id === id);
+  return t && t.name ? t.name : id;
+}
+
+function _feSubjectForThinker(id) {
+  const sources = [
+    ['philosophy', typeof corpusData     !== 'undefined' ? corpusData     : null],
+    ['economics',  typeof economicsData  !== 'undefined' ? economicsData  : null],
+    ['psychology', typeof psychologyData !== 'undefined' ? psychologyData : null],
+  ];
+  for (const [subj, data] of sources) {
+    if (!data || !Array.isArray(data.weeks)) continue;
+    for (const w of data.weeks) {
+      if (!w || !Array.isArray(w.days)) continue;
+      for (const d of w.days) if (d && d.thinkerId === id) return subj;
+    }
+  }
+  return 'philosophy';
+}
+
+// Build the modal DOM. Returns an HTML string that fills #modal-
+// frames-explainer.
+function _feBuildHtml(lang) {
+  const isEn = lang === 'en';
+  const rtl = !isEn;
+  const sgn = rtl ? -1 : 1;
+  const copy = isEn ? {
+    close: 'Close',
+    title: 'Three dialogues, <em>one frame</em>',
+    sub:   'Each dialogue with a thinker adds a point to their card. After three, the card gets a new frame.',
+    tiers: { bronze: ['Bronze', 'Classical'], silver: ['Silver', 'Renaissance'], gold: ['Gold', 'Baroque'], diamond: ['Diamond', 'Modern'] },
+    dare:  'First goal: a <em>bronze frame</em>. Three dialogues with one thinker.',
+    cta:   'Next dialogue',
+    hint:  'Tap the points under any card to see this again.',
+  } : {
+    close: 'סגירה',
+    title: 'שלושה דיאלוגים, <em>מסגרת חדשה</em>',
+    sub:   'כל דיאלוג עם הוגה מוסיף לקלף שלו נקודה. אחרי שלוש, הקלף מקבל מסגרת חדשה.',
+    tiers: { bronze: ['ארד', 'קלאסי'], silver: ['כסף', 'רנסנס'], gold: ['זהב', 'בארוק'], diamond: ['יהלום', 'מודרני'] },
+    dare:  'המטרה הראשונה: <em>מסגרת ארד</em>. שלושה דיאלוגים עם אותו הוגה.',
+    cta:   'לדיאלוג הבא',
+    hint:  'אפשר לחזור לכאן בלחיצה על הנקודות שמתחת לקלף.',
+  };
+  // Fan cards. Each card gets --cf/--cd (subject field/deep) for the
+  // gold gem tint; only gold actually renders one.
+  const cards = _FE_FAN.map((e, i) => {
+    const p = _FE_POS[i];
+    const subj = _feSubjectForThinker(e.id);
+    const tones = _FE_SUBJ_TONES[subj];
+    const thinker = (typeof getT === 'function' ? getT() : []).find(t => t && t.id === e.id);
+    const artSrc = thinker ? _thinkerImage(thinker, subj) : '';
+    const delay = (e.tier === 'diamond' ? 0.55 : 0.08 * i) + 's';
+    const isHero = e.tier === 'diamond';
+    const frameHtml = e.tier === 'plain' ? '' :
+      `<img class="fe-f" src="${_FE_FRAME_PNGS[e.tier]}" alt="" aria-hidden="true">` +
+      (e.tier === 'gold' ? `<span class="fe-g"></span>` : '');
+    return `<div class="fe-card${isHero ? ' fe-hero' : ''}" style="` +
+      `--x:${p.x * sgn}px;--r:${p.r * sgn}deg;--s:${p.s};--z:${p.z};--d:${delay};` +
+      `--cf:${tones.field};--cd:${tones.deep}">` +
+      `<img class="fe-a" src="${artSrc}" alt="">${frameHtml}</div>`;
+  }).join('');
+  // Track: 12 sockets in 4 tier groups. On-state sockets use the
+  // current thinker's subject tone. Progress runs 0..POINTS.
+  const current = _feCurrentThinker();
+  const points = current ? current.filled : 0;
+  const currentSubj = current ? _feSubjectForThinker(current.id) : 'philosophy';
+  const tones = _FE_SUBJ_TONES[currentSubj];
+  const segs = ['bronze', 'silver', 'gold', 'diamond'].map((t, si) => {
+    const gems = [0, 1, 2].map(k => {
+      const idx = si * 3 + k;
+      const on = idx < points;
+      const delay = (1.25 + idx * 0.12) + 's';
+      return `<span class="fe-gm${on ? ' fe-on' : ''}" style="--e:${_FE_MAT[t][1]};--d:${delay}"></span>`;
+    }).join('');
+    return `<div class="fe-seg">` +
+      `<div class="fe-row"><span class="fe-gems">${gems}</span>` +
+      `<span class="fe-med" style="--m:${_FE_MAT[t][0]};--e:${_FE_MAT[t][1]}"></span></div>` +
+      `<span class="fe-n">${copy.tiers[t][0]}</span>` +
+      `<span class="fe-a2">${copy.tiers[t][1]}</span></div>`;
+  }).join('');
+  // Yellow progress tag (hidden when no points, but keeps its height
+  // so layout doesn't jump).
+  const youText = current ? `${_feThinkerName(current.id)} · ${points}${isEn ? ' of ' : ' מתוך '}3` : '';
+  // Twinkle stars scattered behind the fan.
+  const starPos = [[22,40],[300,70],[40,210],[318,190],[160,20],[90,120],[270,140]];
+  const stars = starPos.map(([x, y], i) => `<i style="left:${x}px;top:${y}px;animation-delay:${i * 0.37}s"></i>`).join('');
+  const spk = (x, y, d) => `<svg class="fe-spk" style="left:${x}px;top:${y}px;animation-delay:${d}s" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 0L7.2 4.8 12 6 7.2 7.2 6 12 4.8 7.2 0 6 4.8 4.8Z"/></svg>`;
+
+  return `<div class="fe-mx" role="dialog" aria-modal="true" aria-labelledby="fe-title" ` +
+    `style="--fe-subj-field:${tones.field};--fe-subj-deep:${tones.deep};--fe-subj-line:${tones.line}">` +
+    `<div class="fe-stars">${stars}</div>` +
+    `<button class="fe-close" type="button" aria-label="${copy.close}" onclick="_closeFramesExplainer('close_btn')">✕</button>` +
+    `<div class="fe-fan">` +
+      `<div class="fe-rays"></div><div class="fe-glow"></div>${cards}` +
+      `<div class="fe-flash"></div>` +
+      `${spk(rtl ? 60 : 250, 6, 0.2)}${spk(rtl ? 250 : 66, 150, 1.1)}${spk(rtl ? 210 : 110, 0, 1.7)}` +
+    `</div>` +
+    `<h2 class="fe-tt" id="fe-title">${copy.title}</h2>` +
+    `<p class="fe-sub">${copy.sub}</p>` +
+    `<span class="fe-you${current ? '' : ' fe-hidden'}">${youText}</span>` +
+    `<div class="fe-track">${segs}</div>` +
+    `<p class="fe-dare">` +
+      `<svg viewBox="0 0 20 20" aria-hidden="true">` +
+        `<defs><linearGradient id="fe-bg1" x1="0" y1="0" x2="1" y2="1">` +
+          `<stop offset="0" stop-color="#7A4A22"/><stop offset=".45" stop-color="#C8894A"/>` +
+          `<stop offset=".55" stop-color="#E0A86A"/><stop offset="1" stop-color="#8C5A2B"/>` +
+        `</linearGradient></defs>` +
+        `<circle cx="10" cy="10" r="8.5" fill="url(#fe-bg1)" stroke="#3E220C" stroke-width="1"/>` +
+        `<circle cx="10" cy="10" r="5.5" fill="none" stroke="#3E220C" stroke-width=".7" opacity=".6"/>` +
+        `<circle cx="7.5" cy="7" r="2" fill="#F0BE85" opacity=".7"/>` +
+      `</svg><span>${copy.dare}</span></p>` +
+    `<button class="fe-cta" type="button" onclick="_feCtaTap()">${copy.cta}</button>` +
+    `<p class="fe-hint">${copy.hint}</p>` +
+  `</div>`;
+}
+
+function _showFramesExplainer(trigger) {
+  const overlay = document.getElementById('modal-frames-explainer');
+  if (!overlay) return;
+  overlay.innerHTML = _feBuildHtml(state.lang || 'en');
+  overlay.classList.add('fe-open');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  // Mark seen the moment we're visible — a mid-animation kill still
+  // counts. Only persist for the "launch" trigger; plate-tap reopens
+  // shouldn't touch a flag that's already true, but this is a no-op.
+  if (!state.framesExplainerSeen) {
+    state.framesExplainerSeen = true;
+    try { saveStateLocal(); } catch (e) {}
+  }
+  const current = _feCurrentThinker();
+  _feCapture('frames_explainer_shown', {
+    trigger: trigger || 'launch',
+    points: current ? current.filled : 0,
+    thinker_id: current ? current.id : null,
+  });
+}
+
+function _closeFramesExplainer(source) {
+  const overlay = document.getElementById('modal-frames-explainer');
+  if (!overlay) return;
+  overlay.classList.remove('fe-open');
+  overlay.setAttribute('aria-hidden', 'true');
+  overlay.innerHTML = '';
+  document.body.style.overflow = '';
+  _feCapture('frames_explainer_dismissed', { source: source || 'close_btn' });
+}
+
+// CTA tap: same destination as the home screen's continue action.
+// Uses _findNextUpLesson (the same helper renderHome calls) so the
+// two stay in sync. Fresh installs (no completions) return week 1
+// day 1 naturally; if everything is completed or the only remaining
+// content is paywalled, fall back to weeks[0].days[0].
+function _feCtaTap() {
+  _feCapture('frames_explainer_cta', {});
+  const next = _findNextUpLesson();
+  let weekId = next.weekId;
+  let dayId  = next.dayId;
+  if (weekId === null || dayId === null) {
+    const weeks = getW();
+    if (weeks && weeks[0] && weeks[0].days && weeks[0].days[0]) {
+      weekId = weeks[0].id;
+      dayId  = weeks[0].days[0].id;
+    }
+  }
+  const overlay = document.getElementById('modal-frames-explainer');
+  if (overlay) {
+    overlay.classList.remove('fe-open');
+    overlay.setAttribute('aria-hidden', 'true');
+    overlay.innerHTML = '';
+    document.body.style.overflow = '';
+  }
+  if (weekId != null && dayId != null) {
+    try { openReader(weekId, dayId); } catch (e) {}
+  }
+}
+
+// Launch gate: called from renderHome after showWelcomeBackModal.
+// Guards match spec §14: onboarding done, not already seen, no
+// pending celebrations, no visible streak-repair card. If welcome-
+// back is currently active, DON'T defer to the next open — chain
+// the explainer to fire when welcome-back closes, in the same session.
+function _maybeShowFramesExplainerAtLaunch() {
+  if (state.framesExplainerSeen) return;
+  if (!localStorage.getItem('corpus_onboarding_done')) return;
+  if ((state.pendingCelebrations || []).length > 0) return;
+  const repairHolder = document.getElementById('streak-repair-card-holder');
+  if (repairHolder && repairHolder.style.display !== 'none' && repairHolder.innerHTML.trim()) return;
+  const wb = document.getElementById('welcome-back-modal');
+  if (wb && wb.classList.contains('active')) {
+    _pendingExplainerAfterWelcomeBack = true;
+    return;
+  }
+  _showFramesExplainer('launch');
+}
+
+// Plate-tap delegation. Capture-phase so we run BEFORE the pantheon
+// .pth-slot button's flip onclick (which fires in bubble). Attached
+// once at boot on containers that persist for the app lifetime.
+function _feWirePlateTaps() {
+  // Reveal: only opens the explainer AFTER the reveal animation has
+  // settled. During Fly/Forge, tap-anywhere means skip; letting the
+  // plate tap open the explainer mid-animation would fight that.
+  const rvSvg = document.getElementById('rv-svg');
+  if (rvSvg && !rvSvg._feWired) {
+    rvSvg.addEventListener('click', function (e) {
+      if (!e.target.closest('.rv-plate')) return;
+      const card = document.getElementById('thinker-unlock-box');
+      if (!card || card.dataset.settled !== 'true') return; // let it bubble → skip
+      e.stopPropagation();
+      _showFramesExplainer('plate_tap');
+    }, true);
+    rvSvg._feWired = true;
+  }
+  // Pantheon: capture-phase on the container so we short-circuit the
+  // .pth-slot button's flip handler (which is at bubble on the button).
+  const pth = document.getElementById('pantheon-container');
+  if (pth && !pth._feWired) {
+    pth.addEventListener('click', function (e) {
+      if (!e.target.closest('.pth-bar')) return;
+      e.stopPropagation();
+      _showFramesExplainer('plate_tap');
+    }, true);
+    pth._feWired = true;
+  }
+}
+
 // Single source of truth for the app's default state shape. Called on cold
 // boot (initial declaration), from loadState() to hydrate defaults for any
 // keys the persisted blob is missing, and from every reset path (authLogout
@@ -20806,6 +21441,12 @@ function defaultState() {
     // completedDays, so a missing flag with points intact still gives the
     // user their frame; a flag with points missing doesn't grant one.
     thinkerTierSeen: {},
+    // Frames explainer (spec §14): full-screen light modal shown
+    // once per user at their first launch after this ships. Flag set
+    // the moment the modal opens so a mid-animation kill still
+    // counts as shown. Reopens via any points-plate tap don't touch
+    // the flag.
+    framesExplainerSeen: false,
     lang: 'en',
     currentScreen: 'home',
     currentWeek: null,
@@ -22247,6 +22888,13 @@ function closeWelcomeBackModal() {
       dwell_ms: dwellMs,
     });
   } catch(e) {}
+  // Chain-open the frames explainer if it was deferred at launch
+  // because welcome-back was in the way. Same session, right after
+  // dismiss — not on next open.
+  if (_pendingExplainerAfterWelcomeBack) {
+    _pendingExplainerAfterWelcomeBack = false;
+    try { _showFramesExplainer('launch'); } catch (e) {}
+  }
 }
 // === End welcome-back modal ==========================================
 
@@ -23488,6 +24136,59 @@ function _maybePostSubscriptionBonusReveal(opts) {
   return true;
 }
 
+// Shared next-up-lesson finder. Returns { weekId, dayId,
+// anyLockedRemains } — the first non-done, non-locked lesson across
+// all accessible chapters in the user's current subject. anyLockedRemains
+// is true when the user has completed everything they have access to
+// but paid content remains untouched (drives the "Continue with Corpus"
+// paywall CTA on home; the explainer's CTA doesn't use it).
+//
+// Both renderHome (which fills the practice card / Next Up affordance)
+// and the frames explainer's CTA call this so the explainer's "Next
+// dialogue" button lands at the same destination as home's continue.
+function _findNextUpLesson() {
+  const chapters = getW();
+  const weekLockMap = state.subject === 'economics'
+    ? {
+        1: true,
+        2: isWeekCompleted(1),
+        3: isWeekCompleted(2),
+        'bonusEcon1': isWeekCompleted(1) || _hasBonusProgress('bonusEcon1'),
+        4: isWeekCompleted(3),
+      }
+    : state.subject === 'psychology'
+    ? {
+        1: true,
+        2: isWeekCompleted(1),
+        3: isWeekCompleted(2),
+        'bonusPsy1': isWeekCompleted(1) || _hasBonusProgress('bonusPsy1'),
+        4: isWeekCompleted(3),
+      }
+    : {
+        1: true,
+        2: isWeekCompleted(1),
+        3: isWeekCompleted(2),
+        'bonus1': isWeekCompleted(1) || _hasBonusProgress('bonus1'),
+        4: isWeekCompleted(3),
+      };
+  let weekId = null, dayId = null, anyLockedRemains = false;
+  for (const w of chapters) {
+    if (!w || !w.days) continue;
+    const wkUnlocked = weekLockMap[w.id] !== undefined ? weekLockMap[w.id] : true;
+    if (w.locked || w.comingSoon || !wkUnlocked) continue;
+    if (!canAccessWeek(state.subject, w.id)) { anyLockedRemains = true; continue; }
+    for (let di = 0; di < w.days.length; di++) {
+      const d = w.days[di];
+      const lessonLocked = di > 0 && !state.completedDays[dayKey(w.id, w.days[di - 1].id)];
+      if (!state.completedDays[dayKey(w.id, d.id)] && !lessonLocked) {
+        weekId = w.id; dayId = d.id; break;
+      }
+    }
+    if (weekId !== null) break;
+  }
+  return { weekId, dayId, anyLockedRemains };
+}
+
 function renderHome() {
   const ui = u();
   // Backfill first, then check the trigger. Order matters: if backfill
@@ -23508,6 +24209,14 @@ function renderHome() {
   // Fires at most once per streak-day; internal guards handle all
   // other cases. Blocks tap-through by design (see design report).
   try { showWelcomeBackModal(); } catch (e) {}
+  // Frames explainer (spec §14). Own guards; if welcome-back is
+  // currently active, this flags a chain so it fires when welcome-
+  // back closes (in the same session, not on next open).
+  try { _maybeShowFramesExplainerAtLaunch(); } catch (e) {}
+  // Wire plate-tap delegation on rv-svg + pantheon-container so
+  // tapping any points plate reopens the explainer. Idempotent —
+  // attach-once guarded by ._feWired on the target.
+  try { _feWirePlateTaps(); } catch (e) {}
   // Dir + toggle label
   document.documentElement.dir = state.lang === 'en' ? 'ltr' : 'rtl';
   document.documentElement.lang = state.lang;
@@ -23654,36 +24363,15 @@ function renderHome() {
         };
 
     // Find the single next-up lesson (first non-done, non-locked lesson
-    // across all accessible chapters). Also detect whether any inaccessible
-    // paid content remains, so the practice card can distinguish the two
-    // empty states:
-    //   * genuinely done (everything the user has access to is completed,
-    //     AND no paid content remains) → "You've completed everything!"
-    //   * done-with-accessible (chapter 1 finished, paid content locked)
-    //     → "Continue with Corpus" → paywall
-    let nextUpWeekId = null, nextUpDayId = null;
-    let _anyLockedRemains = false;
-    for (const w of chapters) {
-      if (!w || !w.days) continue;
-      const wkUnlocked = weekLockMap[w.id] !== undefined ? weekLockMap[w.id] : true;
-      if (w.locked || w.comingSoon || !wkUnlocked) continue;
-      // Paywall-locked chapters shouldn't appear as next-up (would surface
-      // paid content in the "Continue" affordance and read as broken). Note
-      // the paywall-locked state, so the empty-state copy below can offer
-      // the paywall instead of falsely claiming completion.
-      if (!canAccessWeek(state.subject, w.id)) {
-        _anyLockedRemains = true;
-        continue;
-      }
-      for (let di = 0; di < w.days.length; di++) {
-        const d = w.days[di];
-        const lessonLocked = di > 0 && !state.completedDays[dayKey(w.id, w.days[di-1].id)];
-        if (!state.completedDays[dayKey(w.id, d.id)] && !lessonLocked) {
-          nextUpWeekId = w.id; nextUpDayId = d.id; break;
-        }
-      }
-      if (nextUpWeekId !== null) break;
-    }
+    // across all accessible chapters). anyLockedRemains distinguishes
+    // "genuinely done" from "done-with-accessible + paid content locked",
+    // so the practice card can offer the paywall in the latter case.
+    // Extracted to _findNextUpLesson so the frames explainer's CTA lands
+    // at the same destination as home's continue.
+    const _next = _findNextUpLesson();
+    let nextUpWeekId = _next.weekId;
+    let nextUpDayId  = _next.dayId;
+    let _anyLockedRemains = _next.anyLockedRemains;
 
     // Auto-select expanded chapter on first render or subject switch.
     // Also bump to next chapter when the currently expanded one is finished,
@@ -25275,6 +25963,9 @@ function showThinkerCardScreen(thinker, chapter, day) {
   card.classList.remove('rv-arrive');
   void card.offsetWidth;
   card.classList.add('rv-arrive');
+  // Reset settled marker on every open — the settle-time timer or
+  // skip handler flips it back to 'true' when the sequence lands.
+  card.dataset.settled = 'false';
 
   // ── Animation orchestration ────────────────────────────────────
   // Timeline (unslowed):
@@ -25319,6 +26010,10 @@ function showThinkerCardScreen(thinker, chapter, day) {
     // lands on bronze+ should still show it. Plain skips get nothing
     // (_rvSkipAll already cleared #rv-shine).
     if (_finalTier >= 1) _playThinkerShine(subj, TIERS[_finalTier]);
+    // Mark the card settled so plate tap opens the frames explainer
+    // (spec §14). During animation, plate tap bubbles to card.onclick
+    // and runs skip; only after settle does it open the explainer.
+    card.dataset.settled = 'true';
     // Eyebrow stays blank on a skipped Forge — the newly-forged
     // frame speaks for itself and the moment is behind them.
   }
@@ -25389,6 +26084,27 @@ function showThinkerCardScreen(thinker, chapter, day) {
       if (_skipped) return;
       _playThinkerShine(subj, _finalTierName);
     }, _shineDelayMs));
+  }
+  // Settled marker: set on the card at the end of whatever scripted
+  // beat runs last. Reveal-tap-anywhere = skip during this window;
+  // once dataset.settled = 'true', a tap on the plate opens the
+  // frames explainer (spec §14). Skip handler sets 'true' too.
+  // For a plain-only, suppressed, or no-fly case, no timers scheduled
+  // — set 'true' immediately.
+  const _settleAt = Math.max(
+    _fly.flies  ? (_fly.delay + _RV_T.fly) * _rvSlowNow : 0,
+    _forge.forges ? ((_fly.delay + _RV_T.fly + _RV_T.forgeDelay + _RV_T.banner) * _rvSlowNow) : 0,
+    _finalTier >= 1 ? ((_forge.forges
+      ? (_fly.delay + _RV_T.fly + _RV_T.forgeDelay + _RV_T.banner) * _rvSlowNow + 100
+      : 500) + 50) : 0
+  );
+  if (_settleAt > 0) {
+    _timers.push(setTimeout(() => {
+      if (_skipped) return;
+      card.dataset.settled = 'true';
+    }, _settleAt + 50));
+  } else {
+    card.dataset.settled = 'true';
   }
   // Auto-flip removed (flip retired). First-unlock's bio + quote now
   // surface via the Read more pill above; no auto-reveal beat.
