@@ -9446,17 +9446,18 @@
   /* Thinker screen */
   .dc-thinker-screen {
     justify-content: flex-start;
-    /* Padding kept above safe-area for notches but the base numbers
-       are tight (8 top, 8 bottom) so an iPhone 15/16 with 59 + 34 px
-       of insets doesn't push .dc-actions off the fold. gap 8 → 4
-       shaves another 8 px across the three children (title, card
-       zone, actions). */
-    padding: calc(8px + var(--safe-top)) 16px calc(8px + var(--safe-bottom));
+    /* Padding-top absorbs the notch. Padding-bottom adds an extra
+       1× the home-indicator inset so notched devices get real
+       breathing room above the indicator (iPhone 15/16 with safe
+       34 px gets 8 + 34 + 34 = 76 px of clear space between the
+       share button and the home indicator area, matching the ~68 px
+       non-notch devices already have). Non-notch: safe-bottom is 0,
+       so the calc collapses to 8 px — unchanged from today. */
+    padding: calc(8px + var(--safe-top)) 16px calc(8px + var(--safe-bottom) + var(--safe-bottom));
     gap: 4px;
-    /* No scrollbar on the reveal. Content fits notched iPhone 15/16
-       (393 × 852 with safe 59/34) and every non-notch viewport we
-       support. Sheen overflow is clipped by the inherited
-       overflow-x: hidden on .dc-screen. */
+    /* No scrollbar. Content fits notched iPhone 15/16 (393 × 852
+       with safe 59/34) and every non-notch viewport. Sheen overflow
+       is clipped by the inherited overflow-x: hidden on .dc-screen. */
     overflow-y: hidden;
   }
   .dc-thinker-title {
@@ -9515,41 +9516,20 @@
      single SVG at viewBox -40 -100 380 745 (aspect 380:745). SVG
      dictates aspect via width:100% + height:auto; no aspect-ratio
      on the wrapper. Width capped by (a) 266 px reference native,
-     (b) viewport minus padding, (c) available height scaled by
-     the SVG's own 380:745 aspect so tall SVG fits inside short
-     viewports. The 280 px constant in (c) reserves room for the
-     title, actions and safe-area on 375 × 667 and below; increase
-     if a future action needs more vertical space. On 844+ the
-     266 px cap dominates and the card is unaffected. */
+     (b) viewport minus padding, (c) available height scaled by the
+     SVG's own 380:745 aspect. The `- safe-top - safe-bottom` in
+     (c) makes the card respect the notch and home-indicator: on
+     notched viewports where (a) would otherwise dominate, the card
+     shrinks to leave real breathing room above the home indicator.
+     Non-notch: the safe vars are 0, so the calc collapses to
+     (100vh - 280) * 380 / 745 — unchanged. */
   .dc-thinker-screen #thinker-unlock-box {
     position: relative;
     z-index: 2;
-    width: min(266px, calc(100vw - 48px), calc((100vh - 280px) * 380 / 745));
+    width: min(266px, calc(100vw - 48px), calc((100vh - 280px - var(--safe-top) - var(--safe-bottom)) * 380 / 745));
     flex-shrink: 0;
     background: transparent;
     /* opacity/transform driven by JS for arrival */
-  }
-  /* Read more pill — shown on first-unlock only. Opens the pantheon
-     modal for the just-met thinker (bio + quote + full portrait).
-     Subtle: sits below the plate, doesn't compete with the main
-     CTAs (Next Dialogue / Back to Home) that live in .dc-actions. */
-  .dc-thinker-screen .dc-read-more-btn {
-    align-self: center;
-    padding: 8px 16px;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: transparent;
-    color: var(--text-2);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 4px;
-    transition: background 0.15s, color 0.15s;
-  }
-  .dc-thinker-screen .dc-read-more-btn:active {
-    background: var(--surface-2);
-    color: var(--text);
   }
   .dc-actions {
     flex-shrink: 0;
@@ -11868,10 +11848,6 @@
           <g id="rv-fx"></g>
         </svg>
       </div>
-      <!-- Read more pill — shown on first-unlock only (points === 1).
-           Opens the pantheon modal for the thinker (bio + quote +
-           full portrait). Wired in showThinkerCardScreen. -->
-      <button type="button" id="dc-read-more-btn" class="dc-read-more-btn" style="display:none"></button>
     </div>
     <div class="dc-actions">
       <button class="next-lesson-btn" id="modal-next-btn" style="display:none"></button>
@@ -25176,21 +25152,11 @@ function showThinkerCardScreen(thinker, chapter, day) {
     }
   }
   document.getElementById('dc-thinker-title').textContent = isEn ? _titleEn : _titleHe;
-  // Read more pill: first-unlock only. Meeting a thinker earns the
-  // bio moment; on repeats + boundaries the frame + Forge are the
-  // moment, and a pill would compete with them. Opens the pantheon
-  // modal, which holds bio + quote + full portrait + share.
-  const readMoreBtn = document.getElementById('dc-read-more-btn');
-  if (readMoreBtn) {
-    if (_points === 1) {
-      readMoreBtn.textContent = isEn ? 'Read more' : 'קראו עוד';
-      readMoreBtn.onclick = () => { try { openThinkerModal(thinker.id); } catch(e) {} };
-      readMoreBtn.style.display = '';
-    } else {
-      readMoreBtn.style.display = 'none';
-      readMoreBtn.onclick = null;
-    }
-  }
+  // Bio + quote + full portrait live in the pantheon detail modal
+  // (openThinkerModal). No Read more pill on the reveal — the
+  // detail view is a deliberate trip, and the reveal stays a
+  // single moment (card + progress + actions) without a competing
+  // secondary affordance.
   // Share-thinker button label (bilingual). The onclick is bound in HTML
   // and reads state.currentWeek/Day to resolve the thinker at tap time.
   const shareBtnLabel = document.getElementById('dc-share-thinker-btn-label');
