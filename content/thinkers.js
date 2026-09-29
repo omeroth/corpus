@@ -356,6 +356,32 @@ const THINKERS = [
     bio: 'פסיכיאטר וחוקר טראומה הולנדי-אמריקאי. הראה שטראומה אינה רק זיכרון של אירוע, אלא חותם שהיא מותירה על הגוף ועל מערכת האזעקה שלו. ספרו "נרשם בגוף" הפך לרב-מכר עצום, ובד בבד גם שנוי במחלוקת בקהילה המדעית.',
     quote: '"טראומה אינה רק אירוע שהתרחש בעבר. היא גם החותם שהותירה החוויה על הנפש, על המוח ועל הגוף. לחותם הזה יש השלכות מתמשכות על האופן שבו האורגניזם מצליח לשרוד בהווה."',
   },
+  // The Hebrew quote below is a translation of the English source line
+  // (Richard Howard, "Madness and Civilization", 1965, Preface to the
+  // 1961 edition) — not drawn from Aharon Amir's 1972 Hebrew translation,
+  // which we did not consult. The attribution names the source book,
+  // not a specific Hebrew edition, so the app does not falsely claim
+  // Amir's phrasing.
+  //
+  // Provenance note: the chapter-5 source documents originally cited the
+  // paraphrase "השיגעון אינו עובדה טבעית, אלא עובדה תרבותית" / "Madness
+  // is not a natural fact, but a cultural fact." That line reads like
+  // Foucault but does not appear in Howard's 1965 abridged translation
+  // or Khalfa/Murphy's 2006 full translation — it circulates as a
+  // scholarly gloss. Verified during the 2026-09-29 chapter-5 build and
+  // replaced (here and in the dialogue's source block) with the
+  // verifiable Preface line. If those documents resurface, do not
+  // reintroduce the paraphrase.
+  {
+    id: 'foucault',
+    name: 'מישל פוקו',
+    era: '1926–1984',
+    emoji: '🗂️',
+    image: './images/foucault.webp',
+    subject: 'psychology',
+    bio: 'פילוסוף והיסטוריון צרפתי. חקר איך חברות מחליטות מה נחשב שיגעון, פשע או מחלה, ואיך ההחלטות האלה משתנות עם הזמן. בספרו "תולדות השיגעון" (1961) הראה שהגבול בין נורמלי לפתולוגי אינו נתון טבעי, אלא נקבע בידי בני אדם ומשתנה עם התרבות.',
+    quote: '"שפת הפסיכיאטריה, שהיא מונולוג של התבונה על השיגעון, יכלה להיווצר רק בתוך שתיקה כזו."',
+  },
   // Economics thinkers
   {
     id: 'mill-econ',
@@ -637,4 +663,11 @@ const THINKERS_EN = [
   { id:'anna-freud',   name:'Anna Freud',           era:'1895–1982', emoji:'🛡️', image:'./images/anna-freud.webp',   subject:'psychology', bio:'A Vienna-born psychoanalyst, Sigmund Freud\'s youngest daughter and a psychoanalyst in her own right. Turned the spotlight from the drives to the ego, and mapped an entire system of defense mechanisms, automatic strategies the mind activates in order to keep anxiety at a distance.',                                                                                                                                                     quote:'"This book is concerned with one problem only: the ways and means by which the ego wards off unpleasure and anxiety, and exercises control over impulsive behavior, affects and instinctive urges."' },
   { id:'beck',         name:'Aaron Beck',           era:'1921–2021', emoji:'💭', image:'./images/beck.webp',         subject:'psychology', bio:'An American psychiatrist trained as a psychoanalyst who discovered in the clinic a new phenomenon: between the event and the emotion passes a fast thought, almost imperceptible. Developed cognitive therapy (CBT), which became the most-researched treatment for depression and anxiety, and placed psychotherapy on an empirical footing.',                                                                                              quote:'"Cognitive therapy seeks to alleviate psychological stresses by correcting faulty conceptions and self-signals. By correcting erroneous beliefs we can lower excessive reactions."' },
   { id:'van-der-kolk', name:'Bessel van der Kolk',  era:'1943–',     emoji:'🫀', image:'./images/van-der-kolk.webp', subject:'psychology', bio:'A Dutch-American psychiatrist and trauma researcher. Showed that trauma is not only a memory of an event, but an imprint it leaves on the body and on its alarm system. His book "The Body Keeps the Score" became an enormous bestseller, and at the same time also controversial in the scientific community.',                                                                                                                             quote:'"Trauma is not just an event that took place sometime in the past; it is also the imprint left by that experience on mind, brain, and body. This imprint has ongoing consequences for how the human organism manages to survive in the present."' },
+  // Psychology chapter 5 — "What is suffering and what is a symptom?"
+  // Foucault quote is from the Preface to the 1961 edition of Histoire
+  // de la folie, in Richard Howard's 1965 abridged English translation
+  // "Madness and Civilization". See the matching Hebrew entry above for
+  // the full provenance note (paraphrase-vs-verified quote correction
+  // made 2026-09-29 during the chapter-5 build).
+  { id:'foucault',     name:'Michel Foucault',      era:'1926–1984', emoji:'🗂️', image:'./images/foucault.webp',     subject:'psychology', bio:'A French philosopher and historian. Studied how societies decide what counts as madness, crime, or illness, and how those decisions shift over time. In his book "History of Madness" (1961) he showed that the line between normal and pathological is not a fact of nature but is set by human beings, and shifts with culture.',                                                                                                                            quote:'"The language of psychiatry, which is a monologue by reason about madness, could only have come into existence in such a silence."' },
 ];
