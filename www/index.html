@@ -4495,30 +4495,69 @@
      hero group centres and the chapter row sits flush at the bottom,
      which is how the design fits 360×640 without overflow.
   */
+  /* Ancestor flex-column chain so .qs-mid { margin: auto 0 } centres the
+     hero group inside the reader viewport, and .qs-chap sits flush at the
+     bottom of the card. Uses body.reader-editorial as anchor so the whole
+     chain matches the mode the reader actually runs in (openReader adds
+     that class unconditionally — see 25366). Only the summary surface is
+     affected; every other section is unchanged.
+
+     Force the reader shell to 100dvh when the summary is up so
+     `.reader-screen-shell { height: 100% }` resolves against a definite
+     parent height (body only sets min-height: 100dvh, which doesn't
+     satisfy percentage resolution). This is what unlocks the flex-fill
+     chain — without it the card collapses to its intrinsic content
+     and the mid group can't centre. */
+  body.reader-editorial:has(#reader-content > .section-card > .quiz-summary-v2) #screen-reader.reader-screen-shell,
+  body:has(#reader-content > .section-card > .quiz-summary-v2) #screen-reader.reader-screen-shell {
+    height: 100dvh;
+  }
   #reader-content:has(> .section-card > .quiz-summary-v2) {
     display: flex;
     flex-direction: column;
-    /* The summary doesn't scroll (flex-column card fills the slot, qs-chap
-       sits at the bottom, fixed button bar overlays below). The editorial
-       reader-content's top/bottom padding is sized for scrolled content
-       and pushes the summary past the viewport at 360×640 without a
-       safe-area (Android without a gesture bar). Trim to zero on this
-       surface only — the fixed button bar remains visible over the card
-       exactly as designed. Scoped via :has() so no other section moves. */
-    padding-top: 0;
-    padding-bottom: 0;
+    /* Reader-content's editorial padding (32 top / 140 bottom) is
+       preserved so the summary card sits at the same vertical inset as
+       every other section — the "same card shell" match the user asked
+       for. Flex-column here lets the section-card grow to fill the
+       interior; the fixed button bar overlays the bottom-140 padding
+       exactly as it does for scrolled sections. */
   }
-  .section-card:has(> .quiz-summary-v2) {
-    flex: 1;
-    min-height: 0;
+  #reader-content:has(> .section-card > .quiz-summary-v2) > .section-card {
+    /* Force the section-card to fill the available height. Base
+       `.section-card { height: auto !important; overflow: visible !important }`
+       (line 4152-4153) would otherwise size the card to its intrinsic
+       content and let it overflow past the flex allocation, which leaves
+       the mid group visually pushed below the viewport centre and breaks
+       .qs-mid { margin: auto 0 }. Reclaim the flex sizing with !important
+       and clip overflow so no scroll appears.
+
+       Also override the shared `.reader-editorial #reader-content
+       .section-card { max-width: 640px; margin-inline: auto }` centring:
+       in a flex-column container, auto cross-axis margins absorb the
+       remaining space based on the item's intrinsic width, which made the
+       summary card sit ~6px narrower on each side than the idea section.
+       Zero the inline margins so it stretches to the full interior width,
+       matching the idea card's horizontal inset. */
+    flex: 1 1 0 !important;
+    height: auto !important;
+    overflow: hidden !important;
+    display: flex;
+    flex-direction: column;
+    max-width: none;
+    margin-inline: 0;
+  }
+  /* Hide the floating A+/A- rail while the summary is up: no text to
+     resize, and the rail overlapped the chip + chapter row on device. */
+  body:has(#reader-content > .section-card > .quiz-summary-v2) .reader-text-size-rail {
+    display: none !important;
   }
   .quiz-summary-v2 {
-    --qs-purple: #7B4FD4;
-    --qs-ink: #2F2150;
+    /* Only gold stays local. Purple / ink / muted / chip-bg / divider all
+       route through the subject theme tokens so the summary matches the
+       rest of the app: purple for philosophy, blue for economics, orange
+       for psychology. Gold medallions and the 3/3 gold headline gradient
+       are universal celebration colour. */
     --qs-gold: #F59E0B;
-    --qs-muted: #6B6285;
-    --qs-soft: #F4EFFC;
-    --qs-line: #E6DDF5;
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -4532,6 +4571,11 @@
     text-align: center;
     position: relative;
     z-index: 2;
+    /* Cap width so long thinker names + dialogue titles can't push the
+       chip past the card. width:100% with min-width:0 lets flex children
+       (chip, subline) shrink and text-overflow. */
+    width: 100%;
+    min-width: 0;
   }
   .qs-hero {
     position: relative;
@@ -4559,7 +4603,9 @@
     width: 230px; height: 150px;
     margin: -75px 0 0 -115px;
     border-radius: 50%;
-    background: radial-gradient(ellipse, rgba(123,79,212,var(--qs-ga)), rgba(123,79,212,0) 70%);
+    /* Themed halo — rgba built from --accent-rgb so opacity scales via
+       --qs-ga variable while colour tracks the subject theme. */
+    background: radial-gradient(ellipse, rgba(var(--accent-rgb),var(--qs-ga)), rgba(var(--accent-rgb),0) 70%);
   }
   .qs-meds {
     position: relative;
@@ -4587,8 +4633,13 @@
     filter: drop-shadow(0 1px 1px rgba(120,53,15,.5));
   }
   .qs-md.qs-done {
-    background: radial-gradient(circle at 35% 30%, #C7B3EC 0%, #9A74E0 45%, #7B4FD4 75%, #5B3AA8 100%);
-    box-shadow: 0 0 0 4px #fff, 0 0 0 6px rgba(123,79,212,.3), 0 8px 18px rgba(91,58,168,.35);
+    /* Themed 0/3 "complete" medallion: theme accent radial + theme halo. */
+    background: radial-gradient(circle at 35% 30%,
+      rgba(var(--accent-rgb),0.25) 0%,
+      rgba(var(--accent-rgb),0.55) 45%,
+      var(--accent) 75%,
+      var(--accent-dark) 100%);
+    box-shadow: 0 0 0 4px #fff, 0 0 0 6px rgba(var(--accent-rgb),.3), 0 8px 18px rgba(var(--accent-rgb),.35);
     animation: qs-land .55s cubic-bezier(.3,1.7,.5,1) .25s both;
   }
   @keyframes qs-land {
@@ -4633,16 +4684,21 @@
     0%, 100% { opacity: .2; transform: scale(.6); }
     50% { opacity: 1; transform: scale(1.1); }
   }
-  .qs-hl {
+  /* Headline: only the accent word (wrapped in <em>) takes colour; the
+     rest stays in --ink. Specificity bumped to .quiz-summary-v2 .qs-hl
+     (0,2,0) so the shared `.learning-card-body h2 { color: var(--accent-text) }`
+     rule at 9727 (specificity 0,1,1) doesn't leak the accent into the
+     non-em words. */
+  .quiz-summary-v2 .qs-hl {
     margin: 14px 0 0;
     font-size: 26px;
     line-height: 1.15;
     font-weight: 900;
-    color: var(--qs-ink);
+    color: var(--ink);
     font-family: 'Nunito', 'Assistant', sans-serif;
   }
-  [dir="rtl"] .qs-hl { font-family: 'Assistant', 'Nunito', sans-serif; }
-  .qs-hl em { font-style: normal; color: var(--qs-purple); }
+  [dir="rtl"] .quiz-summary-v2 .qs-hl { font-family: 'Assistant', 'Nunito', sans-serif; }
+  .quiz-summary-v2 .qs-hl em { font-style: normal; color: var(--accent); }
   .quiz-summary-v2.qs-full .qs-hl em {
     background: linear-gradient(90deg, #F59E0B, #B45309);
     -webkit-background-clip: text;
@@ -4654,7 +4710,7 @@
     font-size: 14.5px;
     line-height: 1.4;
     font-weight: 700;
-    color: var(--qs-muted);
+    color: var(--text-muted);
     max-width: 290px;
   }
   .qs-chip {
@@ -4662,31 +4718,41 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: var(--qs-soft);
+    background: var(--surface-2);
     border-radius: 999px;
     padding-block: 4px;
     padding-inline-start: 4px;
     padding-inline-end: 12px;
+    /* Bound the chip to its parent width so long thinker names + titles
+       can't push it past the card edges. min-width: 0 is required to let
+       the text child shrink below its intrinsic content width so the
+       ellipsis kicks in — flex items default to min-width:auto which
+       blocks truncation. */
     max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
   }
   .qs-chip img {
     width: 30px; height: 30px;
     border-radius: 50%;
-    border: 2px solid var(--accent, var(--qs-purple));
+    border: 2px solid var(--accent);
     object-fit: cover;
     flex: none;
   }
   .qs-chip .qs-chip-txt {
     font-size: 12.5px;
     font-weight: 800;
-    color: var(--qs-ink);
+    color: var(--ink);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1 1 auto;
   }
   .qs-chip .qs-chip-txt i {
     font-style: normal;
-    color: var(--accent, var(--qs-purple));
+    color: var(--accent);
     font-weight: 700;
   }
   .qs-retry {
@@ -4694,9 +4760,9 @@
     height: 40px;
     padding: 0 18px;
     border-radius: 999px;
-    border: 1.5px solid #D6C8F2;
-    background: #fff;
-    color: var(--qs-purple);
+    border: 1.5px solid var(--accent-soft-border);
+    background: var(--surface);
+    color: var(--accent);
     font-size: 14.5px;
     font-weight: 800;
     font-family: inherit;
@@ -4709,20 +4775,22 @@
   .qs-retry svg { width: 16px; height: 16px; }
   [dir="rtl"] .qs-retry svg { transform: scaleX(-1); }
   .qs-chap {
+    /* Sits at the bottom of the card via mid's margin: auto 0 above.
+       (No margin-top: auto here — that would compete with mid's auto
+       margins for free space and split 3-ways, pushing mid off-centre.) */
     position: relative;
     z-index: 2;
     padding-top: 12px;
-    border-top: 1px solid var(--qs-line);
+    border-top: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    margin-top: auto;
   }
   .qs-chap .qs-c {
     font-size: 12.5px;
     font-weight: 800;
-    color: var(--qs-muted);
+    color: var(--text-muted);
   }
   .qs-chap .qs-pd {
     display: flex;
@@ -4731,12 +4799,12 @@
   .qs-chap .qs-pd i {
     width: 8px; height: 8px;
     border-radius: 50%;
-    background: #E2D9F1;
+    background: var(--border);
   }
-  .qs-chap .qs-pd i.qs-pd-done { background: var(--accent, var(--qs-purple)); }
+  .qs-chap .qs-pd i.qs-pd-done { background: var(--accent); opacity: 0.55; }
   .qs-chap .qs-pd i.qs-pd-now {
-    background: var(--qs-purple);
-    box-shadow: 0 0 0 3px rgba(123,79,212,.2);
+    background: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
   }
   @media (prefers-reduced-motion: reduce) {
     .qs-md, .qs-burst, .qs-cf, .qs-rays, .qs-spk { animation: none !important; }
