@@ -1,3 +1,28 @@
+// ─── Card-quote audit: known-suspect list ───────────────────────────
+// A 2026-09-29 audit found that many of the `quote` fields below were
+// slogan-summaries or textbook paraphrases attributed to the thinker
+// rather than sentences they actually wrote. Foucault (psychology
+// chapter 5), Socrates and Sen have been fixed. The following IDs are
+// still suspect on the ENGLISH side; the HE side has not been audited
+// yet and may contain either the same paraphrase in translation, or
+// a translation of a translation. Do NOT add new content (dialogues,
+// share pages, marketing copy) that quotes these entries verbatim
+// until the individual card has been verified against the primary
+// source and its provenance comment updated.
+//
+// Also: many dialogue `source` blocks reuse or paraphrase the same
+// lines. When cleaning a card, check the corresponding dialogues too.
+//
+// Red-flag suspects (22 remaining after Socrates + Sen fixes):
+//   plato, russell, aristotle, gettier, popper, thomson, bostrom,
+//   mill-econ, samuelson, walras, sandel, jevons, kahneman, ricardo,
+//   piketty, aquinas, pareto, rawls, nozick, hayek
+// Yellow (compressed / word-changed / needs check):
+//   aurelius, mill, nietzsche, berkeley, friedman, adler
+//
+// Cleanup track: see the 2026-09-29 chat log for full audit tables and
+// path decisions. When you fix one, remove it from the lists above and
+// add a provenance comment above its entry describing what changed.
 const THINKERS = [
   {
     id: 'socrates',
@@ -5,8 +30,19 @@ const THINKERS = [
     era: '470–399 לפנה"ס',
     emoji: '🦉',
     image: './images/socrates.webp',
-    bio: 'הפילוסוף היווני הגדול שלא כתב דבר אך שינה את פני המחשבה. ידוע בשיטת הדיאלוג והרעיון שהחוכמה האמיתית היא הכרת אי-ידיעתנו.',
-    quote: '"הייתי חכם אם ידעתי שאינני יודע דבר."',
+    // Bio and quote replaced 2026-09-29 in the card-quote audit. The
+    // prior quote, "הייתי חכם אם ידעתי שאינני יודע דבר.", is a paraphrase
+    // of "I know that I know nothing", itself a tradition-quote that
+    // does not appear verbatim in Plato — see Apology 21d where
+    // Socrates actually says "I neither know nor think that I know."
+    // Replaced with the trial line from Apology 38a, which is (a)
+    // verified verbatim, (b) already used by the onboarding taste at
+    // index.html:15818, so the card and the taste now agree in HE.
+    // The philosophy chapter 1 dialogue at ~19367 still uses a
+    // different HE translation of the same English sentence; that
+    // inconsistency belongs to the dialogue-source audit track.
+    bio: 'הפילוסוף האתונאי הגדול שלא כתב דבר, אך שינה את פני המחשבה המערבית. ידוע בשיטת הדיאלוג הסוקרטית ובמה שאמר במשפטו בהגנה על החיים הפילוסופיים, המתועד בכתב ההגנה של אפלטון (סעיף 38a).',
+    quote: '"חיים שלא נבחנים אינם ראויים שיחיו אותם."',
   },
   {
     id: 'plato',
@@ -480,8 +516,13 @@ const THINKERS = [
     emoji: '🌍',
     image: './images/sen.webp',
     subject: 'economics',
+    // Quote replaced 2026-09-29 in the card-quote audit. The prior
+    // quote, "פיתוח הוא חירות." ("Development is freedom."), is a
+    // slogan-reformatting of Sen's 1999 book title "Development as
+    // Freedom" — not a sentence Sen wrote. Replaced with a verified
+    // Sen line from the same book, cited widely and verbatim.
     bio: 'הכלכלן ההודי, חתן פרס נובל, שטען שפיתוח אמיתי אינו גידול ב-GDP אלא הרחבת היכולות של אנשים.',
-    quote: '"פיתוח הוא חירות."',
+    quote: '"רעב המוני מעולם לא התרחש בהיסטוריה בדמוקרטיה מתפקדת."',
   },
   {
     id: 'jevons',
@@ -598,10 +639,87 @@ const THINKERS = [
     bio: 'הכלכלן האוסטרי-בריטי שטען שהמושג "צדק חברתי" חסר משמעות: לא ניתן לכנות תוצאה של תהליך ספונטני "צודקת" או "לא צודקת".',
     quote: '״צדק יכול להיות תכונה של התנהגות אנושית, אך לא של מצב שאיש לא יצר במכוון.״',
   },
+  // ─── Economics chapter 5 — "Growth and Development" ───
+  {
+    id: 'solow',
+    name: 'רוברט סולו',
+    era: '1924–2023',
+    emoji: '📈',
+    image: './images/solow.webp',
+    subject: 'economics',
+    bio: 'כלכלן אמריקאי חתן פרס נובל. הראה על בסיס נתוני ארה"ב מ־1909 עד 1949 שאת רוב הצמיחה הכלכלית אי אפשר להסביר בהצטברות הון, ושהשארית הלא־מוסברת, שכונתה מאוחר יותר "שארית סולו", מגלמת את הטכנולוגיה ואת הפרודוקטיביות. זכה בפרס נובל ב־1987.',
+    quote: '"אני משתמש בביטוי \'שינוי טכנולוגי\' כקיצור לכל סוג של תזוזה בפונקציית הייצור."',
+  },
+  {
+    id: 'romer',
+    name: 'פול רומר',
+    era: '1955–',
+    emoji: '💡',
+    image: './images/romer.webp',
+    subject: 'economics',
+    bio: 'כלכלן אמריקאי חתן פרס נובל. ענה על השאלה שסולו השאיר פתוחה, מאיפה מגיעה הטכנולוגיה, על ידי הכנסת הרעיונות אל תוך המודל הכלכלי. רעיונות נוצרים על ידי אנשים המגיבים לתמריצים, ובניגוד להון פיזי הם אינם יריבים: נוסחה אחת יכולה לשרת מיליון מפעלים בעת ובעונה אחת. זכה בפרס נובל ב־2018.',
+    quote: '"צמיחה כלכלית מתרחשת בכל פעם שאנשים לוקחים משאבים ומסדרים אותם מחדש בדרכים בעלות ערך רב יותר."',
+  },
+  // North source-line note: the docx source for chapter 5 dialogue 3
+  // smoothed the Nobel-lecture line — dropped "then" (×2), singularized
+  // "activities" → "activity" (×4), and removed the "organizations —
+  // firms —" parenthetical. The card and the dialogue's source block
+  // both use the real Nobel-lecture wording (1993). Em-dashes are
+  // preserved because they are North\'s punctuation, not editorial
+  // prose — the "no em-dashes" project rule does not apply inside a
+  // quoted source. If the docx surfaces again, do not reintroduce the
+  // smoothed version.
+  {
+    id: 'north',
+    name: 'דאגלס נורת',
+    era: '1920–2015',
+    emoji: '🎲',
+    image: './images/north.webp',
+    subject: 'economics',
+    bio: 'היסטוריון כלכלי אמריקאי חתן פרס נובל. הגדיר את המוסדות כ"כללי המשחק", ובכללם חוקים פורמליים, נורמות בלתי־כתובות והאכיפה שלהם, וטען שהכללים האלה מסבירים מדוע ארצות מסוימות צומחות בעוד אחרות לא, גם כשאותה טכנולוגיה זמינה לכולן. זכה בפרס נובל ב־1993.',
+    quote: '"אם המסגרת המוסדית מתגמלת פיראטיות, יקומו ארגונים פיראטיים; ואם המסגרת המוסדית מתגמלת פעילויות יצרניות, יקומו ארגונים — חברות — שיעסקו בפעילויות יצרניות."',
+  },
+  // Acemoglu entry covers the joint Acemoglu-and-Robinson dialogue
+  // (chapter 5 dialogue 4) the same way the deci entry covers
+  // Deci-and-Ryan in psychology chapter 2. The dialogue\'s thinker
+  // display reads "אצ\'מוגלו ורובינסון" / "Acemoglu and Robinson",
+  // thinkerId is \'acemoglu\', and Robinson has no separate card.
+  {
+    id: 'acemoglu',
+    name: 'דארון אצ\'מוגלו',
+    era: '1967–',
+    emoji: '🗺️',
+    image: './images/acemoglu.webp',
+    subject: 'economics',
+    bio: 'כלכלן טורקי־אמריקאי חתן פרס נובל. יחד עם מדען המדינה ג\'יימס רובינסון, חידד את הטענה של נורת על המוסדות בספרם "מדוע מדינות נכשלות" (2012), בהבחנה בין מוסדות מכילים, שמפזרים כוח כלכלי ופוליטי באופן רחב, לבין מוסדות מנצלים, המשרתים קבוצת עלית קטנה. טען שגם כאשר מוסדות מכילים יפיקו יותר עושר, העלית מתנגדת להם כי היא עלולה לאבד את מעמדה. זכה בפרס נובל ב־2024, יחד עם סיימון ג\'ונסון.',
+    quote: '"הם חיים בעולם אחר, שעוצב על ידי מוסדות שונים."',
+  },
+  // Easterly source-line note: the docx wrote "efforts by those who
+  // do care", but the real Easterly line (The White Man\'s Burden,
+  // 2006) uses "efforts of those who do care". Card + dialogue source
+  // both use the real wording. Do not reintroduce the "by" version.
+  {
+    id: 'easterly',
+    name: 'ויליאם איסטרלי',
+    era: '1957–',
+    emoji: '🔍',
+    image: './images/easterly.webp',
+    subject: 'economics',
+    bio: 'כלכלן אמריקאי. עבד במשך שנים בבנק העולמי והפך לאחד המבקרים החדים ביותר של סיוע לפיתוח. טען שהמערב הוציא טריליונים על תוכניות שנקבעו מלמעלה ולא הגיעו ליעדיהן, בעוד התערבויות זולות שבוצעו על ידי "מחפשים" מקומיים הגיעו לאנשים שהתוכניות לא הגיעו אליהם. הפיץ את ההבחנה בין מתכננים למחפשים בספרו "משא האדם הלבן" (2006).',
+    quote: '"אנשים עניים מתים לא רק בגלל אדישות העולם לעוני שלהם, אלא גם בגלל מאמצים לא יעילים של אלה שכן איכפת להם."',
+  },
 ];
 
 const THINKERS_EN = [
-  { id:'socrates', name:'Socrates', era:'470–399 BCE', emoji:'🦉', image:'./images/socrates.webp', bio:'The great Athenian philosopher who wrote nothing yet transformed all of Western thought. Famous for the Socratic method of dialogue and the paradox that true wisdom begins with knowing you know nothing.', quote:'"I know that I know nothing."' },
+  // Socrates bio/quote replaced 2026-09-29 in the card-quote audit.
+  // Prior quote "I know that I know nothing" is a widely-repeated
+  // tradition line that does not appear verbatim in Plato — closest
+  // real passage is Apology 21d ("I neither know nor think that I
+  // know"), verified there. Replaced with the trial line from Apology
+  // 38a, which is (a) verified verbatim, (b) already used by the
+  // onboarding taste at index.html:15817, so the card and the taste
+  // now match. See the matching HE entry above for the full note.
+  { id:'socrates', name:'Socrates', era:'470–399 BCE', emoji:'🦉', image:'./images/socrates.webp', bio:'The great Athenian philosopher who wrote nothing yet transformed Western thought. Famous for the Socratic method of dialogue and for what he said in defense of the philosophical life at his trial, recorded in Plato\'s "Apology" (38a).', quote:'"The unexamined life is not worth living."' },
   { id:'plato', name:'Plato', image:'./images/plato.webp', era:'428–348 BCE', emoji:'🏛', bio:'Student of Socrates and master of allegory. Developed the Theory of Forms - the world we perceive is only a shadow of true reality. Founded the Academy, the first institution of higher learning in the Western world.', quote:'"Philosophical inquiry is the liberation of the soul."' },
   { id:'russell', name:'Bertrand Russell', image:'./images/russell.webp', era:'1872–1970', emoji:'📐', bio:'British philosopher, mathematician, and Nobel laureate. Saw philosophy as a critical tool for examining life and the world - and for learning to live with uncertainty rather than false certainty.', quote:'"The philosopher is one who can live with uncertainty."' },
   { id:'wittgenstein', name:'Wittgenstein', image:'./images/wittgenstein.webp', era:'1889–1951', emoji:'🔤', bio:'One of the most influential philosophers of the 20th century. Claimed the limits of our language are the limits of our world - and that most philosophical problems dissolve once we clarify what we are actually saying.', quote:'"The limits of my language mean the limits of my world."' },
@@ -628,7 +746,12 @@ const THINKERS_EN = [
   { id:'sandel', name:'Michael Sandel', era:'1953–', emoji:'🏛️', image:'./images/sandel.webp', subject:'economics', bio:'American political philosopher at Harvard. Known for his critique of capitalism and his argument that there are spheres of life - education, health, democracy - where money should not decide.', quote:'"The market is not a neutral tool - it injects certain values into domains where other values matter more."' },
   { id:'keynes', name:'John Maynard Keynes', era:'1883–1946', emoji:'💰', image:'./images/keynes.webp', subject:'economics', bio:'The British economist who argued that the market does not always correct itself and that governments must spend money during crises.', quote:'"In the long run, we are all dead."' },
   { id:'friedman', name:'Milton Friedman', era:'1912–2006', emoji:'🗽', image:'./images/friedman.webp', subject:'economics', bio:'The American economist from the University of Chicago who argued that the free market is the foundation of human freedom.', quote:'"There\'s no such thing as a free lunch."' },
-  { id:'sen', name:'Amartya Sen', era:'1933–', emoji:'🌍', image:'./images/sen.webp', subject:'economics', bio:'The Indian economist and Nobel laureate who argued that real development is not GDP growth but the expansion of people\'s capabilities.', quote:'"Development is freedom."' },
+  // Sen quote replaced 2026-09-29 in the card-quote audit. Prior quote
+  // "Development is freedom." is a slogan-reformat of Sen's 1999 book
+  // title "Development as Freedom" — not a sentence he wrote. Replaced
+  // with a verified line from the same book. See matching HE entry
+  // above for provenance detail.
+  { id:'sen', name:'Amartya Sen', era:'1933–', emoji:'🌍', image:'./images/sen.webp', subject:'economics', bio:'The Indian economist and Nobel laureate who argued that real development is not GDP growth but the expansion of people\'s capabilities.', quote:'"No famine has ever taken place in the history of the world in a functioning democracy."' },
   { id:'jevons', name:'William Stanley Jevons', era:'1835–1882', emoji:'💎', image:'./images/jevons.webp', subject:'economics', bio:'The English economist who discovered "marginal utility" - that value comes not from labor, but from the desire for the next unit.', quote:'"Value is a subjective relation that a person attributes to a thing."' },
   { id:'marshall', name:'Alfred Marshall', era:'1842–1924', emoji:'✂️', image:'./images/marshall.webp', subject:'economics', bio:'The British economist who united supply and demand into one diagram - and laid the foundation for modern economics.', quote:'"We might as well dispute whether it is the upper or the under blade of a pair of scissors that cuts a piece of paper. But it is clear that both blades are needed."' },
   { id:'kahneman', name:'Daniel Kahneman', era:'1934–2024', emoji:'🧠', image:'./images/kahneman-econ.webp', images:{ economics:'./images/kahneman-econ.webp', psychology:'./images/kahneman-psy.webp' }, subject:'economics', subjects:['economics','psychology'], bio:'The Israeli-American psychologist who won the Nobel Prize in Economics in 2002 for revealing the cognitive biases that influence economic decisions.', quote:'"A loss of $100 is felt about twice as strongly as a gain of $100."' },
@@ -639,6 +762,23 @@ const THINKERS_EN = [
   { id:'rawls', name:'John Rawls', era:'1921–2002', emoji:'⚖️', image:'./images/rawls.webp', subject:'economics', bio:'The American philosopher who formulated "the veil of ignorance," a thought experiment that tries to define a just society without knowing what your position in it will be.', quote:'"Only behind a veil of ignorance can we choose true principles of justice."' },
   { id:'nozick', name:'Robert Nozick', era:'1938–2002', emoji:'🗽', image:'./images/nozick.webp', subject:'economics', bio:'The American libertarian philosopher who formulated "justice as entitlement" as a response to Rawls: justice is measured by process, not by outcome.', quote:'"A just situation is any situation that was achieved through just means."' },
   { id:'hayek', name:'Friedrich Hayek', era:'1899–1992', emoji:'🌬️', image:'./images/hayek.webp', subject:'economics', bio:'The Austrian-British economist who argued that the concept of "social justice" is meaningless: the outcome of a spontaneous process cannot be called "just" or "unjust."', quote:'"Justice can be a property of human behavior, but not of a state that no one intentionally created."' },
+  // Economics chapter 5 — "Growth and Development"
+  { id:'solow',    name:'Robert Solow',        era:'1924–2023', emoji:'📈', image:'./images/solow.webp',    subject:'economics', bio:'An American economist and Nobel laureate. Showed with U.S. data from 1909 to 1949 that most economic growth cannot be explained by the accumulation of capital, and that the unexplained remainder, later called "the Solow residual", captures technology and productivity. Received the Nobel Prize in 1987.',                                                                                                                    quote:'"I am using the phrase \'technical change\' as a shorthand expression for any kind of shift in the production function."' },
+  { id:'romer',    name:'Paul Romer',          era:'1955–',     emoji:'💡', image:'./images/romer.webp',    subject:'economics', bio:'An American economist and Nobel laureate. Answered the question Solow left open, where does technology come from, by placing ideas inside the economic model. Ideas are produced by people responding to incentives, and unlike physical capital they are non-rival: a single formula can serve a million factories at once. Received the Nobel Prize in 2018.',                                                                          quote:'"Economic growth occurs whenever people take resources and rearrange them in ways that are more valuable."' },
+  // North source-line note: the docx source for chapter 5 dialogue 3
+  // smoothed the Nobel-lecture line (dropped "then" ×2, singularized
+  // "activities" → "activity" ×4, removed the "organizations — firms —"
+  // parenthetical). The card + dialogue both use the real 1993 wording.
+  // Em-dashes preserved: they are North's punctuation, not our prose.
+  { id:'north',    name:'Douglass North',      era:'1920–2015', emoji:'🎲', image:'./images/north.webp',    subject:'economics', bio:'An American economic historian and Nobel laureate. Defined institutions as "the rules of the game", including formal laws, unwritten norms, and their enforcement, and argued that these rules explain why some countries grow while others do not, even when the same technology is available to everyone. Received the Nobel Prize in 1993.',                                                                            quote:'"If the institutional framework rewards piracy then piratical organizations will come into existence; and if the institutional framework rewards productive activities then organizations – firms – will come into existence to engage in productive activities."' },
+  // Acemoglu entry covers the joint Acemoglu-and-Robinson dialogue
+  // (chapter 5 dialogue 4), Deci-and-Ryan pattern. Dialogue's thinker
+  // display: "Acemoglu and Robinson"; thinkerId: 'acemoglu'.
+  { id:'acemoglu', name:'Daron Acemoglu',      era:'1967–',     emoji:'🗺️', image:'./images/acemoglu.webp', subject:'economics', bio:'A Turkish-American economist and Nobel laureate. Together with the political scientist James Robinson, sharpened North\'s argument about institutions in the book "Why Nations Fail" (2012), distinguishing between inclusive institutions, which spread economic and political power widely, and extractive ones, which serve a small elite. Argued that even when inclusive institutions would produce more wealth, elites resist them because they would lose their position. Received the Nobel Prize in 2024, together with Simon Johnson.', quote:'"They live in a different world shaped by different institutions."' },
+  // Easterly source-line note: docx wrote "efforts by those who do
+  // care"; the real book (The White Man's Burden, 2006) uses "efforts
+  // of those who do care". Real wording used on card + in dialogue.
+  { id:'easterly', name:'William Easterly',    era:'1957–',     emoji:'🔍', image:'./images/easterly.webp', subject:'economics', bio:'An American economist. Worked for years at the World Bank and became one of the sharpest critics of development aid. Argued that the West spent trillions on top-down plans that missed their targets, while cheap interventions delivered by local "searchers" reached people the plans did not. Popularized the distinction between planners and searchers in "The White Man\'s Burden" (2006).',                                                            quote:'"Poor people die not only because of the world\'s indifference to their poverty, but also because of ineffective efforts of those who do care."' },
   // Psychology thinkers
   { id:'wundt',   name:'Wilhelm Wundt',    era:'1832–1920', emoji:'🧪', image:'./images/wundt.webp',   subject:'psychology', bio:'The German psychologist who founded the world\'s first psychological laboratory, in Leipzig in 1879. Declared that the mind is a subject for scientific inquiry - not for philosophical speculation. His method was abandoned; his idea still rules.',                                                                                                                                                                            quote:'"The book which I here present to the public is an attempt to mark out a new domain of science."' },
   { id:'james',   name:'William James',    era:'1842–1910', emoji:'🌊', image:'./images/james.webp',   subject:'psychology', bio:'An American philosopher-psychologist at Harvard. Argued against Wundt that consciousness is not a chain of discrete moments - it is a river. Coined the term "stream of consciousness" and founded functional psychology: not what consciousness is made of, but what it does.',                                                                                                                                    quote:'"Consciousness does not appear to itself chopped up in bits. It is nothing jointed - it flows."' },

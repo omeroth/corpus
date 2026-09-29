@@ -24997,7 +24997,16 @@ const CAROUSEL_ORDER = {
     // Ch4: What is Reality?
     'spinoza', 'berkeley', 'bostrom',
   ],
-  economics: ['samuelson', 'smith', 'marx', 'keynes', 'friedman', 'sen', 'jevons', 'marshall', 'kahneman', 'ricardo', 'piketty', 'aquinas', 'pareto', 'rawls', 'nozick', 'hayek', 'locke', 'mill-econ', 'walras', 'sandel'],
+  economics: [
+    // Ch1-4 order preserved as-shipped (not chapter-grouped like philosophy
+    // and psychology — economics has an authorial ordering rather than a
+    // dialogue-of-first-appearance ordering).
+    'samuelson', 'smith', 'marx', 'keynes', 'friedman', 'sen', 'jevons',
+    'marshall', 'kahneman', 'ricardo', 'piketty', 'aquinas', 'pareto',
+    'rawls', 'nozick', 'hayek', 'locke', 'mill-econ', 'walras', 'sandel',
+    // Ch5: Growth and Development. Sen already listed above (ch4 debut).
+    'solow', 'romer', 'north', 'acemoglu', 'easterly',
+  ],
   psychology: [
     // Ch1: What is the mind?
     'wundt', 'james', 'freud', 'jung', 'skinner', 'rogers',
