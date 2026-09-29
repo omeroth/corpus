@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-29T08:49:55.400Z",
+  "generatedAt": "2026-09-29T11:24:55.294Z",
   "items": [
     {
       "weekId": 1,
@@ -1324,6 +1324,148 @@
       "title": "Summary: Economic Justice",
       "card": "share/cards/en/econ-4-7.png",
       "page": "d/econ-4-7-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 1,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "solow",
+      "title": "למה מדינות עשירות לא נעצרות?",
+      "card": "share/cards/he/econ-5-1.png",
+      "page": "d/econ-5-1-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 1,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "solow",
+      "title": "Why don't rich countries come to a stop?",
+      "card": "share/cards/en/econ-5-1.png",
+      "page": "d/econ-5-1-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 2,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "romer",
+      "title": "מאיפה מגיעים הרעיונות?",
+      "card": "share/cards/he/econ-5-2.png",
+      "page": "d/econ-5-2-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 2,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "romer",
+      "title": "Where do ideas come from?",
+      "card": "share/cards/en/econ-5-2.png",
+      "page": "d/econ-5-2-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 3,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "north",
+      "title": "למה מדינות לא פשוט מעתיקות מה שעובד?",
+      "card": "share/cards/he/econ-5-3.png",
+      "page": "d/econ-5-3-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 3,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "north",
+      "title": "Why don't countries simply copy what works?",
+      "card": "share/cards/en/econ-5-3.png",
+      "page": "d/econ-5-3-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 4,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "acemoglu",
+      "title": "אילו כללים, ולמי?",
+      "card": "share/cards/he/econ-5-4.png",
+      "page": "d/econ-5-4-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 4,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "acemoglu",
+      "title": "Which rules, and for whom?",
+      "card": "share/cards/en/econ-5-4.png",
+      "page": "d/econ-5-4-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 5,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "sen",
+      "title": "צמיחה לשם מה?",
+      "card": "share/cards/he/econ-5-5.png",
+      "page": "d/econ-5-5-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 5,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "sen",
+      "title": "Growth for the sake of what?",
+      "card": "share/cards/en/econ-5-5.png",
+      "page": "d/econ-5-5-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 6,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "easterly",
+      "title": "האם אנחנו יודעים איך לגרום לזה לקרות?",
+      "card": "share/cards/he/econ-5-6.png",
+      "page": "d/econ-5-6-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 6,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "easterly",
+      "title": "Do we know how to make it happen?",
+      "card": "share/cards/en/econ-5-6.png",
+      "page": "d/econ-5-6-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 7,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "למה יש מדינות עשירות ועניות?",
+      "card": "share/cards/he/econ-5-7.png",
+      "page": "d/econ-5-7-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 7,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "Why are some countries rich and others poor?",
+      "card": "share/cards/en/econ-5-7.png",
+      "page": "d/econ-5-7-en.html"
     },
     {
       "weekId": 1,

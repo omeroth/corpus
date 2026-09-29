@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-29T08:50:01.257Z",
+  "generatedAt": "2026-09-29T11:25:02.730Z",
   "items": [
     {
       "thinkerId": "socrates",
@@ -592,6 +592,56 @@
       "page": "t/hayek-he.html"
     },
     {
+      "thinkerId": "solow",
+      "subject": "economics",
+      "lang": "he",
+      "name": "רוברט סולו",
+      "era": "1924–2023",
+      "cardLandscape": "share/thinkers/he/solow.png",
+      "cardPortrait": "share/thinkers/portrait/he/solow.png",
+      "page": "t/solow-he.html"
+    },
+    {
+      "thinkerId": "romer",
+      "subject": "economics",
+      "lang": "he",
+      "name": "פול רומר",
+      "era": "1955–",
+      "cardLandscape": "share/thinkers/he/romer.png",
+      "cardPortrait": "share/thinkers/portrait/he/romer.png",
+      "page": "t/romer-he.html"
+    },
+    {
+      "thinkerId": "north",
+      "subject": "economics",
+      "lang": "he",
+      "name": "דאגלס נורת",
+      "era": "1920–2015",
+      "cardLandscape": "share/thinkers/he/north.png",
+      "cardPortrait": "share/thinkers/portrait/he/north.png",
+      "page": "t/north-he.html"
+    },
+    {
+      "thinkerId": "acemoglu",
+      "subject": "economics",
+      "lang": "he",
+      "name": "דארון אצ'מוגלו",
+      "era": "1967–",
+      "cardLandscape": "share/thinkers/he/acemoglu.png",
+      "cardPortrait": "share/thinkers/portrait/he/acemoglu.png",
+      "page": "t/acemoglu-he.html"
+    },
+    {
+      "thinkerId": "easterly",
+      "subject": "economics",
+      "lang": "he",
+      "name": "ויליאם איסטרלי",
+      "era": "1957–",
+      "cardLandscape": "share/thinkers/he/easterly.png",
+      "cardPortrait": "share/thinkers/portrait/he/easterly.png",
+      "page": "t/easterly-he.html"
+    },
+    {
       "thinkerId": "socrates",
       "subject": "philosophy",
       "lang": "en",
@@ -970,6 +1020,56 @@
       "cardLandscape": "share/thinkers/en/hayek.png",
       "cardPortrait": "share/thinkers/portrait/en/hayek.png",
       "page": "t/hayek-en.html"
+    },
+    {
+      "thinkerId": "solow",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Robert Solow",
+      "era": "1924–2023",
+      "cardLandscape": "share/thinkers/en/solow.png",
+      "cardPortrait": "share/thinkers/portrait/en/solow.png",
+      "page": "t/solow-en.html"
+    },
+    {
+      "thinkerId": "romer",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Paul Romer",
+      "era": "1955–",
+      "cardLandscape": "share/thinkers/en/romer.png",
+      "cardPortrait": "share/thinkers/portrait/en/romer.png",
+      "page": "t/romer-en.html"
+    },
+    {
+      "thinkerId": "north",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Douglass North",
+      "era": "1920–2015",
+      "cardLandscape": "share/thinkers/en/north.png",
+      "cardPortrait": "share/thinkers/portrait/en/north.png",
+      "page": "t/north-en.html"
+    },
+    {
+      "thinkerId": "acemoglu",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Daron Acemoglu",
+      "era": "1967–",
+      "cardLandscape": "share/thinkers/en/acemoglu.png",
+      "cardPortrait": "share/thinkers/portrait/en/acemoglu.png",
+      "page": "t/acemoglu-en.html"
+    },
+    {
+      "thinkerId": "easterly",
+      "subject": "economics",
+      "lang": "en",
+      "name": "William Easterly",
+      "era": "1957–",
+      "cardLandscape": "share/thinkers/en/easterly.png",
+      "cardPortrait": "share/thinkers/portrait/en/easterly.png",
+      "page": "t/easterly-en.html"
     },
     {
       "thinkerId": "wundt",
