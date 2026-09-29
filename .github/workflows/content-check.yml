@@ -1,0 +1,35 @@
+name: Content check
+
+# Runs scripts/check-thinker-links.mjs on every push to main. Complements
+# the bump-version gate that catches the same errors right before release:
+# the bump gate is authoritative for release, this workflow catches content
+# pushes that happen between releases (typo in CAROUSEL_ORDER, dictionary
+# entry missing an EN counterpart, orphaned thinkerId in a dialogue etc.)
+# so the failure lands as a red X on the commit view rather than being
+# discovered on the phone after Apple approves the next build.
+#
+# Deliberately runs on the source repo (omeroth/corpus). The Pages deploy
+# workflow next to this one runs on the mirror (omeroth/corpus-app) — the
+# two are complementary, not competing.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  check-content:
+    if: ${{ github.repository == 'omeroth/corpus' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # The validator is pure Node — no npm install needed, no build step.
+      # If a future check adds a dependency, wire `npm ci` back in here.
+      - name: Run content validator
+        run: node scripts/check-thinker-links.mjs

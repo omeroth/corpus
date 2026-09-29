@@ -90,6 +90,27 @@ if (dirty.length) {
   process.exit(1);
 }
 
+// --- content validator gate ---
+// Refuse to bump if scripts/check-thinker-links.mjs surfaces any hard
+// error (unknown thinkerId, CAROUSEL_ORDER omission, HE/EN mismatch,
+// broken quiz shape, tag imbalance). Added 2026-09-29 after Foucault
+// shipped to web for ~30 minutes without a CAROUSEL_ORDER entry — the
+// dictionary + dialogue join was clean, but the pantheon/carousel list
+// wasn't and nothing surfaced it until a user opened the pantheon.
+// The validator is cheap (<1s on current content) and this is the last
+// point every release funnels through, so this is where it belongs.
+try {
+  execFileSync('node', ['scripts/check-thinker-links.mjs'], {
+    cwd: REPO,
+    stdio: 'inherit',
+  });
+} catch (e) {
+  console.error('');
+  console.error('bump-version: refusing to run — content validator reported errors above.');
+  console.error('Fix them and re-run `npm run bump <version>`.');
+  process.exit(1);
+}
+
 // --- read current state ---
 const APP_VERSION_RE       = /const APP_VERSION = '([\d.]+)';/;
 const ANDROID_NAME_RE      = /versionName "([\d.]+)"/;
