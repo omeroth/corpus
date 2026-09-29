@@ -4546,16 +4546,6 @@
     max-width: none;
     margin-inline: 0;
   }
-  /* Un-hide the shared SUMMARY / סיכום eyebrow on this surface. Other
-     editorial sections have their eyebrow globally hidden via
-     `body.reader-editorial.hide-section-eyebrow` (line 3845) because
-     their .section-heading names the section. The summary has no heading,
-     so the eyebrow is the only label — SPEC keeps it shared with the
-     other sections' visual style. Restore its default flex layout when
-     the card contains .quiz-summary-v2. */
-  body.reader-editorial.hide-section-eyebrow #reader-content .section-card:has(> .quiz-summary-v2) .section-type-label {
-    display: flex;
-  }
   /* Hide the floating A+/A- rail while the summary is up: no text to
      resize, and the rail overlapped the chip + chapter row on device. */
   body:has(#reader-content > .section-card > .quiz-summary-v2) .reader-text-size-rail {
