@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08T16:07:19.180Z",
+  "generatedAt": "2026-09-29T08:49:55.400Z",
   "items": [
     {
       "weekId": 1,
@@ -1992,6 +1992,148 @@
       "title": "Escape from Choice",
       "card": "share/cards/en/psyc-bonusPsy1-5.png",
       "page": "d/psyc-bonusPsy1-5-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "freud",
+      "title": "מה אם הסימפטום מנסה לומר משהו?",
+      "card": "share/cards/he/psyc-5-1.png",
+      "page": "d/psyc-5-1-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "freud",
+      "title": "What if the symptom is trying to say something?",
+      "card": "share/cards/en/psyc-5-1.png",
+      "page": "d/psyc-5-1-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "kohut",
+      "title": "מה אם הסבל אינו מאבק אלא חוסר?",
+      "card": "share/cards/he/psyc-5-2.png",
+      "page": "d/psyc-5-2-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "kohut",
+      "title": "What if the suffering is not a struggle but a lack?",
+      "card": "share/cards/en/psyc-5-2.png",
+      "page": "d/psyc-5-2-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "bowlby",
+      "title": "מה אם הדיכאון הוא אבל שנתקע?",
+      "card": "share/cards/he/psyc-5-3.png",
+      "page": "d/psyc-5-3-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "bowlby",
+      "title": "What if depression is mourning that got stuck?",
+      "card": "share/cards/en/psyc-5-3.png",
+      "page": "d/psyc-5-3-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "beck",
+      "title": "מה אם הסבל מתחזק על ידי מה שאנחנו אומרים לעצמנו?",
+      "card": "share/cards/he/psyc-5-4.png",
+      "page": "d/psyc-5-4-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "beck",
+      "title": "What if suffering is strengthened by what we say to ourselves?",
+      "card": "share/cards/en/psyc-5-4.png",
+      "page": "d/psyc-5-4-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "van-der-kolk",
+      "title": "מה אם יש סבל שאינו עובר דרך מחשבה?",
+      "card": "share/cards/he/psyc-5-5.png",
+      "page": "d/psyc-5-5-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "van-der-kolk",
+      "title": "What if there is suffering that does not pass through thought?",
+      "card": "share/cards/en/psyc-5-5.png",
+      "page": "d/psyc-5-5-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "foucault",
+      "title": "מי קובע איזה סבל נחשב מחלה?",
+      "card": "share/cards/he/psyc-5-6.png",
+      "page": "d/psyc-5-6-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "foucault",
+      "title": "Who decides which suffering counts as an illness?",
+      "card": "share/cards/en/psyc-5-6.png",
+      "page": "d/psyc-5-6-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 7,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "מה אומר הסבל הנפשי?",
+      "card": "share/cards/he/psyc-5-7.png",
+      "page": "d/psyc-5-7-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 7,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "What does mental suffering say?",
+      "card": "share/cards/en/psyc-5-7.png",
+      "page": "d/psyc-5-7-en.html"
     }
   ]
 }

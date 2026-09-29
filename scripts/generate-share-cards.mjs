@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // Build-time share card + share page generator for corpusapp.io.
 //
-// Reads the dialogue data structures out of index.html (corpusData +
-// economicsData + THINKERS + THINKERS_EN), then for every dialogue that has
-// a thinkerId, renders:
+// Reads the dialogue data structures from content/*.js (corpusData +
+// economicsData + psychologyData) and THINKERS + THINKERS_EN from
+// content/thinkers.js, then for every dialogue renders:
 //   share/cards/<lang>/<subject>-<weekId>-<dayId>.png    — 1200×630 OG image
 //   d/<subject>-<weekId>-<dayId>-<lang>.html             — landing page with OG tags
 //

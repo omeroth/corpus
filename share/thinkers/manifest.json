@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08T16:07:24.736Z",
+  "generatedAt": "2026-09-29T08:50:01.257Z",
   "items": [
     {
       "thinkerId": "socrates",
@@ -370,6 +370,16 @@
       "cardLandscape": "share/thinkers/he/van-der-kolk.png",
       "cardPortrait": "share/thinkers/portrait/he/van-der-kolk.png",
       "page": "t/van-der-kolk-he.html"
+    },
+    {
+      "thinkerId": "foucault",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "מישל פוקו",
+      "era": "1926–1984",
+      "cardLandscape": "share/thinkers/he/foucault.png",
+      "cardPortrait": "share/thinkers/portrait/he/foucault.png",
+      "page": "t/foucault-he.html"
     },
     {
       "thinkerId": "mill-econ",
@@ -1160,6 +1170,16 @@
       "cardLandscape": "share/thinkers/en/van-der-kolk.png",
       "cardPortrait": "share/thinkers/portrait/en/van-der-kolk.png",
       "page": "t/van-der-kolk-en.html"
+    },
+    {
+      "thinkerId": "foucault",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Michel Foucault",
+      "era": "1926–1984",
+      "cardLandscape": "share/thinkers/en/foucault.png",
+      "cardPortrait": "share/thinkers/portrait/en/foucault.png",
+      "page": "t/foucault-en.html"
     }
   ]
 }
