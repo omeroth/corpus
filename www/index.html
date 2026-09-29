@@ -4484,110 +4484,263 @@
     font-weight: 700;
   }
 
-  /* ── Quiz Summary ── */
-  .quiz-summary { text-align: center; padding: 20px 0 8px; position: relative; }
-
-  .quiz-summary-headline {
-    font-family: 'Nunito', 'Assistant', sans-serif; font-size: 26px; font-weight: 900;
-    color: var(--ink); margin-bottom: 10px;
-    opacity: 0; transform: translateY(-8px);
-    animation: qs-headline-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.72s both;
+  /* ── Quiz Summary v2 — celebrate successes only ─────────────────
+     2026-09-29 rebuild per dialogue-summary-handoff/SPEC.md.
+     Each correct answer becomes a gold medallion; missed questions
+     are never drawn; 0/3 shows a single purple "complete" medallion.
+     No stars, no fraction, no "Correct answers" label, no message pill.
+     All classes prefixed `.qs-` and scoped to this surface — safe to
+     edit without touching other reader sections. The layout uses
+     `.qs-mid { margin: auto 0 }` inside a flex-column card so the
+     hero group centres and the chapter row sits flush at the bottom,
+     which is how the design fits 360×640 without overflow.
+  */
+  #reader-content:has(> .section-card > .quiz-summary-v2) {
+    display: flex;
+    flex-direction: column;
+    /* The summary doesn't scroll (flex-column card fills the slot, qs-chap
+       sits at the bottom, fixed button bar overlays below). The editorial
+       reader-content's top/bottom padding is sized for scrolled content
+       and pushes the summary past the viewport at 360×640 without a
+       safe-area (Android without a gesture bar). Trim to zero on this
+       surface only — the fixed button bar remains visible over the card
+       exactly as designed. Scoped via :has() so no other section moves. */
+    padding-top: 0;
+    padding-bottom: 0;
   }
-  @keyframes qs-headline-in { to { opacity: 1; transform: translateY(0); } }
-
-  .quiz-summary-stars { font-size: 36px; letter-spacing: 6px; margin-bottom: 10px; }
-  .qs-star { display: inline-block; opacity: 0; transform: scale(0); }
-  .qs-star--animate { animation: qs-star-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
-  .qs-star--animate.qs-star--1 { animation-delay: 0.05s; }
-  .qs-star--animate.qs-star--2 { animation-delay: 0.17s; }
-  .qs-star--animate.qs-star--3 { animation-delay: 0.29s; }
-  @keyframes qs-star-pop {
-    from { opacity: 0; transform: scale(0); }
-    to { opacity: 1; transform: scale(1); }
+  .section-card:has(> .quiz-summary-v2) {
+    flex: 1;
+    min-height: 0;
   }
-  /* Tier 1: pulse on each star after pop */
-  .quiz-summary--perfect .qs-star--animate.qs-star--1 {
-    animation: qs-star-pop 0.4s 0.05s cubic-bezier(0.34, 1.56, 0.64, 1) both,
-               qs-star-pulse 1.8s 0.75s ease-in-out infinite;
+  .quiz-summary-v2 {
+    --qs-purple: #7B4FD4;
+    --qs-ink: #2F2150;
+    --qs-gold: #F59E0B;
+    --qs-muted: #6B6285;
+    --qs-soft: #F4EFFC;
+    --qs-line: #E6DDF5;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
   }
-  .quiz-summary--perfect .qs-star--animate.qs-star--2 {
-    animation: qs-star-pop 0.4s 0.17s cubic-bezier(0.34, 1.56, 0.64, 1) both,
-               qs-star-pulse 1.8s 0.87s ease-in-out infinite;
+  .qs-mid {
+    margin: auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 2;
   }
-  .quiz-summary--perfect .qs-star--animate.qs-star--3 {
-    animation: qs-star-pop 0.4s 0.29s cubic-bezier(0.34, 1.56, 0.64, 1) both,
-               qs-star-pulse 1.8s 0.99s ease-in-out infinite;
+  .qs-hero {
+    position: relative;
+    width: 100%;
+    height: 122px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  @keyframes qs-star-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-  /* Tier 3: static, no animation */
-  .quiz-summary--review .qs-star { opacity: 1; transform: scale(1); animation: none; }
-
-  .quiz-summary-score {
-    font-size: 52px; font-weight: 900; font-family: 'Nunito', 'Assistant', sans-serif;
-    color: var(--accent-text); margin-bottom: 4px;
+  .qs-rays {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 300px; height: 300px;
+    margin: -150px 0 0 -150px;
+    border-radius: 50%;
+    background: repeating-conic-gradient(rgba(245,158,11,var(--qs-ra)) 0deg 7deg, transparent 7deg 20deg);
+    -webkit-mask: radial-gradient(circle, #000 12%, transparent 60%);
+    mask: radial-gradient(circle, #000 12%, transparent 60%);
+    animation: qs-spin 36s linear infinite;
   }
-  .quiz-summary--perfect .quiz-summary-score {
-    text-shadow: 0 0 24px var(--accent-glow), 0 0 48px var(--accent-glow);
+  @keyframes qs-spin { to { transform: rotate(360deg); } }
+  .qs-glow {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 230px; height: 150px;
+    margin: -75px 0 0 -115px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(123,79,212,var(--qs-ga)), rgba(123,79,212,0) 70%);
   }
-  .quiz-summary--good .quiz-summary-score { position: relative; }
-  .quiz-summary--review .quiz-summary-score { color: var(--text-2); font-size: 42px; }
-
-  /* Tier 2: soft halo behind score, pulses once */
-  .qs-score-halo {
-    position: absolute; inset: -12px -20px;
-    background: var(--accent-glow); border-radius: 50%;
-    filter: blur(16px); opacity: 0.5;
-    animation: qs-halo-pulse 0.6s ease-out both;
+  .qs-meds {
+    position: relative;
+    display: flex;
+    gap: 14px;
+    align-items: center;
   }
-  @keyframes qs-halo-pulse {
-    0% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.05); opacity: 0.7; }
-    100% { transform: scale(1); opacity: 0.5; }
+  .qs-md {
+    position: relative;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
   }
-
-  .quiz-summary-label { font-size: 15px; color: var(--text-muted); margin-bottom: 16px; }
-
-  .quiz-summary-msg {
-    font-size: 15px; font-weight: 600; padding: 12px 20px;
-    border-radius: 14px; display: inline-block; margin-top: 4px; line-height: 1.4;
+  .qs-md.qs-ok {
+    background: radial-gradient(circle at 35% 30%, #FFE7A3 0%, #FBBF24 38%, #F59E0B 70%, #B45309 100%);
+    box-shadow: 0 0 0 4px #fff, 0 0 0 6px rgba(245,158,11,.35), 0 8px 18px rgba(180,83,9,.35);
+    animation: qs-land .55s cubic-bezier(.3,1.7,.5,1) both;
+    animation-delay: var(--qs-d);
   }
-  .quiz-summary--perfect .quiz-summary-msg { background: var(--surface-2); color: var(--accent-text); }
-  .quiz-summary--good .quiz-summary-msg { background: var(--surface-2); color: var(--accent-text); }
-  .quiz-summary--review .quiz-summary-msg { color: var(--text-2); font-weight: 400; }
-
-  /* Tier 3: review lesson — outlined pill button (mirrors .btn-reader-back) */
-  .qs-review-lesson {
-    display: block;
-    width: fit-content;
-    margin: 14px auto 0;
-    padding: 12px 22px;
-    background: none;
-    border: 1.5px solid rgba(var(--accent-rgb), 0.4);
+  .qs-md.qs-ok svg.qs-ck {
+    width: 30px; height: 30px;
+    filter: drop-shadow(0 1px 1px rgba(120,53,15,.5));
+  }
+  .qs-md.qs-done {
+    background: radial-gradient(circle at 35% 30%, #C7B3EC 0%, #9A74E0 45%, #7B4FD4 75%, #5B3AA8 100%);
+    box-shadow: 0 0 0 4px #fff, 0 0 0 6px rgba(123,79,212,.3), 0 8px 18px rgba(91,58,168,.35);
+    animation: qs-land .55s cubic-bezier(.3,1.7,.5,1) .25s both;
+  }
+  @keyframes qs-land {
+    0% { opacity: 0; transform: scale(.2) rotate(-30deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0); }
+  }
+  .qs-burst {
+    position: absolute;
+    inset: -18px;
+    border-radius: 50%;
+    border: 3px solid rgba(245,158,11,.8);
+    opacity: 0;
+    animation: qs-burst .7s ease-out both;
+    animation-delay: calc(var(--qs-d) + .15s);
+    pointer-events: none;
+  }
+  @keyframes qs-burst {
+    0% { opacity: .9; transform: scale(.5); }
+    100% { opacity: 0; transform: scale(1.35); }
+  }
+  .qs-cf {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 7px; height: 11px;
+    border-radius: 2px;
+    opacity: 0;
+    pointer-events: none;
+    animation: qs-cf 1.1s cubic-bezier(.2,.7,.4,1) both;
+    animation-delay: calc(var(--qs-d) + .12s);
+  }
+  @keyframes qs-cf {
+    0% { opacity: 1; transform: translate(-50%,-50%) rotate(0); }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--qs-x)), calc(-50% + var(--qs-y))) rotate(var(--qs-r)); }
+  }
+  .qs-spk {
+    position: absolute;
+    width: 14px; height: 14px;
+    animation: qs-tw 2.4s ease-in-out infinite;
+  }
+  .qs-spk path { fill: var(--qs-gold); }
+  @keyframes qs-tw {
+    0%, 100% { opacity: .2; transform: scale(.6); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+  .qs-hl {
+    margin: 14px 0 0;
+    font-size: 26px;
+    line-height: 1.15;
+    font-weight: 900;
+    color: var(--qs-ink);
+    font-family: 'Nunito', 'Assistant', sans-serif;
+  }
+  [dir="rtl"] .qs-hl { font-family: 'Assistant', 'Nunito', sans-serif; }
+  .qs-hl em { font-style: normal; color: var(--qs-purple); }
+  .quiz-summary-v2.qs-full .qs-hl em {
+    background: linear-gradient(90deg, #F59E0B, #B45309);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .qs-sl {
+    margin: 8px 0 0;
+    font-size: 14.5px;
+    line-height: 1.4;
+    font-weight: 700;
+    color: var(--qs-muted);
+    max-width: 290px;
+  }
+  .qs-chip {
+    margin-top: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--qs-soft);
     border-radius: 999px;
-    color: var(--accent-text);
-    font-size: 14px; font-weight: 700;
+    padding-block: 4px;
+    padding-inline-start: 4px;
+    padding-inline-end: 12px;
+    max-width: 100%;
+  }
+  .qs-chip img {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--accent, var(--qs-purple));
+    object-fit: cover;
+    flex: none;
+  }
+  .qs-chip .qs-chip-txt {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: var(--qs-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .qs-chip .qs-chip-txt i {
+    font-style: normal;
+    color: var(--accent, var(--qs-purple));
+    font-weight: 700;
+  }
+  .qs-retry {
+    margin-top: 14px;
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 999px;
+    border: 1.5px solid #D6C8F2;
+    background: #fff;
+    color: var(--qs-purple);
+    font-size: 14.5px;
+    font-weight: 800;
     font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
     -webkit-tap-highlight-color: transparent;
   }
-  .qs-review-lesson:hover { background: var(--accent-glow); }
-  .qs-review-lesson:active { transform: scale(0.97); background: var(--accent-glow); }
-
-
-  /* Confetti (Tier 1 only) */
-  .quiz-summary-confetti {
-    position: absolute; top: -10px; left: 0; right: 0;
-    height: 0; pointer-events: none; z-index: 10; overflow: visible;
+  .qs-retry svg { width: 16px; height: 16px; }
+  [dir="rtl"] .qs-retry svg { transform: scaleX(-1); }
+  .qs-chap {
+    position: relative;
+    z-index: 2;
+    padding-top: 12px;
+    border-top: 1px solid var(--qs-line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: auto;
   }
-  .qs-confetti-piece {
-    position: absolute; width: 7px; height: 7px; border-radius: 2px;
-    opacity: 0; animation: qs-confetti-fall 2s ease-out both;
+  .qs-chap .qs-c {
+    font-size: 12.5px;
+    font-weight: 800;
+    color: var(--qs-muted);
   }
-  @keyframes qs-confetti-fall {
-    0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-    80% { opacity: 1; }
-    100% { opacity: 0; transform: translateY(220px) rotate(540deg); }
+  .qs-chap .qs-pd {
+    display: flex;
+    gap: 5px;
+  }
+  .qs-chap .qs-pd i {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #E2D9F1;
+  }
+  .qs-chap .qs-pd i.qs-pd-done { background: var(--accent, var(--qs-purple)); }
+  .qs-chap .qs-pd i.qs-pd-now {
+    background: var(--qs-purple);
+    box-shadow: 0 0 0 3px rgba(123,79,212,.2);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .qs-md, .qs-burst, .qs-cf, .qs-rays, .qs-spk { animation: none !important; }
+    .qs-cf, .qs-burst { display: none; }
   }
 
   /* ── XP Float animation ── */
@@ -21734,6 +21887,11 @@ function defaultState() {
     readerXP: 0,
     quizAnswered: {},
     quizAttempts: {},
+    // dayQuizFirstTry[subject-week-day] = first-attempt answers snapshot.
+    // Populated when the user taps "Try again" on the quiz summary; used
+    // by handleQuiz as a retry flag to suppress XP double-counting. See
+    // _quizSummaryRetry.
+    dayQuizFirstTry: {},
     quizCorrect: false,
     activeDays: {},
     todayCompleted: 0,
@@ -25641,70 +25799,175 @@ function renderReader() {
     makeNextBtn(reflectionIsLast ? ui.finishBtn : ui.nextBtn, reflectionIsLast);
   }
   else if (sec.type === 'quiz_summary') {
+    // v2 (2026-09-29): celebrate successes only. See
+    // dialogue-summary-handoff/SPEC.md. One gold medallion per correct
+    // answer, missed questions not drawn. 0/3 → single purple "complete"
+    // medallion. "Try again" button only below 3/3 — jumps to the first
+    // quiz section with all answers cleared. XP and completion rewards
+    // are locked to the first attempt (see _quizSummaryRetry + the retry
+    // gate in handleQuiz below).
     const _dqKey = `${state.subject}-${state.currentWeek}-${state.currentDay}`;
     const _dqMap = (state.dayQuizResults && !Array.isArray(state.dayQuizResults))
       ? (state.dayQuizResults[_dqKey] || {})
       : {};
     const results = Object.values(_dqMap);
-    const total = results.length;
+    const total = results.length || 3;
     const correct = results.filter(Boolean).length;
-    const pct = total > 0 ? correct / total : 0;
     const isEn = state.lang === 'en';
-
-    const tier = pct === 1 ? 'perfect' : pct >= 0.66 ? 'good' : 'review';
-
-    const headline = { perfect: isEn ? 'Perfect!' : 'מושלם!', good: isEn ? 'Well done!' : 'כל הכבוד!', review: isEn ? 'Almost there' : 'כמעט שם' }[tier];
-    const message  = { perfect: isEn ? 'You got every answer right!' : 'ענית נכון על הכל!', good: isEn ? 'You got the main idea' : 'יפה! הבנת את הרעיון המרכזי', review: isEn ? 'It gets clearer each time you try' : 'בכל פעם זה הולך ומתבהר' }[tier];
-    const label = isEn ? 'Correct answers' : 'תשובות נכונות';
+    const isFull = correct === total && correct > 0;
     const sectionLabel = isEn ? 'Summary' : 'סיכום';
 
-    const starCount = pct === 1 ? 3 : pct >= 0.66 ? 2 : 1;
-    const starsHtml = [1, 2, 3].map(n => {
-      const animClass = tier !== 'review' ? ' qs-star--animate' : '';
-      return `<span class="qs-star qs-star--${n}${animClass}">${n <= starCount ? '⭐' : '☆'}</span>`;
+    // Copy per SPEC — headline splits into <em> + plain around the
+    // accent word so the CSS can gradient-fill the accent at 3/3.
+    const HL = {
+      en: {
+        0: 'Dialogue <em>complete!</em>',
+        1: '<em>One</em> correct answer!',
+        2: '<em>Two</em> correct answers!',
+        3: '<em>Perfect</em> dialogue!',
+      },
+      he: {
+        0: 'הדיאלוג <em>הושלם!</em>',
+        1: 'תשובה נכונה <em>אחת!</em>',
+        2: '<em>שתי</em> תשובות נכונות!',
+        3: 'דיאלוג <em>מושלם!</em>',
+      },
+    };
+    const thinker = day.thinkerId ? getT().find(t => t && t.id === day.thinkerId) : null;
+    const thinkerName = thinker ? (isEn ? (thinker.nameEn || thinker.name) : (thinker.name || thinker.nameEn)) : '';
+    const dialogueTitle = isEn ? (day.titleEn || day.title || '') : (day.title || day.titleEn || '');
+    const SL = {
+      en: {
+        0: 'Another thinker met, another idea to keep.',
+        1: `A sharp answer about ${thinkerName}.`,
+        2: `Two sharp answers about ${thinkerName}.`,
+        3: `Every question about ${thinkerName}, answered right.`,
+      },
+      he: {
+        0: 'עוד הוגה, עוד רעיון לקחת איתך.',
+        1: `תשובה חדה על ${thinkerName}.`,
+        2: `שתי תשובות חדות על ${thinkerName}.`,
+        3: `כל השאלות על ${thinkerName} נענו נכון.`,
+      },
+    };
+    const retryLabel = isEn ? 'Try again' : 'לנסות שוב';
+
+    // Chapter + dialogue position for the bottom row.
+    const chapterNum = (typeof state.currentWeek === 'number') ? state.currentWeek : chapter.id;
+    const chapterLabel = isEn ? `Chapter ${chapterNum}` : `פרק ${chapterNum}`;
+    const posIdx = chapter.days.findIndex(d => d.id === state.currentDay);
+    const posK = posIdx >= 0 ? posIdx + 1 : 1;
+    const posTotal = chapter.days.length || posK;
+    const chapText = isEn
+      ? `${chapterLabel} · Dialogue ${posK} of ${posTotal}`
+      : `${chapterLabel} · דיאלוג ${posK} מתוך ${posTotal}`;
+    const posDots = Array.from({ length: posTotal }, (_, i) => {
+      if (i < posIdx) return '<i class="qs-pd-done"></i>';
+      if (i === posIdx) return '<i class="qs-pd-now"></i>';
+      return '<i></i>';
     }).join('');
 
-    const confettiColors = ['var(--accent)', 'var(--amber)', 'var(--lilac)', 'var(--purple-light)', 'var(--accent)', 'var(--amber)'];
-    const confettiHtml = tier === 'perfect' ? `<div class="quiz-summary-confetti">${
-      Array.from({length: 16}, (_, i) => {
-        const col = confettiColors[i % confettiColors.length];
-        const left = 5 + (i * 6) % 88;
-        const delay = (i * 0.09).toFixed(2);
-        const dur = (1.4 + (i % 5) * 0.15).toFixed(2);
-        return `<div class="qs-confetti-piece" style="left:${left}%;background:${col};animation-delay:${delay}s;animation-duration:${dur}s"></div>`;
-      }).join('')
-    }</div>` : '';
+    // Medallions. 0/3 → single purple "complete" medallion. n/3 → n
+    // gold medallions with burst + 9 confetti each, staggered
+    // 0.25s/0.55s/0.85s.
+    const CK = '<svg class="qs-ck" viewBox="0 0 24 24"><path d="M5 12.5 L10 17 L19 7" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const DONE_SVG = '<svg viewBox="0 0 24 24" style="width:30px;height:30px" aria-hidden="true"><path d="M3 6.5c3-1.4 6-1.4 9 0v12c-3-1.4-6-1.4-9 0z M12 6.5c3-1.4 6-1.4 9 0v12c-3-1.4-6-1.4-9 0z" fill="#fff" stroke="#fff" stroke-width="1.4" stroke-linejoin="round"/><path d="M12 6.5v12" stroke="#7B4FD4" stroke-width="1.4"/></svg>';
+    const CF_COLORS = ['#7B4FD4', '#F59E0B', '#FBBF24', '#C7B3EC', '#8460B4', '#FCD34D'];
+    function _qsMedallion(i) {
+      const delay = (0.25 + i * 0.30).toFixed(2) + 's';
+      let confetti = '';
+      for (let k = 0; k < 9; k++) {
+        const a = (k / 9) * Math.PI * 2 + i;
+        const r = 48 + (k % 3) * 14;
+        const x = Math.round(Math.cos(a) * r);
+        const y = Math.round(Math.sin(a) * r - 10);
+        const rot = (k * 67) % 360;
+        const col = CF_COLORS[(k + i) % CF_COLORS.length];
+        confetti += `<i class="qs-cf" style="--qs-d:${delay};background:${col};--qs-x:${x}px;--qs-y:${y}px;--qs-r:${rot}deg"></i>`;
+      }
+      return `<span class="qs-md qs-ok" style="--qs-d:${delay}" aria-label="question ${i + 1}, correct">${CK}<i class="qs-burst" style="--qs-d:${delay}"></i>${confetti}</span>`;
+    }
+    const medsHtml = correct > 0
+      ? Array.from({ length: correct }, (_, i) => _qsMedallion(i)).join('')
+      : `<span class="qs-md qs-done" aria-label="dialogue complete">${DONE_SVG}</span>`;
 
-    const scoreElId = 'qs-score-' + Date.now();
-    const reviewHtml = tier === 'perfect' ? '' : `<button class="qs-review-lesson" onclick="state.currentSection=0;renderReader()">${isEn ? 'Try again →' : 'נסה שוב ←'}</button>`;
+    // Ray + glow opacity by score (per SPEC).
+    const raysOpacity = [0, 0.09, 0.15, 0.22][Math.min(correct, 3)];
+    const glowOpacity = [0.16, 0.16, 0.22, 0.28][Math.min(correct, 3)];
+
+    // Sparkles: 2 at 0/1, 3 at 2, 4 at 3.
+    function _qsSparkle(x, y, d, s) {
+      return `<svg class="qs-spk" style="left:${x}px;top:${y}px;animation-delay:${d}s;transform:scale(${s})" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 0L7.2 4.8 12 6 7.2 7.2 6 12 4.8 7.2 0 6 4.8 4.8Z"/></svg>`;
+    }
+    let sparklesHtml = _qsSparkle(38, 10, 0.3, 1) + _qsSparkle(262, 20, 1.1, 0.8);
+    if (correct >= 2) sparklesHtml += _qsSparkle(60, 92, 1.7, 0.7);
+    if (correct >= 3) sparklesHtml += _qsSparkle(240, 96, 0.8, 1);
+
+    // Thinker chip: portrait + "{name} · {dialogue title}".
+    const portrait = thinker ? _thinkerImage(thinker, state.subject) : '';
+    const chipInner = thinkerName && dialogueTitle
+      ? `${thinkerName} · <i>${dialogueTitle}</i>`
+      : (thinkerName || dialogueTitle || '');
+    const chipHtml = chipInner
+      ? `<span class="qs-chip">${portrait ? `<img src="${portrait}" alt="">` : ''}<span class="qs-chip-txt">${chipInner}</span></span>`
+      : '';
+
+    // Retry button — only shown below 3/3.
+    const RETRY_ICON = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15.5 6.5A6.5 6.5 0 1 0 16.5 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M16.8 2.8v4.4h-4.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const retryHtml = isFull
+      ? ''
+      : `<button class="qs-retry" type="button" onclick="_quizSummaryRetry()">${RETRY_ICON}${retryLabel}</button>`;
 
     card.innerHTML = `
       <div class="section-type-label"><svg viewBox="0 0 64 64" width="28" height="28"><use href="#ic-summary"/></svg> ${sectionLabel}</div>
-      <div class="quiz-summary quiz-summary--${tier}">
-        ${confettiHtml}
-        <div class="quiz-summary-headline">${headline}</div>
-        <div class="quiz-summary-stars">${starsHtml}</div>
-        ${tier === 'good' ? `<div style="position:relative;display:inline-block"><div class="qs-score-halo"></div><div class="quiz-summary-score" id="${scoreElId}">${correct}/${total}</div></div>` : `<div class="quiz-summary-score" id="${scoreElId}">${tier === 'perfect' ? `0/${total}` : `${correct}/${total}`}</div>`}
-        <div class="quiz-summary-label">${label}</div>
-        <div class="quiz-summary-msg">${message}</div>
-        ${reviewHtml}
+      <div class="quiz-summary-v2${isFull ? ' qs-full' : ''}">
+        <div class="qs-mid">
+          <div class="qs-hero" style="--qs-ra:${raysOpacity};--qs-ga:${glowOpacity}">
+            <div class="qs-rays"></div>
+            <div class="qs-glow"></div>
+            ${sparklesHtml}
+            <div class="qs-meds">${medsHtml}</div>
+          </div>
+          <h2 class="qs-hl">${HL[isEn ? 'en' : 'he'][Math.min(correct, 3)]}</h2>
+          <p class="qs-sl">${SL[isEn ? 'en' : 'he'][Math.min(correct, 3)]}</p>
+          ${chipHtml}
+          ${retryHtml}
+        </div>
+        <div class="qs-chap">
+          <span class="qs-c">${chapText}</span>
+          <span class="qs-pd">${posDots}</span>
+        </div>
       </div>
     `;
     content.appendChild(card);
     makeNextBtn(ui.finishBtn, true);
+  }
+}
 
-    if (tier === 'perfect' && correct > 0) {
-      const scoreEl = document.getElementById(scoreElId);
-      if (scoreEl) {
-        let count = 0;
-        const timer = setInterval(() => {
-          count = Math.min(count + 1, correct);
-          scoreEl.textContent = `${count}/${total}`;
-          if (count >= correct) clearInterval(timer);
-        }, Math.round(600 / correct));
-      }
+// Try again: jumps to the first quiz section of the current dialogue and
+// clears the per-dialogue quiz state so questions can be answered again.
+// Snapshots first-attempt results to state.dayQuizFirstTry the first time
+// it runs for this dialogue — subsequent retries do NOT overwrite the
+// snapshot. XP is not re-awarded (see handleQuiz's retry gate), streak /
+// completion / thinker point fire exactly once at Complete Dialogue.
+function _quizSummaryRetry() {
+  const key = `${state.subject}-${state.currentWeek}-${state.currentDay}`;
+  if (!state.dayQuizFirstTry || typeof state.dayQuizFirstTry !== 'object') state.dayQuizFirstTry = {};
+  if (!state.dayQuizFirstTry[key]) {
+    state.dayQuizFirstTry[key] = {};
+    if (state.dayQuizResults && state.dayQuizResults[key]) {
+      Object.assign(state.dayQuizFirstTry[key], state.dayQuizResults[key]);
     }
   }
+  state.quizAnswered = {};
+  state.quizAttempts = {};
+  if (state.dayQuizResults) delete state.dayQuizResults[key];
+  const chapter = getW().find(w => w.id === state.currentWeek);
+  const day = chapter && chapter.days.find(d => d.id === state.currentDay);
+  const sections = (day && day.sections) || [];
+  const firstQuizIdx = sections.findIndex(s => s && s.type === 'quiz');
+  state.currentSection = firstQuizIdx >= 0 ? firstQuizIdx : 0;
+  renderReader();
 }
 
 function makeNextBtn(label, isFinish = false, disabled = false) {
@@ -25811,25 +26074,33 @@ function handleQuiz(chosen, correctIdx, explanation, btn, questionIdx, isSingleQ
     }
   });
 
-  // XP: 15 for first-try correct, 7 for second-try correct, 0 for failed both
+  // XP: 15 for first-try correct, 7 for second-try correct, 0 for failed both.
+  // Retry gate: if state.dayQuizFirstTry[key] exists, the user is on a
+  // second (or later) pass after tapping "Try again" on the summary.
+  // XP, streak, and the floating +XP visual are suppressed — completion
+  // rewards stay pegged to the first attempt. state.dayQuizResults is
+  // still updated so the summary can show the latest attempt's medallion
+  // count. See _quizSummaryRetry for the snapshot.
   const earnedXP = isCorrect ? (actualAttempts === 1 ? 15 : 7) : 0;
-  state.readerXP += earnedXP;
+  const _dqKey = `${state.subject}-${state.currentWeek}-${state.currentDay}`;
+  const _isRetry = !!(state.dayQuizFirstTry && state.dayQuizFirstTry[_dqKey]);
 
   const ui = u();
-  if (isCorrect && actualAttempts === 1) {
-    state.correctInRow = (state.correctInRow || 0) + 1;
-    if (state.correctInRow === 3) {
-      state.readerXP += 10;
-      showStreakToast(ui.streakToast);
+  if (!_isRetry) {
+    state.readerXP += earnedXP;
+    if (isCorrect && actualAttempts === 1) {
+      state.correctInRow = (state.correctInRow || 0) + 1;
+      if (state.correctInRow === 3) {
+        state.readerXP += 10;
+        showStreakToast(ui.streakToast);
+      }
+    } else {
+      state.correctInRow = 0;
     }
-  } else {
-    state.correctInRow = 0;
+    floatXP(earnedXP, btn);
   }
 
-  floatXP(earnedXP, btn);
-
   if (!state.dayQuizResults || Array.isArray(state.dayQuizResults)) state.dayQuizResults = {};
-  const _dqKey = `${state.subject}-${state.currentWeek}-${state.currentDay}`;
   if (!state.dayQuizResults[_dqKey]) state.dayQuizResults[_dqKey] = {};
   state.dayQuizResults[_dqKey][questionIdx] = isCorrect;
 
@@ -25838,6 +26109,7 @@ function handleQuiz(chosen, correctIdx, explanation, btn, questionIdx, isSingleQ
     attempts: actualAttempts,
     chapter: state.currentWeek,
     day: state.currentDay,
+    is_retry: _isRetry,
     // Page context added for reader-instrumentation parity with
     // dialogue_page_viewed. Uses the memo populated in renderReader so
     // the value reflects the page the question actually renders on.
