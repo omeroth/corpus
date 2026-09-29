@@ -3340,7 +3340,7 @@ const psychologyData = {
 // chat log) cited a paraphrase, "Madness is not a natural fact, but a
 // cultural fact." / "השיגעון אינו עובדה טבעית, אלא עובדה תרבותית." That
 // line does not appear in Howard 1965 or Khalfa/Murphy 2006. The quote
-// below is from the Preface to the 1961 edition, in Richard Howard\'s
+// below is from the Preface to the 1961 edition, in Richard Howard's
 // abridged translation. If the source documents surface again, do not
 // reintroduce the paraphrase. See thinkers.js Foucault entry for the
 // full provenance note.

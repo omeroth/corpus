@@ -39,6 +39,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const CONTENT_DIR = path.join(REPO_ROOT, 'content');
 const IMAGES_DIR = path.join(REPO_ROOT, 'images');
+const INDEX_HTML = path.join(REPO_ROOT, 'index.html');
 
 // Which per-subject data constants to look for and their canonical subject
 // name. If a constant isn't declared yet (e.g. psychologyData pre-launch),
@@ -63,8 +64,13 @@ const scriptSrc = fs.readdirSync(CONTENT_DIR)
 
 // Extract a single top-level `const NAME = <literal>;` where <literal> is
 // either an object or array literal. Uses a balanced-brace scan that
-// respects string boundaries (', ", `) so a `}` or `]` inside a string
-// doesn't fool the depth counter.
+// respects string boundaries (', ", `) AND skips // + /* */ comments so
+// braces / quotes inside comments don't fool the depth counter. The
+// comment-skipping was added on 2026-09-29 after a `//` comment
+// containing `Richard Howard\'s` (a spurious escape) caused the scanner
+// to treat the rest of the file as a JS string. Any content file with
+// commentary that includes apostrophes, unbalanced quotes, or braces
+// would have failed the same way.
 function extractConstLiteral(source, name) {
   const re = new RegExp('\\bconst\\s+' + name + '\\s*=\\s*', 'g');
   const m = re.exec(source);
@@ -79,14 +85,28 @@ function extractConstLiteral(source, name) {
   let inString = false;
   let stringChar = null;
   let escape = false;
+  let inLineComment = false;
+  let inBlockComment = false;
   for (let i = start; i < source.length; i++) {
     const c = source[i];
+    const next = source[i + 1];
+    if (inLineComment) {
+      if (c === '\n') inLineComment = false;
+      continue;
+    }
+    if (inBlockComment) {
+      if (c === '*' && next === '/') { inBlockComment = false; i++; }
+      continue;
+    }
     if (escape) { escape = false; continue; }
     if (inString) {
       if (c === '\\') { escape = true; continue; }
       if (c === stringChar) { inString = false; }
       continue;
     }
+    // Comment starts — only recognized outside strings.
+    if (c === '/' && next === '/') { inLineComment = true; i++; continue; }
+    if (c === '/' && next === '*') { inBlockComment = true; i++; continue; }
     if (c === '"' || c === "'" || c === '`') { inString = true; stringChar = c; continue; }
     if (c === openChar) depth++;
     else if (c === closeChar) {
@@ -135,6 +155,27 @@ for (const name of THINKER_CONST_NAMES) {
 }
 
 const imageFiles = new Set(fs.readdirSync(IMAGES_DIR));
+
+// ─── CAROUSEL_ORDER extraction ──────────────────────────────────────────
+//
+// The order-list lives in index.html (not content/) and drives the home
+// carousel + the pantheon grid. A thinker missing from it is invisible
+// on both surfaces even if their dialogue, dictionary entry, share card,
+// and reveal render fine — a silent gap that shipped for Foucault before
+// this check existed (2026-09-29). Extract with the same balanced-brace
+// scanner used above.
+let carouselOrder = null;
+try {
+  const indexSrc = fs.readFileSync(INDEX_HTML, 'utf8');
+  const literal = extractConstLiteral(indexSrc, 'CAROUSEL_ORDER');
+  if (!literal) {
+    console.warn('[extract] CAROUSEL_ORDER not found in index.html — skipping order-list check');
+  } else {
+    carouselOrder = evalLiteral(literal, 'CAROUSEL_ORDER');
+  }
+} catch (e) {
+  console.warn('[extract] CAROUSEL_ORDER extraction failed: ' + e.message);
+}
 
 // ─── Indexes ─────────────────────────────────────────────────────────────
 
@@ -520,6 +561,75 @@ for (const { subject, constName, data } of subjects) {
 walk(thinkers.THINKERS, 'THINKERS');
 walk(thinkers.THINKERS_EN, 'THINKERS_EN');
 
+// ─── CAROUSEL_ORDER coverage check ──────────────────────────────────────
+//
+// Every thinker present in the dictionary (either language) must be listed
+// in CAROUSEL_ORDER[subject] for each of their effective subjects. Every id
+// listed in CAROUSEL_ORDER must exist in both dictionary arrays. Duplicate
+// ids within one subject's array are also flagged — they'd render the
+// pantheon cell twice.
+//
+// Multi-subject rule: effectiveSubjects() returns primary + subjects[], so a
+// thinker with subject='economics' + subjects=['psychology'] must appear
+// in both economics and psychology arrays. The runtime bucketing at
+// index.html:24989 iterates CAROUSEL_ORDER[subject] once per subject render,
+// so an omission is silent — nothing else in the pipeline surfaces it.
+
+const orderIssues = [];
+if (carouselOrder && typeof carouselOrder === 'object') {
+  // Forward: every dictionary thinker → present in CAROUSEL_ORDER[subject]
+  // for each of their effective subjects.
+  const allIds = new Set([...heIndex.keys(), ...enIndex.keys()]);
+  for (const id of allIds) {
+    const rec = heIndex.get(id) || enIndex.get(id);
+    if (!rec) continue; // extraction sanity — can't happen given how allIds is built
+    const subs = effectiveSubjects(rec);
+    for (const subject of subs) {
+      const order = carouselOrder[subject];
+      if (!Array.isArray(order)) {
+        orderIssues.push({
+          issue: 'CAROUSEL_ORDER missing subject key',
+          id, detail: `subject=${subject} has no array in CAROUSEL_ORDER`,
+        });
+        continue;
+      }
+      if (!order.includes(id)) {
+        orderIssues.push({
+          issue: 'thinker missing from CAROUSEL_ORDER',
+          id, detail: `expected in CAROUSEL_ORDER.${subject} (thinker: ${rec.name || ''})`,
+        });
+      }
+    }
+  }
+  // Reverse: every id in CAROUSEL_ORDER → present in both dictionaries.
+  // Also: duplicates within one subject's array.
+  for (const [subject, order] of Object.entries(carouselOrder)) {
+    if (!Array.isArray(order)) continue;
+    const seenIds = new Set();
+    for (const id of order) {
+      if (seenIds.has(id)) {
+        orderIssues.push({
+          issue: 'duplicate id in CAROUSEL_ORDER',
+          id, detail: `subject=${subject}`,
+        });
+      }
+      seenIds.add(id);
+      if (!heIndex.has(id)) {
+        orderIssues.push({
+          issue: 'CAROUSEL_ORDER id missing from THINKERS',
+          id, detail: `subject=${subject}`,
+        });
+      }
+      if (!enIndex.has(id)) {
+        orderIssues.push({
+          issue: 'CAROUSEL_ORDER id missing from THINKERS_EN',
+          id, detail: `subject=${subject}`,
+        });
+      }
+    }
+  }
+}
+
 // ─── Report ──────────────────────────────────────────────────────────────
 
 function reportTable(title, rows) {
@@ -537,11 +647,17 @@ reportTable('Forward-check errors (unknown id / subject mismatch / missing portr
 reportTable('Cross-array consistency errors (HE ↔ EN)', arrayIssues);
 reportTable('Tag-balance errors (HTML in text-only fields / malformed / unclosed <strong>)', tagIssues);
 reportTable('Quiz option shape errors (packed / length mismatch / too few)', quizIssues);
+reportTable('CAROUSEL_ORDER coverage errors (thinker missing from order-list / order references unknown id / duplicates)', orderIssues);
 reportTable('Unreferenced thinkers (never appear in any dialogue — warning only)', unreferenced);
 
-const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length;
+const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length;
 if (hardErrorCount > 0) {
-  console.error(`\nFAIL: ${hardErrorCount} hard error(s). Also: ${noThinkerRows.length} no-thinker day(s), ${unreferenced.length} unreferenced thinker(s).`);
+  console.error('');
+  console.error('╔════════════════════════════════════════════════════════════════════╗');
+  console.error(`║ FAIL: ${String(hardErrorCount).padEnd(4)} hard error(s). Fix before shipping.` +
+                ' '.repeat(Math.max(0, 68 - `║ FAIL: ${hardErrorCount} hard error(s). Fix before shipping.`.length)) + '║');
+  console.error('╚════════════════════════════════════════════════════════════════════╝');
+  console.error(`Also: ${noThinkerRows.length} no-thinker day(s), ${unreferenced.length} unreferenced thinker(s).`);
   process.exit(1);
 }
 console.log(`\nOK: no hard errors. ${noThinkerRows.length} no-thinker day(s), ${unreferenced.length} thinker(s) unreferenced.`);
