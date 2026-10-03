@@ -4782,7 +4782,13 @@
     box-shadow: 0 6px 18px rgba(var(--accent-rgb), 0.08);
   }
   .sk-htop { display: flex; align-items: center; gap: 14px; }
-  .sk-halo { position: relative; width: 76px; height: 76px; flex: none; display: grid; place-items: center; }
+  .sk-halo {
+    position: relative; width: 76px; height: 76px; flex: none;
+    display: grid; place-items: center;
+    background: none; border: 0; padding: 0;
+    color: inherit; font: inherit; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
   .sk-halo::before {
     content: ""; position: absolute; inset: -10px; border-radius: 50%;
     background: radial-gradient(circle at 50% 55%, rgba(255,207,122,0.75) 0%, rgba(255,207,122,0.25) 45%, rgba(255,207,122,0) 70%);
@@ -4792,7 +4798,14 @@
   .sk-lbl b { display: block; font-size: 16px; font-weight: 900; color: var(--ink); }
   .sk-lbl span { display: block; font-size: 12.5px; font-weight: 800; color: var(--text-muted); margin-top: 2px; }
   .sk-week { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); }
-  .sk-dd { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 900; color: var(--text-muted); }
+  .sk-dd {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 900; color: var(--text-muted);
+    background: none; border: 0; padding: 0;
+    font-family: inherit; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sk-dd[data-day-state="future"] { cursor: default; }
   .sk-dd.now { color: var(--ink); }
   .sk-dot { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; border: 2px dashed var(--border); background: var(--surface); }
   /* Lit + today use the treasure amber on purpose — same policy as badges:
@@ -4858,6 +4871,126 @@
   @keyframes sk-flick {
     0%, 100% { transform: scaleY(1)    rotate(0deg); }
     50%      { transform: scaleY(1.05) rotate(1.5deg); }
+  }
+
+  /* ── Streak tap interactivity (commit 2) ──────────────────────────────
+     Bubble: dark-ink tooltip anchored to any tappable element. Arrow x
+     is driven by --sk-arrow-x so clamped bubbles can still point at the
+     anchor's centre. Pointer-events none keeps the bubble from eating
+     the "next tap anywhere" close event.
+     Sheet: standard bottom-sheet pattern — dim backdrop (tap outside)
+     + swipe-down handler mounted in JS on touchstart/move/end.
+     Hit anims: bounce / shake / flare / spark / float. All sit behind
+     prefers-reduced-motion: no-preference so the reduce preference
+     drops them entirely (bubbles and sheet stay visible). */
+  .sk-bubble {
+    position: fixed; z-index: 400; max-width: 240px;
+    padding: 10px 14px; border-radius: 12px;
+    background: var(--ink); color: #fff;
+    font-size: 13px; font-weight: 700; line-height: 1.35;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+    pointer-events: none;
+  }
+  /* Enable pointer events only on explicit action children (e.g. Start). */
+  .sk-bubble .sk-bubble-action { pointer-events: auto; }
+  .sk-bubble::after {
+    content: ""; position: absolute;
+    left: var(--sk-arrow-x, 50%); transform: translateX(-50%);
+    width: 0; height: 0;
+    border: 6px solid transparent;
+    bottom: -11px; border-top-color: var(--ink);
+  }
+  .sk-bubble.below::after { bottom: auto; top: -11px; border-top-color: transparent; border-bottom-color: var(--ink); }
+  .sk-bubble .sk-bubble-title { font-weight: 900; font-size: 14px; }
+  .sk-bubble .sk-bubble-sub { font-weight: 700; font-size: 12.5px; opacity: 0.86; margin-top: 2px; }
+  .sk-bubble .sk-bubble-action {
+    display: inline-block; margin-top: 8px;
+    background: #F59E0B; color: var(--ink);
+    border: 0; border-radius: 999px;
+    padding: 6px 14px; font: inherit; font-weight: 900; font-size: 13px;
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+
+  .sk-sheet-wrap {
+    position: fixed; inset: 0; z-index: 500;
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .sk-sheet-dim {
+    position: absolute; inset: 0;
+    background: rgba(42, 18, 102, 0.42);
+    animation: sk-fade-in 0.2s ease forwards;
+  }
+  .sk-sheet {
+    position: relative;
+    background: var(--surface);
+    border-top-left-radius: 24px; border-top-right-radius: 24px;
+    padding: 10px 20px calc(24px + var(--safe-bottom));
+    display: flex; flex-direction: column; align-items: center;
+    transition: transform 0.2s ease;
+    animation: sk-sheet-in 0.26s cubic-bezier(.25,.9,.3,1.05) forwards;
+    touch-action: pan-y;
+  }
+  .sk-sheet-handle {
+    width: 48px; height: 5px; border-radius: 999px;
+    background: var(--border);
+    margin: 6px 0 14px;
+    border: 0; padding: 0; display: block;
+  }
+  .sk-sheet-crest { animation: sk-float 2.4s ease-in-out infinite; }
+  .sk-sheet-name { font-size: 24px; font-weight: 900; color: var(--ink); margin: 10px 0 2px; }
+  .sk-sheet-earned { font-size: 12.5px; font-weight: 800; color: var(--text-muted); margin-bottom: 10px; }
+  .sk-sheet-line { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.45; max-width: 300px; text-align: center; margin: 0 0 14px; }
+  .sk-sheet-best { font-size: 13px; font-weight: 800; color: var(--text-muted); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .sk-m.sk-bounce, .sk-dot.sk-pop { animation: sk-bounce 300ms ease-out; }
+    .sk-m.sk-shake                  { animation: sk-shake  260ms ease-in-out; }
+    .sk-halo.sk-flare > .sk-heroflame { animation: sk-flare 460ms ease-out; }
+  }
+  .sk-spark {
+    position: fixed; width: 6px; height: 6px; border-radius: 50%;
+    background: #F59E0B; z-index: 450; pointer-events: none;
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.9);
+    animation: sk-spark 560ms ease-out forwards;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    /* Keep bubbles and sheet. Drop the bounce / shake / sparks / flare /
+       float — any animation that moves the user interface. */
+    .sk-m.sk-bounce, .sk-dot.sk-pop, .sk-m.sk-shake,
+    .sk-halo.sk-flare > .sk-heroflame, .sk-sheet-crest { animation: none !important; }
+    .sk-spark { display: none; }
+    .sk-sheet, .sk-sheet-dim { animation: none; }
+  }
+  @keyframes sk-bounce {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.08); }
+  }
+  @keyframes sk-shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-6px); }
+    40%      { transform: translateX(5px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(3px); }
+  }
+  @keyframes sk-flare {
+    0%, 100% { transform: scale(1);    filter: brightness(1); }
+    40%      { transform: scale(1.15); filter: brightness(1.35); }
+  }
+  @keyframes sk-spark {
+    0%   { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: var(--sk-spark-end, translate(0, -30px)) scale(0.4); }
+  }
+  @keyframes sk-float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+  }
+  @keyframes sk-sheet-in {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+  @keyframes sk-fade-in {
+    from { opacity: 0; } to { opacity: 1; }
   }
 
   /* ── XP Float animation ── */
@@ -32616,14 +32749,29 @@ function renderStreakScreen(opts) {
   const dayLetters = isEn
     ? ['M', 'T', 'W', 'T', 'F', 'S', 'S']
     : ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
+  // Full weekday names for the ARIA labels + the done-day bubble headline.
+  // EN array is Mon-first (matching dayLetters); HE array is Sun-first.
+  const dayLongNames = isEn
+    ? ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    : ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+  const longForIdx = (i) => dayLongNames[i];
   const weekKeys = _streakWeekKeys();
   const weekDotsHtml = weekKeys.map((k, i) => {
     const lit = activeSet.has(k);
     const isToday = k === todayKey;
+    const isFuture = k > todayKey;
+    // state = done | today | missed | future — drives the tap behaviour
+    const dayState = isToday ? 'today' : (lit ? 'done' : (isFuture ? 'future' : 'missed'));
     const cls = ['sk-dot', lit ? 'lit' : '', isToday ? 'today' : ''].filter(Boolean).join(' ');
     const inner = lit ? StreakBadges.miniFlame() : '';
     const ddCls = ['sk-dd', isToday ? 'now' : ''].filter(Boolean).join(' ');
-    return `<div class="${ddCls}"><div class="${cls}">${inner}</div><span>${dayLetters[i]}</span></div>`;
+    const aria = `${longForIdx(i)}, ${dayState === 'done' ? (isEn ? 'completed' : 'הושלם')
+                                     : dayState === 'today' ? (isEn ? 'today' : 'היום')
+                                     : dayState === 'missed' ? (isEn ? 'no activity' : 'ללא פעילות')
+                                     : (isEn ? 'future' : 'עתידי')}`;
+    return `<button type="button" class="${ddCls}" data-day-key="${k}" data-day-state="${dayState}" data-day-long="${longForIdx(i)}" aria-label="${aria}">`
+      + `<div class="${cls}">${inner}</div><span>${dayLetters[i]}</span>`
+      + `</button>`;
   }).join('');
 
   // Badge shelf — 3 on top row (tiers 0..2), 2 centred on row 2 (tiers 3..4).
@@ -32690,12 +32838,13 @@ function renderStreakScreen(opts) {
   // whole flame breathes — SVG-shadow content from <use> can't be
   // targeted by inner-class CSS, so animating the outer SVG is the
   // reliable path. Badge crests keep their own .sk-flick <g> inside.
+  const heroAria = isEn ? 'Streak flame' : 'שלהבת הרצף';
   root.innerHTML = `
     <div class="sk-hcard">
       <div class="sk-htop">
-        <div class="sk-halo">
+        <button type="button" class="sk-halo" aria-label="${heroAria}">
           <svg class="sk-flick sk-heroflame" width="72" height="72" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><use href="#icon-streak"/></svg>
-        </div>
+        </button>
         <div style="flex:1;min-width:0">
           <div class="sk-num">${stats.current}</div>
           <div class="sk-lbl">
@@ -32717,10 +32866,352 @@ function renderStreakScreen(opts) {
   `;
 }
 
+// ── Streak tap interactivity ─────────────────────────────────────────
+// Haptic is a no-op unless @capacitor/haptics is installed and loaded.
+// We don't add the plugin here (handoff rule); the gate just reads
+// window.Capacitor.Plugins.Haptics defensively so a future install
+// lights it up with no code change.
+function _skHaptic() {
+  try {
+    const H = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics;
+    if (H && typeof H.impact === 'function') H.impact({ style: 'Light' });
+  } catch (e) {}
+}
+
+function _skPrefersReducedMotion() {
+  try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+  catch (e) { return false; }
+}
+
+// Short pluralised day count used in copy. EN: "1 day" / "7 days".
+// HE: "יום אחד", "יומיים", or "N ימים" — matches the handoff's number
+// policy for 1 and 2.
+function _skDaysWord(n, isEn) {
+  if (isEn) return n === 1 ? '1 day' : `${n} days`;
+  if (n === 1) return 'יום אחד';
+  if (n === 2) return 'יומיים';
+  return `${n} ימים`;
+}
+
+// activeDates source for tap handlers. Reads the debug-preview override
+// first so _debugStreakPreview(current, best) can produce correct done-day
+// bubbles without touching state.activeDates. Real callers get the real
+// state. Mirrors the filter rules in _streakStats (strict YYYY-MM-DD +
+// dedup via Set) so a legacy ISO entry can't throw off position math.
+function _skActiveDatesForTap() {
+  const src = window._skActiveDatesOverride || state.activeDates || [];
+  const RX = /^\d{4}-\d{2}-\d{2}$/;
+  return new Set(src.filter(d => typeof d === 'string' && RX.test(d)));
+}
+
+// _skRunAt(dayKey): for a known done day, walks backward with
+// _streakDayBefore and forward with _streakDayAfter through the active
+// set to find the run that contains it. Returns {position, length, end}
+// where position = 1-indexed slot inside the run, length = total run
+// days, end = the final consecutive day key. Shares the exact helpers
+// _streakStats uses so bubble numbers always agree with the badge count.
+function _skRunAt(dayKey) {
+  const active = _skActiveDatesForTap();
+  if (!active.has(dayKey)) return null;
+  let back = 0, fwd = 0;
+  let cur = _streakDayBefore(dayKey);
+  while (active.has(cur)) { back++; cur = _streakDayBefore(cur); }
+  cur = _streakDayAfter(dayKey);
+  while (active.has(cur)) { fwd++; cur = _streakDayAfter(cur); }
+  const position = back + 1;
+  const length = back + 1 + fwd;
+  let end = dayKey;
+  for (let i = 0; i < fwd; i++) end = _streakDayAfter(end);
+  return { position, length, end };
+}
+
+// Formats a YYYY-MM-DD day key for the earned-date line. Uses local-safe
+// Date construction (new Date(y, m-1, d)) so no toISOString /UTC drift.
+function _skFormatDate(dayKey, isEn) {
+  if (!dayKey) return '';
+  try {
+    const [y, m, d] = dayKey.split('-').map(Number);
+    const dt = new Date(y, m - 1, d);
+    const opts = { year: 'numeric', month: isEn ? 'short' : 'long', day: 'numeric' };
+    return new Intl.DateTimeFormat(isEn ? 'en-US' : 'he-IL', opts).format(dt);
+  } catch (e) { return dayKey; }
+}
+
+// Bubble: one at a time, position above the anchor (fall below if there
+// isn't room), clamp inside the viewport, point an arrow at the anchor
+// centre via --sk-arrow-x. Closes on next tap anywhere OR after 3s.
+function _skCloseBubble() {
+  const a = window._skActiveBubble;
+  if (!a) return;
+  clearTimeout(a.timer);
+  document.removeEventListener('click', a.onClick);
+  a.el.remove();
+  window._skActiveBubble = null;
+}
+function _skBubble(anchor, html) {
+  _skCloseBubble();
+  const bubble = document.createElement('div');
+  bubble.className = 'sk-bubble';
+  bubble.innerHTML = html;
+  document.body.appendChild(bubble);
+  // Measure then position
+  const a = anchor.getBoundingClientRect();
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const bw = bubble.offsetWidth, bh = bubble.offsetHeight;
+  const gap = 10, margin = 8;
+  const placeBelow = a.top < bh + gap + 20;
+  const top = placeBelow ? Math.min(vh - bh - margin, a.bottom + gap) : Math.max(margin, a.top - bh - gap);
+  const centerX = (a.left + a.right) / 2;
+  let left = centerX - bw / 2;
+  left = Math.max(margin, Math.min(vw - bw - margin, left));
+  bubble.style.left = left + 'px';
+  bubble.style.top = top + 'px';
+  bubble.classList.toggle('below', placeBelow);
+  bubble.style.setProperty('--sk-arrow-x', (centerX - left) + 'px');
+  // Close plumbing — delayed so the triggering click doesn't fire the handler
+  const onClick = () => _skCloseBubble();
+  const timer = setTimeout(() => _skCloseBubble(), 3000);
+  setTimeout(() => { document.addEventListener('click', onClick, { once: true }); }, 60);
+  window._skActiveBubble = { el: bubble, timer, onClick };
+}
+
+// Earned-badge sheet. Tap outside (dim) or swipe down to close. Floats
+// the crest with a slow bob. Reduced motion flattens the entry + bob.
+const _SK_TIER_LINES = {
+  en: [
+    'Your streak is lit. One dialogue tomorrow and it catches.',
+    'Three days in a row. This is how a habit starts.',
+    'A full week. The flame is burning on its own now.',
+    'Thirty days. Few flames ever burn this hot.',
+    'A hundred days. This one does not go out.',
+  ],
+  he: [
+    'הרצף נדלק. דיאלוג אחד מחר, והוא בוער.',
+    'שלושה ימים ברצף. ככה מתחיל הרגל.',
+    'שבוע שלם. האש כבר בוערת מעצמה.',
+    'שלושים יום. מעט להבות בוערות כל כך חם.',
+    'מאה ימים. האש הזאת כבר לא כבה.',
+  ],
+};
+function _skSheetClose() {
+  const w = window._skActiveSheet;
+  if (!w) return;
+  w.remove();
+  window._skActiveSheet = null;
+}
+function _skSheetOpen(tier) {
+  _skSheetClose();
+  _skCloseBubble();
+  const isEn = state.lang === 'en';
+  const stats = _streakStats();
+  const NAMES = StreakBadges.NAMES[isEn ? 'en' : 'he'];
+  const earnedKey = stats.earnedOn[tier] || null;
+  const earnedDate = earnedKey ? _skFormatDate(earnedKey, isEn) : '';
+  const earnedLine = earnedDate
+    ? (isEn ? `Earned ${earnedDate}` : `הושג ב-${earnedDate}`)
+    : '';
+  const bestLine = isEn
+    ? `Best streak: ${_skDaysWord(stats.best, true)}`
+    : `השיא: ${_skDaysWord(stats.best, false)}`;
+  const line = _SK_TIER_LINES[isEn ? 'en' : 'he'][tier];
+  const closeAria = isEn ? 'Close' : 'סגירה';
+  const wrap = document.createElement('div');
+  wrap.className = 'sk-sheet-wrap';
+  wrap.innerHTML = `
+    <div class="sk-sheet-dim"></div>
+    <div class="sk-sheet" role="dialog" aria-modal="true" aria-label="${NAMES[tier]}">
+      <button type="button" class="sk-sheet-handle" aria-label="${closeAria}"></button>
+      <div class="sk-sheet-crest">${StreakBadges.crest(tier, 160, { off: false })}</div>
+      <h2 class="sk-sheet-name">${NAMES[tier]}</h2>
+      ${earnedLine ? `<div class="sk-sheet-earned">${earnedLine}</div>` : ''}
+      <p class="sk-sheet-line">${line}</p>
+      <div class="sk-sheet-best">${bestLine}</div>
+    </div>
+  `;
+  document.body.appendChild(wrap);
+  wrap.querySelector('.sk-sheet-dim').addEventListener('click', _skSheetClose);
+  wrap.querySelector('.sk-sheet-handle').addEventListener('click', _skSheetClose);
+  // Swipe-down to close — pure JS, no library
+  const sheet = wrap.querySelector('.sk-sheet');
+  let startY = 0, dy = 0;
+  sheet.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; dy = 0; }, { passive: true });
+  sheet.addEventListener('touchmove', (e) => {
+    const cur = e.touches[0].clientY;
+    dy = Math.max(0, cur - startY);
+    if (dy > 0) sheet.style.transform = `translateY(${dy}px)`;
+  }, { passive: true });
+  sheet.addEventListener('touchend', () => {
+    if (dy > 80) _skSheetClose();
+    else sheet.style.transform = '';
+  });
+  window._skActiveSheet = wrap;
+}
+
+// Hit animations — add a class, remove once the keyframe finishes. Under
+// reduced motion the CSS sets `animation: none !important` so these are
+// no-ops but still safe to call.
+function _skHitAnim(el, cls, ms) {
+  if (!el) return;
+  el.classList.remove(cls);
+  // Force reflow so the class re-adds triggers restart
+  void el.offsetWidth;
+  el.classList.add(cls);
+  setTimeout(() => el.classList.remove(cls), ms + 50);
+}
+
+// Three gold sparks pop from an element's bounding rect. Skipped under
+// reduced motion by the CSS `display: none` rule.
+function _skSparks(anchor, count) {
+  if (_skPrefersReducedMotion()) return;
+  const r = anchor.getBoundingClientRect();
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  for (let i = 0; i < (count || 3); i++) {
+    const s = document.createElement('span');
+    s.className = 'sk-spark';
+    const angle = (Math.PI * 2 * i) / (count || 3) - Math.PI / 2;
+    const dist = 36 + Math.random() * 14;
+    const dx = Math.cos(angle) * dist, dy = Math.sin(angle) * dist;
+    s.style.left = (cx - 3) + 'px';
+    s.style.top = (cy - 3) + 'px';
+    s.style.setProperty('--sk-spark-end', `translate(${dx}px, ${dy}px)`);
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 650);
+  }
+}
+
+// Tap handlers.
+function _skHandleBadgeTap(btn) {
+  const tier = Number(btn.dataset.tier);
+  if (!Number.isFinite(tier)) return;
+  const stats = _streakStats();
+  const earned = stats.earnedTiers.includes(tier);
+  _skHaptic();
+  try { posthog.capture('streak_badge_tapped', { tier, earned }); } catch (e) {}
+  if (earned) {
+    _skHitAnim(btn, 'sk-bounce', 300);
+    // Spark from the flame area, not the ribbon — approximated by the top
+    // third of the badge button's bounding box.
+    const r = btn.getBoundingClientRect();
+    _skSparks({ getBoundingClientRect: () => ({ left: r.left, right: r.right, top: r.top + 6, bottom: r.top + r.height * 0.45, width: r.width, height: r.height * 0.4 }) }, 3);
+    _skSheetOpen(tier);
+  } else {
+    _skHitAnim(btn, 'sk-shake', 260);
+    const isEn = state.lang === 'en';
+    const NAMES = StreakBadges.NAMES[isEn ? 'en' : 'he'];
+    const tierDays = StreakBadges.DAYS[tier];
+    const html = isEn
+      ? `${tierDays} days in a row unlocks ${NAMES[tier]}. You're on ${_skDaysWord(stats.current, true)}.`
+      : `${tierDays} ימים ברצף פותחים את ${NAMES[tier]}. כרגע: ${_skDaysWord(stats.current, false)}.`;
+    _skBubble(btn, html);
+  }
+}
+
+function _skHandleDayTap(btn) {
+  const dayState = btn.dataset.dayState;
+  if (dayState === 'future') return; // nothing happens
+  _skHaptic();
+  try { posthog.capture('streak_day_tapped', { state: dayState }); } catch (e) {}
+  const dot = btn.querySelector('.sk-dot');
+  _skHitAnim(dot, 'sk-pop', 300);
+  const isEn = state.lang === 'en';
+  const longName = btn.dataset.dayLong || '';
+  if (dayState === 'done') {
+    // Show the day's position inside its consecutive-day run instead of a
+    // dialogue count — completionsByDay stores counts only, which doesn't
+    // give the user information they can't infer. Position is computed
+    // with _streakDayBefore / _streakDayAfter so the numbers always track
+    // _streakStats. If the run ended before today (last consecutive day
+    // < today), add a second line reporting the total run length.
+    const run = _skRunAt(btn.dataset.dayKey);
+    const todayKey = _streakDay();
+    if (!run) return; // defensive — dot shouldn't be lit if not active
+    const headline = isEn
+      ? `${longName} · day ${run.position} of the streak`
+      : `${longName} · יום ${run.position} ברצף`;
+    let secondHtml = '';
+    if (run.end < todayKey) {
+      const sub = isEn
+        ? `That run lasted ${_skDaysWord(run.length, true)}`
+        : `הרצף ההוא נמשך ${_skDaysWord(run.length, false)}`;
+      secondHtml = `<div class="sk-bubble-sub">${sub}</div>`;
+    }
+    const html = `<div class="sk-bubble-title">${headline}</div>${secondHtml}`;
+    _skBubble(btn, html);
+  } else if (dayState === 'today') {
+    const title = isEn ? 'Today is still open' : 'היום עוד פתוח';
+    const sub = isEn ? 'One dialogue keeps the flame going' : 'דיאלוג אחד שומר על האש';
+    const startLbl = isEn ? 'Start' : 'להתחיל';
+    const next = (typeof _findNextUpLesson === 'function') ? _findNextUpLesson() : null;
+    const canStart = next && next.weekId != null && next.dayId != null;
+    // Data attributes + delegated handler — safe for string weekIds like
+    // "bonus1" that would otherwise break an inline onclick's quoting.
+    const esc = (v) => String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    const action = canStart
+      ? `<button type="button" class="sk-bubble-action" data-sk-week="${esc(next.weekId)}" data-sk-day="${esc(next.dayId)}">${startLbl}</button>`
+      : '';
+    const html = `<div class="sk-bubble-title">${title}</div><div class="sk-bubble-sub">${sub}</div>${action}`;
+    _skBubble(btn, html);
+  } else if (dayState === 'missed') {
+    const title = isEn ? 'No dialogue this day' : 'לא היה דיאלוג ביום הזה';
+    _skBubble(btn, `<div class="sk-bubble-title">${title}</div>`);
+  }
+}
+
+function _skHandleHeroTap(btn) {
+  _skHaptic();
+  _skHitAnim(btn, 'sk-flare', 460);
+}
+
+// Start button hop: close the bubble, bounce to the dialogue. Guard
+// against partial content state (next.weekId undefined) by refusing to
+// call openReader with bad args.
+function _skStartToday(weekId, dayId) {
+  _skCloseBubble();
+  if (weekId == null || dayId == null) return;
+  if (typeof openReader === 'function') openReader(weekId, dayId);
+}
+
+// One-shot click delegation on #streak-screen. Rendered DOM is replaced
+// on every renderStreakScreen call, so a listener on the stable parent
+// handles every re-render. Also registers a document-level handler for
+// bubble actions (bubbles live in <body>, outside #streak-screen, so
+// the Start button's click can't ride the streak-screen listener).
+function _skWireStreakScreenEvents() {
+  if (!window._skBubbleActionBound) {
+    window._skBubbleActionBound = true;
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.sk-bubble-action');
+      if (!btn) return;
+      const rawW = btn.dataset.skWeek, rawD = btn.dataset.skDay;
+      if (rawW == null || rawD == null) return;
+      // Preserve numeric IDs as numbers; keep string IDs like "bonus1" as strings.
+      const w = /^-?\d+$/.test(rawW) ? Number(rawW) : rawW;
+      const d = /^-?\d+$/.test(rawD) ? Number(rawD) : rawD;
+      _skStartToday(w, d);
+    });
+  }
+  if (window._skEventsBound) return;
+  const root = document.getElementById('streak-screen');
+  if (!root) return;
+  window._skEventsBound = true;
+  root.addEventListener('click', (e) => {
+    const badge = e.target.closest('.sk-m');
+    if (badge && root.contains(badge)) { _skHandleBadgeTap(badge); return; }
+    const dot = e.target.closest('.sk-dd');
+    if (dot && root.contains(dot)) { _skHandleDayTap(dot); return; }
+    const hero = e.target.closest('.sk-halo');
+    if (hero && root.contains(hero)) { _skHandleHeroTap(hero); return; }
+  });
+}
+
 function showStreakScreen() {
+  // Real path — clear any debug activeDates override from _debugStreakPreview
+  // so tap handlers see state.activeDates.
+  window._skActiveDatesOverride = null;
   updateBottomNav('streak');
   renderStreakScreen();
   showScreen('streak');
+  _skWireStreakScreenEvents();
   // showScreen() already window.scrollTo(0,0) — the explicit reset here is
   // defensive: on a tab-switch into a screen whose last render was taller
   // than the current viewport, WKWebView can retain the prior scrollTop
@@ -32782,9 +33273,14 @@ window._debugStreakPreview = function (currentDays, bestDays) {
       dates: bestDatesArr,
     },
   };
+  // Also publish the override so tap handlers (specifically _skRunAt for
+  // the done-day bubble) see the fake dates. Real showStreakScreen clears
+  // this, so the preview is strictly session-local.
+  window._skActiveDatesOverride = dates;
   updateBottomNav('streak');
   renderStreakScreen({ statsOverride, activeDatesOverride: dates });
   showScreen('streak');
+  _skWireStreakScreenEvents();
   return statsOverride;
 };
 
