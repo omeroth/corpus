@@ -12476,6 +12476,20 @@
             </label>
           </div>
         </div>
+
+        <!-- Haptics toggle — reuses the reminder row shape so the rhythm
+             holds. Label updates in both languages via updateHapticsUI,
+             mirroring the reminder pattern. -->
+        <div class="pf-reminder-section">
+          <div class="pf-reminder-row">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent-text);flex-shrink:0"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.9 4.9l2.8 2.8"/><path d="M16.3 16.3l2.8 2.8"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.9 19.1l2.8-2.8"/><path d="M16.3 7.7l2.8-2.8"/><circle cx="12" cy="12" r="3"/></svg>
+            <span id="pf-haptics-label" style="flex:1">רטט</span>
+            <label class="pf-reminder-toggle">
+              <input type="checkbox" id="pf-haptics-toggle" onchange="_onHapticsToggle(event)">
+              <span class="pf-reminder-toggle-slider"></span>
+            </label>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -12907,6 +12921,68 @@ if (typeof corpusData === 'undefined' || typeof economicsData === 'undefined'
 // this against corpusapp.io/version.json to decide whether to prompt the
 // user to grab the newest App Store build.
 const APP_VERSION = '1.4.8';
+
+// ── Haptics ────────────────────────────────────────────────────────────
+// Single entry point for every haptic in the app. Kinds:
+//   nav       — bottom-nav tab switches (ImpactStyle.Light). Fires only
+//               when switching to a different tab, never on the current one.
+//   continue  — reader Next/Finish, onboarding Next, overlay main CTAs
+//               (ImpactStyle.Medium).
+//   locked    — anything blocked: locked streak badges, paywalled items,
+//               locked content (NotificationType.Warning).
+// Safety:
+//   - No-op on web (Capacitor.isNativePlatform() === false).
+//   - No-op if @capacitor/haptics isn't loaded or the plugin bridge throws.
+//   - Globally throttled: never fires twice within 80 ms. Covers synthetic-
+//     click + touchend double-triggers and rage-click flurries.
+//   - User toggle: state.hapticsEnabled (persisted). Default on.
+//   - Fire-and-forget — the native call isn't awaited, so a stuck bridge
+//     can't block the UI thread. Promise rejections are swallowed; the
+//     time-boxing of other native bridges in Corpus is the same shape.
+let _hapticLastT = 0;
+const _HAPTIC_THROTTLE_MS = 80;
+function _haptic(kind) {
+  if (typeof state !== 'undefined' && state && state.hapticsEnabled === false) return;
+  const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  if (now - _hapticLastT < _HAPTIC_THROTTLE_MS) return;
+  _hapticLastT = now;
+  try {
+    const Cap = window.Capacitor;
+    if (!Cap || typeof Cap.isNativePlatform !== 'function' || !Cap.isNativePlatform()) return;
+    const H = Cap.Plugins && Cap.Plugins.Haptics;
+    if (!H) return;
+    let p;
+    if (kind === 'nav'      && typeof H.impact === 'function')       p = H.impact({ style: 'LIGHT' });
+    else if (kind === 'continue' && typeof H.impact === 'function')  p = H.impact({ style: 'MEDIUM' });
+    else if (kind === 'locked'   && typeof H.notification === 'function') p = H.notification({ type: 'WARNING' });
+    if (p && typeof p.catch === 'function') p.catch(() => {});
+  } catch (e) {}
+}
+
+// Delegated haptic dispatch — one touchend listener on the window captures
+// bottom-nav tab switches, onboarding Next, and overlay main CTAs so new
+// buttons added later inherit the feedback for free. Reader Next is
+// explicitly excluded (handled by _readerBtnFire so Back doesn't fire,
+// and so the touchend path and the click-fallback path share one site).
+// capture:true + passive:true runs cheaply and never intercepts the tap.
+(function _wireGlobalHaptics() {
+  function fire(e) {
+    // Nav: only when the tapped tab isn't already active.
+    const navBtn = e.target.closest && e.target.closest('.bottom-nav-btn');
+    if (navBtn && !navBtn.classList.contains('active')) { _haptic('nav'); return; }
+    // Continue: onboarding CTAs + overlay main CTAs. Reader Next is handled
+    // in _readerBtnFire — skip it here. Disabled buttons don't fire (they
+    // can't trigger a navigation).
+    const cta = e.target.closest && e.target.closest(
+      '.onb-cta:not([disabled]), .levelup-continue, .cc-a:not([disabled]), .dc-continue-btn, #chapter-continue-btn'
+    );
+    if (cta && cta.id !== 'reader-next-btn') _haptic('continue');
+  }
+  // Both touchend (native) and click (desktop web / keyboard activation).
+  // _haptic no-ops on web so the click fallback is free.
+  document.addEventListener('touchend', fire, { capture: true, passive: true });
+  document.addEventListener('click',    fire, { capture: true });
+})();
 
 // Register app_version as a PostHog super-property so every event
 // carries the shipped build. Deferred here rather than at the
@@ -14230,6 +14306,8 @@ function showPaywall(opts) {
   // DevTools invocation, any future refactor that routes around the
   // gate — silent no-op. See PAYWALL_ENABLED for the full rationale.
   if (!PAYWALL_ENABLED) return;
+  // Warning-grade haptic — the user tapped a locked / paywalled item.
+  _haptic('locked');
   opts = opts || {};
   _paywallActiveRoot = document.getElementById('modal-paywall');
   _paywallMode = 'modal';
@@ -22285,6 +22363,9 @@ function defaultState() {
     // the OS out from under a user who explicitly declined. Until permission
     // is granted, the toggle reflects intent but no notification is scheduled.
     dailyReminder: { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
+    // Haptic feedback preference. Default on. _haptic() reads this before
+    // every native call; the toggle lives in Profile → Settings.
+    hapticsEnabled: true,
     // Ordered queue of celebration overlays waiting to play. finishDay pushes
     // { type: 'level_up' | 'chapter_complete' | 'bonus_unlock', … } here;
     // _playNextCelebration drains it one at a time. Persisted so an app close
@@ -28816,6 +28897,12 @@ function _readerBtnFire(btnId, isFinishFlag, via) {
   if (_readerBtnClosing) return;
   _readerBtnClosing = true;
   setTimeout(() => { _readerBtnClosing = false; }, 600);
+  // Continue-grade haptic on Next/Finish. Back has no haptic. Hooked here
+  // so the touchend path (31787) and the click-fallback path (26252) share
+  // one firing site — the 80 ms _haptic throttle also absorbs any accidental
+  // double-call on WebView variants where preventDefault doesn't stop the
+  // synthetic click.
+  if (btnId === 'reader-next-btn') _haptic('continue');
   const lag = _readerBtnTouchStart ? Math.round(performance.now() - _readerBtnTouchStart) : null;
   _readerBtnTouchStart = 0;
   try {
@@ -32867,17 +32954,8 @@ function renderStreakScreen(opts) {
 }
 
 // ── Streak tap interactivity ─────────────────────────────────────────
-// Haptic is a no-op unless @capacitor/haptics is installed and loaded.
-// We don't add the plugin here (handoff rule); the gate just reads
-// window.Capacitor.Plugins.Haptics defensively so a future install
-// lights it up with no code change.
-function _skHaptic() {
-  try {
-    const H = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics;
-    if (H && typeof H.impact === 'function') H.impact({ style: 'Light' });
-  } catch (e) {}
-}
-
+// Haptic feedback routes through the shared _haptic(kind) helper so the
+// global throttle, web no-op, and user toggle all apply uniformly.
 function _skPrefersReducedMotion() {
   try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
   catch (e) { return false; }
@@ -33085,7 +33163,10 @@ function _skHandleBadgeTap(btn) {
   if (!Number.isFinite(tier)) return;
   const stats = _streakStats();
   const earned = stats.earnedTiers.includes(tier);
-  _skHaptic();
+  // Earned badges get the lighter nav-grade pulse; locked badges get the
+  // warning-grade "nope" so the physical feedback matches the visual
+  // shake + "N more days" bubble.
+  _haptic(earned ? 'nav' : 'locked');
   try { posthog.capture('streak_badge_tapped', { tier, earned }); } catch (e) {}
   if (earned) {
     _skHitAnim(btn, 'sk-bounce', 300);
@@ -33108,8 +33189,8 @@ function _skHandleBadgeTap(btn) {
 
 function _skHandleDayTap(btn) {
   const dayState = btn.dataset.dayState;
-  if (dayState === 'future') return; // nothing happens
-  _skHaptic();
+  if (dayState === 'future') return; // nothing happens, no haptic
+  _haptic('nav');
   try { posthog.capture('streak_day_tapped', { state: dayState }); } catch (e) {}
   const dot = btn.querySelector('.sk-dot');
   _skHitAnim(dot, 'sk-pop', 300);
@@ -33158,7 +33239,7 @@ function _skHandleDayTap(btn) {
 }
 
 function _skHandleHeroTap(btn) {
-  _skHaptic();
+  _haptic('nav');
   _skHitAnim(btn, 'sk-flare', 460);
 }
 
@@ -33476,6 +33557,7 @@ function updateLangUI() {
   if (checkHe) checkHe.textContent = isEn ? '' : '✓';
   if (checkEn) checkEn.textContent = isEn ? '✓' : '';
   updateReminderUI();
+  updateHapticsUI();
   _updateAppearanceUI();
   // Localize the permanent share entry points. The completion-modal label is
   // touched here too so a mid-lesson language flip keeps its text current.
@@ -33506,6 +33588,27 @@ function _onReminderToggle(ev) {
 function _onReminderTimeChange(ev) {
   const t = ev.target.value || '20:00';
   setReminder({ time: t }).then(updateReminderUI);
+}
+
+// Haptics preference — persisted on state.hapticsEnabled (default true).
+// _haptic() reads it before every native call; the toggle is a one-liner
+// into local state. No Supabase sync field; the preference is device-local
+// since haptics are a hardware feature per device.
+function updateHapticsUI() {
+  const isEn = state.lang === 'en';
+  const label = document.getElementById('pf-haptics-label');
+  if (label) label.textContent = isEn ? 'Haptics' : 'רטט';
+  const toggle = document.getElementById('pf-haptics-toggle');
+  if (toggle) toggle.checked = state.hapticsEnabled !== false;
+}
+
+function _onHapticsToggle(ev) {
+  state.hapticsEnabled = !!ev.target.checked;
+  // Fire a small confirmation pulse when turning ON so the user feels
+  // immediately that it works. Nothing when turning OFF.
+  if (state.hapticsEnabled) _haptic('nav');
+  saveStateLocal();
+  updateHapticsUI();
 }
 
 function showProfileScreen() {
