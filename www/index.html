@@ -4734,6 +4734,132 @@
     .qs-cf, .qs-burst { display: none; }
   }
 
+  /* ── Streak tab (commit 1 of streak-tab rollout) ──────────────────
+     Verbatim from streak-tab/streak-screen.css, prefixed sk-. Only
+     delta: #streak-screen's min-height becomes 100dvh minus the
+     chrome (topbar + bottom-nav + safe-area) so the pinned-bottom
+     next-goal card lands above the nav without the viewport scrolling
+     at 360×640. */
+  #streak-screen {
+    /* Top padding ends flush with the topbar bottom (54px + safe-top). No
+       extra breath — the sk-title "band" is gone and we want zero seam
+       between the topbar and the hero card. Background is intentionally
+       transparent so the body gradient (line 756) shows through, which
+       is how Home gets its subject-tinted background. Bottom padding
+       clears the bottom-nav so the pinned next-goal card lands above
+       the nav row. */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: calc(54px + var(--safe-top)) 16px calc(16px + var(--bottom-nav-height) + var(--safe-bottom));
+    min-height: 100dvh;
+    background: transparent;
+  }
+  /* Mid wrapper absorbs free vertical space so the three groups (hero card,
+     badge shelf, next-goal card) breathe evenly instead of clumping at the
+     top with a dead zone before the pinned bottom. flex:1 on sk-mid plus
+     justify-content:center inside it centres the badges vertically between
+     the hero and the next-goal row. */
+  .sk-mid {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-block: 6px;
+  }
+  /* Hero card: subject-themed gradient. gold-light carries the warm "flame"
+     accent on the leading edge (constant across themes); accent-tint and
+     surface-2 are themed, so the body of the card tints orange on
+     psychology, blue on economics, purple on philosophy. Border and shadow
+     ride the same token system so the whole card follows the subject. */
+  .sk-hcard {
+    width: 100%; max-width: 420px; margin-top: 10px; border-radius: 22px;
+    padding: 14px 16px 12px;
+    background: linear-gradient(135deg, var(--gold-light) 0%, var(--accent-tint) 55%, var(--surface-2) 100%);
+    border: 1px solid var(--border);
+    box-shadow: 0 6px 18px rgba(var(--accent-rgb), 0.08);
+  }
+  .sk-htop { display: flex; align-items: center; gap: 14px; }
+  .sk-halo { position: relative; width: 76px; height: 76px; flex: none; display: grid; place-items: center; }
+  .sk-halo::before {
+    content: ""; position: absolute; inset: -10px; border-radius: 50%;
+    background: radial-gradient(circle at 50% 55%, rgba(255,207,122,0.75) 0%, rgba(255,207,122,0.25) 45%, rgba(255,207,122,0) 70%);
+  }
+  .sk-halo svg { position: relative; z-index: 1; }
+  .sk-num { font-size: 46px; font-weight: 900; line-height: 0.95; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .sk-lbl b { display: block; font-size: 16px; font-weight: 900; color: var(--ink); }
+  .sk-lbl span { display: block; font-size: 12.5px; font-weight: 800; color: var(--text-muted); margin-top: 2px; }
+  .sk-week { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); }
+  .sk-dd { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 900; color: var(--text-muted); }
+  .sk-dd.now { color: var(--ink); }
+  .sk-dot { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; border: 2px dashed var(--border); background: var(--surface); }
+  /* Lit + today use the treasure amber on purpose — same policy as badges:
+     subject-agnostic flame/gold colours stay as hexes. */
+  .sk-dot.lit { border: 2px solid var(--ink); background: #F59E0B; }
+  .sk-dot.today { box-shadow: 0 0 0 3px #FFE3A8; }
+  .sk-dot svg { width: 15px; height: 15px; }
+  .sk-count { margin-top: 16px; font-size: 12px; font-weight: 900; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; }
+  [dir="rtl"] .sk-count { letter-spacing: 0; font-size: 13.5px; text-transform: none; }
+  .sk-shelf {
+    display: grid; grid-template-columns: repeat(3, 108px);
+    justify-content: center; column-gap: 4px; row-gap: 10px; margin-top: 8px;
+  }
+  .sk-row2 { grid-column: 1 / -1; display: flex; justify-content: center; gap: 4px; }
+  .sk-m {
+    display: flex; flex-direction: column; align-items: center; width: 108px;
+    position: relative; background: none; border: 0; padding: 0;
+    font: inherit; color: inherit; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .sk-m svg { position: relative; }
+  .sk-m .sk-n { font-size: 13px; font-weight: 900; line-height: 1.15; margin-top: -2px; color: var(--ink); }
+  .sk-m .sk-k { font-size: 11px; font-weight: 800; color: var(--text-muted); }
+  .sk-m.off .sk-n { color: var(--text-muted); font-weight: 800; }
+  .sk-m.on::before {
+    content: ""; position: absolute; top: 0; left: 50%;
+    width: 104px; height: 104px; margin-left: -52px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,207,122,0.55), rgba(255,207,122,0) 68%);
+  }
+  .sk-next {
+    width: 100%; max-width: 420px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 18px; padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 4px 14px rgba(var(--accent-rgb), 0.08);
+  }
+  .sk-next .sk-t { flex: 1; min-width: 0; }
+  .sk-next .sk-t b { display: block; font-size: 14px; font-weight: 900; color: var(--ink); }
+  .sk-next .sk-t span { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-top: 4px; }
+  .sk-prog { height: 9px; border-radius: 9px; background: var(--surface-2); margin-top: 6px; overflow: hidden; border: 1px solid var(--border); }
+  .sk-prog i { display: block; height: 100%; border-radius: 9px; background: linear-gradient(90deg, #F59E0B, #FFCF7A); }
+  [dir="rtl"] .sk-prog i { background: linear-gradient(270deg, #F59E0B, #FFCF7A); }
+  /* Badge + hero flame flicker. Earned badges only — streak-badges.js
+     renders `<g class="sk-flick">` only when !off (line 32 in that file),
+     so .off badges stay still by construction. Transform-box: fill-box +
+     transform-origin: 50% 100% anchors the scale at the flame's bottom
+     so the flicker reads as "candle breath" not "jump up and down".
+     Delays staggered per tier via data-tier so the five flames don't
+     move in sync — hero flame has no sk-m parent and uses the default
+     0s delay. Stops entirely under prefers-reduced-motion: reduce. */
+  @media (prefers-reduced-motion: no-preference) {
+    .sk-flick {
+      animation: sk-flick 2.4s ease-in-out infinite;
+      transform-box: fill-box;
+      transform-origin: 50% 100%;
+      will-change: transform;
+    }
+    .sk-m[data-tier="0"] .sk-flick { animation-delay: 0s;    }
+    .sk-m[data-tier="1"] .sk-flick { animation-delay: 0.45s; }
+    .sk-m[data-tier="2"] .sk-flick { animation-delay: 0.9s;  }
+    .sk-m[data-tier="3"] .sk-flick { animation-delay: 1.35s; }
+    .sk-m[data-tier="4"] .sk-flick { animation-delay: 1.8s;  }
+  }
+  @keyframes sk-flick {
+    0%, 100% { transform: scaleY(1)    rotate(0deg); }
+    50%      { transform: scaleY(1.05) rotate(1.5deg); }
+  }
+
   /* ── XP Float animation ── */
   .xp-float {
     position: fixed;
@@ -10996,6 +11122,19 @@
         <path d="M3.8 20.5 Q 3.8 13.5 12 13.5 Q 20.2 13.5 20.2 20.5 Z"/>
       </g>
     </symbol>
+    <!-- Streak flame — nav-bar glyph. 24×24 flat with .stroke/.fill groups so
+         the bottom-nav active/inactive flip (3522–3525) swaps outline for solid
+         like every other tab. The decorative #icon-streak at line ~11010 is a
+         different beast (64×64 full illustration used in stats cards). -->
+    <symbol id="ic-streak" viewBox="0 0 24 24">
+      <g class="stroke" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M12 2.5 C 10 6, 7.5 8, 7.5 13 C 7.5 17.8, 9.6 21, 12 21 C 14.4 21, 16.5 17.8, 16.5 13 C 16.5 10, 14.8 9.4, 13.6 7 C 13.1 8.4, 12.4 8.4, 12.4 7 C 12.4 5, 12 3.8, 12 2.5 Z"/>
+        <path d="M12 11.5 C 11 13, 10.3 15, 10.8 17 C 11.2 18.7, 12.8 18.7, 13.2 17 C 13.7 15, 13 13, 12 11.5 Z"/>
+      </g>
+      <g class="fill" fill="currentColor">
+        <path d="M12 2.5 C 10 6, 7.5 8, 7.5 13 C 7.5 17.8, 9.6 21, 12 21 C 14.4 21, 16.5 17.8, 16.5 13 C 16.5 10, 14.8 9.4, 13.6 7 C 13.1 8.4, 12.4 8.4, 12.4 7 C 12.4 5, 12 3.8, 12 2.5 Z"/>
+      </g>
+    </symbol>
     <symbol id="ic-personal-old" viewBox="0 0 64 64">
       <path d="M12 52 Q 12 38 32 38 Q 52 38 52 52" fill="#7B4FD4" stroke="#2A1266" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
       <path d="M32 38 Q 52 38 52 52 L 32 52 Z" fill="#5E37A8" opacity=".45"/>
@@ -12039,6 +12178,16 @@
   </div>
 
   <!-- ═══════════════════════════════
+       STREAK SCREEN (commit 1 of streak-tab rollout)
+       Read-only view: hero card, this-week dots, 5 badges, next-goal
+       card. renderStreakScreen() populates #streak-screen on every
+       showStreakScreen() call. Must fit 360×640 without scrolling.
+  ═══════════════════════════════ -->
+  <div id="screen-streak" class="screen">
+    <div id="streak-screen"></div>
+  </div>
+
+  <!-- ═══════════════════════════════
        PROFILE SCREEN
   ═══════════════════════════════ -->
   <div id="screen-profile" class="screen">
@@ -12604,13 +12753,14 @@
 <script src="content/economics.js"></script>
 <script src="content/psychology.js"></script>
 <script src="content/thinkers.js"></script>
+<script src="content/streak-badges.js"></script>
 
 <script>
 // Fail fast if any content/*.js file 404'd — otherwise getW / deriveDay / getT
 // would return undefined and the app would die silently on first render.
 if (typeof corpusData === 'undefined' || typeof economicsData === 'undefined'
     || typeof psychologyData === 'undefined' || typeof THINKERS === 'undefined'
-    || typeof THINKERS_EN === 'undefined') {
+    || typeof THINKERS_EN === 'undefined' || typeof StreakBadges === 'undefined') {
   throw new Error('[boot] content/*.js failed to load — missing subject data');
 }
 
@@ -22244,6 +22394,8 @@ function showScreen(id) {
   const pc = document.getElementById('practice-card');
   if (pc) {
     // Show practice-card on home/profile/pantheon (where "Next Up" makes sense), hide elsewhere.
+    // Streak screen is excluded on purpose: its pinned-bottom "next goal" card
+    // lives in the same slot and would collide with the floating practice-card.
     const showPracticeCard = ['home', 'profile', 'pantheon'].includes(id);
     if (showPracticeCard) {
       // Only show if renderHome has populated content; otherwise leave the CSS default (none).
@@ -22252,13 +22404,16 @@ function showScreen(id) {
       pc.style.display = 'none';
     }
   }
-  // Global topbar: show on home/profile/pantheon, hide on reader (has reader-topbar) / subject / auth / onboarding / level-journey (has journey-header)
+  // Global topbar: show on home/profile/pantheon/streak, hide on reader (has reader-topbar) / subject / auth / onboarding / level-journey (has journey-header)
   const globalTopbar = document.getElementById('topbar');
   if (globalTopbar) {
-    const showTopbar = ['home', 'profile', 'pantheon'].includes(id);
+    const showTopbar = ['home', 'profile', 'pantheon', 'streak'].includes(id);
     globalTopbar.style.display = showTopbar ? '' : 'none';
   }
-  // Global stats subheader: show on home/profile/pantheon, hide on reader/subject/auth/onboarding
+  // Global stats subheader: show on home/profile/pantheon, hide on streak
+  // (the streak hero card is the much richer presentation; stacking them would
+  // double the streak number and eat 40px of the 640-tall budget), reader/
+  // subject/auth/onboarding.
   const statsBar = document.querySelector('.stats-subheader');
   if (statsBar) {
     const showStats = ['home', 'profile', 'pantheon'].includes(id);
@@ -32318,6 +32473,321 @@ function showPantheonScreen() {
   animateScreen(document.getElementById('screen-pantheon'), 'anim-fade');
 }
 
+// === Streak tab (commit 1 of streak-tab rollout) ===
+// Everything on the Streak screen is derived from existing state fields —
+// nothing new persists on Supabase. See STREAK_TAB_HANDOFF.md §Data.
+//
+// _streakStats() is the single source of truth for every surface that
+// consumes streak data (screen, future overlay trigger, analytics):
+//   current       : state.dailyStreak coerced to a number
+//   best          : longest run of consecutive day keys in activeDates
+//   earnedTiers   : every tier whose DAYS threshold is <= best (kept forever)
+//   earnedOn      : { tier: dayKey } — the first day any run hit DAYS[tier]
+//   nextTier      : index of the next locked tier, or null when all are earned
+//   daysToNext    : DAYS[nextTier] - best
+//
+// Consecutive-day comparisons go through _streakDayBefore / _streakDayAfter;
+// _streakDay is wallclock-only (see the warning at index.html:22643).
+function _streakStats() {
+  const DAYS = (window.StreakBadges && StreakBadges.DAYS) || [1, 3, 7, 30, 100];
+  const current = Math.max(0, Number(state.dailyStreak) || 0);
+  // Only strict YYYY-MM-DD keys count toward a run. Legacy entries (ISO
+  // strings, UTC-shaped keys with a timestamp suffix, anything else) got
+  // picked up by the completionsByDay → activeDates backfill at 13538 and
+  // can produce false runs when sorted next to real local-day keys. The
+  // regex is intentionally strict — length matters.
+  //
+  // Repair-bridged days are KEPT: badges must track the visible streak, so
+  // a repaired chain earns the same badges a never-broken chain would.
+  const RX_DAY = /^\d{4}-\d{2}-\d{2}$/;
+  const rawAll = state.activeDates || [];
+  const raw = rawAll.filter(d => typeof d === 'string' && RX_DAY.test(d));
+  const activeDatesTotal = rawAll.length;
+  const activeDatesKept = raw.length;
+  const activeDatesDropped = activeDatesTotal - activeDatesKept;
+  const dropped = activeDatesDropped > 0
+    ? rawAll.filter(d => !(typeof d === 'string' && RX_DAY.test(d)))
+    : [];
+  // One-shot console surface so the user can see at a glance whether the
+  // strict shape filter is throwing anything away. Flagged on window so a
+  // page lifetime only prints once; _debugStreakStats also returns the
+  // counts in-band for programmatic inspection.
+  if (!window._streakStatsFilterLogged) {
+    window._streakStatsFilterLogged = true;
+    if (activeDatesDropped > 0) {
+      console.warn('[_streakStats] YYYY-MM-DD filter dropped', activeDatesDropped,
+        'of', activeDatesTotal, 'activeDates entries:', dropped);
+    } else {
+      console.log('[_streakStats] YYYY-MM-DD filter kept all', activeDatesTotal, 'activeDates entries');
+    }
+  }
+  const dates = Array.from(new Set(raw)).sort();
+  let best = 0, runLen = 0;
+  let curRunStart = null;
+  const bestRun = { start: null, end: null, dates: [] };
+  const earnedOn = {};
+  for (let i = 0; i < dates.length; i++) {
+    if (i === 0 || _streakDayAfter(dates[i - 1]) !== dates[i]) {
+      runLen = 1;
+      curRunStart = dates[i];
+    } else {
+      runLen += 1;
+    }
+    if (runLen > best) {
+      best = runLen;
+      bestRun.start = curRunStart;
+      bestRun.end = dates[i];
+    }
+    for (let t = 0; t < DAYS.length; t++) {
+      if (runLen === DAYS[t] && earnedOn[t] === undefined) earnedOn[t] = dates[i];
+    }
+  }
+  // Materialise the longest-run dates so _debugStreakStats can show which
+  // keys produced the "best" number. Walks forward from start → end via
+  // _streakDayAfter — no toISOString anywhere.
+  if (bestRun.start && bestRun.end) {
+    const bd = [];
+    let c = bestRun.start;
+    while (true) {
+      bd.push(c);
+      if (c === bestRun.end) break;
+      c = _streakDayAfter(c);
+      if (bd.length > 1000) break; // paranoia guard
+    }
+    bestRun.dates = bd;
+  }
+  // Earned tiers follow BEST (a badge, once earned, stays earned). The
+  // path to the next unearned tier follows CURRENT: a streak is
+  // consecutive days, so even after a 4-day best you still need a fresh
+  // 7-day run from today to light up Blaze. daysToNext is clamped to 1
+  // so a badge the user already earned once but is now 0-current doesn't
+  // read "0 more days".
+  const earnedTiers = DAYS.map((d, i) => best >= d ? i : -1).filter(i => i >= 0);
+  const nextTier = earnedTiers.length < DAYS.length ? earnedTiers.length : null;
+  const daysToNext = nextTier !== null ? Math.max(1, DAYS[nextTier] - current) : 0;
+  return {
+    current, best, earnedTiers, earnedOn, nextTier, daysToNext, bestRun,
+    activeDatesTotal, activeDatesKept, activeDatesDropped, droppedSample: dropped.slice(0, 10),
+  };
+}
+
+// Build the 7 day keys that make up the current calendar week.
+// English: Monday-first — offset = (getDay() + 6) % 7
+// Hebrew:  Sunday-first — offset = getDay()
+// Returns an array of 7 YYYY-MM-DD keys in DOM order; RTL flipping is
+// left to the browser via <html dir>, so the Hebrew array stays in
+// Sun→Sat order and renders Sun on the right automatically.
+function _streakWeekKeys() {
+  const isEn = state.lang === 'en';
+  const today = _streakDay();
+  const [y, m, d] = today.split('-').map(Number);
+  const wkday = new Date(y, m - 1, d).getDay(); // 0..6, Sun=0
+  const offset = isEn ? ((wkday + 6) % 7) : wkday;
+  // Walk back `offset` days without touching _streakDay (grace risk).
+  let cur = today;
+  for (let i = 0; i < offset; i++) cur = _streakDayBefore(cur);
+  const keys = [cur];
+  for (let i = 1; i < 7; i++) keys.push(_streakDayAfter(keys[i - 1]));
+  return keys;
+}
+
+function renderStreakScreen(opts) {
+  // opts: { statsOverride?, activeDatesOverride? } — used by
+  // _debugStreakPreview to render a fake streak without touching
+  // state.activeDates. Production callers pass nothing.
+  opts = opts || {};
+  const root = document.getElementById('streak-screen');
+  if (!root) return;
+  const isEn = state.lang === 'en';
+  const stats = opts.statsOverride || _streakStats();
+  const DAYS = StreakBadges.DAYS;
+  const NAMES = StreakBadges.NAMES[isEn ? 'en' : 'he'];
+  const activeSet = new Set(opts.activeDatesOverride || state.activeDates || []);
+  const todayKey = _streakDay();
+
+  // Hero card — flame in a warm halo, current streak, best, this-week dots.
+  const dayStreakLbl = isEn
+    ? (stats.current === 1 ? 'day streak' : 'day streak')
+    : (stats.current === 1 ? 'יום ברצף' : 'ימים ברצף');
+  const bestLbl = isEn
+    ? (stats.best === 1 ? 'Best: 1 day' : `Best: ${stats.best} days`)
+    : (stats.best === 1 ? 'השיא: יום אחד' : `השיא: ${stats.best} ימים`);
+
+  const dayLetters = isEn
+    ? ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+    : ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
+  const weekKeys = _streakWeekKeys();
+  const weekDotsHtml = weekKeys.map((k, i) => {
+    const lit = activeSet.has(k);
+    const isToday = k === todayKey;
+    const cls = ['sk-dot', lit ? 'lit' : '', isToday ? 'today' : ''].filter(Boolean).join(' ');
+    const inner = lit ? StreakBadges.miniFlame() : '';
+    const ddCls = ['sk-dd', isToday ? 'now' : ''].filter(Boolean).join(' ');
+    return `<div class="${ddCls}"><div class="${cls}">${inner}</div><span>${dayLetters[i]}</span></div>`;
+  }).join('');
+
+  // Badge shelf — 3 on top row (tiers 0..2), 2 centred on row 2 (tiers 3..4).
+  // Each badge is a real button; commit 1 taps are no-ops (overlay lands in
+  // commit 2). The locked line "N more days" shows only on the next locked
+  // tier, matching the handoff.
+  function daysMoreLabel(n) {
+    if (isEn) return n === 1 ? '1 more day' : `${n} more days`;
+    if (n === 1) return 'עוד יום אחד';
+    if (n === 2) return 'עוד יומיים';
+    return `עוד ${n} ימים`;
+  }
+  function badgeHtml(tier) {
+    const earned = stats.earnedTiers.includes(tier);
+    const isNextLocked = !earned && tier === stats.nextTier;
+    const line = isNextLocked ? daysMoreLabel(stats.daysToNext) : '';
+    const aria = earned
+      ? (isEn ? `${NAMES[tier]}, earned` : `${NAMES[tier]}, הושג`)
+      : (isNextLocked
+          ? (isEn ? `${NAMES[tier]}, ${daysMoreLabel(stats.daysToNext)} to go` : `${NAMES[tier]}, ${daysMoreLabel(stats.daysToNext)}`)
+          : (isEn ? `${NAMES[tier]}, locked` : `${NAMES[tier]}, נעול`));
+    return `<button type="button" class="sk-m ${earned ? 'on' : 'off'}" data-tier="${tier}" aria-label="${aria}">`
+      + StreakBadges.crest(tier, 98, { off: !earned })
+      + `<span class="sk-n">${NAMES[tier]}</span>`
+      + (line ? `<span class="sk-k">${line}</span>` : '')
+      + `</button>`;
+  }
+
+  // Next-goal copy. Progress and days-to-next are driven by current (not
+  // best): the badge needs a fresh consecutive run from today regardless
+  // of history. When current is 0 the subline swaps to the "start a new
+  // streak" nudge so the card isn't lecturing the user about keeping a
+  // streak they don't have.
+  const nextTierName = stats.nextTier !== null ? NAMES[stats.nextTier] : '';
+  const nextHtml = stats.nextTier === null ? '' : (() => {
+    const headline = isEn
+      ? `${daysMoreLabel(stats.daysToNext)} to ${nextTierName}`
+      : `${daysMoreLabel(stats.daysToNext)} עד ${nextTierName}`;
+    const sub = stats.current === 0
+      ? (isEn ? 'Start a new streak today' : 'מתחילים רצף חדש היום')
+      : (isEn ? 'One dialogue a day keeps it going' : 'דיאלוג אחד ביום שומר על הרצף');
+    const nextDays = DAYS[stats.nextTier];
+    const pct = Math.max(0, Math.min(100, Math.round(100 * stats.current / nextDays)));
+    return `
+      <div class="sk-next">
+        <div style="flex:none">${StreakBadges.crest(stats.nextTier, 46, { off: true })}</div>
+        <div class="sk-t">
+          <b>${headline}</b>
+          <div class="sk-prog"><i style="width:${pct}%"></i></div>
+          <span>${sub}</span>
+        </div>
+      </div>
+    `;
+  })();
+
+  const countLbl = isEn
+    ? `Badges · ${stats.earnedTiers.length} of ${DAYS.length}`
+    : `תגים · ${stats.earnedTiers.length} מתוך ${DAYS.length}`;
+
+  // Hero flame: reuse the existing #icon-streak sprite (defined at
+  // index.html:11098) rather than drawing a new one. icon-streak's base
+  // ellipse + inner core use var(--accent), so it picks up the current
+  // subject theme automatically. Wrapping SVG carries .sk-flick so the
+  // whole flame breathes — SVG-shadow content from <use> can't be
+  // targeted by inner-class CSS, so animating the outer SVG is the
+  // reliable path. Badge crests keep their own .sk-flick <g> inside.
+  root.innerHTML = `
+    <div class="sk-hcard">
+      <div class="sk-htop">
+        <div class="sk-halo">
+          <svg class="sk-flick sk-heroflame" width="72" height="72" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><use href="#icon-streak"/></svg>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="sk-num">${stats.current}</div>
+          <div class="sk-lbl">
+            <b>${dayStreakLbl}</b>
+            <span>${bestLbl}</span>
+          </div>
+        </div>
+      </div>
+      <div class="sk-week">${weekDotsHtml}</div>
+    </div>
+    <div class="sk-mid">
+      <div class="sk-count">${countLbl}</div>
+      <div class="sk-shelf">
+        ${badgeHtml(0)}${badgeHtml(1)}${badgeHtml(2)}
+        <div class="sk-row2">${badgeHtml(3)}${badgeHtml(4)}</div>
+      </div>
+    </div>
+    ${nextHtml}
+  `;
+}
+
+function showStreakScreen() {
+  updateBottomNav('streak');
+  renderStreakScreen();
+  showScreen('streak');
+  // showScreen() already window.scrollTo(0,0) — the explicit reset here is
+  // defensive: on a tab-switch into a screen whose last render was taller
+  // than the current viewport, WKWebView can retain the prior scrollTop
+  // and surface the user mid-page. Also pin the screen's own scrollTop in
+  // case anything in the chain overrides to position:relative with its own
+  // overflow.
+  window.scrollTo(0, 0);
+  const sc = document.getElementById('screen-streak');
+  if (sc) sc.scrollTop = 0;
+  animateScreen(document.getElementById('screen-streak'), 'anim-fade');
+}
+
+// Debug helper surfaced for the console snippet in STREAK_TAB_HANDOFF.md §Debug.
+// Returns the current _streakStats() payload; the overlay-trigger debug
+// (`_debugStreakBadge`) lands in commit 2 with the overlay itself.
+window._debugStreakStats = function () { return _streakStats(); };
+
+// _debugStreakPreview(current, best?): render the Streak screen as if the
+// user had `current` consecutive active days ending today, with their
+// longest-ever best run being `best` (defaults to current when omitted).
+// Pure render path — never touches state.activeDates, state.dailyStreak,
+// local storage or Supabase, so the preview can be dialled freely from
+// the inspector. Reload to drop it. Uses _streakDay / _streakDayBefore
+// (not toISOString) so the 3AM grace day-of applies the same way the
+// real activeDates writer does.
+//
+// When best > current, the historical best run is placed 30 days before
+// today so it doesn't collide with the current week's dots — useful for
+// testing cases like current:0, best:4 (earned badges linger, days-to-
+// next counts from zero).
+window._debugStreakPreview = function (currentDays, bestDays) {
+  const DAYS = StreakBadges.DAYS;
+  const cur = Math.max(0, Number(currentDays) || 0);
+  const bst = bestDays === undefined ? cur : Math.max(cur, Math.max(0, Number(bestDays) || 0));
+  const earnedTiers = DAYS.map((d, i) => bst >= d ? i : -1).filter(i => i >= 0);
+  const nextTier = earnedTiers.length < DAYS.length ? earnedTiers.length : null;
+  const daysToNext = nextTier !== null ? Math.max(1, DAYS[nextTier] - cur) : 0;
+
+  const curDates = [];
+  if (cur > 0) {
+    let c = _streakDay();
+    for (let i = 0; i < cur; i++) { curDates.unshift(c); c = _streakDayBefore(c); }
+  }
+  const histDates = [];
+  if (bst > cur) {
+    let anchor = _streakDay();
+    for (let i = 0; i < 30; i++) anchor = _streakDayBefore(anchor);
+    let c = anchor;
+    for (let i = 0; i < bst; i++) { histDates.push(c); c = _streakDayAfter(c); }
+  }
+  const bestDatesArr = bst > cur ? histDates.slice() : curDates.slice();
+  const dates = Array.from(new Set([...histDates, ...curDates])).sort();
+
+  const statsOverride = {
+    current: cur, best: bst, earnedTiers, earnedOn: {}, nextTier, daysToNext,
+    bestRun: {
+      start: bestDatesArr[0] || null,
+      end: bestDatesArr[bestDatesArr.length - 1] || null,
+      dates: bestDatesArr,
+    },
+  };
+  updateBottomNav('streak');
+  renderStreakScreen({ statsOverride, activeDatesOverride: dates });
+  showScreen('streak');
+  return statsOverride;
+};
+
 function renderProfile() {
   const isEn = state.lang === 'en';
 
@@ -32904,13 +33374,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script>
 <nav class="bottom-nav" id="bottom-nav">
-  <button class="bottom-nav-btn active" id="bnav-home" onclick="goHome()">
+  <button class="bottom-nav-btn active" id="bnav-home" data-screen="home" onclick="goHome()">
     <svg viewBox="0 0 24 24" width="28" height="28"><use href="#ic-home"/></svg>
   </button>
-  <button class="bottom-nav-btn" id="bnav-pantheon" onclick="showPantheonScreen()">
+  <button class="bottom-nav-btn" id="bnav-streak" data-screen="streak" onclick="showStreakScreen()">
+    <svg viewBox="0 0 24 24" width="28" height="28"><use href="#ic-streak"/></svg>
+  </button>
+  <button class="bottom-nav-btn" id="bnav-pantheon" data-screen="pantheon" onclick="showPantheonScreen()">
     <svg viewBox="0 0 24 24" width="28" height="28"><use href="#ic-pantheon"/></svg>
   </button>
-  <button class="bottom-nav-btn" id="bnav-profile" onclick="showProfileScreen()">
+  <button class="bottom-nav-btn" id="bnav-profile" data-screen="profile" onclick="showProfileScreen()">
     <svg viewBox="0 0 24 24" width="28" height="28"><use href="#ic-personal"/></svg>
   </button>
 </nav>
