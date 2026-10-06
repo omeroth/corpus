@@ -4993,6 +4993,250 @@
     from { opacity: 0; } to { opacity: 1; }
   }
 
+  /* ── Streak-badge earned overlay (commit 2 of streak-tab rollout) ──
+     Verbatim from streak-tab/streak-screen.css §.sk-earn, dropped into
+     the main stylesheet so the overlay fires out of the celebration
+     queue. z-index 600 sits above the celebration-overlay layer; the
+     overlay element is appended to <body> on fire. Reduced motion
+     drops the rise/lift/glow animations but keeps the overlay +
+     elements visible — the user still sees what they earned, just
+     without the motion polish. */
+  .sk-earn {
+    position: fixed; inset: 0; z-index: 600;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: calc(24px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom));
+    color: #2A1B4A;
+    background: radial-gradient(circle at 50% 34%, #FFF4DC 0%, #F4ECFF 40%, #FBF8FF 75%);
+    overflow: hidden;
+  }
+  .sk-earn .sk-glow {
+    position: absolute; top: 34%; left: 50%;
+    width: 240px; height: 240px; margin: -120px 0 0 -120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,207,122,.55), rgba(255,207,122,0) 65%);
+    opacity: .6;
+  }
+  .sk-earn .sk-big { position: relative; }
+  .sk-newpill {
+    position: relative; display: inline-block;
+    padding: 5px 12px; border-radius: 999px;
+    background: #FFF1D6; color: #9A5B06;
+    font-size: 12px; font-weight: 900; letter-spacing: .1em;
+  }
+  [dir="rtl"] .sk-newpill { letter-spacing: 0; font-size: 13px; }
+  .sk-earn h2 { position: relative; font-size: 36px; font-weight: 900; margin: 10px 0 4px; color: #2A1266; }
+  .sk-earn p { position: relative; margin: 0; font-size: 16px; line-height: 1.45; font-weight: 700; color: #6B5B8A; max-width: 280px; }
+  .sk-tease {
+    position: relative; display: flex; align-items: center; gap: 8px;
+    margin-top: 16px; font-size: 13px; font-weight: 800; color: #9B7FC9;
+  }
+  .sk-cta {
+    position: relative; margin-top: 22px;
+    width: 100%; max-width: 360px; min-height: 52px;
+    border: 0; border-radius: 16px;
+    background: #7B4FD4; color: #fff;
+    font: inherit; font-size: 17px; font-weight: 900;
+    box-shadow: 0 6px 16px rgba(123, 79, 212, .3);
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sk-earn .sk-big  { animation: sk-lift 1.1s cubic-bezier(.25,.9,.3,1.05) .15s both; }
+    .sk-earn .sk-glow { animation: sk-glow 3.2s ease-in-out .6s infinite; }
+    .sk-earn .sk-rise { animation: sk-rise .5s ease-out both; }
+    .sk-earn .r1 { animation-delay: .7s; }
+    .sk-earn .r2 { animation-delay: .85s; }
+    .sk-earn .r3 { animation-delay: 1s; }
+    .sk-earn .r4 { animation-delay: 1.15s; }
+  }
+  @keyframes sk-lift {
+    0%   { transform: translateY(24px) scale(.85); opacity: 0; }
+    100% { transform: none; opacity: 1; }
+  }
+  @keyframes sk-glow {
+    0%, 100% { opacity: .55; transform: scale(.95); }
+    50%      { opacity: 1;   transform: scale(1.05); }
+  }
+  @keyframes sk-rise {
+    0%   { transform: translateY(12px); opacity: 0; }
+    100% { transform: none; opacity: 1; }
+  }
+
+  /* ── Streak-badge Ignition overlay (.sk-earn.sk-ign) ───────────────
+     Replaces the light-calm stage with a dark ignition sequence. Text,
+     logic, chain and button are unchanged; only the stage + animation.
+     Timing map:
+       0.00s  grey crest fades in
+       0.60s  warm pre-glow builds behind it
+       0.75s  grey crest shakes lightly for 0.45s
+       1.20s  ignition — grey out, colour pops in, white-gold flash,
+              gold ring expands, 14 tier-coloured sparks fly out,
+              ambient glow pulse starts, SUCCESS haptic fires
+       1.40s  12 ambient embers rise from the bottom, infinite loop
+       1.65s→ text rises in, one line every ~0.13s
+     View mode (badge tap on Streak screen): adds .sk-view which
+     disables shake/flash/sparks/haptic/grey-to-colour transition and
+     mounts the colour crest + glow + embers directly.
+     Reduced motion: show final frame; drop every animation.               */
+  .sk-earn.sk-ign {
+    background: radial-gradient(circle at 50% 34%, #FFF1D6 0%, #F4ECFF 45%, #FBF8FF 80%);
+    color: #2A1B4A;
+  }
+  .sk-cb { position: relative; width: 190px; height: 197px; flex: none; }
+  .sk-cb > .sk-l { position: absolute; inset: 0; display: grid; place-items: center; }
+  .sk-ign .sk-pre {
+    position: absolute; left: 50%; top: 46%;
+    width: 120px; height: 120px; margin: -60px;
+    border-radius: 50%; opacity: 0;
+    background: radial-gradient(circle, rgba(255,207,122,.6), rgba(255,207,122,0) 65%);
+  }
+  .sk-ign .sk-glow2 {
+    position: absolute; left: 50%; top: 46%;
+    width: 280px; height: 280px; margin: -140px;
+    border-radius: 50%; opacity: 0;
+    background: radial-gradient(circle, rgba(255,207,122,.75), rgba(255,207,122,0) 62%);
+  }
+  .sk-ign .sk-flash {
+    position: absolute; left: 50%; top: 46%;
+    width: 220px; height: 220px; margin: -110px;
+    border-radius: 50%; opacity: 0;
+    background: radial-gradient(circle, #fff 0%, rgba(255,236,190,.95) 22%, rgba(255,207,122,0) 62%);
+  }
+  .sk-ign .sk-ring {
+    position: absolute; left: 50%; top: 46%;
+    width: 160px; height: 160px; margin: -80px;
+    border-radius: 50%; border: 3px solid #F59E0B;
+    opacity: 0;
+  }
+  .sk-ign .sk-spk {
+    position: absolute; left: 50%; top: 50%;
+    width: 8px; height: 8px; margin: -4px;
+    border-radius: 2px; opacity: 0;
+  }
+  /* Embers: amber on amber-glow, z-index 0 so they sit BEHIND the text
+     column (text elements have position:relative and default stacking
+     above z-index:0 non-stacking-context siblings — explicit z-index:1
+     on text below keeps the order deterministic). */
+  .sk-ign .sk-emb {
+    position: absolute; bottom: -10px;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #F59E0B; box-shadow: 0 0 6px rgba(245,158,11,.6);
+    opacity: 0; z-index: 0;
+  }
+  /* Ignition palette (light stage): warm amber accents on a soft
+     cream-to-lilac background. */
+  .sk-ign .sk-newpill {
+    background: #FFF1D6; color: #9A5B06;
+    border: 0;
+  }
+  .sk-ign h2 { color: #2A1266; }
+  .sk-ign p  { color: #6B5B8A; }
+  .sk-ign .sk-tease { color: #9B7FC9; }
+  .sk-ign .sk-tease svg { opacity: 1; }
+  .sk-ign .sk-cta {
+    background: #7B4FD4; color: #fff;
+    box-shadow: 0 6px 16px rgba(123,79,212,.3);
+  }
+  /* Text column paints above the ambient embers. Elements already have
+     position:relative from the base .sk-earn rules — just force a
+     higher stacking so the embers (z-index:0) sit behind. */
+  .sk-ign > .sk-rise,
+  .sk-ign > h2,
+  .sk-ign > p,
+  .sk-ign > .sk-tease,
+  .sk-ign > .sk-cta { z-index: 1; }
+  /* On ignition, hide the base light-overlay sk-glow + sk-big so the
+     new .sk-cb owns the crest region cleanly. */
+  .sk-ign > .sk-glow, .sk-ign > .sk-big { display: none; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .sk-ign .sk-off   { animation: sk-ain .6s ease-out both,
+                                    sk-shake .45s ease-in-out .75s,
+                                    sk-aout .15s linear 1.2s forwards; }
+    .sk-ign .sk-on    { opacity: 0;
+                        animation: sk-apop .75s cubic-bezier(.2,1.5,.4,1) 1.2s both; }
+    .sk-ign .sk-pre   { animation: sk-pre .6s ease-in .6s both; }
+    .sk-ign .sk-glow2 { animation: sk-gin .6s ease-out 1.2s both,
+                                   sk-gpulse 3s ease-in-out 1.8s infinite; }
+    .sk-ign .sk-flash { animation: sk-flash .9s ease-out 1.15s both; }
+    .sk-ign .sk-ring  { animation: sk-ring 1s ease-out 1.2s both; }
+    .sk-ign .sk-spk   { animation: sk-spk .9s cubic-bezier(.15,.7,.3,1) var(--t, 1.2s) both; }
+    .sk-ign .sk-rise  { animation: sk-rise .5s ease-out both; }
+    .sk-ign .sk-emb   { animation: sk-emb var(--du, 3.2s) ease-in var(--t, 1.6s) infinite; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    /* Final frame only — no animation, no shake, no sparks, no haptic
+       (haptic is JS-gated against this media query inside the overlay
+       function itself). */
+    .sk-ign .sk-off   { display: none; }
+    .sk-ign .sk-on    { opacity: 1; }
+    .sk-ign .sk-glow2 { opacity: 1; }
+    .sk-ign .sk-pre, .sk-ign .sk-flash, .sk-ign .sk-ring,
+    .sk-ign .sk-spk, .sk-ign .sk-emb { display: none; }
+    .sk-ign .sk-rise  { animation: none; opacity: 1; transform: none; }
+  }
+  @keyframes sk-ain {
+    0%   { opacity: 0; transform: scale(.88); }
+    100% { opacity: 1; transform: none; }
+  }
+  @keyframes sk-shake {
+    0%, 100% { transform: none; }
+    20% { transform: rotate(-3deg) scale(1.02); }
+    40% { transform: rotate( 3deg) scale(1.03); }
+    60% { transform: rotate(-2deg) scale(1.04); }
+    80% { transform: rotate( 2deg) scale(1.05); }
+  }
+  @keyframes sk-aout { to { opacity: 0; } }
+  @keyframes sk-apop {
+    0%   { opacity: 0; transform: scale(1.3); }
+    35%  { opacity: 1; }
+    100% { opacity: 1; transform: none; }
+  }
+  @keyframes sk-pre {
+    0%   { opacity: 0; transform: scale(.5); }
+    100% { opacity: 1; transform: scale(1.3); }
+  }
+  @keyframes sk-gin {
+    0%   { opacity: 0; transform: scale(.6); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes sk-gpulse {
+    0%, 100% { opacity: .8; transform: scale(.96); }
+    50%      { opacity: 1;  transform: scale(1.05); }
+  }
+  @keyframes sk-flash {
+    0%   { transform: scale(.3);  opacity: 0; }
+    18%  { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(2);    opacity: 0; }
+  }
+  @keyframes sk-ring {
+    0%   { transform: scale(.4);  opacity: 1; }
+    100% { transform: scale(2.3); opacity: 0; }
+  }
+  @keyframes sk-spk {
+    0%   { transform: rotate(var(--a)) translateY(0) rotate(45deg) scale(1.2);
+           opacity: 1; }
+    100% { transform: rotate(var(--a)) translateY(calc(-1 * var(--dist))) rotate(45deg) scale(.2);
+           opacity: 0; }
+  }
+  @keyframes sk-emb {
+    0%   { transform: translate(0,0);                opacity: 0; }
+    15%  {                                           opacity: .9; }
+    100% { transform: translate(var(--dx), -560px);  opacity: 0; }
+  }
+
+  /* Small "unseen content" dot on the Streak tab in the bottom nav.
+     Rendered when state.streakTabOpened is false; cleared on first
+     tap into the Streak screen (see updateBottomNav). Positioned top-
+     right so it reads as a notification pip. */
+  #bnav-streak.sk-tab-dot::after {
+    content: ''; position: absolute; top: 10px;
+    inset-inline-end: calc(50% - 18px);
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #F59E0B;
+    box-shadow: 0 0 0 2px var(--surface);
+  }
+
   /* ── XP Float animation ── */
   .xp-float {
     position: fixed;
@@ -13902,6 +14146,15 @@ async function loadProgressFromSupabase() {
     // derived, so a legitimately-alive streak isn't lowered by this
     // second pass — but a truly-broken chain still resets to 0.
     try { recalculateStreak(); } catch(e) { console.warn('[streak] post-merge recalc failed', e); }
+    // Streak-badge seen migration — MUST run after active_dates has
+    // merged. On a fresh sign-in to a new device the local blob could
+    // have streakBadgesSeen: [] while the server carries a long history;
+    // migrating before the merge would mark the empty set and then
+    // every earned tier would re-fire as "new" on the next completion.
+    // Running here means earnedTiers already reflects the merged
+    // history, so legacy users move straight to all-seen.
+    try { _migrateStreakSeen(); } catch(e) {}
+    try { _syncStreakTabDot(); } catch(e) {}
     // Home hints seen — flat string array, union-dedup by id. Same
     // shape as streakRepairs (dates); the id string IS the dedup key.
     state.hintsSeen = state.hintsSeen || [];
@@ -14833,7 +15086,7 @@ async function startPurchase() {
         // shown, grandfathered, chapter 1 not done, etc.), open the
         // returnTo lesson directly.
         const openLessonAfter = returnTo
-          ? () => openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true, source: 'paywall-purchase-return' })
+          ? () => openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true })
           : null;
         setTimeout(() => {
           const fired = _maybePostSubscriptionBonusReveal({ then: openLessonAfter });
@@ -14925,7 +15178,7 @@ async function restorePurchases() {
       if (wasModalMode) {
         _showToast(isEn ? 'Welcome back to Corpus.' : 'ברוכים השבים לקורפוס.');
         const openLessonAfter = returnTo
-          ? () => openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true, source: 'paywall-restore-return' })
+          ? () => openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true })
           : null;
         setTimeout(() => {
           const fired = _maybePostSubscriptionBonusReveal({ then: openLessonAfter });
@@ -19113,7 +19366,6 @@ const _ONB_STEP_HOOKS = {
   19: _onbV2PrepareTaste2,    // subject-specific page-2 prose (+ optional punch line)
   20: _onbV2PrepareTasteQ,    // subject-specific scenario + question + 3 options
   21: _onbV2PrepareFirstCard, // subject-specific thinker card preview (stateless)
-  // 22 (streak) is static once _onbApplyLang runs.
   // Signup: moved from step 4 to step 23 (post-streak) in flow v6.
   // Prepare hook also handles the "already signed in" auto-advance
   // for users who arrive here with currentUser set (either migrated
@@ -21952,7 +22204,7 @@ function _feCtaTap() {
     document.body.style.overflow = '';
   }
   if (weekId != null && dayId != null) {
-    try { openReader(weekId, dayId, { source: 'frames-explainer-cta' }); } catch (e) {}
+    try { openReader(weekId, dayId); } catch (e) {}
   }
 }
 
@@ -22366,6 +22618,18 @@ function defaultState() {
     // Haptic feedback preference. Default on. _haptic() reads this before
     // every native call; the toggle lives in Profile → Settings.
     hapticsEnabled: true,
+    // Streak-badge "seen" set (array of tier indices in [0,4]). An earned
+    // tier that isn't in this set plays the reveal overlay at the next
+    // finishDay. On the first boot after this ships, _migrateStreakSeen
+    // silently fills it with every already-earned tier so legacy users
+    // don't get a pile of retroactive reveals.
+    streakBadgesSeen: [],
+    streakBadgesSeenMigrated: false,
+    // Has the user opened the Streak tab since the badges shipped? Until
+    // true, a small dot renders on the Streak tab in the bottom nav as a
+    // "new section here" cue. updateBottomNav flips the dot off on the
+    // first tap into Streak.
+    streakTabOpened: false,
     // Ordered queue of celebration overlays waiting to play. finishDay pushes
     // { type: 'level_up' | 'chapter_complete' | 'bonus_unlock', … } here;
     // _playNextCelebration drains it one at a time. Persisted so an app close
@@ -22560,9 +22824,6 @@ function getLevelData(xp) {
 // ═══════════════════════════════════════════════════════════
 
 function showScreen(id) {
-  // Snapshot the previous screen BEFORE any mutation below so the two
-  // telemetry events (reader_exited, home_shown) can see it.
-  const _prevScreen = state.currentScreen;
   // Reader exit → fire dialogue_abandoned if the dialogue hasn't been
   // marked complete. Runs BEFORE the reader teardown so state fields are
   // still populated for _shareEventProps. finishDay commits
@@ -22570,25 +22831,6 @@ function showScreen(id) {
   // inside _readerFireAbandonIfNeeded.
   if (id !== 'reader' && state.currentScreen === 'reader') {
     const isEjection = !!_pendingServerRejectedSignout;
-    // Reader-exit telemetry — fires on EVERY reader→elsewhere transition
-    // with a completed flag. The pre-existing dialogue_abandoned fires
-    // ONLY on non-completed exits (and from visibilitychange/pagehide
-    // paths too). reader_exited is the broader "did they leave the
-    // reader" signal joined with completion state, specifically to
-    // answer "lurkers who open a reader — do they finish or bail?"
-    try {
-      const _rwk = state.currentWeek, _rdy = state.currentDay;
-      const _rkey = (_rwk != null && _rdy != null) ? dayKey(_rwk, _rdy) : null;
-      const _rCompleted = _rkey ? !!(state.completedDays && state.completedDays[_rkey]) : false;
-      _phCapture('reader_exited', {
-        week_id:             _rwk,
-        day_id:              _rdy,
-        last_section:        state.currentSection,
-        completed:           _rCompleted,
-        seconds_in_dialogue: Math.max(0, Math.round((Date.now() - (_readerStartMs || Date.now())) / 1000)),
-        reason:              isEjection ? 'auth_ejection' : 'user_nav',
-      });
-    } catch (e) {}
     try { _readerFireAbandonIfNeeded(isEjection ? 'auth_ejection' : 'user_nav'); } catch (e) {}
     // Deferred server-rejected signout: user was mid-read when a
     // background refresh confirmed the session was dead. We held the
@@ -22614,32 +22856,6 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
   state.currentScreen = id;
-  // Home-impression telemetry — fires only on an actual transition INTO
-  // home (not on re-renders while already on home). Answers the open
-  // question "the lurker cohort opens the app, but do they see home and
-  // then leave?" Props carry the next-dialogue affordance target plus
-  // the is_first_post_onboarding flag so the critical onboarding→home
-  // hand-off is identifiable in a funnel.
-  if (id === 'home' && _prevScreen !== 'home') {
-    try {
-      const _nextInfo = (typeof _findNextUpLesson === 'function') ? _findNextUpLesson() : null;
-      const _createdAtSrc = (currentUser && currentUser.created_at) || null;
-      const _daysSinceSignup = _createdAtSrc
-        ? Math.floor((Date.now() - new Date(_createdAtSrc).getTime()) / 86400000)
-        : null;
-      const _completedCount = Object.keys(state.completedDays || {}).length;
-      _phCapture('home_shown', {
-        prev_screen:              _prevScreen || null,
-        next_lesson_week:         _nextInfo ? _nextInfo.weekId : null,
-        next_lesson_day:          _nextInfo ? _nextInfo.dayId  : null,
-        is_first_post_onboarding: _completedCount === 0
-                                  && !!localStorage.getItem('corpus_onboarding_done'),
-        days_since_signup:        _daysSinceSignup,
-        subject:                  state.subject || null,
-        completed_dialogues:      _completedCount,
-      });
-    } catch (e) {}
-  }
   // Mirror the reader-active flag so every exit path (readerGoBack, goHome,
   // profile/pantheon tab, subject switch, auth ejection) automatically
   // releases the celebration-playback guard. Belt-and-suspenders — finishDay
@@ -23458,7 +23674,7 @@ function openStartFirstDialogue() {
   // current subject.
   const weeks = getW();
   if (weeks && weeks[0] && weeks[0].days && weeks[0].days.length) {
-    openReader(weeks[0].id, weeks[0].days[0].id, { source: 'start-card' });
+    openReader(weeks[0].id, weeks[0].days[0].id);
   }
 }
 
@@ -24464,6 +24680,35 @@ function _playNextCelebration() {
   try {
     if (item.type === 'endowment') {
       rendered = !!showEndowmentOverlay({ xp: item.xp, dialogueTitle: item.dialogueTitle });
+    } else if (item.type === 'streak_badge') {
+      // Dedup: if the tier is already in the seen set (e.g. a prior
+      // render of this item flipped it, then the user crash-reloaded
+      // and the queue still carries the duplicate), skip quietly —
+      // _playNextCelebration's `if (!rendered)` branch pops the item
+      // and moves on.
+      const seenNow = Array.isArray(state.streakBadgesSeen) ? state.streakBadgesSeen : [];
+      if (seenNow.includes(item.tier)) {
+        rendered = false;
+      } else {
+        try {
+          posthog.capture('streak_badge_earned', {
+            tier:   item.tier,
+            days:   item.days,
+            source: 'dialogue',
+          });
+        } catch (e) {}
+        _showStreakBadgeOverlay(item.tier, { onDismiss: _onCelebrationDismissed });
+        // Mark seen NOW that the overlay is mounted. Writes include
+        // every new tier the user leap-earned (allNewTiers) so a
+        // two-tier jump doesn't queue a second reveal next completion.
+        // Fallback for legacy items without allNewTiers: mark just .tier.
+        const seenNew = seenNow.slice();
+        const toMark = Array.isArray(item.allNewTiers) ? item.allNewTiers : [item.tier];
+        toMark.forEach(t => { if (!seenNew.includes(t)) seenNew.push(t); });
+        state.streakBadgesSeen = seenNew;
+        try { saveStateLocal(); } catch (e) {}
+        rendered = true;
+      }
     } else if (item.type === 'level_up') {
       rendered = !!showLevelUp(item.levelIndex);
     } else if (item.type === 'chapter_complete') {
@@ -24803,7 +25048,7 @@ function showChapterCompleteOverlay(chapter) {
         });
         return;
       }
-      openReader(nextWeek.id, firstDayId, { source: 'chapter-complete-continue' });
+      openReader(nextWeek.id, firstDayId);
     };
   }
 
@@ -25464,7 +25709,7 @@ function renderHome() {
           `;
 
           if (!lessonLocked) {
-            node.onclick = (e) => { e.stopPropagation(); openReader(w.id, d.id, { source: 'lesson-node' }); };
+            node.onclick = (e) => { e.stopPropagation(); openReader(w.id, d.id); };
           } else {
             node.onclick = (e) => {
               e.stopPropagation();
@@ -25511,13 +25756,13 @@ function renderHome() {
           const thinker = nd.thinker || '';
           const wIdJs = typeof nw.id === 'string' ? `'${nw.id}'` : nw.id;
           pc.style.display = 'block';
-          pc.innerHTML = `<div class="practice-card-inner" onclick="openReader(${wIdJs}, ${nd.id}, {source: 'practice-card'})">
+          pc.innerHTML = `<div class="practice-card-inner" onclick="openReader(${wIdJs}, ${nd.id})">
             <div class="practice-card-text">
               <div class="practice-card-eyebrow">${isEn ? 'Next Up' : 'הבא בתור'}</div>
               <div class="practice-card-title">${dayTitle}</div>
               ${thinker ? `<div class="practice-card-sub">${thinker}</div>` : ''}
             </div>
-            <button class="practice-btn" onclick="event.stopPropagation();openReader(${wIdJs}, ${nd.id}, {source: 'practice-card-btn'})">${btnLabel} ›</button>
+            <button class="practice-btn" onclick="event.stopPropagation();openReader(${wIdJs}, ${nd.id})">${btnLabel} ›</button>
           </div>`;
         } else {
           pc.style.display = 'none';
@@ -25677,7 +25922,7 @@ function handleHeroContinue() {
       renderReader();
       showScreen('reader');
     } else {
-      openReader(btn._nextWeek, btn._nextDay, { source: 'hero-continue' });
+      openReader(btn._nextWeek, btn._nextDay);
     }
   }
 }
@@ -25692,42 +25937,19 @@ function closeLibraryModal() {
 
 function openReader(weekId, dayId, opts) {
   opts = opts || {};
-  // Pre-compute the paywall-gate decision + completion state so the
-  // telemetry below and the gate itself read the same booleans. Logic
-  // identical to the previous inline nested-if (De Morgan equivalent):
-  // paywall fires only when all three are true — not post-purchase AND
-  // chapter locked AND not previously completed. A locked but
-  // already-completed dialogue falls through and opens for re-read.
-  const _openerCompletedKey = dayKey(weekId, dayId);
-  const _openerWasCompleted = !!(state.completedDays && state.completedDays[_openerCompletedKey]);
-  const _openerWouldPaywall =
-    !opts._afterPurchase &&
-    !canAccessWeek(state.subject, weekId) &&
-    !_openerWasCompleted;
-  // Open-attempt telemetry — fires on EVERY call, whether gated or
-  // allowed. Lets us tell "lurker tapped a lesson" apart from "lurker
-  // tapped nothing" and separately audit paywall gate hits.
-  try {
-    _phCapture('openReader_called', {
-      week_id:            weekId,
-      day_id:             dayId,
-      subject:            state.subject || null,
-      source:             (opts && opts.source) || null,
-      after_purchase:     !!opts._afterPurchase,
-      was_completed:      _openerWasCompleted,
-      blocked_by_paywall: _openerWouldPaywall,
-      first_ever_open:    Object.keys(state.completedDays || {}).length === 0,
-    });
-  } catch (e) {}
   // Paywall gate. Free tier = chapter 1 of each subject; everything else
   // requires paid entitlement. A lapsed user keeps access to dialogues
   // they've already completed — the moment stays theirs even after the
   // subscription ends. _afterPurchase bypasses the gate for the post-
   // purchase callback that re-opens the reader with a fresh entitlement
   // still propagating from the webhook.
-  if (_openerWouldPaywall) {
-    showPaywall({ subject: state.subject, weekId, dayId, source: 'lesson-tap' });
-    return;
+  if (!opts._afterPurchase && !canAccessWeek(state.subject, weekId)) {
+    const completedKey = dayKey(weekId, dayId);
+    if (!state.completedDays || !state.completedDays[completedKey]) {
+      showPaywall({ subject: state.subject, weekId, dayId, source: 'lesson-tap' });
+      return;
+    }
+    // Falls through — completed dialogues remain accessible for re-read.
   }
   // Silently drop any stranded celebrations from a prior interrupted chain.
   // Playing them on reader tap-through is jarring — the moment is gone,
@@ -26671,7 +26893,7 @@ function goToNextLesson() {
         });
         return;
       }
-      openReader(next.weekId, next.dayId, { source: 'next-dialogue' });
+      openReader(next.weekId, next.dayId);
     }
   });
 }
@@ -27108,7 +27330,7 @@ function finishDay() {
     const _next = getNextLessonInfo();
     closeCompleteModal({
       continuation: () => {
-        if (_next.hasNext) openReader(_next.weekId, _next.dayId, { forceThinkerIntro: true, source: 'day0-tail' });
+        if (_next.hasNext) openReader(_next.weekId, _next.dayId, { forceThinkerIntro: true });
         else goHome();
       }
     });
@@ -27314,6 +27536,33 @@ function finishDay() {
   // uses this to silently drop items from a prior session (stale celebrations
   // from a completion hours or days ago are worse than not showing them).
   const _enqueuedAt = _streakDay();
+  // Streak-badge reveal: plays BEFORE the milestone winner, after the
+  // thinker card (the DC-stats modal + thinker card fire outside the
+  // celebration queue). Only the highest newly-earned tier plays, but
+  // the item carries every new tier in `allNewTiers` so the render
+  // path can mark all of them seen in one atomic write. Counted inside
+  // the 6-item cap applied below.
+  //
+  // IMPORTANT: do NOT mark seen here. The seen-set is updated by
+  // _playNextCelebration only when the overlay actually renders — so
+  // an item dropped from the queue (stale enqueuedAt, cap trim,
+  // render failure) stays "unseen" and gets a fresh chance at the
+  // next completion.
+  try {
+    const _skStats = _streakStats();
+    const _skSeen = Array.isArray(state.streakBadgesSeen) ? state.streakBadgesSeen : [];
+    const _skNew = (_skStats.earnedTiers || []).filter(t => !_skSeen.includes(t));
+    if (_skNew.length) {
+      const _skPlay = _skNew[_skNew.length - 1]; // highest new tier
+      _newCelebrations.push({
+        type: 'streak_badge',
+        tier: _skPlay,
+        allNewTiers: _skNew.slice(),
+        days: _skStats.current || 0,
+        enqueuedAt: _enqueuedAt,
+      });
+    }
+  } catch (e) {}
   if (_bonusUnlockDue) {
     _newCelebrations.push({ type: 'bonus_unlock', subject: state.subject, enqueuedAt: _enqueuedAt });
     _queueWinnerType = 'bonus_unlock';
@@ -31136,7 +31385,7 @@ function _consumePendingDeepLink() {
   const day = wk && wk.days && wk.days[0];
   if (day) {
     _phCapture('bonus_link_landed', { subject: 'economics', opened: true });
-    openReader('bonusEcon1', day.id, { source: 'bonus-deep-link' });
+    openReader('bonusEcon1', day.id);
     return true;
   }
   _phCapture('bonus_link_landed', {
@@ -31715,6 +31964,31 @@ async function enterAppState(user) {
       try { saveStateLocal(); } catch(e) {}
     }
   }
+  // Streak-badge seen migration — fallback branches. The signed-in
+  // happy path runs migration inside loadProgressFromSupabase (after
+  // active_dates has merged) and sets _progressLoaded = true as its
+  // last statement; by the time we reach this line enterAppState has
+  // awaited the parallel loads so _progressLoaded reflects the true
+  // outcome.
+  //   • Guest             (!currentUser)           → run with raiseFlag
+  //                       default (true). No pull will ever come, so
+  //                       lock the flag now and move on.
+  //   • Pull failed       (user && !_progressLoaded) → mark only what
+  //                       we can see locally and DO NOT raise the
+  //                       flag. The next successful pull on a later
+  //                       session will re-run _migrateStreakSeen
+  //                       against the fuller server data and only
+  //                       then latch the flag — which keeps a brief-
+  //                       offline sign-in from permanently anchoring
+  //                       migration to a partial local history.
+  //   • Pull succeeded    → both conditions false → SKIP (migration
+  //                       already ran, flag already raised).
+  if (!currentUser) {
+    try { _migrateStreakSeen(); } catch (e) {}
+  } else if (!_progressLoaded) {
+    try { _migrateStreakSeen({ raiseFlag: false }); } catch (e) {}
+  }
+  try { _syncStreakTabDot(); } catch (e) {}
   // Auth is confirmed at this point (we have a real user object).
   // Flip _authKnown before returning so the topbar (visible during
   // onboarding overlays too, not just home) sees the fresh state.
@@ -32048,6 +32322,14 @@ function initUI() {
     _pruneUnlockedThinkers();
     migrateDayQuizResults();
     recalculateStreak();
+    // Streak-badge rollout: migration (_migrateStreakSeen) runs from
+    // the load paths, NOT here. Guests have no Supabase step so the
+    // guest-boot path calls it after loadState; signed-in users wait
+    // until loadProgressFromSupabase finishes merging active_dates so
+    // a fresh sign-in on a new device doesn't fire legacy reveals.
+    // See the two call sites below. The tab-dot pip only reads state,
+    // so it can safely sync here.
+    try { _syncStreakTabDot(); } catch (e) {}
     applyTheme(state.subject);
     document.documentElement.dir = state.lang === 'en' ? 'ltr' : 'rtl';
     document.documentElement.lang = state.lang;
@@ -32492,6 +32774,19 @@ function updateBottomNav(active) {
   document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
   const btn = document.getElementById('bnav-' + active);
   if (btn) btn.classList.add('active');
+  // Streak-tab "new section" dot. Shown until the user visits the tab
+  // once; set state.streakTabOpened = true on first visit and remove.
+  _syncStreakTabDot();
+}
+
+// Add/remove the .sk-tab-dot pip on the Streak tab button based on
+// state.streakTabOpened. Called from updateBottomNav + boot so the dot
+// is correct before and after the first tap.
+function _syncStreakTabDot() {
+  const btn = document.getElementById('bnav-streak');
+  if (!btn) return;
+  const show = state && state.streakTabOpened === false;
+  btn.classList.toggle('sk-tab-dot', !!show);
 }
 
 // Tier label for the flip-back. Diamond drops the "N OF 3" suffix
@@ -33138,11 +33433,11 @@ const _SK_TIER_LINES = {
     'A hundred days. This one does not go out.',
   ],
   he: [
-    'הרצף נדלק. דיאלוג אחד מחר, והוא בוער.',
-    'שלושה ימים ברצף. ככה מתחיל הרגל.',
-    'שבוע שלם. האש כבר בוערת מעצמה.',
-    'שלושים יום. מעט להבות בוערות כל כך חם.',
-    'מאה ימים. האש הזאת כבר לא כבה.',
+    'התחלתם. מחר ממשיכים.',
+    'שלושה ימים ברצף. אתם בכיוון.',
+    'שבוע שלם. זה כבר הרגל.',
+    'חודש שלם. מעטים מגיעים עד כאן.',
+    'מאה ימים. זה כבר חלק מכם.',
   ],
 };
 function _skSheetClose() {
@@ -33323,7 +33618,7 @@ function _skHandleHeroTap(btn) {
 function _skStartToday(weekId, dayId) {
   _skCloseBubble();
   if (weekId == null || dayId == null) return;
-  if (typeof openReader === 'function') openReader(weekId, dayId, { source: 'streak-start-today' });
+  if (typeof openReader === 'function') openReader(weekId, dayId);
 }
 
 // One-shot click delegation on #streak-screen. Rendered DOM is replaced
@@ -33363,6 +33658,12 @@ function showStreakScreen() {
   // Real path — clear any debug activeDates override from _debugStreakPreview
   // so tap handlers see state.activeDates.
   window._skActiveDatesOverride = null;
+  // First-visit cue: clear the Streak-tab dot. saveStateLocal persists
+  // across reloads; the dot never re-appears for this user.
+  if (state && state.streakTabOpened === false) {
+    state.streakTabOpened = true;
+    try { saveStateLocal(); } catch (e) {}
+  }
   updateBottomNav('streak');
   renderStreakScreen();
   showScreen('streak');
@@ -33380,9 +33681,176 @@ function showStreakScreen() {
 }
 
 // Debug helper surfaced for the console snippet in STREAK_TAB_HANDOFF.md §Debug.
-// Returns the current _streakStats() payload; the overlay-trigger debug
-// (`_debugStreakBadge`) lands in commit 2 with the overlay itself.
+// Returns the current _streakStats() payload.
 window._debugStreakStats = function () { return _streakStats(); };
+
+// ── Earned-badge overlay (commit 2 of streak-tab rollout) ───────────
+// Builds and mounts the .sk-earn overlay for a given tier. Called from
+// _playNextCelebration (type: streak_badge) and from _debugStreakBadge.
+// Design: calm screen with a warm radial glow, 190px crest lifting in,
+// NEW BADGE pill, name, tier line, next-tier tease, "Keep it lit" CTA.
+// Haptic timing: SUCCESS notification fires when the crest *lands* at
+// the end of the rise (~1.1 s under full motion, immediate under
+// reduced motion), not at open. Analytics fires separately via the
+// caller (not this function) so the debug path can skip it.
+// Tier flame triplets — [outer, inner, core]. Mirrored from
+// streak-badges.js (not exposed on window) so sparks can cycle through
+// the earned tier's palette plus a white "spark" slot.
+const _SK_FLAMES = [
+  ['#F59E0B', '#FFCF7A', '#7B4FD4'], // Spark   (tier 0)
+  ['#FF7A45', '#FFCF7A', '#FF6FA8'], // Ember   (tier 1)
+  ['#FF6FA8', '#FFD0E4', '#7B4FD4'], // Blaze   (tier 2)
+  ['#4FB3F0', '#D6F0FF', '#7B4FD4'], // Blue flame (tier 3)
+  ['#9B6FE4', '#F3E8FF', '#F59E0B'], // Eternal (tier 4)
+];
+function _showStreakBadgeOverlay(tier, opts) {
+  opts = opts || {};
+  const isEn = state.lang === 'en';
+  const DAYS = StreakBadges.DAYS;
+  const NAMES = StreakBadges.NAMES[isEn ? 'en' : 'he'];
+  const TIER_LINES = _SK_TIER_LINES;
+  // Close any prior overlay first (idempotent for debug replays).
+  _closeStreakBadgeOverlay();
+  const newPill = isEn ? 'NEW BADGE' : 'תג חדש';
+  const cta = isEn ? 'Keep it lit' : 'שומרים על האש';
+  // Tease: hidden at tier 4. Earn-mode uses the FIXED delta
+  // DAYS[t+1] - DAYS[t]. The view-mode sheet (_skSheetOpen) is used
+  // for badge taps on the Streak screen and has no tease of its own.
+  let teaseHtml = '';
+  if (tier < DAYS.length - 1) {
+    const nextTier = tier + 1;
+    const nextName = NAMES[nextTier];
+    const gap = DAYS[nextTier] - DAYS[tier];
+    const moreDays = isEn
+      ? (gap === 1 ? '1 more day' : (gap + ' more days'))
+      : (gap === 1 ? 'עוד יום אחד'
+        : gap === 2 ? 'עוד יומיים'
+        : ('עוד ' + gap + ' ימים'));
+    const teaseText = isEn
+      ? (moreDays + ' to ' + nextName)
+      : (moreDays + ' עד ' + nextName);
+    teaseHtml =
+      '<div class="sk-tease sk-rise" style="animation-delay:2.05s">' +
+        '<span>' + StreakBadges.crest(nextTier, 24, { off: true }) + '</span>' +
+        '<span>' + teaseText + '</span>' +
+      '</div>';
+  }
+
+  // 14 sparks — each gets a CSS-variable triplet (angle, distance,
+  // delay) and a tier-palette background. Angles distributed around
+  // 360° with up to 14° jitter so the burst isn't visibly uniform.
+  const flames = _SK_FLAMES[Math.max(0, Math.min(4, tier))];
+  // White is lost on the light stage — swap to purple (--accent / #7B4FD4)
+  // so every spark reads against the warm cream-lilac background.
+  const sparkPalette = [flames[0], flames[1], '#7B4FD4', flames[2]];
+  let sparksHtml = '';
+  for (let i = 0; i < 14; i++) {
+    const a = Math.round(i * (360 / 14) + Math.random() * 14);
+    const dist = Math.round(90 + Math.random() * 70); // 90..160
+    const t = (1.2 + Math.random() * 0.06).toFixed(3); // 1.2..1.26
+    const bg = sparkPalette[i % sparkPalette.length];
+    sparksHtml += '<i class="sk-spk" style="--a:' + a + 'deg;--dist:' + dist + 'px;--t:' + t + 's;background:' + bg + '"></i>';
+  }
+  // 12 ambient embers — direct children of .sk-earn, start below the
+  // viewport, rise ~560px over 2.6..4.2s with a horizontal drift.
+  let embersHtml = '';
+  for (let i = 0; i < 12; i++) {
+    const left = (8 + Math.random() * 84).toFixed(1) + '%';
+    const dx = Math.round(-30 + Math.random() * 60) + 'px';
+    const t = (1.4 + Math.random() * 2.4).toFixed(2) + 's';
+    const du = (2.6 + Math.random() * 1.6).toFixed(2) + 's';
+    embersHtml += '<i class="sk-emb" style="left:' + left + ';--dx:' + dx + ';--t:' + t + ';--du:' + du + '"></i>';
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'sk-earn sk-ign';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', NAMES[tier]);
+  // Text rise delays: pill 1.65 → name 1.77 → line 1.91 → tease 2.05
+  //                   → button 2.20.
+  overlay.innerHTML =
+    '<div class="sk-cb" aria-hidden="true">' +
+      '<div class="sk-pre"></div>' +
+      '<div class="sk-glow2"></div>' +
+      '<div class="sk-flash"></div>' +
+      '<div class="sk-ring"></div>' +
+      '<div class="sk-l sk-off">' + StreakBadges.crest(tier, 190, { off: true  }) + '</div>' +
+      '<div class="sk-l sk-on">'  + StreakBadges.crest(tier, 190, { off: false }) + '</div>' +
+      sparksHtml +
+    '</div>' +
+    embersHtml +
+    '<div class="sk-rise" style="margin-top:12px;animation-delay:1.65s"><span class="sk-newpill">' + newPill + '</span></div>' +
+    '<h2 class="sk-rise" style="animation-delay:1.77s">' + NAMES[tier] + '</h2>' +
+    '<p class="sk-rise" style="animation-delay:1.91s">' + TIER_LINES[isEn ? 'en' : 'he'][tier] + '</p>' +
+    teaseHtml +
+    '<button type="button" class="sk-cta sk-rise" style="animation-delay:2.2s">' + cta + '</button>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('.sk-cta').addEventListener('click', () => {
+    _closeStreakBadgeOverlay();
+    if (typeof opts.onDismiss === 'function') opts.onDismiss();
+  });
+  window._skActiveEarn = overlay;
+  // SUCCESS haptic lands at ignition (1200 ms). Under reduced motion
+  // we skip entirely — the user asked for no-animation and the haptic
+  // belongs to the moment.
+  const reduce = (() => {
+    try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch (e) { return false; }
+  })();
+  if (reduce) return;
+  const fireHaptic = () => {
+    try {
+      const Cap = window.Capacitor;
+      if (!Cap || typeof Cap.isNativePlatform !== 'function' || !Cap.isNativePlatform()) return;
+      const H = Cap.Plugins && Cap.Plugins.Haptics;
+      if (!H || typeof H.notification !== 'function') return;
+      // Bypass the shared _haptic throttle so the celebration beat
+      // isn't eaten by an earlier tap haptic that still owes 80 ms.
+      const p = H.notification({ type: 'SUCCESS' });
+      if (p && typeof p.catch === 'function') p.catch(() => {});
+    } catch (e) {}
+  };
+  setTimeout(fireHaptic, 1200);
+}
+function _closeStreakBadgeOverlay() {
+  const el = window._skActiveEarn;
+  if (!el) return;
+  el.remove();
+  window._skActiveEarn = null;
+}
+
+// Rollout migration: on the first boot after streak badges ship, mark
+// every already-earned tier as seen so legacy users don't get a stack
+// of retroactive reveals. Default behaviour raises the one-shot flag
+// (streakBadgesSeenMigrated); the signed-in-fallback branch of
+// enterAppState passes { raiseFlag: false } so a session that lost its
+// pull still marks locally-visible tiers as seen (quieting the next
+// completion's reveal spike), but leaves the flag down so the next
+// successful loadProgressFromSupabase can finish the job against the
+// server's fuller active_dates history.
+function _migrateStreakSeen(opts) {
+  if (!state) return;
+  if (state.streakBadgesSeenMigrated) return; // already fully migrated
+  const raiseFlag = !opts || opts.raiseFlag !== false;
+  state.streakBadgesSeen = Array.isArray(state.streakBadgesSeen) ? state.streakBadgesSeen : [];
+  try {
+    const earned = _streakStats().earnedTiers || [];
+    earned.forEach(t => {
+      if (!state.streakBadgesSeen.includes(t)) state.streakBadgesSeen.push(t);
+    });
+  } catch (e) {}
+  if (raiseFlag) state.streakBadgesSeenMigrated = true;
+  try { saveStateLocal(); } catch (e) {}
+}
+
+// Debug: open the overlay for any tier without touching seen state or
+// firing analytics. Session-only — reload or dismiss to clear.
+window._debugStreakBadge = function (tier) {
+  const t = Math.max(0, Math.min(4, Number(tier) || 0));
+  _showStreakBadgeOverlay(t, { onDismiss: () => {} });
+  return { tier: t, overlayMounted: !!window._skActiveEarn };
+};
 
 // _debugStreakPreview(current, best?): render the Streak screen as if the
 // user had `current` consecutive active days ending today, with their
