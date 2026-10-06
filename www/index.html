@@ -8180,6 +8180,42 @@
     border-color: rgba(255, 255, 255, 0.16);
   }
 
+  /* ── Step 26 (journey) — scale-to-fit ──────────────────────────────
+     The journey screen's layout + copy stay exactly as designed. The
+     content block (head + card + features) sits inside
+     #onb-v2-journey-fitwrap; after render, _onbV2FitJourney() measures
+     the wrap's natural height against the available space inside
+     .onb-v2-inner and applies `transform: scale(s)` with origin
+     top-center, s clamped to [0.82, 1]. CTA sits outside the wrap and
+     is never scaled.
+       • Fits natively → s = 1, layout identical to the original.
+       • Overflows      → s shrinks proportionally, floor 0.82.
+       • Still overflows at 0.82 → scroll re-enabled (last resort).
+     transform-origin: top center keeps the shrunk content anchored to
+     the top so the gap under the progress bar stays constant.
+     Overriding the shared .onb-v2-scroll rule for journey: never
+     auto-scroll by default (JS flips overflowY as needed), never
+     auto-center the single child (we want anchor-to-top). */
+  #onb-v2-journey #onb-v2-journey-fitwrap {
+    transform-origin: top center;
+    width: 100%;
+  }
+  #onb-v2-journey.onb-v2-scroll .onb-v2-inner {
+    overflow-y: hidden;
+    /* Anchor content to the top instead of centering it. The default
+       .onb-screen.onb-v2 .onb-v2-inner is justify-content: center, which
+       on the journey screen was pushing the top of the content block
+       down and clipping the second feature at the bottom. */
+    justify-content: flex-start;
+    /* Shrink the gap between the progress bar and "Your plan" to about
+       a third of the shared 40px top padding. */
+    padding-top: 13px;
+  }
+  #onb-v2-journey.onb-v2-scroll .onb-v2-inner > #onb-v2-journey-fitwrap {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
   /* ── Act 3: The Taste ─────────────────────────────────────────
      v11 screens 17-23. Timeline (how-it-works), quote card (taste-1),
      taste-question correct-answer reveal (taste-q), first-card 3D
@@ -17288,6 +17324,11 @@ function _onbSetLang(lang) {
   state.lang = lang;
   try { localStorage.setItem('corpus_lang', lang); } catch(e) {}
   _onbApplyLang(lang);
+  // Re-measure the journey scale after copy swaps — HE and EN lines wrap
+  // differently so the natural height changes.
+  if (typeof _onbV2FitJourney === 'function') {
+    requestAnimationFrame(() => requestAnimationFrame(_onbV2FitJourney));
+  }
 }
 
 // Populates every .onb-v2 .onb-progress container with the windowed
@@ -19277,6 +19318,77 @@ function _onbV2PrepareJourney() {
       featEl.appendChild(li);
     });
   }
+  // Scale-to-fit: run after layout settles. Design is preserved — we
+  // only shrink proportionally if the natural content wouldn't fit.
+  requestAnimationFrame(() => requestAnimationFrame(_onbV2FitJourney));
+}
+
+// Scale-to-fit for the journey screen. Measures the natural height of
+// #onb-v2-journey-fitwrap against the actual distance from the top of
+// the wrap to the top of the CTA holder (minus a small gap), applies
+// `transform: scale(s)` with transform-origin top-center where s =
+// available / natural (clamped to [0.82, 1]). CTA sits outside the
+// wrap and is never scaled.
+//
+// transform does NOT shrink the layout box — scrollHeight would still
+// equal natural without compensation, defeating overflow:hidden. The
+// fix is a negative margin-bottom equal to natural × (1 − s), which
+// pulls the layout box bottom up to match the scaled visual bottom.
+// After that, inner.scrollHeight ≈ natural × s and overflow:hidden
+// is a no-op (which is what we want — fits cleanly, no scroll).
+//
+// Measurement timing: wait for document.fonts.ready + one rAF after
+// the state reset so the natural scrollHeight reflects the actual
+// rendered text metrics. Earlier takes would read half-flushed layout
+// (fallback font metrics + a scaled wrap left over from the previous
+// render) and produce s = 1 even when overflow was obvious.
+//
+// Fallback: if the floor (s = 0.82) still overflows — only on the
+// very smallest screens with the largest font — overflowY:auto is
+// flipped on so the user can scroll through the (compensated) layout.
+async function _onbV2FitJourney() {
+  const screen = document.getElementById('onb-v2-journey');
+  if (!screen) return;
+  const inner = screen.querySelector('.onb-v2-inner');
+  const wrap  = document.getElementById('onb-v2-journey-fitwrap');
+  const ctaHolder = screen.querySelector('.onb-cta-holder');
+  if (!inner || !wrap || !ctaHolder) return;
+  // Reset first so `natural` is actually natural + rects are un-scaled.
+  wrap.style.transform = '';
+  wrap.style.marginBottom = '';
+  inner.style.overflowY = 'hidden';
+  // Wait for web fonts + one more frame so metrics are final.
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+  await new Promise(r => requestAnimationFrame(r));
+  const GAP = 8; // small gap above the CTA
+  const wrapRect = wrap.getBoundingClientRect();
+  const ctaRect  = ctaHolder.getBoundingClientRect();
+  const available = (ctaRect.top - wrapRect.top) - GAP;
+  if (available <= 0) return; // not laid out yet
+  const natural = wrap.scrollHeight;
+  if (natural <= available) return; // fits at s = 1
+  const ideal = available / natural;
+  const s = ideal >= 0.82 ? ideal : 0.82;
+  wrap.style.transform = 'scale(' + s + ')';
+  // Layout compensation — see block comment above.
+  wrap.style.marginBottom = (-(natural * (1 - s))) + 'px';
+  // Fallback: visual still overflows at the floor → allow scrolling.
+  if (natural * s > available) {
+    inner.style.overflowY = 'auto';
+  }
+}
+
+// Recalculate on resize + orientation + language change. The resize
+// listener is attached once; the lang-change hook rides _onbApplyLang
+// above. Each handler no-ops when the journey screen isn't visible.
+if (!window._onbV2FitJourneyBound) {
+  window._onbV2FitJourneyBound = true;
+  const refit = () => {
+    const el = document.getElementById('onb-v2-journey');
+    if (el && getComputedStyle(el).display !== 'none') _onbV2FitJourney();
+  };
+  window.addEventListener('resize', refit);
+  window.addEventListener('orientationchange', refit);
 }
 
 // Screen 24 — commit. Renders five commitment-level cards (single-
@@ -35302,7 +35414,12 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="onb-progress" aria-hidden="true" data-step="6">
   </div>
   <div class="onb-v2-inner">
-    <div class="onb-v2-copy">
+    <!-- #onb-v2-journey-fitwrap is the measurement + scale target for
+         _onbV2FitJourney(). Everything inside this wrap is the content
+         we want to preserve exactly; the CTA sits outside and is never
+         scaled. See the CSS block "Step 26 (journey) — scale-to-fit"
+         above the dark-mode features rule. -->
+    <div class="onb-v2-copy" id="onb-v2-journey-fitwrap">
       <h1 class="onb-v2-head onb-v2-journey-head" id="onb-v2-journey-head"></h1>
       <div class="onb-v2-journey-card">
         <div class="onb-v2-journey-card-head" id="onb-v2-journey-card-head"></div>
