@@ -14100,6 +14100,9 @@ async function syncProgressToSupabase() {
       daily_goal_history:  state.dailyGoalHistory   || [],
       completions_by_day:  state.completionsByDay   || {},
       goal_met_history:    state.goalMetHistory     || [],
+      // openings_by_hour: foreground-hour histogram. See defaultState +
+      // migration 20261006000000 for the shape rationale.
+      openings_by_hour:    state.openingsByHour     || {},
       // Home hints seen once-ever — string array, union-dedup on load.
       hints_seen: state.hintsSeen || [],
     }, { onConflict: 'user_id' });
@@ -14280,6 +14283,14 @@ async function loadProgressFromSupabase() {
       const server = data.completions_by_day[day] || 0;
       const local  = state.completionsByDay[day] || 0;
       if (server > local) state.completionsByDay[day] = server;
+    });
+    // openings_by_hour: max per key. Shape, not sum. See the schema comment
+    // in 20261006000000_openings_by_hour.sql for why max is sufficient.
+    state.openingsByHour = state.openingsByHour || {};
+    Object.keys(data.openings_by_hour || {}).forEach(h => {
+      const server = data.openings_by_hour[h] || 0;
+      const local  = state.openingsByHour[h] || 0;
+      if (server > local) state.openingsByHour[h] = server;
     });
     state.goalMetHistory = state.goalMetHistory || [];
     (data.goal_met_history || []).forEach(g => {
@@ -22791,6 +22802,12 @@ function defaultState() {
     //   at most once per streak day per install.
     completionsByDay: {},
     goalMetHistory: [],
+    // openingsByHour: { '0'..'23': count } — one write per app-foreground
+    // per hour-slot. Fed by _recordActiveHour (session debounce), merged
+    // max-per-key on load (same approximation as completionsByDay).
+    // Consumed by _pickReminderHour, which is defined but currently gated
+    // off by _REMINDER_HOUR_PERSONALIZED. Collecting shape data first.
+    openingsByHour: {},
     // Legacy home-hints ID array. Feature retired in favour of the
     // owl-guided walkthrough; field kept because it's a Supabase-synced
     // union-merge column (see 20260728120000_hints_seen.sql) and dropping
@@ -24580,6 +24597,70 @@ async function _scheduleOneEvening(fireDate, id, body) {
       }],
     });
   } catch(e) { console.warn('[Reminder] schedule failed for id ' + id + ':', e && e.message); }
+}
+
+// ─── Openings-by-hour tracking ────────────────────────────────────
+//
+// Records which local hours the user opens the app so a future
+// _pickReminderHour can personalize firing time (see below). Session-
+// ephemeral debounce fires at most once per 'YYYY-MM-DD:HH' slot, so
+// multi-foreground returns within the same hour collapse to one count.
+// Writer is attached at three points: enterAppState (cold boot + sign-
+// in), appStateChange(isActive=true), and visibilitychange(visible).
+// The internal debounce makes multi-attach idempotent.
+//
+// Merge: max-per-key on load. Underestimates cross-device sum but the
+// distribution shape (which hour is modal) is preserved, which is all
+// _pickReminderHour needs.
+let _lastRecordedHourSlot = null;
+function _recordActiveHour() {
+  if (typeof state === 'undefined' || !state) return;
+  const now = new Date();
+  const dayKey = now.getFullYear() + '-' +
+    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+    String(now.getDate()).padStart(2, '0');
+  const slot = dayKey + ':' + now.getHours();
+  if (slot === _lastRecordedHourSlot) return;
+  _lastRecordedHourSlot = slot;
+  state.openingsByHour = state.openingsByHour || {};
+  const h = String(now.getHours());
+  state.openingsByHour[h] = (state.openingsByHour[h] || 0) + 1;
+  try { saveStateLocal(); } catch (e) {}
+}
+async function _wireActiveHourTracking() {
+  try {
+    const App = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+    if (App && typeof App.addListener === 'function') {
+      await App.addListener('appStateChange', ({ isActive }) => {
+        if (isActive) _recordActiveHour();
+      });
+    }
+  } catch (e) {}
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') _recordActiveHour();
+  });
+}
+
+// Picker — reads state.openingsByHour and returns the modal hour
+// (0..23) if the user has at least 10 recorded opens, else null.
+//
+// Currently DORMANT: _REMINDER_HOUR_PERSONALIZED is false, so
+// _reconcileReminders continues to use state.dailyReminder.time
+// unchanged. Flipping to true also needs an override-semantics
+// decision (does personalization defer to a user-set custom time?
+// right now there's no "defaulted vs explicitly-set" flag on
+// state.dailyReminder.time to tell them apart).
+const _REMINDER_HOUR_PERSONALIZED = false;
+function _pickReminderHour() {
+  const m = (typeof state !== 'undefined' && state && state.openingsByHour) || {};
+  let total = 0, bestN = -1, bestH = null;
+  for (let h = 0; h < 24; h++) {
+    const n = m[String(h)] || 0;
+    total += n;
+    if (n > bestN) { bestN = n; bestH = h; }
+  }
+  if (total < 10) return null;
+  return bestH;
 }
 
 // Builds the fire Date for a given offset (0 = today) at the user's
@@ -32100,6 +32181,10 @@ async function enterAppState(user) {
   // forget; UPDATE-only; bypasses _progressLoaded by design. See
   // _bumpLastActiveIfNeeded for the full rationale.
   if (user) _bumpLastActiveIfNeeded().catch(e => console.warn('[Loops] _bumpLastActiveIfNeeded failed:', e));
+  // Record this foreground into the hour-of-day histogram. Resume
+  // transitions get caught by _wireActiveHourTracking's listeners;
+  // this call covers the cold-boot path. Internal debounce dedupes.
+  _recordActiveHour();
   // Reset per-session pull-completed flag. Set true inside
   // loadProgressFromSupabase's try block only if all merges finished.
   // syncProgressToSupabase gates every push on this — see the guard at
@@ -34557,6 +34642,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Android — the plugin registration silently no-ops when absent.
 document.addEventListener('DOMContentLoaded', () => {
   _initScreenshotDetection();
+  _wireActiveHourTracking();
 });
 
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
