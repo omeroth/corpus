@@ -69,6 +69,28 @@
 	     compliance question at every submission. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- SKAdNetwork — Apple's privacy-preserving install-attribution
+	     channel. Postbacks are aggregated, delayed, and never carry a
+	     user identifier, which is why Apple's own documentation carves
+	     SKAdNetwork out of the "tracking" definition (so this does
+	     NOT flip the App Store privacy label).
+	     Meta's SKAdNetwork ID is v9wttpbfk9.skadnetwork. Add other DSPs'
+	     IDs here if we ever run on them. See plugins/corpus-meta-events
+	     for the SDK-side wiring (isSKAdNetworkReportEnabled = true). -->
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>v9wttpbfk9.skadnetwork</string>
+		</dict>
+	</array>
+	<!-- NSAdvertisingAttributionReportEndpoint — SKAN 4 feature. Tells
+	     iOS to forward SKAdNetwork postback copies to Meta's endpoint
+	     so their Events Manager receives install/conversion attribution
+	     without going through an intermediate DSP of record. Aggregated,
+	     non-user-linking; same privacy posture as SKAdNetwork itself. -->
+	<key>NSAdvertisingAttributionReportEndpoint</key>
+	<string>https://www.facebook.com</string>
 	<!-- LSApplicationQueriesSchemes: iOS 9+ requires apps to declare
 	     which URL schemes they will query via canOpenURL. Instagram
 	     Stories one-tap share (see CorpusInstagramSharePlugin) probes
