@@ -14833,7 +14833,7 @@ async function startPurchase() {
         // shown, grandfathered, chapter 1 not done, etc.), open the
         // returnTo lesson directly.
         const openLessonAfter = returnTo
-          ? () => openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true })
+          ? () => openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true, source: 'paywall-purchase-return' })
           : null;
         setTimeout(() => {
           const fired = _maybePostSubscriptionBonusReveal({ then: openLessonAfter });
@@ -14925,7 +14925,7 @@ async function restorePurchases() {
       if (wasModalMode) {
         _showToast(isEn ? 'Welcome back to Corpus.' : 'ברוכים השבים לקורפוס.');
         const openLessonAfter = returnTo
-          ? () => openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true })
+          ? () => openReader(returnTo.weekId, returnTo.dayId, { _afterPurchase: true, source: 'paywall-restore-return' })
           : null;
         setTimeout(() => {
           const fired = _maybePostSubscriptionBonusReveal({ then: openLessonAfter });
@@ -21952,7 +21952,7 @@ function _feCtaTap() {
     document.body.style.overflow = '';
   }
   if (weekId != null && dayId != null) {
-    try { openReader(weekId, dayId); } catch (e) {}
+    try { openReader(weekId, dayId, { source: 'frames-explainer-cta' }); } catch (e) {}
   }
 }
 
@@ -22560,6 +22560,9 @@ function getLevelData(xp) {
 // ═══════════════════════════════════════════════════════════
 
 function showScreen(id) {
+  // Snapshot the previous screen BEFORE any mutation below so the two
+  // telemetry events (reader_exited, home_shown) can see it.
+  const _prevScreen = state.currentScreen;
   // Reader exit → fire dialogue_abandoned if the dialogue hasn't been
   // marked complete. Runs BEFORE the reader teardown so state fields are
   // still populated for _shareEventProps. finishDay commits
@@ -22567,6 +22570,25 @@ function showScreen(id) {
   // inside _readerFireAbandonIfNeeded.
   if (id !== 'reader' && state.currentScreen === 'reader') {
     const isEjection = !!_pendingServerRejectedSignout;
+    // Reader-exit telemetry — fires on EVERY reader→elsewhere transition
+    // with a completed flag. The pre-existing dialogue_abandoned fires
+    // ONLY on non-completed exits (and from visibilitychange/pagehide
+    // paths too). reader_exited is the broader "did they leave the
+    // reader" signal joined with completion state, specifically to
+    // answer "lurkers who open a reader — do they finish or bail?"
+    try {
+      const _rwk = state.currentWeek, _rdy = state.currentDay;
+      const _rkey = (_rwk != null && _rdy != null) ? dayKey(_rwk, _rdy) : null;
+      const _rCompleted = _rkey ? !!(state.completedDays && state.completedDays[_rkey]) : false;
+      _phCapture('reader_exited', {
+        week_id:             _rwk,
+        day_id:              _rdy,
+        last_section:        state.currentSection,
+        completed:           _rCompleted,
+        seconds_in_dialogue: Math.max(0, Math.round((Date.now() - (_readerStartMs || Date.now())) / 1000)),
+        reason:              isEjection ? 'auth_ejection' : 'user_nav',
+      });
+    } catch (e) {}
     try { _readerFireAbandonIfNeeded(isEjection ? 'auth_ejection' : 'user_nav'); } catch (e) {}
     // Deferred server-rejected signout: user was mid-read when a
     // background refresh confirmed the session was dead. We held the
@@ -22592,6 +22614,32 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
   state.currentScreen = id;
+  // Home-impression telemetry — fires only on an actual transition INTO
+  // home (not on re-renders while already on home). Answers the open
+  // question "the lurker cohort opens the app, but do they see home and
+  // then leave?" Props carry the next-dialogue affordance target plus
+  // the is_first_post_onboarding flag so the critical onboarding→home
+  // hand-off is identifiable in a funnel.
+  if (id === 'home' && _prevScreen !== 'home') {
+    try {
+      const _nextInfo = (typeof _findNextUpLesson === 'function') ? _findNextUpLesson() : null;
+      const _createdAtSrc = (currentUser && currentUser.created_at) || null;
+      const _daysSinceSignup = _createdAtSrc
+        ? Math.floor((Date.now() - new Date(_createdAtSrc).getTime()) / 86400000)
+        : null;
+      const _completedCount = Object.keys(state.completedDays || {}).length;
+      _phCapture('home_shown', {
+        prev_screen:              _prevScreen || null,
+        next_lesson_week:         _nextInfo ? _nextInfo.weekId : null,
+        next_lesson_day:          _nextInfo ? _nextInfo.dayId  : null,
+        is_first_post_onboarding: _completedCount === 0
+                                  && !!localStorage.getItem('corpus_onboarding_done'),
+        days_since_signup:        _daysSinceSignup,
+        subject:                  state.subject || null,
+        completed_dialogues:      _completedCount,
+      });
+    } catch (e) {}
+  }
   // Mirror the reader-active flag so every exit path (readerGoBack, goHome,
   // profile/pantheon tab, subject switch, auth ejection) automatically
   // releases the celebration-playback guard. Belt-and-suspenders — finishDay
@@ -23410,7 +23458,7 @@ function openStartFirstDialogue() {
   // current subject.
   const weeks = getW();
   if (weeks && weeks[0] && weeks[0].days && weeks[0].days.length) {
-    openReader(weeks[0].id, weeks[0].days[0].id);
+    openReader(weeks[0].id, weeks[0].days[0].id, { source: 'start-card' });
   }
 }
 
@@ -24755,7 +24803,7 @@ function showChapterCompleteOverlay(chapter) {
         });
         return;
       }
-      openReader(nextWeek.id, firstDayId);
+      openReader(nextWeek.id, firstDayId, { source: 'chapter-complete-continue' });
     };
   }
 
@@ -25416,7 +25464,7 @@ function renderHome() {
           `;
 
           if (!lessonLocked) {
-            node.onclick = (e) => { e.stopPropagation(); openReader(w.id, d.id); };
+            node.onclick = (e) => { e.stopPropagation(); openReader(w.id, d.id, { source: 'lesson-node' }); };
           } else {
             node.onclick = (e) => {
               e.stopPropagation();
@@ -25463,13 +25511,13 @@ function renderHome() {
           const thinker = nd.thinker || '';
           const wIdJs = typeof nw.id === 'string' ? `'${nw.id}'` : nw.id;
           pc.style.display = 'block';
-          pc.innerHTML = `<div class="practice-card-inner" onclick="openReader(${wIdJs}, ${nd.id})">
+          pc.innerHTML = `<div class="practice-card-inner" onclick="openReader(${wIdJs}, ${nd.id}, {source: 'practice-card'})">
             <div class="practice-card-text">
               <div class="practice-card-eyebrow">${isEn ? 'Next Up' : 'הבא בתור'}</div>
               <div class="practice-card-title">${dayTitle}</div>
               ${thinker ? `<div class="practice-card-sub">${thinker}</div>` : ''}
             </div>
-            <button class="practice-btn" onclick="event.stopPropagation();openReader(${wIdJs}, ${nd.id})">${btnLabel} ›</button>
+            <button class="practice-btn" onclick="event.stopPropagation();openReader(${wIdJs}, ${nd.id}, {source: 'practice-card-btn'})">${btnLabel} ›</button>
           </div>`;
         } else {
           pc.style.display = 'none';
@@ -25629,7 +25677,7 @@ function handleHeroContinue() {
       renderReader();
       showScreen('reader');
     } else {
-      openReader(btn._nextWeek, btn._nextDay);
+      openReader(btn._nextWeek, btn._nextDay, { source: 'hero-continue' });
     }
   }
 }
@@ -25644,19 +25692,42 @@ function closeLibraryModal() {
 
 function openReader(weekId, dayId, opts) {
   opts = opts || {};
+  // Pre-compute the paywall-gate decision + completion state so the
+  // telemetry below and the gate itself read the same booleans. Logic
+  // identical to the previous inline nested-if (De Morgan equivalent):
+  // paywall fires only when all three are true — not post-purchase AND
+  // chapter locked AND not previously completed. A locked but
+  // already-completed dialogue falls through and opens for re-read.
+  const _openerCompletedKey = dayKey(weekId, dayId);
+  const _openerWasCompleted = !!(state.completedDays && state.completedDays[_openerCompletedKey]);
+  const _openerWouldPaywall =
+    !opts._afterPurchase &&
+    !canAccessWeek(state.subject, weekId) &&
+    !_openerWasCompleted;
+  // Open-attempt telemetry — fires on EVERY call, whether gated or
+  // allowed. Lets us tell "lurker tapped a lesson" apart from "lurker
+  // tapped nothing" and separately audit paywall gate hits.
+  try {
+    _phCapture('openReader_called', {
+      week_id:            weekId,
+      day_id:             dayId,
+      subject:            state.subject || null,
+      source:             (opts && opts.source) || null,
+      after_purchase:     !!opts._afterPurchase,
+      was_completed:      _openerWasCompleted,
+      blocked_by_paywall: _openerWouldPaywall,
+      first_ever_open:    Object.keys(state.completedDays || {}).length === 0,
+    });
+  } catch (e) {}
   // Paywall gate. Free tier = chapter 1 of each subject; everything else
   // requires paid entitlement. A lapsed user keeps access to dialogues
   // they've already completed — the moment stays theirs even after the
   // subscription ends. _afterPurchase bypasses the gate for the post-
   // purchase callback that re-opens the reader with a fresh entitlement
   // still propagating from the webhook.
-  if (!opts._afterPurchase && !canAccessWeek(state.subject, weekId)) {
-    const completedKey = dayKey(weekId, dayId);
-    if (!state.completedDays || !state.completedDays[completedKey]) {
-      showPaywall({ subject: state.subject, weekId, dayId, source: 'lesson-tap' });
-      return;
-    }
-    // Falls through — completed dialogues remain accessible for re-read.
+  if (_openerWouldPaywall) {
+    showPaywall({ subject: state.subject, weekId, dayId, source: 'lesson-tap' });
+    return;
   }
   // Silently drop any stranded celebrations from a prior interrupted chain.
   // Playing them on reader tap-through is jarring — the moment is gone,
@@ -26600,7 +26671,7 @@ function goToNextLesson() {
         });
         return;
       }
-      openReader(next.weekId, next.dayId);
+      openReader(next.weekId, next.dayId, { source: 'next-dialogue' });
     }
   });
 }
@@ -27037,7 +27108,7 @@ function finishDay() {
     const _next = getNextLessonInfo();
     closeCompleteModal({
       continuation: () => {
-        if (_next.hasNext) openReader(_next.weekId, _next.dayId, { forceThinkerIntro: true });
+        if (_next.hasNext) openReader(_next.weekId, _next.dayId, { forceThinkerIntro: true, source: 'day0-tail' });
         else goHome();
       }
     });
@@ -31065,7 +31136,7 @@ function _consumePendingDeepLink() {
   const day = wk && wk.days && wk.days[0];
   if (day) {
     _phCapture('bonus_link_landed', { subject: 'economics', opened: true });
-    openReader('bonusEcon1', day.id);
+    openReader('bonusEcon1', day.id, { source: 'bonus-deep-link' });
     return true;
   }
   _phCapture('bonus_link_landed', {
@@ -33252,7 +33323,7 @@ function _skHandleHeroTap(btn) {
 function _skStartToday(weekId, dayId) {
   _skCloseBubble();
   if (weekId == null || dayId == null) return;
-  if (typeof openReader === 'function') openReader(weekId, dayId);
+  if (typeof openReader === 'function') openReader(weekId, dayId, { source: 'streak-start-today' });
 }
 
 // One-shot click delegation on #streak-screen. Rendered DOM is replaced
