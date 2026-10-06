@@ -24173,22 +24173,25 @@ async function maybeRequestReminderPermission() {
   if (!r.enabled || r.permissionAsked) return;
   if (r.prePromptDeferred) return;
   const perm = await _requestNotifPermission();
+  // Persist the flipped flag BEFORE any further await. The prior ordering
+  // awaited _reconcileReminders between flipping the flag and saveState;
+  // a throw from reconcile (plugin bridge timeout on Android cold start,
+  // iOS WKWebView stall under memory pressure, or user force-quit during
+  // the await) left permissionAsked=true in memory but false on disk.
+  // loadState on the next launch read the pre-flip value and the next
+  // finishDay walked the same path. Observed as 16 users in the safety-
+  // net-miss bucket between 2026-08-16 and 2026-09-29.
   state.dailyReminder.permissionAsked = true;
-  if (perm === 'granted') {
-    // Route through _reconcileReminders — the current scheduler. The
-    // legacy _scheduleReminderFor(time) was deleted when the model
-    // shifted from a single repeating notification to a rolling window
-    // of per-day evenings, but this call site was missed. Calling
-    // _reconcileReminders here matches setReminder's pattern (which
-    // handles the manual "user enables reminders in Profile" path) and
-    // no-ops correctly if r.enabled is false or permission was denied
-    // after all (guarded inside the reconcile function).
-    await _reconcileReminders();
-  } else {
+  if (perm !== 'granted') {
     // Permission denied → reflect in state so the Profile toggle shows OFF.
     state.dailyReminder.enabled = false;
   }
   saveState();
+  if (perm === 'granted') {
+    // Fire-and-forget. Reconcile failure can no longer unwind the
+    // permissionAsked write because saveState already ran above.
+    _reconcileReminders().catch(e => console.warn('[Reminder] reconcile failed:', e));
+  }
 }
 // === End daily reminder ===
 
