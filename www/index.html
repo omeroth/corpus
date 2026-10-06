@@ -13221,7 +13221,95 @@ const APP_VERSION = '1.4.8';
 //     time-boxing of other native bridges in Corpus is the same shape.
 let _hapticLastT = 0;
 const _HAPTIC_THROTTLE_MS = 80;
-function _haptic(kind) {
+
+// Onboarding Continue pool. Each tag maps to a short sequence built only
+// from what @capacitor/haptics exposes (impact + selectionChanged). No
+// pattern exceeds ~130 ms total — well under the 200 ms budget. Gaps get
+// a ±15 ms jitter so a repeated pattern doesn't feel identical.
+//
+// Progression bands are keyed to how far into the onboarding flow the
+// user is (step / _ONB_TOTAL_STEPS), not the kind alone:
+//   first third   lighter only (plain light / selectionChanged)
+//   middle third  everything in the pool
+//   last third    lean toward the medium-leaning patterns
+// A separate SUCCESS notification fires on the single "last Next before
+// the first dialogue" CTA (tagged via data-onb-last-cta="success"), so
+// that one tap feels distinct from the stream of regular Continues.
+// Two progression bands for onboarding Continues:
+//   Band 1 — steps 1..16, anchored to 16. The run-up to the taste.
+//   Band 2 — steps 22..34, scaled by (cursor - 22) / 12. Post-dialogue
+//            plan + commitment + getting-set-up, winding into the paywall.
+// Reader-like interlude 17..20 (lets-start + taste-1..taste-q) fires
+// plain `continue` (single medium impact) so the taste feels physically
+// identical to the real reader that follows onboarding.
+// Step 21 (first-card) short-circuits to NotificationType.Success via
+// data-onb-last-cta — moved there from lets-start because first-card is
+// the celebratory close of the user's first completed dialogue.
+// Paywall (35) uses its own purchase/restore/skip buttons which are not
+// .onb-cta and don't hit this dispatcher.
+const _ONB_BAND1_END   = 16;
+const _ONB_BAND2_START = 22;
+const _ONB_BAND2_END   = 34;
+// 'selection' dropped from all pools after device verification showed the
+// trio (selectionStart→selectionChanged→selectionEnd) wasn't producing a
+// felt tick on iPhone. The 'selection' case in _hapticOnbPlay stays alive
+// so re-adding it to a pool is a one-line change if the ergonomics shift.
+const _ONB_HAPTIC_POOL_LIGHT  = ['light', 'light-med'];
+const _ONB_HAPTIC_POOL_ALL    = ['light', 'medium', 'light-med', 'med-light', 'light-light-med'];
+const _ONB_HAPTIC_POOL_HEAVY  = ['medium', 'med-light', 'light-med', 'light-light-med'];
+function _hapticOnbPick(progress) {
+  const pool = progress < 1/3 ? _ONB_HAPTIC_POOL_LIGHT
+             : progress < 2/3 ? _ONB_HAPTIC_POOL_ALL
+             :                   _ONB_HAPTIC_POOL_HEAVY;
+  const prev = window._hapticLastOnbPattern;
+  let pick = pool[Math.floor(Math.random() * pool.length)];
+  // "Never same as previous" — resample up to 6 times. If every slot in
+  // the pool is the previous (pool size 1), accept it.
+  for (let i = 0; i < 6 && pick === prev && pool.length > 1; i++) {
+    pick = pool[Math.floor(Math.random() * pool.length)];
+  }
+  window._hapticLastOnbPattern = pick;
+  return pick;
+}
+function _hapticOnbPlay(H, tag) {
+  const j = () => Math.round((Math.random() - 0.5) * 30); // ±15 ms
+  const safe = (fn) => { try { const p = fn(); if (p && typeof p.catch === 'function') p.catch(() => {}); } catch (e) {} };
+  const light     = () => (typeof H.impact === 'function') && H.impact({ style: 'LIGHT' });
+  const medium    = () => (typeof H.impact === 'function') && H.impact({ style: 'MEDIUM' });
+  const selStart  = () => (typeof H.selectionStart === 'function')   && H.selectionStart();
+  const selChg    = () => (typeof H.selectionChanged === 'function') && H.selectionChanged();
+  const selEnd    = () => (typeof H.selectionEnd === 'function')     && H.selectionEnd();
+  switch (tag) {
+    case 'light':      safe(light);  break;
+    case 'medium':     safe(medium); break;
+    case 'selection':
+      // selectionStart → selectionChanged → selectionEnd. On iOS the
+      // generator-lifecycle calls themselves don't emit haptics (only
+      // selectionChanged does), but running the trio is what the user
+      // asked for and keeps the pattern explicit. If verification shows
+      // this still feels like nothing, drop 'selection' from the pool
+      // entries in _ONB_HAPTIC_POOL_LIGHT / _ALL above — one-line change.
+      safe(selStart);
+      setTimeout(() => safe(selChg), 25 + j());
+      setTimeout(() => safe(selEnd), 55 + j());
+      break;
+    case 'light-med':
+      safe(light);
+      setTimeout(() => safe(medium), 70 + j());
+      break;
+    case 'med-light':
+      safe(medium);
+      setTimeout(() => safe(light), 60 + j());
+      break;
+    case 'light-light-med':
+      safe(light);
+      setTimeout(() => safe(light),  50 + j());
+      setTimeout(() => safe(medium), 100 + j());
+      break;
+  }
+}
+
+function _haptic(kind, opts) {
   if (typeof state !== 'undefined' && state && state.hapticsEnabled === false) return;
   const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
   if (now - _hapticLastT < _HAPTIC_THROTTLE_MS) return;
@@ -13235,6 +13323,36 @@ function _haptic(kind) {
     if (kind === 'nav'      && typeof H.impact === 'function')       p = H.impact({ style: 'LIGHT' });
     else if (kind === 'continue' && typeof H.impact === 'function')  p = H.impact({ style: 'MEDIUM' });
     else if (kind === 'locked'   && typeof H.notification === 'function') p = H.notification({ type: 'WARNING' });
+    else if (kind === 'continue-onb') {
+      // SUCCESS short-circuit: the CTA tagged data-onb-last-cta="success"
+      // (currently first-card, step 21).
+      if (opts && opts.isLast && typeof H.notification === 'function') {
+        p = H.notification({ type: 'SUCCESS' });
+      } else {
+        const stepRaw = parseInt(localStorage.getItem('corpus_onboarding_step') || '1', 10);
+        // Reader-like interlude: lets-start (17) + taste-1/2/q (18..20)
+        // mirror the real reader's Continue — single medium impact.
+        if (stepRaw >= 17 && stepRaw <= 20) {
+          if (typeof H.impact === 'function') p = H.impact({ style: 'MEDIUM' });
+        } else {
+          // Two bands: 1..16 anchored on 16; 22..34 scaled across its
+          // own span. Cursors outside both bands (e.g. a programmatic
+          // path lands at 35 and somehow dispatches here) clamp to 1.0.
+          let progress;
+          if (stepRaw <= _ONB_BAND1_END) {
+            progress = stepRaw / _ONB_BAND1_END;
+          } else if (stepRaw >= _ONB_BAND2_START && stepRaw <= _ONB_BAND2_END) {
+            progress = (stepRaw - _ONB_BAND2_START) / (_ONB_BAND2_END - _ONB_BAND2_START);
+          } else {
+            progress = 1;
+          }
+          progress = Math.min(1, Math.max(0, progress));
+          const tag = _hapticOnbPick(progress);
+          _hapticOnbPlay(H, tag);
+          return; // multi-event pattern — fire-and-forget inside _hapticOnbPlay
+        }
+      }
+    }
     if (p && typeof p.catch === 'function') p.catch(() => {});
   } catch (e) {}
 }
@@ -13256,7 +13374,18 @@ function _haptic(kind) {
     const cta = e.target.closest && e.target.closest(
       '.onb-cta:not([disabled]), .levelup-continue, .cc-a:not([disabled]), .dc-continue-btn, #chapter-continue-btn'
     );
-    if (cta && cta.id !== 'reader-next-btn') _haptic('continue');
+    if (!cta) return;
+    if (cta.id === 'reader-next-btn') return;
+    if (cta.classList.contains('onb-cta')) {
+      // Onboarding gets the varied pool. The one CTA that leads directly
+      // into the first in-app dialogue experience fires SUCCESS instead;
+      // tag that button via data-onb-last-cta="success" in the HTML so
+      // this stays declarative (and survives flow renumbers).
+      const isLast = cta.dataset.onbLastCta === 'success';
+      _haptic('continue-onb', { isLast });
+    } else {
+      _haptic('continue');
+    }
   }
   // Both touchend (native) and click (desktop web / keyboard activation).
   // _haptic no-ops on web so the click fallback is free.
@@ -18141,6 +18270,28 @@ function _onbV2CtaStreak() {
   _onbAdvanceStep(22, 23);
 }
 
+// Step 22 (streak celebration) — v11 shows "day 1 today". Replaces the
+// decorative flame SVG with StreakBadges.crest(0) so the Spark crest
+// IS the day-1 flame. Fires a medium haptic on arrival (first-card at
+// step 21 already fires SUCCESS; this is the gentler follow-through).
+// Marks tier 0 as seen so the real finishDay path doesn't fire a
+// Spark reveal again right after the first dialogue completes.
+function _onbV2PrepareStreak() {
+  const flameEl = document.querySelector('#onb-v2-streak .onb-v2-streak-flame');
+  if (flameEl && window.StreakBadges) {
+    // Spark crest sized to match the flame slot (88dp in the HTML).
+    flameEl.innerHTML = StreakBadges.crest(0, 88, { off: false });
+  }
+  // Medium impact — explicit, bypasses the pool / continue-onb logic
+  // because this fires on arrival, not on a Continue tap.
+  _haptic('continue');
+  if (!Array.isArray(state.streakBadgesSeen)) state.streakBadgesSeen = [];
+  if (!state.streakBadgesSeen.includes(0)) {
+    state.streakBadgesSeen.push(0);
+    try { saveStateLocal(); } catch (e) {}
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════
 // Act 4 — The Plan (steps 24-29)
 // ═══════════════════════════════════════════════════════════════════
@@ -19478,6 +19629,7 @@ const _ONB_STEP_HOOKS = {
   19: _onbV2PrepareTaste2,    // subject-specific page-2 prose (+ optional punch line)
   20: _onbV2PrepareTasteQ,    // subject-specific scenario + question + 3 options
   21: _onbV2PrepareFirstCard, // subject-specific thinker card preview (stateless)
+  22: _onbV2PrepareStreak,    // swap decorative flame → Spark crest + mark tier 0 seen
   // Signup: moved from step 4 to step 23 (post-streak) in flow v6.
   // Prepare hook also handles the "already signed in" auto-advance
   // for users who arrive here with currentUser set (either migrated
@@ -35068,7 +35220,13 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
   <div class="onb-cta-holder">
-    <button type="button" class="nav-btn onb-cta" id="onb-v2-first-card-cta" onclick="_onbV2CtaFirstCard()"></button>
+    <!-- data-onb-last-cta="success" — the celebratory close of the user's
+         first completed dialogue. _haptic('continue-onb', {isLast}) fires
+         NotificationType.Success here, distinct from every other
+         Continue in the flow. Previously lived on onb-v2-lets-start-cta
+         (pre-dialogue bridge) — moved to the post-dialogue celebration
+         to mark finishing, not starting. -->
+    <button type="button" class="nav-btn onb-cta" id="onb-v2-first-card-cta" data-onb-last-cta="success" onclick="_onbV2CtaFirstCard()"></button>
   </div>
 </div>
 
