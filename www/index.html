@@ -14292,6 +14292,16 @@ async function loadProgressFromSupabase() {
       const local  = state.openingsByHour[h] || 0;
       if (server > local) state.openingsByHour[h] = server;
     });
+    // last_active_at: prefer-newer. Already written by _bumpLastActiveIfNeeded
+    // and the base sync, so the server copy is the merged latest across
+    // devices. Pulled into state.lastActiveAtISO for _pickReminderHour's
+    // 'last_active' source. Local _recordActiveHour then keeps it fresh
+    // within the session.
+    if (data.last_active_at) {
+      const localT  = state.lastActiveAtISO ? Date.parse(state.lastActiveAtISO) : 0;
+      const serverT = Date.parse(data.last_active_at) || 0;
+      if (serverT > localT) state.lastActiveAtISO = data.last_active_at;
+    }
     state.goalMetHistory = state.goalMetHistory || [];
     (data.goal_met_history || []).forEach(g => {
       if (!g || !g.metAt) return;
@@ -22804,10 +22814,17 @@ function defaultState() {
     goalMetHistory: [],
     // openingsByHour: { '0'..'23': count } — one write per app-foreground
     // per hour-slot. Fed by _recordActiveHour (session debounce), merged
-    // max-per-key on load (same approximation as completionsByDay).
-    // Consumed by _pickReminderHour, which is defined but currently gated
-    // off by _REMINDER_HOUR_PERSONALIZED. Collecting shape data first.
+    // max-per-key on load. Will become the preferred signal for
+    // _pickReminderHour once ~2 weeks of distribution data has accrued —
+    // flip _REMINDER_HOUR_SOURCE from 'last_active' to 'histogram'.
     openingsByHour: {},
+    // lastActiveAtISO: ISO timestamp of the most recent app-foreground
+    // (device-local Date().toISOString()). Updated unthrottled on every
+    // foreground, merged prefer-newer from server last_active_at on load.
+    // Consumed by _pickReminderHour's 'last_active' source until the
+    // histogram matures. Nullable: new installs with no foreground
+    // activity yet fall through to the 20:00 default.
+    lastActiveAtISO: null,
     // Legacy home-hints ID array. Feature retired in favour of the
     // owl-guided walkthrough; field kept because it's a Supabase-synced
     // union-merge column (see 20260728120000_hints_seen.sql) and dropping
@@ -22895,7 +22912,12 @@ function defaultState() {
     // screen — set true so the finishDay safety net won't surprise-prompt
     // the OS out from under a user who explicitly declined. Until permission
     // is granted, the toggle reflects intent but no notification is scheduled.
-    dailyReminder: { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
+    // timeExplicitlySet: did the user themselves pick the time via the Profile
+    // picker (true) or is this still the default (false)? _pickReminderHour
+    // only personalizes when false, so a user's explicit choice is always
+    // respected. Backfilled for pre-flag users in the normalize block below:
+    // any time !== '20:00' is inferred as explicitly set.
+    dailyReminder: { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false, timeExplicitlySet: false },
     // Haptic feedback preference. Default on. _haptic() reads this before
     // every native call; the toggle lives in Profile → Settings.
     hapticsEnabled: true,
@@ -22978,9 +23000,9 @@ function loadState() {
     try { saveStateLocal(); } catch(e) {}
   }
   // Normalize state.dailyReminder for existing users whose persisted state predates this field.
-  // Shape: { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false }.
+  // Shape: { enabled, time, permissionAsked, prePromptDeferred, timeExplicitlySet }.
   state.dailyReminder = Object.assign(
-    { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
+    { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false, timeExplicitlySet: false },
     state.dailyReminder || {}
   );
   // One-shot migration: default reminder time moved 19:00 → 20:00. Anyone
@@ -22998,6 +23020,16 @@ function loadState() {
         saveStateLocal();
       }
       localStorage.setItem('corpus_reminder_time_20_migrated', '1');
+    }
+  } catch(e) {}
+  // Infer timeExplicitlySet for pre-flag users: a persisted time !== '20:00'
+  // can only have come from the Profile picker (the 19:00→20:00 migration
+  // above already normalized any 19:00 to 20:00). This keeps the user's
+  // explicit choice safe when _pickReminderHour starts personalizing.
+  try {
+    if (state.dailyReminder.timeExplicitlySet !== true &&
+        state.dailyReminder.time !== '20:00') {
+      state.dailyReminder.timeExplicitlySet = true;
     }
   } catch(e) {}
   // Normalize state.guestPrompt for users whose persisted state predates the cadence object.
@@ -24616,15 +24648,20 @@ let _lastRecordedHourSlot = null;
 function _recordActiveHour() {
   if (typeof state === 'undefined' || !state) return;
   const now = new Date();
+  // lastActiveAtISO: always update (unthrottled) so the 'last_active'
+  // picker source reflects the current foreground. The hour-slot debounce
+  // below only protects openingsByHour from double-counting.
+  state.lastActiveAtISO = now.toISOString();
   const dayKey = now.getFullYear() + '-' +
     String(now.getMonth() + 1).padStart(2, '0') + '-' +
     String(now.getDate()).padStart(2, '0');
   const slot = dayKey + ':' + now.getHours();
-  if (slot === _lastRecordedHourSlot) return;
-  _lastRecordedHourSlot = slot;
-  state.openingsByHour = state.openingsByHour || {};
-  const h = String(now.getHours());
-  state.openingsByHour[h] = (state.openingsByHour[h] || 0) + 1;
+  if (slot !== _lastRecordedHourSlot) {
+    _lastRecordedHourSlot = slot;
+    state.openingsByHour = state.openingsByHour || {};
+    const h = String(now.getHours());
+    state.openingsByHour[h] = (state.openingsByHour[h] || 0) + 1;
+  }
   try { saveStateLocal(); } catch (e) {}
 }
 async function _wireActiveHourTracking() {
@@ -24641,26 +24678,72 @@ async function _wireActiveHourTracking() {
   });
 }
 
-// Picker — reads state.openingsByHour and returns the modal hour
-// (0..23) if the user has at least 10 recorded opens, else null.
+// Picker — returns the user's preferred reminder hour (0..23) given the
+// currently-selected source, or null if nothing usable.
 //
-// Currently DORMANT: _REMINDER_HOUR_PERSONALIZED is false, so
-// _reconcileReminders continues to use state.dailyReminder.time
-// unchanged. Flipping to true also needs an override-semantics
-// decision (does personalization defer to a user-set custom time?
-// right now there's no "defaulted vs explicitly-set" flag on
-// state.dailyReminder.time to tell them apart).
-const _REMINDER_HOUR_PERSONALIZED = false;
+// Source toggle. Day-1 personalization uses the single-point
+// `last_active` signal because `openingsByHour` needs ~2 weeks of
+// opens to beat it. Flip to 'histogram' once the shape has accrued —
+// that's the one-line swap called out in the TODO.
+const _REMINDER_HOUR_PERSONALIZED = true;
+const _REMINDER_HOUR_SOURCE = 'last_active'; // 'last_active' | 'histogram'
+// Reasonable-window clamp. A single 2am session shouldn't move the
+// reminder to 2am, and 7am is still before a lot of people wake up on
+// weekends. Hours outside this window return null → caller falls back
+// to the user-set / default time (20:00). Also used as a sanity cap
+// for the histogram source once that's enabled.
+//
+// Known at ship (2026-10-06): 41 of 230 last_active_at values fall
+// outside this window and get clamped back to 20:00 — about 18%. Some
+// are genuinely late readers; some are noise from one odd evening. The
+// 'histogram' source will tell them apart in ~2 weeks. If a real
+// night-reader cluster shows up in openingsByHour, widen this window
+// before flipping _REMINDER_HOUR_SOURCE.
+const _REMINDER_HOUR_MIN = 8;
+const _REMINDER_HOUR_MAX = 22;
+function _reminderClamp(h) {
+  if (h == null || isNaN(h)) return null;
+  if (h < _REMINDER_HOUR_MIN || h > _REMINDER_HOUR_MAX) return null;
+  return h;
+}
 function _pickReminderHour() {
-  const m = (typeof state !== 'undefined' && state && state.openingsByHour) || {};
-  let total = 0, bestN = -1, bestH = null;
-  for (let h = 0; h < 24; h++) {
-    const n = m[String(h)] || 0;
-    total += n;
-    if (n > bestN) { bestN = n; bestH = h; }
+  if (!_REMINDER_HOUR_PERSONALIZED) return null;
+  if (typeof state === 'undefined' || !state) return null;
+  if (_REMINDER_HOUR_SOURCE === 'last_active') {
+    const iso = state.lastActiveAtISO;
+    if (!iso) return null;
+    const t = Date.parse(iso);
+    if (isNaN(t)) return null;
+    // getHours() on a local Date gives the device-local hour. The ISO
+    // comes from Date().toISOString() written on this device (or merged
+    // from server, written on another device of the same user). Parsing
+    // back through Date on the current device re-anchors to current TZ,
+    // which is what we want for the picker.
+    return _reminderClamp(new Date(t).getHours());
   }
-  if (total < 10) return null;
-  return bestH;
+  if (_REMINDER_HOUR_SOURCE === 'histogram') {
+    const m = state.openingsByHour || {};
+    let total = 0, bestN = -1, bestH = null;
+    for (let h = 0; h < 24; h++) {
+      const n = m[String(h)] || 0;
+      total += n;
+      if (n > bestN) { bestN = n; bestH = h; }
+    }
+    if (total < 10) return null;
+    return _reminderClamp(bestH);
+  }
+  return null;
+}
+// Resolves the actual HH:MM the scheduler should fire at. Order:
+//   1. user explicitly set a time in Profile → always respect it;
+//   2. picker returns a personalized hour (clamped, within source rules) → use that;
+//   3. default (state.dailyReminder.time, which is '20:00' unless the user picked).
+function _effectiveReminderTime(r) {
+  if (!r) return '20:00';
+  if (r.timeExplicitlySet) return r.time || '20:00';
+  const hh = _pickReminderHour();
+  if (hh == null) return r.time || '20:00';
+  return String(hh).padStart(2, '0') + ':00';
 }
 
 // Builds the fire Date for a given offset (0 = today) at the user's
@@ -24701,8 +24784,10 @@ async function _reconcileReminders(opts) {
   const lang = state.lang || 'en';
   const activeDates = new Set(state.activeDates || []);
   const now = new Date();
+  // Resolve the actual fire-at HH:MM once: picker is per-user, not per-day.
+  const fireTime = _effectiveReminderTime(r);
   for (let offset = 0; offset < windowDays; offset++) {
-    const fireDate = _reminderFireDateFor(offset, r.time);
+    const fireDate = _reminderFireDateFor(offset, fireTime);
     const streakDayFor = _streakDay(fireDate);
     const id = REMINDER_ID_BASE + offset;
     const completed = activeDates.has(streakDayFor);
@@ -34478,7 +34563,9 @@ function _onReminderToggle(ev) {
 
 function _onReminderTimeChange(ev) {
   const t = ev.target.value || '20:00';
-  setReminder({ time: t }).then(updateReminderUI);
+  // Explicit flag: user interacted with the picker, so _pickReminderHour
+  // must never override their choice from here on.
+  setReminder({ time: t, timeExplicitlySet: true }).then(updateReminderUI);
 }
 
 // Haptics preference — persisted on state.hapticsEnabled (default true).
