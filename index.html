@@ -21766,106 +21766,29 @@ function getW(subject) {
     });
   }
 
-  const oldWeeks = lang === 'en' ? WEEKS_EN : WEEKS;
-  const oldWeek1 = oldWeeks[0];
-  const cdWeek1  = corpusData.weeks.find(function(w) { return w.id === 1; });
-
-  const week1 = {
-    id: 1,
-    title:    lang === 'en' ? cdWeek1.titleEn    : cdWeek1.title,
-    subtitle: lang === 'en' ? cdWeek1.subtitleEn : cdWeek1.subtitle,
-    days: [
-      deriveDay(cdWeek1.days[0]),  // Day 1 from corpusData
-      deriveDay(cdWeek1.days[1]),  // Day 2 from corpusData
-      deriveDay(cdWeek1.days[2]),  // Day 3 from corpusData
-      deriveDay(cdWeek1.days[3]),  // Day 4 from corpusData
-      deriveDay(cdWeek1.days[4]),  // Day 5 from corpusData
-      deriveDay(cdWeek1.days[5]),  // Day 6 from corpusData
-      deriveDay(cdWeek1.days[6]),  // Day 7 from corpusData
-    ],
-  };
-
-  const cdWeek2  = corpusData.weeks.find(function(w) { return w.id === 2; });
-  const oldWeek2 = oldWeeks[1];
-  const week2 = {
-    id: 2,
-    title:    lang === 'en' ? cdWeek2.titleEn    : cdWeek2.title,
-    subtitle: lang === 'en' ? cdWeek2.subtitleEn : cdWeek2.subtitle,
-    days: [
-      deriveDay(cdWeek2.days[0]),  // Day 1 from corpusData
-      deriveDay(cdWeek2.days[1]),  // Day 2 from corpusData
-      deriveDay(cdWeek2.days[2]),  // Day 3 from corpusData
-      deriveDay(cdWeek2.days[3]),  // Day 4 from corpusData
-      deriveDay(cdWeek2.days[4]),  // Day 5 from corpusData
-      deriveDay(cdWeek2.days[5]),  // Day 6 from corpusData
-      deriveDay(cdWeek2.days[6]),  // Day 7 from corpusData
-    ],
-  };
-
-  const cdWeek3  = corpusData.weeks.find(function(w) { return w.id === 3; });
-  const oldWeek3 = oldWeeks[2];
-  const week3 = {
-    id: 3,
-    title:    lang === 'en' ? cdWeek3.titleEn    : cdWeek3.title,
-    subtitle: lang === 'en' ? cdWeek3.subtitleEn : cdWeek3.subtitle,
-    days: [
-      deriveDay(cdWeek3.days[0]),  // Day 1 from corpusData
-      deriveDay(cdWeek3.days[1]),  // Day 2 from corpusData
-      deriveDay(cdWeek3.days[2]),  // Day 3 from corpusData
-      deriveDay(cdWeek3.days[3]),  // Day 4 from corpusData
-      deriveDay(cdWeek3.days[4]),  // Day 5 from corpusData
-      deriveDay(cdWeek3.days[5]),  // Day 6 from corpusData
-      deriveDay(cdWeek3.days[6]),  // Day 7 from corpusData
-    ],
-  };
-
-  const cdWeek4  = corpusData.weeks.find(function(w) { return w.id === 4; });
-  const oldWeek4 = oldWeeks[3];
-  const week4 = cdWeek4 ? {
-    id: 4,
-    title:    lang === 'en' ? cdWeek4.titleEn    : cdWeek4.title,
-    subtitle: lang === 'en' ? cdWeek4.subtitleEn : cdWeek4.subtitle,
-    days: [
-      deriveDay(cdWeek4.days[0]),  // Day 1 from corpusData
-      deriveDay(cdWeek4.days[1]),  // Day 2 from corpusData
-      deriveDay(cdWeek4.days[2]),  // Day 3 from corpusData
-      deriveDay(cdWeek4.days[3]),  // Day 4 from corpusData
-      deriveDay(cdWeek4.days[4]),  // Day 5 from corpusData
-      deriveDay(cdWeek4.days[5]),  // Day 6 from corpusData
-      deriveDay(cdWeek4.days[6]),  // Day 7 from corpusData
-    ],
-  } : oldWeek4;
-
-  const cdBonus1 = corpusData.weeks.find(function(w) { return w.id === 'bonus1'; });
-  const bonusWeek1 = cdBonus1 ? {
-    id: 'bonus1',
-    title: cdBonus1.title,
-    titleEn: cdBonus1.titleEn,
-    // Flatten subtitle to the current language so the padlock overlay
-    // (which reads chapter.subtitle) matches the economics branch above
-    // and stays in sync with the chapter data as a single source of
-    // truth. Was hardcoded '' before the chapter-object refactor.
-    subtitle: lang === 'en' ? (cdBonus1.subtitleEn || '') : (cdBonus1.subtitle || ''),
-    isBonus: true,
-    days: cdBonus1.days.map(function(d) { return deriveDay(d); }),
-  } : null;
-  // Coming-soon placeholders live directly in corpusData.weeks with empty days arrays;
-  // they bypass the deriveDay pipeline above (which assumes a fixed day count).
-  const comingSoonChapters = corpusData.weeks
-    .filter(function(w) { return w.comingSoon; })
-    .map(function(w) {
-      return {
-        id: w.id,
-        title: lang === 'en' ? w.titleEn : w.title,
-        comingSoon: true,
-        days: [],
-      };
-    });
-  return [week1, week2]
-    .concat(bonusWeek1 ? [bonusWeek1] : [])
-    .concat([week3, week4])
-    .concat(oldWeeks.slice(4))
-    .concat(comingSoonChapters);
+  // Philosophy maps over corpusData.weeks the same way economics and
+  // psychology do above. The hand-rolled week1..week4 constructors
+  // used to pick up each chapter by id, which silently dropped any
+  // chapter that didn't have its own constructor and wasn't flagged
+  // comingSoon:true — Freedom of Choice (ch5) shipped as populated
+  // content with no explicit constructor, fell through every bucket,
+  // and was invisible on home until this rewrite.
+  //
+  // corpusData.weeks is now the single source of truth for philosophy
+  // chapter order and shape. Legacy WEEKS / WEEKS_EN arrays only ever
+  // carried chapters 1-4; the oldWeeks.slice(4) tail was already empty
+  // before this change. The arrays are kept around in case any
+  // non-getW read site still references them.
+  return corpusData.weeks.map(function(w) {
+    return {
+      id: w.id,
+      title: lang === 'en' ? w.titleEn : w.title,
+      subtitle: lang === 'en' ? w.subtitleEn : w.subtitle,
+      isBonus: w.isBonus,
+      comingSoon: w.comingSoon,
+      days: w.days.map(function(d) { return deriveDay(d); }),
+    };
+  });
 }
 function getT() { return state.lang === 'en' ? THINKERS_EN : THINKERS; }
 function getLvls() { return state.lang === 'en' ? LEVELS_EN : LEVELS; }
