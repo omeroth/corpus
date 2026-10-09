@@ -776,6 +776,71 @@ const THINKERS = [
     bio: 'כלכלן אמריקאי. עבד במשך שנים בבנק העולמי והפך לאחד המבקרים החדים ביותר של סיוע לפיתוח. טען שהמערב הוציא טריליונים על תוכניות שנקבעו מלמעלה ולא הגיעו ליעדיהן, בעוד התערבויות זולות שבוצעו על ידי "מחפשים" מקומיים הגיעו לאנשים שהתוכניות לא הגיעו אליהם. הפיץ את ההבחנה בין מתכננים למחפשים בספרו "משא האדם הלבן" (2006).',
     quote: '"אנשים עניים מתים לא רק בגלל אדישות העולם לעוני שלהם, אלא גם בגלל מאמצים לא יעילים של אלה שכן איכפת להם."',
   },
+  // Economics chapter 6 — "Behavioral Economics". Kahneman already defined
+  // above (dual-subject entry, appears in psychology ch1 and economics ch6
+  // dialogue 2 under the "Kahneman and Tversky" display). Simon, Thaler,
+  // Shiller and Gigerenzer are new. No Tversky card (Kahneman-and-Tversky
+  // uses the Deci-and-Ryan pattern). No Sunstein card (Thaler-and-Sunstein
+  // dialogue reuses the thaler id, same pattern).
+  //
+  // Simon card quote: canonical bounded-rationality statement from
+  // Models of Man (1957), p. 198. The docx's dialogue source cited
+  // Simon's 1978 Nobel lecture with a smoothed satisficing summary;
+  // card + dialogue source both now use the Models of Man line.
+  //
+  // Thaler card quote: opening sentence of "Mental Accounting Matters"
+  // (JBDM, 1999). Replaces the docx's smoothed two-sentence paraphrase
+  // of Thaler's mental-accounting examples from Misbehaving (2015).
+  //
+  // Shiller card quote: the headline finding from the 1981 AER paper
+  // "Do Stock Prices Move Too Much", restored to the published abstract
+  // wording (docx had dropped "far" and "real").
+  //
+  // Gigerenzer card quote: verbatim definition of a heuristic from
+  // Gigerenzer and Gaissmaier, "Heuristic Decision Making" (Annual
+  // Review of Psychology, 2011). Replaces the docx's version, which
+  // was explicitly labelled "based on" Rationality for Mortals and
+  // was therefore a paraphrase.
+  {
+    id: 'simon',
+    name: 'הרברט סיימון',
+    era: '1916–2001',
+    emoji: '🧩',
+    image: './images/simon.webp',
+    subject: 'economics',
+    bio: 'כלכלן, פסיכולוג וחלוץ הבינה המלאכותית האמריקאי שחתר תחת ההנחה שבני אדם ממקסמים. טבע את המונחים "רציונליות חסומה" ו"הסתפקות": מחפשים עד שמוצאים משהו מספיק טוב, ואז עוצרים, לא כפשרה מתוך חולשה אלא כנוהל יעיל. פרס נובל בכלכלה, 1978.',
+    quote: '"יכולת המוח האנושי לנסח ולפתור בעיות מורכבות קטנה מאוד ביחס לגודל הבעיות שפתרונן נדרש כדי לנהוג באופן רציונלי אובייקטיבי בעולם האמיתי."',
+  },
+  {
+    id: 'thaler',
+    name: 'ריצ\'רד תיילר',
+    era: '1945–',
+    emoji: '🪙',
+    image: './images/thaler.webp',
+    subject: 'economics',
+    bio: 'הכלכלן האמריקאי שהכניס את הפסיכולוגיה אל תוך הכלכלה. חקר את "אפקט הבעלות", שלפיו אנשים דורשים יותר כסף כדי לוותר על חפץ ממה שהם מוכנים לשלם כדי לקנותו, ואת "החשבונאות המנטלית", שבה כסף מחולק בראש לקופות עם כללים שונים. יחד עם כאס סנסטיין פיתח את רעיון ה"דחיפה": עיצוב הסביבה כך שבחירות שמשרתות אותנו יהיו הקלות ביותר. פרס נובל בכלכלה, 2017.',
+    quote: '"חשבונאות מנטלית היא מכלול הפעולות הקוגניטיביות שבהן אנשים ומשקי בית משתמשים כדי לארגן, להעריך ולעקוב אחר פעילויות פיננסיות."',
+  },
+  {
+    id: 'shiller',
+    name: 'רוברט שילר',
+    era: '1946–',
+    emoji: '🎢',
+    image: './images/shiller.webp',
+    subject: 'economics',
+    bio: 'הכלכלן האמריקאי שהראה שמחירי מניות נעים הרבה יותר ממה שהעובדות מצדיקות, פי חמישה עד שלושה עשר. חיבר את הפסיכולוגיה לכלכלת שווקים, ופרסם את "Irrational Exuberance" ב-2000, רגע לפני התפוצצות בועת הדוט-קום, ובמהדורת 2005 התריע על שוק הדיור. פרס נובל בכלכלה, 2013.',
+    quote: '"מדדי התנודתיות של מחירי המניות במאה האחרונה נראים גבוהים מדי בהרבה, פי חמישה עד שלושה עשר ממה שאפשר לייחס למידע חדש על דיבידנדים ריאליים עתידיים."',
+  },
+  {
+    id: 'gigerenzer',
+    name: 'גרד גיגרנצר',
+    era: '1947–',
+    emoji: '🧭',
+    image: './images/gigerenzer.webp',
+    subject: 'economics',
+    bio: 'הפסיכולוג הגרמני שחלק על הגישה של כהנמן וטברסקי. טען שקיצורי דרך קוגניטיביים אינם פגם אלא כלי: היוריסטיקה שמתעלמת מרוב המידע עשויה להיות מדויקת ויעילה יותר משיטות מורכבות, אם היא מותאמת לסביבה שבה היא פועלת. מנהל ותיק במכון מקס פלנק בברלין, מחבר "רציונליות לבני תמותה" (2008).',
+    quote: '"היוריסטיקה היא אסטרטגיה שמתעלמת מחלק מהמידע, במטרה לקבל החלטות מהר יותר, בחיסכון רב יותר ו/או במדויק יותר משיטות מורכבות יותר."',
+  },
 ];
 
 const THINKERS_EN = [
@@ -855,6 +920,19 @@ const THINKERS_EN = [
   // care"; the real book (The White Man's Burden, 2006) uses "efforts
   // of those who do care". Real wording used on card + in dialogue.
   { id:'easterly', name:'William Easterly',    era:'1957–',     emoji:'🔍', image:'./images/easterly.webp', subject:'economics', bio:'An American economist. Worked for years at the World Bank and became one of the sharpest critics of development aid. Argued that the West spent trillions on top-down plans that missed their targets, while cheap interventions delivered by local "searchers" reached people the plans did not. Popularized the distinction between planners and searchers in "The White Man\'s Burden" (2006).',                                                            quote:'"Poor people die not only because of the world\'s indifference to their poverty, but also because of ineffective efforts of those who do care."' },
+  // Economics chapter 6 — "Behavioral Economics". Kahneman already defined
+  // above (dual-subject). Simon, Thaler, Shiller, Gigerenzer are new.
+  // Deci-and-Ryan pattern used for both Kahneman-and-Tversky (dialogue 2)
+  // and Thaler-and-Sunstein (dialogue 4) — no Tversky or Sunstein card.
+  // See the matching HE entries above for the full provenance notes on
+  // the four card quotes (Simon → Models of Man 1957; Thaler → Mental
+  // Accounting Matters 1999; Shiller → the 1981 AER paper, with "far"
+  // and "real" restored; Gigerenzer → Heuristic Decision Making 2011,
+  // replacing the docx's explicitly-paraphrased "based on" line).
+  { id:'simon',      name:'Herbert Simon',    era:'1916–2001', emoji:'🧩', image:'./images/simon.webp',      subject:'economics', bio:'An American economist, psychologist and AI pioneer who overturned the assumption that human beings maximize. Coined the terms "bounded rationality" and "satisficing": we search until we find something good enough, and then we stop, not as a compromise born of weakness but as an efficient procedure. Received the Nobel Prize in Economics in 1978.',                                                                                                                 quote:'"The capacity of the human mind for formulating and solving complex problems is very small compared with the size of the problems whose solution is required for objectively rational behavior in the real world."' },
+  { id:'thaler',     name:'Richard Thaler',   era:'1945–',     emoji:'🪙', image:'./images/thaler.webp',     subject:'economics', bio:'The American economist who brought psychology into economics. Studied the "endowment effect", by which people demand more money to give up an object than they will pay to acquire it, and "mental accounting", in which money is divided in the head into separate pots with different rules. Together with Cass Sunstein developed the idea of the "nudge": designing the environment so that the choices that serve us are the easy ones. Received the Nobel Prize in Economics in 2017.', quote:'"Mental accounting is the set of cognitive operations used by individuals and households to organize, evaluate, and keep track of financial activities."' },
+  { id:'shiller',    name:'Robert Shiller',   era:'1946–',     emoji:'🎢', image:'./images/shiller.webp',    subject:'economics', bio:'The American economist who showed that stock prices move far more than the facts justify, five to thirteen times more. Linked psychology to market economics and published "Irrational Exuberance" in 2000, just before the dot-com bubble burst, and in its 2005 edition warned about the housing market. Received the Nobel Prize in Economics in 2013.',                                                                                                                                                                                                                               quote:'"Measures of stock price volatility over the past century appear to be far too high, five to thirteen times too high, to be attributed to new information about future real dividends."' },
+  { id:'gigerenzer', name:'Gerd Gigerenzer',  era:'1947–',     emoji:'🧭', image:'./images/gigerenzer.webp', subject:'economics', bio:'The German psychologist who disputed Kahneman and Tversky\'s approach. Argued that cognitive shortcuts are not flaws but tools: a heuristic that ignores most of the information can be more accurate and more efficient than complex methods, when it is matched to the environment in which it operates. Long-time director at the Max Planck Institute in Berlin and author of "Rationality for Mortals" (2008).',                                                                                                                                               quote:'"A heuristic is a strategy that ignores part of the information, with the goal of making decisions more quickly, frugally, and/or accurately than more complex methods."' },
   // Psychology thinkers
   { id:'wundt',   name:'Wilhelm Wundt',    era:'1832–1920', emoji:'🧪', image:'./images/wundt.webp',   subject:'psychology', bio:'The German psychologist who founded the world\'s first psychological laboratory, in Leipzig in 1879. Declared that the mind is a subject for scientific inquiry - not for philosophical speculation. His method was abandoned; his idea still rules.',                                                                                                                                                                            quote:'"The book which I here present to the public is an attempt to mark out a new domain of science."' },
   { id:'james',   name:'William James',    era:'1842–1910', emoji:'🌊', image:'./images/james.webp',   subject:'psychology', bio:'An American philosopher-psychologist at Harvard. Argued against Wundt that consciousness is not a chain of discrete moments - it is a river. Coined the term "stream of consciousness" and founded functional psychology: not what consciousness is made of, but what it does.',                                                                                                                                    quote:'"Consciousness does not appear to itself chopped up in bits. It is nothing jointed - it flows."' },
