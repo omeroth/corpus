@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-09T12:41:55.728Z",
+  "generatedAt": "2026-10-09T14:06:00.475Z",
   "items": [
     {
       "weekId": 1,
@@ -620,7 +620,7 @@
       "lang": "he",
       "thinkerId": null,
       "kind": "other",
-      "title": "ביקורת: איפה כל גישה נכשלת?",
+      "title": "איפה כל גישה נכשלת?",
       "card": "share/cards/he/phil-4-5.png",
       "page": "d/phil-4-5-he.html"
     },
@@ -631,7 +631,7 @@
       "lang": "en",
       "thinkerId": null,
       "kind": "other",
-      "title": "Critique: Where Each Approach Fails",
+      "title": "Where Each Approach Fails",
       "card": "share/cards/en/phil-4-5.png",
       "page": "d/phil-4-5-en.html"
     },
@@ -946,7 +946,7 @@
       "lang": "he",
       "thinkerId": null,
       "kind": "summary",
-      "title": "סיכום: מה זאת בכלל כלכלה?",
+      "title": "מה זאת בכלל כלכלה?",
       "card": "share/cards/he/econ-1-7.png",
       "page": "d/econ-1-7-he.html"
     },
@@ -957,7 +957,7 @@
       "lang": "en",
       "thinkerId": null,
       "kind": "summary",
-      "title": "Summary: What is Economics Anyway?",
+      "title": "What is Economics Anyway?",
       "card": "share/cards/en/econ-1-7.png",
       "page": "d/econ-1-7-en.html"
     },
@@ -1088,7 +1088,7 @@
       "lang": "he",
       "thinkerId": null,
       "kind": "summary",
-      "title": "סיכום: מהו ערך?",
+      "title": "מהו ערך?",
       "card": "share/cards/he/econ-2-7.png",
       "page": "d/econ-2-7-he.html"
     },
@@ -1099,7 +1099,7 @@
       "lang": "en",
       "thinkerId": null,
       "kind": "summary",
-      "title": "Summary: What is Value?",
+      "title": "What is Value?",
       "card": "share/cards/en/econ-2-7.png",
       "page": "d/econ-2-7-en.html"
     },
@@ -1310,7 +1310,7 @@
       "lang": "he",
       "thinkerId": null,
       "kind": "summary",
-      "title": "סיכום: הון ועבודה",
+      "title": "הון ועבודה",
       "card": "share/cards/he/econ-3-6.png",
       "page": "d/econ-3-6-he.html"
     },
@@ -1321,7 +1321,7 @@
       "lang": "en",
       "thinkerId": null,
       "kind": "summary",
-      "title": "Summary: Capital and Labor",
+      "title": "Capital and Labor",
       "card": "share/cards/en/econ-3-6.png",
       "page": "d/econ-3-6-en.html"
     },
@@ -1452,7 +1452,7 @@
       "lang": "he",
       "thinkerId": null,
       "kind": "summary",
-      "title": "סיכום: צדק כלכלי",
+      "title": "צדק כלכלי",
       "card": "share/cards/he/econ-4-7.png",
       "page": "d/econ-4-7-he.html"
     },
@@ -1463,7 +1463,7 @@
       "lang": "en",
       "thinkerId": null,
       "kind": "summary",
-      "title": "Summary: Economic Justice",
+      "title": "Economic Justice",
       "card": "share/cards/en/econ-4-7.png",
       "page": "d/econ-4-7-en.html"
     },
@@ -1615,7 +1615,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "simon",
-      "title": "סיימון: האם אנחנו בכלל מסוגלים להיות רציונליים?",
+      "title": "האם אנחנו בכלל מסוגלים להיות רציונליים?",
       "card": "share/cards/he/econ-6-1.png",
       "page": "d/econ-6-1-he.html"
     },
@@ -1625,7 +1625,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "simon",
-      "title": "Simon: Are we even capable of being rational?",
+      "title": "Are we even capable of being rational?",
       "card": "share/cards/en/econ-6-1.png",
       "page": "d/econ-6-1-en.html"
     },
@@ -1635,7 +1635,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "kahneman",
-      "title": "כהנמן וטברסקי: למה הפסד כואב יותר מרווח משמח",
+      "title": "למה הפסד כואב יותר מרווח משמח",
       "card": "share/cards/he/econ-6-2.png",
       "page": "d/econ-6-2-he.html"
     },
@@ -1645,7 +1645,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "kahneman",
-      "title": "Kahneman and Tversky: Why a loss hurts more than an equal gain pleases",
+      "title": "Why a loss hurts more than an equal gain pleases",
       "card": "share/cards/en/econ-6-2.png",
       "page": "d/econ-6-2-en.html"
     },
@@ -1655,7 +1655,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "thaler",
-      "title": "תיילר: למה אותו חפץ שווה פי שניים כשהוא שלנו?",
+      "title": "למה אותו חפץ שווה פי שניים כשהוא שלנו?",
       "card": "share/cards/he/econ-6-3.png",
       "page": "d/econ-6-3-he.html"
     },
@@ -1665,7 +1665,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "thaler",
-      "title": "Thaler: Why is the same object worth twice as much when it is ours?",
+      "title": "Why is the same object worth twice as much when it is ours?",
       "card": "share/cards/en/econ-6-3.png",
       "page": "d/econ-6-3-en.html"
     },
@@ -1675,7 +1675,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "thaler",
-      "title": "דחיפה: אם אנחנו יודעים איך אנשים בוחרים, מותר לעצב את הבחירה?",
+      "title": "אם אנחנו יודעים איך אנשים בוחרים, מותר לעצב את הבחירה?",
       "card": "share/cards/he/econ-6-4.png",
       "page": "d/econ-6-4-he.html"
     },
@@ -1685,7 +1685,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "thaler",
-      "title": "Nudge: If we know how people choose, are we permitted to design the choice?",
+      "title": "If we know how people choose, are we permitted to design the choice?",
       "card": "share/cards/en/econ-6-4.png",
       "page": "d/econ-6-4-en.html"
     },
@@ -1695,7 +1695,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "shiller",
-      "title": "שילר: מה קורה כשהסטיות מצטברות לשוק שלם?",
+      "title": "מה קורה כשהסטיות מצטברות לשוק שלם?",
       "card": "share/cards/he/econ-6-5.png",
       "page": "d/econ-6-5-he.html"
     },
@@ -1705,7 +1705,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "shiller",
-      "title": "Shiller: What happens when the deviations accumulate into an entire market?",
+      "title": "What happens when the deviations accumulate into an entire market?",
       "card": "share/cards/en/econ-6-5.png",
       "page": "d/econ-6-5-en.html"
     },
@@ -1715,7 +1715,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "gigerenzer",
-      "title": "גיגרנצר: ואולי זו בכלל לא טעות?",
+      "title": "ואולי זו בכלל לא טעות?",
       "card": "share/cards/he/econ-6-6.png",
       "page": "d/econ-6-6-he.html"
     },
@@ -1725,7 +1725,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "gigerenzer",
-      "title": "Gigerenzer: And perhaps it is not a mistake at all?",
+      "title": "And perhaps it is not a mistake at all?",
       "card": "share/cards/en/econ-6-6.png",
       "page": "d/econ-6-6-en.html"
     },
@@ -1736,7 +1736,7 @@
       "lang": "he",
       "thinkerId": null,
       "kind": "summary",
-      "title": "סיכום: האם אנחנו באמת רציונליים?",
+      "title": "האם אנחנו באמת רציונליים?",
       "card": "share/cards/he/econ-6-7.png",
       "page": "d/econ-6-7-he.html"
     },
@@ -1747,7 +1747,7 @@
       "lang": "en",
       "thinkerId": null,
       "kind": "summary",
-      "title": "Summary: Are we really rational?",
+      "title": "Are we really rational?",
       "card": "share/cards/en/econ-6-7.png",
       "page": "d/econ-6-7-en.html"
     },

@@ -516,10 +516,10 @@ const economicsData = {
           },
           { type: 'quiz_summary' },
         ] },
-        { id: 7, title: 'סיכום: מה זאת בכלל כלכלה?', titleEn: 'Summary: What is Economics Anyway?', thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary', thinkerId: null, xp: 50, isSummary: true, sections: [
+        { id: 7, title: 'מה זאת בכלל כלכלה?', titleEn: 'What is Economics Anyway?', thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary', thinkerId: null, xp: 50, isSummary: true, sections: [
           {
             type: 'idea',
-            title: 'סיכום: מה זאת בכלל כלכלה?', titleEn: 'Summary: What is Economics Anyway?',
+            title: 'מה זאת בכלל כלכלה?', titleEn: 'What is Economics Anyway?',
             content: 'התחלנו את הפרק בשאלה פשוטה: <strong>מה זאת בכלל כלכלה?</strong></p><p>עכשיו, אחרי שישה דיאלוגים, ברור שזו לא שאלה תמימה. כי <strong>הכלכלה אינה תחום טכני של מספרים וגרפים - היא שדה ויכוח על איך לארגן חברה אנושית.</strong>',
             contentEn: 'We began the chapter with a simple question: <strong>what is economics anyway?</strong></p><p>Now, after six dialogues, it\'s clear this is not an innocent question. Because <strong>economics is not a technical field of numbers and graphs - it is a field of debate about how to organize human society.</strong>',
           },
@@ -1119,10 +1119,10 @@ const economicsData = {
           },
           { type: 'quiz_summary' },
         ] },
-        { id: 7, title: 'סיכום: מהו ערך?', titleEn: 'Summary: What is Value?', thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary', thinkerId: null, xp: 50, isSummary: true, sections: [
+        { id: 7, title: 'מהו ערך?', titleEn: 'What is Value?', thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary', thinkerId: null, xp: 50, isSummary: true, sections: [
           {
             type: 'idea',
-            title: 'סיכום: מהו ערך?', titleEn: 'Summary: What is Value?',
+            title: 'מהו ערך?', titleEn: 'What is Value?',
             content: 'התחלנו את הפרק בשאלה פשוטה: <strong>מה קובע ערך?</strong> למה כוס מים זולה, ויהלום יקר?</p><p>עכשיו, אחרי שישה דיאלוגים, ברור שזו לא שאלה תמימה. כי <strong>כל תשובה לשאלה הזו היא גם תשובה על איך החברה צריכה להיראות.</strong>',
             contentEn: 'We began the chapter with a simple question: <strong>what determines value?</strong> Why is a glass of water cheap, and a diamond expensive?</p><p>Now, after six dialogues, it\'s clear this is not an innocent question. Because <strong>every answer to this question is also an answer about how society should look.</strong>',
           },
@@ -2211,10 +2211,10 @@ const economicsData = {
           },
           { type: 'quiz_summary' },
         ] },
-        { id: 6, title: 'סיכום: הון ועבודה', titleEn: 'Summary: Capital and Labor', thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary', thinkerId: null, xp: 50, isSummary: true, sections: [
+        { id: 6, title: 'הון ועבודה', titleEn: 'Capital and Labor', thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary', thinkerId: null, xp: 50, isSummary: true, sections: [
           {
             type: 'idea',
-            title: 'סיכום: הון ועבודה', titleEn: 'Summary: Capital and Labor',
+            title: 'הון ועבודה', titleEn: 'Capital and Labor',
             content: 'התחלנו את הפרק בשאלה: <strong>מי באמת יוצר את הערך - בעל ההון או העובד?</strong></p><p>עכשיו, אחרי חמישה דיאלוגים, אנחנו רואים שזו לא רק שאלה כלכלית. <strong>זו שאלה על איך החברה מתפקדת - ועל מי באמת מרוויח מהמערכת.</strong>',
             contentEn: 'We began the chapter with a question: <strong>who really creates value - the capital owner or the worker?</strong></p><p>Now, after five dialogues, we see that this isn\'t just an economic question. <strong>It\'s a question about how society functions - and about who really profits from the system.</strong>',
           },
@@ -2816,10 +2816,10 @@ const economicsData = {
           },
           { type: 'quiz_summary' },
         ] },
-        { id: 7, title: 'סיכום: צדק כלכלי', titleEn: 'Summary: Economic Justice', thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary', thinkerId: null, xp: 50, isSummary: true, sections: [
+        { id: 7, title: 'צדק כלכלי', titleEn: 'Economic Justice', thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary', thinkerId: null, xp: 50, isSummary: true, sections: [
           {
             type: 'idea',
-            title: 'סיכום: צדק כלכלי', titleEn: 'Summary: Economic Justice',
+            title: 'צדק כלכלי', titleEn: 'Economic Justice',
             content: 'התחלנו את הפרק בשאלה: <strong>האם החלוקה הכלכלית הנוכחית היא צודקת?</strong></p><p>עכשיו, אחרי שישה דיאלוגים, אנחנו רואים שזו לא שאלה אחת. <strong>זו שאלה שמתפצלת לשאלות רבות.</strong> איך מודדים צדק? לפי תהליך או תוצאה? לפי משאבים או יכולות? והאם יש בכלל תשובה אובייקטיבית?',
             contentEn: 'We began the chapter with a question: <strong>is the current economic distribution just?</strong></p><p>Now, after six dialogues, we see that this isn\'t one question. <strong>It\'s a question that splits into many.</strong> How do we measure justice? By process or outcome? By resources or capabilities? And is there even an objective answer?',
           },
@@ -3541,10 +3541,10 @@ const economicsData = {
       title: 'כלכלה התנהגותית',
       titleEn: 'Behavioral Economics',
       days: [
-          { id: 1, title: 'סיימון: האם אנחנו בכלל מסוגלים להיות רציונליים?', titleEn: 'Simon: Are we even capable of being rational?', thinker: 'הרברט סיימון', thinkerEn: 'Herbert Simon', thinkerId: 'simon', xp: 50, sections: [
+          { id: 1, title: 'האם אנחנו בכלל מסוגלים להיות רציונליים?', titleEn: 'Are we even capable of being rational?', thinker: 'הרברט סיימון', thinkerEn: 'Herbert Simon', thinkerId: 'simon', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'סיימון: האם אנחנו בכלל מסוגלים להיות רציונליים?', titleEn: 'Simon: Are we even capable of being rational?',
+              title: 'האם אנחנו בכלל מסוגלים להיות רציונליים?', titleEn: 'Are we even capable of being rational?',
               content: 'המודל הכלכלי הקלאסי מניח משהו מסוים על בני אדם: שהם ממקסמים. שוקלים את כל האפשרויות, מעריכים את התוצאות, ובוחרים את הטובה ביותר.\n\nהרברט סיימון טען שזה לא רק לא מדויק, זה בלתי אפשרי.\n\nוהטיעון שלו אינו על חולשת אופי. אין לנו את הזמן לסרוק את כל האפשרויות, אין לנו את המידע המלא, ואין לנו את יכולת החישוב. גם המחשב החזק ביותר לא היה מצליח, כי מספר האפשרויות ברוב ההחלטות האמיתיות עצום.\n\nמכאן המונח שלו: רציונליות חסומה. לא היעדר היגיון, אלא היגיון שפועל בתוך גבולות ממשיים.\n\nומה שאנחנו עושים במקום נקרא הסתפקות: מחפשים עד שמוצאים משהו מספיק טוב, ואז עוצרים. לא הטוב ביותר, אלא הראשון שעובר את הרף.',
               contentEn: 'The classical economic model assumes something particular about human beings: that they maximize. They weigh all the options, assess the outcomes, and choose the best one.\n\nHerbert Simon argued that this is not merely inaccurate, it is impossible.\n\nAnd his argument is not about weakness of character. We do not have the time to scan all the options, we do not have complete information, and we do not have the computational capacity. Even the most powerful computer would not manage it, because the number of options in most real decisions is enormous.\n\nFrom here his term: bounded rationality. Not an absence of reasoning, but reasoning that operates within real limits.\n\nAnd what we do instead is called satisficing: we search until we find something good enough, and then we stop. Not the best one, but the first one that clears the bar.',
             },
@@ -3602,10 +3602,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 2, title: 'כהנמן וטברסקי: למה הפסד כואב יותר מרווח משמח', titleEn: 'Kahneman and Tversky: Why a loss hurts more than an equal gain pleases', thinker: 'כהנמן וטברסקי', thinkerEn: 'Kahneman and Tversky', thinkerId: 'kahneman', xp: 50, sections: [
+          { id: 2, title: 'למה הפסד כואב יותר מרווח משמח', titleEn: 'Why a loss hurts more than an equal gain pleases', thinker: 'כהנמן וטברסקי', thinkerEn: 'Kahneman and Tversky', thinkerId: 'kahneman', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'כהנמן וטברסקי: למה הפסד כואב יותר מרווח משמח', titleEn: 'Kahneman and Tversky: Why a loss hurts more than an equal gain pleases',
+              title: 'למה הפסד כואב יותר מרווח משמח', titleEn: 'Why a loss hurts more than an equal gain pleases',
               content: 'סיימון הראה שאיננו ממקסמים. דניאל כהנמן ועמוס טברסקי הראו משהו חד יותר: גם הסטיות עצמן אינן אקראיות. הן שיטתיות, חוזרות, וניתנות לחיזוי.\n\nובמאמר מ-1979 הם הצביעו על הנחה שהמודל הקלאסי עושה בלי לומר אותה. התיאוריה הקלאסית מניחה שאנשים שוקלים מצבי עושר סופיים: כמה יהיה לי בסוף.\n\nוכהנמן וטברסקי הראו שאנחנו לא חושבים כך בכלל. אנחנו חושבים בשינויים מנקודת ייחוס: כמה יותר או פחות יהיה לי ממה שיש לי עכשיו, או ממה שציפיתי.\n\nומכאן הממצא המרכזי: האסימטריה. העקומה אינה סימטרית סביב נקודת הייחוס. הכאב מהפסד גדול בערך פי שניים מההנאה מרווח זהה.',
               contentEn: 'Simon showed that we do not maximize. Daniel Kahneman and Amos Tversky showed something sharper: the deviations themselves are not random either. They are systematic, recurring, and predictable.\n\nAnd in a 1979 paper they pointed to an assumption the classical model makes without saying it. Classical theory assumes that people weigh final states of wealth: how much I will have at the end.\n\nAnd Kahneman and Tversky showed that we do not think that way at all. We think in changes from a reference point: how much more or less I will have than I have now, or than I expected.\n\nAnd from here the central finding: the asymmetry. The curve is not symmetrical around the reference point. The pain of a loss is roughly twice the pleasure of an identical gain.',
             },
@@ -3663,10 +3663,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 3, title: 'תיילר: למה אותו חפץ שווה פי שניים כשהוא שלנו?', titleEn: 'Thaler: Why is the same object worth twice as much when it is ours?', thinker: 'ריצ\'רד תיילר', thinkerEn: 'Richard Thaler', thinkerId: 'thaler', xp: 50, sections: [
+          { id: 3, title: 'למה אותו חפץ שווה פי שניים כשהוא שלנו?', titleEn: 'Why is the same object worth twice as much when it is ours?', thinker: 'ריצ\'רד תיילר', thinkerEn: 'Richard Thaler', thinkerId: 'thaler', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'תיילר: למה אותו חפץ שווה פי שניים כשהוא שלנו?', titleEn: 'Thaler: Why is the same object worth twice as much when it is ours?',
+              title: 'למה אותו חפץ שווה פי שניים כשהוא שלנו?', titleEn: 'Why is the same object worth twice as much when it is ours?',
               content: 'כהנמן וטברסקי היו פסיכולוגים שכתבו לכלכלנים. ריצ\'רד תיילר היה הכלכלן שהכניס את הממצאים שלהם אל תוך הכלכלה עצמה, והוא ניסח את ההבדל בצורה שנדבקה.\n\nספרי הלימוד, אמר תיילר, מתארים יצור שהוא כינה "אקון": מחשב לגמרי, עקבי, משקלל נכון. בעולם האמיתי יש בני אדם. הם מחשבים, אבל גם שוכחים, נאחזים ומתבלבלים.\n\nהטענה שלו לא הייתה שבני אדם טיפשים, אלא שהם שונים מהמודל בדרכים ניתנות לחיזוי.\n\nהתופעה הראשונה שמיפה: אפקט הבעלות. ברגע שמשהו שייך לנו, הוא נעשה שווה יותר בעינינו. החפץ לא השתנה. מה שהשתנה הוא שלוותר עליו נחווה מעכשיו כהפסד, ואת האסימטריה הזו פגשנו בדיאלוג הקודם.',
               contentEn: 'Kahneman and Tversky were psychologists writing for economists. Richard Thaler was the economist who brought their findings into economics itself, and he formulated the difference in a way that stuck.\n\nThe textbooks, said Thaler, describe a creature he called an "Econ": entirely calculating, consistent, weighing things correctly. In the real world there are human beings. They calculate, but they also forget, cling and get confused.\n\nHis claim was not that human beings are stupid, but that they differ from the model in predictable ways.\n\nThe first phenomenon he mapped: the endowment effect. The moment something belongs to us, it becomes worth more in our eyes. The object did not change. What changed is that giving it up is now experienced as a loss, and we already met that asymmetry in the previous dialogue.',
             },
@@ -3724,10 +3724,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 4, title: 'דחיפה: אם אנחנו יודעים איך אנשים בוחרים, מותר לעצב את הבחירה?', titleEn: 'Nudge: If we know how people choose, are we permitted to design the choice?', thinker: 'תיילר וסנסטיין', thinkerEn: 'Thaler and Sunstein', thinkerId: 'thaler', xp: 50, sections: [
+          { id: 4, title: 'אם אנחנו יודעים איך אנשים בוחרים, מותר לעצב את הבחירה?', titleEn: 'If we know how people choose, are we permitted to design the choice?', thinker: 'תיילר וסנסטיין', thinkerEn: 'Thaler and Sunstein', thinkerId: 'thaler', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'דחיפה: אם אנחנו יודעים איך אנשים בוחרים, מותר לעצב את הבחירה?', titleEn: 'Nudge: If we know how people choose, are we permitted to design the choice?',
+              title: 'אם אנחנו יודעים איך אנשים בוחרים, מותר לעצב את הבחירה?', titleEn: 'If we know how people choose, are we permitted to design the choice?',
               content: 'שלושת הדיאלוגים הקודמים מיפו סטיות. תיילר וכאס סנסטיין שאלו מה עושים עם הידע הזה, ובספרם מ-2008 הציעו תשובה שהפכה למדיניות ברחבי העולם.\n\nהרעיון: כל בחירה מוצגת בדרך מסוימת. יש סדר לאפשרויות, יש ברירת מחדל, ויש מה שנמצא בגובה העיניים. הם קראו לזה "ארכיטקטורת בחירה", וטענו שאי אפשר לוותר עליה.\n\nואם כך, אפשר לעצב אותה בכוונה כך שתסייע לאנשים.\n\nויש כאן תנאי קפדני: דחיפה אינה כפייה. שום אפשרות אינה נאסרת, ושום תמריץ כלכלי אינו משתנה מהותית. להציב פירות בגובה העיניים בקפיטריה זו דחיפה. לאסור משקאות מתוקים זו אינה דחיפה.',
               contentEn: 'The three previous dialogues mapped deviations. Thaler and Cass Sunstein asked what to do with this knowledge, and in their 2008 book they proposed an answer that became policy around the world.\n\nThe idea: every choice is presented in a particular way. There is an order to the options, there is a default, and there is what sits at eye level. They called this "choice architecture", and argued that it cannot be dispensed with.\n\nAnd if so, it can be designed deliberately so as to help people.\n\nAnd there is a strict condition here: a nudge is not coercion. No option is forbidden, and no economic incentive is substantially changed. Placing fruit at eye level in a cafeteria is a nudge. Banning sugary drinks is not a nudge.',
             },
@@ -3785,10 +3785,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 5, title: 'שילר: מה קורה כשהסטיות מצטברות לשוק שלם?', titleEn: 'Shiller: What happens when the deviations accumulate into an entire market?', thinker: 'רוברט שילר', thinkerEn: 'Robert Shiller', thinkerId: 'shiller', xp: 50, sections: [
+          { id: 5, title: 'מה קורה כשהסטיות מצטברות לשוק שלם?', titleEn: 'What happens when the deviations accumulate into an entire market?', thinker: 'רוברט שילר', thinkerEn: 'Robert Shiller', thinkerId: 'shiller', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'שילר: מה קורה כשהסטיות מצטברות לשוק שלם?', titleEn: 'Shiller: What happens when the deviations accumulate into an entire market?',
+              title: 'מה קורה כשהסטיות מצטברות לשוק שלם?', titleEn: 'What happens when the deviations accumulate into an entire market?',
               content: 'ארבעת הדיאלוגים עד כה עסקו באדם אחד. רוברט שילר שאל מה קורה כשמיליוני אנשים כאלה נפגשים בשוק אחד.\n\nולשאלה הזו הייתה תשובה מקובלת: לא קורה כלום. גם אם כל אחד סוטה מהמודל, הסטיות אינן באותו כיוון, ולכן הן מתקזזות זו בזו. ואם מניה מתומחרת נמוך מדי, מישהו יקנה אותה וירוויח, והקנייה הזו עצמה תעלה את המחיר. ולכן טעות אינה נשארת מונחת על השולחן.\n\nוזו ההנחה שהכלכלה עבדה לפיה: המחיר בשוק משקף בכל רגע את כל המידע הקיים. ההנחה הזו קיבלה שם, השערת השוק היעיל, והיא העמדה שהפרק הזה מתמודד איתה מתחילתו.\n\nושילר בנה מבחן פשוט להפליא לטענה הזו.',
               contentEn: 'The four dialogues so far dealt with a single person. Robert Shiller asked what happens when millions of such people meet in one market.\n\nAnd this question had an accepted answer: nothing happens. Even if each person deviates from the model, the deviations are not in the same direction, and therefore they cancel each other out. And if a stock is priced too low, someone will buy it and profit, and that very purchase will raise the price. And therefore an error does not remain lying on the table.\n\nAnd this is the assumption economics worked by: the price in the market reflects at every moment all the information that exists. This assumption received a name, the efficient market hypothesis, and it is the position this chapter has been contending with from its start.\n\nAnd Shiller built a remarkably simple test of this claim.',
             },
@@ -3846,10 +3846,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 6, title: 'גיגרנצר: ואולי זו בכלל לא טעות?', titleEn: 'Gigerenzer: And perhaps it is not a mistake at all?', thinker: 'גרד גיגרנצר', thinkerEn: 'Gerd Gigerenzer', thinkerId: 'gigerenzer', xp: 50, sections: [
+          { id: 6, title: 'ואולי זו בכלל לא טעות?', titleEn: 'And perhaps it is not a mistake at all?', thinker: 'גרד גיגרנצר', thinkerEn: 'Gerd Gigerenzer', thinkerId: 'gigerenzer', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'גיגרנצר: ואולי זו בכלל לא טעות?', titleEn: 'Gigerenzer: And perhaps it is not a mistake at all?',
+              title: 'ואולי זו בכלל לא טעות?', titleEn: 'And perhaps it is not a mistake at all?',
               content: 'חמשת הדיאלוגים עד כה בנו טיעון אחד: אנחנו סוטים מהמודל באופן שיטתי. גרד גיגרנצר, פסיכולוג גרמני, טוען שהטיעון הזה נשען על הנחה שלא נאמרה בקול.\n\nההנחה: שיש דרך אחת נכונה להחליט, ושכל מה ששונה ממנה הוא הטיה.\n\nוגיגרנצר חולק על ההנחה הזאת. קיצור דרך אינו פגם, הוא כלי. קיצור דרך אינו פגם, הוא כלי. והשאלה אינה אם הוא תואם לנוסחה, אלא אם הוא מתאים לסביבה שבה משתמשים בו.\n\nלכך הוא קרא רציונליות אקולוגית: התאמה בין הכלי לסביבה. ומכאן שאותו קיצור דרך יכול להיות מבריק במקום אחד וכושל במקום אחר, ואין טעם לשפוט אותו בלי ההקשר.',
               contentEn: 'The five dialogues so far built a single argument: we deviate from the model systematically. Gerd Gigerenzer, a German psychologist, argues that this argument rests on an assumption that was never stated out loud.\n\nThe assumption: that there is one correct way to decide, and that anything different from it is a bias.\n\nAnd Gigerenzer disputes this assumption. A shortcut is not a flaw, it is a tool. And the question is not whether it matches the formula, but whether it suits the environment in which it is used.\n\nThis he called ecological rationality: a match between the tool and the environment. And from here it follows that the same shortcut can be brilliant in one place and fail in another, and there is no point in judging it without the context.',
             },
@@ -3907,10 +3907,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 7, title: 'סיכום: האם אנחנו באמת רציונליים?', titleEn: 'Summary: Are we really rational?', thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary', thinkerId: null, xp: 50, isSummary: true, sections: [
+          { id: 7, title: 'האם אנחנו באמת רציונליים?', titleEn: 'Are we really rational?', thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary', thinkerId: null, xp: 50, isSummary: true, sections: [
             {
               type: 'idea',
-              title: 'סיכום: האם אנחנו באמת רציונליים?', titleEn: 'Summary: Are we really rational?',
+              title: 'האם אנחנו באמת רציונליים?', titleEn: 'Are we really rational?',
               content: 'פתחנו את הפרק בשאלה שנשמעת תיאורטית ואינה: האם אנחנו באמת רציונליים?\n\nשישה דיאלוגים אחר כך, התשובה אינה כן ואינה לא. היא שהשאלה עצמה הייתה מנוסחת לא נכון.',
               contentEn: 'We opened the chapter with a question that sounds theoretical and is not: are we really rational?\n\nSix dialogues later, the answer is neither yes nor no. It is that the question itself was wrongly formulated.',
             },

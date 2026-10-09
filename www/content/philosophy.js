@@ -2223,13 +2223,13 @@ const corpusData = {
       },
       {
         id: 5,
-        title: 'ביקורת: איפה כל גישה נכשלת?', titleEn: 'Critique: Where Each Approach Fails',
+        title: 'איפה כל גישה נכשלת?', titleEn: 'Where Each Approach Fails',
         thinker: 'לודוויג ויטגנשטיין', thinkerEn: 'Ludwig Wittgenstein',
         thinkerId: null, xp: 50,
         sections: [
           {
             type: 'idea',
-            title: 'ביקורת: איפה כל גישה נכשלת?', titleEn: 'Critique: Where Each Approach Fails',
+            title: 'איפה כל גישה נכשלת?', titleEn: 'Where Each Approach Fails',
             content: 'ארבעה ימים, ארבעה פילוסופים. אפלטון הציע עולם אידאות. שפינוזה אמר שהכל עצם אחד. ברקלי אמר שאין חומר כלל.\n\nהיום נבחן את הביקורות, ונראה אם מישהו מנצח.',
             contentEn: 'Four days, four philosophers. Plato proposed a world of Forms. Spinoza said all is one substance. Berkeley said there is no matter at all.\n\nToday we\'ll examine the critiques, and see if anyone wins.',
           },
