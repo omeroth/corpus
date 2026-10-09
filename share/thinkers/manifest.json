@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-09T10:05:40.220Z",
+  "generatedAt": "2026-10-09T11:17:29.865Z",
   "items": [
     {
       "thinkerId": "socrates",
@@ -260,6 +260,26 @@
       "cardLandscape": "share/thinkers/he/rogers.png",
       "cardPortrait": "share/thinkers/portrait/he/rogers.png",
       "page": "t/rogers-he.html"
+    },
+    {
+      "thinkerId": "breuer",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "יוזף ברויר",
+      "era": "1842–1925",
+      "cardLandscape": "share/thinkers/he/breuer.png",
+      "cardPortrait": "share/thinkers/portrait/he/breuer.png",
+      "page": "t/breuer-he.html"
+    },
+    {
+      "thinkerId": "miller",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "סקוט ד. מילר",
+      "era": "1960–",
+      "cardLandscape": "share/thinkers/he/miller.png",
+      "cardPortrait": "share/thinkers/portrait/he/miller.png",
+      "page": "t/miller-he.html"
     },
     {
       "thinkerId": "adler",
@@ -1190,6 +1210,26 @@
       "cardLandscape": "share/thinkers/en/rogers.png",
       "cardPortrait": "share/thinkers/portrait/en/rogers.png",
       "page": "t/rogers-en.html"
+    },
+    {
+      "thinkerId": "breuer",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Josef Breuer",
+      "era": "1842–1925",
+      "cardLandscape": "share/thinkers/en/breuer.png",
+      "cardPortrait": "share/thinkers/portrait/en/breuer.png",
+      "page": "t/breuer-en.html"
+    },
+    {
+      "thinkerId": "miller",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Scott D. Miller",
+      "era": "1960–",
+      "cardLandscape": "share/thinkers/en/miller.png",
+      "cardPortrait": "share/thinkers/portrait/en/miller.png",
+      "page": "t/miller-en.html"
     },
     {
       "thinkerId": "adler",

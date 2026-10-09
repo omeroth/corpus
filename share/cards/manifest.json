@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-09T10:05:33.367Z",
+  "generatedAt": "2026-10-09T11:17:22.659Z",
   "items": [
     {
       "weekId": 1,
@@ -2418,6 +2418,148 @@
       "title": "What does mental suffering say?",
       "card": "share/cards/en/psyc-5-7.png",
       "page": "d/psyc-5-7-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "breuer",
+      "title": "מה אם עצם הדיבור הוא מה שמרפא?",
+      "card": "share/cards/he/psyc-6-1.png",
+      "page": "d/psyc-6-1-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "breuer",
+      "title": "What if the speaking itself is what heals?",
+      "card": "share/cards/en/psyc-6-1.png",
+      "page": "d/psyc-6-1-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "rogers",
+      "title": "מה אם לא השיטה מרפאת אלא הקשר?",
+      "card": "share/cards/he/psyc-6-2.png",
+      "page": "d/psyc-6-2-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "rogers",
+      "title": "What if it is not the method that heals but the relationship?",
+      "card": "share/cards/en/psyc-6-2.png",
+      "page": "d/psyc-6-2-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "winnicott",
+      "title": "מה אם צריך פחות לתקן ויותר לאפשר?",
+      "card": "share/cards/he/psyc-6-3.png",
+      "page": "d/psyc-6-3-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "winnicott",
+      "title": "What if less repairing and more allowing is needed?",
+      "card": "share/cards/en/psyc-6-3.png",
+      "page": "d/psyc-6-3-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "beck",
+      "title": "מה אם אפשר פשוט לבדוק את המחשבה?",
+      "card": "share/cards/he/psyc-6-4.png",
+      "page": "d/psyc-6-4-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "beck",
+      "title": "What if one can simply test the thought?",
+      "card": "share/cards/en/psyc-6-4.png",
+      "page": "d/psyc-6-4-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "frankl",
+      "title": "מה קורה כשאי אפשר לשנות דבר?",
+      "card": "share/cards/he/psyc-6-5.png",
+      "page": "d/psyc-6-5-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "frankl",
+      "title": "What happens when nothing can be changed?",
+      "card": "share/cards/en/psyc-6-5.png",
+      "page": "d/psyc-6-5-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "miller",
+      "title": "מה מכל זה באמת עובד?",
+      "card": "share/cards/he/psyc-6-6.png",
+      "page": "d/psyc-6-6-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "miller",
+      "title": "Which of all this actually works?",
+      "card": "share/cards/en/psyc-6-6.png",
+      "page": "d/psyc-6-6-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 7,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "other",
+      "title": "האם השינוי אמיתי?",
+      "card": "share/cards/he/psyc-6-7.png",
+      "page": "d/psyc-6-7-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 7,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "other",
+      "title": "Is the change real?",
+      "card": "share/cards/en/psyc-6-7.png",
+      "page": "d/psyc-6-7-en.html"
     }
   ]
 }
