@@ -9146,24 +9146,16 @@
     padding: 8px 26px 24px;
     text-align: center;
   }
-  /* Mid-chapter mode: edge-to-edge presentation, no backdrop blur,
-     no centered box. Still uses #modal-paywall + .paywall-close etc.,
-     only CSS differs. The offering stays standard (non-trial) because
-     _paywallMode === 'modal-fullscreen' !== 'onboarding'. */
-  #modal-paywall.paywall-fullscreen {
-    background: var(--bg);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    padding: 0;
-  }
-  #modal-paywall.paywall-fullscreen .modal-box {
-    max-width: none;
-    width: 100%;
-    min-height: 100vh;
-    margin: 0;
-    border-radius: 0;
-    padding: calc(12px + var(--safe-top)) 20px calc(20px + var(--safe-bottom));
-  }
+  /* Paywall z-index raised above #modal-complete (1500) so the mid-
+     chapter trigger can render as a modal ON TOP of the thinker-card
+     reveal, not behind it. Below the level-up (10000) and streak-
+     earn (2036) overlays; neither can be visible when the mid-chapter
+     paywall fires because the celebration queue drains before the
+     thinker-card screen opens. Applies to every paywall callsite —
+     chapter-lock, lesson-tap, bonus-tap, practice-card, chapter-
+     complete-continue — none of which have a higher-z overlay above
+     them, so the raise is a visual no-op elsewhere. */
+  #modal-paywall.modal-overlay { z-index: 1700; }
   /* Flex header row anchoring the close X to the top-right corner
      without absolute positioning. .modal-overlay already applies
      safe-top padding at the overlay level (line 3970), so no
@@ -14955,21 +14947,7 @@ function showPaywall(opts) {
   _haptic('locked');
   opts = opts || {};
   _paywallActiveRoot = document.getElementById('modal-paywall');
-  // Mode selects the DOM shell + the offering. 'modal' is the default
-  // (centered modal + standard offering). 'modal-fullscreen' is the
-  // mid-chapter variant — edge-to-edge presentation via a CSS class on
-  // the same #modal-paywall DOM, still the standard (non-trial)
-  // offering. 'onboarding' is set only by _onbV2PreparePaywall and is
-  // the only mode that unlocks the trial offering (see trialOn + the
-  // onboarding === check in _paywallActiveOffering, which keep keying
-  // on the literal 'onboarding' so 'modal-fullscreen' naturally gets
-  // standard pricing — this is load-bearing for not giving away free
-  // trials from the mid-chapter trigger).
-  _paywallMode = (opts.mode === 'modal-fullscreen') ? 'modal-fullscreen' : 'modal';
-  if (_paywallActiveRoot) {
-    if (_paywallMode === 'modal-fullscreen') _paywallActiveRoot.classList.add('paywall-fullscreen');
-    else _paywallActiveRoot.classList.remove('paywall-fullscreen');
-  }
+  _paywallMode = 'modal';
   _paywallShownThisSession = true;
   _paywallReturnTo = (typeof opts.weekId !== 'undefined' && typeof opts.dayId !== 'undefined')
     ? { weekId: opts.weekId, dayId: opts.dayId }
@@ -25347,14 +25325,20 @@ function _wrapWithQueuePlay(fn) {
 // it rides on the dialogue they just finished. Session-only — a
 // crash before the paywall actually renders means the user gets
 // another chance on their next completion. state.midChapterPaywallShown
-// is flipped at render time (inside the wrapper below), not here.
+// is flipped at render time (inside _openMidChapterPaywall), not here.
 //
-// The wrapper is composed around the thinker-card dismiss buttons:
-//   nextBtn.onclick = _wrapWithMidChapterPaywall(_wrapWithQueuePlay(goToNextLesson));
-//   backBtn.onclick = _wrapWithMidChapterPaywall(_wrapWithQueuePlay(closeCompleteModal));
-// So the sequence is: thinker-card reveal → user dismisses → paywall
-// (if flagged) → paywall-close dismisses to the user's chosen next
-// action. "Card first, ask second."
+// Placement: the paywall opens AS A MODAL ON TOP OF whatever celebration
+// surface the user is currently on. For a new-thinker reveal, the
+// thinker-card screen is visible — the paywall lands over it at a
+// settle-dependent delay (see showThinkerCardScreen for the fire
+// scheduling). For a no-new-thinker completion, dc-stats is the
+// visible surface — the paywall lands over it at ~2800ms.
+//
+// The paywall is a MOMENT, not a GATE. Dismissing it leaves the user
+// on their card (or stats). No forced navigation. They can then tap
+// Next Dialogue / Back to Home at their own pace, same as if the
+// paywall never fired. Z-index on the paywall is raised to 1700 so
+// it renders above modal-complete (1500) during the reveal.
 let _pendingMidChapterPaywall = null;
 // Session-only dedupe clock for the "dialogue 6 → chapter 2 lock"
 // collision. _exitPaywall writes _lastPaywallDismissedAt; the
@@ -25489,38 +25473,34 @@ function _midChapterPaywallCopy(subject, source) {
   return { eyebrow: interp(slot.eyebrow), headline: interp(slot.headline), sub: interp(slot.sub) };
 }
 
-function _wrapWithMidChapterPaywall(fn) {
-  return function() {
-    const p = _pendingMidChapterPaywall;
-    if (!p) {
-      try { console.log('[midchpw] wrapper fired; no pending flag, passthrough'); } catch(e) {}
-      fn.apply(this, arguments);
-      return;
-    }
-    try { console.log('[midchpw] wrapper fired WITH pending flag; opening paywall for', p); } catch(e) {}
-    _pendingMidChapterPaywall = null;
-    // Flip the shown flag HERE — at the moment the paywall opens —
-    // not at completion time. A crash before this point leaves the
-    // flag false and the user gets another chance.
-    state.midChapterPaywallShown = state.midChapterPaywallShown || {};
-    state.midChapterPaywallShown[p.key] = true;
-    try { saveState(); } catch (e) { try { saveStateLocal(); } catch(_) {} }
-    // Defer the next-action to run on paywall dismiss.
-    const self = this, args = arguments;
-    const resumeAfterPaywall = () => { fn.apply(self, args); };
-    const ctx = _midChapterPaywallCopy(p.subject, p.source);
-    showPaywall({
-      subject: p.subject,
-      weekId: 1,
-      dayId: p.dayId,
-      source: p.source,
-      mode: 'modal-fullscreen',
-      contextEyebrow:  ctx.eyebrow,
-      contextHeadline: ctx.headline,
-      contextSub:      ctx.sub,
-      onClose: resumeAfterPaywall,
-    });
-  };
+// Opens the paywall over whatever surface is currently visible.
+// Called from showThinkerCardScreen's settle timer (over the card)
+// and from _showDcStats' settle timer (over the stats screen) when
+// _pendingMidChapterPaywall is set. Flips the shown flag at this
+// moment — if the user dismisses the thinker-card or navigates
+// before this fires (visibility check at the call site), the flag
+// stays unflipped and the user gets another chance on their next
+// completion. No onClose: paywall dismiss leaves the user on the
+// surface underneath, no forced navigation. The paywall is a tap
+// moment, not a chokepoint.
+function _openMidChapterPaywall() {
+  const p = _pendingMidChapterPaywall;
+  if (!p) { try { console.log('[midchpw] open called with no pending flag; bail'); } catch(e) {} return; }
+  try { console.log('[midchpw] open; firing paywall for', p); } catch(e) {}
+  _pendingMidChapterPaywall = null;
+  state.midChapterPaywallShown = state.midChapterPaywallShown || {};
+  state.midChapterPaywallShown[p.key] = true;
+  try { saveState(); } catch (e) { try { saveStateLocal(); } catch(_) {} }
+  const ctx = _midChapterPaywallCopy(p.subject, p.source);
+  showPaywall({
+    subject: p.subject,
+    weekId: 1,
+    dayId: p.dayId,
+    source: p.source,
+    contextEyebrow:  ctx.eyebrow,
+    contextHeadline: ctx.headline,
+    contextSub:      ctx.sub,
+  });
 }
 
 
@@ -27964,29 +27944,19 @@ function _showDcStats(titleText, subtitleText, xpAmount, streakCount, onContinue
   // card's OWN Next Dialogue and Back to Home buttons — wired inside
   // showThinkerCardScreen. Caller flags this path via onContinue.thinker=true.
   if (next.hasNext && onContinue.fn === closeCompleteModal) {
-    // Branch: next lesson exists but there's no new thinker to reveal
-    // (user had already unlocked this dialogue's thinker). The stats
-    // screen IS the final beat before leaving, so the mid-chapter
-    // paywall wrap belongs here — without it, a user who completes
-    // ch1-d3 or ch1-d6 and has the thinker already unlocked never
-    // sees the paywall even though _maybeFlagMidChapterPaywall set
-    // the pending flag in finishDay.
     continueBtn.textContent = isEn ? 'Next Dialogue' : 'הדיאלוג הבא';
-    continueBtn.onclick = _wrapWithMidChapterPaywall(_wrapWithQueuePlay(goToNextLesson));
+    continueBtn.onclick = _wrapWithQueuePlay(goToNextLesson);
     backHomeBtn.textContent = isEn ? 'Back to Home' : 'חזרה לבית';
-    backHomeBtn.onclick = _wrapWithMidChapterPaywall(_wrapWithQueuePlay(closeCompleteModal));
+    backHomeBtn.onclick = _wrapWithQueuePlay(closeCompleteModal);
     backHomeBtn.style.display = '';
   } else {
     continueBtn.textContent = onContinue.label;
-    // Thinker-card path: unwrapped at stats level. The thinker card's
-    // own buttons (Next Dialogue / Back to Home) carry the mid-chapter
-    // paywall wrap, so the paywall fires AFTER the reveal, not before.
-    // Non-thinker-with-no-next path: this is the user's final exit from
-    // the completion flow — wrap it so the paywall gets a chance here
-    // too (same reasoning as the branch above).
+    // Thinker-card path: continueBtn runs onContinue.fn directly
+    // (showThinkerCardScreen) so the thinker card's own buttons can
+    // wrap the queue drain.
     continueBtn.onclick = onContinue.thinker
       ? onContinue.fn
-      : _wrapWithMidChapterPaywall(_wrapWithQueuePlay(onContinue.fn));
+      : _wrapWithQueuePlay(onContinue.fn);
     backHomeBtn.style.display = 'none';
   }
 
@@ -28019,6 +27989,22 @@ function _showDcStats(titleText, subtitleText, xpAmount, streakCount, onContinue
     const _streakItem = document.getElementById('metric-streak-item');
     const _streakVisible = _streakItem && _streakItem.style.display !== 'none';
     if (_streakVisible) setTimeout(() => _haptic('stat'), 2000);
+  }
+
+  // Mid-chapter paywall over the stats screen. Only fires when there
+  // is NO thinker-card follow-up (onContinue.thinker !== true) — the
+  // thinker-card path has its own paywall schedule inside
+  // showThinkerCardScreen so the paywall lands over the card instead.
+  // Timing: 2800ms after screen activate — XP count-up finishes at
+  // 1600, streak stat lands at 2000, buttons finish fading in at
+  // 2700, so 2800 is right after everything has settled. Visibility
+  // check in the callback bails if the user already tapped a button
+  // and left the stats screen before the timer fires.
+  if (_pendingMidChapterPaywall && !(onContinue && onContinue.thinker)) {
+    setTimeout(() => {
+      const stats = document.getElementById('dc-stats-screen');
+      if (stats && stats.style.display !== 'none') _openMidChapterPaywall();
+    }, 2800);
   }
 }
 
@@ -28123,18 +28109,14 @@ function showThinkerCardScreen(thinker, chapter, day) {
   const nextBtn = document.getElementById('modal-next-btn');
   if (nextInfo.hasNext) {
     nextBtn.textContent = isEn ? 'Next Dialogue' : 'הדיאלוג הבא';
-    // Mid-chapter paywall wrap: if _pendingMidChapterPaywall is set
-    // (ch1 d3 / d6 finish by a non-paid user), paywall opens on
-    // dismiss and goToNextLesson defers to its close. Pass-through
-    // otherwise.
-    nextBtn.onclick = _wrapWithMidChapterPaywall(_wrapWithQueuePlay(goToNextLesson));
+    nextBtn.onclick = _wrapWithQueuePlay(goToNextLesson);
     nextBtn.style.display = '';
   } else {
     nextBtn.style.display = 'none';
   }
   const backBtn = document.getElementById('modal-continue-btn');
   backBtn.textContent = isEn ? 'Back to Home' : 'חזרה לבית';
-  backBtn.onclick = _wrapWithMidChapterPaywall(_wrapWithQueuePlay(closeCompleteModal));
+  backBtn.onclick = _wrapWithQueuePlay(closeCompleteModal);
 
   // Re-activate modal-complete. Under the celebration-queue flow
   // (introduced in 9228d92), _wrapWithQueuePlay removes .active from
@@ -28326,6 +28308,28 @@ function showThinkerCardScreen(thinker, chapter, day) {
   } else {
     card.dataset.settled = 'true';
   }
+
+  // Mid-chapter paywall over the card. Scheduled only if the flag was
+  // set by finishDay (ch1 d3 or d6, non-paid, non-trial, not already
+  // shown). Timing is forge-aware: non-boundary gets a +800ms "look at
+  // your plate" grace after Fly settles (= ~2.85s into the card).
+  // Boundary (Fly + Forge) fires at the Forge banner-clear moment with
+  // no added grace (= ~4.85s), because adding another 800ms on top of
+  // the full forge spectacle pushes well past 5s and reads as drifted.
+  // Push into _timers so the reveal-skip handler cancels it; visibility
+  // check inside the callback catches the case where the user has
+  // already tapped Next Dialogue / Back to Home before the timer fires.
+  if (_pendingMidChapterPaywall) {
+    const _mcPaywallAt = _forge.forges
+      ? (_fly.delay + _RV_T.fly + _RV_T.forgeDelay + _RV_T.banner) * _rvSlowNow
+      : (_fly.delay + _RV_T.fly) * _rvSlowNow + 800;
+    _timers.push(setTimeout(() => {
+      if (_skipped) return;
+      const dcT = document.getElementById('dc-thinker-screen');
+      if (dcT && dcT.style.display !== 'none') _openMidChapterPaywall();
+    }, _mcPaywallAt));
+  }
+
   // Auto-flip removed (flip retired). First-unlock's bio + quote now
   // surface via the Read more pill above; no auto-reveal beat.
 }
@@ -28422,9 +28426,9 @@ function finishDay() {
   try { saveState(); } catch(e) { saveStateLocal(); }
   // Mid-chapter-one paywall trigger — set the session flag if the user
   // just completed ch1 d3 or d6 and isn't paid/trial/grandfathered.
-  // The flag is read inside the thinker-card dismiss handlers by
-  // _wrapWithMidChapterPaywall. Set here (not in the wrapper) so the
-  // reveal is already queued when the paywall fires on dismiss.
+  // The flag is consumed by _openMidChapterPaywall, scheduled by a
+  // settle-timer inside showThinkerCardScreen (over the card) or
+  // _showDcStats (over the stats screen, when no new thinker reveals).
   _maybeFlagMidChapterPaywall(state.currentWeek, state.currentDay);
   // After the user finishes their first real lesson, request OS notification permission
   // (no-op if already asked, plugin unavailable, or reminder disabled). Fire-and-forget;
