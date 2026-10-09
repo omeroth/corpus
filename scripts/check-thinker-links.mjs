@@ -34,6 +34,12 @@
 // template. Grandfathered allowlist exempts chapters that pre-date the
 // rule, pending a per-chapter distractor rewrite.
 //
+// HTML entity check (added after the &quot; audit):
+//   - no HTML entity (&quot; &amp; &lt; &gt; &#39; &nbsp; or numeric)
+//     may appear in any content string field
+// Content strings are data, not HTML. Escaping belongs in the render
+// path. Scoped to every string field across the four content files.
+//
 // Reverse content check: thinkers present in either array but never
 // referenced by any dialogue → they can never be unlocked and probably
 // shouldn't ship.
@@ -809,6 +815,67 @@ for (const { subject, data } of subjects) {
   }
 }
 
+// ─── HTML entity check ────────────────────────────────────────────────
+//
+// Content strings are data, not HTML. Any HTML entity (&quot; &amp;
+// &lt; &gt; &#39; &nbsp; or numeric &#NNN;/&#xNN;) in a content string
+// is a bug: either the field is rendered via textContent and the user
+// sees the literal entity (we saw this in quiz question text, where
+// `&quot;` showed as `&quot;` on screen), or the field happens to be
+// rendered via innerHTML today and the entity decodes correctly — but
+// that's luck, not correctness. The moment a render path is changed
+// from innerHTML to textContent, every entity in that field surfaces.
+//
+// Fix for authors: write the literal character in the source. Hebrew
+// source quotes use ״ (gershayim); scare quotes and English quotes
+// use ASCII ". If a field needs an actual `&` in displayed text, the
+// source should contain a literal `&` and the render path handles it.
+// Escaping belongs in the render path, never in the data.
+//
+// Scope: every string field in every loaded content constant plus
+// THINKERS / THINKERS_EN. Already covered by the TAG_RE walker above
+// in a limited way (half-tag detection), but entities are a different
+// class of mistake — they're well-formed HTML that still shouldn't
+// be in the source.
+
+const ENTITY_RE = /&(?:[a-zA-Z][a-zA-Z0-9]*|#\d+|#x[0-9a-fA-F]+);/g;
+const entityIssues = [];
+
+function walkEntities(obj, path) {
+  if (obj == null) return;
+  if (typeof obj === 'string') {
+    const matches = obj.match(ENTITY_RE);
+    if (matches) {
+      // One row per unique entity in this string, with the count + a
+      // short context snippet so the reviewer sees what to fix.
+      const counts = {};
+      for (const m of matches) counts[m] = (counts[m] || 0) + 1;
+      for (const [entity, n] of Object.entries(counts)) {
+        const idx = obj.indexOf(entity);
+        const before = obj.substring(Math.max(0, idx - 20), idx);
+        const after  = obj.substring(idx + entity.length, idx + entity.length + 20);
+        entityIssues.push({
+          issue: 'html entity in content',
+          where: path, detail: `${entity} ×${n} — "…${before}[${entity}]${after}…"`,
+        });
+      }
+    }
+    return;
+  }
+  if (Array.isArray(obj)) {
+    obj.forEach((v, i) => walkEntities(v, path + '[' + i + ']'));
+    return;
+  }
+  if (typeof obj !== 'object') return;
+  for (const k of Object.keys(obj)) walkEntities(obj[k], path + '.' + k);
+}
+
+for (const { subject, constName, data } of subjects) {
+  walkEntities(data, `${constName} (${subject})`);
+}
+walkEntities(thinkers.THINKERS, 'THINKERS');
+walkEntities(thinkers.THINKERS_EN, 'THINKERS_EN');
+
 // ─── Chapter surfacing check (getW ↔ content) ──────────────────────────
 //
 // The content validator used to inspect only the content files. That
@@ -1009,9 +1076,10 @@ reportTable('CAROUSEL_ORDER coverage errors (thinker missing from order-list / o
 reportTable('Chapter surfacing errors (content ↔ getW mismatch)', surfacingIssues);
 reportTable('Correct-answer distribution errors (letter > 50% / run ≥ 4)', distributionIssues);
 reportTable('Distractor length-signature errors (correct option strict-longest > 60%)', lengthIssues);
+reportTable('HTML entity errors (content strings should contain literal characters, not entities)', entityIssues);
 reportTable('Unreferenced thinkers (never appear in any dialogue — warning only)', unreferenced);
 
-const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length + surfacingIssues.length + distributionIssues.length + lengthIssues.length;
+const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length + surfacingIssues.length + distributionIssues.length + lengthIssues.length + entityIssues.length;
 if (hardErrorCount > 0) {
   console.error('');
   console.error('╔════════════════════════════════════════════════════════════════════╗');

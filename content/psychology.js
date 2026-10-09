@@ -3534,13 +3534,13 @@ const psychologyData = {
           {
             type: 'idea',
             title: 'ברויר: מה אם עצם הדיבור הוא מה שמרפא?', titleEn: 'Breuer: What If the Act of Speaking Is What Heals?',
-            content: 'וינה, 1880. רופא בשם יוזף ברויר מטפל בצעירה בת 21 שסובלת מתסמינים קשים שאין להם הסבר רפואי. בכתביו הוא קרא לה &quot;אנה או.&quot;, ושמה האמיתי היה ברטה פפנהיים.\n\nברויר ניסה את השיטות שהיו מקובלות אז, ובעיקר היפנוזה. אבל הדבר שעבד לא היה שלו. פפנהיים גילתה שכשהיא מספרת לו, לפרטי פרטים, מתי הופיע תסמין מסוים בפעם הראשונה, התסמין נחלש ולעיתים נעלם.\n\nוהיא זו שנתנה לזה שם. באנגלית, כי באותה תקופה היא איבדה את היכולת לדבר גרמנית. היא קראה לזה &quot;ריפוי בדיבור&quot;, ולפעמים, בהומור, &quot;ניקוי ארובות&quot;.\n\nוזו נקודת הפתיחה של כל הפרק הזה. לפני כל תיאוריה על מה מרפא, הייתה תצפית אחת: מישהי סיפרה, ומשהו השתחרר.',
+            content: 'וינה, 1880. רופא בשם יוזף ברויר מטפל בצעירה בת 21 שסובלת מתסמינים קשים שאין להם הסבר רפואי. בכתביו הוא קרא לה "אנה או.", ושמה האמיתי היה ברטה פפנהיים.\n\nברויר ניסה את השיטות שהיו מקובלות אז, ובעיקר היפנוזה. אבל הדבר שעבד לא היה שלו. פפנהיים גילתה שכשהיא מספרת לו, לפרטי פרטים, מתי הופיע תסמין מסוים בפעם הראשונה, התסמין נחלש ולעיתים נעלם.\n\nוהיא זו שנתנה לזה שם. באנגלית, כי באותה תקופה היא איבדה את היכולת לדבר גרמנית. היא קראה לזה "ריפוי בדיבור", ולפעמים, בהומור, "ניקוי ארובות".\n\nוזו נקודת הפתיחה של כל הפרק הזה. לפני כל תיאוריה על מה מרפא, הייתה תצפית אחת: מישהי סיפרה, ומשהו השתחרר.',
             contentEn: 'Vienna, 1880. A physician named Josef Breuer is treating a 21-year-old woman suffering from severe symptoms that have no medical explanation. In his writings he called her "Anna O.", and her real name was Bertha Pappenheim.\n\nBreuer tried the methods that were accepted at the time, mainly hypnosis. But the thing that worked was not his. Pappenheim discovered that when she told him, in minute detail, when a particular symptom had first appeared, the symptom weakened and sometimes disappeared.\n\nAnd it was she who gave it a name. In English, because at that period she had lost the ability to speak German. She called it the "talking cure", and sometimes, jokingly, "chimney-sweeping".\n\nAnd this is the starting point of this whole chapter. Before any theory about what heals, there was one observation: someone told, and something was released.',
           },
           {
             type: 'source',
             title: 'פרויד על אנה או. ועל "הטיפול בדיבור"', titleEn: 'Freud on Anna O. and "the Talking Cure"',
-            quote: '&quot;המטופלת עצמה, שבאותה תקופה יכלה באורח מוזר לדבר ולהבין רק אנגלית, היא שהעניקה לטיפול החדש הזה את השם \'ריפוי בדיבור\', ונהגה לכנותו בהומור \'ניקוי ארובות\'.&quot;',
+            quote: '״המטופלת עצמה, שבאותה תקופה יכלה באורח מוזר לדבר ולהבין רק אנגלית, היא שהעניקה לטיפול החדש הזה את השם \'ריפוי בדיבור\', ונהגה לכנותו בהומור \'ניקוי ארובות\'.״',
             quoteEn: '"The patient herself, who, strange to say, could at that time speak and understand only English, gave this new kind of treatment the name of \'talking cure\' and used to refer to it jokingly as \'chimney-sweeping\'."',
             attr: 'זיגמונד פרויד, הרצאות באוניברסיטת קלארק, 1909',
             attrEn: 'Sigmund Freud, lectures at Clark University, 1909',
@@ -3561,7 +3561,7 @@ const psychologyData = {
           },
           {
             type: 'quiz',
-            question: 'מי נתן ל&quot;ריפוי בדיבור&quot; את שמו?',
+            question: 'מי נתן ל"ריפוי בדיבור" את שמו?',
             questionEn: 'Who gave the "talking cure" its name?',
             options: ['יוזף ברויר, הרופא שפיתח את השיטה', 'ברטה פפנהיים, המטופלת עצמה', 'זיגמונד פרויד, שנים אחר כך'],
             optionsEn: ['Josef Breuer, the physician who developed the method', 'Bertha Pappenheim, the patient herself', 'Sigmund Freud, years later'],
@@ -3607,9 +3607,9 @@ const psychologyData = {
           {
             type: 'source',
             title: 'רוג\'רס על הפרדוקס של הקבלה', titleEn: 'Rogers on the Paradox of Acceptance',
-            quote: '&quot;הפרדוקס המשונה הוא שכאשר אני מקבל את עצמי כפי שאני, אז אני יכול להשתנות.&quot;',
+            quote: '״הפרדוקס המשונה הוא שכאשר אני מקבל את עצמי כפי שאני, אז אני יכול להשתנות.״',
             quoteEn: '"The curious paradox is that when I accept myself just as I am, then I can change."',
-            attr: 'קרל רוג\'רס, &quot;להיות אדם&quot;, 1961',
+            attr: 'קרל רוג\'רס, "להיות אדם", 1961',
             attrEn: 'Carl Rogers, "On Becoming a Person", 1961',
             content: '',
             contentEn: '',
@@ -3681,7 +3681,7 @@ const psychologyData = {
           {
             type: 'source',
             title: 'ויניקוט על ה"אם הטובה-מספיק"', titleEn: 'Winnicott on the "Good-Enough Mother"',
-            quote: '&quot;האם הטובה דיה מתחילה בהתאמה כמעט מלאה לצורכי תינוקה, וככל שהזמן עובר היא מתאימה עצמה פחות ופחות, בהדרגה, בהתאם ליכולתו הגדלה של התינוק להתמודד עם כישלונה.&quot;',
+            quote: '״האם הטובה דיה מתחילה בהתאמה כמעט מלאה לצורכי תינוקה, וככל שהזמן עובר היא מתאימה עצמה פחות ופחות, בהדרגה, בהתאם ליכולתו הגדלה של התינוק להתמודד עם כישלונה.״',
             quoteEn: '"The good-enough mother starts off with an almost complete adaptation to her infant\'s needs, and as time proceeds she adapts less and less completely, gradually, according to the infant\'s growing ability to deal with her failure."',
             attr: 'ד.ו. ויניקוט, "התיאוריה של היחסים בין הורה-תינוק", International Journal of Psycho-Analysis, 1960',
             attrEn: 'D.W. Winnicott, "The Theory of the Parent-Infant Relationship," International Journal of Psycho-Analysis, 1960',
@@ -3691,13 +3691,13 @@ const psychologyData = {
           {
             type: 'explanation',
             title: 'הכישלון המועיל, ומרחב משחק', titleEn: 'Useful Failure, and Space to Play',
-            content: 'ההבדל בין לתקן לבין לאפשר נשמע דק, אבל הוא משנה הכל.\n\nדוגמה מהחיים: אדם עובר תקופה קשה ומספר על כך לשני חברים. הראשון נכנס מיד לפעולה: מציע פתרונות, שולח קישורים, מסביר מה כדאי לעשות. הוא מנסה לתקן. השני לא עושה כמעט כלום. הוא מקשיב, נשאר, שואל מדי פעם מה שלומו, וברור שהוא לא הולך לשום מקום.\n\nולעיתים קרובות דווקא השני עוזר יותר. לא כי אין ערך לעצות, אלא כי מה שנדרש קודם הוא מקום שבו אפשר לא להיות בסדר. ורק אחרי שיש מקום כזה, מתחילה תנועה.\n\nוזו גם הסיבה שוויניקוט התעקש על אם &quot;טובה דיה&quot;: לא מושלמת. מי שמנסה לספק סביבה מושלמת מייצר תלות, ולא צמיחה.',
+            content: 'ההבדל בין לתקן לבין לאפשר נשמע דק, אבל הוא משנה הכל.\n\nדוגמה מהחיים: אדם עובר תקופה קשה ומספר על כך לשני חברים. הראשון נכנס מיד לפעולה: מציע פתרונות, שולח קישורים, מסביר מה כדאי לעשות. הוא מנסה לתקן. השני לא עושה כמעט כלום. הוא מקשיב, נשאר, שואל מדי פעם מה שלומו, וברור שהוא לא הולך לשום מקום.\n\nולעיתים קרובות דווקא השני עוזר יותר. לא כי אין ערך לעצות, אלא כי מה שנדרש קודם הוא מקום שבו אפשר לא להיות בסדר. ורק אחרי שיש מקום כזה, מתחילה תנועה.\n\nוזו גם הסיבה שוויניקוט התעקש על אם "טובה דיה": לא מושלמת. מי שמנסה לספק סביבה מושלמת מייצר תלות, ולא צמיחה.',
             contentEn: 'The difference between repairing and allowing sounds slight, but it changes everything.\n\nA real-life example: a person is going through a difficult period and tells two friends about it. The first immediately goes into action: he offers solutions, sends links, explains what should be done. He is trying to repair. The second does almost nothing. He listens, he stays, he asks from time to time how the person is doing, and it is clear that he is not going anywhere.\n\nAnd often it is precisely the second who helps more. Not because advice has no value, but because what is needed first is a place where it is possible not to be all right. And only once there is such a place does movement begin.\n\nAnd this is also why Winnicott insisted on a "good-enough" mother: not a perfect one. Whoever tries to provide a perfect environment produces dependence, not growth.',
           },
           {
             type: 'depth',
             title: 'מהתינוק לחדר הטיפול: אותו עיקרון', titleEn: 'From Infant to Therapy Room: Same Principle',
-            content: 'וכאן ויניקוט מוסיף רעיון שנשמע פשוט: היכולת להיות לבד נבנית מנוכחות.\n\nהוא תיאר את זה כפרדוקס. ילד לומד להיות לבד בזמן שמישהו נמצא בחדר. הנוכחות השקטה של המבוגר היא שמאפשרת לו לשקוע במשחק בלי לפחד. ובהמשך, הנוכחות הזו מופנמת, וכך נוצרת אצל הילד היכולת להיות עם עצמו.\n\nוזה משנה את מה שאנחנו מבינים בשינוי. המטרה אינה שאדם יהיה תלוי במטפל, וגם לא שיסתדר לבד מהיום הראשון. המטרה היא שהנוכחות תיבנה בפנים.\n\nוצריך את הסייג הרגיל. ויניקוט הגיע מהקליניקה, לא מהמעבדה, ומושגים כמו &quot;מרחב מחזיק&quot; קשים למדידה. ויש גם ביקורת מעשית: יש מצבים שבהם נוכחות בלבד אינה מספיקה, ונדרשות התערבויות ממוקדות, כפי שנראה בדיאלוג הבא.\n\nומה שנשאר עומד: לא כל עזרה היא פעולה. לפעמים מה שמאפשר שינוי הוא שמישהו מחזיק את המקום מספיק זמן.\n\nומכאן לדיאלוג הבא. ויניקוט טען שצריך לאפשר. אהרון בק יטען את ההפך כמעט: שאפשר להתערב ישירות, ושזה עובד.',
+            content: 'וכאן ויניקוט מוסיף רעיון שנשמע פשוט: היכולת להיות לבד נבנית מנוכחות.\n\nהוא תיאר את זה כפרדוקס. ילד לומד להיות לבד בזמן שמישהו נמצא בחדר. הנוכחות השקטה של המבוגר היא שמאפשרת לו לשקוע במשחק בלי לפחד. ובהמשך, הנוכחות הזו מופנמת, וכך נוצרת אצל הילד היכולת להיות עם עצמו.\n\nוזה משנה את מה שאנחנו מבינים בשינוי. המטרה אינה שאדם יהיה תלוי במטפל, וגם לא שיסתדר לבד מהיום הראשון. המטרה היא שהנוכחות תיבנה בפנים.\n\nוצריך את הסייג הרגיל. ויניקוט הגיע מהקליניקה, לא מהמעבדה, ומושגים כמו "מרחב מחזיק" קשים למדידה. ויש גם ביקורת מעשית: יש מצבים שבהם נוכחות בלבד אינה מספיקה, ונדרשות התערבויות ממוקדות, כפי שנראה בדיאלוג הבא.\n\nומה שנשאר עומד: לא כל עזרה היא פעולה. לפעמים מה שמאפשר שינוי הוא שמישהו מחזיק את המקום מספיק זמן.\n\nומכאן לדיאלוג הבא. ויניקוט טען שצריך לאפשר. אהרון בק יטען את ההפך כמעט: שאפשר להתערב ישירות, ושזה עובד.',
             contentEn: 'And here Winnicott adds an idea that sounds simple: the capacity to be alone is built out of presence.\n\nHe described this as a paradox. A child learns to be alone while someone is in the room. The quiet presence of the adult is what allows him to sink into play without fear. And later, that presence is internalised, and in this way the child\'s capacity to be with himself is created.\n\nAnd this changes what we understand by change. The aim is not for a person to be dependent on the therapist, nor for him to manage on his own from day one. The aim is for the presence to be built on the inside.\n\nAnd the usual caveat is needed. Winnicott came from the clinic, not from the laboratory, and concepts such as "holding space" are difficult to measure. And there is also a practical criticism: there are situations in which presence alone is not sufficient, and focused interventions are required, as we will see in the next dialogue.\n\nAnd what remains standing: not all help is action. Sometimes what makes change possible is that someone holds the space for long enough.\n\nAnd from here to the next dialogue. Winnicott argued that one must allow. Aaron Beck will argue almost the opposite: that it is possible to intervene directly, and that it works.',
           },
           {
@@ -3712,7 +3712,7 @@ const psychologyData = {
           },
           {
             type: 'quiz',
-            question: 'מדוע ויניקוט התעקש על סביבה &quot;טובה דיה&quot; ולא מושלמת?',
+            question: 'מדוע ויניקוט התעקש על סביבה "טובה דיה" ולא מושלמת?',
             questionEn: 'Why did Winnicott insist on a "good-enough" environment rather than a perfect one?',
             options: ['משום שסביבה מושלמת יקרה מדי ליישום בפועל', 'משום שכל סביבה נכשלת ממילא, ולכן אין הבדל', 'משום שסביבה מושלמת מייצרת תלות ולא צמיחה'],
             optionsEn: ['Because a perfect environment is too expensive to implement in practice', 'Because every environment fails anyway, and therefore there is no difference', 'Because a perfect environment produces dependence and not growth'],
@@ -3765,7 +3765,7 @@ const psychologyData = {
           {
             type: 'explanation',
             title: 'המחשבה האוטומטית, והבדיקה', titleEn: 'The Automatic Thought, and the Test',
-            content: 'המהלך שבק פיתח פשוט להפליא, וזה בדיוק כוחו.\n\nדוגמה מהחיים: אדם משוכנע ש&quot;כולם בעבודה חושבים שהוא לא מספיק טוב&quot;. במקום לשאול מאיפה הגיעה המחשבה, בק היה מציע לבחון אותה. מה הראיות בעדה? מה הראיות נגדה? ומה היית אומר לחבר שהיה אומר לך את זה על עצמו?\n\nולרוב קורה משהו מעניין. האדם מגלה שהראיות דלות בהרבה ממה שהמחשבה מרמזת, ושהיא נשענת בעיקר על שני אירועים ופרשנות אחת. המחשבה אינה נעלמת בבת אחת, אבל היא מפסיקה להיות עובדה והופכת להשערה.\n\nוכאן ההיגיון של השיטה. אם המחשבה מייצרת את הרגש, ואם המחשבה ניתנת לבדיקה, אז יש נקודת התערבות ברורה. ולא צריך לחכות שנים.',
+            content: 'המהלך שבק פיתח פשוט להפליא, וזה בדיוק כוחו.\n\nדוגמה מהחיים: אדם משוכנע ש"כולם בעבודה חושבים שהוא לא מספיק טוב". במקום לשאול מאיפה הגיעה המחשבה, בק היה מציע לבחון אותה. מה הראיות בעדה? מה הראיות נגדה? ומה היית אומר לחבר שהיה אומר לך את זה על עצמו?\n\nולרוב קורה משהו מעניין. האדם מגלה שהראיות דלות בהרבה ממה שהמחשבה מרמזת, ושהיא נשענת בעיקר על שני אירועים ופרשנות אחת. המחשבה אינה נעלמת בבת אחת, אבל היא מפסיקה להיות עובדה והופכת להשערה.\n\nוכאן ההיגיון של השיטה. אם המחשבה מייצרת את הרגש, ואם המחשבה ניתנת לבדיקה, אז יש נקודת התערבות ברורה. ולא צריך לחכות שנים.',
             contentEn: 'The move Beck developed is remarkably simple, and that is precisely its strength.\n\nA real-life example: a person is convinced that "everyone at work thinks he is not good enough". Instead of asking where the thought came from, Beck would propose examining it. What is the evidence for it? What is the evidence against it? And what would you say to a friend who said this about himself to you?\n\nAnd usually something interesting happens. The person discovers that the evidence is far thinner than the thought implies, and that it rests mainly on two events and one interpretation. The thought does not disappear all at once, but it stops being a fact and becomes a hypothesis.\n\nAnd here is the logic of the method. If the thought produces the emotion, and if the thought can be tested, then there is a clear point of intervention. And there is no need to wait years.',
           },
           {
@@ -3822,9 +3822,9 @@ const psychologyData = {
           {
             type: 'source',
             title: 'פרנקל על החופש האחרון', titleEn: 'Frankl on the Last Freedom',
-            quote: '&quot;הכל אפשר ליטול מאדם חוץ מדבר אחד: החירות האחרונה, לבחור את עמדתו בכל נסיבות שהן.&quot;',
+            quote: '״הכל אפשר ליטול מאדם חוץ מדבר אחד: החירות האחרונה, לבחור את עמדתו בכל נסיבות שהן.״',
             quoteEn: '"Everything can be taken from a man but one thing: the last of the human freedoms, to choose one\'s attitude in any given set of circumstances."',
-            attr: 'ויקטור פרנקל, &quot;האדם מחפש משמעות&quot;, 1946',
+            attr: 'ויקטור פרנקל, "האדם מחפש משמעות", 1946',
             attrEn: 'Viktor Frankl, "Man\'s Search for Meaning", 1946',
             content: '',
             contentEn: '',
@@ -3832,13 +3832,13 @@ const psychologyData = {
           {
             type: 'explanation',
             title: 'המשמעות שאי אפשר לקחת', titleEn: 'The Meaning That Cannot Be Taken',
-            content: 'ופרנקל לא התכוון לחשיבה חיובית. הוא לא הציע לאדם לספר לעצמו שהמצב טוב יותר משהוא באמת. הוא הציע משהו צנוע וקשה יותר: למצוא משימה בתוך מה שכבר קורה.\n\nדוגמה מהחיים: אדם שמלווה בן משפחה בתקופת מחלה ממושכת. הוא אינו יכול לשנות את המחלה, לא את הקצב, ולא את התוצאה. כל הכלים שדיברנו עליהם עד כה לא באמת פותרים את זה.\n\nמה שכן משתנה הוא איך הוא מבין את מה שהוא עושה. &quot;אני תקוע במצב הזה&quot; ו&quot;אני מלווה מישהו שאני אוהב דרך הדבר הכי קשה שיש לו&quot; הן שתי גישות לתיאור של אותם ימים בדיוק. העייפות זהה, השעות זהות. אבל האדם שנושא אותן אינו זהה.\n\nוזו הנקודה העדינה של פרנקל: המשמעות אינה מפחיתה את הסבל, היא הופכת אותו לניתן לנשיאה.',
+            content: 'ופרנקל לא התכוון לחשיבה חיובית. הוא לא הציע לאדם לספר לעצמו שהמצב טוב יותר משהוא באמת. הוא הציע משהו צנוע וקשה יותר: למצוא משימה בתוך מה שכבר קורה.\n\nדוגמה מהחיים: אדם שמלווה בן משפחה בתקופת מחלה ממושכת. הוא אינו יכול לשנות את המחלה, לא את הקצב, ולא את התוצאה. כל הכלים שדיברנו עליהם עד כה לא באמת פותרים את זה.\n\nמה שכן משתנה הוא איך הוא מבין את מה שהוא עושה. "אני תקוע במצב הזה" ו"אני מלווה מישהו שאני אוהב דרך הדבר הכי קשה שיש לו" הן שתי גישות לתיאור של אותם ימים בדיוק. העייפות זהה, השעות זהות. אבל האדם שנושא אותן אינו זהה.\n\nוזו הנקודה העדינה של פרנקל: המשמעות אינה מפחיתה את הסבל, היא הופכת אותו לניתן לנשיאה.',
             contentEn: 'And Frankl did not mean positive thinking. He did not propose that a person tell himself that the situation is better than it really is. He proposed something more modest and more difficult: to find a task within what is already happening.\n\nA real-life example: a person accompanying a family member through a prolonged illness. He cannot change the illness, nor the pace, nor the outcome. All the tools we have spoken about so far do not really solve this.\n\nWhat does change is how he understands what he is doing. "I am stuck in this situation" and "I am accompanying someone I love through the hardest thing he has" are two approaches to describing exactly the same days. The exhaustion is identical, the hours are identical. But the person carrying them is not identical.\n\nAnd this is Frankl\'s delicate point: meaning does not reduce the suffering, it makes it bearable.',
           },
           {
             type: 'depth',
             title: 'מגרמניה למרפאה, ועד איפה הטיעון מגיע', titleEn: 'From Germany to the Clinic, and How Far the Argument Reaches',
-            content: 'וכאן חובה לחזור על מה שפרנקל עצמו התעקש עליו, כי בלעדיו הוא הופך לסיסמה מזיקה.\n\nהוא סירב לטעון שמשמעות הצילה חיים. הוא חזר ואמר שהטובים שבהם לא חזרו, ושההישרדות במחנות נקבעה בעיקר במקריות אכזרית. מי שקורא אותו כאילו אמר &quot;תחשוב נכון ותשרוד&quot; קורא אותו לא נכון.\n\nויש כאן סכנה נוספת שכדאי לשים לב אליה. הרעיון שאפשר למצוא משמעות בסבל עלול להפוך לדרישה: שאדם שסובל צריך למצוא בה משמעות, ואם לא הצליח, נכשל. זו עמדה אכזרית, והיא אינה של פרנקל. המשמעות אינה מטלה, והיא גם לא תמיד נמצאת.\n\nוצריך גם לומר: זו עדות, לא ניסוי. אבל דווקא כעדות היא חזקה, כי היא באה מהמקום שבו כל שאר הכלים לא היו זמינים. ומחקר מודרני על התמודדות אכן מוצא שתחושת משמעות קשורה לחוסן, גם אם לא באופן שאפשר להורות עליו לאדם.\n\nומה שנשאר עומד: יש מצבים שבהם השאלה אינה איך לשנות את המצב, אלא מי אני בתוכו.\n\nומכאן לדיאלוג האחרון. חמישה הוגים הציעו חמישה מנגנוני שינוי. סקוט מילר ישאל את השאלה שאיש לא שאל: מה מכל זה באמת עובד?',
+            content: 'וכאן חובה לחזור על מה שפרנקל עצמו התעקש עליו, כי בלעדיו הוא הופך לסיסמה מזיקה.\n\nהוא סירב לטעון שמשמעות הצילה חיים. הוא חזר ואמר שהטובים שבהם לא חזרו, ושההישרדות במחנות נקבעה בעיקר במקריות אכזרית. מי שקורא אותו כאילו אמר "תחשוב נכון ותשרוד" קורא אותו לא נכון.\n\nויש כאן סכנה נוספת שכדאי לשים לב אליה. הרעיון שאפשר למצוא משמעות בסבל עלול להפוך לדרישה: שאדם שסובל צריך למצוא בה משמעות, ואם לא הצליח, נכשל. זו עמדה אכזרית, והיא אינה של פרנקל. המשמעות אינה מטלה, והיא גם לא תמיד נמצאת.\n\nוצריך גם לומר: זו עדות, לא ניסוי. אבל דווקא כעדות היא חזקה, כי היא באה מהמקום שבו כל שאר הכלים לא היו זמינים. ומחקר מודרני על התמודדות אכן מוצא שתחושת משמעות קשורה לחוסן, גם אם לא באופן שאפשר להורות עליו לאדם.\n\nומה שנשאר עומד: יש מצבים שבהם השאלה אינה איך לשנות את המצב, אלא מי אני בתוכו.\n\nומכאן לדיאלוג האחרון. חמישה הוגים הציעו חמישה מנגנוני שינוי. סקוט מילר ישאל את השאלה שאיש לא שאל: מה מכל זה באמת עובד?',
             contentEn: 'And here it is obligatory to repeat what Frankl himself insisted on, because without it he becomes a harmful slogan.\n\nHe refused to claim that meaning saved lives. He said again and again that the best of them did not return, and that survival in the camps was determined mainly by cruel chance. Whoever reads him as if he had said "think correctly and you will survive" is reading him wrongly.\n\nAnd there is a further danger here that is worth noticing. The idea that one can find meaning in suffering may turn into a demand: that a person who suffers ought to find meaning in it, and that if he did not succeed, he failed. That is a cruel position, and it is not Frankl\'s. Meaning is not a task, and it is also not always to be found.\n\nAnd it must also be said: this is testimony, not an experiment. But precisely as testimony it is strong, because it comes from the place where all the other tools were unavailable. And modern research on coping does find that a sense of meaning is connected with resilience, even if not in a way that can be prescribed to a person.\n\nAnd what remains standing: there are situations in which the question is not how to change the situation, but who I am within it.\n\nAnd from here to the final dialogue. Five thinkers proposed five mechanisms of change. Scott Miller will ask the question no one asked: which of all this actually works?',
           },
           {
@@ -3853,7 +3853,7 @@ const psychologyData = {
           },
           {
             type: 'quiz',
-            question: 'חבר אומר: &quot;פרנקל מוכיח שמי שמצא משמעות שרד.&quot; היכן הוא טועה?',
+            question: 'חבר אומר: "פרנקל מוכיח שמי שמצא משמעות שרד." היכן הוא טועה?',
             questionEn: 'A friend says: "Frankl proves that whoever found meaning survived." Where is he mistaken?',
             options: ['בשום מקום, זו בדיוק הטענה שפרנקל העלה', 'הוא טועה רק בכך שמדובר במחקר ולא בעדות אישית', 'פרנקל אמר שהטובים לא חזרו, ומשמעות לא קבעה מי שרד'],
             optionsEn: ['Nowhere, this is exactly the claim Frankl made', 'He is mistaken only in that this is research and not personal testimony', 'Frankl said that the best did not return, and that meaning did not determine who survived'],
@@ -3883,7 +3883,7 @@ const psychologyData = {
           {
             type: 'idea',
             title: 'מילר: מה מכל זה באמת עובד?', titleEn: 'Miller: Of All of This, What Actually Works?',
-            content: 'חמישה הוגים, חמש תשובות. דיבור, קשר, סביבה, מחשבה, משמעות. כל אחד היה משוכנע, וכל אחד הביא נימוקים.\n\nסקוט מילר, פסיכולוג אמריקאי, שאל שאלה שאיש מהם לא שאל: מי מכם צודק, ואיך נדע?\n\nוהתשובה שהמחקר נתן הפתיעה את כולם. כשמשווים שיטות טיפול זו לזו, ההבדלים ביניהן קטנים בהרבה ממה שהיה מצופה. התופעה קיבלה שם מ&quot;אליס בארץ הפלאות&quot;, שבו ציפור הדודו מכריזה בסוף המרוץ: &quot;כולם ניצחו, וכולם יקבלו פרסים&quot;.\n\nוזה לא אומר שטיפול לא עובד. להפך, טיפול עובד היטב. זה אומר שמה שגורם לו לעבוד אינו בהכרח מה שכל אסכולה חשבה.',
+            content: 'חמישה הוגים, חמש תשובות. דיבור, קשר, סביבה, מחשבה, משמעות. כל אחד היה משוכנע, וכל אחד הביא נימוקים.\n\nסקוט מילר, פסיכולוג אמריקאי, שאל שאלה שאיש מהם לא שאל: מי מכם צודק, ואיך נדע?\n\nוהתשובה שהמחקר נתן הפתיעה את כולם. כשמשווים שיטות טיפול זו לזו, ההבדלים ביניהן קטנים בהרבה ממה שהיה מצופה. התופעה קיבלה שם מ"אליס בארץ הפלאות", שבו ציפור הדודו מכריזה בסוף המרוץ: "כולם ניצחו, וכולם יקבלו פרסים".\n\nוזה לא אומר שטיפול לא עובד. להפך, טיפול עובד היטב. זה אומר שמה שגורם לו לעבוד אינו בהכרח מה שכל אסכולה חשבה.',
             contentEn: 'Five thinkers, five answers. Speaking, relationship, environment, thought, meaning. Each one was convinced, and each one brought reasons.\n\nScott Miller, an American psychologist, asked a question that none of them asked: which of you is right, and how would we know?\n\nAnd the answer the research gave surprised everyone. When therapy methods are compared with one another, the differences between them are far smaller than would be expected. The phenomenon received a name from "Alice in Wonderland", in which the dodo bird announces at the end of the race: "Everybody has won, and all must have prizes."\n\nAnd this does not mean that therapy does not work. On the contrary, therapy works well. It means that what makes it work is not necessarily what each school thought.',
           },
           // Miller quote + citation swapped from docx. The docx carried
@@ -3913,7 +3913,7 @@ const psychologyData = {
           {
             type: 'depth',
             title: 'מה המדידה מגלה, ומה היא מפספסת', titleEn: 'What Measurement Reveals, and What It Misses',
-            content: 'וכאן צריך את שני הצדדים, כי גם הטענה הזו שנויה במחלוקת.\n\nמה שמבוסס: שטיפול יעיל, ושברית טובה מנבאת תוצאה. מה שמוערך במחקר: שהברית מסבירה חלק ניכר מהשונות בתוצאות, בעוד שהטכניקה הספציפית מסבירה חלק קטן יותר.\n\nומה שמערער על התמונה הפשוטה: יש הטוענים שהניסוח &quot;כל השיטות שוות&quot; מוגזם. במצבים מסוימים, כמו חרדה, OCD ודיכאון, גישות ממוקדות כמו CBT הראו יתרון עקבי על גישות פחות ממוקדות. כלומר, השיטה כן משנה, לפחות לפעמים.\n\nוגם השיטה של מילר עצמו אינה חפה מביקורת. חלק מהמחקרים על טיפול מונחה משוב הראו תוצאות חיוביות, ואחרים לא הצליחו לשחזר אותן. מילר עצמו כתב על כך בפומבי.\n\nומה שנשאר עומד, וזה לא מעט: השאלה &quot;איזו שיטה הכי טובה&quot; כנראה פחות חשובה מהשאלה &quot;האם זה עובד עבור האדם הזה, ואיך נדע&quot;. וזו שאלה שאפשר לענות עליה רק אם שואלים.',
+            content: 'וכאן צריך את שני הצדדים, כי גם הטענה הזו שנויה במחלוקת.\n\nמה שמבוסס: שטיפול יעיל, ושברית טובה מנבאת תוצאה. מה שמוערך במחקר: שהברית מסבירה חלק ניכר מהשונות בתוצאות, בעוד שהטכניקה הספציפית מסבירה חלק קטן יותר.\n\nומה שמערער על התמונה הפשוטה: יש הטוענים שהניסוח "כל השיטות שוות" מוגזם. במצבים מסוימים, כמו חרדה, OCD ודיכאון, גישות ממוקדות כמו CBT הראו יתרון עקבי על גישות פחות ממוקדות. כלומר, השיטה כן משנה, לפחות לפעמים.\n\nוגם השיטה של מילר עצמו אינה חפה מביקורת. חלק מהמחקרים על טיפול מונחה משוב הראו תוצאות חיוביות, ואחרים לא הצליחו לשחזר אותן. מילר עצמו כתב על כך בפומבי.\n\nומה שנשאר עומד, וזה לא מעט: השאלה "איזו שיטה הכי טובה" כנראה פחות חשובה מהשאלה "האם זה עובד עבור האדם הזה, ואיך נדע". וזו שאלה שאפשר לענות עליה רק אם שואלים.',
             contentEn: 'And here both sides are needed, because this claim too is disputed.\n\nWhat is established: that therapy is effective, and that a good alliance predicts outcome. What is estimated in the research: that the alliance explains a considerable part of the variance in outcomes, while the specific technique explains a smaller part.\n\nAnd what unsettles the simple picture: some argue that the formulation "all methods are equal" is overstated. In certain conditions, such as anxiety, OCD and depression, focused approaches such as CBT have shown a consistent advantage over less focused approaches. That is to say, the method does make a difference, at least sometimes.\n\nAnd Miller\'s own method is not free of criticism either. Some studies on feedback-informed treatment showed positive results, and others failed to replicate them. Miller himself wrote about this publicly.\n\nAnd what remains standing, and it is not little: the question "which method is best" is probably less important than the question "is this working for this person, and how would we know". And that is a question that can only be answered if one asks.',
           },
           {
@@ -3938,7 +3938,7 @@ const psychologyData = {
           },
           {
             type: 'quiz',
-            question: 'מהי הביקורת המרכזית על הניסוח &quot;כל שיטות הטיפול שוות בערכן&quot;?',
+            question: 'מהי הביקורת המרכזית על הניסוח "כל שיטות הטיפול שוות בערכן"?',
             questionEn: 'What is the central criticism of the formulation "all therapy methods are equal in value"?',
             options: ['הוא מוגזם, ובמצבים מסוימים גישות ממוקדות הראו יתרון עקבי', 'אין ביקורת, שכן זהו ממצא מוסכם על כל החוקרים', 'הוא מוגזם, שכן בפועל אף שיטת טיפול אינה יעילה'],
             optionsEn: ['It is overstated, and in certain conditions focused approaches have shown a consistent advantage', 'There is no criticism, since this is a finding agreed upon by all researchers', 'It is overstated, since in practice no therapy method is effective'],
@@ -3964,7 +3964,7 @@ const psychologyData = {
           {
             type: 'source',
             title: 'המסע שעברנו', titleEn: 'The Journey We Took',
-            quote: '&quot;ברויר: הדיבור משחרר. רוג\'רס: הקשר הוא שמרפא. ויניקוט: צריך לאפשר, לא לתקן. בק: אפשר לבדוק את המחשבה. פרנקל: גם כשאין מה לשנות, נשאר היחס. מילר: תפסיקו להתווכח, תמדדו.&quot;',
+            quote: '״ברויר: הדיבור משחרר. רוג\'רס: הקשר הוא שמרפא. ויניקוט: צריך לאפשר, לא לתקן. בק: אפשר לבדוק את המחשבה. פרנקל: גם כשאין מה לשנות, נשאר היחס. מילר: תפסיקו להתווכח, תמדדו.״',
             quoteEn: '"Breuer: speaking releases. Rogers: it is the relationship that heals. Winnicott: one must allow, not repair. Beck: the thought can be tested. Frankl: even when there is nothing to change, the attitude remains. Miller: stop arguing, measure."',
             attr: '— סיכום פרק 6',
             attrEn: '— Summary of Chapter 6',

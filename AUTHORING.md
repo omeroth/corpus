@@ -69,7 +69,23 @@ Length-ratio target per chapter: correct option averages no more than ~1.3× the
 
 ---
 
-## 4. Checklist before handoff
+## 4. Content strings are data, not HTML
+
+Every string in the content files — titles, bodies, quotes, questions, options, feedback, attributions, bios — is **data**. Write the literal character you want the reader to see. Never pre-escape with an HTML entity.
+
+- Hebrew source quotes: `״...״` (gershayim, U+05F4).
+- Hebrew scare quotes and inline citations: `"..."` (ASCII double quote).
+- English source quotes, scare quotes, titles: `"..."` (ASCII double quote).
+- Apostrophes inside single-quoted JS string literals: `\'` (backslash escape), not `&#39;` or `&apos;`.
+- Literal `&` in displayed text: write `&`, not `&amp;`. Same for `<`, `>`, ` ` (non-breaking space). The render path handles encoding where needed.
+
+Why this matters: a field like `question` is read into the DOM via `textContent`, so `&quot;` renders as the literal five-character string `&quot;`. Fields like `content` and `quote` currently flow through `innerHTML` templates where entities happen to decode — but that's the current render path, not a guarantee. If someone refactors a render sink from innerHTML to textContent, every entity in that field surfaces as a visible bug months later. Writing literal characters at authoring time removes the entire class.
+
+The validator fails on any HTML entity (`&quot;`, `&amp;`, `&lt;`, `&gt;`, `&#39;`, `&nbsp;`, numeric `&#NNN;` / `&#xNN;`) in any content string. There are no exceptions.
+
+---
+
+## 5. Checklist before handoff
 
 Run:
 
