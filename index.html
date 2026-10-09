@@ -13996,6 +13996,16 @@ async function syncProgressToSupabase() {
     if (error) _reportSyncFailure('chapter_complete_shown', error);
   } catch(e) { _reportSyncFailure('chapter_complete_shown', e); }
   try {
+    // mid_chapter_paywall_shown — jsonb array of '{subject}-d{N}' keys.
+    // Separate upsert so a missing column doesn't break base sync. See
+    // migration 20261009000000_mid_chapter_paywall_shown.sql.
+    const { error } = await sb.from('user_progress').upsert({
+      user_id: currentUser.id,
+      mid_chapter_paywall_shown: Object.keys(state.midChapterPaywallShown || {}),
+    }, { onConflict: 'user_id' });
+    if (error) _reportSyncFailure('mid_chapter_paywall_shown', error);
+  } catch(e) { _reportSyncFailure('mid_chapter_paywall_shown', e); }
+  try {
     // Separate upsert so a missing `onboarding_done` column doesn't break the main sync.
     // Requires Supabase column: onboarding_done boolean on user_progress.
     const { error } = await sb.from('user_progress').upsert({
@@ -14244,6 +14254,11 @@ async function loadProgressFromSupabase() {
     // Union-merge above may re-inject legacy bare-number keys from cloud
     // copies still living on old app versions. Migrate again to normalize.
     try { migrateChapterCompleteShown(); } catch(e) {}
+    // Mid-chapter-one paywall shown keys. Union-dedup (same shape as
+    // chapter_complete_shown): server has an array of '{subject}-d{N}'
+    // keys, local materializes to a bool map.
+    state.midChapterPaywallShown = state.midChapterPaywallShown || {};
+    (data.mid_chapter_paywall_shown || []).forEach(k => { state.midChapterPaywallShown[k] = true; });
     if (data.onboarding_done === true) {
       try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
     }
@@ -14766,6 +14781,11 @@ function showPaywall(opts) {
   if (_paywallActiveRoot) _paywallActiveRoot.classList.add('active');
   document.body.style.overflow = 'hidden';
   try {
+    // completed_dialogues_at_shown — engagement signal joined to source.
+    // Lets the retrospective separate "did the trigger convert?" from
+    // "did engagement predict conversion?" without a second query.
+    const _completedCount = state && state.completedDays
+      ? Object.keys(state.completedDays).length : 0;
     posthog.capture('paywall_shown', {
       source: opts.source || 'unknown',
       subject: opts.subject || state.subject || null,
@@ -14773,6 +14793,7 @@ function showPaywall(opts) {
       day_id:  typeof opts.dayId  !== 'undefined' ? opts.dayId  : null,
       trial_enabled: TRIAL_ENABLED,
       offering_id: (_paywallActiveOffering() && _paywallActiveOffering().identifier) || null,
+      completed_dialogues_at_shown: _completedCount,
     });
   } catch(e) {}
 }
@@ -14796,6 +14817,11 @@ function _exitPaywall(reason) {
     _paywallActiveRoot.classList.remove('active');
     document.body.style.overflow = '';
   }
+  // Session-only dismiss clock for the openReader-gate dedupe. Stamped
+  // on EVERY exit (close_x, skip, purchase_success, restore_success) —
+  // paid exits already stop the lock gate from firing, so the extra
+  // write is harmless; non-paid exits are the real target.
+  _lastPaywallDismissedAt = Date.now();
   try {
     posthog.capture('paywall_dismissed', {
       package_selected: _paywallSelectedPkg,
@@ -22831,6 +22857,13 @@ function defaultState() {
     // it would need a schema migration. Harmless to leave (no readers).
     hintsSeen: [],
     chapterCompleteShown: {}, // { weekId: true } — fires the chapter-complete overlay once per chapter
+    // Mid-chapter-one paywall trigger. Keys: '{subject}-d{dialogueId}' for
+    // dialogueId in {3, 6}, value true. Flipped at paywall-render time
+    // (not at completion time) so a crash or an "it never actually opened"
+    // path leaves the flag false and the user gets another chance on their
+    // next completion. Union-dedup synced to Supabase (migration
+    // 20261009000000_mid_chapter_paywall_shown.sql).
+    midChapterPaywallShown: {},
     chapterXPByWeek: {},      // XP tallied per chapter for chapter-complete metrics
     guestSignupPromptShown: false,  // legacy single-shot flag — kept for back-compat; migrated into guestPrompt below on load
     // Guest sign-in prompt cadence. Local-only (never uploaded to Supabase — gated by guest mode).
@@ -25079,6 +25112,69 @@ function _wrapWithQueuePlay(fn) {
   };
 }
 
+// ─── Mid-chapter-one paywall trigger ───────────────────────────────
+// Non-paid, non-trial users who finish ch1 dialogue 3 or 6 see the
+// standard (in-app) paywall once per subject per trigger. Flag
+// _pendingMidChapterPaywall is set in finishDay when all gates pass;
+// it rides on the dialogue they just finished. Session-only — a
+// crash before the paywall actually renders means the user gets
+// another chance on their next completion. state.midChapterPaywallShown
+// is flipped at render time (inside the wrapper below), not here.
+//
+// The wrapper is composed around the thinker-card dismiss buttons:
+//   nextBtn.onclick = _wrapWithMidChapterPaywall(_wrapWithQueuePlay(goToNextLesson));
+//   backBtn.onclick = _wrapWithMidChapterPaywall(_wrapWithQueuePlay(closeCompleteModal));
+// So the sequence is: thinker-card reveal → user dismisses → paywall
+// (if flagged) → paywall-close dismisses to the user's chosen next
+// action. "Card first, ask second."
+let _pendingMidChapterPaywall = null;
+// Session-only dedupe clock for the "dialogue 6 → chapter 2 lock"
+// collision. _exitPaywall writes _lastPaywallDismissedAt; the
+// openReader paywall gate reads it below. 120s per spec.
+let _lastPaywallDismissedAt = 0;
+const _MID_CHAPTER_PAYWALL_DEDUPE_MS = 120000;
+function _isUserPaidOrTrialNow() {
+  if (state && state.isPaid === true) return true;
+  if (state && state.grandfathered === true) return true;
+  if (state && state.subscription && state.subscription.status === 'trial') return true;
+  const opt = state && state.subscriptionOptimistic;
+  if (opt && opt.until && Date.parse(opt.until) > Date.now()) return true;
+  return false;
+}
+function _maybeFlagMidChapterPaywall(weekId, dayId) {
+  if (_isUserPaidOrTrialNow()) return;
+  if (weekId !== 1) return;
+  if (dayId !== 3 && dayId !== 6) return;
+  const subj = state.subject || 'philosophy';
+  const key  = subj + '-d' + dayId;
+  if (state.midChapterPaywallShown && state.midChapterPaywallShown[key]) return;
+  _pendingMidChapterPaywall = { subject: subj, dayId: dayId, source: 'ch1-d' + dayId, key: key };
+}
+function _wrapWithMidChapterPaywall(fn) {
+  return function() {
+    const p = _pendingMidChapterPaywall;
+    if (!p) { fn.apply(this, arguments); return; }
+    _pendingMidChapterPaywall = null;
+    // Flip the shown flag HERE — at the moment the paywall opens —
+    // not at completion time. A crash before this point leaves the
+    // flag false and the user gets another chance.
+    state.midChapterPaywallShown = state.midChapterPaywallShown || {};
+    state.midChapterPaywallShown[p.key] = true;
+    try { saveState(); } catch (e) { try { saveStateLocal(); } catch(_) {} }
+    // Defer the next-action to run on paywall dismiss.
+    const self = this, args = arguments;
+    const resumeAfterPaywall = () => { fn.apply(self, args); };
+    showPaywall({
+      subject: p.subject,
+      weekId: 1,
+      dayId: p.dayId,
+      source: p.source,
+      onClose: resumeAfterPaywall,
+    });
+  };
+}
+
+
 function _playNextCelebration() {
   if (_promptModalActiveForCelebrations()) return;  // resumed via prompt-close paths
   // Invariant: celebrations never render while the user is actively
@@ -26376,6 +26472,16 @@ function openReader(weekId, dayId, opts) {
   if (!opts._afterPurchase && !canAccessWeek(state.subject, weekId)) {
     const completedKey = dayKey(weekId, dayId);
     if (!state.completedDays || !state.completedDays[completedKey]) {
+      // Mid-chapter-paywall dedupe. If a paywall was dismissed within
+      // the last 120s (dialogue-6 → chapter-2 lock is the realistic
+      // case: user dismisses mid-chapter paywall, taps "Next Dialogue",
+      // hits this gate), silently redirect to home instead of showing
+      // a second paywall seconds after the first. A toast would just
+      // be the paywall's message in smaller type.
+      if (Date.now() - _lastPaywallDismissedAt < _MID_CHAPTER_PAYWALL_DEDUPE_MS) {
+        try { goHome(); } catch (e) {}
+        return;
+      }
       showPaywall({ subject: state.subject, weekId, dayId, source: 'lesson-tap' });
       return;
     }
@@ -27541,14 +27647,18 @@ function showThinkerCardScreen(thinker, chapter, day) {
   const nextBtn = document.getElementById('modal-next-btn');
   if (nextInfo.hasNext) {
     nextBtn.textContent = isEn ? 'Next Dialogue' : 'הדיאלוג הבא';
-    nextBtn.onclick = _wrapWithQueuePlay(goToNextLesson);
+    // Mid-chapter paywall wrap: if _pendingMidChapterPaywall is set
+    // (ch1 d3 / d6 finish by a non-paid user), paywall opens on
+    // dismiss and goToNextLesson defers to its close. Pass-through
+    // otherwise.
+    nextBtn.onclick = _wrapWithMidChapterPaywall(_wrapWithQueuePlay(goToNextLesson));
     nextBtn.style.display = '';
   } else {
     nextBtn.style.display = 'none';
   }
   const backBtn = document.getElementById('modal-continue-btn');
   backBtn.textContent = isEn ? 'Back to Home' : 'חזרה לבית';
-  backBtn.onclick = _wrapWithQueuePlay(closeCompleteModal);
+  backBtn.onclick = _wrapWithMidChapterPaywall(_wrapWithQueuePlay(closeCompleteModal));
 
   // Re-activate modal-complete. Under the celebration-queue flow
   // (introduced in 9228d92), _wrapWithQueuePlay removes .active from
@@ -27810,6 +27920,12 @@ function finishDay() {
 
   const newLevel = getLevel(state.xp);
   try { saveState(); } catch(e) { saveStateLocal(); }
+  // Mid-chapter-one paywall trigger — set the session flag if the user
+  // just completed ch1 d3 or d6 and isn't paid/trial/grandfathered.
+  // The flag is read inside the thinker-card dismiss handlers by
+  // _wrapWithMidChapterPaywall. Set here (not in the wrapper) so the
+  // reveal is already queued when the paywall fires on dismiss.
+  _maybeFlagMidChapterPaywall(state.currentWeek, state.currentDay);
   // After the user finishes their first real lesson, request OS notification permission
   // (no-op if already asked, plugin unavailable, or reminder disabled). Fire-and-forget;
   // the day-complete UI continues to render without waiting.
