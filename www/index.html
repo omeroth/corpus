@@ -9214,6 +9214,13 @@
     color: var(--ink);
     margin: 0 0 10px;
     line-height: 1.15;
+    /* Honor literal newlines in the headline string so a two-sentence
+       pitch can force its break between sentences regardless of width.
+       pre-line still collapses whitespace runs and allows wrapping
+       within each line if the viewport is too narrow, so the default
+       single-line headlines ("Unlock everything" etc.) still render
+       normally. */
+    white-space: pre-line;
   }
   .paywall-sub {
     font-size: 15px;
@@ -25392,14 +25399,18 @@ function _maybeFlagMidChapterPaywall(weekId, dayId) {
 // Hebrew. "Just the beginning" is worn thin in English marketing in a
 // way the Hebrew equivalent isn't, so the English finds its own
 // phrasing while keeping the same calm.
+// The literal \n between the two sentences is honored by
+// white-space: pre-line on .paywall-headline, so the break holds at
+// every viewport width — second sentence sits on its own line
+// regardless of how much room the first sentence has.
 const _MID_CH_PAYWALL_COPY = {
   'ch1-d3': {
-    en: 'Three dialogues in. The rest is waiting.',
-    he: 'שלושה דיאלוגים מאחוריכם וזאת רק ההתחלה',
+    en: 'Three dialogues in.\nThe rest is waiting.',
+    he: 'שלושה דיאלוגים מאחוריכם\nוזאת רק ההתחלה',
   },
   'ch1-d6': {
-    en: 'Six dialogues in. The rest is waiting.',
-    he: 'שישה דיאלוגים מאחוריכם וזאת רק ההתחלה',
+    en: 'Six dialogues in.\nThe rest is waiting.',
+    he: 'שישה דיאלוגים מאחוריכם\nוזאת רק ההתחלה',
   },
 };
 function _midChapterPaywallCopy(subject, source) {
