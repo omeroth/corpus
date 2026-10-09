@@ -9146,6 +9146,24 @@
     padding: 8px 26px 24px;
     text-align: center;
   }
+  /* Mid-chapter mode: edge-to-edge presentation, no backdrop blur,
+     no centered box. Still uses #modal-paywall + .paywall-close etc.,
+     only CSS differs. The offering stays standard (non-trial) because
+     _paywallMode === 'modal-fullscreen' !== 'onboarding'. */
+  #modal-paywall.paywall-fullscreen {
+    background: var(--bg);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    padding: 0;
+  }
+  #modal-paywall.paywall-fullscreen .modal-box {
+    max-width: none;
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    border-radius: 0;
+    padding: calc(12px + var(--safe-top)) 20px calc(20px + var(--safe-bottom));
+  }
   /* Flex header row anchoring the close X to the top-right corner
      without absolute positioning. .modal-overlay already applies
      safe-top padding at the overlay level (line 3970), so no
@@ -13363,6 +13381,21 @@ const _HAPTIC_PATTERNS = {
   frame:     [{ at: 0,   p: 'light'  }, { at: 70,  p: 'medium' }, { at: 140, p: 'heavy'   }, { at: 300, p: 'success' }],
   'box-open':[{ at: 0,   p: 'heavy'  }, { at: 90,  p: 'heavy'  }, { at: 230, p: 'success' }],
   unlock:    [{ at: 0,   p: 'heavy'  }, { at: 100, p: 'heavy'  }, { at: 260, p: 'success' }],
+  // Count-up texture for the XP number animation. 13 light impacts
+  // at 60ms spacing (780ms total) run while the counter climbs
+  // (animateXPCount: 20 × 40ms = 800ms). Internal pulses bypass the
+  // 80ms general throttle via _firePattern's setTimeout schedule.
+  // Not reward-class — doesn't reserve the 300ms clock, so the
+  // streak stat haptic at +2000ms (420ms after the ramp ends) fires
+  // on its own schedule. 60ms is a starting point; may need tuning
+  // on device if iOS Taptic Engine merges adjacent pulses.
+  'xp-ramp': [
+    { at:   0, p: 'light' }, { at:  60, p: 'light' }, { at: 120, p: 'light' },
+    { at: 180, p: 'light' }, { at: 240, p: 'light' }, { at: 300, p: 'light' },
+    { at: 360, p: 'light' }, { at: 420, p: 'light' }, { at: 480, p: 'light' },
+    { at: 540, p: 'light' }, { at: 600, p: 'light' }, { at: 660, p: 'light' },
+    { at: 720, p: 'light' },
+  ],
 };
 function _firePulseNative(pulse) {
   // Native-only path for a single pulse. Does NOT consult throttles —
@@ -14922,7 +14955,21 @@ function showPaywall(opts) {
   _haptic('locked');
   opts = opts || {};
   _paywallActiveRoot = document.getElementById('modal-paywall');
-  _paywallMode = 'modal';
+  // Mode selects the DOM shell + the offering. 'modal' is the default
+  // (centered modal + standard offering). 'modal-fullscreen' is the
+  // mid-chapter variant — edge-to-edge presentation via a CSS class on
+  // the same #modal-paywall DOM, still the standard (non-trial)
+  // offering. 'onboarding' is set only by _onbV2PreparePaywall and is
+  // the only mode that unlocks the trial offering (see trialOn + the
+  // onboarding === check in _paywallActiveOffering, which keep keying
+  // on the literal 'onboarding' so 'modal-fullscreen' naturally gets
+  // standard pricing — this is load-bearing for not giving away free
+  // trials from the mid-chapter trigger).
+  _paywallMode = (opts.mode === 'modal-fullscreen') ? 'modal-fullscreen' : 'modal';
+  if (_paywallActiveRoot) {
+    if (_paywallMode === 'modal-fullscreen') _paywallActiveRoot.classList.add('paywall-fullscreen');
+    else _paywallActiveRoot.classList.remove('paywall-fullscreen');
+  }
   _paywallShownThisSession = true;
   _paywallReturnTo = (typeof opts.weekId !== 'undefined' && typeof opts.dayId !== 'undefined')
     ? { weekId: opts.weekId, dayId: opts.dayId }
@@ -25323,13 +25370,25 @@ function _isUserPaidOrTrialNow() {
   return false;
 }
 function _maybeFlagMidChapterPaywall(weekId, dayId) {
-  if (_isUserPaidOrTrialNow()) return;
-  if (weekId !== 1) return;
-  if (dayId !== 3 && dayId !== 6) return;
+  try {
+    console.log('[midchpw] _maybeFlag entry; weekId=' + weekId + ', dayId=' + dayId +
+      ', subject=' + (state && state.subject) +
+      ', isPaid=' + (state && state.isPaid) +
+      ', grandfathered=' + (state && state.grandfathered) +
+      ', subStatus=' + (state && state.subscription && state.subscription.status) +
+      ', optUntil=' + (state && state.subscriptionOptimistic && state.subscriptionOptimistic.until));
+  } catch(e) {}
+  if (_isUserPaidOrTrialNow()) { try { console.log('[midchpw] bail: paid-or-trial'); } catch(e) {} return; }
+  if (weekId !== 1) { try { console.log('[midchpw] bail: weekId !== 1'); } catch(e) {} return; }
+  if (dayId !== 3 && dayId !== 6) { try { console.log('[midchpw] bail: dayId not 3 or 6 (got ' + dayId + ')'); } catch(e) {} return; }
   const subj = state.subject || 'philosophy';
   const key  = subj + '-d' + dayId;
-  if (state.midChapterPaywallShown && state.midChapterPaywallShown[key]) return;
+  if (state.midChapterPaywallShown && state.midChapterPaywallShown[key]) {
+    try { console.log('[midchpw] bail: already shown for key=' + key); } catch(e) {}
+    return;
+  }
   _pendingMidChapterPaywall = { subject: subj, dayId: dayId, source: 'ch1-d' + dayId, key: key };
+  try { console.log('[midchpw] FLAG SET; _pendingMidChapterPaywall=', _pendingMidChapterPaywall); } catch(e) {}
 }
 
 // Contextual copy per {subject, trigger, lang}. D3 is a lock preview —
@@ -25433,7 +25492,12 @@ function _midChapterPaywallCopy(subject, source) {
 function _wrapWithMidChapterPaywall(fn) {
   return function() {
     const p = _pendingMidChapterPaywall;
-    if (!p) { fn.apply(this, arguments); return; }
+    if (!p) {
+      try { console.log('[midchpw] wrapper fired; no pending flag, passthrough'); } catch(e) {}
+      fn.apply(this, arguments);
+      return;
+    }
+    try { console.log('[midchpw] wrapper fired WITH pending flag; opening paywall for', p); } catch(e) {}
     _pendingMidChapterPaywall = null;
     // Flip the shown flag HERE — at the moment the paywall opens —
     // not at completion time. A crash before this point leaves the
@@ -25450,6 +25514,7 @@ function _wrapWithMidChapterPaywall(fn) {
       weekId: 1,
       dayId: p.dayId,
       source: p.source,
+      mode: 'modal-fullscreen',
       contextEyebrow:  ctx.eyebrow,
       contextHeadline: ctx.headline,
       contextSub:      ctx.sub,
@@ -27899,18 +27964,29 @@ function _showDcStats(titleText, subtitleText, xpAmount, streakCount, onContinue
   // card's OWN Next Dialogue and Back to Home buttons — wired inside
   // showThinkerCardScreen. Caller flags this path via onContinue.thinker=true.
   if (next.hasNext && onContinue.fn === closeCompleteModal) {
+    // Branch: next lesson exists but there's no new thinker to reveal
+    // (user had already unlocked this dialogue's thinker). The stats
+    // screen IS the final beat before leaving, so the mid-chapter
+    // paywall wrap belongs here — without it, a user who completes
+    // ch1-d3 or ch1-d6 and has the thinker already unlocked never
+    // sees the paywall even though _maybeFlagMidChapterPaywall set
+    // the pending flag in finishDay.
     continueBtn.textContent = isEn ? 'Next Dialogue' : 'הדיאלוג הבא';
-    continueBtn.onclick = _wrapWithQueuePlay(goToNextLesson);
+    continueBtn.onclick = _wrapWithMidChapterPaywall(_wrapWithQueuePlay(goToNextLesson));
     backHomeBtn.textContent = isEn ? 'Back to Home' : 'חזרה לבית';
-    backHomeBtn.onclick = _wrapWithQueuePlay(closeCompleteModal);
+    backHomeBtn.onclick = _wrapWithMidChapterPaywall(_wrapWithQueuePlay(closeCompleteModal));
     backHomeBtn.style.display = '';
   } else {
     continueBtn.textContent = onContinue.label;
-    // Thinker-card path: unwrapped. The thinker card's own buttons
-    // (Next Dialogue / Back to Home) wrap the queue drain instead.
+    // Thinker-card path: unwrapped at stats level. The thinker card's
+    // own buttons (Next Dialogue / Back to Home) carry the mid-chapter
+    // paywall wrap, so the paywall fires AFTER the reveal, not before.
+    // Non-thinker-with-no-next path: this is the user's final exit from
+    // the completion flow — wrap it so the paywall gets a chance here
+    // too (same reasoning as the branch above).
     continueBtn.onclick = onContinue.thinker
       ? onContinue.fn
-      : _wrapWithQueuePlay(onContinue.fn);
+      : _wrapWithMidChapterPaywall(_wrapWithQueuePlay(onContinue.fn));
     backHomeBtn.style.display = 'none';
   }
 
@@ -27926,18 +28002,20 @@ function _showDcStats(titleText, subtitleText, xpAmount, streakCount, onContinue
 
   setTimeout(() => animateXPCount(xpEl, xpAmount), 800);
   setTimeout(() => launchConfetti(), 1200);
-  // 'stat' haptics on each number landing. XP count-up starts at
-  // 800ms and runs 800ms (animateXPCount: 20 × 40ms), so it lands at
-  // ~1600ms. Streak metric is a static pop at 2000ms (dc-fade-up 0.6s
-  // + 1.4s delay). Both fire _haptic('stat'); the stat clock enforces
-  // the 150ms min gap. If the streak isn't visible on this call,
-  // skip its haptic. Reduced motion skips the whole sequence.
+  // Count-up haptic + streak stat. XP count-up starts at 800ms and
+  // runs 800ms (animateXPCount: 20 × 40ms, lands at ~1600ms). Fire
+  // 'xp-ramp' as it STARTS so the texture runs underneath the number
+  // climbing — a continuous feel rather than a single tap at the end.
+  // The ramp spans 780ms (13 light pulses at 60ms); its last pulse
+  // lands ~80ms before the number settles, which reads as the stick.
+  // Streak metric is a static pop at 2000ms (dc-fade-up 0.6s + 1.4s
+  // delay), 420ms after the ramp ends. Reduced motion skips both.
   const _dcStatReduce = (() => {
     try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
     catch (e) { return false; }
   })();
   if (!_dcStatReduce) {
-    setTimeout(() => _haptic('stat'), 1600);
+    setTimeout(() => _haptic('xp-ramp'), 800);
     const _streakItem = document.getElementById('metric-streak-item');
     const _streakVisible = _streakItem && _streakItem.style.display !== 'none';
     if (_streakVisible) setTimeout(() => _haptic('stat'), 2000);
@@ -28300,6 +28378,7 @@ function finishDay() {
 
   // If day already completed - stats only, no thinker card
   if (state.completedDays[key]) {
+    try { console.log('[midchpw] finishDay replay-branch; key=' + key + ', will NOT reach _maybeFlagMidChapterPaywall'); } catch(e) {}
     _showDcStats(
       ui.dayCompleted(day.id),
       isEn ? (day.titleEn || day.title) : day.title,
