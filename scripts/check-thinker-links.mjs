@@ -27,6 +27,13 @@
 // Catches the "always B" authoring template the source documents keep
 // arriving with — 14-17 of 21 correct answers at B is the baseline.
 //
+// Distractor length-signature check (added after the length audit):
+//   - no new chapter where the correct option is strict-longest in more
+//     than 60% of its 3-option quizzes (chance baseline: 33%)
+// Catches the "long correct answer, short dismissive wrongs" authoring
+// template. Grandfathered allowlist exempts chapters that pre-date the
+// rule, pending a per-chapter distractor rewrite.
+//
 // Reverse content check: thinkers present in either array but never
 // referenced by any dialogue → they can never be unlocked and probably
 // shouldn't ship.
@@ -723,6 +730,85 @@ for (const { subject, data } of subjects) {
   }
 }
 
+// ─── Distractor length-signature check ──────────────────────────────
+//
+// A reader who picks the longest option scores ~83% across the current
+// catalogue, against a 33% chance baseline. The pattern comes from the
+// authoring source: correct answers are long and nuanced, wrong answers
+// are short and dismissive. Position rebalance (above) didn't close
+// this — it just moved the correct TEXT to a different slot without
+// shortening it.
+//
+// Rule: if more than 60% of a chapter's 3-option quizzes have the
+// correct option as the strict longest, fail. 60% is roughly 2× chance
+// and leaves authors room for natural variance while catching severe
+// cases (bonus1 shipped at 100%). Checks both HE and EN; either
+// exceeding fires the error.
+//
+// Grandfather list: every chapter present in the catalogue when this
+// rule was added. The fix for grandfathered chapters is a content
+// rewrite of the distractors — a separate workstream, scoped
+// chapter-by-chapter. When a chapter has been rewritten, remove its
+// id from GRANDFATHER_LENGTH_CHECK so it starts being enforced. New
+// chapters not in the list are enforced by default.
+//
+// Authoring guidance for distractors lives in AUTHORING.md at repo
+// root. The thresholds here match what the guidance tells authors.
+const LENGTH_RULE_THRESHOLD = 0.60;
+const GRANDFATHER_LENGTH_CHECK = new Set([
+  'philosophy:1', 'philosophy:2', 'philosophy:3', 'philosophy:4',
+  'philosophy:5', 'philosophy:bonus1',
+  'economics:1',  'economics:2',  'economics:3',  'economics:4',
+  'economics:5',  'economics:6',  'economics:bonusEcon1',
+  'psychology:1', 'psychology:2', 'psychology:3', 'psychology:4',
+  'psychology:5', 'psychology:6', 'psychology:bonusPsy1',
+]);
+
+const lengthIssues = [];
+for (const { subject, data } of subjects) {
+  if (!Array.isArray(data.weeks)) continue;
+  for (const week of data.weeks) {
+    if (!week || !Array.isArray(week.days) || week.days.length === 0) continue;
+    const key = `${subject}:${week.id}`;
+    if (GRANDFATHER_LENGTH_CHECK.has(key)) continue;
+    let total = 0, heLongest = 0, enLongest = 0;
+    for (const day of week.days) {
+      if (!day || !Array.isArray(day.sections)) continue;
+      for (const sec of day.sections) {
+        if (!sec || sec.type !== 'quiz') continue;
+        if (!Array.isArray(sec.options) || sec.options.length !== 3) continue;
+        if (!Array.isArray(sec.optionsEn) || sec.optionsEn.length !== 3) continue;
+        total++;
+        const heLens = sec.options.map(s => (s || '').length);
+        const enLens = sec.optionsEn.map(s => (s || '').length);
+        const heWrong = heLens.filter((_, i) => i !== sec.correctIndex);
+        const enWrong = enLens.filter((_, i) => i !== sec.correctIndex);
+        if (heLens[sec.correctIndex] > Math.max(...heWrong)) heLongest++;
+        if (enLens[sec.correctIndex] > Math.max(...enWrong)) enLongest++;
+      }
+    }
+    if (total === 0) continue;
+    const hePct = heLongest / total;
+    const enPct = enLongest / total;
+    if (hePct > LENGTH_RULE_THRESHOLD) {
+      lengthIssues.push({
+        issue: 'correct option is strict longest in > 60% of quizzes',
+        where: `${subject} chapter ${week.id} (HE)`,
+        detail: `${heLongest}/${total} (${Math.round(hePct * 100)}%). ` +
+                `Rewrite wrong options to match correct-option length and specificity. See AUTHORING.md.`,
+      });
+    }
+    if (enPct > LENGTH_RULE_THRESHOLD) {
+      lengthIssues.push({
+        issue: 'correct option is strict longest in > 60% of quizzes',
+        where: `${subject} chapter ${week.id} (EN)`,
+        detail: `${enLongest}/${total} (${Math.round(enPct * 100)}%). ` +
+                `Rewrite wrong options to match correct-option length and specificity. See AUTHORING.md.`,
+      });
+    }
+  }
+}
+
 // ─── Chapter surfacing check (getW ↔ content) ──────────────────────────
 //
 // The content validator used to inspect only the content files. That
@@ -922,9 +1008,10 @@ reportTable('Quiz option shape errors (packed / length mismatch / too few)', qui
 reportTable('CAROUSEL_ORDER coverage errors (thinker missing from order-list / order references unknown id / duplicates)', orderIssues);
 reportTable('Chapter surfacing errors (content ↔ getW mismatch)', surfacingIssues);
 reportTable('Correct-answer distribution errors (letter > 50% / run ≥ 4)', distributionIssues);
+reportTable('Distractor length-signature errors (correct option strict-longest > 60%)', lengthIssues);
 reportTable('Unreferenced thinkers (never appear in any dialogue — warning only)', unreferenced);
 
-const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length + surfacingIssues.length + distributionIssues.length;
+const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length + surfacingIssues.length + distributionIssues.length + lengthIssues.length;
 if (hardErrorCount > 0) {
   console.error('');
   console.error('╔════════════════════════════════════════════════════════════════════╗');
