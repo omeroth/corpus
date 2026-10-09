@@ -9201,6 +9201,12 @@
     margin: 0 0 10px;
   }
   .paywall-eyebrow:empty { display: none; }
+  /* Match the eyebrow collapse rule — when the caller passes an empty
+     sub (mid-chapter trigger, which carries the pitch entirely in the
+     headline), the sub element stays in the DOM with 0-height text but
+     its 24px bottom margin would leave a visible gap between the
+     headline and the price cards. :empty collapses it cleanly. */
+  .paywall-sub:empty { display: none; }
   .paywall-headline {
     font-family: 'Nunito', 'Assistant', sans-serif;
     font-size: calc(26px * var(--text-scale));
@@ -25375,102 +25381,32 @@ function _maybeFlagMidChapterPaywall(weekId, dayId) {
   try { console.log('[midchpw] FLAG SET; _pendingMidChapterPaywall=', _pendingMidChapterPaywall); } catch(e) {}
 }
 
-// Contextual copy per {subject, trigger, lang}. D3 is a lock preview —
-// static text (chapter titles + count words don't change often enough to
-// warrant computation). D6 is a thinker-count pitch — {met} and {total}
-// are interpolated at paywall-open time from the current subject's
-// content so the numbers age correctly as content ships.
+// Headline-only copy, four strings, keyed {trigger}.{lang}. Same copy
+// across subjects — no per-subject chapter titles, no computed thinker
+// counts, no eyebrow, no sub. The pitch is in the headline; the price
+// cards below say the rest. Only the number word changes between D3
+// and D6, and it's a word in both languages ("three" / "שלושה",
+// "six" / "שישה"), not a digit.
 //
-// Numbers come from _distinctThinkerIdsInSubject below: {total} is the
-// subject's full roster (every non-coming-soon week), {met} is the
-// intersection with state.unlockedThinkers. Subject-local by design — a
-// user who read philosophy ch1 then started economics sees "You've met 6
-// in economics" at the Economics d6 trigger, not a cross-subject total
-// that would jump unpredictably.
+// The English line is deliberately NOT a literal translation of the
+// Hebrew. "Just the beginning" is worn thin in English marketing in a
+// way the Hebrew equivalent isn't, so the English finds its own
+// phrasing while keeping the same calm.
 const _MID_CH_PAYWALL_COPY = {
-  philosophy: {
-    'ch1-d3': {
-      en: { eyebrow: '',
-            headline: 'Chapter 2: Ethics',
-            sub: 'Three more chapters in philosophy, plus economics and psychology. Over 60 thinkers across them.' },
-      he: { eyebrow: '',
-            headline: 'פרק 2: אתיקה',
-            sub: 'עוד שלושה פרקים בפילוסופיה, וגם כלכלה ופסיכולוגיה. יותר מ-60 הוגים.' },
-    },
-    'ch1-d6': {
-      en: { eyebrow: "You've met {met} in philosophy",
-            headline: 'There are {total} in philosophy alone',
-            sub: 'And more in economics and psychology.' },
-      he: { eyebrow: 'פגשתם {met} בפילוסופיה',
-            headline: 'יש {total} הוגים בפילוסופיה לבדה',
-            sub: 'ועוד בכלכלה ובפסיכולוגיה.' },
-    },
+  'ch1-d3': {
+    en: 'Three dialogues in. The rest is waiting.',
+    he: 'שלושה דיאלוגים מאחוריכם וזאת רק ההתחלה',
   },
-  economics: {
-    'ch1-d3': {
-      en: { eyebrow: '',
-            headline: 'Chapter 2: Value and Price',
-            sub: 'Four more chapters in economics, plus philosophy and psychology. Over 60 thinkers across them.' },
-      he: { eyebrow: '',
-            headline: 'פרק 2: ערך ומחיר',
-            sub: 'עוד ארבעה פרקים בכלכלה, וגם פילוסופיה ופסיכולוגיה. יותר מ-60 הוגים.' },
-    },
-    'ch1-d6': {
-      en: { eyebrow: "You've met {met} in economics",
-            headline: 'There are {total} in economics alone',
-            sub: 'And more in philosophy and psychology.' },
-      he: { eyebrow: 'פגשתם {met} בכלכלה',
-            headline: 'יש {total} הוגים בכלכלה לבדה',
-            sub: 'ועוד בפילוסופיה ובפסיכולוגיה.' },
-    },
-  },
-  psychology: {
-    'ch1-d3': {
-      en: { eyebrow: '',
-            headline: 'Chapter 2: What Drives Us?',
-            sub: 'Four more chapters in psychology, plus philosophy and economics. Over 60 thinkers across them.' },
-      he: { eyebrow: '',
-            headline: 'פרק 2: מה מניע אותנו?',
-            sub: 'עוד ארבעה פרקים בפסיכולוגיה, וגם פילוסופיה וכלכלה. יותר מ-60 הוגים.' },
-    },
-    'ch1-d6': {
-      en: { eyebrow: "You've met {met} in psychology",
-            headline: 'There are {total} in psychology alone',
-            sub: 'And more in philosophy and economics.' },
-      he: { eyebrow: 'פגשתם {met} בפסיכולוגיה',
-            headline: 'יש {total} הוגים בפסיכולוגיה לבדה',
-            sub: 'ועוד בפילוסופיה ובכלכלה.' },
-    },
+  'ch1-d6': {
+    en: 'Six dialogues in. The rest is waiting.',
+    he: 'שישה דיאלוגים מאחוריכם וזאת רק ההתחלה',
   },
 };
-function _distinctThinkerIdsInSubject(subject) {
-  const dataMap = {
-    philosophy:  typeof corpusData     !== 'undefined' ? corpusData     : null,
-    economics:   typeof economicsData  !== 'undefined' ? economicsData  : null,
-    psychology:  typeof psychologyData !== 'undefined' ? psychologyData : null,
-  };
-  const d = dataMap[subject];
-  const out = new Set();
-  if (!d || !Array.isArray(d.weeks)) return out;
-  for (const w of d.weeks) {
-    if (!w || w.comingSoon || !Array.isArray(w.days)) continue;
-    for (const day of w.days) { if (day && day.thinkerId) out.add(day.thinkerId); }
-  }
-  return out;
-}
 function _midChapterPaywallCopy(subject, source) {
-  const copy = _MID_CH_PAYWALL_COPY[subject] && _MID_CH_PAYWALL_COPY[subject][source];
-  if (!copy) return { eyebrow: '', headline: '', sub: '' };
-  const lang = state && state.lang === 'en' ? 'en' : 'he';
-  const slot = copy[lang];
+  const slot = _MID_CH_PAYWALL_COPY[source];
   if (!slot) return { eyebrow: '', headline: '', sub: '' };
-  const ids = _distinctThinkerIdsInSubject(subject);
-  const total = ids.size;
-  const unlocked = new Set(state && state.unlockedThinkers || []);
-  let met = 0;
-  for (const id of ids) if (unlocked.has(id)) met++;
-  const interp = (s) => String(s || '').replace('{met}', met).replace('{total}', total);
-  return { eyebrow: interp(slot.eyebrow), headline: interp(slot.headline), sub: interp(slot.sub) };
+  const lang = state && state.lang === 'en' ? 'en' : 'he';
+  return { eyebrow: '', headline: slot[lang] || slot.en, sub: '' };
 }
 
 // Opens the paywall over whatever surface is currently visible.
