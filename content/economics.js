@@ -40,16 +40,16 @@ const economicsData = {
             question: 'סטודנט אומר: "אני לא חושב שיש לי בעיה כלכלית. אני לא רעב, יש לי בית. כלכלה לא רלוונטית לחיים שלי." איך סמואלסון היה מגיב לטענה הזו?',
             questionEn: 'A student says: "I don\'t think I have an economic problem. I\'m not hungry, I have a home. Economics is not relevant to my life." How would Samuelson respond to this claim?',
             options: [
-              'אתה צודק - כלכלה רלוונטית רק לעניים',
               'גם אדם עשיר חי בתוך מחסור - של זמן, אנרגיה ואפשרויות',
+              'אתה צודק - כלכלה רלוונטית רק לעניים',
               'תחכה - כשתהיה לך משפחה, תבין מה זה צרכים'
             ],
             optionsEn: [
-              'You\'re right - economics is only relevant to the poor',
               'Even a rich person lives within scarcity - of time, energy, and possibilities',
+              'You\'re right - economics is only relevant to the poor',
               'Wait - when you have a family, you\'ll understand what needs are'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: 'סמואלסון הראה שמחסור אינו רק מחסור בכסף. לכל אחד יש משאב מוגבל אחד לפחות: זמן. אדם בן 30 שיש לו עוד כ-60 שנה לחיות חייב לבחור איך לבלות אותן - וכל בחירה היא ויתור. <strong>הבעיה הכלכלית קיימת בחיים של כל אדם, גם של מיליארדר.</strong>',
             explanationEn: 'Samuelson showed that scarcity is not just scarcity of money. Everyone has at least one limited resource: time. A 30-year-old with about 60 years left to live must choose how to spend them - and every choice is a forgoing. <strong>The economic problem exists in every person\'s life, even a billionaire\'s.</strong>',
           },
@@ -59,15 +59,15 @@ const economicsData = {
             questionEn: 'A CEO offers a professional woman a salary of 30,000 shekels a month in a very demanding job. She refuses. His colleague says: "She\'s not rational - who refuses 30,000?" How would Samuelson explain her decision?',
             options: [
               'היא לא הגיונית - צריך לקבל הצעות עם שכר טוב',
-              'היא בטח מקבלת כסף ממקור אחר - אחרת זה לא הגיוני',
-              'היא ערכה חישוב של עלות אלטרנטיבית: זמן, איכות חיים וערכים'
+              'היא ערכה חישוב של עלות אלטרנטיבית: זמן, איכות חיים וערכים',
+              'היא בטח מקבלת כסף ממקור אחר - אחרת זה לא הגיוני'
             ],
             optionsEn: [
               'She\'s not rational - one should accept good salary offers',
-              'She must be getting money from another source - otherwise it doesn\'t make sense',
-              'She made an opportunity cost calculation: time, quality of life, and values'
+              'She made an opportunity cost calculation: time, quality of life, and values',
+              'She must be getting money from another source - otherwise it doesn\'t make sense'
             ],
-            correctIndex: 2,
+            correctIndex: 1,
             explanation: 'השכר הוא לא העלות היחידה - הוא הרווח. היא חשבה כמה הג\'וב הזה יעלה לה: שעות, סטרס, זמן שלא תהיה עם הילדים ופגיעה בבריאות. <strong>אם העלות האלטרנטיבית של ההזדמנות גבוהה מהרווח המוניטרי, ההחלטה הרציונלית היא לסרב.</strong>',
             explanationEn: 'The salary is not the only cost - it is the gain. She thought about what this job would cost her: hours, stress, time not with the children, and harm to her health. <strong>If the opportunity cost of the opportunity is greater than the monetary gain, the rational decision is to refuse.</strong>',
           },
@@ -77,15 +77,15 @@ const economicsData = {
             questionEn: 'Someone says: "Economics is only about markets and money. Why is this relevant to someone not in the business world?" What would the classical Samuelsonian response be?',
             options: [
               'אתה צודק - כלכלה רלוונטית רק לעולם העסקים',
-              'כלכלה היא לימוד של בחירה תחת מחסור - וזה מקיף את כל החיים',
-              'כלכלה לא רלוונטית לחיי היומיום - אלא רק לתיאוריה'
+              'כלכלה לא רלוונטית לחיי היומיום - אלא רק לתיאוריה',
+              'כלכלה היא לימוד של בחירה תחת מחסור - וזה מקיף את כל החיים'
             ],
             optionsEn: [
               'You\'re right - economics is only relevant to the business world',
-              'Economics is the study of choice under scarcity - and that encompasses all of life',
-              'Economics is not relevant to daily life - only to theory'
+              'Economics is not relevant to daily life - only to theory',
+              'Economics is the study of choice under scarcity - and that encompasses all of life'
             ],
-            correctIndex: 1,
+            correctIndex: 2,
             explanation: 'ההגדרה של סמואלסון פתחה את הכלכלה לעולם רחב בהרבה ממסחר וכסף. כל בחירה היא כלכלית - כי כל בחירה כוללת ויתור. הזמן שלך, מערכות היחסים שלך והקריירה שלך - כולם דורשים בחירה תחת מחסור. <strong>כלכלה היא לא תחום של עסקים - היא מערכת חשיבה על החיים.</strong>',
             explanationEn: 'Samuelson\'s definition opened economics to a much broader world than commerce and money. Every choice is economic - because every choice includes a forgoing. Your time, your relationships, and your career - all require choice under scarcity. <strong>Economics is not a field of business - it is a system of thinking about life.</strong>',
           },
@@ -143,16 +143,16 @@ const economicsData = {
             question: 'ממשלה מחליטה לקבוע מחיר מקסימלי על לחם - 5 שקלים - כדי לעזור לעניים. הסוחרים אומרים שזה לא רווחי להם. איך סמית היה צופה את ההמשך?',
             questionEn: 'A government decides to set a maximum price on bread - 5 shekels - to help the poor. The merchants say it is not profitable for them. How would Smith predict what follows?',
             options: [
-              'הסוחרים יקבלו את ההפסד וימשיכו לאפות',
+              'הסוחרים יקטינו את הייצור - ייווצר מחסור ושוק שחור',
               'הממשלה תצליח להוריד את המחיר בלי השלכות',
-              'הסוחרים יקטינו את הייצור - ייווצר מחסור ושוק שחור'
+              'הסוחרים יקבלו את ההפסד וימשיכו לאפות'
             ],
             optionsEn: [
-              'The merchants will accept the loss and continue baking',
+              'The merchants will reduce production - a shortage and black market will form',
               'The government will succeed in lowering the price without consequences',
-              'The merchants will reduce production - a shortage and black market will form'
+              'The merchants will accept the loss and continue baking'
             ],
-            correctIndex: 2,
+            correctIndex: 0,
             explanation: 'סמית היה אומר שכשמתערבים במנגנון המחיר, התוצאה לרוב הפוכה מהמתוכננת. אם אופה מפסיד על כל לחם - הוא יאפה פחות, וייווצר מחסור. אנשים יהיו מוכנים לשלם יותר בשוק השחור. <strong>במקום שלעניים יהיה לחם זול - לא יהיה להם לחם בכלל.</strong>',
             explanationEn: 'Smith would say that when one intervenes in the price mechanism, the result is usually the opposite of what was intended. If a baker loses on every loaf - he will bake less, and a shortage will form. People will be willing to pay more on the black market. <strong>Instead of the poor having cheap bread - they will have no bread at all.</strong>',
           },
@@ -162,15 +162,15 @@ const economicsData = {
             questionEn: 'Smith wrote two great books: The Theory of Moral Sentiments (1759) on empathy and compassion, and The Wealth of Nations (1776) on selfishness and economics. They seem contradictory. What can be inferred from the fact that the same person wrote both?',
             options: [
               'סמית התבלבל בסוף חייו ושינה את דעתו',
-              'סמית ראה את האדם כמורכב: גם אמפתיה וגם אינטרס עצמי',
-              'סמית כתב את הספרים ביחד עם עוזרים שלא הסכימו'
+              'סמית כתב את הספרים ביחד עם עוזרים שלא הסכימו',
+              'סמית ראה את האדם כמורכב: גם אמפתיה וגם אינטרס עצמי'
             ],
             optionsEn: [
               'Smith got confused at the end of his life and changed his mind',
-              'Smith saw man as complex: both empathy and self-interest',
-              'Smith wrote the books with assistants who disagreed'
+              'Smith wrote the books with assistants who disagreed',
+              'Smith saw man as complex: both empathy and self-interest'
             ],
-            correctIndex: 1,
+            correctIndex: 2,
             explanation: 'הסתירה היא רק לכאורה. סמית האמין שיש באדם שני כוחות: <strong>אמפתיה (שעובדת בקשרים אישיים) ואינטרס עצמי (שעובד בשוק האנונימי)</strong>. שני הספרים הם שני צדדים של אותה מטבע. סמית לא היה כלכלן מנותק - הוא היה פילוסוף מוסרי. נחזור לזה בפרק על המוסר.',
             explanationEn: 'The contradiction is only apparent. Smith believed man has two forces: <strong>empathy (which works in personal relations) and self-interest (which works in the anonymous market)</strong>. Both books are two sides of the same coin. Smith was not a detached economist - he was a moral philosopher. We will return to this in the chapter on morality.',
           },
@@ -210,16 +210,16 @@ const economicsData = {
             question: 'חבר אומר: "השוק החופשי הוא הדרך הטבעית של בני אדם להתמקח. תמיד היה ככה ותמיד יהיה." איך מרקס היה מערער על הטענה הזו?',
             questionEn: 'A friend says: "The free market is the natural way for human beings to bargain. It has always been this way and always will be." How would Marx challenge this claim?',
             options: [
-              'הוא צודק - קפיטליזם הוא הסדר הנצחי של הטבע',
               'קפיטליזם הוא תופעה היסטורית עם התחלה - וייתכן גם סוף',
+              'הוא צודק - קפיטליזם הוא הסדר הנצחי של הטבע',
               'אין דבר כזה "שוק" - הכל אשליה'
             ],
             optionsEn: [
-              'He is right - capitalism is the eternal order of nature',
               'Capitalism is a historical phenomenon with a beginning - and possibly an end',
+              'He is right - capitalism is the eternal order of nature',
               'There is no such thing as "the market" - it is all an illusion'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: 'מרקס היה היסטוריון. הוא ראה שלפני 500 שנה היה פיאודליזם, ולפני 2,000 שנה - עבדות. כל מערכת כלכלית נראתה למי שחי בה כ"הסדר הטבעי" - עד שהוחלפה. <strong>הקפיטליזם דומה: הוא התחיל עם המהפכה התעשייתית.</strong> לטעון שהוא נצחי זה לבלבל בין "מה שיש כרגע" ל"מה שחייב להיות תמיד".',
             explanationEn: 'Marx was a historian. He saw that 500 years ago there was feudalism, and 2,000 years ago - slavery. Every economic system seemed to those living in it as "the natural order" - until it was replaced. <strong>Capitalism is similar: it began with the Industrial Revolution.</strong> To claim it is eternal is to confuse "what exists now" with "what must always be."',
           },
@@ -229,15 +229,15 @@ const economicsData = {
             questionEn: 'Smith said that the free market leads to public welfare. What is Marx\'s main argument against this?',
             options: [
               'סמית טעה כי השוק החופשי בכלל לא קיים',
-              'סמית טעה כי כסף הוא רע - וצריך לבטל אותו',
-              'השוק אינו זירת מיקוח בין שווים - בעל-ההון והפועל אינם שווים'
+              'השוק אינו זירת מיקוח בין שווים - בעל-ההון והפועל אינם שווים',
+              'סמית טעה כי כסף הוא רע - וצריך לבטל אותו'
             ],
             optionsEn: [
               'Smith was wrong because the free market doesn\'t exist at all',
-              'Smith was wrong because money is evil - and should be abolished',
-              'The market is not an arena of bargaining between equals - the capital-holder and the worker are not equals'
+              'The market is not an arena of bargaining between equals - the capital-holder and the worker are not equals',
+              'Smith was wrong because money is evil - and should be abolished'
             ],
-            correctIndex: 2,
+            correctIndex: 1,
             explanation: 'מרקס לא טען שהשוק לא קיים או שכסף הוא "רע". הוא טען שסמית פספס משהו קריטי: <strong>המתמקחים אינם שווים מלכתחילה.</strong> בעל-ההון יכול לחכות; הפועל לא יכול. ולכן "ההסכמה החופשית" של הפועל לעבוד בתנאים גרועים אינה באמת חופשית. השוק לא יוצר אי-שוויון - <strong>הוא חושף ומנציח אי-שוויון שכבר קיים.</strong>',
             explanationEn: 'Marx did not claim the market doesn\'t exist or that money is "evil." He claimed Smith missed something critical: <strong>the bargainers are not equals to begin with.</strong> The capital-holder can wait; the worker cannot. Therefore the worker\'s "free agreement" to work under bad conditions is not really free. The market does not create inequality - <strong>it exposes and perpetuates inequality that already exists.</strong>',
           },
@@ -247,15 +247,15 @@ const economicsData = {
             questionEn: 'A student says: "Workers receive wages for their work. If they weren\'t satisfied, they would leave. There is no exploitation here." How would Marx respond?',
             options: [
               'אתה צודק - אם הם נשארים, סימן שזה הוגן',
-              'החופש "לעזוב" אינו חופש אמיתי כשהאלטרנטיבה היחידה היא רעב',
-              'הפועלים תמיד מנוצלים - אין שום הבדל בין עבודות'
+              'הפועלים תמיד מנוצלים - אין שום הבדל בין עבודות',
+              'החופש "לעזוב" אינו חופש אמיתי כשהאלטרנטיבה היחידה היא רעב'
             ],
             optionsEn: [
               'You\'re right - if they stay, it\'s a sign it\'s fair',
-              'The freedom "to leave" is not a real freedom when the only alternative is starvation',
-              'Workers are always exploited - there is no difference between jobs'
+              'Workers are always exploited - there is no difference between jobs',
+              'The freedom "to leave" is not a real freedom when the only alternative is starvation'
             ],
-            correctIndex: 1,
+            correctIndex: 2,
             explanation: 'זו הביקורת המרכזית של מרקס. <strong>החופש החוקי "לעזוב את העבודה" אינו חופש אמיתי כשאין לאדם מספיק הון כדי להמתין.</strong> הוא יחזור לעבוד באותם תנאים - או יגווע ברעב. "ההסכמה" שלו אינה אישור לתנאים - היא תוצאה של כורח כלכלי. סמית הניח חופש בחירה; מרקס הראה שהחופש הזה תיאורטי בלבד עבור מי שתלוי לחלוטין בשכר העבודה שלו.',
             explanationEn: 'This is Marx\'s central critique. <strong>The legal freedom "to leave the job" is not a real freedom when a person has not enough capital to wait.</strong> He will return to work under the same conditions - or starve. His "agreement" is not approval of the conditions - it is the result of economic compulsion. Smith assumed freedom of choice; Marx showed that this freedom is only theoretical for one who is fully dependent on their wage labor.',
           },
@@ -331,16 +331,16 @@ const economicsData = {
             question: 'סמית טען שהשוק יוצר רווחה כשנותנים לו לפעול. מה ההתערבות הקיינסיאנית בטענה הזו?',
             questionEn: 'Smith argued that the market creates welfare when we let it operate. What is the Keynesian intervention in this claim?',
             options: [
-              'השוק לא יוצר רווחה - תמיד צריך תכנון מרכזי',
+              'השוק יוצר רווחה רוב הזמן - אבל לא תמיד, ואז נדרשת התערבות',
               'סמית טעה לחלוטין - כלכלה זה לא על שוק כלל',
-              'השוק יוצר רווחה רוב הזמן - אבל לא תמיד, ואז נדרשת התערבות'
+              'השוק לא יוצר רווחה - תמיד צריך תכנון מרכזי'
             ],
             optionsEn: [
-              'The market doesn\'t create welfare - central planning is always needed',
+              'The market creates welfare most of the time - but not always, and then intervention is needed',
               'Smith was completely wrong - economics isn\'t about the market at all',
-              'The market creates welfare most of the time - but not always, and then intervention is needed'
+              'The market doesn\'t create welfare - central planning is always needed'
             ],
-            correctIndex: 2,
+            correctIndex: 0,
             explanation: 'קיינס לא ביטל את סמית. הוא הוסיף סייג חשוב: <strong>השוק עובד טוב - בזמנים רגילים. במשברים, הוא יכול להיכשל.</strong> ההצעה שלו אינה לבטל את השוק, אלא להוסיף לו מנגנון חירום. בזמנים טובים - תנו לשוק לעבוד. בזמני משבר - תנו למדינה להפעיל את הכלכלה. זוהי "הדרך השלישית" בין סמית למרקס.',
             explanationEn: 'Keynes did not abolish Smith. He added an important caveat: <strong>the market works well - in normal times. In crises, it can fail.</strong> His proposal is not to abolish the market, but to add to it an emergency mechanism. In good times - let the market work. In times of crisis - let the state activate the economy. This is the "third way" between Smith and Marx.',
           },
@@ -380,16 +380,16 @@ const economicsData = {
             question: 'חבר אומר: "כלכלה זה רק על יעילות. לא קשור לחירות." איך פרידמן היה מערער על הטענה הזו?',
             questionEn: 'A friend says: "Economics is just about efficiency. It has nothing to do with freedom." How would Friedman challenge this claim?',
             options: [
-              'הוא צודק - כלכלה היא תחום נפרד מערכים פוליטיים',
               'כלכלה ופוליטיקה אינן נפרדות - מי ששולט בכלכלה שולט בחיים',
+              'הוא צודק - כלכלה היא תחום נפרד מערכים פוליטיים',
               'כלכלה היא רק על כסף, לא על שום ערך עמוק יותר'
             ],
             optionsEn: [
-              'He\'s right - economics is a field separate from political values',
               'Economics and politics are not separate - whoever controls the economy controls life',
+              'He\'s right - economics is a field separate from political values',
               'Economics is only about money, not about any deeper value'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: 'הטענה המרכזית של פרידמן: <strong>חופש כלכלי הוא הבסיס לחופש פוליטי.</strong> כשהמדינה שולטת באמצעי הפרנסה שלך - באיזו עבודה תעבוד ובאיזו דירה תגור - היא שולטת בחיים שלך, ואז גם חופש הביטוי שלך הופך לתיאורטי בלבד.',
             explanationEn: 'Friedman\'s central claim: <strong>economic freedom is the foundation of political freedom.</strong> When the state controls your means of livelihood - what job you\'ll work in and what apartment you\'ll live in - it controls your life, and then even your freedom of expression becomes merely theoretical.',
           },
@@ -399,15 +399,15 @@ const economicsData = {
             questionEn: 'Keynes argued that the state must intervene in economic crises. What is a typical response from Friedman?',
             options: [
               'קיינס צדק - התערבות ממשלתית תמיד עוזרת',
-              'המדינה צריכה להתערב עוד יותר ממה שקיינס הציע',
-              'ההתערבות הממשלתית גורמת לבעיות יותר ממה שהיא פותרת'
+              'ההתערבות הממשלתית גורמת לבעיות יותר ממה שהיא פותרת',
+              'המדינה צריכה להתערב עוד יותר ממה שקיינס הציע'
             ],
             optionsEn: [
               'Keynes was right - government intervention always helps',
-              'The state needs to intervene even more than Keynes proposed',
-              'Government intervention causes more problems than it solves'
+              'Government intervention causes more problems than it solves',
+              'The state needs to intervene even more than Keynes proposed'
             ],
-            correctIndex: 2,
+            correctIndex: 1,
             explanation: 'פרידמן טען שגם המשבר הגדול נגרם בעיקר על ידי טעויות של הבנק המרכזי האמריקאי - ולא על ידי כשל מולד של השוק. <strong>ההתערבות הממשלתית, גם בכוונות טובות, יוצרת עיוותים שמחמירים את המצב.</strong> הפתרון אינו עוד התערבות - אלא כללים יציבים וקבועים שמאפשרים לשוק לתפקד.',
             explanationEn: 'Friedman argued that even the Great Depression was caused mainly by mistakes of the American central bank - not by an inherent failure of the market. <strong>Government intervention, even with good intentions, creates distortions that worsen the situation.</strong> The solution is not more intervention - but stable, fixed rules that allow the market to function.',
           },
@@ -417,15 +417,15 @@ const economicsData = {
             questionEn: 'Marx argued that the market exploits workers. Friedman saw the matter differently. What\'s the debate?',
             options: [
               'פרידמן הסכים עם מרקס - השוק תמיד מנצל',
-              'פרידמן ראה את השוק כמשחרר - נותן בחירה גם לחלשים',
-              'הם הסכימו לחלוטין - שני הוגים זהים בעמדתם'
+              'הם הסכימו לחלוטין - שני הוגים זהים בעמדתם',
+              'פרידמן ראה את השוק כמשחרר - נותן בחירה גם לחלשים'
             ],
             optionsEn: [
               'Friedman agreed with Marx - the market always exploits',
-              'Friedman saw the market as liberating - giving choice even to the weak',
-              'They agreed completely - both thinkers identical in their position'
+              'They agreed completely - both thinkers identical in their position',
+              'Friedman saw the market as liberating - giving choice even to the weak'
             ],
-            correctIndex: 1,
+            correctIndex: 2,
             explanation: 'זו המחלוקת הבסיסית ביותר. <strong>מרקס ראה את הפועל כמי שאין לו ברירה</strong> - מוכרח לעבוד או לרעוב. <strong>פרידמן ראה את הפועל כמי שיש לו אופציות</strong> הודות לתחרות בין מעסיקים, חופש לעזוב וחופש להתפתח. שני ההוגים מסתכלים על אותה מציאות בדיוק ורואים דברים הפוכים - וזהו לב הוויכוח הכלכלי-פוליטי של המאה ה-20.',
             explanationEn: 'This is the most basic dispute. <strong>Marx saw the worker as having no choice</strong> - forced to work or starve. <strong>Friedman saw the worker as having options</strong> thanks to competition between employers, freedom to leave, and freedom to develop. The two thinkers look at exactly the same reality and see opposite things - and this is the heart of the economic-political debate of the 20th century.',
           },
@@ -465,16 +465,16 @@ const economicsData = {
             question: 'מדינה צומחת ב-7% בשנה לאורך עשור וה-GDP (התוצר המקומי הגולמי) שלה גדל, אבל אחוז הנשים שלמדו באוניברסיטה לא השתנה כלל. איך סן היה מעריך את ההצלחה הכלכלית הזו?',
             questionEn: 'A country grows at 7% a year for a decade and its GDP grows, but the percentage of women who studied at university did not change at all. How would Sen evaluate this economic success?',
             options: [
-              'הצלחה גדולה - הכלכלה צומחת בקצב מהיר',
+              'הצלחה חלקית בלבד - צמיחה ללא הרחבת יכולות אינה מהווה פיתוח אמיתי',
               'אי-הצלחה - אם הצמיחה לא רחבה, היא לא משמעותית כלל',
-              'הצלחה חלקית בלבד - צמיחה ללא הרחבת יכולות אינה מהווה פיתוח אמיתי'
+              'הצלחה גדולה - הכלכלה צומחת בקצב מהיר'
             ],
             optionsEn: [
-              'A great success - the economy is growing rapidly',
+              'Only partial success - growth without expanding capabilities is not real development',
               'A failure - if growth is not broad, it has no meaning at all',
-              'Only partial success - growth without expanding capabilities is not real development'
+              'A great success - the economy is growing rapidly'
             ],
-            correctIndex: 2,
+            correctIndex: 0,
             explanation: 'סן היה אומר שצמיחה כלכלית (עליית ה-GDP) היא כלי, לא יעד. <strong>אם המדינה צומחת אך היכולות הבסיסיות של חצי מאזרחיה אינן מתרחבות, הצמיחה לא הגיעה אליהם.</strong> המספרים היבשים שקריים - הם מסתירים את הכישלון של הפיתוח האנושי האמיתי.',
             explanationEn: 'Sen would say that economic growth (GDP growth) is a tool, not a goal. <strong>If a country grows but the basic capabilities of half its citizens are not expanding, the growth has not reached them.</strong> The dry numbers are misleading - they hide the failure of true human development.',
           },
@@ -484,15 +484,15 @@ const economicsData = {
             questionEn: 'In Bengal of 1943, millions of people died of hunger in a region that produced enough food for its entire population. How did Sen explain this situation?',
             options: [
               'הייתה בעיה לוגיסטית - האוכל פשוט לא הגיע למקום הנכון',
-              'הרעב נגרם מחוסר ב"זכאויות" - ולא מחוסר פיזי באוכל',
-              'תמיד יש רעב בזמן מלחמות - אין כאן מה להסביר'
+              'תמיד יש רעב בזמן מלחמות - אין כאן מה להסביר',
+              'הרעב נגרם מחוסר ב"זכאויות" - ולא מחוסר פיזי באוכל'
             ],
             optionsEn: [
               'There was a logistical problem - the food simply did not reach the right place',
-              'The famine was caused by a lack of "entitlements" - not by a physical lack of food',
-              'There is always famine in wartime - there\'s nothing to explain here'
+              'There is always famine in wartime - there\'s nothing to explain here',
+              'The famine was caused by a lack of "entitlements" - not by a physical lack of food'
             ],
-            correctIndex: 1,
+            correctIndex: 2,
             explanation: 'זו התובנה המכוננת של סן: <strong>רעב אינו בעיה של ייצור, אלא בעיה של גישה ונגישות.</strong> האוכל היה קיים באסמים, אבל לאנשים לא הייתה יכולת לקנות אותו בגלל אינפלציה, אובדן מקומות עבודה והחרמה צבאית בריטית של אספקה וכלי תחבורה. זכאויות - היכולת החוקית והכלכלית לרכוש, לגדל או לקבל מזון - הן הקריטריון האמיתי, ולא נפח הייצור.',
             explanationEn: 'This is Sen\'s founding insight: <strong>famine is not a problem of production, but a problem of access.</strong> The food existed in granaries, but people had no ability to buy it because of inflation, loss of jobs, and British military confiscation of supplies and transportation. Entitlements - the legal and economic ability to purchase, grow, or receive food - are the real criterion, not the volume of production.',
           },
@@ -502,15 +502,15 @@ const economicsData = {
             questionEn: 'Friedman said that a free market guarantees freedom. Sen added a caveat to this claim. What is the caveat?',
             options: [
               'שוק חופשי לעולם אינו מבטיח חירות בשום מצב',
-              'סן הסכים לחלוטין עם פרידמן - אין ביניהם שום הסתייגות',
-              'חירות פורמלית בלבד אינה מספיקה - נדרשת יכולת ממשית לפעול'
+              'חירות פורמלית בלבד אינה מספיקה - נדרשת יכולת ממשית לפעול',
+              'סן הסכים לחלוטין עם פרידמן - אין ביניהם שום הסתייגות'
             ],
             optionsEn: [
               'A free market never guarantees freedom under any circumstances',
-              'Sen completely agreed with Friedman - there is no caveat between them',
-              'Formal freedom alone is not enough - actual capability to act is required'
+              'Formal freedom alone is not enough - actual capability to act is required',
+              'Sen completely agreed with Friedman - there is no caveat between them'
             ],
-            correctIndex: 2,
+            correctIndex: 1,
             explanation: 'זו ההסתייגות המרכזית של סן: יש הבדל בין <strong>חופש פורמלי</strong> (המצב שבו החוק והשוק לא מונעים ממך משהו באופן רשמי) לבין <strong>חופש ממשי</strong> (המצב שבו יש לך את המשאבים, הבריאות וההשכלה לפעול). אדם רעב חופשי בשוק החופשי לקנות אוכל - אך אין לו חירות ממשית לבצע זאת כי אין לו כסף. <strong>חירות אמיתית דורשת בניית יכולות בסיסיות.</strong>',
             explanationEn: 'This is Sen\'s central caveat: there is a difference between <strong>formal freedom</strong> (the situation where law and the market do not officially prevent you from something) and <strong>actual freedom</strong> (the situation where you have the resources, health, and education to act). A hungry person is free in the free market to buy food - but he has no actual freedom to do so because he has no money. <strong>True freedom requires building basic capabilities.</strong>',
           },
@@ -551,16 +551,16 @@ const economicsData = {
             question: 'חבר אומר: "כלכלה היא תחום מדעי, נטול ערכים." איך הפרק כולו ערער על הטענה הזו?',
             questionEn: 'A friend says: "Economics is a scientific, value-free field." How did the entire chapter challenge this claim?',
             options: [
-              'החבר צודק - כלכלה היא רק עניין טכני של מספרים',
               'הכלכלה מתעסקת בערכים כי כל מענה לשאלות "מה, איך, ועבור מי" מבוסס על ערכים',
+              'החבר צודק - כלכלה היא רק עניין טכני של מספרים',
               'רק סן ערער על זה - שאר ההוגים הסכימו'
             ],
             optionsEn: [
-              'The friend is right - economics is just a technical matter of numbers',
               'Economics deals with values because every answer to the questions "what, how, and for whom" is based on values',
+              'The friend is right - economics is just a technical matter of numbers',
               'Only Sen challenged this - the other thinkers agreed'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: 'זו התובנה המרכזית של הפרק. <strong>השאלות הבסיסיות של הכלכלה הן ערכיות, גם אם הן נראות טכניות.</strong> "מה לייצר?" דורש החלטה אילו צרכים חשובים יותר. "איך לייצר?" דורש החלטה על תנאי עובדים. "עבור מי?" דורש החלטה על חלוקה הוגנת. <strong>אין דרך להתחמק מערכים - רק להסתיר אותם מאחורי נוסחאות.</strong>',
             explanationEn: 'This is the central insight of the chapter. <strong>The basic questions of economics are value-based, even if they look technical.</strong> "What to produce?" requires a decision about which needs are more important. "How to produce?" requires a decision about workers\' conditions. "For whom?" requires a decision about fair distribution. <strong>There is no way to escape values - only to hide them behind formulas.</strong>',
           },
@@ -680,15 +680,15 @@ const economicsData = {
             questionEn: 'A friend says: "Value is something objective - it depends on how many resources and time were invested in production." How would you respond based on what we learned?',
             options: [
               'החבר צודק לחלוטין - זו עמדת סמית והיא נכונה',
-              'זו עמדת סמית, אבל מאז 1871 הכלכלה מבינה שזה לא מספיק',
-              'החבר טועה לחלוטין - ערך הוא רק עניין סובייקטיבי'
+              'החבר טועה לחלוטין - ערך הוא רק עניין סובייקטיבי',
+              'זו עמדת סמית, אבל מאז 1871 הכלכלה מבינה שזה לא מספיק'
             ],
             optionsEn: [
               'The friend is completely right - this is Smith\'s position and it is correct',
-              'This is Smith\'s position, but since 1871 economics has understood that it\'s not enough',
-              'The friend is completely wrong - value is purely subjective'
+              'The friend is completely wrong - value is purely subjective',
+              'This is Smith\'s position, but since 1871 economics has understood that it\'s not enough'
             ],
-            correctIndex: 1,
+            correctIndex: 2,
             explanation: 'החבר מבטא את עמדת סמית - שערך טמון בחפץ עצמו, בעבודה שמושקעת בו. <strong>זו הייתה הגישה הדומיננטית במשך 100 שנה - עד "המהפכה השולית" של 1871, שהראתה שערך תלוי לא רק במה שמושקע, אלא גם בכמה אנשים רוצים את הדבר ברגע נתון.</strong> נגיע לזה בדיאלוג 3.',
             explanationEn: 'The friend expresses Smith\'s position - that value resides in the object itself, in the labor invested in it. <strong>This was the dominant approach for 100 years - until "the marginal revolution" of 1871, which showed that value depends not only on what is invested, but also on how much people want the item at a given moment.</strong> We\'ll get to this in Dialogue 3.',
           },
@@ -728,16 +728,16 @@ const economicsData = {
             question: 'חבר אומר: "רווח הוא פרס על השקעה - בלי בעלי-הון שמסכנים את כספם, לא יהיו מפעלים." איך מרקס היה מערער על הטענה הזו?',
             questionEn: 'A friend says: "Profit is a reward for investment - without capital-holders who risk their money, there would be no factories." How would Marx challenge this claim?',
             options: [
-              'הוא צודק - בלי השקעה אין כלכלה',
               'ההון עצמו הוא תוצר של עבודה - והרווח הוא הפער בין מה שהעובדים יצרו לבין מה ששולם להם',
+              'הוא צודק - בלי השקעה אין כלכלה',
               'רווח הוא תוצאה של מחירי השוק, לא של פעילות המפעל'
             ],
             optionsEn: [
-              'He is right - without investment there is no economy',
               'Capital itself is a product of labor - and profit is the gap between what workers produced and what was paid to them',
+              'He is right - without investment there is no economy',
               'Profit is a result of market prices, not of factory activity'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: 'מרקס היה מצביע על דבר אחד: <strong>המכונות, החומרים והבניין הם גם הם תוצר של עבודה - עבודה מוקפאת מן העבר.</strong> ההון לעצמו אינו יוצר שום דבר. רק העובד החי יוצר ערך חדש. <strong>לכן הרווח אינו פרס על "סיכון" או "השקעה" - הוא הפער בין מה שהעובד יצר לבין מה ששילמו לו.</strong>',
             explanationEn: 'Marx would point to one thing: <strong>the machines, materials, and building are also a product of labor - frozen labor from the past.</strong> Capital on its own creates nothing. Only the living worker creates new value. <strong>Therefore profit is not a reward for "risk" or "investment" - it is the gap between what the worker created and what was paid to him.</strong>',
           },
@@ -765,15 +765,15 @@ const economicsData = {
             questionEn: 'If Smith and Marx\'s labor theory of value is not correct (as the 1871 marginal revolution claimed), does that mean Marx is not relevant today?',
             options: [
               'כן - אם הבסיס שלו נפל, גם המסקנות נופלות',
-              'לא - השאלה ששאל "מאיפה בא הרווח?" עדיין נשאלת בכלכלה המודרנית',
-              'השאלה לא רלוונטית - מרקס היה רק היסטוריון'
+              'השאלה לא רלוונטית - מרקס היה רק היסטוריון',
+              'לא - השאלה ששאל "מאיפה בא הרווח?" עדיין נשאלת בכלכלה המודרנית'
             ],
             optionsEn: [
               'Yes - if his foundation fell, the conclusions also fall',
-              'No - the question he asked "where does profit come from?" is still being asked in modern economics',
-              'The question is not relevant - Marx was only a historian'
+              'The question is not relevant - Marx was only a historian',
+              'No - the question he asked "where does profit come from?" is still being asked in modern economics'
             ],
-            correctIndex: 1,
+            correctIndex: 2,
             explanation: 'הבסיס המתמטי של מרקס (תיאוריית ערך-העבודה) אכן נפל. <strong>אבל השאלה היותר עמוקה - מהיכן בא הרווח? - לא נפלה.</strong> היום כלכלנים בודקים את אותה שאלה בכלים אחרים: למה שכר העובדים בארה"ב לא עלה מ-1980 בעוד התפוקה גדלה פי 4? למה רווחי החברות הגדולות זינקו? <strong>מרקס פתח שאלה שעדיין מטרידה אותנו - גם אם התשובה שלו לא הייתה הכי מדויקת.</strong>',
             explanationEn: 'Marx\'s mathematical foundation (the labor theory of value) did fall. <strong>But the deeper question - where does profit come from? - did not fall.</strong> Today economists examine the same question with other tools: why have US wages not risen since 1980 while productivity grew fourfold? Why have profits of large companies soared? <strong>Marx opened a question that still troubles us - even if his answer was not the most accurate.</strong>',
           },
@@ -813,16 +813,16 @@ const economicsData = {
             question: 'חברה מציגה חולצה בחנות במחיר 100 שקלים. אותה חולצה בדיוק - אריג, גזרה, ייצור - נמכרת בחנות אחרת ב-500 שקלים, רק בגלל מותג יוקרה. לפי הגישה השולית, מי קובע מהו הערך האמיתי של החולצה?',
             questionEn: 'A company displays a shirt in a store at 100 shekels. The exact same shirt - fabric, cut, production - is sold in another store for 500 shekels, just because of a luxury brand. According to the marginal approach, who determines the true value of the shirt?',
             options: [
-              'הצרכן - אם מישהו מוכן לשלם 500, זה הערך האמיתי לרגע הזה',
+              'הממשלה - שצריכה לפקח שמחירים לא יהיו מנופחים',
               'החולצה עצמה - לפי כמה עבודה הושקעה בייצורה',
-              'הממשלה - שצריכה לפקח שמחירים לא יהיו מנופחים'
+              'הצרכן - אם מישהו מוכן לשלם 500, זה הערך האמיתי לרגע הזה'
             ],
             optionsEn: [
-              'The consumer - if someone is willing to pay 500, that is the true value for this moment',
+              'The government - which should regulate so that prices are not inflated',
               'The shirt itself - based on how much labor was invested in its production',
-              'The government - which should regulate so that prices are not inflated'
+              'The consumer - if someone is willing to pay 500, that is the true value for this moment'
             ],
-            correctIndex: 0,
+            correctIndex: 2,
             explanation: 'זה ליבת המהפכה השולית. <strong>ערך אינו תכונה של החולצה - הוא יחס בין הצרכן לחפץ.</strong> אם הצרכן מוכן לשלם 500 בגלל המותג - אז 500 הוא הערך, לרגע הזה. הגישה הזו רדיקלית: אין "מחיר אובייקטיבי" של החולצה. יש רק מה שמישהו מוכן לשלם תמורתה.',
             explanationEn: 'This is the heart of the marginal revolution. <strong>Value is not a property of the shirt - it is a relation between the consumer and the object.</strong> If the consumer is willing to pay 500 because of the brand - then 500 is the value, for this moment. This approach is radical: there is no "objective price" of the shirt. There is only what someone is willing to pay for it.',
           },
@@ -849,16 +849,16 @@ const economicsData = {
             question: 'אם ערך הוא סובייקטיבי - מה שאני מוכן לשלם - האם מרקס היה מסכים שאין יותר ניצול בקפיטליזם? איך אפשר לשלב את שתי הגישות?',
             questionEn: 'If value is subjective - what I\'m willing to pay - would Marx agree that there is no more exploitation in capitalism? How can the two approaches be combined?',
             options: [
-              'המהפכה השולית הוכיחה שמרקס טעה לחלוטין - אין ניצול',
               'שתי השאלות שונות - איך נקבע מחיר היא שאלה אחת, איך מתחלק הרווח היא שאלה אחרת',
+              'המהפכה השולית הוכיחה שמרקס טעה לחלוטין - אין ניצול',
               'צריך לוותר על תועלת שולית ולחזור לתיאוריית ערך-העבודה'
             ],
             optionsEn: [
-              'The marginal revolution proved Marx was completely wrong - there is no exploitation',
               'The two questions are different - how a price is determined is one question, how profit is distributed is another',
+              'The marginal revolution proved Marx was completely wrong - there is no exploitation',
               'We need to abandon marginal utility and return to the labor theory of value'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: 'זו תובנה מתוחכמת. <strong>המהפכה השולית פתרה איך נקבע מחיר - לא איך מתחלק הרווח.</strong> גם אם מחיר חולצה הוא 500 שקלים כי הצרכן מוכן לשלם - עדיין נשארת השאלה: כמה מתוך ה-500 הולך לעובד שתפר, וכמה לבעלי המניות? <strong>שתי השאלות נפרדות, ושתיהן עדיין רלוונטיות בכלכלה המודרנית.</strong>',
             explanationEn: 'This is a sophisticated insight. <strong>The marginal revolution solved how a price is determined - not how profit is distributed.</strong> Even if the price of a shirt is 500 shekels because the consumer is willing to pay - there still remains the question: how much of the 500 goes to the worker who sewed it, and how much to the shareholders? <strong>The two questions are separate, and both are still relevant in modern economics.</strong>',
           },
@@ -898,16 +898,16 @@ const economicsData = {
             question: 'ידיעה בעיתון: "בעקבות שריפות יער ענק, מחיר העגבניות הוכפל." איך מרשל היה מסביר את העלייה הזו?',
             questionEn: 'A newspaper headline: "Following massive forest fires, the price of tomatoes has doubled." How would Marshall explain this rise?',
             options: [
-              'הביקוש לעגבניות עלה - אנשים פתאום רוצים יותר עגבניות',
               'ההיצע ירד - פחות עגבניות בשוק, אבל הביקוש זהה, אז נקודת המפגש זזה למחיר גבוה יותר',
+              'הביקוש לעגבניות עלה - אנשים פתאום רוצים יותר עגבניות',
               'החקלאים הסכימו ביניהם להעלות מחירים'
             ],
             optionsEn: [
-              'Demand for tomatoes rose - people suddenly want more tomatoes',
               'Supply fell - fewer tomatoes in the market, but demand is the same, so the meeting point moves to a higher price',
+              'Demand for tomatoes rose - people suddenly want more tomatoes',
               'The farmers agreed among themselves to raise prices'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: 'זו דוגמה קלאסית של שינוי במחיר. <strong>השריפות פגעו בייצור - קו ההיצע נסוג שמאלה (פחות עגבניות יוצעו בכל מחיר).</strong> הביקוש לא השתנה - אנשים עדיין רוצים עגבניות. <strong>כשקו ההיצע זז ונקודת המפגש משתנה - המחיר חייב לעלות.</strong> זה אותו עיקרון שמסביר למה דלק התייקר במלחמת אוקראינה, ולמה דירות יקרות באזורי ביקוש.',
             explanationEn: 'This is a classic example of a price change. <strong>The fires damaged production - the supply curve retreated to the left (fewer tomatoes offered at every price).</strong> Demand did not change - people still want tomatoes. <strong>When the supply curve moves and the meeting point shifts - the price must rise.</strong> This is the same principle that explains why fuel became more expensive in the Ukraine war, and why apartments are expensive in high-demand areas.',
           },
@@ -916,16 +916,16 @@ const economicsData = {
             question: 'חברה חדשה משיקה אפליקציה בחינם. עשרות אלפי משתמשים נרשמים. אחרי שנה, החברה גובה 50 שקלים לחודש. הרבה משתמשים נשארים בלי בעיה. מה זה אומר על הביקוש לאפליקציה?',
             questionEn: 'A new company launches a free app. Tens of thousands of users sign up. After a year, the company charges 50 shekels a month. Many users stay without issue. What does this say about the demand for the app?',
             options: [
-              'הביקוש שלהם לא רגיש למחיר - הם רוצים אותה מאוד',
               'הביקוש שלהם רגיש מאוד למחיר - לכן הם נשארו',
+              'הביקוש שלהם לא רגיש למחיר - הם רוצים אותה מאוד',
               'אין קשר בין מחיר לביקוש לפי מרשל'
             ],
             optionsEn: [
-              'Their demand is not sensitive to price - they really want it',
               'Their demand is very sensitive to price - that\'s why they stayed',
+              'Their demand is not sensitive to price - they really want it',
               'There is no connection between price and demand according to Marshall'
             ],
-            correctIndex: 0,
+            correctIndex: 1,
             explanation: '<strong>כשמשתמשים נשארים גם אחרי שמחיר עולה - סימן שהביקוש שלהם "נוקשה".</strong> הם זקוקים לאפליקציה, או שאין להם תחליף. <strong>קו הביקוש שלהם הוא תלול - שינוי במחיר לא משפיע הרבה על כמות שהם רוצים.</strong> זה ההפך מ"ביקוש גמיש" - כשאנשים זזים מהר בין מוצרים בעקבות שינויי מחיר.',
             explanationEn: '<strong>When users stay even after the price rises - it\'s a sign that their demand is "rigid".</strong> They need the app, or have no alternative. <strong>Their demand curve is steep - a change in price doesn\'t affect much the quantity they want.</strong> This is the opposite of "elastic demand" - when people move quickly between products following price changes.',
           },
@@ -935,15 +935,15 @@ const economicsData = {
             questionEn: 'A friend says: "If consumers refused to buy bagels at 15 shekels, the bakeries would be forced to lower the price." Would Marshall agree?',
             options: [
               'לא - מחיר נקבע רק על ידי היצרן',
-              'כן - אם כל הצרכנים יסרבו, הביקוש קורס וכוח השוק חוזר אליהם',
-              'כן - אבל רק אם הממשלה תתערב'
+              'כן - אבל רק אם הממשלה תתערב',
+              'כן - אם כל הצרכנים יסרבו, הביקוש קורס וכוח השוק חוזר אליהם'
             ],
             optionsEn: [
               'No - price is determined only by the producer',
-              'Yes - if all consumers refuse, demand collapses and market power returns to them',
-              'Yes - but only if the government intervenes'
+              'Yes - but only if the government intervenes',
+              'Yes - if all consumers refuse, demand collapses and market power returns to them'
             ],
-            correctIndex: 1,
+            correctIndex: 2,
             explanation: 'זה לב התיאוריה של מרשל. <strong>כוח הצרכן הוא לא ויכוח על מחיר אחד - הוא קולקטיבי.</strong> אם מספיק צרכנים מסרבים - קו הביקוש נסוג. <strong>נקודת המפגש זזה לכיוון מחיר נמוך יותר.</strong> זו הסיבה שחרמות צרכנים יכולים לעבוד, ולמה תחרות בין מאפיות מורידה מחירים.',
             explanationEn: 'This is the heart of Marshall\'s theory. <strong>Consumer power is not a debate over a single price - it is collective.</strong> If enough consumers refuse - the demand curve retreats. <strong>The meeting point moves toward a lower price.</strong> This is why consumer boycotts can work, and why competition between bakeries lowers prices.',
           },
@@ -983,16 +983,16 @@ const economicsData = {
             question: 'בית חולים מציע: "תרום כליה - תקבל 50,000 שקלים." מספר התורמים יורד באופן ניכר. למה, לפי סנדל?',
             questionEn: 'A hospital offers: "Donate a kidney - receive 50,000 shekels." The number of donors drops significantly. Why, according to Sandel?',
             options: [
-              'הסכום נמוך מדי - צריך להציע יותר כסף',
               'הכנסת כסף שינתה את משמעות התרומה מ"מעשה של נדיבות" ל"עסקה כלכלית"',
+              'הסכום נמוך מדי - צריך להציע יותר כסף',
               'אנשים תורמים רק בלחץ חברתי - בלי לחץ אין תרומה'
             ],
             optionsEn: [
-              'The amount is too low - they should offer more money',
               'Bringing in money changed the meaning of the donation from "an act of generosity" to "an economic transaction"',
+              'The amount is too low - they should offer more money',
               'People donate only under social pressure - without pressure, no donation'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: 'זו הליבה של סנדל. <strong>השוק לא ניטרלי - הוא משנה את משמעות הדבר שהוא נוגע בו.</strong> תרומה ללא תמורה מבטאת ערכים של נדיבות וסולידריות. כשהיא הופכת לעסקה ב-50,000 שקלים, היא מאבדת את האופי המוסרי שלה. <strong>תורמים שהיו עושים את זה מתוך ערכים - מפסיקים, כי "זה כבר לא אותו דבר".</strong>',
             explanationEn: 'This is the heart of Sandel. <strong>The market is not neutral - it changes the meaning of the thing it touches.</strong> A donation without compensation expresses values of generosity and solidarity. When it becomes a 50,000-shekel transaction, it loses its moral character. <strong>Donors who would do it out of values - stop, because "it\'s no longer the same thing."</strong>',
           },
@@ -1002,15 +1002,15 @@ const economicsData = {
             questionEn: 'In a certain city, residents can pay $1,000 a year to access a fast lane on a road that is otherwise blocked. The liberal economist says: "This is just efficient. Those who value time more will pay." What would Sandel\'s response be?',
             options: [
               'הוא יסכים - זו דוגמה לשוק חופשי שעובד טוב',
-              'הוא יחלוק לא על היעילות, אלא על המוסר - נתיב מהיר לעשירים בלבד מעצים אי-שוויון',
-              'הוא יציע פתרון אמצע - שכל אחד יוכל לנסוע ב-30 קמ"ש בכל נתיב'
+              'הוא יציע פתרון אמצע - שכל אחד יוכל לנסוע ב-30 קמ"ש בכל נתיב',
+              'הוא יחלוק לא על היעילות, אלא על המוסר - נתיב מהיר לעשירים בלבד מעצים אי-שוויון'
             ],
             optionsEn: [
               'He\'ll agree - this is an example of a free market working well',
-              'He won\'t dispute the efficiency, but the morality - a fast lane for the wealthy only deepens inequality',
-              'He\'ll propose a compromise - that everyone be allowed to drive 30 kph in any lane'
+              'He\'ll propose a compromise - that everyone be allowed to drive 30 kph in any lane',
+              'He won\'t dispute the efficiency, but the morality - a fast lane for the wealthy only deepens inequality'
             ],
-            correctIndex: 1,
+            correctIndex: 2,
             explanation: 'סנדל אינו נגד יעילות. <strong>הוא נגד מצב שבו כסף הופך לכוח שמעצב את החיים - כולל גישה לדרכים ציבוריות.</strong> כשמי שיש לו כסף מקבל גישה לנתיבים מהירים, ומי שאין לו תקוע - <strong>השוק לא רק מתחלק לפי כסף, הוא יוצר חוויית חיים שונה לחלוטין לעשירים ולעניים.</strong> וזה לא רק עניין יעילות, אלא עניין של ערכים אזרחיים.',
             explanationEn: 'Sandel is not against efficiency. <strong>He is against a situation where money becomes a force that shapes life - including access to public roads.</strong> When those with money get access to fast lanes, and those without are stuck - <strong>the market doesn\'t just divide by money, it creates a completely different life experience for the rich and the poor.</strong> And this is not just an efficiency matter, but a matter of civic values.',
           },
@@ -1020,15 +1020,15 @@ const economicsData = {
             questionEn: 'A friend says: "If people agree freely to a transaction - then it\'s fine. There\'s no problem here." How would Sandel challenge this argument?',
             options: [
               'הסכמה חופשית אינה תמיד הסכמה אמיתית - כפי שמרקס הראה בעבר',
-              'יש דברים שעצם הכנסתם לשוק משחיתה את ערכם - גם אם שני הצדדים מסכימים',
-              'שני הטיעונים נכונים - גם הסכמה לא חופשית באמת, וגם השוק משחית'
+              'שני הטיעונים נכונים - גם הסכמה לא חופשית באמת, וגם השוק משחית',
+              'יש דברים שעצם הכנסתם לשוק משחיתה את ערכם - גם אם שני הצדדים מסכימים'
             ],
             optionsEn: [
               'Free agreement is not always true agreement - as Marx showed earlier',
-              'There are things whose mere introduction into the market corrupts their value - even if both sides agree',
-              'Both arguments are right - both that agreement isn\'t really free, and that the market corrupts'
+              'Both arguments are right - both that agreement isn\'t really free, and that the market corrupts',
+              'There are things whose mere introduction into the market corrupts their value - even if both sides agree'
             ],
-            correctIndex: 2,
+            correctIndex: 1,
             explanation: 'סנדל בעצם משלב שני טיעונים. <strong>ראשית</strong> - בהמשך למרקס, "ההסכמה" של מי שאין לו ברירה אינה באמת חופשית. <strong>שנית</strong> - גם אם ההסכמה חופשית, יש דברים שעצם הכנסתם לשוק משנה את אופיים. <strong>שתי הביקורות עומדות יחד.</strong> אהבה הניתנת תמורת כסף - אולי הסכמה, אבל זה כבר לא אהבה. הצבעה הניתנת תמורת כסף - אולי הסכמה, אבל זה כבר לא דמוקרטיה.',
             explanationEn: 'Sandel essentially combines two arguments. <strong>First</strong> - following Marx, "the agreement" of one who has no choice is not really free. <strong>Second</strong> - even if the agreement is free, there are things whose mere entry into the market changes their character. <strong>Both critiques stand together.</strong> Love given for money - maybe agreement, but it\'s no longer love. A vote given for money - maybe agreement, but it\'s no longer democracy.',
           },
@@ -1068,16 +1068,16 @@ const economicsData = {
             question: 'מסעדה מוסיפה לתפריט מנת יוקרה ב-450 שקלים, שכמעט אף אחד לא מזמין. בעקבותיה, המנה ב-180 שקלים - שלפני כן נראתה יקרה - פתאום מרגישה "סבירה". מה קורה כאן?',
             questionEn: 'A restaurant adds a luxury dish to the menu priced at 450 shekels, that almost no one orders. Following that, the 180-shekel dish - which previously seemed expensive - suddenly feels "reasonable." What\'s happening here?',
             options: [
-              'אנשים פשוט אוהבים מנות יוקרה',
               'אפקט עיגון - המנה ב-450 שקלים יצרה נקודת ייחוס שגרמה ל-180 להיראות זול',
+              'אנשים פשוט אוהבים מנות יוקרה',
               'המסעדה הורידה את המחיר של המנה השנייה'
             ],
             optionsEn: [
-              'People just love luxury dishes',
               'The anchoring effect - the 450-shekel dish created a reference point that made 180 seem cheap',
+              'People just love luxury dishes',
               'The restaurant lowered the price of the second dish'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: 'טכניקה קלאסית בתפריטים. <strong>המנה ב-450 שקלים לא נועדה להימכר - היא נועדה לשמש כעוגן.</strong> היא הופכת את כל שאר התפריט לזול יחסית. הצרכן חושב שהוא קונה "באמצע", אבל בעצם הוא קונה במחיר שהוגדר ככזה רק בגלל שהמסעדה הציבה עוגן גבוה במכוון. <strong>זה לא רמאות - אלה ניצול שיטתי של איך המוח האנושי עובד.</strong>',
             explanationEn: 'A classic technique in menus. <strong>The 450-shekel dish wasn\'t meant to be sold - it was meant to serve as an anchor.</strong> It makes everything else on the menu relatively cheap. The consumer thinks they\'re buying "in the middle," but actually they\'re buying at a price that was defined as such only because the restaurant deliberately set a high anchor. <strong>This isn\'t fraud - it\'s systematic exploitation of how the human brain works.</strong>',
           },
@@ -1154,16 +1154,16 @@ const economicsData = {
             question: 'חבר אומר: "כלכלה היא תחום מדעי, ניטרלי. לכן \'מה זה ערך\' היא שאלה טכנית בלבד." איך פרק 2 כולו ערער על הטענה הזו?',
             questionEn: 'A friend says: "Economics is a scientific, neutral field. Therefore \'what is value\' is just a technical question." How did all of Chapter 2 challenge this claim?',
             options: [
-              'החבר צודק - כלכלה היא רק עניין טכני',
               'כל תשובה ל"מה זה ערך" טוענת גם משהו על איך החברה צריכה להיראות',
+              'החבר צודק - כלכלה היא רק עניין טכני',
               'רק קהנמן ערער על זה - שאר ההוגים הסכימו'
             ],
             optionsEn: [
-              'The friend is right - economics is just a technical matter',
               'Every answer to "what is value" also claims something about how society should look',
+              'The friend is right - economics is just a technical matter',
               'Only Kahneman challenged this - the other thinkers agreed'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: 'זו התובנה המרכזית של הפרק. <strong>כשסמית אמר "ערך מגיע מעבודה" - הוא לא רק תיאר. הוא הצדיק את הקפיטליזם כשיטה ראויה.</strong> כשמרקס לקח את אותו רעיון לקיצון, הוא הוקיע את אותה שיטה. <strong>שאלות "טכניות" של ערך הן בעצם שאלות פוליטיות בתחפושת.</strong> אין דרך לדבר על כלכלה בלי לדבר על ערכים.',
             explanationEn: 'This is the central insight of the chapter. <strong>When Smith said "value comes from labor" - he didn\'t just describe. He justified capitalism as a worthy system.</strong> When Marx took the same idea to an extreme, he condemned the same system. <strong>"Technical" questions of value are actually political questions in disguise.</strong> There is no way to talk about economics without talking about values.',
           },
@@ -1291,16 +1291,16 @@ const economicsData = {
               "question": "בשבוע הראשון של המלחמה מחיר הנפט זינק בעשרות אחוזים, למרות שכמות הנפט שזרמה בפועל כמעט לא השתנתה. כיצד אדם סמית היה מסביר את הקפיצה?",
               "questionEn": "In the first week of the war, the price of oil jumped by tens of percent, even though the amount of oil actually flowing barely changed. How would Adam Smith explain the jump?",
               "options": [
-                "השוק טעה, ומכיוון שלא היה מחסור אמיתי, המחיר היה מנותק מהמציאות",
                 "הקונים חששו ממחסור עתידי והתחרו זה בזה על הדלק, וכך מחיר השוק טיפס מעל המחיר הטבעי עוד לפני מחסור בפועל",
+                "השוק טעה, ומכיוון שלא היה מחסור אמיתי, המחיר היה מנותק מהמציאות",
                 "רק התערבות ממשלתית יכלה להעלות את המחיר כל כך מהר"
               ],
               "optionsEn": [
-                "The market was wrong, and since there was no real shortage, the price was disconnected from reality",
                 "Buyers worried about a future shortage and competed with one another over the fuel, so the market price climbed above the natural price even before an actual shortage",
+                "The market was wrong, and since there was no real shortage, the price was disconnected from reality",
                 "Only government intervention could have raised the price so fast"
               ],
-              "correctIndex": 1,
+              "correctIndex": 0,
               "explanation": "זה לב הרעיון של סמית. מחיר השוק לא נקבע רק לפי הכמות הקיימת היום, אלא לפי הלהיטות של הקונים. כשמצרך חיוני כמו נפט נמצא בסיכון, החשש מהמחסור מספיק כדי להצית תחרות בין קונים ולהקפיץ את המחיר. המחיר גילם את הציפייה, לא את המחסור עצמו.",
               "explanationEn": "This is the heart of Smith's idea. The market price is set not only by the quantity available today, but by the eagerness of the buyers. When an essential good like oil is at risk, the concern about a shortage is enough to ignite competition among buyers and send the price up. The price embodied the expectation, not the shortage itself."
             },
@@ -1399,15 +1399,15 @@ const economicsData = {
               "questionEn": "Two friends are arguing. One says: \"It makes sense that the oil price would rise by about a fifth, since a fifth of it was threatened.\" According to Jevons, where is he wrong?",
               "options": [
                 "הוא צודק לגמרי, איום על חמישית מהנפט מעלה את המחיר בדיוק בחמישית",
-                "הערך נקבע בשוליים, ולכן איום קטן מקפיץ את המחיר הרבה מעבר לחלקו",
-                "הוא טועה, כי בפועל אבדה הרבה יותר מחמישית מהנפט במשבר"
+                "הוא טועה, כי בפועל אבדה הרבה יותר מחמישית מהנפט במשבר",
+                "הערך נקבע בשוליים, ולכן איום קטן מקפיץ את המחיר הרבה מעבר לחלקו"
               ],
               "optionsEn": [
                 "He is entirely right, a threat to a fifth of the oil raises the price by exactly a fifth",
-                "Value is set at the margin, so a small threat sends the price far beyond its share",
-                "He is wrong, because in practice far more than a fifth of the oil was lost in the crisis"
+                "He is wrong, because in practice far more than a fifth of the oil was lost in the crisis",
+                "Value is set at the margin, so a small threat sends the price far beyond its share"
               ],
-              "correctIndex": 1,
+              "correctIndex": 2,
               "explanation": "האינטואיציה הליניארית (חמישית סיכון, חמישית עלייה) מפספסת את כל הרעיון. הערך נקבע אצל היחידה השולית, ושם הוא רגיש לנדירות. איום קטן דוחף את הנפט במעלה המצוק, והמחיר זז הרבה מעבר לגודל האיום.",
               "explanationEn": "The linear intuition (a fifth at risk, a fifth rise) misses the whole idea. Value is set at the marginal unit, and there it is sensitive to scarcity. A small threat pushes oil up the cliff, and the price moves far beyond the size of the threat."
             },
@@ -1419,15 +1419,15 @@ const economicsData = {
               "questionEn": "A person is stranded in the desert with ten cups of water. The first they drink at once, and with the tenth they would probably wash their face. If only one cup remained, what would happen to the value they place on it?",
               "options": [
                 "הוא יישאר זהה, כי מים הם מים בכל כמות שנותרה",
-                "הוא יירד, כי נשאר לו פחות מים ליהנות מהם",
-                "הוא יזנק, כי היחידה האחרונה היקרה ביותר בשיא הנדירות"
+                "הוא יזנק, כי היחידה האחרונה היקרה ביותר בשיא הנדירות",
+                "הוא יירד, כי נשאר לו פחות מים ליהנות מהם"
               ],
               "optionsEn": [
                 "It would stay the same, since water is water in any remaining amount",
-                "It would drop, since there is less water left for them to enjoy",
-                "It would soar, as the last unit is the most precious at peak scarcity"
+                "It would soar, as the last unit is the most precious at peak scarcity",
+                "It would drop, since there is less water left for them to enjoy"
               ],
-              "correctIndex": 2,
+              "correctIndex": 1,
               "explanation": "זה בדיוק העיקרון. ערך אינו תכונה קבועה של המים, אלא יחס שתלוי בכמה נשאר. ככל שמתקרבים לאפס, היחידה הבאה נעשית יקרה יותר. אותו היגיון בדיוק הניע את מחיר הנפט.",
               "explanationEn": "This is exactly the principle. Value is not a fixed property of the water, but a relation that depends on how much is left. The closer to zero, the more precious the next unit becomes. That very logic drove the price of oil."
             },
@@ -1438,16 +1438,16 @@ const economicsData = {
               "question": "חברה מתמחרת תיק יד זהה בדיוק לזה של מתחרתה פי עשרה, רק בזכות שם המותג, ואנשים קונים. כיצד היה ג'בונס מסביר זאת?",
               "questionEn": "A company prices a handbag identical to its competitor's at ten times the price, purely on the strength of the brand name, and people buy it. How would Jevons explain this?",
               "options": [
-                "המחיר שגוי ומנופח, שהרי הערך האמיתי הוא עלות הייצור",
                 "הערך הוא יחס בין הקונה לחפץ, וזה מה שמוכנים לשלם עכשיו",
+                "המחיר שגוי ומנופח, שהרי הערך האמיתי הוא עלות הייצור",
                 "רק פיקוח ממשלתי יכול לקבוע את הערך הנכון של התיק"
               ],
               "optionsEn": [
-                "The price is wrong and inflated, since the true value is the cost of production",
                 "Value is a relation between buyer and thing, and this is what they will pay now",
+                "The price is wrong and inflated, since the true value is the cost of production",
                 "Only government oversight can set the correct value of the bag"
               ],
-              "correctIndex": 1,
+              "correctIndex": 0,
               "explanation": "אין \"ערך אמיתי\" נסתר בתוך החפץ. הערך הוא מה שמישהו מקנה לו. אם הקונה מוכן לשלם פי עשרה בזכות המותג, זה הערך עבורו עכשיו. בדיוק התובנה שאקווינס יתנגד לה בדיאלוג הבא.",
               "explanationEn": "There is no hidden \"true value\" inside the object. Value is what someone assigns to it. If the buyer is willing to pay ten times more for the brand, that is its value to them now. Exactly the insight Aquinas will resist in the next dialogue."
             },
@@ -1505,16 +1505,16 @@ const economicsData = {
               "question": "בזמן המלחמה, שתי תחנות דלק העלו מחירים. תחנה א' העלתה בדיוק בגובה העלייה במחיר הסיטונאי ששילמה לספק. תחנה ב' העלתה הרבה מעבר לכך, כי ידעה שנהגים נואשים ישלמו. כיצד אקווינס היה מבחין בין השתיים?",
               "questionEn": "During the war, two gas stations raised prices. Station A raised it exactly by the increase in the wholesale price it paid its supplier. Station B raised it far beyond that, because it knew desperate drivers would pay. How would Aquinas distinguish between the two?",
               "options": [
-                "שתיהן חטאו, כי כל העלאת מחיר בעת מצוקה היא ניצול אסור",
                 "תחנה א' רק גלגלה עלות אמיתית שגדלה, ותחנה ב' גבתה פרמיה על הייאוש",
+                "שתיהן חטאו, כי כל העלאת מחיר בעת מצוקה היא ניצול אסור",
                 "שתיהן הוגנות, כי בשוק חופשי כל מחיר מוסכם הוא צודק"
               ],
               "optionsEn": [
-                "Both sinned, since any price increase in a time of distress is forbidden exploitation",
                 "Station A only passed on a real cost that grew, while Station B charged a premium on desperation",
+                "Both sinned, since any price increase in a time of distress is forbidden exploitation",
                 "Both are just, since in a free market any agreed price is just"
               ],
-              "correctIndex": 1,
+              "correctIndex": 0,
               "explanation": "אקווינס לא נגד כל עליית מחיר. גלגול עלות אמיתית הוגן, ניצול הייאוש של הקונה הוא החטא. זה הגבול.",
               "explanationEn": "Aquinas is not against every price increase. Passing on a real cost is just, exploiting the buyer's desperation is the sin. That is the line."
             },
@@ -1526,15 +1526,15 @@ const economicsData = {
               "questionEn": "A friend says: \"If the high price made people conserve fuel and brought suppliers to deliver more, that is a sign it is just.\" How would Aquinas respond?",
               "options": [
                 "נכון, מחיר שמסדר את השוק ביעילות הוא בהגדרה גם צודק",
-                "נכון, אבל רק אם הממשלה אישרה את גובה המחיר מראש",
-                "מחיר יכול להיות יעיל ועדיין לא צודק, כי יעילות לא שואלת מי משלם ובאיזה כאב"
+                "מחיר יכול להיות יעיל ועדיין לא צודק, כי יעילות לא שואלת מי משלם ובאיזה כאב",
+                "נכון, אבל רק אם הממשלה אישרה את גובה המחיר מראש"
               ],
               "optionsEn": [
                 "Correct, a price that organizes the market efficiently is by definition also just",
-                "Correct, but only if the government approved the price level in advance",
-                "A price can be efficient and still not be just, because efficiency does not ask who pays and at what pain"
+                "A price can be efficient and still not be just, because efficiency does not ask who pays and at what pain",
+                "Correct, but only if the government approved the price level in advance"
               ],
-              "correctIndex": 2,
+              "correctIndex": 1,
               "explanation": "סמית מודד יעילות, אקווינס מודד צדק. מחיר יכול לתאם שוק בצורה מושלמת ובו זמנית למוטט את מי שהכי זקוק לו. אלה שתי שאלות שונות.",
               "explanationEn": "Smith measures efficiency, Aquinas measures justice. A price can coordinate a market perfectly and at the same time crush the one who needs it most. These are two different questions."
             },
@@ -1546,15 +1546,15 @@ const economicsData = {
               "questionEn": "A friend argues: \"If a driver agreed of his own free will to pay the high price for fuel, then the price is just, period.\" What would Aquinas answer?",
               "options": [
                 "נכון, עצם ההסכמה מרצון פותרת את שאלת הצדק",
-                "הסכמה מתוך מצוקה אינה בחירה חופשית, אלא כניעה למצב",
-                "צדק נקבע רק לפי החוק, לא לפי הסכמת הצדדים"
+                "צדק נקבע רק לפי החוק, לא לפי הסכמת הצדדים",
+                "הסכמה מתוך מצוקה אינה בחירה חופשית, אלא כניעה למצב"
               ],
               "optionsEn": [
                 "Correct, the act of agreeing freely settles the question of justice",
-                "Agreement out of distress is not a free choice, but submission to circumstance",
-                "Justice is determined only by law, not by the agreement of the parties"
+                "Justice is determined only by law, not by the agreement of the parties",
+                "Agreement out of distress is not a free choice, but submission to circumstance"
               ],
-              "correctIndex": 1,
+              "correctIndex": 2,
               "explanation": "אדם שחייב דלק כדי להגיע לבית חולים לא באמת מתמקח. הסכמה תחת לחץ קיומי אינה הסכמה אמיתית, ולכן התשלום עצמו לא הופך את המחיר להוגן.",
               "explanationEn": "A person who needs fuel to get to a hospital is not really bargaining. Agreement under existential pressure is not real agreement, so the payment itself does not make the price just."
             },
@@ -1612,16 +1612,16 @@ const economicsData = {
               "question": "חבר אומר: \"יצרני הנפט הרוויחו הון במשבר, סימן שהם עבדו קשה והשקיעו יותר מכולם.\" לפי ריקרדו, היכן הוא טועה?",
               "questionEn": "A friend says: \"The oil producers made a fortune in the crisis, that is a sign they worked hard and invested more than anyone.\" According to Ricardo, where is he wrong?",
               "options": [
-                "הוא צודק, רווחי השיא הם פרי המאמץ וההשקעה שלהם",
                 "הרווח בא מעצם הבעלות על משאב שהתייקר, לא ממאמץ או השקעה",
+                "הוא צודק, רווחי השיא הם פרי המאמץ וההשקעה שלהם",
                 "הוא טועה, כי בפועל הם דווקא ייצרו פחות נפט מהרגיל"
               ],
               "optionsEn": [
-                "He is right, the record profits are the fruit of their effort and investment",
                 "The profit came from owning a resource that grew dearer, not from effort or investment",
+                "He is right, the record profits are the fruit of their effort and investment",
                 "He is wrong, because in practice they actually produced less oil than usual"
               ],
-              "correctIndex": 1,
+              "correctIndex": 0,
               "explanation": "זו הרֵנטה. אותן בארות, אותו נפט, רק מחיר גבוה יותר. הרווח לא בא מעבודה או מסיכון, אלא מעצם ההחזקה במשאב כשהוא התייקר.",
               "explanationEn": "This is rent. The same wells, the same oil, only a higher price. The profit came not from labor or risk, but from merely holding the resource as it grew more expensive."
             },
@@ -1633,15 +1633,15 @@ const economicsData = {
               "questionEn": "A bakery owner raises prices because his flour and electricity got more expensive. An oil-well owner earns more because the price of oil jumped. How is the second one's profit different from the first?",
               "options": [
                 "אין הבדל, שניהם פשוט הגיבו לעליית מחירים בשוק",
-                "המאפייה כיסתה עלות שגדלה, ובעל הבאר גרף הפרש בלי שעלותו השתנתה",
-                "דווקא הרווח של המאפייה הוא הבעייתי, לא של בעל הבאר"
+                "דווקא הרווח של המאפייה הוא הבעייתי, לא של בעל הבאר",
+                "המאפייה כיסתה עלות שגדלה, ובעל הבאר גרף הפרש בלי שעלותו השתנתה"
               ],
               "optionsEn": [
                 "There is no difference, both simply responded to rising market prices",
-                "The bakery covered a cost that grew, while the well owner reaped a margin without any change in his costs",
-                "It is actually the bakery's profit that is the problem, not the well owner's"
+                "It is actually the bakery's profit that is the problem, not the well owner's",
+                "The bakery covered a cost that grew, while the well owner reaped a margin without any change in his costs"
               ],
-              "correctIndex": 1,
+              "correctIndex": 2,
               "explanation": "ההבדל הוא בין כיסוי עלות לבין רֵנטה. אצל המאפייה העלות באמת גדלה. אצל בעל הבאר העלות לא זזה, רק המחיר, וכל ההפרש נפל בחיקו בלי מאמץ.",
               "explanationEn": "The difference is between covering a cost and rent. For the bakery, the cost truly rose. For the well owner, the cost did not move, only the price, so the entire difference fell into his lap without effort."
             },
@@ -1719,16 +1719,16 @@ const economicsData = {
               "question": "חבר אומר: \"בעצם לא היה משבר נפט אמיתי, כי הנפט המשיך לזרום ואף באר לא נסגרה.\" כיצד היה סן מגיב, על סמך מה שראה בבנגל?",
               "questionEn": "A friend says: \"There was no real oil crisis, because the oil kept flowing and not a single well shut down.\" How would Sen respond, based on what he saw in Bengal?",
               "options": [
-                "הוא צודק, אם הנפט לא נעלם אז לא היה משבר אמיתי",
                 "משבר אינו רק היעדר המשאב, אלא קריסה ביכולת של אנשים להרשות אותו",
+                "הוא צודק, אם הנפט לא נעלם אז לא היה משבר אמיתי",
                 "הוא צודק, כי משבר נמדד רק לפי כמות המשאב שאבדה"
               ],
               "optionsEn": [
-                "He is right, if the oil did not vanish then there was no real crisis",
                 "A crisis is not only the absence of the resource, but a collapse in people's ability to afford it",
+                "He is right, if the oil did not vanish then there was no real crisis",
                 "He is right, because a crisis is measured only by how much of the resource was lost"
               ],
-              "correctIndex": 1,
+              "correctIndex": 0,
               "explanation": "זו תובנת בנגל. שם היה אוכל, ובכל זאת מיליונים מתו כי לא יכלו לקנותו. הנפט ב-2026 לא נעלם, אבל היכולת של חלק מהאנשים להרשות אותו כן קרסה. זה המשבר.",
               "explanationEn": "This is the Bengal insight. There, food existed, yet millions died because they could not buy it. The oil in 2026 did not vanish, but some people's ability to afford it did collapse. That is the crisis."
             },
@@ -1740,15 +1740,15 @@ const economicsData = {
               "questionEn": "Two families absorbed exactly the same rise in fuel prices. One barely felt it, the other could not make the month. What, according to Sen, should be measured to understand the crisis?",
               "options": [
                 "את המחיר הממוצע, שהיה זהה לשתיהן",
-                "את ה-GDP, שמסכם את כל הכלכלה במספר אחד",
-                "את היכולת הממשית של כל משפחה לחיות, שנפגעה בצורה שונה"
+                "את היכולת הממשית של כל משפחה לחיות, שנפגעה בצורה שונה",
+                "את ה-GDP, שמסכם את כל הכלכלה במספר אחד"
               ],
               "optionsEn": [
                 "The average price, which was identical for both",
-                "The GDP, which sums up the whole economy in a single number",
-                "Each family's real ability to live, which was harmed differently"
+                "Each family's real ability to live, which was harmed differently",
+                "The GDP, which sums up the whole economy in a single number"
               ],
-              "correctIndex": 2,
+              "correctIndex": 1,
               "explanation": "זו גישת היכולות. אותו מחיר עצמו משפיע אחרת על אנשים שונים. המספר הממוצע מחביא את הפער, ורק מבט על מה שאנשים יכולים לעשות בפועל חושף מי באמת נפגע.",
               "explanationEn": "This is the capabilities approach. The same price itself affects different people differently. The average number hides the gap, and only looking at what people can actually do reveals who was truly harmed."
             },
@@ -1760,15 +1760,15 @@ const economicsData = {
               "questionEn": "A friend says: \"The price came back down, so the crisis is over, end of story.\" How would Sen challenge this?",
               "options": [
                 "הוא צודק, ברגע שהמחיר חוזר לקדמותו המשבר נגמר לגמרי",
-                "מי שנדחף לחוב או ויתר על צרכים בזמן המשבר נשא נזק שלא נמחק כשהמחיר ירד",
-                "הוא צודק, כי כלכלה נמדדת רק לפי מחירים בשוק"
+                "הוא צודק, כי כלכלה נמדדת רק לפי מחירים בשוק",
+                "מי שנדחף לחוב או ויתר על צרכים בזמן המשבר נשא נזק שלא נמחק כשהמחיר ירד"
               ],
               "optionsEn": [
                 "He is right, the moment the price returns to normal the crisis is completely over",
-                "Whoever was pushed into debt or gave up necessities during the crisis bore a harm that was not erased when the price fell",
-                "He is right, because an economy is measured only by market prices"
+                "He is right, because an economy is measured only by market prices",
+                "Whoever was pushed into debt or gave up necessities during the crisis bore a harm that was not erased when the price fell"
               ],
-              "correctIndex": 1,
+              "correctIndex": 2,
               "explanation": "בשביל סן המחיר אינו התכלית. משפחה שנכנסה לחוב או ויתרה על טיפול כדי לעבור את החודשים האלה ספגה פגיעה ביכולת לחיות, ופגיעה כזו אינה מתאדה ברגע שהמחיר יורד. המדד האמיתי הוא האנשים, לא המספר.",
               "explanationEn": "For Sen, the price is not the goal. A family that went into debt or gave up care to get through those months suffered harm to its ability to live, and such harm does not evaporate the moment the price drops. The real measure is the people, not the number."
             },
@@ -1820,16 +1820,16 @@ const economicsData = {
             question: 'חבר אומר: "קניתי דירה - עכשיו יש לי הון." האם הוא צודק לפי סמית?',
             questionEn: 'A friend says: "I bought an apartment - now I have capital." Is he right according to Smith?',
             options: [
-              'כן - כל נכס שאדם רוכש הוא הון',
               'תלוי - אם הוא גר בה, היא לא הון. אם הוא משכיר אותה, היא כן',
+              'כן - כל נכס שאדם רוכש הוא הון',
               'לא - דירות לעולם אינן הון, רק כלים תעשייתיים'
             ],
             optionsEn: [
-              'Yes - every asset a person acquires is capital',
               'It depends - if he lives in it, it\'s not capital. If he rents it out, it is',
+              'Yes - every asset a person acquires is capital',
               'No - apartments are never capital, only industrial tools'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: 'סמית הגדיר הון כ<strong>דבר שאדם משתמש בו כדי לייצר הכנסה</strong>. דירה שאדם גר בה - היא חלק מהמלאי שלו, אבל היא נצרכת (הוא משתמש בה לעצמו). <strong>דירה שמושכרת - היא הון</strong>, כי היא מייצרת זרם הכנסה. אותו נכס פיזית, אבל סטטוס כלכלי שונה לחלוטין לפי השימוש.',
             explanationEn: 'Smith defined capital as <strong>a thing a person uses to produce income</strong>. An apartment a person lives in - is part of his stock, but it\'s consumed (he uses it for himself). <strong>An apartment that is rented out - is capital</strong>, because it produces a stream of income. The same asset physically, but a completely different economic status based on its use.',
           },
@@ -1839,15 +1839,15 @@ const economicsData = {
             questionEn: 'A café acquires an espresso machine for 50,000 shekels, and a box of coffee beans for 200 shekels. Both items are required for the business. How would Smith classify each?',
             options: [
               'שניהם הון חוזר - הם משתתפים בייצור',
-              'שניהם הון קבוע - הם נדרשים לעסק',
-              'המכונה הון קבוע (משמשת לאורך שנים), הפולים הון חוזר (מתחלפים בכל סבב ייצור)'
+              'המכונה הון קבוע (משמשת לאורך שנים), הפולים הון חוזר (מתחלפים בכל סבב ייצור)',
+              'שניהם הון קבוע - הם נדרשים לעסק'
             ],
             optionsEn: [
               'Both are circulating capital - they participate in production',
-              'Both are fixed capital - they are required for the business',
-              'The machine is fixed capital (serves for years), the beans are circulating capital (turn over with each production cycle)'
+              'The machine is fixed capital (serves for years), the beans are circulating capital (turn over with each production cycle)',
+              'Both are fixed capital - they are required for the business'
             ],
-            correctIndex: 2,
+            correctIndex: 1,
             explanation: 'זו ההבחנה המרכזית של סמית. <strong>הון קבוע נשאר במקום - הוא משמש פעם אחר פעם.</strong> <strong>הון חוזר עובר דרך התהליך ויוצא ממנו.</strong> המכונה תעבוד עוד עשור. הפולים ייגמרו השבוע. שני סוגי הון, שני זמני חיים שונים, שני אופני התנהגות פיננסי שונים.',
             explanationEn: 'This is Smith\'s central distinction. <strong>Fixed capital stays in place - it serves again and again.</strong> <strong>Circulating capital passes through the process and exits from it.</strong> The machine will work for another decade. The beans will be gone this week. Two types of capital, two different lifespans, two different financial behaviors.',
           },
@@ -1906,15 +1906,15 @@ const economicsData = {
             questionEn: 'A restaurant needs to increase its production. The owners consider: add more waiters or expand the size of the restaurant. According to Ricardo, when will adding more waiters without expanding the restaurant stop being efficient?',
             options: [
               'אף פעם - תמיד יותר עובדים = יותר ייצור',
-              'כשהמלצרים מתחילים להפריע אחד לשני ולא מצליחים לטפל ביותר שולחנות',
-              'רק כשהמלצרים נהיים עייפים'
+              'רק כשהמלצרים נהיים עייפים',
+              'כשהמלצרים מתחילים להפריע אחד לשני ולא מצליחים לטפל ביותר שולחנות'
             ],
             optionsEn: [
               'Never - more workers always = more production',
-              'When the waiters start getting in each other\'s way and fail to handle more tables',
-              'Only when the waiters get tired'
+              'Only when the waiters get tired',
+              'When the waiters start getting in each other\'s way and fail to handle more tables'
             ],
-            correctIndex: 1,
+            correctIndex: 2,
             explanation: 'זו ההמחשה של חוק התפוקה הפוחתת. <strong>כל גורם ייצור קבוע</strong> (כאן: גודל המסעדה ומספר השולחנות) <strong>יוצר גבול עליון לתפוקה.</strong> המלצר העשירי לא פחות חרוץ מהראשון - אבל אין לו מקום פיזי לעבוד. הוא חוסם מסדרון, מחכה למטבח, מתחרה על אותו לקוח. <strong>התפוקה השולית שלו נמוכה כי השדה שלו "מלא".</strong>',
             explanationEn: 'This is the illustration of the law of diminishing returns. <strong>Every fixed factor of production</strong> (here: the size of the restaurant and the number of tables) <strong>creates an upper ceiling on production.</strong> The tenth waiter isn\'t less diligent than the first - but he has no physical space to work. He blocks a corridor, waits at the kitchen, competes for the same customer. <strong>His marginal productivity is low because his "field" is full.</strong>',
           },
@@ -1923,16 +1923,16 @@ const economicsData = {
             question: 'חברת היי-טק רוצה להכפיל את התפוקה שלה. היא מחליטה להכפיל את מספר המהנדסים - אבל לא להגדיל את המשרד, להוסיף מחשבים, או לעדכן ציוד. לפי ריקרדו, מה יקרה?',
             questionEn: 'A tech company wants to double its production. It decides to double the number of engineers - but not to expand the office, add computers, or update equipment. According to Ricardo, what will happen?',
             options: [
-              'התפוקה לא תוכפל - בלי להגדיל גם את שאר גורמי הייצור, הוספת עובדים מגיעה לתקרה',
               'התפוקה תוכפל - יותר מהנדסים = יותר עבודה',
+              'התפוקה לא תוכפל - בלי להגדיל גם את שאר גורמי הייצור, הוספת עובדים מגיעה לתקרה',
               'התפוקה תרד - מהנדסים נוספים רק מבלבלים אחד את השני'
             ],
             optionsEn: [
-              'Production won\'t double - without also increasing the other factors of production, adding workers hits a ceiling',
               'Production will double - more engineers = more work',
+              'Production won\'t double - without also increasing the other factors of production, adding workers hits a ceiling',
               'Production will fall - additional engineers just confuse each other'
             ],
-            correctIndex: 0,
+            correctIndex: 1,
             explanation: 'זו ההשלכה המרכזית של החוק. <strong>כדי להגדיל באמת את התפוקה, צריך להגדיל את כל גורמי הייצור - לא רק את העבודה.</strong> אם החברה רק מוסיפה מהנדסים בלי להגדיל את התשתית, הם יידחקו בחללים קטנים, יחכו למחשבים, יתחרו על אותם המשאבים. <strong>התפוקה תעלה - אבל פחות ממה שמצופה.</strong> זו תובנה שמסבירה למה חברות שמכפילות צוות לא מכפילות תוצאות.',
             explanationEn: 'This is the central implication of the law. <strong>To really increase production, you need to increase all factors of production - not just labor.</strong> If the company only adds engineers without expanding infrastructure, they\'ll be crammed into small spaces, wait for computers, compete over the same resources. <strong>Production will rise - but less than expected.</strong> This is an insight that explains why companies that double their team don\'t double their results.',
           },
@@ -1941,16 +1941,16 @@ const economicsData = {
             question: 'ריקרדו האמין ששכר העובדים יישאר נמוך לנצח. במאה ה-20, השכר הריאלי עלה פי כמה. איך נסביר את ההפרכה הזו?',
             questionEn: 'Ricardo believed that workers\' wages would remain low forever. In the 20th century, real wages rose several times over. How do we explain this refutation?',
             options: [
-              'ריקרדו פשוט טעה - חוק התפוקה הפוחתת לא נכון',
               'החוק עצמו נכון, אבל הוא הניח שגורמי הייצור (הון וטכנולוגיה) קבועים - והם לא נשארו קבועים',
+              'ריקרדו פשוט טעה - חוק התפוקה הפוחתת לא נכון',
               'השכר עלה למרות החוק - בגלל איגודי עובדים בלבד'
             ],
             optionsEn: [
-              'Ricardo was simply wrong - the law of diminishing returns isn\'t true',
               'The law itself is correct, but he assumed that the factors of production (capital and technology) were fixed - and they didn\'t stay fixed',
+              'Ricardo was simply wrong - the law of diminishing returns isn\'t true',
               'Wages rose despite the law - only because of labor unions'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: 'ריקרדו הניח שהקרקע וההון לא ישתנו. <strong>הוא לא יכול היה לחזות שהמהפכה התעשייתית תכפיל ותשלש את התפוקה לעובד.</strong> הטכנולוגיה החליפה גורמי ייצור קודמים - טרקטור החליף עשרה אנשים בשדה, מכונה החליפה תופרת. <strong>התפוקה השולית הפוחתת עדיין פועלת, אבל היא פועלת ביחס לגורמים החדשים.</strong> כשטכנולוגיה משתפרת, כל החוק "מתחדש" עם בסיס גבוה יותר.',
             explanationEn: 'Ricardo assumed that land and capital wouldn\'t change. <strong>He couldn\'t have predicted that the industrial revolution would double and triple production per worker.</strong> Technology replaced previous factors of production - a tractor replaced ten people in the field, a machine replaced a seamstress. <strong>Diminishing marginal returns still operates, but it operates relative to the new factors.</strong> When technology improves, the entire law "renews itself" with a higher base.',
           },
@@ -1990,16 +1990,16 @@ const economicsData = {
             question: 'באזור מרכז תל אביב, מחירי הנדל"ן עולים מדי שנה. מי, לפי ריקרדו, מרוויח הכי הרבה מהמצב הזה?',
             questionEn: 'In central Manhattan, real estate prices rise every year. Who, according to Ricardo, profits most from this situation?',
             options: [
-              'בעלי העסקים שפועלים באזור - כי המקום פופולרי',
+              'בעלי הקרקעות - שמתעשרים בלי לעשות דבר',
               'העובדים שגרים שם - כי שכרם עולה עם המחירים',
-              'בעלי הקרקעות - שמתעשרים בלי לעשות דבר'
+              'בעלי העסקים שפועלים באזור - כי המקום פופולרי'
             ],
             optionsEn: [
-              'The business owners operating in the area - because the place is popular',
+              'The landowners - who get rich without doing anything',
               'The workers who live there - because their wages rise with the prices',
-              'The landowners - who get rich without doing anything'
+              'The business owners operating in the area - because the place is popular'
             ],
-            correctIndex: 2,
+            correctIndex: 0,
             explanation: 'זו ההמחשה הטהורה של הרעיון של ריקרדו. <strong>בעלי קרקעות מרוויחים מעצם הבעלות שלהם - לא מעבודה, לא מהשקעה, לא מסיכון.</strong> ככל שהאזור מתפתח, הקרקע שלהם עולה בערכה. הם לא הוסיפו דבר - אבל הם מקבלים את החלק הגדול ביותר מההצלחה הכלכלית של האזור. <strong>זו הסתירה המבנית שריקרדו זיהה: מי שיש לו קרקע, מרוויח מהפיתוח של אחרים.</strong>',
             explanationEn: 'This is the pure illustration of Ricardo\'s idea. <strong>Landowners profit from their very ownership - not from labor, not from investment, not from risk.</strong> As the area develops, their land rises in value. They added nothing - but they receive the largest share of the area\'s economic success. <strong>This is the structural contradiction Ricardo identified: those who own land profit from the development of others.</strong>',
           },
@@ -2027,15 +2027,15 @@ const economicsData = {
             questionEn: 'A friend says: "Ricardo described the economy of 1817 - agricultural, English, early. It\'s not relevant today." Is he right?',
             options: [
               'כן - ריקרדו תיאר עולם שלא קיים יותר',
-              'לא - הסתירה שזיהה (בין בעלי קרקע, בעלי הון ועובדים) מתחדשת בכל דור עם שחקנים שונים',
-              'חצי-חצי - חלק מהרעיונות שלו עדיין נכונים, חלק לא'
+              'חצי-חצי - חלק מהרעיונות שלו עדיין נכונים, חלק לא',
+              'לא - הסתירה שזיהה (בין בעלי קרקע, בעלי הון ועובדים) מתחדשת בכל דור עם שחקנים שונים'
             ],
             optionsEn: [
               'Yes - Ricardo described a world that no longer exists',
-              'No - the contradiction he identified (between landowners, capital owners and workers) renews itself in every generation with different players',
-              'Half and half - some of his ideas are still correct, some are not'
+              'Half and half - some of his ideas are still correct, some are not',
+              'No - the contradiction he identified (between landowners, capital owners and workers) renews itself in every generation with different players'
             ],
-            correctIndex: 1,
+            correctIndex: 2,
             explanation: 'השמות השתנו, אבל הסתירה נשארה. <strong>בעלי קרקעות</strong> של 1817 = <strong>בעלי נדל"ן ופלטפורמות דיגיטליות</strong> של היום. <strong>בעלי הון</strong> של 1817 = <strong>בעלי מניות וקרנות הון</strong> של היום. <strong>עובדים</strong> של 1817 = <strong>עובדים שכירים</strong> של היום. <strong>המאבק על חלוקת העוגה לא נעצר</strong> - הוא רק עבר לזירות חדשות. סטרטאפים נאבקים בענקיות טק. מי שיש לו דירה נאבק במי שאין לו. <strong>זה ריקרדו, חי ב-2025.</strong>',
             explanationEn: 'The names changed, but the contradiction remained. <strong>Landowners</strong> of 1817 = <strong>real estate and digital platform owners</strong> of today. <strong>Capital owners</strong> of 1817 = <strong>shareholders and capital funds</strong> of today. <strong>Workers</strong> of 1817 = <strong>salaried workers</strong> of today. <strong>The struggle over the division of the pie hasn\'t stopped</strong> - it has only moved to new arenas. Startups battle tech giants. Those who own an apartment battle those who don\'t. <strong>This is Ricardo, alive in 2025.</strong>',
           },
@@ -2075,16 +2075,16 @@ const economicsData = {
             question: 'אדם נולד למשפחה ענייה, מנסה כל חייו להתקדם, אבל בקושי מצליח להחזיק את עצמו. החברה אומרת: "הוא לא ניסה מספיק. אם רק היה עובד קשה יותר, היה מצליח." איך מרקס היה מגיב?',
             questionEn: 'A person is born to a poor family, tries his whole life to advance, but barely manages to support himself. Society says: "He didn\'t try hard enough. If only he had worked harder, he would have succeeded." How would Marx respond?',
             options: [
-              'החברה צודקת - בקפיטליזם, כל אחד יכול לעלות במעמד',
               'הסיפור האישי לא רלוונטי - המבנה הוא שמכתיב את התוצאה, לא הבחירות',
+              'החברה צודקת - בקפיטליזם, כל אחד יכול לעלות במעמד',
               'הוא היה מסכים - אם האדם היה משקיע יותר, היה מצליח'
             ],
             optionsEn: [
-              'Society is right - in capitalism, anyone can rise in class',
               'The personal story isn\'t relevant - structure dictates the outcome, not choices',
+              'Society is right - in capitalism, anyone can rise in class',
               'He would agree - if the person had invested more, he would have succeeded'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: 'זו ליבת הניתוח של מרקס. <strong>המערכת אינה תוצאה של בחירות אישיות.</strong> מי שנולד בלי הון מתחיל את חייו במצב מבני שונה לחלוטין ממי שנולד עם הון. הוא חייב למכור את עבודתו, הוא לא יכול להשקיע, ילדיו יירשו את אותו מצב. <strong>"לעבוד קשה" לא משנה את המבנה</strong> - זה רק ממקסם בתוך גבולותיו.',
             explanationEn: 'This is the heart of Marx\'s analysis. <strong>The system isn\'t the result of individual choices.</strong> Whoever is born without capital begins life in a completely different structural situation than someone born with capital. He must sell his labor, he cannot invest, his children will inherit the same situation. <strong>"Working hard" doesn\'t change the structure</strong> - it only maximizes within its boundaries.',
           },
@@ -2160,16 +2160,16 @@ const economicsData = {
             question: 'חבר אומר: "אם אתה רוצה להתעשר, פשוט תעבוד קשה יותר ותחסוך יותר." איך פיקטי היה מערער על זה?',
             questionEn: 'A friend says: "If you want to get rich, just work harder and save more." How would Piketty challenge this?',
             options: [
-              'הוא היה מסכים - חסכון הוא הדרך היחידה',
               'הוא היה מראה שלאורך זמן, מי שיש לו הון מתחיל לייצר הון מעצמו - לעובד אין דרך לדבוק בקצב הזה',
+              'הוא היה מסכים - חסכון הוא הדרך היחידה',
               'הוא היה אומר שעבודה היא חסרת תועלת לחלוטין'
             ],
             optionsEn: [
-              'He would agree - saving is the only way',
               'He would show that over time, those who have capital begin to produce capital on their own - a worker has no way to keep up with that pace',
+              'He would agree - saving is the only way',
               'He would say that work is completely useless'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: 'זו הליבה של r > g. <strong>חסכון יוצר הון - אבל בקצב איטי.</strong> העובד חוסך מהשכר, ולכן ההון שלו צומח בקצב של g. <strong>אבל מי שכבר יש לו הון - צובר אותו בקצב של r, גבוה יותר.</strong> התוצאה: גם אם העובד חוסך 30% מהכנסתו, הוא לא יצליח לעקוף את מי שכבר יש לו הון. <strong>זה לא עניין של חריצות - זה מתמטי.</strong>',
             explanationEn: 'This is the core of r > g. <strong>Saving creates capital - but at a slow pace.</strong> The worker saves from his wage, so his capital grows at the rate of g. <strong>But those who already have capital - accumulate it at the rate of r, which is higher.</strong> The result: even if the worker saves 30% of his income, he won\'t manage to overtake those who already have capital. <strong>This isn\'t a matter of diligence - it\'s mathematical.</strong>',
           },
@@ -2179,15 +2179,15 @@ const economicsData = {
             questionEn: 'In which historical period, according to Piketty, did inequality drop exceptionally?',
             options: [
               'בעידן הקפיטליזם המוקדם - המאה ה-18',
-              'במאה ה-19 - בזכות המהפכה התעשייתית',
-              'במאה ה-20 - בין שתי מלחמות העולם'
+              'במאה ה-20 - בין שתי מלחמות העולם',
+              'במאה ה-19 - בזכות המהפכה התעשייתית'
             ],
             optionsEn: [
               'In early capitalism - the 18th century',
-              'In the 19th century - thanks to the industrial revolution',
-              'In the 20th century - between the two world wars'
+              'In the 20th century - between the two world wars',
+              'In the 19th century - thanks to the industrial revolution'
             ],
-            correctIndex: 2,
+            correctIndex: 1,
             explanation: 'זו אחת התובנות הכי חשובות של פיקטי - <strong>המאה ה-20 הייתה חריגה, לא הכלל.</strong> <strong>שתי מלחמות עולם הרסו הון פיזית.</strong> מהפכות (סובייטית, סינית) הלאימו הון. <strong>מיסים שהגיעו ל-90% על העשירים</strong> מימנו את שיקום אירופה. אחרי המלחמות, אי-שוויון התחיל לעלות שוב - וכיום הוא חוזר לרמות של 1900. <strong>מה שאנחנו תופסים כ"נורמלי" (שכר ביניים, מעמד ביניים יציב), היה תקופה חריגה ולא הכלל ההיסטורי.</strong>',
             explanationEn: 'This is one of Piketty\'s most important insights - <strong>the 20th century was an exception, not the rule.</strong> <strong>Two world wars destroyed capital physically.</strong> Revolutions (Soviet, Chinese) nationalized capital. <strong>Taxes that reached 90% on the wealthy</strong> financed Europe\'s reconstruction. After the wars, inequality began to rise again - and today it\'s returning to 1900 levels. <strong>What we perceive as "normal" (middle-class wages, a stable middle class), was an exceptional period, not the historical rule.</strong>',
           },
@@ -2197,15 +2197,15 @@ const economicsData = {
             questionEn: 'A friend argues: "Inequality is natural. It will always exist - there\'s nothing to do about it." How would Piketty challenge this?',
             options: [
               'הוא היה מסכים - באמת אי אפשר לעשות שום דבר',
-              'הוא היה מראה שהמאה ה-20 הוכיחה שאי-שוויון יכול לרדת - דרך מיסים, חינוך, ובחירות פוליטיות',
-              'הוא היה אומר שאי-שוויון הוא בעיה רק אם הוא רוצה להיות בעיה'
+              'הוא היה אומר שאי-שוויון הוא בעיה רק אם הוא רוצה להיות בעיה',
+              'הוא היה מראה שהמאה ה-20 הוכיחה שאי-שוויון יכול לרדת - דרך מיסים, חינוך, ובחירות פוליטיות'
             ],
             optionsEn: [
               'He would agree - really nothing can be done',
-              'He would show that the 20th century proved inequality can decline - through taxes, education, and political choices',
-              'He would say that inequality is only a problem if it wants to be a problem'
+              'He would say that inequality is only a problem if it wants to be a problem',
+              'He would show that the 20th century proved inequality can decline - through taxes, education, and political choices'
             ],
-            correctIndex: 1,
+            correctIndex: 2,
             explanation: 'זו הליבה של פיקטי. <strong>r > g אינו חוק טבע - הוא תוצאה של מבנה כלכלי שניתן לשנות.</strong> במאה ה-20, אי-שוויון ירד בזכות מיסים גבוהים על העשירים, השקעה מסיבית בחינוך ציבורי, ומדיניות רווחה. <strong>פיקטי לא טוען שאי-שוויון נעלם לבד - הוא טוען שצריך בחירות פוליטיות פעילות כדי לעכב אותו.</strong> האדישות היא הבחירה שמאפשרת לאי-שוויון לצמוח.',
             explanationEn: 'This is the heart of Piketty. <strong>r > g isn\'t a law of nature - it\'s the result of an economic structure that can be changed.</strong> In the 20th century, inequality declined thanks to high taxes on the wealthy, massive investment in public education, and welfare policy. <strong>Piketty doesn\'t claim that inequality disappears on its own - he claims that active political choices are needed to slow it down.</strong> Indifference is the choice that allows inequality to grow.',
           },
@@ -2246,16 +2246,16 @@ const economicsData = {
             question: 'מה ראו גם סמית וגם מרקס שערערו עליו השוליסטים בפרק 2?',
             questionEn: 'What did both Smith and Marx believe that the marginalists challenged in Chapter 2?',
             options: [
-              'ששלוש קבוצות (קרקע, הון, עבודה) מתחלקות בהכנסה',
               'שערך מגיע מעבודה',
+              'ששלוש קבוצות (קרקע, הון, עבודה) מתחלקות בהכנסה',
               'שהון מצטבר אצל מעטים'
             ],
             optionsEn: [
-              'That three groups (land, capital, labor) divide the income',
               'That value comes from labor',
+              'That three groups (land, capital, labor) divide the income',
               'That capital accumulates in the hands of the few'
             ],
-            correctIndex: 1,
+            correctIndex: 0,
             explanation: '<strong>גם סמית וגם מרקס האמינו שערך מגיע מעבודה</strong> - הם רק נחלקו על מי מקבל אותו. השוליסטים, ב-1871, הראו שערך מגיע מ<strong>תועלת</strong> של הצרכן, לא מעבודה. אבל בפרק 3 ראינו שגם אם תיאוריית ערך-העבודה נפלה - <strong>השאלה על חלוקה מבנית עדיין רלוונטית, כפי שפיקטי הוכיח 200 שנה אחרי.</strong>',
             explanationEn: '<strong>Both Smith and Marx believed that value comes from labor</strong> - they only disagreed about who receives it. The marginalists, in 1871, showed that value comes from the <strong>utility</strong> of the consumer, not from labor. But in Chapter 3 we saw that even though the labor theory of value fell - <strong>the question about structural distribution is still relevant, as Piketty proved 200 years later.</strong>',
           },
@@ -2264,16 +2264,16 @@ const economicsData = {
             question: 'מרקס ופיקטי הגיעו למסקנה דומה - שההון מתרכז אצל מעטים - אבל בכלים שונים. במה הם נבדלים?',
             questionEn: 'Marx and Piketty reached a similar conclusion - that capital concentrates in the hands of the few - but with different tools. How are they different?',
             options: [
-              'מרקס דיבר על מבנה תיאורטי, פיקטי הציג נתונים אמפיריים',
               'הם הגיעו לאותה מסקנה בדיוק אותם כלים',
+              'מרקס דיבר על מבנה תיאורטי, פיקטי הציג נתונים אמפיריים',
               'פיקטי הפריך את מרקס לחלוטין'
             ],
             optionsEn: [
-              'Marx spoke about a theoretical structure, Piketty presented empirical data',
               'They reached the same conclusion with exactly the same tools',
+              'Marx spoke about a theoretical structure, Piketty presented empirical data',
               'Piketty completely refuted Marx'
             ],
-            correctIndex: 0,
+            correctIndex: 1,
             explanation: '<strong>מרקס פיתח תיאוריה</strong> מתוך ניתוח לוגי של הקפיטליזם. <strong>פיקטי, 150 שנה אחריו, אסף נתונים אמיתיים</strong> מ-30 מדינות על פני 300 שנה. הוא לא רק טען - הוא הראה. <strong>בגלל זה הספר של פיקטי הצליח לעורר ויכוח גם בקרב מי שדחה את מרקס.</strong> קל לדחות תיאוריה. קשה לדחות נתונים.',
             explanationEn: '<strong>Marx developed a theory</strong> from a logical analysis of capitalism. <strong>Piketty, 150 years later, collected real data</strong> from 30 countries over 300 years. He didn\'t just argue - he showed. <strong>That\'s why Piketty\'s book managed to spark debate even among those who rejected Marx.</strong> It\'s easy to reject a theory. It\'s hard to reject data.',
           },
@@ -2283,15 +2283,15 @@ const economicsData = {
             questionEn: 'Ricardo identified a contradiction between three groups - landowners, capital owners, and workers. Marx simplified it to just two groups. Why?',
             options: [
               'כי מרקס לא הבין את ריקרדו',
-              'כי במאה ה-19, ההון התעשייתי הפך משמעותי יותר מהקרקע - והקרקע איבדה את מרכזיותה',
-              'כי שתי קבוצות פשוט נשמע יותר טוב'
+              'כי שתי קבוצות פשוט נשמע יותר טוב',
+              'כי במאה ה-19, ההון התעשייתי הפך משמעותי יותר מהקרקע - והקרקע איבדה את מרכזיותה'
             ],
             optionsEn: [
               'Because Marx didn\'t understand Ricardo',
-              'Because in the 19th century, industrial capital became more significant than land - and land lost its centrality',
-              'Because two groups simply sounds better'
+              'Because two groups simply sounds better',
+              'Because in the 19th century, industrial capital became more significant than land - and land lost its centrality'
             ],
-            correctIndex: 1,
+            correctIndex: 2,
             explanation: '<strong>בזמנו של ריקרדו (1817), הקרקע עדיין הייתה גורם ייצור מרכזי</strong> - הכלכלה האנגלית הייתה חקלאית בעיקרה. <strong>כשמרקס כתב ב-1867, המהפכה התעשייתית כבר שינתה הכל.</strong> מפעלים החליפו שדות. <strong>הסיפור האמיתי עבר מבעלי קרקעות לבעלי מפעלים.</strong>',
             explanationEn: '<strong>In Ricardo\'s time (1817), land was still a central factor of production</strong> - the English economy was primarily agricultural. <strong>When Marx wrote in 1867, the industrial revolution had already changed everything.</strong> Factories replaced fields. <strong>The real story moved from landowners to factory owners.</strong>',
           },
