@@ -18529,25 +18529,55 @@ function _onbV2CtaStreak() {
   _onbAdvanceStep(22, 23);
 }
 
-// Step 22 (streak celebration) — v11 shows "day 1 today". Replaces the
-// decorative flame SVG with StreakBadges.crest(0) so the Spark crest
-// IS the day-1 flame. Fires a medium haptic on arrival (first-card at
-// step 21 already fires SUCCESS; this is the gentler follow-through).
-// Marks tier 0 as seen so the real finishDay path doesn't fire a
-// Spark reveal again right after the first dialogue completes.
+// Step 22 (streak celebration) — v11 shows "day 1 today". Previously
+// a native screen with its own flame + "1" + copy; now a badge-earned
+// moment that fires the real ignition overlay (sparks + embers +
+// crest + "NEW BADGE" pill) over the step, so the user receives the
+// Spark badge instead of being taught about streaks. One screen,
+// doing both jobs: the overlay's tier-0 line ("Your streak is lit.
+// One dialogue tomorrow and it catches.") carries the streak
+// explanation inside the celebration.
+//
+// Haptic: overlay fires _haptic('tick') instead of 'success' when
+// source === 'onboarding' — the user felt a SUCCESS 5 seconds ago on
+// first-card (step 21) and two SUCCESS beats so close together read
+// as noisy. tick (medium impact) acknowledges the moment without
+// trumpeting a second time.
+//
+// Tier-0 seen flag flips BEFORE the overlay call so a mid-session
+// crash between overlay-mount and overlay-dismiss doesn't leave the
+// user eligible for another Spark reveal after their first real
+// dialogue completion.
 function _onbV2PrepareStreak() {
+  // Fallback paint on the underlying step. Overlay sits at z 2036
+  // above the step at z 1100; the user never sees this when the
+  // overlay mounts correctly. Belt-and-suspenders for StreakBadges
+  // unavailable / DOM race / script load failure.
   const flameEl = document.querySelector('#onb-v2-streak .onb-v2-streak-flame');
   if (flameEl && window.StreakBadges) {
-    // Spark crest sized to match the flame slot (88dp in the HTML).
     flameEl.innerHTML = StreakBadges.crest(0, 88, { off: false });
   }
-  // Medium impact — explicit, bypasses the pool / continue-onb logic
-  // because this fires on arrival, not on a Continue tap.
-  _haptic('continue');
   if (!Array.isArray(state.streakBadgesSeen)) state.streakBadgesSeen = [];
   if (!state.streakBadgesSeen.includes(0)) {
     state.streakBadgesSeen.push(0);
     try { saveStateLocal(); } catch (e) {}
+  }
+  // Analytics: match the dispatcher's shape, source distinguishes
+  // this (onboarding grant) from the real post-dialogue earn
+  // (source: 'dialogue' from _playNextCelebration).
+  try {
+    posthog.capture('streak_badge_earned', {
+      tier:   0,
+      days:   (window.StreakBadges && StreakBadges.DAYS && StreakBadges.DAYS[0]) || 1,
+      source: 'onboarding',
+    });
+  } catch (e) {}
+  // Open the real ignition overlay. Keep it lit CTA → advance step 23.
+  if (typeof _showStreakBadgeOverlay === 'function' && window.StreakBadges) {
+    _showStreakBadgeOverlay(0, {
+      source: 'onboarding',
+      onDismiss: () => _onbAdvanceStep(22, 23),
+    });
   }
 }
 
@@ -34800,11 +34830,14 @@ function _showStreakBadgeOverlay(tier, opts) {
     catch (e) { return false; }
   })();
   if (reduce) return;
-  // Routed through _haptic('success') so the reward-class 300 ms min-gap
-  // throttle (see _haptic) covers streak-badge → next overlay haptics
-  // uniformly. The 1200 ms show-delay plus the 250 ms inter-overlay
-  // queue delay keeps us comfortably clear in practice.
-  setTimeout(() => _haptic('success'), 1200);
+  // Dialogue earn fires 'success' (full notification trumpet). Onboarding
+  // fires 'tick' (single medium impact) — the user just felt a SUCCESS
+  // on first-card at step 21 ~5s earlier, and a second SUCCESS so close
+  // reads as noisy. tick acknowledges the moment without doubling up.
+  // Both still land at 1200 ms (ignition peak); reward-class throttle
+  // (see _haptic) covers the chain either way.
+  const _kind = opts.source === 'onboarding' ? 'tick' : 'success';
+  setTimeout(() => _haptic(_kind), 1200);
 }
 function _closeStreakBadgeOverlay() {
   const el = window._skActiveEarn;
@@ -36357,14 +36390,18 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="onb-progress" aria-hidden="true" data-step="5">
   </div>
   <div class="onb-v2-inner">
+    <!-- Step 22 is now a Spark badge-earned moment: _onbV2PrepareStreak
+         opens the real ignition overlay (sparks + embers + crest) over
+         this step, and the overlay's "Keep it lit" CTA advances to
+         step 23. The elements below are a fallback for the edge case
+         where the overlay fails to mount (StreakBadges unavailable,
+         script load race) — flame swaps to the Spark crest in the
+         preparer, head/sub stay as the pre-overlay copy, native CTA
+         still advances. In normal flow the user never sees them. -->
     <div class="onb-v2-copy onb-v2-streak-copy">
       <div class="onb-v2-streak-flame" aria-hidden="true">
         <svg viewBox="0 0 64 64" width="88" height="88"><use href="#icon-streak"/></svg>
       </div>
-      <!-- v11 replaces the eyebrow ("DAY 1 · STREAK") with a big
-           amber "1" — the number carries the streak cue on its own.
-           Static text; never localized (a numeral). -->
-      <div class="onb-v2-streak-number" aria-hidden="true">1</div>
       <h1 class="onb-v2-head" id="onb-v2-streak-head"></h1>
       <p class="onb-v2-sub" id="onb-v2-streak-sub"></p>
     </div>
