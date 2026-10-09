@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-29T11:24:55.294Z",
+  "generatedAt": "2026-10-09T10:05:33.367Z",
   "items": [
     {
       "weekId": 1,
@@ -676,6 +676,148 @@
       "title": "What is Reality? - Chapter Summary",
       "card": "share/cards/en/phil-4-7.png",
       "page": "d/phil-4-7-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 1,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "laplace",
+      "title": "האם העתיד כבר כתוב?",
+      "card": "share/cards/he/phil-5-1.png",
+      "page": "d/phil-5-1-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 1,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "laplace",
+      "title": "Is the future already written?",
+      "card": "share/cards/en/phil-5-1.png",
+      "page": "d/phil-5-1-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 2,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "spinoza",
+      "title": "למה זה מרגיש כמו בחירה?",
+      "card": "share/cards/he/phil-5-2.png",
+      "page": "d/phil-5-2-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 2,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "spinoza",
+      "title": "Why does it feel like choice?",
+      "card": "share/cards/en/phil-5-2.png",
+      "page": "d/phil-5-2-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 3,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "hume",
+      "title": "אולי כל הדילמה נשענת על בלבול?",
+      "card": "share/cards/he/phil-5-3.png",
+      "page": "d/phil-5-3-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 3,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "hume",
+      "title": "Perhaps the whole dilemma rests on a confusion?",
+      "card": "share/cards/en/phil-5-3.png",
+      "page": "d/phil-5-3-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 4,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "kant",
+      "title": "בלי חופש אין מוסר",
+      "card": "share/cards/he/phil-5-4.png",
+      "page": "d/phil-5-4-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 4,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "kant",
+      "title": "Without freedom there is no morality",
+      "card": "share/cards/en/phil-5-4.png",
+      "page": "d/phil-5-4-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 5,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "sartre",
+      "title": "ואולי אי אפשר לברוח מהחופש?",
+      "card": "share/cards/he/phil-5-5.png",
+      "page": "d/phil-5-5-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 5,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "sartre",
+      "title": "And perhaps there is no escaping freedom?",
+      "card": "share/cards/en/phil-5-5.png",
+      "page": "d/phil-5-5-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 6,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "libet",
+      "title": "מה המוח עושה רגע לפני שהחלטנו?",
+      "card": "share/cards/he/phil-5-6.png",
+      "page": "d/phil-5-6-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 6,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "libet",
+      "title": "What does the brain do a moment before we decided?",
+      "card": "share/cards/en/phil-5-6.png",
+      "page": "d/phil-5-6-en.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 7,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "other",
+      "title": "האם אנחנו באמת בוחרים?",
+      "card": "share/cards/he/phil-5-7.png",
+      "page": "d/phil-5-7-he.html"
+    },
+    {
+      "weekId": 5,
+      "dayId": 7,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "other",
+      "title": "Do we really choose?",
+      "card": "share/cards/en/phil-5-7.png",
+      "page": "d/phil-5-7-en.html"
     },
     {
       "weekId": 1,

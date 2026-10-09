@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-29T11:25:02.730Z",
+  "generatedAt": "2026-10-09T10:05:40.220Z",
   "items": [
     {
       "thinkerId": "socrates",
@@ -170,6 +170,36 @@
       "cardLandscape": "share/thinkers/he/thomson.png",
       "cardPortrait": "share/thinkers/portrait/he/thomson.png",
       "page": "t/thomson-he.html"
+    },
+    {
+      "thinkerId": "laplace",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "פייר-סימון לפלס",
+      "era": "1749–1827",
+      "cardLandscape": "share/thinkers/he/laplace.png",
+      "cardPortrait": "share/thinkers/portrait/he/laplace.png",
+      "page": "t/laplace-he.html"
+    },
+    {
+      "thinkerId": "sartre",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "ז'אן-פול סארטר",
+      "era": "1905–1980",
+      "cardLandscape": "share/thinkers/he/sartre.png",
+      "cardPortrait": "share/thinkers/portrait/he/sartre.png",
+      "page": "t/sartre-he.html"
+    },
+    {
+      "thinkerId": "libet",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "בנג'מין ליבט",
+      "era": "1916–2007",
+      "cardLandscape": "share/thinkers/he/libet.png",
+      "cardPortrait": "share/thinkers/portrait/he/libet.png",
+      "page": "t/libet-he.html"
     },
     {
       "thinkerId": "wundt",
@@ -810,6 +840,36 @@
       "cardLandscape": "share/thinkers/en/bostrom.png",
       "cardPortrait": "share/thinkers/portrait/en/bostrom.png",
       "page": "t/bostrom-en.html"
+    },
+    {
+      "thinkerId": "laplace",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Pierre-Simon Laplace",
+      "era": "1749–1827",
+      "cardLandscape": "share/thinkers/en/laplace.png",
+      "cardPortrait": "share/thinkers/portrait/en/laplace.png",
+      "page": "t/laplace-en.html"
+    },
+    {
+      "thinkerId": "sartre",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Jean-Paul Sartre",
+      "era": "1905–1980",
+      "cardLandscape": "share/thinkers/en/sartre.png",
+      "cardPortrait": "share/thinkers/portrait/en/sartre.png",
+      "page": "t/sartre-en.html"
+    },
+    {
+      "thinkerId": "libet",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Benjamin Libet",
+      "era": "1916–2007",
+      "cardLandscape": "share/thinkers/en/libet.png",
+      "cardPortrait": "share/thinkers/portrait/en/libet.png",
+      "page": "t/libet-en.html"
     },
     {
       "thinkerId": "mill-econ",
