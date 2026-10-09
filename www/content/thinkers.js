@@ -283,6 +283,40 @@ const THINKERS = [
     bio: 'פסיכולוג אמריקאי, מייסד הפסיכולוגיה ההומניסטית. דחה גם את פרויד (שראה באדם קורבן של דחפים מודחקים) וגם את סקינר (שראה בו מכונה ביולוגית) - וטען שהאדם הוא סובייקט של חייו, שיש בו נטייה פנימית לצמוח כשמספקים לו את התנאים המתאימים.',
     quote: '"מוטב לתפוס זאת כנטייה לקראת הגשמה, לקראת מימוש עצמי, הכוללת לא רק את שימורו של האורגניזם אלא גם את פיתוחו."',
   },
+  // Psychology chapter 6 — "Can a person really change?" Rogers, Winnicott,
+  // Beck and Frankl already defined elsewhere in this array. Breuer and
+  // Miller are new.
+  //
+  // Breuer quote is from the Preliminary Communication (1893), the paper
+  // Breuer co-wrote with Freud that first described the talking cure.
+  // Verified direct line — Hysterics-suffer-mainly-from-reminiscences is
+  // the most-cited sentence in the history of psychoanalysis and is
+  // present verbatim in that paper. See CLAUDE.md § Source attributions.
+  {
+    id: 'breuer',
+    name: 'יוזף ברויר',
+    era: '1842–1925',
+    emoji: '💬',
+    image: './images/breuer.webp',
+    subject: 'psychology',
+    bio: 'רופא אוסטרי שהטיפול שלו בחולה שהוא כינה אנה או., בין 1880 ל-1882, הניב את מה שהיא עצמה כינתה "הטיפול בדיבור" — הצורה הקדומה ביותר של פסיכואנליזה. פרויד, שלמד את השיטה מברויר, פיתח אותה אחר כך לתיאוריה שלו. ברויר נסוג מהפסיכואנליזה כשהיא עברה להעמיד את המיניות במרכז; התובנה שלו שהתסמינים נסוגים כשמקורם מדוּבּר נותרה בעינה.',
+    quote: '"ההיסטריות סובלות בעיקר מזיכרונות."',
+  },
+  // Miller quote is from Miller/Hubble/Duncan, "Supershrinks: What Is the
+  // Secret of Their Success?", Psychotherapy Networker, 2007 — verified
+  // direct line, matches the attribution. The dialogue source block uses
+  // the same paper (replacing the docx's uncited "working principle"
+  // paraphrase). See CLAUDE.md § Source attributions.
+  {
+    id: 'miller',
+    name: 'סקוט ד. מילר',
+    era: '1960–',
+    emoji: '📊',
+    image: './images/miller.webp',
+    subject: 'psychology',
+    bio: 'פסיכותרפיסט וחוקר אמריקאי שהוציא את השאלה "מה עובד בטיפול?" מהתיאוריה והכניס אותה למדידה. ממייסדי המרכז הבינלאומי למצוינות קלינית; עבודתו על טיפול מונחה-משוב, על מדידת תוצאות, ועל ממצא ה"סופר-מטפלים" — לפיו המטפלים הטובים ביותר הם אלה שבאופן עקבי מבקשים משוב מהמטופל ופועלים לפיו — שינתה את הדרך שבה חושבים על איכות טיפולית מחוץ לאסכולה כזו או אחרת.',
+    quote: '"המטפלים הטובים ביותר מקדישים יותר זמן לבקש משוב מהמטופל — וחשוב מכך, לפעול לפיו — מהמטפלים הפחות יעילים."',
+  },
   // Psychology chapter 2 — "What drives us?"
   {
     id: 'adler',
@@ -828,6 +862,18 @@ const THINKERS_EN = [
   { id:'jung',    name:'Carl Gustav Jung', era:'1875–1961', emoji:'🌀', image:'./images/jung.webp',    subject:'psychology', bio:'A Swiss psychologist, Freud\'s senior student and later his rival. Argued that beneath the personal unconscious lies a collective unconscious - a layer shared by all humans, holding archetypes that recur across myths, dreams, and stories in every culture.',                                                                                                                                                    quote:'"In addition to our immediate consciousness, there exists a second psychic system of a collective, universal, and impersonal nature which is identical in all individuals."' },
   { id:'skinner', name:'B. F. Skinner',    era:'1904–1990', emoji:'🐦', image:'./images/skinner.webp', subject:'psychology', bio:'An American psychologist at Harvard who led the radical-behaviorist revolution. Argued that all talk of an inner "mind" is empty speculation - psychology can only be a science if it measures observable behavior and its consequences: reinforcements and punishments.',                                                                                                                                                quote:'"A person does not act upon the world, the world acts upon him."' },
   { id:'rogers',  name:'Carl Rogers',      era:'1902–1987', emoji:'🌱', image:'./images/rogers.webp',  subject:'psychology', bio:'An American psychologist, founder of humanistic psychology. Rejected both Freud (who saw the person as a victim of repressed drives) and Skinner (who saw a biological machine) - and argued that the person is the subject of their own life, with an inner tendency to grow when given the right conditions.',                                                                                                     quote:'"It is perhaps best conceptualized as a tendency toward fulfillment, toward actualization, involving not only the maintenance but also the enhancement of the organism."' },
+  // Psychology chapter 6 — "Can a person really change?" Rogers, Winnicott,
+  // Beck and Frankl already defined elsewhere in this array. Breuer and
+  // Miller are new.
+  //
+  // Breuer quote is from the 1893 Preliminary Communication he co-wrote
+  // with Freud — verified direct line, the most-cited sentence in the
+  // history of psychoanalysis. See CLAUDE.md § Source attributions.
+  { id:'breuer',  name:'Josef Breuer',     era:'1842–1925', emoji:'💬', image:'./images/breuer.webp',   subject:'psychology', bio:'Austrian physician whose treatment of a patient he called Anna O., between 1880 and 1882, produced what she herself named "the talking cure" — the earliest form of psychoanalysis. Freud, who learned the method from Breuer, later developed it into his own theory. Breuer stepped back from psychoanalysis as it moved toward sexuality as its central explanation; his insight that symptoms yield when their origin is spoken survived.', quote:'"Hysterics suffer mainly from reminiscences."' },
+  // Miller quote is from Miller/Hubble/Duncan, "Supershrinks: What Is the
+  // Secret of Their Success?", Psychotherapy Networker, 2007 — verified
+  // direct line, matches the dialogue source block attribution.
+  { id:'miller',  name:'Scott D. Miller',  era:'1960–',     emoji:'📊', image:'./images/miller.webp',   subject:'psychology', bio:'American psychotherapist and researcher who moved the question "what works in therapy?" out of theory and into measurement. Co-founder of the International Center for Clinical Excellence; his work on feedback-informed treatment, outcome measurement, and the "Supershrinks" finding — that the best therapists are the ones who most consistently ask for and act on client feedback — reshaped how therapy quality is thought about outside any single school.', quote:'"The best therapists spend more time asking for feedback — and more importantly, acting on it — than less effective therapists."' },
   // Psychology chapter 2 — "What drives us?"
   { id:'adler',   name:'Alfred Adler',     era:'1870–1937', emoji:'⬆️', image:'./images/adler.webp',    subject:'psychology', bio:'An Austrian psychologist, once close to Freud and later his rival. Headed the Vienna Psychoanalytic Society until his stormy departure in 1911. Argued that the hidden engine of a person is not sexual but the wish to stop feeling small - what he called "the striving for superiority".',                                                                                                                              quote:'"To be human means to feel inferior, which presses ceaselessly toward its own conquest."' },
   { id:'maslow',  name:'Abraham Maslow',   era:'1908–1970', emoji:'🔺', image:'./images/maslow.webp',   subject:'psychology', bio:'An American psychologist who sought to explain why the same person wants different things at different stages of life. Ordered human needs into an ascending pyramid, from what is necessary for life up to self-actualization, and argued that a need that is satisfied ceases to motivate.',                                                                                                                            quote:'"What a man can be, he must be."' },

@@ -167,7 +167,9 @@ Every `type: 'source'` section attributes a `quote` to a specific thinker and wo
 
 1. **Swap** to a verifiably exact passage from the same cited work (preferred when a well-known line exists) and add a short provenance comment above the swap, naming the paraphrase that was there and the paper/book the swap comes from. Example pattern: `// Libet quote is a verified direct passage from the 1985 BBS paper ("Unconscious Cerebral Initiative…"). The docx's original wording was a cleaner summary of Libet's conclusion rather than a quoted sentence; swapped to a verifiable line.`
 2. **Re-cite** to a different work by the same thinker where the paraphrased sentence does actually appear (if that's easy to find), and expand the attribution to the real citation.
-3. **Rewrite** the paraphrase as prose outside quotation marks (last resort — loses the "words of the thinker" beat the source block is designed to carry).
+3. **Find a different verifiable line from the same thinker** and swap both the quote and the citation. The thinker-card source block gives the user a real sentence that thinker wrote; a different real sentence is a straight substitute.
+
+**Not a fix**: rewriting the paraphrase as prose outside quotation marks and keeping the same unverified content with softer framing. The whole point of the audit is that the app gives readers real sentences a thinker actually produced. A paraphrase without quote marks is still the paraphrase, just better disguised. If verification fails, the only acceptable move is to replace the content, not re-wrap it.
 
 **Riskiest cases** (historically): neuroscientists whose findings are usually quoted in summary form (Libet, Kahneman), 20th-century figures who gave many interviews (Foucault, Sartre), and economists whose textbook-style propositions circulate as if they wrote them that way. For these, be especially skeptical of a crisp one-sentence "quote."
 
