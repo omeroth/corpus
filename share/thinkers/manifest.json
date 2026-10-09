@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-09T11:17:29.865Z",
+  "generatedAt": "2026-10-09T12:42:03.743Z",
   "items": [
     {
       "thinkerId": "socrates",
@@ -692,6 +692,46 @@
       "page": "t/easterly-he.html"
     },
     {
+      "thinkerId": "simon",
+      "subject": "economics",
+      "lang": "he",
+      "name": "הרברט סיימון",
+      "era": "1916–2001",
+      "cardLandscape": "share/thinkers/he/simon.png",
+      "cardPortrait": "share/thinkers/portrait/he/simon.png",
+      "page": "t/simon-he.html"
+    },
+    {
+      "thinkerId": "thaler",
+      "subject": "economics",
+      "lang": "he",
+      "name": "ריצ'רד תיילר",
+      "era": "1945–",
+      "cardLandscape": "share/thinkers/he/thaler.png",
+      "cardPortrait": "share/thinkers/portrait/he/thaler.png",
+      "page": "t/thaler-he.html"
+    },
+    {
+      "thinkerId": "shiller",
+      "subject": "economics",
+      "lang": "he",
+      "name": "רוברט שילר",
+      "era": "1946–",
+      "cardLandscape": "share/thinkers/he/shiller.png",
+      "cardPortrait": "share/thinkers/portrait/he/shiller.png",
+      "page": "t/shiller-he.html"
+    },
+    {
+      "thinkerId": "gigerenzer",
+      "subject": "economics",
+      "lang": "he",
+      "name": "גרד גיגרנצר",
+      "era": "1947–",
+      "cardLandscape": "share/thinkers/he/gigerenzer.png",
+      "cardPortrait": "share/thinkers/portrait/he/gigerenzer.png",
+      "page": "t/gigerenzer-he.html"
+    },
+    {
       "thinkerId": "socrates",
       "subject": "philosophy",
       "lang": "en",
@@ -1150,6 +1190,46 @@
       "cardLandscape": "share/thinkers/en/easterly.png",
       "cardPortrait": "share/thinkers/portrait/en/easterly.png",
       "page": "t/easterly-en.html"
+    },
+    {
+      "thinkerId": "simon",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Herbert Simon",
+      "era": "1916–2001",
+      "cardLandscape": "share/thinkers/en/simon.png",
+      "cardPortrait": "share/thinkers/portrait/en/simon.png",
+      "page": "t/simon-en.html"
+    },
+    {
+      "thinkerId": "thaler",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Richard Thaler",
+      "era": "1945–",
+      "cardLandscape": "share/thinkers/en/thaler.png",
+      "cardPortrait": "share/thinkers/portrait/en/thaler.png",
+      "page": "t/thaler-en.html"
+    },
+    {
+      "thinkerId": "shiller",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Robert Shiller",
+      "era": "1946–",
+      "cardLandscape": "share/thinkers/en/shiller.png",
+      "cardPortrait": "share/thinkers/portrait/en/shiller.png",
+      "page": "t/shiller-en.html"
+    },
+    {
+      "thinkerId": "gigerenzer",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Gerd Gigerenzer",
+      "era": "1947–",
+      "cardLandscape": "share/thinkers/en/gigerenzer.png",
+      "cardPortrait": "share/thinkers/portrait/en/gigerenzer.png",
+      "page": "t/gigerenzer-en.html"
     },
     {
       "thinkerId": "wundt",

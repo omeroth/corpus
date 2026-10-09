@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-09T11:17:22.659Z",
+  "generatedAt": "2026-10-09T12:41:55.728Z",
   "items": [
     {
       "weekId": 1,
@@ -1608,6 +1608,148 @@
       "title": "Why are some countries rich and others poor?",
       "card": "share/cards/en/econ-5-7.png",
       "page": "d/econ-5-7-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 1,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "simon",
+      "title": "סיימון: האם אנחנו בכלל מסוגלים להיות רציונליים?",
+      "card": "share/cards/he/econ-6-1.png",
+      "page": "d/econ-6-1-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 1,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "simon",
+      "title": "Simon: Are we even capable of being rational?",
+      "card": "share/cards/en/econ-6-1.png",
+      "page": "d/econ-6-1-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 2,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "kahneman",
+      "title": "כהנמן וטברסקי: למה הפסד כואב יותר מרווח משמח",
+      "card": "share/cards/he/econ-6-2.png",
+      "page": "d/econ-6-2-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 2,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "kahneman",
+      "title": "Kahneman and Tversky: Why a loss hurts more than an equal gain pleases",
+      "card": "share/cards/en/econ-6-2.png",
+      "page": "d/econ-6-2-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 3,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "thaler",
+      "title": "תיילר: למה אותו חפץ שווה פי שניים כשהוא שלנו?",
+      "card": "share/cards/he/econ-6-3.png",
+      "page": "d/econ-6-3-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 3,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "thaler",
+      "title": "Thaler: Why is the same object worth twice as much when it is ours?",
+      "card": "share/cards/en/econ-6-3.png",
+      "page": "d/econ-6-3-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 4,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "thaler",
+      "title": "דחיפה: אם אנחנו יודעים איך אנשים בוחרים, מותר לעצב את הבחירה?",
+      "card": "share/cards/he/econ-6-4.png",
+      "page": "d/econ-6-4-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 4,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "thaler",
+      "title": "Nudge: If we know how people choose, are we permitted to design the choice?",
+      "card": "share/cards/en/econ-6-4.png",
+      "page": "d/econ-6-4-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 5,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "shiller",
+      "title": "שילר: מה קורה כשהסטיות מצטברות לשוק שלם?",
+      "card": "share/cards/he/econ-6-5.png",
+      "page": "d/econ-6-5-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 5,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "shiller",
+      "title": "Shiller: What happens when the deviations accumulate into an entire market?",
+      "card": "share/cards/en/econ-6-5.png",
+      "page": "d/econ-6-5-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 6,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "gigerenzer",
+      "title": "גיגרנצר: ואולי זו בכלל לא טעות?",
+      "card": "share/cards/he/econ-6-6.png",
+      "page": "d/econ-6-6-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 6,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "gigerenzer",
+      "title": "Gigerenzer: And perhaps it is not a mistake at all?",
+      "card": "share/cards/en/econ-6-6.png",
+      "page": "d/econ-6-6-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 7,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "סיכום: האם אנחנו באמת רציונליים?",
+      "card": "share/cards/he/econ-6-7.png",
+      "page": "d/econ-6-7-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 7,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "Summary: Are we really rational?",
+      "card": "share/cards/en/econ-6-7.png",
+      "page": "d/econ-6-7-en.html"
     },
     {
       "weekId": 1,
