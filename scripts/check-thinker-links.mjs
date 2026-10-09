@@ -21,6 +21,12 @@
 // Catches the class of bug where content is correct but the home-screen
 // data pipeline silently drops it.
 //
+// Correct-answer distribution check (added after the rebalance pass):
+//   - no single correct-letter > 50% of a chapter's 3-option quizzes
+//   - no run of 4+ identical correct answers within a chapter
+// Catches the "always B" authoring template the source documents keep
+// arriving with — 14-17 of 21 correct answers at B is the baseline.
+//
 // Reverse content check: thinkers present in either array but never
 // referenced by any dialogue → they can never be unlocked and probably
 // shouldn't ship.
@@ -641,6 +647,82 @@ if (carouselOrder && typeof carouselOrder === 'object') {
   }
 }
 
+// ─── Correct-answer distribution check ────────────────────────────────
+//
+// Across the catalogue, every source document the authors send has had
+// 14-17 of 21 correct answers at option B. Picking B every time scores
+// well above chance — the whole quiz surface loses meaning. Once the
+// rebalance pass is done, this check keeps the catalogue from drifting
+// back. Each new chapter has to be shaped at authoring time (or
+// rebalanced before merge) rather than caught weeks later by a user
+// noticing the pattern.
+//
+// Rules (hard errors):
+//   - Any letter above 50% of the chapter's quizzes.
+//   - Any run of 4 or more identical consecutive correct answers
+//     within a single chapter.
+// Counts every quiz with 3 options (True/False and other shapes are
+// excluded from the share-of-letter rule; they'd distort it unfairly).
+// Run detection uses all quizzes to catch "always B" patterns that
+// span dialogue types.
+
+const distributionIssues = [];
+for (const { subject, data } of subjects) {
+  if (!Array.isArray(data.weeks)) continue;
+  for (const week of data.weeks) {
+    if (!week || !Array.isArray(week.days) || week.days.length === 0) continue;
+    const abcLetters = []; // only 3-option quizzes
+    const allLetters = []; // all quizzes (for run detection)
+    for (const day of week.days) {
+      if (!day || !Array.isArray(day.sections)) continue;
+      for (const sec of day.sections) {
+        if (!sec || sec.type !== 'quiz') continue;
+        const letter = 'ABC'[sec.correctIndex];
+        if (!letter) continue;
+        allLetters.push(letter);
+        if (Array.isArray(sec.options) && sec.options.length === 3) abcLetters.push(letter);
+      }
+    }
+    if (abcLetters.length === 0) continue;
+    // Share-of-letter rule
+    const counts = { A: 0, B: 0, C: 0 };
+    for (const l of abcLetters) counts[l]++;
+    for (const [letter, n] of Object.entries(counts)) {
+      const share = n / abcLetters.length;
+      if (share > 0.50) {
+        distributionIssues.push({
+          issue: 'correct-letter share > 50%',
+          where: `${subject} chapter ${week.id}`,
+          detail: `${letter}=${n}/${abcLetters.length} (${Math.round(share * 100)}%). ` +
+                  `Rebalance so no single letter exceeds 50%.`,
+        });
+      }
+    }
+    // Run detection on all quizzes (both ABC and TF, so a TF run
+    // between ABC answers still contributes).
+    let runLetter = null, runLen = 0, runStart = 0;
+    for (let i = 0; i <= allLetters.length; i++) {
+      const l = allLetters[i];
+      if (l === runLetter) {
+        runLen++;
+      } else {
+        if (runLen >= 4) {
+          distributionIssues.push({
+            issue: 'run of 4+ identical correct answers',
+            where: `${subject} chapter ${week.id}`,
+            detail: `${runLetter}×${runLen} starting at quiz #${runStart + 1} ` +
+                    `(sequence: ${allLetters.join('')}). ` +
+                    `Interleave the correct-answer position so no letter streaks ≥ 4.`,
+          });
+        }
+        runLetter = l;
+        runLen = 1;
+        runStart = i;
+      }
+    }
+  }
+}
+
 // ─── Chapter surfacing check (getW ↔ content) ──────────────────────────
 //
 // The content validator used to inspect only the content files. That
@@ -839,9 +921,10 @@ reportTable('Tag-balance errors (HTML in text-only fields / malformed / unclosed
 reportTable('Quiz option shape errors (packed / length mismatch / too few)', quizIssues);
 reportTable('CAROUSEL_ORDER coverage errors (thinker missing from order-list / order references unknown id / duplicates)', orderIssues);
 reportTable('Chapter surfacing errors (content ↔ getW mismatch)', surfacingIssues);
+reportTable('Correct-answer distribution errors (letter > 50% / run ≥ 4)', distributionIssues);
 reportTable('Unreferenced thinkers (never appear in any dialogue — warning only)', unreferenced);
 
-const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length + surfacingIssues.length;
+const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length + surfacingIssues.length + distributionIssues.length;
 if (hardErrorCount > 0) {
   console.error('');
   console.error('╔════════════════════════════════════════════════════════════════════╗');
