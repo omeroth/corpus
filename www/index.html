@@ -13309,11 +13309,139 @@ function _hapticOnbPlay(H, tag) {
   }
 }
 
+// Haptic patterns and clocks.
+//
+// Single-pulse kinds (nav, continue, locked, success, stat, tick):
+//   fire one native call and bail.
+// Multi-pulse pattern kinds (reward, frame, box-open, unlock):
+//   fire a sequence of pulses via setTimeout. Internal pulses BYPASS
+//   the 80ms general throttle (they're meant to be felt as one
+//   gesture). The whole pattern reserves the reward clock to its END
+//   time, so the next reward-class call lands ≥300ms after the
+//   pattern finishes. If opts.timers is an array, every pulse's
+//   setTimeout handle is pushed into it, so an external skip handler
+//   (thinker-reveal _skipRevealAnimation, Forge _rvSkipAll) can
+//   clearTimeout them. Each deferred pulse rechecks hapticsEnabled
+//   before firing — flipping the toggle mid-pattern cancels the rest.
+//
+// Clocks (both delay-not-drop):
+//   reward (300ms): reward / tick / success / frame / box-open / unlock.
+//   stat   (150ms): stat.
+// General 80ms throttle (drop semantics) applies to tap kinds only:
+//   nav / continue / locked / continue-onb / box-tap.
+let _hapticLastRewardT = 0;
+let _hapticLastStatT   = 0;
+const _HAPTIC_REWARD_THROTTLE_MS = 300;
+const _HAPTIC_STAT_THROTTLE_MS   = 150;
+const _REWARD_KINDS = { reward: 1, tick: 1, success: 1, frame: 1, 'box-open': 1, unlock: 1, correct: 1 };
+const _STAT_KINDS   = { stat: 1 };
+// Patterns: [{ at: offset ms, p: 'light'|'medium'|'heavy'|'success' }].
+// Pattern END time = max(at) across pulses — used to reserve the clock.
+const _HAPTIC_PATTERNS = {
+  reward:    [{ at: 0,   p: 'heavy'  }, { at: 110, p: 'medium' }],
+  correct:   [{ at: 0,   p: 'light'  }, { at: 60,  p: 'medium' }],
+  frame:     [{ at: 0,   p: 'light'  }, { at: 70,  p: 'medium' }, { at: 140, p: 'heavy'   }, { at: 300, p: 'success' }],
+  'box-open':[{ at: 0,   p: 'heavy'  }, { at: 90,  p: 'heavy'  }, { at: 230, p: 'success' }],
+  unlock:    [{ at: 0,   p: 'heavy'  }, { at: 100, p: 'heavy'  }, { at: 260, p: 'success' }],
+};
+function _firePulseNative(pulse) {
+  // Native-only path for a single pulse. Does NOT consult throttles —
+  // the caller (pattern scheduler or single-pulse dispatcher) owns
+  // throttle policy. Rechecks hapticsEnabled so a mid-pattern toggle
+  // cancels queued pulses.
+  if (typeof state !== 'undefined' && state && state.hapticsEnabled === false) return;
+  try {
+    const Cap = window.Capacitor;
+    if (!Cap || typeof Cap.isNativePlatform !== 'function' || !Cap.isNativePlatform()) return;
+    const H = Cap.Plugins && Cap.Plugins.Haptics;
+    if (!H) return;
+    let p;
+    if      (pulse === 'light'   && typeof H.impact       === 'function') p = H.impact({ style: 'LIGHT'   });
+    else if (pulse === 'medium'  && typeof H.impact       === 'function') p = H.impact({ style: 'MEDIUM'  });
+    else if (pulse === 'heavy'   && typeof H.impact       === 'function') p = H.impact({ style: 'HEAVY'   });
+    else if (pulse === 'success' && typeof H.notification === 'function') p = H.notification({ type: 'SUCCESS' });
+    else if (pulse === 'warning' && typeof H.notification === 'function') p = H.notification({ type: 'WARNING' });
+    if (p && typeof p.catch === 'function') p.catch(() => {});
+  } catch (e) {}
+}
+function _firePattern(pulses, opts) {
+  // Schedules every pulse via setTimeout. The at=0 pulse still runs
+  // through setTimeout(0) so a caller passing opts.timers has a handle
+  // for the first pulse too — consistent cancellation semantics.
+  for (const pulse of pulses) {
+    const t = setTimeout(() => _firePulseNative(pulse.p), pulse.at);
+    if (opts && Array.isArray(opts.timers)) opts.timers.push(t);
+  }
+}
+function _doHapticNative(kind, opts) {
+  // Deferred fire path for reward/stat-class single pulses that got
+  // delayed by their clock. Patterns are deferred as a whole via
+  // this path too — _firePattern runs through its full schedule.
+  if (typeof state !== 'undefined' && state && state.hapticsEnabled === false) return;
+  const pattern = _HAPTIC_PATTERNS[kind];
+  if (pattern) { _firePattern(pattern, opts); return; }
+  // Single-pulse kinds map here.
+  if      (kind === 'nav')     _firePulseNative('light');
+  else if (kind === 'continue')_firePulseNative('medium');
+  else if (kind === 'locked')  _firePulseNative('warning');
+  else if (kind === 'tick')    _firePulseNative('medium');
+  else if (kind === 'answer')  _firePulseNative('light');
+  else if (kind === 'wrong')   _firePulseNative('warning');
+  else if (kind === 'stat')    _firePulseNative('medium');
+  else if (kind === 'success') _firePulseNative('success');
+}
+// Escalating box-tap tracker — not persisted. The caller passes
+// opts.tap (1-indexed); if omitted this still works, defaulting to
+// 'heavy' so a stray call doesn't surprise.
+function _boxTapPulse(tap) {
+  const n = Number(tap) || 3;
+  return n === 1 ? 'light' : n === 2 ? 'medium' : 'heavy';
+}
 function _haptic(kind, opts) {
   if (typeof state !== 'undefined' && state && state.hapticsEnabled === false) return;
   const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+  // box-tap: tap-class, general throttle only, no clock reservation.
+  if (kind === 'box-tap') {
+    if (now - _hapticLastT < _HAPTIC_THROTTLE_MS) return;
+    _hapticLastT = now;
+    _firePulseNative(_boxTapPulse(opts && opts.tap));
+    return;
+  }
   if (now - _hapticLastT < _HAPTIC_THROTTLE_MS) return;
+  if (_REWARD_KINDS[kind]) {
+    const pattern = _HAPTIC_PATTERNS[kind];
+    const patternEnd = pattern ? pattern[pattern.length - 1].at : 0;
+    const gap = now - _hapticLastRewardT;
+    if (gap < _HAPTIC_REWARD_THROTTLE_MS) {
+      // Defer the whole pattern (or single pulse) to the slot
+      // boundary. Reserve _hapticLastRewardT to the pattern END so a
+      // third stacked call queues after it, cumulatively.
+      const delay = _HAPTIC_REWARD_THROTTLE_MS - gap;
+      _hapticLastRewardT = now + delay + patternEnd;
+      _hapticLastT = now;
+      const t = setTimeout(() => _doHapticNative(kind, opts), delay);
+      if (opts && Array.isArray(opts.timers)) opts.timers.push(t);
+      return;
+    }
+    _hapticLastRewardT = now + patternEnd;
+  }
+  if (_STAT_KINDS[kind]) {
+    const gap = now - _hapticLastStatT;
+    if (gap < _HAPTIC_STAT_THROTTLE_MS) {
+      const delay = _HAPTIC_STAT_THROTTLE_MS - gap;
+      _hapticLastStatT = now + delay;
+      _hapticLastT = now;
+      const t = setTimeout(() => _doHapticNative(kind, opts), delay);
+      if (opts && Array.isArray(opts.timers)) opts.timers.push(t);
+      return;
+    }
+    _hapticLastStatT = now;
+  }
   _hapticLastT = now;
+  // Pattern path: fire the whole sequence (pulses bypass the 80ms
+  // throttle because setTimeout schedules them directly).
+  const pattern = _HAPTIC_PATTERNS[kind];
+  if (pattern) { _firePattern(pattern, opts); return; }
   try {
     const Cap = window.Capacitor;
     if (!Cap || typeof Cap.isNativePlatform !== 'function' || !Cap.isNativePlatform()) return;
@@ -13323,6 +13451,16 @@ function _haptic(kind, opts) {
     if (kind === 'nav'      && typeof H.impact === 'function')       p = H.impact({ style: 'LIGHT' });
     else if (kind === 'continue' && typeof H.impact === 'function')  p = H.impact({ style: 'MEDIUM' });
     else if (kind === 'locked'   && typeof H.notification === 'function') p = H.notification({ type: 'WARNING' });
+    // tick + stat: single medium impact. answer: single light impact
+    // (answer taps are feather-weight, distinct from gem landings).
+    // wrong: notification Warning — gentler than Error, cleaner than
+    // a medium impact for an "incorrect, try again" beat.
+    // success: notification Success.
+    else if (kind === 'tick'    && typeof H.impact       === 'function') p = H.impact({ style: 'MEDIUM' });
+    else if (kind === 'answer'  && typeof H.impact       === 'function') p = H.impact({ style: 'LIGHT'  });
+    else if (kind === 'stat'    && typeof H.impact       === 'function') p = H.impact({ style: 'MEDIUM' });
+    else if (kind === 'wrong'   && typeof H.notification === 'function') p = H.notification({ type: 'WARNING' });
+    else if (kind === 'success' && typeof H.notification === 'function') p = H.notification({ type: 'SUCCESS' });
     else if (kind === 'continue-onb') {
       // SUCCESS short-circuit: the CTA tagged data-onb-last-cta="success"
       // (currently first-card, step 21).
@@ -13372,7 +13510,7 @@ function _haptic(kind, opts) {
     // in _readerBtnFire — skip it here. Disabled buttons don't fire (they
     // can't trigger a navigation).
     const cta = e.target.closest && e.target.closest(
-      '.onb-cta:not([disabled]), .levelup-continue, .cc-a:not([disabled]), .dc-continue-btn, #chapter-continue-btn'
+      '.onb-cta:not([disabled]), .levelup-continue, .cc-a:not([disabled]), .dc-continue-btn, #chapter-continue-btn, .unlock-cta-btn, .practice-card-inner'
     );
     if (!cta) return;
     if (cta.id === 'reader-next-btn') return;
@@ -15246,6 +15384,14 @@ async function startPurchase() {
       state.subscriptionOptimistic = { until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() };
       state.isPaid = true;
       saveStateLocal();
+      // 'success' haptic the instant the store confirms the entitlement.
+      // Not on button press — only on this branch. Reduced motion skips.
+      (() => {
+        try {
+          const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (!reduce) _haptic('success');
+        } catch (e) {}
+      })();
       try { posthog.capture('paywall_purchase_succeeded', {
         package_id: sel.pkg.identifier,
         is_trial: TRIAL_ENABLED && _paywallMode === 'onboarding',
@@ -15378,6 +15524,14 @@ async function restorePurchases() {
       state.subscriptionOptimistic = { until: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() };
       state.isPaid = true;
       saveStateLocal();
+      // 'success' haptic only on a confirmed restore (paid branch).
+      // Not on the restore button tap. Reduced motion skips.
+      (() => {
+        try {
+          const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (!reduce) _haptic('success');
+        } catch (e) {}
+      })();
       // Explicit .catch() — try/catch would not catch the async rejection.
       loadSubscription().catch(e => console.error('[Sub] loadSubscription (restore) failed:', e));
       try { posthog.capture('paywall_restore_result', { found: true }); } catch(e) {}
@@ -21980,22 +22134,26 @@ function _playThinkerCardFly(thinkerId, subject, k, renderTier, landPlate) {
   });
   fx.innerHTML = h;
 
-  // At 0.85 s: fill the socket, clear the effects, LIGHT haptic.
-  // Skip check: if fx was cleared by _rvSkipAll before this fires,
-  // don't touch anything. Scaled by --rv-slow so slow-motion
-  // inspection stays in phase with the CSS animations.
+  // At 0.85 s: fill the socket, clear the effects, 'tick' haptic
+  // through the shared helper (medium impact, reward-clock managed).
+  // Fires on every gem — boundary points (3/6/9/12) get both the
+  // gem tick AND the Forge crescendo later; the 300ms reward-class
+  // throttle between them makes the sequence read as "point lands,
+  // then frame builds" instead of overlapping. Skip check: if fx was
+  // cleared by _rvSkipAll before this fires, don't touch anything.
+  // Scaled by --rv-slow so slow-motion inspection stays in phase.
   const _slow = _rvSlow();
+  const _reduceMotion = (() => {
+    try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch (e) { return false; }
+  })();
   const _landT = setTimeout(() => {
     if (fx._rvSkipped) return;
     const landTierIdx = landPlate ? landPlate.tier : tierIdx;
     const landFilled  = landPlate ? landPlate.filled : thinkerPlateFilled(thinkerId);
     layers.innerHTML = _rvLayer(TIERS[landTierIdx], landFilled);
     fx.innerHTML = '';
-    try {
-      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics) {
-        window.Capacitor.Plugins.Haptics.impact({ style: 'LIGHT' });
-      }
-    } catch(e) {}
+    if (!_reduceMotion) _haptic('tick');
   }, _RV_T.fly * _slow);
 
   // Expose timers to the skip handler for cancellation.
@@ -22059,22 +22217,25 @@ function _playThinkerCardForge(thinker, subject, oldTier, newTier, newFilled) {
     console.log('[rv-forge]', { subject: subj, oldTier: oldTierName, newTier: newTierName, newFilled: newFilled });
   } catch(e) {}
 
-  // Haptic MEDIUM at the shock peak (~74% of 2.2 s = 1628 ms).
-  const _hapticT = setTimeout(() => {
-    if (fx._rvSkipped) return;
-    try {
-      if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Haptics) {
-        window.Capacitor.Plugins.Haptics.impact({ style: 'MEDIUM' });
-      }
-    } catch(e) {}
-  }, Math.round(_RV_T.forge * 0.74 * _slow));
-
   // At 2.2 s: remove old layer, remove art filter (settle to
-  // "new tier only").
+  // "new tier only"). 'frame' haptic fires here — the moment the
+  // new frame is visually in place. 'frame' is a crescendo pattern
+  // (light → medium → heavy → success over 300ms); _rvForgeTimers
+  // receives each pulse's setTimeout handle so a skip mid-crescendo
+  // clears the remainder along with everything else _rvSkipAll kills.
+  // Reduced motion skips the pattern entirely.
+  const _reduceMotion = (() => {
+    try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch (e) { return false; }
+  })();
   const _forgeEndT = setTimeout(() => {
     if (fx._rvSkipped) return;
     layers.innerHTML = _rvLayer(newTierName, newFilled);
     art.classList.remove('rv-art-forge');
+    if (!_reduceMotion) {
+      if (!Array.isArray(fx._rvForgeTimers)) fx._rvForgeTimers = [];
+      _haptic('frame', { timers: fx._rvForgeTimers });
+    }
   }, _RV_T.forge * _slow);
 
   // At 2.6 s: clear effects.
@@ -22083,7 +22244,7 @@ function _playThinkerCardForge(thinker, subject, oldTier, newTier, newFilled) {
     fx.innerHTML = '';
   }, _RV_T.banner * _slow);
 
-  fx._rvForgeTimers = [_plainClipT, _hapticT, _forgeEndT, _bannerEndT];
+  fx._rvForgeTimers = [_plainClipT, _forgeEndT, _bannerEndT];
 }
 
 // Clear every rv- animation timer and effect. Called by the skip
@@ -25430,6 +25591,22 @@ function showUnlockOverlay() {
     s.offsetHeight;
     s.style.animation = '';
   });
+  // 'unlock' pattern at the lock p3-pop settle (~1050ms). The lock
+  // uses the same spring as the thinker-card arrival (p3-pop 0.9s +
+  // 0.15s delay). The pattern is heavy + heavy at +100 + success at
+  // +260 — three beats landing after the lock seats. Captured ref +
+  // display recheck guard against a dismiss before settle. Reduced
+  // motion skips the pattern.
+  const _buReduce = (() => {
+    try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch (e) { return false; }
+  })();
+  if (!_buReduce) {
+    const _buRef = overlay;
+    setTimeout(() => {
+      if (_buRef && _buRef.style.display !== 'none') _haptic('unlock');
+    }, 1050);
+  }
   return true;
 }
 
@@ -25589,6 +25766,26 @@ function showChapterCompleteOverlay(chapter) {
   };
 
   overlay.style.display = 'flex';
+  // 'stat' haptics on each number landing. XP pops in at 1400ms
+  // (dc-pop-in 0.7s + 0.7s delay); thinkers metric pops in at 2100ms
+  // (dc-pop-in 0.7s + 1.4s delay). If the streak metric is visible on
+  // this overlay (static render at the same 2100ms slot), the stat
+  // clock pushes its haptic 150ms later rather than dropping it.
+  // Captured ref + visibility recheck guard against a dismiss before
+  // either beat lands. Reduced motion skips the sequence.
+  const _ccReduce = (() => {
+    try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch (e) { return false; }
+  })();
+  if (!_ccReduce) {
+    const _ccRef = overlay;
+    const _stillUp = () => _ccRef && _ccRef.style.display !== 'none';
+    setTimeout(() => { if (_stillUp()) _haptic('stat'); }, 1400);
+    setTimeout(() => { if (_stillUp()) _haptic('stat'); }, 2100);
+    const _streakItem = _ccRef.querySelector('#metric-streak-item');
+    const _streakVisible = _streakItem && _streakItem.style.display !== 'none';
+    if (_streakVisible) setTimeout(() => { if (_stillUp()) _haptic('stat'); }, 2100);
+  }
   return true;
 }
 
@@ -26689,6 +26886,22 @@ function _showThinkerIntroIfNeeded(day, opts) {
   // bonus-picker patterns) so the underlying reader can't be scrolled through
   // the overlay on iOS.
   document.body.style.overflow = 'hidden';
+  // 'stat' haptic at the entrance-animation settle. Portrait pops in at
+  // p3-pop 0.9s + 0.1s delay = 1000ms; mystery coin uses the same spring
+  // with 0.15s delay = 1050ms. Fire at 1050ms to cover both variants.
+  // Fresh-entry path only — the reopen path (_openThinkerIntro) is a
+  // replay and gets no haptic. Captured ref + .active recheck guard
+  // against a dismiss before settle. Reduced motion skips the haptic.
+  const _tiReduce = (() => {
+    try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch (e) { return false; }
+  })();
+  if (!_tiReduce) {
+    const _tiRef = overlay;
+    setTimeout(() => {
+      if (_tiRef && _tiRef.classList.contains('active')) _haptic('stat');
+    }, 1050);
+  }
 }
 
 // Manual open from the reader-topbar reopen button. Always opens (even on
@@ -27103,6 +27316,32 @@ function renderReader() {
     `;
     content.appendChild(card);
     makeNextBtn(ui.finishBtn, true);
+    // Medallion stat haptics. Each gold medallion lands at
+    // (0.25 + i * 0.30 + 0.55)s = 800ms / 1100ms / 1400ms. 0/3 fires
+    // once (qs-done at 800ms, same window). If isFull (3/3), the
+    // last beat is 'success' instead of 'stat' — the perfect-dialogue
+    // close. Session-only guard so re-renders of the same section
+    // (user navigates back + forward, retry flow) don't re-fire.
+    // Reduced motion skips the sequence.
+    if (!window._qsHapticSeen) window._qsHapticSeen = {};
+    const _qsReduce = (() => {
+      try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+      catch (e) { return false; }
+    })();
+    if (!_qsReduce && !window._qsHapticSeen[_dqKey]) {
+      window._qsHapticSeen[_dqKey] = true;
+      const n = Math.min(correct, 3);
+      if (n <= 1) {
+        setTimeout(() => _haptic('stat'), 800);
+      } else if (n === 2) {
+        setTimeout(() => _haptic('stat'), 800);
+        setTimeout(() => _haptic('stat'), 1100);
+      } else {
+        setTimeout(() => _haptic('stat'), 800);
+        setTimeout(() => _haptic('stat'), 1100);
+        setTimeout(() => _haptic('success'), 1400);
+      }
+    }
   }
 }
 
@@ -27202,6 +27441,17 @@ function handleQuiz(chosen, correctIdx, explanation, btn, questionIdx, isSingleQ
   if (!state.quizAttempts || typeof state.quizAttempts !== 'object') state.quizAttempts = {};
   if (state.quizAnswered[questionIdx]) return;
 
+  // Quiz feedback haptics fire WITH the color — not on the tap. The
+  // tap and the color land on the same frame, so timing-wise this is
+  // identical to firing at function entry, but it's semantically
+  // tied to the feedback (correct/wrong), which is what the user
+  // perceives. Reduced-motion skips the haptic (same rule as other
+  // reward moments).
+  const _qzReduce = (() => {
+    try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch (e) { return false; }
+  })();
+
   const block = btn.closest('.quiz-block');
   const opts = block ? block.querySelectorAll('.quiz-option') : document.querySelectorAll('.quiz-option');
 
@@ -27214,6 +27464,7 @@ function handleQuiz(chosen, correctIdx, explanation, btn, questionIdx, isSingleQ
     state.quizAttempts[questionIdx] = 1;
     opts.forEach(o => o.classList.remove('option-wrong', 'option-correct', 'option-faded'));
     if (opts[chosen]) opts[chosen].classList.add('option-wrong');
+    if (!_qzReduce) _haptic('wrong');
     return;
   }
 
@@ -27235,6 +27486,7 @@ function handleQuiz(chosen, correctIdx, explanation, btn, questionIdx, isSingleQ
       o.classList.add('option-faded');
     }
   });
+  if (!_qzReduce) _haptic(isCorrect ? 'correct' : 'wrong');
 
   // XP: 15 for first-try correct, 7 for second-try correct, 0 for failed both.
   // Retry gate: if state.dayQuizFirstTry[key] exists, the user is on a
@@ -27544,6 +27796,22 @@ function _showDcStats(titleText, subtitleText, xpAmount, streakCount, onContinue
 
   setTimeout(() => animateXPCount(xpEl, xpAmount), 800);
   setTimeout(() => launchConfetti(), 1200);
+  // 'stat' haptics on each number landing. XP count-up starts at
+  // 800ms and runs 800ms (animateXPCount: 20 × 40ms), so it lands at
+  // ~1600ms. Streak metric is a static pop at 2000ms (dc-fade-up 0.6s
+  // + 1.4s delay). Both fire _haptic('stat'); the stat clock enforces
+  // the 150ms min gap. If the streak isn't visible on this call,
+  // skip its haptic. Reduced motion skips the whole sequence.
+  const _dcStatReduce = (() => {
+    try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch (e) { return false; }
+  })();
+  if (!_dcStatReduce) {
+    setTimeout(() => _haptic('stat'), 1600);
+    const _streakItem = document.getElementById('metric-streak-item');
+    const _streakVisible = _streakItem && _streakItem.style.display !== 'none';
+    if (_streakVisible) setTimeout(() => _haptic('stat'), 2000);
+  }
 }
 
 function showThinkerCardScreen(thinker, chapter, day) {
@@ -27688,6 +27956,16 @@ function showThinkerCardScreen(thinker, chapter, day) {
   // skip handler flips it back to 'true' when the sequence lands.
   card.dataset.settled = 'false';
 
+  // 'reward' haptic at p3-pop settle (~900 ms). This is the "card is
+  // in" moment — not DOM mount, not animation start. Scheduled through
+  // the shared _timers list so the skip handler can cancel it.
+  // Reduced-motion mirrors the streak-badge policy: no animation →
+  // no haptic, since the moment is a visual beat the user opted out of.
+  const _rewardReduce = (() => {
+    try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch (e) { return false; }
+  })();
+
   // ── Animation orchestration ────────────────────────────────────
   // Timeline (unslowed):
   //   0 ms      : Card p3-pop starts (0.9 s spring, scale 0.2→1.18→1,
@@ -27754,6 +28032,19 @@ function showThinkerCardScreen(thinker, chapter, day) {
   // All kickoff delays scale with --rv-slow so slow-motion
   // inspection stays in phase.
   const _rvSlowNow = _rvSlow();
+
+  // Reward at p3-pop settle. 900 ms is the CSS animation's duration;
+  // scale by _rvSlowNow to stay in phase with slow-motion inspection.
+  // 'reward' is now a double-thump pattern (heavy + medium at +110);
+  // passing opts.timers lets _skipRevealAnimation cancel the trailing
+  // pulse the same way it cancels the Fly / Forge kickoff timers.
+  if (!_rewardReduce) {
+    _timers.push(setTimeout(() => {
+      if (_skipped) return;
+      _haptic('reward', { timers: _timers });
+    }, 900 * _rvSlowNow));
+  }
+
   if (_fly.flies) {
     const _flyLand = _forge.forges
       ? { tier: _renderTier, filled: 3 }
@@ -34349,19 +34640,11 @@ function _showStreakBadgeOverlay(tier, opts) {
     catch (e) { return false; }
   })();
   if (reduce) return;
-  const fireHaptic = () => {
-    try {
-      const Cap = window.Capacitor;
-      if (!Cap || typeof Cap.isNativePlatform !== 'function' || !Cap.isNativePlatform()) return;
-      const H = Cap.Plugins && Cap.Plugins.Haptics;
-      if (!H || typeof H.notification !== 'function') return;
-      // Bypass the shared _haptic throttle so the celebration beat
-      // isn't eaten by an earlier tap haptic that still owes 80 ms.
-      const p = H.notification({ type: 'SUCCESS' });
-      if (p && typeof p.catch === 'function') p.catch(() => {});
-    } catch (e) {}
-  };
-  setTimeout(fireHaptic, 1200);
+  // Routed through _haptic('success') so the reward-class 300 ms min-gap
+  // throttle (see _haptic) covers streak-badge → next overlay haptics
+  // uniformly. The 1200 ms show-delay plus the 250 ms inter-overlay
+  // queue delay keeps us comfortably clear in practice.
+  setTimeout(() => _haptic('success'), 1200);
 }
 function _closeStreakBadgeOverlay() {
   const el = window._skActiveEarn;
@@ -34455,6 +34738,117 @@ window._debugStreakPreview = function (currentDays, bestDays) {
   showScreen('streak');
   _skWireStreakScreenEvents();
   return statsOverride;
+};
+
+// ─── Overlay + thinker-reveal debug helpers ───────────────────────
+// Each shows the real overlay (including its real _haptic firing)
+// without persisting anything. Snapshots any state the show touches
+// around the call and restores it; stubs analytics capture for
+// paths that emit them. The overlay stays on screen with its real
+// CTAs — those still carry live onclick handlers, so tapping them
+// resumes normal flow. For a pure visual check, reload after
+// dismissing. Session-only; reload clears everything.
+
+// _debugChapterComplete([chapterIndex=0]) — chapter_complete overlay
+// using the chapter at getW()[index]. Idempotent-shown guard, XP
+// clear, and localStorage snapshot are all restored after the call.
+window._debugChapterComplete = function (chapterIndex) {
+  const i = Math.max(0, Number(chapterIndex) || 0);
+  const chapter = (typeof getW === 'function' ? (getW() || []) : [])[i];
+  if (!chapter) return { error: 'no chapter at index ' + i };
+  const beforeLs    = localStorage.getItem('corpus_state');
+  const beforeShown = state.chapterCompleteShown ? Object.assign({}, state.chapterCompleteShown) : null;
+  const beforeXp    = state.chapterXPByWeek      ? Object.assign({}, state.chapterXPByWeek)      : null;
+  // Null the idempotent guard so the overlay actually renders.
+  const key = (typeof chapterCompleteKey === 'function') ? chapterCompleteKey(state.subject, chapter.id) : null;
+  if (key && state.chapterCompleteShown) delete state.chapterCompleteShown[key];
+  const shown = showChapterCompleteOverlay(chapter);
+  state.chapterCompleteShown = beforeShown;
+  state.chapterXPByWeek      = beforeXp;
+  if (beforeLs != null) localStorage.setItem('corpus_state', beforeLs);
+  return { shown, chapterId: chapter.id };
+};
+
+// _debugLevelUp([newLevelIndex=1]) — level_up overlay for LEVELS[idx].
+// Stubs _phCapture during the call so the 'level_up' analytics event
+// doesn't fire. currentLevelUpData is module-scope, not persisted.
+window._debugLevelUp = function (newLevelIndex) {
+  const max = (typeof LEVELS !== 'undefined' && LEVELS.length) ? LEVELS.length - 1 : 0;
+  const idx = Math.max(0, Math.min(max, Number(newLevelIndex != null ? newLevelIndex : 1)));
+  const origPh = (typeof window !== 'undefined') ? window._phCapture : null;
+  window._phCapture = function () {};
+  try { showLevelUp(idx); }
+  finally { window._phCapture = origPh; }
+  return { newLevelIndex: idx, name: (typeof LEVELS !== 'undefined' && LEVELS[idx]) ? LEVELS[idx].name : null };
+};
+
+// _debugBonusUnlock() — bonus-unlock overlay. The show function
+// itself has no state writes; closeUnlockOverlay (the CTA) does.
+// Monkey-patches closeUnlockOverlay with a non-writing version
+// scoped to this call; the patch self-restores on first click.
+window._debugBonusUnlock = function () {
+  const beforeLs    = localStorage.getItem('corpus_state');
+  const beforeShown = state.bonusUnlockShown ? Object.assign({}, state.bonusUnlockShown) : null;
+  const origClose = window.closeUnlockOverlay;
+  window.closeUnlockOverlay = function () {
+    const el = document.getElementById('unlock-overlay');
+    if (el) el.style.display = 'none';
+    state.bonusUnlockShown = beforeShown;
+    if (beforeLs != null) localStorage.setItem('corpus_state', beforeLs);
+    window.closeUnlockOverlay = origClose;
+  };
+  const shown = showUnlockOverlay();
+  return { shown };
+};
+
+// _debugThinkerReveal(thinkerId, points) — thinker card reveal with a
+// fake point count. points in {1,2,4,5,7,8,10,11} → gem Fly only;
+// points in {3,6,9,12} → Fly + Forge (frame upgrade). Snapshots the
+// _debugThinkerPoints override + thinkerTierSeen + localStorage and
+// restores them synchronously after showThinkerCardScreen returns —
+// the sync Forge-kickoff state write (:27680) is caught by the
+// restore. In-flight setTimeouts for Fly/Forge continue to run and
+// use values they already captured, so the animation plays cleanly
+// against the restored state. posthog.capture is stubbed for the
+// thinker_frame_forged event the Forge kickoff fires.
+window._debugThinkerReveal = function (thinkerId, points) {
+  const id = thinkerId || (typeof THINKERS !== 'undefined' && THINKERS[0] && THINKERS[0].id);
+  if (!id) return { error: 'pass a thinker id (e.g. "socrates")' };
+  const thinker = (typeof THINKERS !== 'undefined') ? THINKERS.find(t => t && t.id === id) : null;
+  if (!thinker) return { error: 'thinker "' + id + '" not found in THINKERS' };
+  const n = Math.max(1, Math.min(12, Number(points) || 2));
+  const beforeLs   = localStorage.getItem('corpus_state');
+  const beforeDbg  = state._debugThinkerPoints ? Object.assign({}, state._debugThinkerPoints) : null;
+  const beforeSeen = state.thinkerTierSeen ? JSON.parse(JSON.stringify(state.thinkerTierSeen)) : null;
+  // Apply the point override. thinkerPoints() consults state._debugThinkerPoints first.
+  if (!state._debugThinkerPoints) state._debugThinkerPoints = {};
+  state._debugThinkerPoints[id] = n;
+  // Clear tier-seen for the target newTier so Forge actually plays
+  // on boundary points instead of being suppressed as "already seen".
+  const newTier = (typeof thinkerTier === 'function') ? thinkerTier(id) : 0;
+  if (newTier > 0 && state.thinkerTierSeen && state.thinkerTierSeen[id] &&
+      typeof TIERS !== 'undefined' && TIERS[newTier]) {
+    delete state.thinkerTierSeen[id][TIERS[newTier]];
+  }
+  // Capture the Forge decision BEFORE calling. After showThinkerCardScreen
+  // returns, state has been restored (so a post-call _shouldPlayForge
+  // would read live state, not the debug override) and the Forge-kickoff
+  // write would also look like "already seen". Capture now, report later.
+  const willForge = (typeof _shouldPlayForge === 'function') ? !!_shouldPlayForge(id).forges : (n % 3 === 0);
+  // Suppress thinker_frame_forged analytics the Forge kickoff emits.
+  const origPhCapture = (typeof posthog !== 'undefined' && posthog && posthog.capture) ? posthog.capture : null;
+  if (origPhCapture) posthog.capture = function () {};
+  const chapterStub = { id: 0, title: 'debug', titleEn: 'debug', days: [] };
+  const dayStub     = { id: 0, title: 'debug', titleEn: 'debug' };
+  try {
+    showThinkerCardScreen(thinker, chapterStub, dayStub);
+  } finally {
+    if (origPhCapture) posthog.capture = origPhCapture;
+    state._debugThinkerPoints = beforeDbg;
+    state.thinkerTierSeen     = beforeSeen;
+    if (beforeLs != null) localStorage.setItem('corpus_state', beforeLs);
+  }
+  return { thinkerId: id, points: n, forges: willForge };
 };
 
 function renderProfile() {
@@ -34941,6 +35335,12 @@ function showLevelUp(newLevelIndex) {
   overlay.setAttribute('data-subject', state.subject || 'philosophy');
 
   overlay.classList.add('active');
+  // No haptic at overlay-activate anymore — the celebration lives on
+  // the user's chest taps and the badge arrival that follows the
+  // third tap. See the chest click handler (search '#treasure-chest')
+  // for box-tap, box-open, and success wiring. Previously a fixed
+  // 1400ms-from-activate success fired regardless of whether the user
+  // had tapped the chest — a timing bug the chest-driven approach fixes.
   return true;
 }
 
@@ -35004,6 +35404,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
       chest.dataset.stage = String(stage);
 
+      // Haptics on chest taps. 'box-tap' escalates per tap (1=light,
+      // 2=medium) — spec treats box-tap as the "before it opens"
+      // beat, so the 3rd tap plays 'box-open' (crescendo pattern)
+      // instead. Success fires later at badge arrival (see below).
+      // Reduced motion skips all three.
+      const _chestReduce = (() => {
+        try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+        catch (e) { return false; }
+      })();
+      if (!_chestReduce) {
+        if (stage < 3) _haptic('box-tap', { tap: stage });
+        else _haptic('box-open');
+      }
+
       // Shake on each tap
       chest.classList.remove('shake');
       void chest.offsetWidth;
@@ -35029,6 +35443,18 @@ document.addEventListener('DOMContentLoaded', function() {
         // Slight dim on the chest while the badge starts to emerge from it.
         chest.style.transition = 'filter 0.4s ease-out';
         chest.style.filter = 'brightness(0.85)';
+
+        // 'success' haptic at badge arrival: 300ms badge-emerge delay
+        // + 1200ms arc = 1500ms from stage-3 tap. box-open's last pulse
+        // lands at +230ms; 1500 - 230 = 1270ms gap, comfortably over
+        // the required 300ms minimum. Reward-clock reservation on
+        // box-open means the clock is held through +230ms; success at
+        // +1500ms is well past.
+        if (!_chestReduce) {
+          setTimeout(() => {
+            if (currentLevelUpData) _haptic('success');
+          }, 1500);
+        }
 
         setTimeout(() => {
           if (!currentLevelUpData) return;
