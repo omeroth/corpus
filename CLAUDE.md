@@ -107,6 +107,58 @@ All colors flow through CSS custom properties defined on `:root` and overridden 
 
 ---
 
+## Z-index map (full-screen / overlay layers)
+
+Two paywall-visibility bugs cost real time to diagnose, both "it fires correctly, you just can't see it." Keep this ordered list current whenever you add or move a layer.
+
+Ordered **low → high**. Only layers that are `position: fixed` (or absolute-full-screen) are listed; small internal stacking contexts (e.g. z-index on crest decoration inside a card) are not.
+
+| z-index | Element | Purpose |
+|---|---|---|
+| **99** | `.stats-subheader` | Stats strip below topbar |
+| **100** | `.topbar` | Top bar |
+| **200** | `.bottom-nav` | Bottom navigation |
+| **201** | `.drawer-toggle-btn` | Subject-select drawer chevron |
+| **300** | `.modal-overlay` | Base modal backdrop class |
+| **350** | `.menu-drawer` | Hamburger / subject drawer |
+| **400** | `#thinker-intro` | Next-dialogue preview card |
+| **500** | `.toast-fullscreen` | Full-screen toast |
+| **999** | `#onboarding-backdrop`, `#onboarding-spotlight` | Walkthrough coach-mark backdrop + spotlight |
+| **1001** | `.onboarding-owl-float`, `.onboarding-speech` | Walkthrough owl + speech bubble |
+| **1002** | `.onboarding-dots-float` | Walkthrough dots |
+| **1100** | `.onb-screen` | Every onboarding step (incl. the onboarding paywall shell) |
+| **1200** | `#chapter-complete-overlay`, `#unlock-overlay` | Celebration-queue overlays |
+| **1500** | `#modal-complete` | End-of-dialogue stats + thinker-card host |
+| **1700** | `#modal-paywall.modal-overlay` | In-app paywall (chapter lock, mid-chapter, bonus tap, practice card, etc.) |
+| **1800** | `#modal-signin-required` | Sign-in prompt — fires from paywall taps; **must stay above modal-paywall** |
+| **2000** | `.sk-earn` | Streak-badge ignition overlay (celebration queue + onboarding step 22) |
+| **3000** | `#update-banner` | App-update banner |
+| **4000** | `.corpus-toast` | Transient confirmation toast |
+| **10000** | `.levelup-overlay` | Level-up chest overlay (last in celebration queue) |
+| **2147483000** | iOS native status bar | Set in head, above every DOM layer |
+
+### Coexistence rules (what can be visible at the same time)
+
+- **Celebration queue items** (`streak_badge`, `bonus_unlock`, `chapter_complete`, `level_up`, `goal_met`) play **sequentially**, never overlapping. Each fires on a cleared stage (`modal-complete` deactivated via `_wrapWithQueuePlay`). The ordering above matters only if two could coexist — they can't within the queue.
+- **`#modal-complete` + `#modal-paywall`**: mid-chapter paywall fires over the thinker-card screen. Modal-paywall at 1700 must stay above modal-complete at 1500. 
+- **`#modal-paywall` + `#modal-signin-required`**: guest taps Subscribe or Restore on a paywall → signin modal opens while the paywall is still active. Signin at 1800 must stay above paywall at 1700. Historical: this was 1150 vs 300 before the paywall was raised; the earlier raise inverted the relationship until 1800.
+- **`.onb-screen` + `.sk-earn`**: onboarding step 22 opens the streak-badge ignition overlay over its own step. sk-earn at 2000 must stay above onb-screen at 1100. Historical: this was 600 vs 1100 before the raise.
+- **`#modal-complete` + `.sk-earn`**: streak-badge plays as a queue item; queue drains **before** modal-complete opens. Not contemporaneous today — but 2000 > 1500 keeps the relationship safe if the sequence ever changes.
+- **`.levelup-overlay` + anything**: level-up at 10000 trumps all other overlays. Level-up plays after streak-badge in the queue, so no inter-queue conflict.
+- **Native status bar (2147483000)**: above every DOM layer. Don't try to render on top of iOS chrome.
+
+### Before adding a new overlay
+
+1. Pick a slot in the table above based on what the overlay **can coexist with**. If it fires over a surface already in the table, pick a z-index above that surface. If it needs to be dismissed before anything else can appear, slot it below the celebration band so the queue still owns the top.
+2. Add a comment at the CSS declaration naming every other layer it stacks against — the comment is what catches the next inversion when someone later raises an underlying layer.
+3. Append the new row to the table above in this file. **Keep the table ordered.**
+
+### Debugging an invisible overlay
+
+If a user reports "the X doesn't appear" and you've verified the DOM is mounting and animations are attaching: check whether X's z-index is below some other overlay that's active at the same moment. The table above is the first place to look.
+
+---
+
 ## Screens (state.currentScreen + showScreen())
 
 ```

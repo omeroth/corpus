@@ -5022,7 +5022,16 @@
      elements visible — the user still sees what they earned, just
      without the motion polish. */
   .sk-earn {
-    position: fixed; inset: 0; z-index: 600;
+    /* z-index 2000: must sit ABOVE .onb-screen (1100) because the
+       onboarding step 22 preparer opens this overlay over its own
+       step container. Also above #modal-complete (1500) and
+       #modal-paywall (1700) — nothing in the celebration chain is
+       contemporaneous with the streak earn (queue drains before
+       thinker-card and paywall triggers), but keeping clear of
+       known opaques is defence in depth. Below .levelup-overlay
+       (10000); level-up plays after streak-badge in the queue
+       order, so no conflict. See CLAUDE.md § Z-index map. */
+    position: fixed; inset: 0; z-index: 2000;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center;
     padding: calc(24px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom));
@@ -9358,15 +9367,16 @@
      .modal-box for the frame and shape; only overrides the internals
      that need paywall-specific layout (stacked buttons, cancel link
      below).
-     z-index: 1150 — must sit above both paywall shells (the modal
-     paywall inherits .modal-overlay's z-index: 300; the onboarding
-     paywall uses .onb-screen's z-index: 1100). 1150 slots between the
-     onboarding paywall (1100) and the celebration overlay band
-     (unlock / chapter-complete at 1200) — semantically the sign-in
-     prompt is a paywall companion, not a celebration, and no
-     celebration can fire while a paywall is open. ID selector to beat
-     .modal-overlay's z-index: 300 without needing !important. */
-  #modal-signin-required { z-index: 1150; }
+     z-index: 1800 — must sit above both paywall shells. The modal
+     paywall now runs at #modal-paywall.modal-overlay 1700 (mid-chapter
+     trigger raised it from the base .modal-overlay 300 in 51fbe7f;
+     the onboarding paywall still uses .onb-screen's 1100). 1800
+     slots above modal-paywall and below .sk-earn (2000) + level-up
+     (10000) — the sign-in prompt only fires FROM a paywall (Subscribe
+     / Restore tap by a guest), so no celebration can be
+     contemporaneous. See CLAUDE.md § Z-index map for the full
+     stacking order. ID selector keeps the required specificity. */
+  #modal-signin-required { z-index: 1800; }
   .signin-required-box {
     max-width: 380px;
     text-align: center;
@@ -18573,7 +18583,20 @@ function _onbV2PrepareStreak() {
     });
   } catch (e) {}
   // Open the real ignition overlay. Keep it lit CTA → advance step 23.
+  //
+  // Suppress the step's inner column and native CTA when the overlay
+  // is actually going to mount. Two reasons: (1) no flash-of-fallback
+  // in the paint frame between step show and overlay mount, (2) no
+  // phantom tap target behind the overlay — the step's own CTA stops
+  // being clickable since the user shouldn't advance except via the
+  // overlay's "Keep it lit" button. If StreakBadges / overlay are
+  // unavailable (edge case), the fallback DOM stays visible.
   if (typeof _showStreakBadgeOverlay === 'function' && window.StreakBadges) {
+    const _stepRoot = document.getElementById('onb-v2-streak');
+    const _inner = _stepRoot && _stepRoot.querySelector('.onb-v2-inner');
+    const _ctaH  = _stepRoot && _stepRoot.querySelector('.onb-cta-holder');
+    if (_inner) _inner.style.display = 'none';
+    if (_ctaH)  _ctaH.style.display  = 'none';
     _showStreakBadgeOverlay(0, {
       source: 'onboarding',
       onDismiss: () => _onbAdvanceStep(22, 23),
