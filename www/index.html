@@ -3989,10 +3989,21 @@
     min-height: 64px;
     font-weight: 500;
   }
-  .reader-editorial #reader-content .quiz-option:hover:not(:disabled),
+  /* :selected is applied explicitly by JS when a selection should stick.
+     :hover is a mouse interaction and must NOT fire on touch — iOS Safari
+     holds the hover state after a tap and the next question's option at
+     the same screen coordinates inherits it, which reads as pre-selected.
+     Gating :hover behind (hover: hover) and (pointer: fine) restricts it
+     to real pointing devices; touch devices rely on .selected only. */
   .reader-editorial #reader-content .quiz-option.selected {
     background: var(--accent-tint);
     border-color: var(--accent);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .reader-editorial #reader-content .quiz-option:hover:not(:disabled) {
+      background: var(--accent-tint);
+      border-color: var(--accent);
+    }
   }
   .reader-editorial #reader-content .opt-letter {
     width: 28px;
@@ -4301,10 +4312,19 @@
     align-items: center;
     gap: 12px;
     min-height: 54px;
+    /* No gray-flash on tap. The option's own transition handles the
+       visual response via option-correct / option-wrong / option-faded
+       classes that handleQuiz adds after the color is applied. */
+    -webkit-tap-highlight-color: transparent;
   }
-  .quiz-option:hover:not(:disabled) {
-    border-color: var(--accent);
-    background: var(--surface-2);
+  /* :hover is gated to real pointers only — on touch, iOS persists the
+     hover state after a tap and the next question's option in the same
+     screen slot inherits it, reading as pre-selected. */
+  @media (hover: hover) and (pointer: fine) {
+    .quiz-option:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: var(--surface-2);
+    }
   }
   .quiz-option.selected {
     border-color: var(--accent);
@@ -25311,6 +25331,105 @@ function _maybeFlagMidChapterPaywall(weekId, dayId) {
   if (state.midChapterPaywallShown && state.midChapterPaywallShown[key]) return;
   _pendingMidChapterPaywall = { subject: subj, dayId: dayId, source: 'ch1-d' + dayId, key: key };
 }
+
+// Contextual copy per {subject, trigger, lang}. D3 is a lock preview —
+// static text (chapter titles + count words don't change often enough to
+// warrant computation). D6 is a thinker-count pitch — {met} and {total}
+// are interpolated at paywall-open time from the current subject's
+// content so the numbers age correctly as content ships.
+//
+// Numbers come from _distinctThinkerIdsInSubject below: {total} is the
+// subject's full roster (every non-coming-soon week), {met} is the
+// intersection with state.unlockedThinkers. Subject-local by design — a
+// user who read philosophy ch1 then started economics sees "You've met 6
+// in economics" at the Economics d6 trigger, not a cross-subject total
+// that would jump unpredictably.
+const _MID_CH_PAYWALL_COPY = {
+  philosophy: {
+    'ch1-d3': {
+      en: { eyebrow: '',
+            headline: 'Chapter 2: Ethics',
+            sub: 'Three more chapters in philosophy, plus economics and psychology. Over 60 thinkers across them.' },
+      he: { eyebrow: '',
+            headline: 'פרק 2: אתיקה',
+            sub: 'עוד שלושה פרקים בפילוסופיה, וגם כלכלה ופסיכולוגיה. יותר מ-60 הוגים.' },
+    },
+    'ch1-d6': {
+      en: { eyebrow: "You've met {met} in philosophy",
+            headline: 'There are {total} in philosophy alone',
+            sub: 'And more in economics and psychology.' },
+      he: { eyebrow: 'פגשתם {met} בפילוסופיה',
+            headline: 'יש {total} הוגים בפילוסופיה לבדה',
+            sub: 'ועוד בכלכלה ובפסיכולוגיה.' },
+    },
+  },
+  economics: {
+    'ch1-d3': {
+      en: { eyebrow: '',
+            headline: 'Chapter 2: Value and Price',
+            sub: 'Four more chapters in economics, plus philosophy and psychology. Over 60 thinkers across them.' },
+      he: { eyebrow: '',
+            headline: 'פרק 2: ערך ומחיר',
+            sub: 'עוד ארבעה פרקים בכלכלה, וגם פילוסופיה ופסיכולוגיה. יותר מ-60 הוגים.' },
+    },
+    'ch1-d6': {
+      en: { eyebrow: "You've met {met} in economics",
+            headline: 'There are {total} in economics alone',
+            sub: 'And more in philosophy and psychology.' },
+      he: { eyebrow: 'פגשתם {met} בכלכלה',
+            headline: 'יש {total} הוגים בכלכלה לבדה',
+            sub: 'ועוד בפילוסופיה ובפסיכולוגיה.' },
+    },
+  },
+  psychology: {
+    'ch1-d3': {
+      en: { eyebrow: '',
+            headline: 'Chapter 2: What Drives Us?',
+            sub: 'Four more chapters in psychology, plus philosophy and economics. Over 60 thinkers across them.' },
+      he: { eyebrow: '',
+            headline: 'פרק 2: מה מניע אותנו?',
+            sub: 'עוד ארבעה פרקים בפסיכולוגיה, וגם פילוסופיה וכלכלה. יותר מ-60 הוגים.' },
+    },
+    'ch1-d6': {
+      en: { eyebrow: "You've met {met} in psychology",
+            headline: 'There are {total} in psychology alone',
+            sub: 'And more in philosophy and economics.' },
+      he: { eyebrow: 'פגשתם {met} בפסיכולוגיה',
+            headline: 'יש {total} הוגים בפסיכולוגיה לבדה',
+            sub: 'ועוד בפילוסופיה ובכלכלה.' },
+    },
+  },
+};
+function _distinctThinkerIdsInSubject(subject) {
+  const dataMap = {
+    philosophy:  typeof corpusData     !== 'undefined' ? corpusData     : null,
+    economics:   typeof economicsData  !== 'undefined' ? economicsData  : null,
+    psychology:  typeof psychologyData !== 'undefined' ? psychologyData : null,
+  };
+  const d = dataMap[subject];
+  const out = new Set();
+  if (!d || !Array.isArray(d.weeks)) return out;
+  for (const w of d.weeks) {
+    if (!w || w.comingSoon || !Array.isArray(w.days)) continue;
+    for (const day of w.days) { if (day && day.thinkerId) out.add(day.thinkerId); }
+  }
+  return out;
+}
+function _midChapterPaywallCopy(subject, source) {
+  const copy = _MID_CH_PAYWALL_COPY[subject] && _MID_CH_PAYWALL_COPY[subject][source];
+  if (!copy) return { eyebrow: '', headline: '', sub: '' };
+  const lang = state && state.lang === 'en' ? 'en' : 'he';
+  const slot = copy[lang];
+  if (!slot) return { eyebrow: '', headline: '', sub: '' };
+  const ids = _distinctThinkerIdsInSubject(subject);
+  const total = ids.size;
+  const unlocked = new Set(state && state.unlockedThinkers || []);
+  let met = 0;
+  for (const id of ids) if (unlocked.has(id)) met++;
+  const interp = (s) => String(s || '').replace('{met}', met).replace('{total}', total);
+  return { eyebrow: interp(slot.eyebrow), headline: interp(slot.headline), sub: interp(slot.sub) };
+}
+
 function _wrapWithMidChapterPaywall(fn) {
   return function() {
     const p = _pendingMidChapterPaywall;
@@ -25325,11 +25444,15 @@ function _wrapWithMidChapterPaywall(fn) {
     // Defer the next-action to run on paywall dismiss.
     const self = this, args = arguments;
     const resumeAfterPaywall = () => { fn.apply(self, args); };
+    const ctx = _midChapterPaywallCopy(p.subject, p.source);
     showPaywall({
       subject: p.subject,
       weekId: 1,
       dayId: p.dayId,
       source: p.source,
+      contextEyebrow:  ctx.eyebrow,
+      contextHeadline: ctx.headline,
+      contextSub:      ctx.sub,
       onClose: resumeAfterPaywall,
     });
   };
@@ -27316,13 +27439,20 @@ function renderReader() {
     `;
     content.appendChild(card);
     makeNextBtn(ui.finishBtn, true);
-    // Medallion stat haptics. Each gold medallion lands at
-    // (0.25 + i * 0.30 + 0.55)s = 800ms / 1100ms / 1400ms. 0/3 fires
-    // once (qs-done at 800ms, same window). If isFull (3/3), the
-    // last beat is 'success' instead of 'stat' — the perfect-dialogue
-    // close. Session-only guard so re-renders of the same section
-    // (user navigates back + forward, retry flow) don't re-fire.
-    // Reduced motion skips the sequence.
+    // Medallion stat haptics, aligned to the overshoot peak — not the
+    // settle. qs-land uses cubic-bezier(.3,1.7,.5,1), a bounce curve
+    // that scales past 1 before settling. The "SLAM into place" is
+    // the peak (~60% into the 0.55s duration = +0.33s from each
+    // medallion's own delay), not the 100% keyframe. Firing at settle
+    // (800/1100/1400) landed ~220ms after the visual beat and read as
+    // two separate events; firing at peak (580/880/1180) lands on
+    // the hit.
+    //   i=0 delay 0.25s → peak at 0.58s
+    //   i=1 delay 0.55s → peak at 0.88s
+    //   i=2 delay 0.85s → peak at 1.18s
+    // 0/3 (qs-done) uses the same keyframe + same delay → same 580ms.
+    // Session-only guard so re-renders (back/forward, retry) don't
+    // re-fire. Reduced motion skips the sequence.
     if (!window._qsHapticSeen) window._qsHapticSeen = {};
     const _qsReduce = (() => {
       try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
@@ -27332,14 +27462,14 @@ function renderReader() {
       window._qsHapticSeen[_dqKey] = true;
       const n = Math.min(correct, 3);
       if (n <= 1) {
-        setTimeout(() => _haptic('stat'), 800);
+        setTimeout(() => _haptic('stat'), 580);
       } else if (n === 2) {
-        setTimeout(() => _haptic('stat'), 800);
-        setTimeout(() => _haptic('stat'), 1100);
+        setTimeout(() => _haptic('stat'), 580);
+        setTimeout(() => _haptic('stat'), 880);
       } else {
-        setTimeout(() => _haptic('stat'), 800);
-        setTimeout(() => _haptic('stat'), 1100);
-        setTimeout(() => _haptic('success'), 1400);
+        setTimeout(() => _haptic('stat'), 580);
+        setTimeout(() => _haptic('stat'), 880);
+        setTimeout(() => _haptic('success'), 1180);
       }
     }
   }
