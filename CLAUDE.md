@@ -159,6 +159,22 @@ If a user reports "the X doesn't appear" and you've verified the DOM is mounting
 
 ---
 
+## Source quote attributions — verify, don't paraphrase
+
+Every `type: 'source'` section attributes a `quote` to a specific thinker and work. **This is where fabricated-looking content most often appears**: the source documents the authors send us occasionally contain paraphrases of a thinker's position, presented inside quotation marks with a date attribution, as if they were lifted from the work cited. Four of the last five chapters shipped had at least one such paraphrase (Foucault; one of the economics entries; two in philosophy ch5 before manual intervention). Whatever authoring tool produces these documents smooths language in a way that produces plausible paraphrases.
+
+**Rule when transcribing a chapter**: for every quote block in the source document, verify against the cited work before shipping. If a quote cannot be sourced to a sentence that appears in the cited text — even if the summary is faithful to the thinker's view — treat it as a paraphrase and either:
+
+1. **Swap** to a verifiably exact passage from the same cited work (preferred when a well-known line exists) and add a short provenance comment above the swap, naming the paraphrase that was there and the paper/book the swap comes from. Example pattern: `// Libet quote is a verified direct passage from the 1985 BBS paper ("Unconscious Cerebral Initiative…"). The docx's original wording was a cleaner summary of Libet's conclusion rather than a quoted sentence; swapped to a verifiable line.`
+2. **Re-cite** to a different work by the same thinker where the paraphrased sentence does actually appear (if that's easy to find), and expand the attribution to the real citation.
+3. **Rewrite** the paraphrase as prose outside quotation marks (last resort — loses the "words of the thinker" beat the source block is designed to carry).
+
+**Riskiest cases** (historically): neuroscientists whose findings are usually quoted in summary form (Libet, Kahneman), 20th-century figures who gave many interviews (Foucault, Sartre), and economists whose textbook-style propositions circulate as if they wrote them that way. For these, be especially skeptical of a crisp one-sentence "quote."
+
+**Report the audit before you build**: when transcribing a chapter, flag which quotes you verified, which you couldn't, and which you suspect are paraphrases. Don't ask the user whether to swap — propose the swap with a verifiable alternative and let them approve.
+
+---
+
 ## Screens (state.currentScreen + showScreen())
 
 ```

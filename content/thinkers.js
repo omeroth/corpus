@@ -188,6 +188,40 @@ const THINKERS = [
     bio: 'פילוסופית אמריקאית מהמובילות בתחום האתיקה. ידועה בניסוי המחשבתי "בעיית הקרונית" שפרסמה ב-1967 - אחד הכלים הפדגוגיים הנפוצים ביותר בפילוסופיה המוסרית.',
     quote: '"העובדה שאתה עלול לגרום נזק לאחד אינה הופכת אותך למי שאסור לו לסייע לחמישה."'
   },
+  // Chapter 5: Freedom of Choice. Spinoza, Hume, Kant already defined above.
+  {
+    id: 'laplace',
+    name: 'פייר-סימון לפלס',
+    era: '1749–1827',
+    image: './images/laplace.webp',
+    emoji: '🌌',
+    bio: 'מתמטיקאי ואסטרונום צרפתי שניסח את הגרסה החדה ביותר של הדטרמיניזם. ב-1814 תיאר תבונה שיודעת ברגע אחד את כל המיקומים והכוחות ויכולה לחשב מכאן את כל העתיד — ניסוי מחשבתי שאילץ דורות של הוגים לשאול אם לבחירה האנושית יש בכלל מקום בחשבון הזה.',
+    quote: '"עלינו להתייחס אל המצב הנוכחי של היקום כאל התוצאה של מצבו הקודם וכאל הסיבה למצב שיבוא אחריו."'
+  },
+  {
+    id: 'sartre',
+    name: 'ז\'אן-פול סארטר',
+    era: '1905–1980',
+    image: './images/sartre.webp',
+    emoji: '🚬',
+    bio: 'פילוסוף אקזיסטנציאליסט צרפתי שטען שבני אדם אינם נולדים עם מהות קבועה אלא יוצרים את עצמם דרך בחירותיהם. סיסמתו "הקיום קודם למהות" והטענה שאנחנו "נידונים לחופש" עיצבו דור של חשיבה על אחריות ועל אמונה כוזבת. סירב לקבל את פרס נובל לספרות ב-1964.',
+    quote: '"האדם נידון להיות חופשי."'
+  },
+  // Libet quote on this card is from his 1999 essay "Do We Have Free
+  // Will?" (Journal of Consciousness Studies 6:47-57) — verifiably his
+  // own phrasing of the conscious-veto thesis. The dialogue's source
+  // block quotes a longer verified passage from the 1985 BBS paper.
+  // Same provenance pattern as Foucault / economics entries — see
+  // CLAUDE.md § Source attributions for the paraphrase-swap policy.
+  {
+    id: 'libet',
+    name: 'בנג\'מין ליבט',
+    era: '1916–2007',
+    image: './images/libet.webp',
+    emoji: '🧠',
+    bio: 'חוקר מוח אמריקאי שהביא את הדיון בחופש הבחירה למעבדה. ניסויו מ-1983 מדד את פעילות המוח לפני החלטות מודעות, ומצא שההכנה מתחילה כשליש שנייה לפני שהאדם יודע. ליבט עצמו דחה את הקריאה הדטרמיניסטית החזקה, והציע שהתודעה שומרת על יכולת וטו בחלון שבין המודעות לביצוע.',
+    quote: '"תפקידו של הרצון החופשי המודע הוא, אם כן, לא ליזום פעולה רצונית, אלא לקבוע אם הפעולה אכן תתבצע."'
+  },
   // Psychology thinkers
   {
     id: 'wundt',
@@ -736,6 +770,14 @@ const THINKERS_EN = [
   { id:'berkeley', name:'George Berkeley', era:'1685–1753', image:'./images/berkeley.webp', emoji:'👁️', bio:'Irish philosopher and Anglican bishop who argued that matter has no independent existence. Developed subjective idealism - esse est percipi ("to be is to be perceived"). Though it seems extreme, his theory was designed to defend religion against materialism, and received unexpected support from quantum physics.', quote:'"The existence of a thing perceived by the senses is nothing different from its being perceived."' },
   { id:'thomson', name:'Judith Jarvis Thomson', era:'1929–2020', image:'./images/thomson.webp', emoji:'🦉', bio:'American moral philosopher best known for the Trolley Problem thought experiment (1967), one of the most widely used tools in ethics. Her work on rights and personal identity reshaped analytic philosophy.', quote:'"The fact that you may cause harm to one does not make it impermissible for you to save five."' },
   { id:'bostrom', name:'Nick Bostrom', era:'1973–', image:'./images/bostrom.webp', emoji:'🖥️', bio:'Swedish philosopher and founding director of the Future of Humanity Institute at Oxford. Best known for the simulation argument (2003) and his work on existential risks to humanity.', quote:'"If posthuman civilizations run a large number of simulations of their forebears, then the vast majority of all minds having experiences like ours live inside a simulation."' },
+  // Chapter 5: Freedom of Choice. Spinoza, Hume, Kant already defined above.
+  { id:'laplace', name:'Pierre-Simon Laplace', era:'1749–1827', image:'./images/laplace.webp', emoji:'🌌', bio:'A French mathematician and astronomer who formulated the strictest version of determinism. In 1814 he described an intellect that, knowing all positions and forces at a single moment, could compute the entire future — a thought experiment that forced generations to ask whether human choice is anything more than a line in that calculation.', quote:'"We ought to regard the present state of the universe as the effect of its anterior state and as the cause of the one which is to follow."' },
+  { id:'sartre', name:'Jean-Paul Sartre', era:'1905–1980', image:'./images/sartre.webp', emoji:'🚬', bio:'French existentialist philosopher who argued that human beings are not born with a fixed essence but create themselves through their choices. His slogan "existence precedes essence" and his claim that we are "condemned to be free" shaped a generation of thinking about responsibility and bad faith. Refused the Nobel Prize for Literature in 1964.', quote:'"Man is condemned to be free."' },
+  // Libet quote is a verified direct passage from the 1985 BBS paper
+  // ("Unconscious Cerebral Initiative…"). Same provenance pattern as the
+  // economics / Foucault entries — the dialogue's source block quotes a
+  // longer line from the same paper. See CLAUDE.md § Source attributions.
+  { id:'libet', name:'Benjamin Libet', era:'1916–2007', image:'./images/libet.webp', emoji:'🧠', bio:'American neuroscientist whose 1983 experiment brought the free-will debate into the laboratory. He measured brain activity before conscious decisions and found that preparation begins about a third of a second before a person is aware of deciding. Libet himself rejected the strong deterministic reading, proposing that conscious will retains a veto in the window between awareness and action.', quote:'"The role of conscious free will would be, then, not to initiate a voluntary act, but rather to control whether the act takes place."' },
   // Economics thinkers
   { id:'mill-econ', name:'John Stuart Mill', era:'1806–1873', image:'./images/mill1.webp', emoji:'🌻', subject:'economics', bio:'British philosopher and economist. Distinguished between the laws of production (natural) and the laws of distribution (social) - a distinction that changed the history of economic thought.', quote:'"The question for the future is not how to produce more - but how to distribute better."' },
   { id:'smith', name:'Adam Smith', era:'1723–1790', emoji:'🏭', image:'./images/smith.webp', subject:'economics', bio:'The Scottish economist who laid the foundations of modern economics. Famous for the "invisible hand" metaphor - a self-coordinating free market without central planning.', quote:'"It is not from the benevolence of the butcher, the brewer, or the baker that we expect our dinner, but from their regard to their own interest."' },
