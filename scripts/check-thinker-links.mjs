@@ -1,24 +1,35 @@
 #!/usr/bin/env node
-// Validates the join between dialogue content and thinker records.
+// Validates the join between dialogue content and thinker records,
+// plus the surfacing layer that exposes those records to the app.
 //
-// For every day in corpusData / economicsData / psychologyData (as they
-// exist), resolves day.thinkerId against THINKERS (Hebrew) and THINKERS_EN
-// (English) and reports each of:
+// Content-side checks:
 //   - days with no thinkerId
-//   - days pointing at an id that exists in neither array
-//   - thinkers present in one array and missing from the other
+//   - days pointing at an id that exists in neither THINKERS array
+//   - thinkers present in one language array and missing from the other
 //   - subject mismatch (thinker.subject vs the source's subject)
 //     [philosophy thinkers omit .subject by convention — see index.html:19370
 //      for the runtime bucketing rule]
 //   - portraits referenced but not present under ./images/
+//   - quiz option shape (packed options, HE/EN length mismatch, too few)
+//   - CAROUSEL_ORDER coverage (missing / unknown / duplicate ids)
+//   - tag balance in text-only vs HTML-rendering fields
 //
-// Reverse check: thinkers present in either array but never referenced by
-// any dialogue → they can never be unlocked and probably shouldn't ship.
+// Surfacing check (added after the ch5 Freedom-of-Choice regression):
+//   - every chapter present in content/*.js surfaces through getW()
+//   - every id getW() returns has a backing content entry
+//   - no duplicate ids in the surfaced output
+// Catches the class of bug where content is correct but the home-screen
+// data pipeline silently drops it.
 //
-// Extraction: reads index.html, plucks the four const declarations we care
-// about by regex + balanced-brace scan, and evaluates each in an isolated
-// vm sandbox. Doesn't load the rest of index.html (which would fail because
-// it depends on the browser environment).
+// Reverse content check: thinkers present in either array but never
+// referenced by any dialogue → they can never be unlocked and probably
+// shouldn't ship.
+//
+// Extraction: reads index.html, plucks the const declarations and the
+// getW() function body by regex + balanced-brace scan (comment- and
+// string-aware), and evaluates in an isolated vm sandbox. Doesn't load
+// the rest of index.html (which would fail because it depends on the
+// browser environment).
 //
 // Exits non-zero iff any errors are found (empty warnings alone are OK
 // for staging, so you can wire this into CI without breaking on WIP
@@ -630,6 +641,185 @@ if (carouselOrder && typeof carouselOrder === 'object') {
   }
 }
 
+// ─── Chapter surfacing check (getW ↔ content) ──────────────────────────
+//
+// The content validator used to inspect only the content files. That
+// caught malformed dialogues, broken thinker joins, carousel coverage
+// gaps, etc. — but not whether the surfacing layer (getW() in
+// index.html) actually exposed every chapter present in the content.
+//
+// Context: philosophy's getW() branch used to hand-roll each chapter
+// (week1..week4 + bonusWeek1 + comingSoonChapters). A populated chapter
+// without an explicit constructor and without a comingSoon:true flag
+// fell through every bucket. Freedom of Choice (ch5) shipped as such
+// and was invisible on home for a release cycle. The validator was
+// green the whole time because the content file was correct.
+//
+// This check runs the real getW() against the real content files,
+// then asserts the surfaced chapter-id set equals the content-file
+// chapter-id set, per subject. Catches:
+//   - populated chapter in content but not surfaced (the ch5 bug)
+//   - coming-soon chapter in content but not surfaced
+//   - orphan id in getW output that doesn't exist in content
+//   - any future per-subject branch that drops a chapter
+//
+// Extraction technique: same balanced-brace scan the validator already
+// uses on CAROUSEL_ORDER / WEEKS / etc, extended to pull `function foo
+// (...) { ... }` declarations. Runs in a vm sandbox with just the
+// loaded data constants + a minimal state shim; no DOM, no fetch.
+
+function extractFunctionDecl(source, name) {
+  const re = new RegExp('\\bfunction\\s+' + name + '\\s*\\(', 'g');
+  const m = re.exec(source);
+  if (!m) return null;
+  const start = m.index;
+  const bodyOpen = source.indexOf('{', start);
+  if (bodyOpen < 0) return null;
+  // Same hardened scan as extractConstLiteral — respects strings,
+  // template literals, and // / /* */ comments so braces inside them
+  // don't confuse the depth counter.
+  let depth = 0;
+  let inString = false;
+  let stringChar = null;
+  let escape = false;
+  let inLineComment = false;
+  let inBlockComment = false;
+  for (let i = bodyOpen; i < source.length; i++) {
+    const c = source[i];
+    const next = source[i + 1];
+    if (inLineComment) {
+      if (c === '\n') inLineComment = false;
+      continue;
+    }
+    if (inBlockComment) {
+      if (c === '*' && next === '/') { inBlockComment = false; i++; }
+      continue;
+    }
+    if (escape) { escape = false; continue; }
+    if (inString) {
+      if (c === '\\') { escape = true; continue; }
+      if (c === stringChar) { inString = false; }
+      continue;
+    }
+    if (c === '/' && next === '/') { inLineComment = true; i++; continue; }
+    if (c === '/' && next === '*') { inBlockComment = true; i++; continue; }
+    if (c === '"' || c === "'" || c === '`') { inString = true; stringChar = c; continue; }
+    if (c === '{') depth++;
+    else if (c === '}') {
+      depth--;
+      if (depth === 0) return source.substring(start, i + 1);
+    }
+  }
+  throw new Error(`${name}: unbalanced function braces`);
+}
+
+const surfacingIssues = [];
+try {
+  const indexSrc = fs.readFileSync(INDEX_HTML, 'utf8');
+  const getWSrc = extractFunctionDecl(indexSrc, 'getW');
+  if (!getWSrc) {
+    surfacingIssues.push({
+      issue: 'getW extraction failed',
+      subject: '(all)',
+      detail: 'function getW not found in index.html — can\'t validate surfacing',
+    });
+  } else {
+    // Legacy WEEKS/WEEKS_EN arrays are referenced only by philosophy's
+    // old code path and may still be referenced elsewhere in the file.
+    // Pull them if present; default to [] if not (future-proof against
+    // their eventual removal).
+    let WEEKS_lit, WEEKS_EN_lit;
+    try { WEEKS_lit    = extractConstLiteral(indexSrc, 'WEEKS'); }    catch (_) {}
+    try { WEEKS_EN_lit = extractConstLiteral(indexSrc, 'WEEKS_EN'); } catch (_) {}
+    const WEEKS_val    = WEEKS_lit    ? evalLiteral(WEEKS_lit,    'WEEKS')    : [];
+    const WEEKS_EN_val = WEEKS_EN_lit ? evalLiteral(WEEKS_EN_lit, 'WEEKS_EN') : [];
+
+    // Build a vm context with everything getW() reads from its enclosing
+    // scope. State is a minimal shim — getW only reads state.subject (if
+    // called without arg) and state.lang. We pass subject explicitly so
+    // only state.lang matters; set it per-run below.
+    const context = {
+      state: { subject: 'philosophy', lang: 'en' },
+      corpusData:    subjects.find(s => s.subject === 'philosophy')?.data ?? null,
+      economicsData: subjects.find(s => s.subject === 'economics')?.data  ?? null,
+      psychologyData:subjects.find(s => s.subject === 'psychology')?.data ?? null,
+      WEEKS: WEEKS_val,
+      WEEKS_EN: WEEKS_EN_val,
+    };
+    vm.createContext(context);
+    // Expose getW on the sandbox global by assigning the function
+    // expression. The function declaration itself needs to execute in
+    // the context so it binds there.
+    vm.runInContext(getWSrc + '\nglobalThis._getW = getW;', context);
+
+    for (const { subject, data } of subjects) {
+      const contentIds = data.weeks.map(w => w && w.id).filter(id => id != null);
+      const contentIdSet = new Set(contentIds.map(String));
+      // Run in both languages — if the branch logic depends on lang
+      // (as philosophy's hand-rolled branch used to), a bug could
+      // surface differently in HE vs EN. Run both to catch that.
+      for (const lang of ['en', 'he']) {
+        context.state.subject = subject;
+        context.state.lang = lang;
+        let surfaced;
+        try {
+          surfaced = context._getW(subject);
+        } catch (e) {
+          surfacingIssues.push({
+            issue: 'getW threw', subject, detail: `[lang=${lang}] ${e.message}`,
+          });
+          continue;
+        }
+        if (!Array.isArray(surfaced)) {
+          surfacingIssues.push({
+            issue: 'getW returned non-array', subject, detail: `[lang=${lang}] got ${typeof surfaced}`,
+          });
+          continue;
+        }
+        const surfacedIds = surfaced.map(w => w && w.id).filter(id => id != null).map(String);
+        const surfacedIdSet = new Set(surfacedIds);
+
+        // Content chapters that getW didn't surface — the ch5 class.
+        for (const id of contentIdSet) {
+          if (!surfacedIdSet.has(id)) {
+            surfacingIssues.push({
+              issue: 'chapter in content but not surfaced by getW',
+              subject,
+              detail: `[lang=${lang}] chapter id=${id} present in ${subject === 'philosophy' ? 'corpusData' : subject + 'Data'}.weeks but missing from getW('${subject}') output`,
+            });
+          }
+        }
+        // Orphan ids that getW produces without a backing content entry.
+        for (const id of surfacedIdSet) {
+          if (!contentIdSet.has(id)) {
+            surfacingIssues.push({
+              issue: 'chapter surfaced by getW but not in content',
+              subject,
+              detail: `[lang=${lang}] getW('${subject}') returned chapter id=${id} with no matching entry in content`,
+            });
+          }
+        }
+        // Duplicate ids in the surfaced output — would render the
+        // chapter card twice on home.
+        if (surfacedIds.length !== surfacedIdSet.size) {
+          const counts = surfacedIds.reduce((acc, id) => (acc[id] = (acc[id] || 0) + 1, acc), {});
+          const dups = Object.entries(counts).filter(([, n]) => n > 1).map(([id, n]) => `${id}×${n}`).join(', ');
+          surfacingIssues.push({
+            issue: 'duplicate chapter id in getW output',
+            subject,
+            detail: `[lang=${lang}] ${dups}`,
+          });
+        }
+      }
+    }
+  }
+} catch (e) {
+  surfacingIssues.push({
+    issue: 'surfacing check failed', subject: '(all)',
+    detail: e.message,
+  });
+}
+
 // ─── Report ──────────────────────────────────────────────────────────────
 
 function reportTable(title, rows) {
@@ -648,9 +838,10 @@ reportTable('Cross-array consistency errors (HE ↔ EN)', arrayIssues);
 reportTable('Tag-balance errors (HTML in text-only fields / malformed / unclosed <strong>)', tagIssues);
 reportTable('Quiz option shape errors (packed / length mismatch / too few)', quizIssues);
 reportTable('CAROUSEL_ORDER coverage errors (thinker missing from order-list / order references unknown id / duplicates)', orderIssues);
+reportTable('Chapter surfacing errors (content ↔ getW mismatch)', surfacingIssues);
 reportTable('Unreferenced thinkers (never appear in any dialogue — warning only)', unreferenced);
 
-const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length;
+const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length + surfacingIssues.length;
 if (hardErrorCount > 0) {
   console.error('');
   console.error('╔════════════════════════════════════════════════════════════════════╗');
