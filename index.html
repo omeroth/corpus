@@ -28485,6 +28485,12 @@ function finishDay() {
     const _thinkerAt = day && day.thinkerId ? day.thinkerId : null;
     const _tierAt = _thinkerAt ? TIERS[thinkerTier(_thinkerAt)] : null;
     posthog.capture('day_completed', {
+      // subject added so completions can be split per subject and
+      // joined against dialogue_abandoned / dialogue_page_viewed
+      // (both of which already carry subject). Without this,
+      // per-subject completion and abandonment rates can't be
+      // computed.
+      subject: state.subject || null,
       chapter: state.currentWeek,
       day: state.currentDay,
       thinker_id: _thinkerAt,
@@ -30338,6 +30344,18 @@ const READER_VERSION = 'v3-per-question-2026-08';
 
 function _readerBaseProps() {
   return Object.assign(_shareEventProps(), {
+    // chapter / day / card_index / total_cards are duplicated against
+    // _shareEventProps' dialogue_id and the older page_index /
+    // total_pages so dashboards built on either naming keep working.
+    // dialogue_abandoned, dialogue_page_viewed, and day_completed all
+    // use the same chapter / day / card_index / total_cards names so
+    // within-dialogue funnels (how far into a dialogue people get
+    // before quitting) and per-subject completion/abandonment rates
+    // can be joined on identical keys.
+    chapter:          state.currentWeek,
+    day:              state.currentDay,
+    card_index:       _readerLastPageIndex,
+    total_cards:      _readerLastPageTotal,
     page_index:       _readerLastPageIndex,
     page_type:        _readerLastPageType,
     total_pages:      _readerLastPageTotal,
