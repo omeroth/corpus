@@ -2004,7 +2004,7 @@ const corpusData = {
         sections: [
           {
             type: 'idea',
-            title: 'אפלטון: עולם האידאות', titleEn: 'Plato: The World of Forms',
+            title: 'עולם האידאות', titleEn: 'The World of Forms',
             content: 'פגשנו את אפלטון בפרק 1. שם משל המערה לימד אותנו שמה שאנחנו רואים הוא רק צל של המציאות. היום נשאל: מה המציאות האמיתית הזו בעצם?\n\nלפי אפלטון, יש שני עולמות. העולם שאנחנו חיים בו, ו<strong>עולם אחר, נסתר, שבו נמצאת האמת האמיתית</strong>.',
             contentEn: 'We met Plato in chapter 1. There, the Allegory of the Cave taught us that what we see is only a shadow of reality. Today we\'ll ask: what is this true reality, exactly?\n\nAccording to Plato, there are two worlds. The world we live in, and <strong>another, hidden world, where the real truth resides</strong>.',
           },
@@ -2095,7 +2095,7 @@ const corpusData = {
         sections: [
           {
             type: 'idea',
-            title: 'שפינוזה: הכל אחד', titleEn: 'Spinoza: All is One',
+            title: 'הכל אחד', titleEn: 'All is One',
             content: 'אפלטון אמר שיש שני עולמות: עולם החושים ועולם האידאות. דקארט אמר שיש שתי מציאויות: גוף ורוח. שפינוזה הגיע למסקנה הפוכה לגמרי: <strong>יש רק אחד</strong>.\n\nלא שני עולמות. לא שתי מציאויות. עצם אחד, אינסופי, נצחי, שאנחנו קוראים לו <strong>אלוהים, או הטבע</strong>. והם אותו דבר.',
             contentEn: 'Plato said there are two worlds: the world of the senses and the world of Forms. Descartes said there are two realities: body and spirit. Spinoza arrived at the opposite conclusion entirely: <strong>there is only one</strong>.\n\nNot two worlds. Not two realities. One substance, infinite, eternal, that we call <strong>God, or Nature</strong>. And they are the same thing.',
           },
@@ -2162,7 +2162,7 @@ const corpusData = {
         sections: [
           {
             type: 'idea',
-            title: 'ברקלי: להיות זה להיתפס', titleEn: 'Berkeley: To Be is to Be Perceived',
+            title: 'להיות זה להיתפס', titleEn: 'To Be is to Be Perceived',
             content: 'אפלטון אמר שיש עולם אידאות. שפינוזה אמר שהכל אחד. ברקלי הגיע לטענה שנשמעת מוזרה יותר מכולן: <strong>אין חומר כלל</strong>.\n\nלא שחומר פחות אמיתי. לא שחומר הוא רק אופן. אלא שחומר, כעצם עצמאי שקיים מחוץ לתפיסה, פשוט לא קיים.',
             contentEn: 'Plato said there is a world of Forms. Spinoza said all is one. Berkeley arrived at a claim that sounds stranger than any of them: <strong>there is no matter at all</strong>.\n\nNot that matter is less real. Not that matter is just a mode. But that matter, as an independent substance existing outside of perception, simply does not exist.',
           },
@@ -2438,7 +2438,7 @@ const corpusData = {
         sections: [
           {
             type: 'idea',
-            title: 'לפלס: האם העתיד כבר כתוב?', titleEn: 'Laplace: Is the Future Already Written?',
+            title: 'האם העתיד כבר כתוב?', titleEn: 'Is the Future Already Written?',
             content: 'תחושת הבחירה היא אולי הדבר המיידי ביותר שיש לנו. אנחנו עומדים מול שתי אפשרויות, שוקלים, ומרגישים ש<strong>הכף יכולה ליפול לכל צד</strong>.\n\nופייר סימון לפלס, מתמטיקאי ואסטרונום צרפתי, ניסח ב-1814 תמונה ש<strong>מערערת את זה לגמרי</strong>.\n\nהטיעון שלו אינו מסתורי. הוא פשוט לוקח ברצינות את מה שהפיזיקה אומרת. כל מצב בעולם נובע מהמצב שקדם לו, לפי חוקים קבועים. וזה נכון לכוכבים, לאבנים, ולמולקולות.\n\nואז לפלס מבקש לדמיין תבונה שיודעת, ברגע אחד, את מיקומו של כל דבר בעולם ואת כל הכוחות שפועלים עליו. תבונה כזו, הוא טוען, <strong>תוכל לחשב את כל העתיד</strong>.\n\nומכאן המסקנה שנוגעת בנו: אם אנחנו עשויים מחומר, גם ההחלטה שלנו היא מצב של העולם. ומצב נובע ממצב שקדם לו, <strong>שהתקיים עוד לפני שנולדנו</strong>.',
             contentEn: 'The feeling of choosing is perhaps the most immediate thing we have. We stand before two options, we weigh them, and we feel that <strong>the scales could tip either way</strong>.\n\nAnd Pierre Simon Laplace, a French mathematician and astronomer, formulated in 1814 a picture that <strong>undermines this completely</strong>.\n\nHis argument is not mysterious. He simply takes seriously what physics says. Every state of the world follows from the state that preceded it, according to fixed laws. And this is true of stars, of stones, and of molecules.\n\nAnd then Laplace asks us to imagine an intellect that knows, in a single moment, the position of every thing in the world and all the forces acting upon it. Such an intellect, he argues, <strong>would be able to compute the entire future</strong>.\n\nAnd from here the conclusion that touches us: if we are made of matter, then our decision too is a state of the world. And a state follows from a state that preceded it, <strong>one that existed even before we were born</strong>.',
           },
@@ -2505,7 +2505,7 @@ const corpusData = {
         sections: [
           {
             type: 'idea',
-            title: 'שפינוזה: למה זה מרגיש כמו בחירה?', titleEn: 'Spinoza: Why Does It Feel Like Choice?',
+            title: 'למה זה מרגיש כמו בחירה?', titleEn: 'Why Does It Feel Like Choice?',
             content: 'לפלס תיאר את העולם מבחוץ. וברוך שפינוזה שאל את השאלה שנשארה: אם הכל נקבע, <strong>למה מבפנים זה מרגיש אחרת לגמרי?</strong>\n\nוהתשובה שלו מדויקת ולא נוחה. <strong>אנחנו מודעים למה שאנחנו רוצים, ולא מודעים למה שגרם לנו לרצות את זה</strong>.\n\nשימו לב מה זה אומר. הרצון עצמו גלוי לנו לחלוטין. אני יודע שאני רוצה לקום, לעזוב, להגיד משהו. <strong>מה שחבוי הוא מאיפה הרצון הגיע</strong>.\n\nומכאן: <strong>תחושת החופש אינה עדות לחופש</strong>. היא עדות לכך שאנחנו רואים רק חצי מהתמונה.\n\nשפינוזה כתב את זה ב"אתיקה", שיצא לאור ב-1677, אחרי מותו. הוא היה יהודי מאמסטרדם שהוחרם מקהילתו בגיל 23, וכתב את מה שכתב מחוץ לכל מסגרת.',
             contentEn: 'Laplace described the world from the outside. And Baruch Spinoza asked the question that remained: if everything is determined, <strong>why does it feel from the inside completely different?</strong>\n\nAnd his answer is precise and uncomfortable. <strong>We are conscious of what we want, and unconscious of what made us want it</strong>.\n\nNotice what this means. The desire itself is entirely visible to us. I know that I want to get up, to leave, to say something. <strong>What is hidden is where the desire came from</strong>.\n\nAnd from here: <strong>the feeling of freedom is not evidence of freedom</strong>. It is evidence that we see only half the picture.\n\nSpinoza wrote this in the "Ethics", which was published in 1677, after his death. He was a Jew from Amsterdam who was excommunicated from his community at the age of 23, and wrote what he wrote outside of any framework.',
           },
@@ -2572,7 +2572,7 @@ const corpusData = {
         sections: [
           {
             type: 'idea',
-            title: 'יום: אולי כל הדילמה נשענת על בלבול?', titleEn: 'Hume: Perhaps the Whole Dilemma Rests on a Confusion?',
+            title: 'אולי כל הדילמה נשענת על בלבול?', titleEn: 'Perhaps the Whole Dilemma Rests on a Confusion?',
             content: 'שני הדיאלוגים הקודמים בנו מלכודת. דיוויד יום טוען ש<strong>המלכודת נשענת על בלבול במילה אחת</strong>.\n\nהשאלה "האם הרצון שלי חופשי" מניחה שחופשי פירושו ללא סיבה. ויום שואל מאיפה ההנחה הזו הגיעה.\n\nבואו נבדוק מתי אנחנו באמת אומרים שאדם לא היה חופשי. כשאיימו עליו. כשכבלו אותו. כשהחזיקו אותו בכוח. <strong>מעולם לא אמרנו על אדם שהוא לא היה חופשי מפני שלהחלטה שלו הייתה סיבה</strong>.\n\nומכאן הטענה: <strong>חופש אינו היעדר סיבות, הוא היעדר כפייה</strong>.\n\nיום קרא לזה "פרויקט של פיוס". הוא לא בא להוכיח שיש בחירה חופשית ולא להפריך אותה, אלא להראות שהוויכוח כולו נובע משימוש לא זהיר במילים.',
             contentEn: 'The two previous dialogues built a trap. David Hume argues that <strong>the trap rests on a confusion over a single word</strong>.\n\nThe question "is my will free" assumes that free means without a cause. And Hume asks where that assumption came from.\n\nLet us check when we actually say that a person was not free. When he was threatened. When he was shackled. When he was held by force. <strong>We never said of a person that he was not free because his decision had a cause</strong>.\n\nAnd from here the claim: <strong>freedom is not the absence of causes, it is the absence of coercion</strong>.\n\nHume called this a "reconciling project". He did not come to prove that there is free choice, nor to refute it, but to show that the entire argument arises from a careless use of words.',
           },
@@ -2639,13 +2639,13 @@ const corpusData = {
         sections: [
           {
             type: 'idea',
-            title: 'קאנט: בלי חופש אין מוסר', titleEn: 'Kant: Without Freedom There Is No Morality',
+            title: 'בלי חופש אין מוסר', titleEn: 'Without Freedom There Is No Morality',
             content: 'יום פירק את הדילמה. עמנואל קאנט טען ש<strong>הפירוק גרוע מהבעיה, מפני שהוא הורס את המוסר</strong>.\n\nקאנט מתחיל ממקום אחר לגמרי. לא מהפיזיקה, אלא מהחוויה המוסרית.\n\nשימו לב מה קורה כשאנחנו מאשימים מישהו. אנחנו אומרים שהוא היה צריך לנהוג אחרת. ו<strong>באמירה הזו כבר הנחנו שהוא היה יכול</strong>.\n\nזה העיקרון שקאנט ניסח: "צריך" מחייב "יכול". <strong>אין טעם לדרוש מאדם משהו שאינו בגדר אפשרותו</strong>.\n\nומכאן הטיעון שלו: אם האדם באמת לא יכול היה לפעול אחרת, אז להאשים אותו זה כמו להאשים אבן שנפלה. ואם כך, כל המוסר מתמוטט.\n\nוהמסקנה: <strong>המוסר אמיתי, ולכן החופש חייב להיות אמיתי</strong>.',
             contentEn: 'Hume dismantled the dilemma. Immanuel Kant argued that <strong>the dismantling is worse than the problem, because it destroys morality</strong>.\n\nKant starts from an entirely different place. Not from physics, but from moral experience.\n\nNotice what happens when we blame someone. We say that he should have acted otherwise. And <strong>in saying that, we have already assumed that he could have</strong>.\n\nThis is the principle Kant formulated: "ought" implies "can". <strong>There is no point in demanding of a person something that is not within his power</strong>.\n\nAnd from here his argument: if the person truly could not have acted otherwise, then blaming him is like blaming a stone that fell. And if so, the whole of morality collapses.\n\nAnd the conclusion: <strong>morality is real, and therefore freedom must be real</strong>.',
           },
           {
             type: 'source',
-            title: 'קאנט: "צריך" מחייב "יכול"', titleEn: 'Kant: "Ought" Implies "Can"',
+            title: '"צריך" מחייב "יכול"', titleEn: '"Ought" Implies "Can"',
             quote: '"שהרי אם החוק המוסרי מצווה עלינו שעלינו להיות בני אדם טובים יותר עכשיו, נובע מכך בהכרח שעלינו להיות מסוגלים להיות בני אדם טובים יותר."',
             quoteEn: '"For if the moral law commands that we ought now to be better human beings, it follows inescapably that we must be capable of being better human beings."',
             attr: 'עמנואל קאנט, "הדת בגבולות התבונה בלבד", 1793',
@@ -2706,7 +2706,7 @@ const corpusData = {
         sections: [
           {
             type: 'idea',
-            title: 'סארטר: ואולי אי אפשר לברוח מהחופש?', titleEn: 'Sartre: Perhaps There Is No Escaping Freedom?',
+            title: 'ואולי אי אפשר לברוח מהחופש?', titleEn: 'Perhaps There Is No Escaping Freedom?',
             content: 'ארבעת הדיאלוגים עד כה שאלו אם יש לנו חופש. ז\'אן פול סארטר הופך את השאלה: <strong>האם אפשר להימלט ממנו?</strong>\n\nהוא מתחיל ממשפט שנעשה סיסמה: "הקיום קודם למהות".\n\nסכין נוצרה לשם משהו. יש לה תכלית שקדמה לה, ולכן יש תשובה לשאלה מה היא אמורה להיות. אדם, טוען סארטר, נזרק לעולם בלי תכלית כזו.\n\nומכאן שאין טבע אנושי שקובע מראש מי אתה אמור להיות. <strong>אתה נעשה מי שאתה דרך מה שאתה עושה, ולא לפני כן</strong>.\n\nזה אמנם נשמע משחרר, אבל סארטר מתעקש שזה נורא. אם אין טבע נתון ואין תכלית מוכנה, <strong>אין למי להעביר את האחריות</strong>. כל בחירה היא שלך, ואין שום דבר מחוץ אליך שיצדיק אותה.\n\nולכן לא "זכינו" בחופש, אלא <strong>נידונו לו</strong>.',
             contentEn: 'The four dialogues so far asked whether we have freedom. Jean Paul Sartre reverses the question: <strong>is it possible to escape it?</strong>\n\nHe starts from a sentence that became a slogan: "existence precedes essence".\n\nA knife was created for the sake of something. It has a purpose that preceded it, and therefore there is an answer to the question of what it is supposed to be. A human being, Sartre argues, is thrown into the world without such a purpose.\n\nAnd from here it follows that there is no human nature that determines in advance who you are supposed to be. <strong>You become who you are through what you do, and not before that</strong>.\n\nThis does admittedly sound liberating, but Sartre insists that it is terrible. If there is no given nature and no ready purpose, <strong>there is no one to whom responsibility can be passed</strong>. Every choice is yours, and there is nothing outside you that would justify it.\n\nAnd therefore we did not "win" freedom, <strong>we were condemned to it</strong>.',
           },
@@ -2773,7 +2773,7 @@ const corpusData = {
         sections: [
           {
             type: 'idea',
-            title: 'ליבט: מה המוח עושה רגע לפני שהחלטנו?', titleEn: 'Libet: What Does the Brain Do a Moment Before We Decide?',
+            title: 'מה המוח עושה רגע לפני שהחלטנו?', titleEn: 'What Does the Brain Do a Moment Before We Decide?',
             content: 'כל הפרק עד כה היה פילוסופי. <strong>ב-1983 הביא בנג\'מין ליבט את השאלה למעבדה</strong>.\n\nהניסוי פשוט. נבדק יושב מול שעון מיוחד ומתבקש להזיז את אצבעו מתי שבא לו, בלי שום סיבה. בזמן שהוא עושה זאת, אלקטרודות מודדות את פעילות המוח. ובסוף הוא מדווח באיזה רגע בדיוק הרגיש לראשונה את הדחף לזוז.\n\nוהתוצאה הפתיעה. פעילות מוחית שנקראת "פוטנציאל מוכנות" מתחילה כ-550 אלפיות שנייה לפני התנועה. ו<strong>הדיווח על הדחף המודע מגיע רק כ-200 אלפיות שנייה לפניה</strong>.\n\nכלומר <strong>המוח מתחיל להתכונן כשליש שנייה לפני שהאדם יודע שהחליט</strong>.',
             contentEn: 'The whole chapter until now has been philosophical. <strong>In 1983 Benjamin Libet brought the question into the laboratory</strong>.\n\nThe experiment is simple. A subject sits in front of a special clock and is asked to move his finger whenever he feels like it, for no reason at all. While he does so, electrodes measure brain activity. And at the end he reports at exactly which moment he first felt the urge to move.\n\nAnd the result was surprising. Brain activity called the "readiness potential" begins about 550 milliseconds before the movement. And <strong>the report of the conscious urge arrives only about 200 milliseconds before it</strong>.\n\nThat is to say, <strong>the brain begins to prepare about a third of a second before the person knows that he has decided</strong>.',
           },
@@ -2840,7 +2840,7 @@ const corpusData = {
         sections: [
           {
             type: 'idea',
-            title: 'סיכום: האם אנחנו באמת בוחרים?', titleEn: 'Summary: Do We Really Choose?',
+            title: 'האם אנחנו באמת בוחרים?', titleEn: 'Do We Really Choose?',
             content: 'פתחנו את הפרק בשאלה שנשמעת פשוטה: האם אנחנו באמת בוחרים?\n\nשישה דיאלוגים אחר כך ברור שאין הסכמה בין ההוגים לגבי השאלה הזו. אבל כן התברר משהו אחר: <strong>המחלוקת אינה על העובדות, היא על מה המילה "חופש" בכלל אומרת</strong>.',
             contentEn: 'We opened the chapter with a question that sounds simple: do we really choose?\n\nSix dialogues later it is clear that there is no agreement among the thinkers on this question. But something else did become clear: <strong>the disagreement is not about the facts, it is about what the word "freedom" means in the first place</strong>.',
           },

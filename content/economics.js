@@ -100,7 +100,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'סמית: היד הנעלמה', titleEn: 'Smith: The Invisible Hand',
+            title: 'היד הנעלמה', titleEn: 'The Invisible Hand',
             quote: '״איננו מצפים לארוחת הערב שלנו מנדיבותו של הקצב או האופה - אלא מהדאגה שלהם לאינטרס שלהם.״',
             quoteEn: '"It is not from the benevolence of the butcher or the baker that we expect our dinner - but from their regard to their own interest."',
             attr: 'אדם סמית, עושר העמים, 1776',
@@ -185,7 +185,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'מרקס: החופש הכפול', titleEn: 'Marx: The Double Freedom',
+            title: 'החופש הכפול', titleEn: 'The Double Freedom',
             quote: '״הפועל חופשי לבחור את מי לעבוד אצלו. אבל אין לו ברירה אחרת - לא יש לו דבר למכור פרט לכוח-העבודה שלו.״',
             quoteEn: '"The worker is free to choose whom to work for. But he has no other choice - he has nothing to sell other than his own labor-power."',
             attr: 'קרל מרקס, הקפיטל, 1867',
@@ -270,7 +270,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'קיינס: בטווח הארוך', titleEn: 'Keynes: In the Long Run',
+            title: 'בטווח הארוך', titleEn: 'In the Long Run',
             quote: '״בטווח הארוך, כולנו מתים. הכלכלנים מציבים לעצמם משימה קלה מדי, חסרת תועלת מדי, אם בעונת הסערה הם רק יכולים לומר לנו שכאשר הסערה תעבור, הים יהיה שוב שטוח.״',
             quoteEn: '"In the long run we are all dead. Economists set themselves too easy, too useless a task if in tempestuous seasons they can only tell us that when the storm is long past the ocean is flat again."',
             attr: 'ג\'ון מיינרד קיינס, A Tract on Monetary Reform, 1923',
@@ -355,7 +355,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'פרידמן: כלכלה וחירות', titleEn: 'Friedman: Economy and Freedom',
+            title: 'כלכלה וחירות', titleEn: 'Economy and Freedom',
             quote: '״כשהמדינה שולטת באמצעי הפרנסה של אזרחיה, היא שולטת בכל מה שהם יכולים לעשות, לומר או לחשוב.״',
             quoteEn: '"When the state controls the means of livelihood of its citizens, it controls everything they can do, say, or think."',
             attr: 'מילטון פרידמן, Capitalism and Freedom, 1962',
@@ -440,7 +440,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'סן: פיתוח כחירות', titleEn: 'Sen: Development as Freedom',
+            title: 'פיתוח כחירות', titleEn: 'Development as Freedom',
             quote: '״הפיתוח יכול להיראות כתהליך של הרחבת היכולות של אנשים לחיות חיים שיש להם סיבה לרצות בהם.״',
             quoteEn: '"Development can be seen as a process of expanding the capabilities of people to live lives they have reason to want."',
             attr: 'אמרטיה סן, Development as Freedom, 1999',
@@ -618,7 +618,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'סמית: ערך-שימוש וערך-חליפין', titleEn: 'Smith: Use-Value and Exchange-Value',
+            title: 'ערך-שימוש וערך-חליפין', titleEn: 'Use-Value and Exchange-Value',
             quote: '״אין דבר מועיל יותר ממים, אך אין כמעט דבר שיכול להירכש תמורתם. יהלום, לעומת זאת, כמעט חסר ערך-שימוש - אך כמות עצומה של סחורות אחרות ניתן לרכוש תמורתו.״',
             quoteEn: '"Nothing is more useful than water, but it will purchase scarce anything. A diamond, on the contrary, has scarce any value in use; but a very great quantity of other goods may frequently be had in exchange for it."',
             attr: 'אדם סמית, עושר העמים, ספר ראשון, פרק 4, 1776',
@@ -703,7 +703,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'מרקס: ערך עודף', titleEn: 'Marx: Surplus Value',
+            title: 'ערך עודף', titleEn: 'Surplus Value',
             quote: '״הקפיטליסט שילם את הערך של כוח-העבודה. אבל כוח-העבודה, כשנעשה בו שימוש, יוצר ערך גדול יותר ממה ששולם עליו. ההפרש - הערך העודף - שייך לקפיטליסט.״',
             quoteEn: '"The capitalist paid the value of labor-power. But labor-power, when used, creates a value greater than what was paid for it. The difference - surplus value - belongs to the capitalist."',
             attr: 'קרל מרקס, הקפיטל, כרך ראשון, 1867',
@@ -788,7 +788,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'ג\'בונס: ערך סובייקטיבי', titleEn: 'Jevons: Subjective Value',
+            title: 'ערך סובייקטיבי', titleEn: 'Subjective Value',
             quote: '״ערך הוא יחס סובייקטיבי שאדם מקנה לדבר. הוא אינו תכונה של הדבר עצמו - הוא תוצאה של החשיבות שיש לדבר עבור הסיפוק של אדם מסוים.״',
             quoteEn: '"Value is a subjective relation that a person attributes to a thing. It is not a property of the thing itself - it is the result of the importance the thing has for the satisfaction of a particular person."',
             attr: 'ויליאם סטנלי ג\'בונס, תיאוריה של הכלכלה הפוליטית, 1871',
@@ -873,7 +873,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'מרשל: שני הכוחות', titleEn: 'Marshall: The Two Forces',
+            title: 'שני הכוחות', titleEn: 'The Two Forces',
             quote: '״אנחנו יכולים להתווכח אם זה הסכין העליון או התחתון של המספריים שחותך פיסת נייר. אבל ברור שיש צורך בשני הסכינים. כך גם המחיר נקבע על ידי שני כוחות - היצע וביקוש - ולא על ידי אחד מהם.״',
             quoteEn: '"We might as well dispute whether it is the upper or the under blade of a pair of scissors that cuts a piece of paper. But it is clear that both blades are needed. So too the price is determined by two forces - supply and demand - and not by one of them."',
             attr: 'אלפרד מרשל, עקרונות הכלכלה, 1890',
@@ -958,7 +958,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'סנדל: חברת שוק', titleEn: 'Sandel: Market Society',
+            title: 'חברת שוק', titleEn: 'Market Society',
             quote: '״אנחנו עברנו מלהיות כלכלת שוק - שבה השוק הוא כלי שירות שימושי - להיות חברת שוק - שבה הכל למכירה. ההבדל אינו כלכלי. הוא מוסרי.״',
             quoteEn: '"We have drifted from being a market economy - where the market is a useful tool - to being a market society - where everything is for sale. The difference is not economic. It is moral."',
             attr: 'מייקל סנדל, מה שכסף לא יכול לקנות, 2012',
@@ -1043,7 +1043,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'קהנמן: סלידה מהפסד', titleEn: 'Kahneman: Loss Aversion',
+            title: 'סלידה מהפסד', titleEn: 'Loss Aversion',
             quote: '״הפסד של 100 דולר מורגש בערך פי שניים יותר מרווח של 100 דולר. זו אחת התגליות החשובות שלנו: אנחנו לא סוחרים סימטריים - אנחנו שונאים הפסד הרבה יותר ממה שאנחנו אוהבים רווח.״',
             quoteEn: '"A loss of $100 is felt about twice as strongly as a gain of $100. This is one of our most important discoveries: we are not symmetrical traders - we hate loss far more than we love gain."',
             attr: 'דניאל קהנמן, לחשוב מהר, לחשוב לאט, 2011',
@@ -1795,7 +1795,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'סמית: ההון', titleEn: 'Smith: Capital',
+            title: 'ההון', titleEn: 'Capital',
             quote: '״החלק של מלאי האדם שממנו הוא מצפה לקבל הכנסה - הוא ההון שלו. ההון הוא חלק מן המלאי, אבל המלאי כולל גם דברים שאדם שומר לצריכה ישירה.״',
             quoteEn: '"That part of a man\'s stock from which he expects to derive an income - is his capital. Capital is part of his stock, but stock also includes things a person keeps for direct consumption."',
             attr: 'אדם סמית, עושר העמים, ספר שני, פרק 1, 1776',
@@ -1880,7 +1880,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'ריקרדו: חוק התפוקה הפוחתת', titleEn: 'Ricardo: The Law of Diminishing Returns',
+            title: 'חוק התפוקה הפוחתת', titleEn: 'The Law of Diminishing Returns',
             quote: '״כשמוסיפים יותר ויותר עבודה לאותה כמות של אדמה - היחידה הנוספת של עבודה תוסיף פחות תפוקה מהקודמת. זה החוק הבלתי נמנע של הייצור.״',
             quoteEn: '"As more and more labor is added to the same quantity of land - the additional unit of labor will add less production than the previous one. This is the inevitable law of production."',
             attr: 'דייוויד ריקרדו, עקרונות הכלכלה הפוליטית והמיסוי, 1817',
@@ -1965,7 +1965,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'ריקרדו: בעיית החלוקה', titleEn: 'Ricardo: The Distribution Problem',
+            title: 'בעיית החלוקה', titleEn: 'The Distribution Problem',
             quote: '״תוצרת האדמה - כל מה שנוצר על ידי שילוב של עבודה, מכונות והון - מתחלקת בין שלוש מעמדות בחברה: בעלי האדמה, בעלי ההון, והעובדים. לקבוע את החוקים השולטים בחלוקה הזו - היא המשימה העיקרית של הכלכלה הפוליטית.״',
             quoteEn: '"The produce of the earth - all that is created by the combined application of labor, machinery, and capital - is divided among three classes of the community: the proprietors of the land, the owners of capital, and the laborers. To determine the laws which regulate this distribution - is the principal problem of Political Economy."',
             attr: 'דייוויד ריקרדו, עקרונות הכלכלה הפוליטית והמיסוי, 1817',
@@ -2050,7 +2050,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'מרקס: ההון כיחס חברתי', titleEn: 'Marx: Capital as Social Relation',
+            title: 'ההון כיחס חברתי', titleEn: 'Capital as Social Relation',
             quote: '״ההון אינו אדם, ואינו חפץ. הוא יחס חברתי בין אנשים, יחס הנקבע באמצעות חפצים. ההון יכול להתקיים רק במצב שבו רוב האנשים אינם מחזיקים באמצעי הייצור, ומוכרחים למכור את כוח-עבודתם.״',
             quoteEn: '"Capital is not a person, nor a thing. It is a social relation between people, a relation established through things. Capital can exist only in a state where most people do not hold means of production, and are compelled to sell their labor-power."',
             attr: 'קרל מרקס, הקפיטל, כרך ראשון, 1867',
@@ -2135,7 +2135,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'פיקטי: r > g', titleEn: 'Piketty: r > g',
+            title: 'r > g', titleEn: 'r > g',
             quote: '״כאשר תשואת ההון חורגת באופן מתמשך משיעור הצמיחה של הכלכלה - עושר תורשתי גדל מהר יותר מהתפוקה וההכנסה של החברה. די לבעלי הון לחסוך חלק קטן מתשואותיהם, כדי שההון שלהם יגדל מהר יותר מהכלכלה כולה.״',
             quoteEn: '"When the rate of return on capital significantly exceeds the growth rate of the economy - inherited wealth grows faster than the output and income of society. It suffices for capital holders to save a small portion of their returns for their capital to grow more quickly than the entire economy."',
             attr: 'תומאס פיקטי, ההון במאה ה-21, 2013',
@@ -2315,7 +2315,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'אקווינס: המחיר הצודק', titleEn: 'Aquinas: The Just Price',
+            title: 'המחיר הצודק', titleEn: 'The Just Price',
             quote: '״למכור דבר ביותר מערכו האמיתי הוא חטא, אפילו אם אין חוק שאוסר זאת. שכן הרצון לנצל את צרכיו של חברך אינו ראוי לאדם המוסרי.״',
             quoteEn: '"To sell something for more than its real value is a sin, even if no law forbids it. For the desire to exploit your fellow\'s needs is unworthy of a moral person."',
             attr: 'תומאס אקווינס, סומה תאולוגיקה, שאלה 77, 1265',
@@ -2400,7 +2400,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'פארטו: יעילות פארטו', titleEn: 'Pareto: Pareto Efficiency',
+            title: 'יעילות פארטו', titleEn: 'Pareto Efficiency',
             quote: '״מצב כלכלי הוא אופטימלי כאשר אי אפשר לשפר את רווחתו של אדם אחד בלי להפחית את רווחתו של אדם אחר. זו הגדרה אובייקטיבית, שאינה דורשת שיפוט מוסרי על מי ראוי לקבל יותר.״',
             quoteEn: '"An economic state is optimal when it is impossible to improve the welfare of one person without reducing the welfare of another. This is an objective definition, requiring no moral judgment about who deserves more."',
             attr: 'וילפרדו פארטו, מדריך לכלכלה פוליטית, 1906',
@@ -2485,7 +2485,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'רולס: מסך הבערות', titleEn: 'Rawls: The Veil of Ignorance',
+            title: 'מסך הבערות', titleEn: 'The Veil of Ignorance',
             quote: '״כדי לחשוב על צדק באובייקטיביות, עלינו לדמיין את עצמנו במצב התחלתי, שבו אנו לא יודעים מה יהיו כישורינו, מעמדנו, או רכושנו. רק מאחורי מסך כזה של בערות, נוכל לבחור עקרונות צדק אמיתיים.״',
             quoteEn: '"To think about justice objectively, we must imagine ourselves in an initial state, where we don\'t know what our abilities, status, or property will be. Only behind such a veil of ignorance can we choose true principles of justice."',
             attr: 'ג\'ון רולס, תיאוריית הצדק, 1971',
@@ -2570,7 +2570,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'נוזיק: צדק כזכאות', titleEn: 'Nozick: Justice as Entitlement',
+            title: 'צדק כזכאות', titleEn: 'Justice as Entitlement',
             quote: '״מצב צודק הוא כל מצב שהושג בדרכים צודקות. אם אנשים השיגו את רכושם על ידי עבודה, סחר חופשי, או מתנה, הרכוש הוא שלהם, גם אם החלוקה נראית לא שווה. אין \'חלוקה צודקת\' שאליה צריך לכפות את הכלכלה.״',
             quoteEn: '"A just situation is any situation that was achieved through just means. If people acquired their property through labor, free trade, or gift, the property is theirs, even if the distribution looks unequal. There is no \'just distribution\' to which the economy must be forced."',
             attr: 'רוברט נוזיק, אנרכיה, מדינה ואוטופיה, 1974',
@@ -2655,7 +2655,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'הייק: צדק חברתי', titleEn: 'Hayek: Social Justice',
+            title: 'צדק חברתי', titleEn: 'Social Justice',
             quote: '״אי-שוויון של תוצאות בשוק החופשי אינו לא צודק, כי איש לא תיכנן אותו. צדק יכול להיות תכונה של התנהגות אנושית, אך לא של מצב שאיש לא יצר במכוון. כשאנו דורשים \'צדק חברתי\', אנו דורשים שמישהו ינסה לחקות את התוצאה של מיליוני בחירות חופשיות, וזה בלתי אפשרי.״',
             quoteEn: '"Inequality of outcomes in the free market is not unjust, because no one planned it. Justice can be a property of human behavior, but not of a state that no one intentionally created. When we demand \'social justice,\' we are demanding that someone try to mimic the outcome of millions of free choices, and this is impossible."',
             attr: 'פרידריך הייק, חוק, חקיקה וחירות, כרך שני, 1976',
@@ -2740,7 +2740,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'סן: גישת היכולות', titleEn: 'Sen: The Capability Approach',
+            title: 'גישת היכולות', titleEn: 'The Capability Approach',
             quote: '״השאלה החשובה ביותר אינה כמה משאבים יש לאדם, אלא איזה חיים הוא מסוגל לחיות. אדם עם אותה הכנסה אך בריאות לקויה, נכות, או חוסר השכלה, אינו במצב שווה לאדם בריא ומשכיל. צדק חברתי דורש לבחון את היכולות, לא רק את האמצעים.״',
             quoteEn: '"The most important question is not how many resources a person has, but what kind of life he is able to live. A person with the same income but poor health, disability, or lack of education, is not in an equal state to a healthy and educated person. Social justice requires examining capabilities, not just means."',
             attr: 'אמרטיה סן, פיתוח כחירות, 1999',
@@ -2921,7 +2921,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'סולו: שינוי טכנולוגי', titleEn: 'Solow: Technical Change',
+            title: 'שינוי טכנולוגי', titleEn: 'Technical Change',
             quote: '"אני משתמש בביטוי \'שינוי טכנולוגי\' כקיצור לכל סוג של הסטה בפונקציית הייצור. האטות, האצות, שיפורים בהשכלת כוח העבודה, וכל מיני דברים אחרים, כולם יופיעו כ\'שינוי טכנולוגי\'."',
             quoteEn: '"I am using the phrase \'technical change\' as a shorthand expression for any kind of shift in the production function. Slowdowns, speedups, improvements in the education of the labor force, and all sorts of things will appear as \'technical change\'."',
             attr: 'רוברט סולו, "שינוי טכנולוגי ופונקציית הייצור המצרפית", 1957',
@@ -3008,7 +3008,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'רומר: על צמיחה כלכלית', titleEn: 'Romer: On Economic Growth',
+            title: 'על צמיחה כלכלית', titleEn: 'On Economic Growth',
             quote: '"צמיחה כלכלית מתרחשת בכל פעם שאנשים לוקחים משאבים ומסדרים אותם מחדש בדרכים בעלות ערך רב יותר."',
             quoteEn: '"Economic growth occurs whenever people take resources and rearrange them in ways that are more valuable."',
             attr: 'פול רומר, "צמיחה כלכלית", האנציקלופדיה התמציתית לכלכלה',
@@ -3100,7 +3100,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'נורת: מסגרת מוסדית ותמריצים', titleEn: 'North: Institutional Framework and Incentives',
+            title: 'מסגרת מוסדית ותמריצים', titleEn: 'Institutional Framework and Incentives',
             quote: '"אם המסגרת המוסדית מתגמלת פיראטיות, יקומו ארגונים פיראטיים; ואם המסגרת המוסדית מתגמלת פעילויות יצרניות, יקומו ארגונים — חברות — שיעסקו בפעילויות יצרניות."',
             quoteEn: '"If the institutional framework rewards piracy then piratical organizations will come into existence; and if the institutional framework rewards productive activities then organizations – firms – will come into existence to engage in productive activities."',
             attr: 'דאגלס נורת, הרצאת פרס נובל, 1993',
@@ -3189,7 +3189,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'אצ\'מוגלו ורובינסון: שתי נוגאלס', titleEn: 'Acemoglu and Robinson: Two Nogaleses',
+            title: 'שתי נוגאלס', titleEn: 'Two Nogaleses',
             quote: '"הם חיים בעולם אחר, שעוצב על ידי מוסדות שונים. המוסדות השונים האלה יוצרים תמריצים שונים מאוד עבור תושבי שתי הנוגאלסים, ועבור היזמים והעסקים שמוכנים להשקיע בהן."',
             quoteEn: '"They live in a different world shaped by different institutions. These different institutions create very disparate incentives for the inhabitants of the two Nogaleses, and for the entrepreneurs and businesses willing to invest there."',
             attr: 'דארון אצ\'מוגלו וג\'יימס רובינסון, "מדוע מדינות נכשלות", 2012',
@@ -3276,7 +3276,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'סן: הסרת חוסר חירות', titleEn: 'Sen: Removing Unfreedom',
+            title: 'הסרת חוסר חירות', titleEn: 'Removing Unfreedom',
             quote: '"פיתוח מחייב הסרה של מקורות מרכזיים לחוסר חירות: עוני וגם עריצות, הזדמנויות כלכליות דלות וגם קיפוח חברתי שיטתי, הזנחה של שירותים ציבוריים וגם חוסר סובלנות או פעלתנות יתר של מדינות מדכאות."',
             quoteEn: '"Development requires the removal of major sources of unfreedom: poverty as well as tyranny, poor economic opportunities as well as systematic social deprivation, neglect of public facilities as well as intolerance or overactivity of repressive states."',
             attr: 'אמרטיה סן, "פיתוח כחירות", 1999',
@@ -3366,7 +3366,7 @@ const economicsData = {
           },
           {
             type: 'source',
-            title: 'איסטרלי: אדישות וחוסר יעילות', titleEn: 'Easterly: Indifference and Ineffectiveness',
+            title: 'אדישות וחוסר יעילות', titleEn: 'Indifference and Ineffectiveness',
             quote: '"אנשים עניים מתים לא רק בגלל אדישות העולם לעוני שלהם, אלא גם בגלל מאמצים לא יעילים של אלה שכן איכפת להם."',
             quoteEn: '"Poor people die not only because of the world\'s indifference to their poverty, but also because of ineffective efforts of those who do care."',
             attr: 'ויליאם איסטרלי, "משא האדם הלבן", 2006',
@@ -3550,7 +3550,7 @@ const economicsData = {
             },
             {
               type: 'source',
-              title: 'סיימון: המגבלה של המוח', titleEn: 'Simon: The Limit of the Mind',
+              title: 'המגבלה של המוח', titleEn: 'The Limit of the Mind',
               quote: '״יכולת המוח האנושי לנסח ולפתור בעיות מורכבות קטנה מאוד ביחס לגודל הבעיות שפתרונן נדרש כדי לנהוג באופן רציונלי אובייקטיבי בעולם האמיתי.״',
               quoteEn: '"The capacity of the human mind for formulating and solving complex problems is very small compared with the size of the problems whose solution is required for objectively rational behavior in the real world."',
               attr: 'הרברט סיימון, \'מודלים של אדם\', 1957',
@@ -3611,7 +3611,7 @@ const economicsData = {
             },
             {
               type: 'source',
-              title: 'כהנמן וטברסקי: תורת הערך', titleEn: 'Kahneman and Tversky: Prospect Theory',
+              title: 'תורת הערך', titleEn: 'Prospect Theory',
               quote: '״הפסדים נראים גדולים מרווחים.״',
               quoteEn: '"Losses loom larger than gains."',
               attr: 'דניאל כהנמן ועמוס טברסקי, "תורת הערך: ניתוח של החלטה בתנאי סיכון", 1979',
@@ -3672,7 +3672,7 @@ const economicsData = {
             },
             {
               type: 'source',
-              title: 'תיילר: חשבונאות מנטלית', titleEn: 'Thaler: Mental Accounting',
+              title: 'חשבונאות מנטלית', titleEn: 'Mental Accounting',
               quote: '״חשבונאות מנטלית היא מכלול הפעולות הקוגניטיביות שבהן אנשים ומשקי בית משתמשים כדי לארגן, להעריך ולעקוב אחר פעילויות פיננסיות.״',
               quoteEn: '"Mental accounting is the set of cognitive operations used by individuals and households to organize, evaluate, and keep track of financial activities."',
               attr: 'ריצ\'רד תיילר, המאמר \'חשבונאות מנטלית\', 1999',
@@ -3733,7 +3733,7 @@ const economicsData = {
             },
             {
               type: 'source',
-              title: 'תיילר וסנסטיין: מהי דחיפה', titleEn: 'Thaler and Sunstein: What a Nudge Is',
+              title: 'מהי דחיפה', titleEn: 'What a Nudge Is',
               quote: '״דחיפה היא כל היבט של ארכיטקטורת הבחירה שמשנה את התנהגותם של אנשים באופן צפוי, בלי לאסור אף אפשרות ובלי לשנות משמעותית את התמריצים הכלכליים שלהם.״',
               quoteEn: '"A nudge is any aspect of the choice architecture that alters people\'s behavior in a predictable way without forbidding any options or significantly changing their economic incentives."',
               attr: 'ריצ\'רד תיילר וכאס סנסטיין, "דחיפה", 2008',
@@ -3794,7 +3794,7 @@ const economicsData = {
             },
             {
               type: 'source',
-              title: 'שילר: תנודתיות עודפת', titleEn: 'Shiller: Excess Volatility',
+              title: 'תנודתיות עודפת', titleEn: 'Excess Volatility',
               quote: '״מדדי התנודתיות של מחירי המניות במאה האחרונה נראים גבוהים מדי בהרבה, פי חמישה עד שלושה עשר ממה שאפשר לייחס למידע חדש על דיבידנדים ריאליים עתידיים.״',
               quoteEn: '"Measures of stock price volatility over the past century appear to be far too high, five to thirteen times too high, to be attributed to new information about future real dividends."',
               attr: 'רוברט שילר, "האם מחירי מניות נעים יותר מדי", 1981',
@@ -3855,7 +3855,7 @@ const economicsData = {
             },
             {
               type: 'source',
-              title: 'גיגרנצר: היוריסטיקה כאסטרטגיה', titleEn: 'Gigerenzer: Heuristics as Strategy',
+              title: 'היוריסטיקה כאסטרטגיה', titleEn: 'Heuristics as Strategy',
               quote: '״היוריסטיקה היא אסטרטגיה שמתעלמת מחלק מהמידע, במטרה לקבל החלטות מהר יותר, בחיסכון רב יותר ו/או במדויק יותר משיטות מורכבות יותר.״',
               quoteEn: '"A heuristic is a strategy that ignores part of the information, with the goal of making decisions more quickly, frugally, and/or accurately than more complex methods."',
               attr: 'גרד גיגרנצר וולפגנג גייסמאייר, המאמר \'קבלת החלטות היוריסטית\', 2011',

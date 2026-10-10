@@ -3533,7 +3533,7 @@ const psychologyData = {
         sections: [
           {
             type: 'idea',
-            title: 'ברויר: מה אם עצם הדיבור הוא מה שמרפא?', titleEn: 'Breuer: What If the Act of Speaking Is What Heals?',
+            title: 'מה אם עצם הדיבור הוא מה שמרפא?', titleEn: 'What If the Act of Speaking Is What Heals?',
             content: 'וינה, 1880. רופא בשם יוזף ברויר מטפל בצעירה בת 21 שסובלת מתסמינים קשים שאין להם הסבר רפואי. בכתביו הוא קרא לה "אנה או.", ושמה האמיתי היה ברטה פפנהיים.\n\nברויר ניסה את השיטות שהיו מקובלות אז, ובעיקר היפנוזה. אבל <strong>הדבר שעבד לא היה שלו</strong>. פפנהיים גילתה ש<strong>כשהיא מספרת לו, לפרטי פרטים, מתי הופיע תסמין מסוים בפעם הראשונה, התסמין נחלש ולעיתים נעלם</strong>.\n\nוהיא זו שנתנה לזה שם. באנגלית, כי באותה תקופה היא איבדה את היכולת לדבר גרמנית. היא קראה לזה "ריפוי בדיבור", ולפעמים, בהומור, "ניקוי ארובות".\n\nוזו נקודת הפתיחה של כל הפרק הזה. <strong>לפני כל תיאוריה על מה מרפא, הייתה תצפית אחת: מישהי סיפרה, ומשהו השתחרר</strong>.',
             contentEn: 'Vienna, 1880. A physician named Josef Breuer is treating a 21-year-old woman suffering from severe symptoms that have no medical explanation. In his writings he called her "Anna O.", and her real name was Bertha Pappenheim.\n\nBreuer tried the methods that were accepted at the time, mainly hypnosis. But <strong>the thing that worked was not his</strong>. Pappenheim discovered that <strong>when she told him, in minute detail, when a particular symptom had first appeared, the symptom weakened and sometimes disappeared</strong>.\n\nAnd it was she who gave it a name. In English, because at that period she had lost the ability to speak German. She called it the "talking cure", and sometimes, jokingly, "chimney-sweeping".\n\nAnd this is the starting point of this whole chapter. <strong>Before any theory about what heals, there was one observation: someone told, and something was released</strong>.',
           },
@@ -3600,7 +3600,7 @@ const psychologyData = {
         sections: [
           {
             type: 'idea',
-            title: 'רוג\'רס: מה אם לא השיטה מרפאת אלא הקשר?', titleEn: 'Rogers: What If It Is the Relationship, Not the Method, That Heals?',
+            title: 'מה אם לא השיטה מרפאת אלא הקשר?', titleEn: 'What If It Is the Relationship, Not the Method, That Heals?',
             content: 'ברויר חשב שהמפתח הוא מה שנאמר. קרל רוג\'רס טען ש<strong>המפתח הוא מי מקשיב</strong>.\n\nרוג\'רס הגיע למסקנה הזו מכיוון לא צפוי. הוא היה מהראשונים שהקליטו שיחות טיפול ובחנו אותן שיטתית, ומה שראה בהקלטות הפתיע אותו. ההצלחה לא נראתה תלויה בפירושים מבריקים או בטכניקה נכונה. <strong>היא נראתה תלויה במשהו שקורה בין שני אנשים</strong>.\n\nמכאן ניסח שלושה תנאים שלדעתו הם הלב של כל שינוי: קבלה בלתי מותנית, כלומר יחס שאינו תלוי בכך שהאדם יהיה משהו מסוים. אמפתיה, ניסיון אמיתי להבין מבפנים ולא לפרש מבחוץ. ואותנטיות, מטפל שאינו משחק תפקיד.\n\nוהטענה החדה: אלה אינם תנאי רקע נחמדים שמסביב לטיפול. <strong>הם הטיפול עצמו</strong>.',
             contentEn: 'Breuer thought the key was what is said. Carl Rogers argued that <strong>the key is who is listening</strong>.\n\nRogers arrived at this conclusion from an unexpected direction. He was among the first to record therapy sessions and examine them systematically, and what he saw in the recordings surprised him. Success did not appear to depend on brilliant interpretations or on correct technique. <strong>It appeared to depend on something that happens between two people</strong>.\n\nFrom here he formulated three conditions that in his view are the heart of all change: unconditional acceptance, that is, a regard that does not depend on the person being something in particular. Empathy, a real attempt to understand from the inside and not to interpret from the outside. And authenticity, a therapist who is not playing a role.\n\nAnd the sharp claim: these are not pleasant background conditions surrounding the therapy. <strong>They are the therapy itself</strong>.',
           },
@@ -3667,7 +3667,7 @@ const psychologyData = {
         sections: [
           {
             type: 'idea',
-            title: 'ויניקוט: מה אם צריך פחות לתקן ויותר לאפשר?', titleEn: 'Winnicott: What If One Should Repair Less and Allow More?',
+            title: 'מה אם צריך פחות לתקן ויותר לאפשר?', titleEn: 'What If One Should Repair Less and Allow More?',
             content: 'רוג\'רס דיבר על מה שמטפל צריך לספק. דונלד ויניקוט שאל שאלה קרובה, אבל שינה בה משהו עקרוני.\n\nויניקוט הגיע מרפואת ילדים, וראה אלפי תינוקות והורים. ומה שלמד שם הוא ש<strong>אף אחד לא מלמד תינוק להתפתח</strong>. אין טכניקה, אין שיטה, ואין מה לתקן. <strong>מה שההורה עושה הוא לספק תנאים, וההתפתחות קורית מעצמה</strong>.\n\nוהוא העביר את זה לטיפול. אם ילד גדל כשהסביבה מאפשרת, אז אולי <strong>גם שינוי בבגרות אינו משהו שמישהו עושה לאדם</strong>. אולי הוא משהו שקורה כשמישהו מחזיק את התנאים.\n\nוכאן המונח שלו: מרחב מחזיק. לא מי שפותר, אלא <strong>מי שנוכח מספיק כדי שאפשר יהיה להתפרק בלי לחשוש שהכל ייעלם</strong>.',
             contentEn: 'Rogers spoke about what a therapist must provide. Donald Winnicott asked a related question, but changed something fundamental in it.\n\nWinnicott came from paediatrics, and saw thousands of infants and parents. And what he learned there is that <strong>no one teaches an infant to develop</strong>. There is no technique, no method, and nothing to repair. <strong>What the parent does is provide conditions, and the development happens of its own accord</strong>.\n\nAnd he transferred this to therapy. If a child grows when the environment allows it, then <strong>perhaps change in adulthood too is not something that someone does to a person</strong>. Perhaps it is something that happens when someone holds the conditions.\n\nAnd here is his term: a holding space. Not someone who solves, but <strong>someone who is present enough that it becomes possible to fall apart without fearing that everything will disappear</strong>.',
           },
@@ -3741,7 +3741,7 @@ const psychologyData = {
         sections: [
           {
             type: 'idea',
-            title: 'בק: מה אם אפשר פשוט לבדוק את המחשבה?', titleEn: 'Beck: What If One Can Simply Test the Thought?',
+            title: 'מה אם אפשר פשוט לבדוק את המחשבה?', titleEn: 'What If One Can Simply Test the Thought?',
             content: 'שלושת ההוגים עד כה תיארו שינוי שקורה דרך יחסים: מישהו מקשיב, מישהו נוכח, מישהו מחזיק את המקום. אהרון בק הציע משהו אחר לגמרי.\n\nהוא שאל שאלה פשוטה: <strong>אם המחשבה היא שמייצרת את הרגש, למה לא לבדוק אם המחשבה נכונה?</strong>\n\nוזו הייתה פרידה מהמסורת. במקום לחפור אחורה, במקום לחכות שהקשר יבשיל, בק הציע התערבות ישירה ומיידית. <strong>לזהות את המחשבה שמופיעה בין האירוע לרגש, לרשום אותה, ולבחון אותה מול העובדות. לא כאמונה, כהשערה</strong>.\n\nוההצעה הרדיקלית שלו: <strong>לא צריך להבין למה המחשבה נוצרה כדי לשנות אותה</strong>.',
             contentEn: 'The three thinkers so far described change that happens through relationships: someone listens, someone is present, someone holds the space. Aaron Beck proposed something entirely different.\n\nHe asked a simple question: <strong>if it is the thought that produces the emotion, why not check whether the thought is correct?</strong>\n\nAnd this was a break with the tradition. Instead of digging backwards, instead of waiting for the relationship to ripen, Beck proposed a direct and immediate intervention. <strong>To identify the thought that appears between the event and the emotion, to write it down, and to examine it against the facts. Not as a belief, as a hypothesis</strong>.\n\nAnd his radical proposal: <strong>one does not need to understand why the thought was created in order to change it</strong>.',
           },
@@ -3815,7 +3815,7 @@ const psychologyData = {
         sections: [
           {
             type: 'idea',
-            title: 'פרנקל: מה קורה כשאי אפשר לשנות דבר?', titleEn: 'Frankl: What Happens When Nothing Can Be Changed?',
+            title: 'מה קורה כשאי אפשר לשנות דבר?', titleEn: 'What Happens When Nothing Can Be Changed?',
             content: 'ארבעת ההוגים עד כה הניחו הנחה משותפת, בלי לומר אותה: שיש מה לשנות. מחשבה שאפשר לבחון, קשר שאפשר לתקן, סביבה שאפשר לאפשר.\n\nויקטור פרנקל שאל מה קורה כשאין.\n\n<strong>הוא הגיע לשאלה הזו מהמקום שבו אין מה לשנות בכלל</strong>. במחנה השמדה בשואה, שום פעולה לא הייתה יכולה לשנות את הנסיבות. ובכל זאת הוא הבחין בהבדל בין אנשים. לא בהישרדות, וזה חשוב לומר, אלא באופן שבו אדם נושא את מה שהוא נושא.\n\nומכאן הטענה שלו: <strong>גם כשהנסיבות סגורות לגמרי, נשארת חירות אחת – לבחור את העמדה כלפיהן</strong>. לא כפיצוי, ולא כנחמה. כדבר האחרון שאינו ניתן ליטול ממך.\n\nוזה משנה את מה שאנחנו קוראים לו שינוי. <strong>לא רק שינוי במצב או במחשבה, אלא שינוי ביחס</strong>.',
             contentEn: 'The four thinkers so far held a shared assumption, without saying it: that there is something to change. A thought that can be examined, a relationship that can be repaired, an environment that can allow.\n\nViktor Frankl asked what happens when there is not.\n\n<strong>He arrived at this question from the place where there is nothing at all to change</strong>. In an extermination camp in the Holocaust, no action could have changed the circumstances. And nevertheless he noticed a difference between people. Not in survival, and this is important to say, but in the manner in which a person carries what he carries.\n\nAnd from here his claim: <strong>even when the circumstances are entirely closed, one freedom remains, to choose one\'s attitude towards them</strong>. Not as compensation, and not as consolation. As the last thing that cannot be taken from you.\n\nAnd this changes what we call change. <strong>Not only a change in the situation or in the thought, but a change in attitude</strong>.',
           },
@@ -3882,7 +3882,7 @@ const psychologyData = {
         sections: [
           {
             type: 'idea',
-            title: 'מילר: מה מכל זה באמת עובד?', titleEn: 'Miller: Of All of This, What Actually Works?',
+            title: 'מה מכל זה באמת עובד?', titleEn: 'Of All of This, What Actually Works?',
             content: 'חמישה הוגים, חמש תשובות. דיבור, קשר, סביבה, מחשבה, משמעות. כל אחד היה משוכנע, וכל אחד הביא נימוקים.\n\nסקוט מילר, פסיכולוג אמריקאי, שאל שאלה שאיש מהם לא שאל: <strong>מי מכם צודק, ואיך נדע?</strong>\n\nוהתשובה שהמחקר נתן הפתיעה את כולם. כשמשווים שיטות טיפול זו לזו, <strong>ההבדלים ביניהן קטנים בהרבה ממה שהיה מצופה</strong>. התופעה קיבלה שם מ"אליס בארץ הפלאות", שבו ציפור הדודו מכריזה בסוף המרוץ: "כולם ניצחו, וכולם יקבלו פרסים".\n\nוזה לא אומר שטיפול לא עובד. להפך, טיפול עובד היטב. זה אומר ש<strong>מה שגורם לו לעבוד אינו בהכרח מה שכל אסכולה חשבה</strong>.',
             contentEn: 'Five thinkers, five answers. Speaking, relationship, environment, thought, meaning. Each one was convinced, and each one brought reasons.\n\nScott Miller, an American psychologist, asked a question that none of them asked: <strong>which of you is right, and how would we know?</strong>\n\nAnd the answer the research gave surprised everyone. When therapy methods are compared with one another, <strong>the differences between them are far smaller than would be expected</strong>. The phenomenon received a name from "Alice in Wonderland", in which the dodo bird announces at the end of the race: "Everybody has won, and all must have prizes."\n\nAnd this does not mean that therapy does not work. On the contrary, therapy works well. It means that <strong>what makes it work is not necessarily what each school thought</strong>.',
           },
@@ -3957,7 +3957,7 @@ const psychologyData = {
         sections: [
           {
             type: 'idea',
-            title: 'סיכום: האם השינוי אמיתי?', titleEn: 'Summary: Is the Change Real?',
+            title: 'האם השינוי אמיתי?', titleEn: 'Is the Change Real?',
             content: 'פתחנו את הפרק בשאלה: מה גורם לאדם להשתנות באמת?\n\n<strong>חמישה הוגים נתנו חמש תשובות, ואז המחקר שינה את השאלה עצמה</strong>.',
             contentEn: 'We opened the chapter with a question: what makes a person really change?\n\n<strong>Five thinkers gave five answers, and then the research changed the question itself</strong>.',
           },
