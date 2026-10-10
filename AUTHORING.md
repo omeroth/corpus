@@ -85,7 +85,55 @@ The validator fails on any HTML entity (`&quot;`, `&amp;`, `&lt;`, `&gt;`, `&#39
 
 ---
 
-## 5. Checklist before handoff
+## 5. Dialogue titles are labels, not opening questions
+
+A dialogue title appears on the home-screen lesson list, in a 2-line clamp inside a ~265 px cell (less on 360 px devices). Anything longer than that gets truncated with an ellipsis before the reader sees the end of it. The fix is not to shrink the font — it's to write short titles in the first place.
+
+### The rule
+
+- **Three to six words.**
+- **Title Case** in English (`The Veil of Ignorance`, not `the veil of ignorance` and not sentence case `The veil of ignorance`).
+- **A label**: either an image / concept name, or a short question of three to five words. Not a full sentence, not the question the dialogue opens with.
+
+A good title names the dialogue so a returning reader can find it. Shorter is only right when it still identifies the specific dialogue — a title that could belong to any dialogue in the chapter is worse than a long one.
+
+Hebrew should sit at roughly the same relative length as the English in its own writing system. A title that fits on one line in English and wraps in Hebrew is still a wrap problem.
+
+### The pattern — before and after
+
+The rule is clearer from the contrast than from the rule. Every row below is a real title that shipped and was shortened.
+
+| Before | After |
+|---|---|
+| `Why a loss hurts more than an equal gain pleases` | `Why Losing Hurts More` |
+| `Why is the same object worth twice as much when it is ours?` | `Worth More Once It's Yours` |
+| `If we know how people choose, are we permitted to design the choice?` | `The Ethics of Nudging` |
+| `What happens when the deviations accumulate into an entire market?` | `When Biases Scale Up` |
+| `What if the pattern is not an emotion but a sentence we tell ourselves?` | `The Stories We Repeat` |
+| `What if the symptom is trying to say something?` | `The Symptom Speaks` |
+| `What if depression is mourning that got stuck?` | `Mourning That Got Stuck` |
+| `What if it is not the method that heals but the relationship?` | `The Relationship Heals` |
+| `What does the brain do a moment before we decided?` | `The Brain Decides First` |
+| `And perhaps there is no escaping freedom?` | `Condemned to Be Free` |
+| `Why are some countries rich and others poor?` | `Rich Countries, Poor Countries` |
+| `Why don't rich countries come to a stop?` | `Why Growth Persists` |
+
+Older chapters already follow this: `The Allegory of the Cave`, `The Veil of Ignorance`, `The Mental Iceberg`, `The Marginal Revolution`, `The Trolley Problem`. The newer chapters drifted into using the dialogue's opening question as its title, which is what produced the wrap problem. The question wording survives in the dialogue content; the title does not need to carry it.
+
+### Common temptations to avoid
+
+- **Textbook jargon as a label.** `Loss Aversion` and `The Endowment Effect` are terms a reader meets inside the dialogue, not before. The older labels we admire (`The Marginal Revolution`, `The Veil of Ignorance`) are images, not jargon. Prefer `Why Losing Hurts More` and `Worth More Once It's Yours`.
+- **Imperative voice.** `Allow, Don't Fix` is a different speaker than every other title. Use noun-phrase or short-question voice: `Allowing Instead of Fixing`.
+- **Chapter name in the title.** `Doubt and Knowledge - Chapter Summary` reads as a breadcrumb; `Chapter Summary` already lives inside the chapter card. Just `Chapter Summary` / `סיכום הפרק` matches ch1 / ch2.
+- **Full-sentence questions.** The sentence form is appropriate for the opening paragraph of the dialogue, not the title. If the title is naturally a question, keep it to three to five words: `What Must Be Done?`, `What is Capital?`, `A False Dilemma?`.
+
+### Where to put the full question
+
+The newer chapters duplicated the dialogue title into the first `type: 'idea'` section's own `title` field, which meant the long question appeared both on the home card and at the top of the reader. When the home-card title is shortened, the first section's `title` should match it — the dialogue's opening paragraph (the `content` of that section) already restates the question in prose, so nothing is lost.
+
+---
+
+## 6. Checklist before handoff
 
 Run:
 
@@ -105,5 +153,5 @@ A clean run is required for merge. The validator covers:
 Separate from the validator, verify by hand:
 
 - Every source quote traced to a verifiable passage (name the ones you couldn't).
-- Chapter title and dialogue titles don't bake the thinker's name into the title — the home-screen card already shows the thinker. "Why a loss hurts more than an equal gain pleases" is the title; the author is "Kahneman and Tversky", shown on its own line.
+- Chapter and dialogue titles follow §5 (label, Title Case, three to six words, no sentence-shaped questions) and don't bake the thinker's name into the title. The home-screen card already shows the thinker on its own line.
 - Hebrew and English option arrays mirror each other at every index — option A in Hebrew is the translation of option A in English, same for B and C. The rebalance pass depends on this, and the share cards assume it.

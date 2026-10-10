@@ -1835,10 +1835,10 @@ const psychologyData = {
     },
     { id: 4, title: 'למה אנחנו נעולים בדפוסים?', titleEn: 'Why Are We Locked into Patterns?', subtitle: 'שישה מסבירים למה השינוי קשה', subtitleEn: 'Six thinkers on why change is hard', days: [
 // ─── Chapter 4, Dialogue 1 — Freud: Why do we repeat exactly what hurt us? ───
-        { id: 1, title: 'למה אנחנו חוזרים בדיוק על מה שפגע בנו?', titleEn: 'Why do we repeat exactly what hurt us?', thinker: 'פרויד', thinkerEn: 'Freud', thinkerId: 'freud', xp: 50, sections: [
+        { id: 1, title: 'כפיית החזרה', titleEn: 'The Repetition Compulsion', thinker: 'פרויד', thinkerEn: 'Freud', thinkerId: 'freud', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'למה אנחנו חוזרים בדיוק על מה שפגע בנו?', titleEn: 'Why do we repeat exactly what hurt us?',
+            title: 'כפיית החזרה', titleEn: 'The Repetition Compulsion',
             content: 'את הפרק הקודם סיימנו עם תשובה מעודדת: הילדות היא נקודת פתיחה, לא נקודת סיום. אבל אם כך, נשאלת שאלה מטרידה, למה השינוי כל כך קשה? למה אנשים חוזרים שוב ושוב לאותו סוג של בן זוג, לאותה מריבה, לאותה טעות שהם רואים מגיעה מרחוק?</p><p>פרויד נתקל בזה בקליניקה, והוא הופתע. לפי התיאוריה שלו, בני אדם רודפים אחרי עונג ובורחים מכאב. אבל המטופלים שלו עשו משהו אחר לגמרי: <strong>הם שחזרו דווקא את מה שהכאיב להם</strong>, שוב ושוב, בלי הנאה ובלי רווח.</p><p>ב-1914 הוא נתן לזה שם, <strong>כפיית חזרה</strong>, וב-1920 טען שזה מנגנון עמוק כל כך עד שהוא גובר על עקרון העונג עצמו. וההסבר שנתן הוא מפתח הפרק כולו: <strong>מה שלא עובד דרך הזיכרון, פורץ דרך הפעולה.</strong> מי שאינו יכול להיזכר, נאלץ לשחזר.',
             contentEn: 'We ended the previous chapter with an encouraging answer: childhood is a starting point, not an end point. But if so, a troubling question arises, why is change so hard? Why do people return again and again to the same kind of partner, to the same quarrel, to the same mistake they see coming from far away?</p><p>Freud encountered this in the clinic, and he was surprised. According to his theory, human beings pursue pleasure and flee from pain. But his patients did something entirely different: <strong>they re-enacted precisely what had hurt them</strong>, again and again, without pleasure and without gain.</p><p>In 1914 he gave it a name, <strong>repetition compulsion</strong>, and in 1920 argued that this is a mechanism so deep that it overrides the pleasure principle itself. And the explanation he gave is the key to the whole chapter: <strong>what does not work through memory, breaks out through action.</strong> Whoever cannot remember, is compelled to re-enact.',
           },
@@ -1925,10 +1925,10 @@ const psychologyData = {
         ]},
 
 // ─── Chapter 4, Dialogue 2 — Klein: What if we carry the people from our past inside us? ───
-        { id: 2, title: 'מה אם אנחנו נושאים את האנשים מהעבר בתוכנו?', titleEn: 'What if we carry the people from our past inside us?', thinker: 'קליין', thinkerEn: 'Klein', thinkerId: 'klein', xp: 50, sections: [
+        { id: 2, title: 'האחרים שבתוכנו', titleEn: 'The Others Inside Us', thinker: 'קליין', thinkerEn: 'Klein', thinkerId: 'klein', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'מה אם אנחנו נושאים את האנשים מהעבר בתוכנו?', titleEn: 'What if we carry the people from our past inside us?',
+            title: 'האחרים שבתוכנו', titleEn: 'The Others Inside Us',
             content: 'פרויד תיאר שאנחנו חוזרים על מצבים מהעבר. מלאני קליין, פסיכואנליטיקאית ילידת וינה שפעלה בלונדון, הוסיפה טענה מרחיקת לכת יותר: <strong>איננו חוזרים רק על אירועים. אנחנו נושאים בתוכנו את הדמויות עצמן.</strong></p><p>קליין הייתה מהראשונות שעסקה בפסיכואנליזה עם ילדים קטנים, והיא עשתה זאת דרך משחק. בזמן שהילדים שיחקו בבובות, היא ראתה עולם שלם: דמויות שמענישות, דמויות שמגנות, דמויות שנוטשות. ומכאן פיתחה את מה שנקרא תיאוריית <strong>יחסי אובייקט</strong>.</p><p>הרעיון: מהרגע הראשון התינוק סופג פנימה דימויים של האנשים שסביבו, ובונה מהם <strong>עולם פנימי</strong>. לא זיכרונות מדויקים, אלא דמויות רגשיות. <strong>וההפתעה: הדמויות האלה אינן נשארות בעבר. הן ממשיכות לפעול בתוכנו, מדברות, שופטות, מאיימות, גם עשרות שנים אחרי.</strong>',
             contentEn: 'Freud described that we repeat situations from the past. Melanie Klein, a Vienna-born psychoanalyst who worked in London, added a more far-reaching claim: <strong>we do not repeat only events. We carry the figures themselves inside us.</strong></p><p>Klein was among the first to practice psychoanalysis with young children, and she did so through play. While the children played with dolls, she saw an entire world: figures that punish, figures that protect, figures that abandon. And from this she developed what is called <strong>object relations</strong> theory.</p><p>The idea: from the very first moment the infant absorbs inward images of the people around him, and builds from them an <strong>inner world</strong>. Not accurate memories, but emotional figures. <strong>And the surprise: these figures do not stay in the past. They continue to operate inside us, speaking, judging, threatening, even decades later.</strong>',
           },
@@ -2015,10 +2015,10 @@ const psychologyData = {
         ]},
 
 // ─── Chapter 4, Dialogue 3 — Anna Freud: What if our defenses are actually what keeps us stuck? ───
-        { id: 3, title: 'מה אם ההגנות שלנו הן בעצם מה שתוקע אותנו?', titleEn: 'What if our defenses are actually what keeps us stuck?', thinker: 'אנה פרויד', thinkerEn: 'Anna Freud', thinkerId: 'anna-freud', xp: 50, sections: [
+        { id: 3, title: 'כשההגנות תוקעות', titleEn: 'When Defenses Trap Us', thinker: 'אנה פרויד', thinkerEn: 'Anna Freud', thinkerId: 'anna-freud', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'מה אם ההגנות שלנו הן בעצם מה שתוקע אותנו?', titleEn: 'What if our defenses are actually what keeps us stuck?',
+            title: 'כשההגנות תוקעות', titleEn: 'When Defenses Trap Us',
             content: 'קליין הראתה שאנחנו נושאים בתוכנו דמויות. אנה פרויד, בתו הצעירה של זיגמונד ופסיכואנליטיקאית בזכות עצמה, שאלה שאלה מעשית יותר: <strong>מה הנפש עושה בפועל כשמשהו כואב מדי?</strong></p><p>התשובה שלה, בספר מ-1936 "האני ומנגנוני ההגנה", הפכה למפת דרכים של הפסיכולוגיה המודרנית. אביה תיאר בעיקר את ההדחקה. <strong>היא מיפתה מערכת שלמה של מנגנוני הגנה</strong>, אסטרטגיות אוטומטיות שהנפש מפעילה כדי להרחיק חרדה.</p><p>ויש כאן שינוי דגש חשוב. פרויד האב התמקד בדחפים, בסתם (באיד), במה שקבור. הבת הפנתה את הזרקור אל <strong>האני (האגו)</strong>, החלק שמנהל את המשא ומתן בין הדחפים לבין המציאות. <strong>וההגנות אינן פגם, הן פתרון.</strong> הבעיה מתחילה במקום אחר לגמרי.',
             contentEn: 'Klein showed that we carry figures inside us. Anna Freud, Sigmund\'s youngest daughter and a psychoanalyst in her own right, asked a more practical question: <strong>what does the mind actually do when something is too painful?</strong></p><p>Her answer, in the 1936 book "The Ego and the Mechanisms of Defence", became a road map of modern psychology. Her father described mainly repression. <strong>She mapped an entire system of defense mechanisms</strong>, automatic strategies the mind activates in order to keep anxiety at a distance.</p><p>And there is an important shift of emphasis here. Freud the father focused on the drives, on the id, on what is buried. The daughter turned the spotlight to <strong>the ego</strong>, the part that manages the negotiation between the drives and reality. <strong>And the defenses are not a flaw, they are a solution.</strong> The problem begins somewhere else entirely.',
           },
@@ -2105,10 +2105,10 @@ const psychologyData = {
         ]},
 
 // ─── Chapter 4, Dialogue 4 — Beck: What if the pattern is not an emotion but a sentence we tell ourselves? ───
-        { id: 4, title: 'מה אם הדפוס אינו רגש אלא משפט שאנחנו אומרים לעצמנו?', titleEn: 'What if the pattern is not an emotion but a sentence we tell ourselves?', thinker: 'בק', thinkerEn: 'Beck', thinkerId: 'beck', xp: 50, sections: [
+        { id: 4, title: 'התסריט הפנימי', titleEn: 'The Stories We Repeat', thinker: 'בק', thinkerEn: 'Beck', thinkerId: 'beck', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'מה אם הדפוס אינו רגש אלא משפט שאנחנו אומרים לעצמנו?', titleEn: 'What if the pattern is not an emotion but a sentence we tell ourselves?',
+            title: 'התסריט הפנימי', titleEn: 'The Stories We Repeat',
             content: 'שלושת ההוגים עד כה הסבירו את הדפוסים דרך העבר: שחזור, דמויות פנימיות, הגנות. אהרון בק, פסיכיאטר אמריקאי שהוכשר בעצמו כפסיכואנליטיקאי, גילה משהו בטעות, וזה שינה את כל התחום.</p><p>בשנות ה-60 בק ניסה לבסס מדעית את התיאוריה הפסיכואנליטית של דיכאון. במקום זאת הוא שם לב לתופעה אחרת לגמרי. מטופליו דיווחו לו על רגשות, אבל <strong>בין הרגש לבין האירוע היה עוד שלב שאיש לא שאל עליו: מחשבה מהירה, כמעט בלתי מורגשת.</strong> הוא קרא להן <strong>מחשבות אוטומטיות</strong>.</p><p>וכאן הרעיון המרכזי: לא האירוע קובע את הרגש, אלא <strong>הפרשנות</strong> שניתנה לו. ומתחת למחשבות האוטומטיות יושבות <strong>סכמות</strong>, אמונות יסוד על עצמנו ועל העולם, שנבנו מזמן והפכו למסננת שדרכה הכל עובר.',
             contentEn: 'The three thinkers so far explained the patterns through the past: re-enactment, internal figures, defenses. Aaron Beck, an American psychiatrist who was himself trained as a psychoanalyst, discovered something by accident, and it changed the entire field.</p><p>In the 1960s Beck tried to establish scientifically the psychoanalytic theory of depression. Instead, he noticed an entirely different phenomenon. His patients reported emotions to him, but <strong>between the emotion and the event there was another stage no one had asked about: a fast thought, almost imperceptible.</strong> He called them <strong>automatic thoughts</strong>.</p><p>And here is the central idea: it is not the event that determines the emotion, but <strong>the interpretation</strong> given to it. And beneath the automatic thoughts sit <strong>schemas</strong>, basic beliefs about ourselves and about the world, which were built long ago and became a filter through which everything passes.',
           },
@@ -2195,10 +2195,10 @@ const psychologyData = {
         ]},
 
 // ─── Chapter 4, Dialogue 5 — Van der Kolk: What if there are patterns that do not sit in thought? ───
-        { id: 5, title: 'מה אם יש דפוסים שלא יושבים במחשבה?', titleEn: 'What if there are patterns that do not sit in thought?', thinker: 'ון דר קולק', thinkerEn: 'Van der Kolk', thinkerId: 'van-der-kolk', xp: 50, sections: [
+        { id: 5, title: 'דפוסים מתחת למחשבה', titleEn: 'Patterns Beneath Thought', thinker: 'ון דר קולק', thinkerEn: 'Van der Kolk', thinkerId: 'van-der-kolk', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'מה אם יש דפוסים שלא יושבים במחשבה?', titleEn: 'What if there are patterns that do not sit in thought?',
+            title: 'דפוסים מתחת למחשבה', titleEn: 'Patterns Beneath Thought',
             content: 'בק הראה שאפשר לתפוס מחשבה ולבדוק אותה. אבל הרבה אנשים מכירים מצב אחר: הם <strong>יודעים</strong> שאין סכנה, מבינים את זה לגמרי, והגוף בכל זאת מגיב. הלב דוהר, הנשימה מתקצרת, השרירים נדרכים, וההיגיון לא עוזר.</p><p>בסל ון דר קולק, פסיכיאטר וחוקר טראומה, טען שיש דפוסים שאינם יושבים במחשבה כלל. הם נחרטים במערכות אחרות, בוויסות העוררות ובתגובות הגוף. <strong>ולכן אי אפשר לדבר איתם, כי הם לא מדברים.</strong></p><p>הרעיון המרכזי: אירוע קשה אינו נשאר רק כזיכרון של משהו שקרה. הוא משאיר <strong>חותם</strong> באופן שבו הגוף מזהה סכנה ומגיב אליה. ובגלל זה מערכת ההתראה עלולה להישאר דרוכה גם כשהאיום מזמן חלף.',
             contentEn: 'Beck showed that a thought can be caught and tested. But many people know a different situation: they <strong>know</strong> there is no danger, they understand it completely, and the body reacts anyway. The heart races, breathing shortens, the muscles tense, and logic does not help.</p><p>Bessel van der Kolk, a psychiatrist and trauma researcher, argued that there are patterns that do not sit in thought at all. They are engraved in other systems, in the regulation of arousal and in the body\'s responses. <strong>And therefore one cannot talk with them, because they do not speak.</strong></p><p>The central idea: a difficult event does not remain only as a memory of something that happened. It leaves an <strong>imprint</strong> on the way the body identifies danger and responds to it. And because of this the alarm system may remain on alert even when the threat has long since passed.',
           },
@@ -2285,10 +2285,10 @@ const psychologyData = {
         ]},
 
 // ─── Chapter 4, Dialogue 6 — Kahneman: What if most of what we do was decided before we thought? ───
-        { id: 6, title: 'מה אם רוב מה שאנחנו עושים הוכרע לפני שחשבנו?', titleEn: 'What if most of what we do was decided before we thought?', thinker: 'כהנמן', thinkerEn: 'Kahneman', thinkerId: 'kahneman', xp: 50, sections: [
+        { id: 6, title: 'הוכרע לפני המחשבה', titleEn: 'Decided Before We Think', thinker: 'כהנמן', thinkerEn: 'Kahneman', thinkerId: 'kahneman', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'מה אם רוב מה שאנחנו עושים הוכרע לפני שחשבנו?', titleEn: 'What if most of what we do was decided before we thought?',
+            title: 'הוכרע לפני המחשבה', titleEn: 'Decided Before We Think',
             content: 'ון דר קולק דיבר על תגובות קיצון. דניאל כהנמן, פסיכולוג ישראלי-אמריקאי שזכה בפרס נובל לכלכלה, מראה שאותו עיקרון פועל <strong>בחיים הרגילים לחלוטין</strong>, אצל כולם, כל היום.</p><p>בספרו "לחשוב מהר, לחשוב לאט" הוא תיאר שתי מערכות. <strong>מערכת 1</strong> מהירה, אוטומטית וחסרת מאמץ. היא מזהה פנים, משלימה משפטים, מגיבה מיד. <strong>מערכת 2</strong> איטית, מודעת ודורשת מאמץ. היא מחשבת, שוקלת, בודקת.</p><p>וההפתעה: אנחנו מזהים את עצמנו עם מערכת 2, עם החלק החושב והשוקל. <strong>אבל רוב מה שקורה בפועל מוכרע במערכת 1, ומערכת 2 לרוב רק מאשרת בדיעבד.</strong> כלומר לא רק בטראומה התגובה מקדימה את המחשבה. זה מצב ברירת המחדל.',
             contentEn: 'Van der Kolk spoke about extreme reactions. Daniel Kahneman, an Israeli-American psychologist who won the Nobel Prize in economics, shows that the same principle operates <strong>in entirely ordinary life</strong>, in everyone, all day.</p><p>In his book "Thinking, Fast and Slow" he described two systems. <strong>System 1</strong> is fast, automatic and effortless. It recognizes faces, completes sentences, responds immediately. <strong>System 2</strong> is slow, conscious and requires effort. It calculates, weighs, checks.</p><p>And the surprise: we identify ourselves with System 2, with the thinking and weighing part. <strong>But most of what actually happens is decided in System 1, and System 2 usually only confirms it in retrospect.</strong> That is, it is not only in trauma that the reaction precedes the thought. This is the default state.',
           },
@@ -2375,10 +2375,10 @@ const psychologyData = {
         ]},
 
 // ─── Chapter 4, Dialogue 7 — Summary: Why is it so hard to be different? ───
-        { id: 7, title: 'למה כל כך קשה להיות אחר?', titleEn: 'Why is it so hard to be different?', xp: 50, isSummary: true, sections: [
+        { id: 7, title: 'למה כל כך קשה להיות אחר?', titleEn: 'Why Change Is Hard', xp: 50, isSummary: true, sections: [
           {
             type: 'idea',
-            title: 'למה כל כך קשה להיות אחר?', titleEn: 'Why is it so hard to be different?',
+            title: 'למה כל כך קשה להיות אחר?', titleEn: 'Why Change Is Hard',
             content: 'פתחנו את הפרק בשאלה מתסכלת: אם האישיות שלנו לא נחתמת בילדותנו, למה השינוי כל כך קשה?</p><p>שישה הוגים נתנו שש תשובות, ויחד הן מסבירות משהו אחד: <strong>הדפוס אינו החלטה שקיבלנו, ולכן אי אפשר לבטל אותו בהחלטה.</strong>',
             contentEn: 'We opened the chapter with a frustrating question: if our personality is not sealed in our childhood, why is change so hard?</p><p>Six thinkers gave six answers, and together they explain one thing: <strong>the pattern is not a decision we made, and therefore it cannot be cancelled by a decision.</strong>',
           },
@@ -2886,10 +2886,10 @@ const psychologyData = {
     { id: 5, title: 'מה זה סבל ומה זה סימפטום?', titleEn: 'What is suffering and what is a symptom?', subtitle: 'שישה הוגים, שישה סוגי סבל', subtitleEn: 'Six thinkers, six kinds of suffering', days: [
 
 // ─── Chapter 5, Dialogue 1 — Freud: What if the symptom is trying to say something? ───
-        { id: 1, title: 'מה אם הסימפטום מנסה לומר משהו?', titleEn: 'What if the symptom is trying to say something?', thinker: 'פרויד', thinkerEn: 'Freud', thinkerId: 'freud', xp: 50, sections: [
+        { id: 1, title: 'הסימפטום מדבר', titleEn: 'The Symptom Speaks', thinker: 'פרויד', thinkerEn: 'Freud', thinkerId: 'freud', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'מה אם הסימפטום מנסה לומר משהו?', titleEn: 'What if the symptom is trying to say something?',
+            title: 'הסימפטום מדבר', titleEn: 'The Symptom Speaks',
             content: 'כשמשהו בנפש כואב, ההנחה הטבעית היא שמשהו התקלקל. חרדה שמופיעה בלי סיבה, נדודי שינה, כאב בטן שאין לו הסבר רפואי. הגיוני להתייחס לזה כמו לתקלה שצריך לתקן.</p><p>פרויד הציע משהו אחר לגמרי, וזו אחת התובנות המקוריות שלו. <strong>הסימפטום אינו תקלה, הוא פשרה.</strong></p><p>ההיגיון שלו: כשיש בתוכנו רצון שאסור להרגיש, נוצר מאבק. מצד אחד הרצון דוחף החוצה, ומצד שני משהו בנו אוסר עליו. ואז הנפש מוצאת פתרון ביניים. <strong>הסימפטום מבטא את שני הצדדים בו זמנית, ולכן הוא נראה חסר היגיון מבחוץ.</strong></p><p>וזו הנקודה: אם הסימפטום הוא פשרה, יש לו משמעות. הוא לא רעש אקראי, הוא אמירה שנאמרה בשפה אחרת.',
             contentEn: 'When something in the mind hurts, the natural assumption is that something has broken. Anxiety that appears for no reason, sleeplessness, a stomach ache that has no medical explanation. It is reasonable to treat this like a malfunction that needs repairing.</p><p>Freud proposed something entirely different, and this is one of his original insights. <strong>The symptom is not a malfunction, it is a compromise.</strong></p><p>His logic: when there is a wish within us that we are not allowed to feel, a struggle arises. On one side the wish pushes outward, and on the other side something in us forbids it. And then the mind finds an intermediate solution. <strong>The symptom expresses both sides at once, and that is why it looks illogical from the outside.</strong></p><p>And this is the point: if the symptom is a compromise, it has meaning. It is not random noise, it is a statement made in a different language.',
           },
@@ -2976,10 +2976,10 @@ const psychologyData = {
         ]},
 
 // ─── Chapter 5, Dialogue 2 — Kohut: What if the suffering is not a struggle but a lack? ───
-        { id: 2, title: 'מה אם הסבל אינו מאבק אלא חוסר?', titleEn: 'What if the suffering is not a struggle but a lack?', thinker: 'קוהוט', thinkerEn: 'Kohut', thinkerId: 'kohut', xp: 50, sections: [
+        { id: 2, title: 'סבל כחוסר', titleEn: 'Suffering as Absence', thinker: 'קוהוט', thinkerEn: 'Kohut', thinkerId: 'kohut', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'מה אם הסבל אינו מאבק אלא חוסר?', titleEn: 'What if the suffering is not a struggle but a lack?',
+            title: 'סבל כחוסר', titleEn: 'Suffering as Absence',
             content: 'פרויד תיאר את הסבל כהתנגשות: דחף מצד אחד, איסור מצד שני, וסימפטום באמצע. <strong>היינץ קוהוט טען שיש סוג אחר של סבל, שאינו מאבק כלל.</strong></p><p>הוא הבחין בזה בקליניקה. חלק מהמטופלים שלו לא הגיעו עם קונפליקט. הם הגיעו עם משהו שקשה יותר לנסח: תחושה שהם מתפרקים. <strong>לא עצב על משהו מסוים, אלא ריקנות. לא פחד ממשהו, אלא הרגשה שאין להם קרקע.</strong></p><p>והפירוש שלו: זה אינו מאבק בין חלקים, זה חוסר. כפי שראינו בפרק השלישי, העצמי נבנה משיקוף, מכך שמישהו רואה אותנו ומגיב במדויק. וכשהשיקוף חסר לאורך זמן, מה שנפגע אינו רצון מסוים אלא <strong>היכולת להרגיש שלמים</strong>.</p><p>קוהוט קרא לזה פגיעה נרקיסיסטית, והמונח מטעה. אין הכוונה ליהירות. הכוונה לפגיעה בתחושת הערך הבסיסית של האדם.',
             contentEn: 'Freud described suffering as a collision: a drive on one side, a prohibition on the other, and a symptom in between. <strong>Heinz Kohut argued that there is another kind of suffering, which is not a struggle at all.</strong></p><p>He noticed this in the clinic. Some of his patients did not arrive with a conflict. They arrived with something harder to put into words: a feeling that they were falling apart. <strong>Not sadness about something in particular, but emptiness. Not fear of something, but a sense that they had no ground.</strong></p><p>And his interpretation: this is not a struggle between parts, it is a lack. As we saw in the third chapter, the self is built from mirroring, from someone seeing us and responding precisely. And when the mirroring is missing over time, what is harmed is not a particular wish but <strong>the ability to feel whole</strong>.</p><p>Kohut called this a narcissistic injury, and the term is misleading. It does not refer to arrogance. It refers to an injury to the person\'s basic sense of worth.',
           },
@@ -3066,10 +3066,10 @@ const psychologyData = {
         ]},
 
 // ─── Chapter 5, Dialogue 3 — Bowlby: What if depression is mourning that got stuck? ───
-        { id: 3, title: 'מה אם הדיכאון הוא אבל שנתקע?', titleEn: 'What if depression is mourning that got stuck?', thinker: 'בולבי', thinkerEn: 'Bowlby', thinkerId: 'bowlby', xp: 50, sections: [
+        { id: 3, title: 'אבל שנתקע', titleEn: 'Mourning That Got Stuck', thinker: 'בולבי', thinkerEn: 'Bowlby', thinkerId: 'bowlby', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'מה אם הדיכאון הוא אבל שנתקע?', titleEn: 'What if depression is mourning that got stuck?',
+            title: 'אבל שנתקע', titleEn: 'Mourning That Got Stuck',
             content: 'פרויד ראה בסבל התנגשות. קוהוט ראה בו חוסר. <strong>ג\'ון בולבי הצביע על מקור שלישי: אובדן.</strong></p><p>בולבי חקר מה קורה לילדים שהופרדו מהוריהם, וזיהה רצף תגובות שחוזר על עצמו: קודם <strong>מחאה</strong>, ניסיון להחזיר את מה שאבד. אחר כך <strong>ייאוש</strong>. ולבסוף <strong>ניתוק</strong>, מצב שנראה מבחוץ כמו הסתגלות אבל אינו כזה.</p><p>והתובנה שלו: התהליך הזה אינו פתולוגיה, הוא אבל. יש לו שלבים, והוא מוביל בסופו לארגון מחדש, כלומר להתאמה של העולם הפנימי למציאות שהשתנתה.</p><p>אבל לפעמים התהליך נתקע. <strong>בולבי טען שכשאבל אינו מצליח לעבור את שלביו, הוא אינו נעלם. הוא מקבל צורה אחרת, ולעיתים הצורה הזו היא דיכאון.</strong>',
             contentEn: 'Freud saw suffering as a collision. Kohut saw it as a lack. <strong>John Bowlby pointed to a third source: loss.</strong></p><p>Bowlby studied what happens to children separated from their parents, and identified a sequence of reactions that repeats itself: first <strong>protest</strong>, an attempt to bring back what was lost. Then <strong>despair</strong>. And finally <strong>detachment</strong>, a state that looks from the outside like adjustment but is not.</p><p>And his insight: this process is not pathology, it is mourning. It has stages, and it leads in the end to reorganization, that is, to an adaptation of the inner world to a reality that has changed.</p><p>But sometimes the process gets stuck. <strong>Bowlby argued that when mourning does not manage to pass through its stages, it does not disappear. It takes another form, and sometimes that form is depression.</strong>',
           },
@@ -3156,10 +3156,10 @@ const psychologyData = {
         ]},
 
 // ─── Chapter 5, Dialogue 4 — Beck: What if suffering is strengthened by what we say to ourselves? ───
-        { id: 4, title: 'מה אם הסבל מתחזק על ידי מה שאנחנו אומרים לעצמנו?', titleEn: 'What if suffering is strengthened by what we say to ourselves?', thinker: 'בק', thinkerEn: 'Beck', thinkerId: 'beck', xp: 50, sections: [
+        { id: 4, title: 'הקול שמעמיק את הכאב', titleEn: 'The Voice That Deepens Pain', thinker: 'בק', thinkerEn: 'Beck', thinkerId: 'beck', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'מה אם הסבל מתחזק על ידי מה שאנחנו אומרים לעצמנו?', titleEn: 'What if suffering is strengthened by what we say to ourselves?',
+            title: 'הקול שמעמיק את הכאב', titleEn: 'The Voice That Deepens Pain',
             content: 'שלושת ההוגים עד כה חיפשו את מקור הסבל בעבר: בקונפליקט שהודחק, בחוסר שנמשך שנים, באובדן שלא עובד. <strong>אהרון בק הסתכל במקום אחר לגמרי.</strong></p><p>בשנות ה-60 הוא ניסה לבסס מדעית את התיאוריה הפסיכואנליטית של דיכאון, ומצא משהו שלא חיפש. מטופליו הדיכאוניים לא דיווחו בעיקר על כעס מודחק. <strong>הם דיווחו על מחשבות.</strong> שליליות, חוזרות, ומיידיות כל כך שהם עצמם כמעט לא שמו לב אליהן.</p><p>מכאן פיתח את מה שכינה <strong>המשולש הקוגניטיבי</strong>: בדיכאון, המחשבות נוטות לשלילה בשלושה כיוונים בו זמנית. על העצמי ("אני לא מספיק"), על העולם ("שום דבר לא עובד"), ועל העתיד ("זה לא ישתנה").</p><p>וזו הנקודה המעשית: <strong>המחשבות אינן רק סימן לדיכאון, הן גם מתדלקות אותו.</strong>',
             contentEn: 'The three thinkers so far looked for the source of suffering in the past: in a conflict that was repressed, in a lack that lasted for years, in a loss that did not work through. <strong>Aaron Beck looked somewhere else entirely.</strong></p><p>In the 1960s he tried to establish scientifically the psychoanalytic theory of depression, and found something he was not looking for. His depressed patients did not report mainly on repressed anger. <strong>They reported on thoughts.</strong> Negative, recurring, and so immediate that they themselves barely noticed them.</p><p>From this he developed what he called <strong>the cognitive triad</strong>: in depression, thoughts tend toward the negative in three directions at once. About the self ("I am not enough"), about the world ("nothing works"), and about the future ("this will not change").</p><p>And this is the practical point: <strong>the thoughts are not only a sign of depression, they also fuel it.</strong>',
           },
@@ -3246,10 +3246,10 @@ const psychologyData = {
         ]},
 
 // ─── Chapter 5, Dialogue 5 — Van der Kolk: What if there is suffering that does not pass through thought? ───
-        { id: 5, title: 'מה אם יש סבל שאינו עובר דרך מחשבה?', titleEn: 'What if there is suffering that does not pass through thought?', thinker: 'ון דר קולק', thinkerEn: 'Van der Kolk', thinkerId: 'van-der-kolk', xp: 50, sections: [
+        { id: 5, title: 'סבל מתחת למחשבה', titleEn: 'Suffering Beneath Thought', thinker: 'ון דר קולק', thinkerEn: 'Van der Kolk', thinkerId: 'van-der-kolk', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'מה אם יש סבל שאינו עובר דרך מחשבה?', titleEn: 'What if there is suffering that does not pass through thought?',
+            title: 'סבל מתחת למחשבה', titleEn: 'Suffering Beneath Thought',
             content: 'בק הראה שאפשר לתפוס מחשבה ולבדוק אותה מול המציאות. <strong>אבל יש מצב שבו הכלי הזה מגיע מאוחר מדי.</strong></p><p>אדם יודע שהוא בטוח. הוא מבין את זה לגמרי, יכול להסביר את זה למישהו אחר, ואפילו לומר בדיוק למה התגובה שלו אינה פרופורציונלית. ובכל זאת הגוף מגיב. הלב דוהר, הנשימה מתקצרת, השרירים נדרכים.</p><p>בסל ון דר קולק, פסיכיאטר וחוקר טראומה, טען שיש סבל שאינו יושב במחשבה כלל. <strong>הוא נחרט במערכות הפיזיולוגיות שאחראיות על זיהוי סכנה ועל ויסות עוררות.</strong> ולכן, כפי שראינו בפרק הרביעי, אי אפשר לדבר עם הסבל, כי הוא אינו מדבר.</p><p>והתובנה המרכזית: אירוע קשה אינו נשאר רק כזיכרון של משהו שקרה. <strong>הוא משאיר חותם באופן שבו הגוף מזהה איום ומגיב אליו, ומערכת ההתראה עלולה להישאר דרוכה הרבה אחרי שהאיום חלף.</strong>',
             contentEn: 'Beck showed that a thought can be caught and tested against reality. <strong>But there is a situation in which this tool arrives too late.</strong></p><p>A person knows that he is safe. He understands it completely, can explain it to someone else, and can even say exactly why his reaction is not proportional. And yet the body reacts. The heart races, breathing shortens, the muscles tense.</p><p>Bessel van der Kolk, a psychiatrist and trauma researcher, argued that there is suffering that does not sit in thought at all. <strong>It is engraved in the physiological systems responsible for identifying danger and for regulating arousal.</strong> And therefore, as we saw in the fourth chapter, one cannot talk with the suffering, because it does not speak.</p><p>And the central insight: a difficult event does not remain only as a memory of something that happened. <strong>It leaves an imprint on the way the body identifies a threat and responds to it, and the alarm system may remain on alert long after the threat has passed.</strong>',
           },
@@ -3344,10 +3344,10 @@ const psychologyData = {
 // abridged translation. If the source documents surface again, do not
 // reintroduce the paraphrase. See thinkers.js Foucault entry for the
 // full provenance note.
-        { id: 6, title: 'מי קובע איזה סבל נחשב מחלה?', titleEn: 'Who decides which suffering counts as an illness?', thinker: 'פוקו', thinkerEn: 'Foucault', thinkerId: 'foucault', xp: 50, sections: [
+        { id: 6, title: 'מה נחשב מחלה?', titleEn: 'What Counts as Illness?', thinker: 'פוקו', thinkerEn: 'Foucault', thinkerId: 'foucault', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'מי קובע איזה סבל נחשב מחלה?', titleEn: 'Who decides which suffering counts as an illness?',
+            title: 'מה נחשב מחלה?', titleEn: 'What Counts as Illness?',
             content: 'חמשת ההוגים עד כה שאלו מה גורם לסבל. <strong>מישל פוקו, פילוסוף והיסטוריון צרפתי, שאל שאלה שקודמת להם: מי קובע מה בכלל נחשב הפרעה?</strong></p><p>בספרו "תולדות השיגעון" (1961) הוא הראה שהתשובה השתנתה דרמטית לאורך ההיסטוריה. מה שנחשב שיגעון בתקופה אחת לא נחשב שיגעון בתקופה אחרת, ולא בגלל שהאנשים השתנו, אלא בגלל שהקטגוריות השתנו.</p><p>והדוגמה החדה מכולן היא בת זמננו. <strong>הומוסקסואליות הופיעה בספר האבחנות הפסיכיאטרי האמריקאי כהפרעה נפשית עד 1973.</strong> אותם אנשים בדיוק, אותה תופעה, ויום אחד הם הפסיקו להיות "חולים". לא בגלל תגלית מדעית, אלא בגלל שינוי בחברה.</p><p>ומכאן הטענה של פוקו: <strong>הגבול בין נורמלי לפתולוגי אינו נתון טבע. הוא נקבע, והוא משתנה.</strong>',
             contentEn: 'The five thinkers so far asked what causes suffering. <strong>Michel Foucault, a French philosopher and historian, asked a question that comes before them: who decides what counts as a disorder in the first place?</strong></p><p>In his book "History of Madness" (1961) he showed that the answer changed dramatically over the course of history. What was considered madness in one period was not considered madness in another, and not because the people changed, but because the categories changed.</p><p>And the sharpest example of all is contemporary. <strong>Homosexuality appeared in the American psychiatric diagnostic manual as a mental disorder until 1973.</strong> Exactly the same people, the same phenomenon, and one day they stopped being "ill". Not because of a scientific discovery, but because of a change in society.</p><p>And from here Foucault\'s claim: <strong>the boundary between normal and pathological is not a given of nature. It is determined, and it changes.</strong>',
           },
@@ -3527,13 +3527,13 @@ const psychologyData = {
     days: [
       {
         id: 1,
-        title: 'מה אם עצם הדיבור הוא מה שמרפא?', titleEn: 'What if the speaking itself is what heals?',
+        title: 'ריפוי בדיבור', titleEn: 'The Talking Cure',
         thinker: 'יוזף ברויר', thinkerEn: 'Josef Breuer',
         thinkerId: 'breuer', xp: 50,
         sections: [
           {
             type: 'idea',
-            title: 'מה אם עצם הדיבור הוא מה שמרפא?', titleEn: 'What If the Act of Speaking Is What Heals?',
+            title: 'ריפוי בדיבור', titleEn: 'The Talking Cure',
             content: 'וינה, 1880. רופא בשם יוזף ברויר מטפל בצעירה בת 21 שסובלת מתסמינים קשים שאין להם הסבר רפואי. בכתביו הוא קרא לה "אנה או.", ושמה האמיתי היה ברטה פפנהיים.\n\nברויר ניסה את השיטות שהיו מקובלות אז, ובעיקר היפנוזה. אבל <strong>הדבר שעבד לא היה שלו</strong>. פפנהיים גילתה ש<strong>כשהיא מספרת לו, לפרטי פרטים, מתי הופיע תסמין מסוים בפעם הראשונה, התסמין נחלש ולעיתים נעלם</strong>.\n\nוהיא זו שנתנה לזה שם. באנגלית, כי באותה תקופה היא איבדה את היכולת לדבר גרמנית. היא קראה לזה "ריפוי בדיבור", ולפעמים, בהומור, "ניקוי ארובות".\n\nוזו נקודת הפתיחה של כל הפרק הזה. <strong>לפני כל תיאוריה על מה מרפא, הייתה תצפית אחת: מישהי סיפרה, ומשהו השתחרר</strong>.',
             contentEn: 'Vienna, 1880. A physician named Josef Breuer is treating a 21-year-old woman suffering from severe symptoms that have no medical explanation. In his writings he called her "Anna O.", and her real name was Bertha Pappenheim.\n\nBreuer tried the methods that were accepted at the time, mainly hypnosis. But <strong>the thing that worked was not his</strong>. Pappenheim discovered that <strong>when she told him, in minute detail, when a particular symptom had first appeared, the symptom weakened and sometimes disappeared</strong>.\n\nAnd it was she who gave it a name. In English, because at that period she had lost the ability to speak German. She called it the "talking cure", and sometimes, jokingly, "chimney-sweeping".\n\nAnd this is the starting point of this whole chapter. <strong>Before any theory about what heals, there was one observation: someone told, and something was released</strong>.',
           },
@@ -3594,13 +3594,13 @@ const psychologyData = {
       },
       {
         id: 2,
-        title: 'מה אם לא השיטה מרפאת אלא הקשר?', titleEn: 'What if it is not the method that heals but the relationship?',
+        title: 'הקשר שמרפא', titleEn: 'The Relationship Heals',
         thinker: 'קרל רוג\'רס', thinkerEn: 'Carl Rogers',
         thinkerId: 'rogers', xp: 50,
         sections: [
           {
             type: 'idea',
-            title: 'מה אם לא השיטה מרפאת אלא הקשר?', titleEn: 'What If It Is the Relationship, Not the Method, That Heals?',
+            title: 'הקשר שמרפא', titleEn: 'The Relationship Heals',
             content: 'ברויר חשב שהמפתח הוא מה שנאמר. קרל רוג\'רס טען ש<strong>המפתח הוא מי מקשיב</strong>.\n\nרוג\'רס הגיע למסקנה הזו מכיוון לא צפוי. הוא היה מהראשונים שהקליטו שיחות טיפול ובחנו אותן שיטתית, ומה שראה בהקלטות הפתיע אותו. ההצלחה לא נראתה תלויה בפירושים מבריקים או בטכניקה נכונה. <strong>היא נראתה תלויה במשהו שקורה בין שני אנשים</strong>.\n\nמכאן ניסח שלושה תנאים שלדעתו הם הלב של כל שינוי: קבלה בלתי מותנית, כלומר יחס שאינו תלוי בכך שהאדם יהיה משהו מסוים. אמפתיה, ניסיון אמיתי להבין מבפנים ולא לפרש מבחוץ. ואותנטיות, מטפל שאינו משחק תפקיד.\n\nוהטענה החדה: אלה אינם תנאי רקע נחמדים שמסביב לטיפול. <strong>הם הטיפול עצמו</strong>.',
             contentEn: 'Breuer thought the key was what is said. Carl Rogers argued that <strong>the key is who is listening</strong>.\n\nRogers arrived at this conclusion from an unexpected direction. He was among the first to record therapy sessions and examine them systematically, and what he saw in the recordings surprised him. Success did not appear to depend on brilliant interpretations or on correct technique. <strong>It appeared to depend on something that happens between two people</strong>.\n\nFrom here he formulated three conditions that in his view are the heart of all change: unconditional acceptance, that is, a regard that does not depend on the person being something in particular. Empathy, a real attempt to understand from the inside and not to interpret from the outside. And authenticity, a therapist who is not playing a role.\n\nAnd the sharp claim: these are not pleasant background conditions surrounding the therapy. <strong>They are the therapy itself</strong>.',
           },
@@ -3661,13 +3661,13 @@ const psychologyData = {
       },
       {
         id: 3,
-        title: 'מה אם צריך פחות לתקן ויותר לאפשר?', titleEn: 'What if less repairing and more allowing is needed?',
+        title: 'לאפשר במקום לתקן', titleEn: 'Allowing Instead of Fixing',
         thinker: 'דונלד ויניקוט', thinkerEn: 'Donald Winnicott',
         thinkerId: 'winnicott', xp: 50,
         sections: [
           {
             type: 'idea',
-            title: 'מה אם צריך פחות לתקן ויותר לאפשר?', titleEn: 'What If One Should Repair Less and Allow More?',
+            title: 'לאפשר במקום לתקן', titleEn: 'Allowing Instead of Fixing',
             content: 'רוג\'רס דיבר על מה שמטפל צריך לספק. דונלד ויניקוט שאל שאלה קרובה, אבל שינה בה משהו עקרוני.\n\nויניקוט הגיע מרפואת ילדים, וראה אלפי תינוקות והורים. ומה שלמד שם הוא ש<strong>אף אחד לא מלמד תינוק להתפתח</strong>. אין טכניקה, אין שיטה, ואין מה לתקן. <strong>מה שההורה עושה הוא לספק תנאים, וההתפתחות קורית מעצמה</strong>.\n\nוהוא העביר את זה לטיפול. אם ילד גדל כשהסביבה מאפשרת, אז אולי <strong>גם שינוי בבגרות אינו משהו שמישהו עושה לאדם</strong>. אולי הוא משהו שקורה כשמישהו מחזיק את התנאים.\n\nוכאן המונח שלו: מרחב מחזיק. לא מי שפותר, אלא <strong>מי שנוכח מספיק כדי שאפשר יהיה להתפרק בלי לחשוש שהכל ייעלם</strong>.',
             contentEn: 'Rogers spoke about what a therapist must provide. Donald Winnicott asked a related question, but changed something fundamental in it.\n\nWinnicott came from paediatrics, and saw thousands of infants and parents. And what he learned there is that <strong>no one teaches an infant to develop</strong>. There is no technique, no method, and nothing to repair. <strong>What the parent does is provide conditions, and the development happens of its own accord</strong>.\n\nAnd he transferred this to therapy. If a child grows when the environment allows it, then <strong>perhaps change in adulthood too is not something that someone does to a person</strong>. Perhaps it is something that happens when someone holds the conditions.\n\nAnd here is his term: a holding space. Not someone who solves, but <strong>someone who is present enough that it becomes possible to fall apart without fearing that everything will disappear</strong>.',
           },
@@ -3735,13 +3735,13 @@ const psychologyData = {
       },
       {
         id: 4,
-        title: 'מה אם אפשר פשוט לבדוק את המחשבה?', titleEn: 'What if one can simply test the thought?',
+        title: 'לבדוק את המחשבה', titleEn: 'Testing the Thought',
         thinker: 'אהרון בק', thinkerEn: 'Aaron Beck',
         thinkerId: 'beck', xp: 50,
         sections: [
           {
             type: 'idea',
-            title: 'מה אם אפשר פשוט לבדוק את המחשבה?', titleEn: 'What If One Can Simply Test the Thought?',
+            title: 'לבדוק את המחשבה', titleEn: 'Testing the Thought',
             content: 'שלושת ההוגים עד כה תיארו שינוי שקורה דרך יחסים: מישהו מקשיב, מישהו נוכח, מישהו מחזיק את המקום. אהרון בק הציע משהו אחר לגמרי.\n\nהוא שאל שאלה פשוטה: <strong>אם המחשבה היא שמייצרת את הרגש, למה לא לבדוק אם המחשבה נכונה?</strong>\n\nוזו הייתה פרידה מהמסורת. במקום לחפור אחורה, במקום לחכות שהקשר יבשיל, בק הציע התערבות ישירה ומיידית. <strong>לזהות את המחשבה שמופיעה בין האירוע לרגש, לרשום אותה, ולבחון אותה מול העובדות. לא כאמונה, כהשערה</strong>.\n\nוההצעה הרדיקלית שלו: <strong>לא צריך להבין למה המחשבה נוצרה כדי לשנות אותה</strong>.',
             contentEn: 'The three thinkers so far described change that happens through relationships: someone listens, someone is present, someone holds the space. Aaron Beck proposed something entirely different.\n\nHe asked a simple question: <strong>if it is the thought that produces the emotion, why not check whether the thought is correct?</strong>\n\nAnd this was a break with the tradition. Instead of digging backwards, instead of waiting for the relationship to ripen, Beck proposed a direct and immediate intervention. <strong>To identify the thought that appears between the event and the emotion, to write it down, and to examine it against the facts. Not as a belief, as a hypothesis</strong>.\n\nAnd his radical proposal: <strong>one does not need to understand why the thought was created in order to change it</strong>.',
           },
@@ -3809,13 +3809,13 @@ const psychologyData = {
       },
       {
         id: 5,
-        title: 'מה קורה כשאי אפשר לשנות דבר?', titleEn: 'What happens when nothing can be changed?',
+        title: 'כשאי אפשר לשנות', titleEn: 'When Change Isn\'t Possible',
         thinker: 'ויקטור פרנקל', thinkerEn: 'Viktor Frankl',
         thinkerId: 'frankl', xp: 50,
         sections: [
           {
             type: 'idea',
-            title: 'מה קורה כשאי אפשר לשנות דבר?', titleEn: 'What Happens When Nothing Can Be Changed?',
+            title: 'כשאי אפשר לשנות', titleEn: 'When Change Isn\'t Possible',
             content: 'ארבעת ההוגים עד כה הניחו הנחה משותפת, בלי לומר אותה: שיש מה לשנות. מחשבה שאפשר לבחון, קשר שאפשר לתקן, סביבה שאפשר לאפשר.\n\nויקטור פרנקל שאל מה קורה כשאין.\n\n<strong>הוא הגיע לשאלה הזו מהמקום שבו אין מה לשנות בכלל</strong>. במחנה השמדה בשואה, שום פעולה לא הייתה יכולה לשנות את הנסיבות. ובכל זאת הוא הבחין בהבדל בין אנשים. לא בהישרדות, וזה חשוב לומר, אלא באופן שבו אדם נושא את מה שהוא נושא.\n\nומכאן הטענה שלו: <strong>גם כשהנסיבות סגורות לגמרי, נשארת חירות אחת – לבחור את העמדה כלפיהן</strong>. לא כפיצוי, ולא כנחמה. כדבר האחרון שאינו ניתן ליטול ממך.\n\nוזה משנה את מה שאנחנו קוראים לו שינוי. <strong>לא רק שינוי במצב או במחשבה, אלא שינוי ביחס</strong>.',
             contentEn: 'The four thinkers so far held a shared assumption, without saying it: that there is something to change. A thought that can be examined, a relationship that can be repaired, an environment that can allow.\n\nViktor Frankl asked what happens when there is not.\n\n<strong>He arrived at this question from the place where there is nothing at all to change</strong>. In an extermination camp in the Holocaust, no action could have changed the circumstances. And nevertheless he noticed a difference between people. Not in survival, and this is important to say, but in the manner in which a person carries what he carries.\n\nAnd from here his claim: <strong>even when the circumstances are entirely closed, one freedom remains, to choose one\'s attitude towards them</strong>. Not as compensation, and not as consolation. As the last thing that cannot be taken from you.\n\nAnd this changes what we call change. <strong>Not only a change in the situation or in the thought, but a change in attitude</strong>.',
           },

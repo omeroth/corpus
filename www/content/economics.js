@@ -6,10 +6,10 @@ const economicsData = {
       title: 'היסודות', titleEn: 'The Foundations',
       subtitle: 'שאלות בסיסיות, תשובות מפתיעות', subtitleEn: 'Basic questions, surprising answers',
       days: [
-        { id: 1, title: 'השאלות שאי אפשר לברוח מהן', titleEn: 'The Questions That Cannot Be Escaped', thinker: 'פול סמואלסון', thinkerEn: 'Paul Samuelson', thinkerId: 'samuelson', xp: 50, sections: [
+        { id: 1, title: 'השאלות שאין מהן מנוס', titleEn: 'The Inescapable Questions', thinker: 'פול סמואלסון', thinkerEn: 'Paul Samuelson', thinkerId: 'samuelson', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'השאלות שאי אפשר לברוח מהן', titleEn: 'The Questions That Cannot Be Escaped',
+            title: 'השאלות שאין מהן מנוס', titleEn: 'The Inescapable Questions',
             content: 'ב-1948 פרסם כלכלן בן 33 בשם פול סמואלסון ספר שישנה את האופן שבו לומדים כלכלה.</p><p>ההגדרה שלו הייתה רדיקלית בפשטותה: <strong>כלכלה היא המדע של בחירה תחת מחסור.</strong></p><p>לא כסף, לא שווקים, לא קפיטליזם. כל חברה - מהשבט הקדמון עד הציוויליזציה המודרנית - חייבת לענות על שלוש שאלות: <strong>מה לייצר? איך לייצר? עבור מי לייצר?</strong></p><p>ולמה הן בלתי נמנעות? כי המשאבים מוגבלים, והרצונות אינסופיים.',
             contentEn: 'In 1948, a 33-year-old economist named Paul Samuelson published a book that would change how economics is learned.</p><p>His definition was radical in its simplicity: <strong>economics is the science of choice under scarcity.</strong></p><p>Not money, not markets, not capitalism. Every society - from the primitive tribe to modern civilization - must answer three questions: <strong>What to produce? How to produce? For whom to produce?</strong></p><p>And why are they unavoidable? Because resources are limited, and desires are infinite.',
           },
@@ -261,10 +261,10 @@ const economicsData = {
           },
           { type: 'quiz_summary' },
         ] },
-        { id: 4, title: 'כשהשוק לא חוזר לאיזון', titleEn: 'When the Market Does Not Return to Balance', thinker: 'ג\'ון מיינרד קיינס', thinkerEn: 'John Maynard Keynes', thinkerId: 'keynes', xp: 50, sections: [
+        { id: 4, title: 'כשהשוק לא חוזר לאיזון', titleEn: 'When Balance Breaks', thinker: 'ג\'ון מיינרד קיינס', thinkerEn: 'John Maynard Keynes', thinkerId: 'keynes', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'כשהשוק לא חוזר לאיזון', titleEn: 'When the Market Does Not Return to Balance',
+            title: 'כשהשוק לא חוזר לאיזון', titleEn: 'When Balance Breaks',
             content: 'אוקטובר 1929. הבורסה בניו יורק קורסת. תוך שנתיים, אדם אחד מתוך ארבעה בארה"ב מובטל. <strong>המשבר הגדול.</strong></p><p>הכלכלנים הקלאסיים - תלמידיו של סמית - אמרו: תחכו. השוק יתקן את עצמו. כשהשכר ירד מספיק, מעסיקים יחזרו לשכור.</p><p>אבל זה לא קרה. שנה, שנתיים, שלוש - והכלכלה רק החמירה.</p><p>באנגליה ישב כלכלן בן 50 בשם ג\'ון מיינרד קיינס וצפה בכישלון התיאוריה הקלאסית. ב-1936 הוא פרסם ספר שיהפוך אותו לכלכלן המשפיע ביותר של המאה.</p><p>הטענה שלו הייתה רדיקלית: <strong>השוק לא תמיד מתקן את עצמו.</strong> הוא יכול להישאר תקוע באבטלה גבוהה - אולי לנצח.',
             contentEn: 'October 1929. The New York Stock Exchange crashes. Within two years, one in four people in the US is unemployed. <strong>The Great Depression.</strong></p><p>The classical economists - Smith\'s disciples - said: wait. The market will correct itself. When wages drop enough, employers will hire again.</p><p>But it didn\'t happen. One year, two, three - and the economy only got worse.</p><p>In England, a 50-year-old economist named John Maynard Keynes sat watching the failure of classical theory. In 1936 he published a book that would make him the most influential economist of the century.</p><p>His claim was radical: <strong>the market does not always correct itself.</strong> It can remain stuck in high unemployment - perhaps forever.',
           },
@@ -346,10 +346,10 @@ const economicsData = {
           },
           { type: 'quiz_summary' },
         ] },
-        { id: 5, title: 'השוק כשומר על החירות', titleEn: 'The Market as a Guardian of Freedom', thinker: 'מילטון פרידמן', thinkerEn: 'Milton Friedman', thinkerId: 'friedman', xp: 50, sections: [
+        { id: 5, title: 'השוק כשומר על החירות', titleEn: 'Markets and Freedom', thinker: 'מילטון פרידמן', thinkerEn: 'Milton Friedman', thinkerId: 'friedman', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'השוק כשומר על החירות', titleEn: 'The Market as a Guardian of Freedom',
+            title: 'השוק כשומר על החירות', titleEn: 'Markets and Freedom',
             content: 'שיקגו, אמצע המאה ה-20. שלושים שנה אחרי שקיינס לימד את העולם שהמדינה חייבת להתערב, מתחיל לעלות קול אחר. כלכלן בשם מילטון פרידמן, באוניברסיטת שיקגו, יוצא נגד הדומיננטיות הקיינסיאנית.</p><p>הוא ראה משהו שקיינס לא הדגיש: <strong>השוק החופשי אינו רק מנגנון ליעילות כלכלית - הוא יסוד של החירות האנושית.</strong></p><p>הטיעון של פרידמן: <strong>כשהמדינה שולטת בכלכלה, היא שולטת גם בחיים האישיים.</strong> אם הממשלה מחליטה מה לייצר, איך לייצר ועבור מי - היא בעצם מחליטה איך אתה תחיה.</p><p>פרידמן הסתכל על ברית המועצות וראה לא רק חוסר יעילות, אלא אובדן חירות. ואז הכריז: <strong>חופש כלכלי וחופש פוליטי אינם נפרדים. אם תאבד את האחד - תאבד את השני.</strong>',
             contentEn: 'Chicago, mid-20th century. Thirty years after Keynes taught the world that the state must intervene, another voice begins to rise. An economist named Milton Friedman, at the University of Chicago, comes out against Keynesian dominance.</p><p>He saw something Keynes did not emphasize: <strong>the free market is not just a mechanism for economic efficiency - it is a foundation of human freedom.</strong></p><p>Friedman\'s argument: <strong>when the state controls the economy, it also controls personal lives.</strong> If the government decides what to produce, how to produce, and for whom - it essentially decides how you will live.</p><p>Friedman looked at the Soviet Union and saw not just inefficiency, but loss of freedom. Then he declared: <strong>economic freedom and political freedom are inseparable. If you lose one - you\'ll lose the other.</strong>',
           },
@@ -431,10 +431,10 @@ const economicsData = {
           },
           { type: 'quiz_summary' },
         ] },
-        { id: 6, title: 'מה הכלכלה באמת מודדת?', titleEn: 'What Does Economics Really Measure?', thinker: 'אמרטיה סן', thinkerEn: 'Amartya Sen', thinkerId: 'sen', xp: 50, sections: [
+        { id: 6, title: 'מה הכלכלה באמת מודדת?', titleEn: 'What Economics Measures', thinker: 'אמרטיה סן', thinkerEn: 'Amartya Sen', thinkerId: 'sen', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'מה הכלכלה באמת מודדת?', titleEn: 'What Does Economics Really Measure?',
+            title: 'מה הכלכלה באמת מודדת?', titleEn: 'What Economics Measures',
             content: 'בנגל, הודו, 1943. ילד בן תשע בשם אמרטיה סן רואה משהו שלא יעזוב אותו לעולם: <strong>הרעב הגדול.</strong> בין שניים לשלושה מיליון בני אדם מתים מרעב.</p><p>אבל ההלם של הילד הוא לא רק מהמוות - אלא ממשהו אחר.</p><p><strong>לא היה מחסור באוכל.</strong> הייצור החקלאי בבנגל באותה שנה היה תקין. היה אוכל - אבל לאנשים לא היה כסף לקנותו. הצבא הבריטי אצר מזון לחיילים, ייצא כמויות לחזיתות אחרות, והחרים סירות. המחירים זינקו, ומיליונים מתו ליד אוכל שעמד באסם.</p><p>הילד גדל והפך לכלכלן. <strong>רעב, הוא הראה, אינו תוצאה של חוסר באוכל - הוא תוצאה של חוסר ביכולת לרכוש אותו.</strong></p><p>ולאחר מכן הרחיב את התובנה לטענה גדולה יותר: <strong>כל הכלכלה מודדת את הדברים הלא נכונים.</strong> GDP, צמיחה, שכר - אלה רק כלים. אבל מהי התכלית?',
             contentEn: 'Bengal, India, 1943. A nine-year-old boy named Amartya Sen sees something that will never leave him: <strong>the Great Famine.</strong> Between two and three million people die of hunger.</p><p>But the boy\'s shock is not just from the death - but from something else.</p><p><strong>There was no shortage of food.</strong> Agricultural production in Bengal that year was normal. There was food - but people had no money to buy it. The British army hoarded food for soldiers, exported quantities to other fronts, and confiscated boats. Prices skyrocketed, and millions died next to food sitting in granaries.</p><p>The boy grew up and became an economist. <strong>Hunger, he showed, is not the result of lack of food - it is the result of lack of ability to purchase it.</strong></p><p>And then he expanded the insight into a bigger claim: <strong>all of economics measures the wrong things.</strong> GDP, growth, wages - these are just tools. But what is the purpose?',
           },
@@ -2912,10 +2912,10 @@ const economicsData = {
       days: [
 
 // ─── Chapter 5, Dialogue 1 — Solow: Why don't rich countries come to a stop? ───
-        { id: 1, title: 'למה מדינות עשירות לא נעצרות?', titleEn: 'Why don\'t rich countries come to a stop?', thinker: 'רוברט סולו', thinkerEn: 'Robert Solow', thinkerId: 'solow', xp: 50, sections: [
+        { id: 1, title: 'למה הצמיחה נמשכת', titleEn: 'Why Growth Persists', thinker: 'רוברט סולו', thinkerEn: 'Robert Solow', thinkerId: 'solow', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'למה מדינות עשירות לא נעצרות?', titleEn: 'Why don\'t rich countries come to a stop?',
+            title: 'למה הצמיחה נמשכת', titleEn: 'Why Growth Persists',
             content: 'בפרק הקודם שאלנו מה צודק בתוך חברה. עכשיו נשאלת שאלה אחרת: <strong>למה יש חברות עשירות פי עשרים מאחרות?</strong></p><p>עד שנות ה-50 התשובה נראתה מובנת מאליה: הון. מי שצובר יותר מכונות, מפעלים ותשתיות, מייצר יותר. ולכן מדינה ענייה צריכה פשוט לחסוך ולהשקיע.</p><p><strong>רוברט סולו הראה שזה לא יכול לעבוד.</strong></p><p>הטיעון שלו נשען על עיקרון אחד: <strong>תשואה פוחתת להון</strong>. המכונה הראשונה במפעל משנה הכל. העשירית מוסיפה קצת. המאה כמעט לא מוסיפה דבר, ובינתיים גם היא נשחקת ודורשת תחזוקה.</p><p>ולכן, בשלב מסוים, כל ההשקעה החדשה הולכת רק על שמירה על הקיים. המשק מגיע ל<strong>מצב יציב</strong>, והצמיחה נעצרת.</p><p>אבל המשקים העשירים לא נעצרו. ומכאן השאלה: <strong>מה מניע אותם?</strong>',
             contentEn: 'In the previous chapter we asked what is just within a society. Now a different question arises: <strong>why are some societies twenty times richer than others?</strong></p><p>Until the 1950s the answer seemed self-evident: capital. Whoever accumulates more machines, factories and infrastructure produces more. And therefore a poor country simply needs to save and invest.</p><p><strong>Robert Solow showed that this cannot work.</strong></p><p>His argument rests on one principle: <strong>diminishing returns to capital</strong>. The first machine in a factory changes everything. The tenth adds a little. The hundredth adds almost nothing, and meanwhile it too wears out and requires maintenance.</p><p>And therefore, at a certain point, all the new investment goes only toward maintaining what already exists. The economy reaches a <strong>steady state</strong>, and growth comes to a stop.</p><p>But the rich economies did not come to a stop. And from here the question: <strong>what drives them?</strong>',
           },
@@ -3091,10 +3091,10 @@ const economicsData = {
 // removed the "organizations – firms –" parenthetical). Card + source
 // section below use the real wording, em-dashes preserved (they are
 // North's punctuation). See thinkers.js `north` entry for full note.
-        { id: 3, title: 'למה מדינות לא פשוט מעתיקות מה שעובד?', titleEn: 'Why don\'t countries simply copy what works?', thinker: 'דאגלס נורת', thinkerEn: 'Douglass North', thinkerId: 'north', xp: 50, sections: [
+        { id: 3, title: 'למה אי אפשר רק להעתיק?', titleEn: 'Why Copying Fails', thinker: 'דאגלס נורת', thinkerEn: 'Douglass North', thinkerId: 'north', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'למה מדינות לא פשוט מעתיקות מה שעובד?', titleEn: 'Why don\'t countries simply copy what works?',
+            title: 'למה אי אפשר רק להעתיק?', titleEn: 'Why Copying Fails',
             content: 'סולו ורומר הסבירו את המנגנון. <strong>אבל נשארה חידה: אם רעיונות זמינים לכולם, למה מדינות מסוימות לא מאמצות אותם?</strong></p><p>הידע כיצד לבנות מפעל יעיל, לנהל בנק או לזקק נפט אינו סוד. ובכל זאת הפערים בין מדינות נשארים עצומים.</p><p>דאגלס נורת, היסטוריון כלכלי אמריקאי, טען שהתשובה אינה בטכנולוגיה אלא <strong>בכללים</strong>.</p><p>הוא הגדיר <strong>מוסדות</strong> כ"כללי המשחק": האילוצים שבני אדם יצרו, שמעצבים את האינטראקציה ביניהם. ולא רק חוקים. מוסדות כוללים שלושה דברים: <strong>חוקים פורמליים, נורמות בלתי כתובות, והאכיפה של שניהם.</strong></p><p>וההבחנה המרכזית שלו: <strong>המוסדות הם כללי המשחק, והארגונים הם השחקנים.</strong>',
             contentEn: 'Solow and Romer explained the mechanism. <strong>But a puzzle remained: if ideas are available to everyone, why do some countries not adopt them?</strong></p><p>The knowledge of how to build an efficient factory, run a bank or refine oil is not a secret. And yet the gaps between countries remain enormous.</p><p>Douglass North, an American economic historian, argued that the answer is not in technology but <strong>in the rules</strong>.</p><p>He defined <strong>institutions</strong> as "the rules of the game": the constraints that human beings created, which shape the interaction between them. And not only laws. Institutions include three things: <strong>formal laws, unwritten norms, and the enforcement of both.</strong></p><p>And his central distinction: <strong>the institutions are the rules of the game, and the organizations are the players.</strong>',
           },
@@ -3357,10 +3357,10 @@ const economicsData = {
 // Source-line note: docx wrote "efforts by those who do care"; the real
 // White Man's Burden (2006) has "efforts of those who do care". Card +
 // source below use the real "of" wording. See thinkers.js `easterly`.
-        { id: 6, title: 'האם אנחנו יודעים איך לגרום לזה לקרות?', titleEn: 'Do we know how to make it happen?', thinker: 'ויליאם איסטרלי', thinkerEn: 'William Easterly', thinkerId: 'easterly', xp: 50, sections: [
+        { id: 6, title: 'אפשר להנדס צמיחה?', titleEn: 'Can Growth Be Engineered?', thinker: 'ויליאם איסטרלי', thinkerEn: 'William Easterly', thinkerId: 'easterly', xp: 50, sections: [
           {
             type: 'idea',
-            title: 'האם אנחנו יודעים איך לגרום לזה לקרות?', titleEn: 'Do we know how to make it happen?',
+            title: 'אפשר להנדס צמיחה?', titleEn: 'Can Growth Be Engineered?',
             content: 'הפרק הסביר למה מדינות צומחות: טכנולוגיה, רעיונות, מוסדות, חירויות. <strong>אבל נשארה שאלה מעשית: האם אנחנו יודעים לגרום לזה לקרות?</strong></p><p>ויליאם איסטרלי, כלכלן אמריקאי שעבד שנים בבנק העולמי, טען שהתשובה ברובה שלילית. <strong>המערב הוציא טריליוני דולרים על סיוע לפיתוח, ורוב התוכניות הגדולות לא השיגו את יעדיהן.</strong></p><p>וההסבר שלו אינו שאכפת לנו פחות מדי. הוא הפוך: <strong>הבעיה היא בצורה שבה איכפת לנו.</strong></p><p>מכאן ההבחנה המפורסמת שלו בין שני סוגים. <strong>מתכננים</strong> מגיעים מלמעלה עם תוכנית כוללת, יעדים גדולים ותאריכי יעד. ו<strong>מחפשים</strong> מתחילים מלמטה, מבעיה קונקרטית, ומנסים למצוא מה עובד במקום הזה.</p><p>ובלשונו: <strong>המתכננים קובעים מה לספק, והמחפשים מגלים מה נדרש.</strong>',
             contentEn: 'The chapter explained why countries grow: technology, ideas, institutions, freedoms. <strong>But a practical question remained: do we know how to make it happen?</strong></p><p>William Easterly, an American economist who worked for years at the World Bank, argued that the answer is largely negative. <strong>The West spent trillions of dollars on development aid, and most of the large programmes did not achieve their goals.</strong></p><p>And his explanation is not that we care too little. It is the opposite: <strong>the problem is in the way we care.</strong></p><p>From here his famous distinction between two types. <strong>Planners</strong> arrive from above with a comprehensive plan, big targets and target dates. And <strong>searchers</strong> start from below, from a concrete problem, and try to find what works in this particular place.</p><p>And in his words: <strong>the planners determine what to supply, and the searchers find out what is in demand.</strong>',
           },
@@ -3444,10 +3444,10 @@ const economicsData = {
         ] },
 
 // ─── Chapter 5, Dialogue 7 — Summary: Why are some countries rich and others poor? ───
-        { id: 7, title: 'למה יש מדינות עשירות ועניות?', titleEn: 'Why are some countries rich and others poor?', thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary', thinkerId: null, xp: 50, isSummary: true, sections: [
+        { id: 7, title: 'עשירות ועניות', titleEn: 'Rich Countries, Poor Countries', thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary', thinkerId: null, xp: 50, isSummary: true, sections: [
           {
             type: 'idea',
-            title: 'למה יש מדינות עשירות ועניות?', titleEn: 'Why are some countries rich and others poor?',
+            title: 'עשירות ועניות', titleEn: 'Rich Countries, Poor Countries',
             content: 'פתחנו את הפרק בשאלה הגדולה ביותר בכלכלה: <strong>למה יש חברות עשירות פי עשרים מאחרות?</strong></p><p>שישה הוגים ענו עליה בשש רמות שונות, וכל אחד מהם חשף שהתשובה הקודמת לא הייתה מספיקה.',
             contentEn: 'We opened the chapter with the biggest question in economics: <strong>why are some societies twenty times richer than others?</strong></p><p>Six thinkers answered it at six different levels, and each of them revealed that the previous answer was not sufficient.',
           },
@@ -3541,10 +3541,10 @@ const economicsData = {
       title: 'כלכלה התנהגותית',
       titleEn: 'Behavioral Economics',
       days: [
-          { id: 1, title: 'האם אנחנו בכלל מסוגלים להיות רציונליים?', titleEn: 'Are we even capable of being rational?', thinker: 'הרברט סיימון', thinkerEn: 'Herbert Simon', thinkerId: 'simon', xp: 50, sections: [
+          { id: 1, title: 'גבולות ההיגיון', titleEn: 'The Limits of Reason', thinker: 'הרברט סיימון', thinkerEn: 'Herbert Simon', thinkerId: 'simon', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'האם אנחנו בכלל מסוגלים להיות רציונליים?', titleEn: 'Are we even capable of being rational?',
+              title: 'גבולות ההיגיון', titleEn: 'The Limits of Reason',
               content: 'המודל הכלכלי הקלאסי מניח משהו מסוים על בני אדם: שהם ממקסמים. שוקלים את כל האפשרויות, מעריכים את התוצאות, ובוחרים את הטובה ביותר.\n\nהרברט סיימון טען ש<strong>זה לא רק לא מדויק, זה בלתי אפשרי</strong>.\n\nוהטיעון שלו אינו על חולשת אופי. אין לנו את הזמן לסרוק את כל האפשרויות, אין לנו את המידע המלא, ואין לנו את יכולת החישוב. גם המחשב החזק ביותר לא היה מצליח, כי מספר האפשרויות ברוב ההחלטות האמיתיות עצום.\n\nמכאן המונח שלו: רציונליות חסומה. לא היעדר היגיון, אלא <strong>היגיון שפועל בתוך גבולות ממשיים</strong>.\n\nומה שאנחנו עושים במקום נקרא הסתפקות: <strong>מחפשים עד שמוצאים משהו מספיק טוב, ואז עוצרים</strong>. לא הטוב ביותר, אלא הראשון שעובר את הרף.',
               contentEn: 'The classical economic model assumes something particular about human beings: that they maximize. They weigh all the options, assess the outcomes, and choose the best one.\n\nHerbert Simon argued that <strong>this is not merely inaccurate, it is impossible</strong>.\n\nAnd his argument is not about weakness of character. We do not have the time to scan all the options, we do not have complete information, and we do not have the computational capacity. Even the most powerful computer would not manage it, because the number of options in most real decisions is enormous.\n\nFrom here his term: bounded rationality. Not an absence of reasoning, but <strong>reasoning that operates within real limits</strong>.\n\nAnd what we do instead is called satisficing: <strong>we search until we find something good enough, and then we stop</strong>. Not the best one, but the first one that clears the bar.',
             },
@@ -3602,10 +3602,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 2, title: 'למה הפסד כואב יותר מרווח משמח', titleEn: 'Why a loss hurts more than an equal gain pleases', thinker: 'כהנמן וטברסקי', thinkerEn: 'Kahneman and Tversky', thinkerId: 'kahneman', xp: 50, sections: [
+          { id: 2, title: 'למה הפסד כואב יותר', titleEn: 'Why Losing Hurts More', thinker: 'כהנמן וטברסקי', thinkerEn: 'Kahneman and Tversky', thinkerId: 'kahneman', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'למה הפסד כואב יותר מרווח משמח', titleEn: 'Why a loss hurts more than an equal gain pleases',
+              title: 'למה הפסד כואב יותר', titleEn: 'Why Losing Hurts More',
               content: 'סיימון הראה שאיננו ממקסמים. דניאל כהנמן ועמוס טברסקי הראו משהו חד יותר: <strong>גם הסטיות עצמן אינן אקראיות. הן שיטתיות, חוזרות, וניתנות לחיזוי</strong>.\n\nובמאמר מ-1979 הם הצביעו על הנחה שהמודל הקלאסי עושה בלי לומר אותה. התיאוריה הקלאסית מניחה שאנשים שוקלים מצבי עושר סופיים: כמה יהיה לי בסוף.\n\nוכהנמן וטברסקי הראו שאנחנו לא חושבים כך בכלל. <strong>אנחנו חושבים בשינויים מנקודת ייחוס</strong>: כמה יותר או פחות יהיה לי ממה שיש לי עכשיו, או ממה שציפיתי.\n\nומכאן הממצא המרכזי: האסימטריה. העקומה אינה סימטרית סביב נקודת הייחוס. <strong>הכאב מהפסד גדול בערך פי שניים מההנאה מרווח זהה</strong>.',
               contentEn: 'Simon showed that we do not maximize. Daniel Kahneman and Amos Tversky showed something sharper: <strong>the deviations themselves are not random either. They are systematic, recurring, and predictable</strong>.\n\nAnd in a 1979 paper they pointed to an assumption the classical model makes without saying it. Classical theory assumes that people weigh final states of wealth: how much I will have at the end.\n\nAnd Kahneman and Tversky showed that we do not think that way at all. <strong>We think in changes from a reference point</strong>: how much more or less I will have than I have now, or than I expected.\n\nAnd from here the central finding: the asymmetry. The curve is not symmetrical around the reference point. <strong>The pain of a loss is roughly twice the pleasure of an identical gain</strong>.',
             },
@@ -3663,10 +3663,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 3, title: 'למה אותו חפץ שווה פי שניים כשהוא שלנו?', titleEn: 'Why is the same object worth twice as much when it is ours?', thinker: 'ריצ\'רד תיילר', thinkerEn: 'Richard Thaler', thinkerId: 'thaler', xp: 50, sections: [
+          { id: 3, title: 'שווה יותר כשזה שלי', titleEn: 'Worth More Once It\'s Yours', thinker: 'ריצ\'רד תיילר', thinkerEn: 'Richard Thaler', thinkerId: 'thaler', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'למה אותו חפץ שווה פי שניים כשהוא שלנו?', titleEn: 'Why is the same object worth twice as much when it is ours?',
+              title: 'שווה יותר כשזה שלי', titleEn: 'Worth More Once It\'s Yours',
               content: 'כהנמן וטברסקי היו פסיכולוגים שכתבו לכלכלנים. ריצ\'רד תיילר היה הכלכלן שהכניס את הממצאים שלהם אל תוך הכלכלה עצמה, ו<strong>הוא ניסח את ההבדל בצורה שנדבקה</strong>.\n\nספרי הלימוד, אמר תיילר, מתארים יצור שהוא כינה "אקון": מחשב לגמרי, עקבי, משקלל נכון. בעולם האמיתי יש בני אדם. הם מחשבים, אבל גם שוכחים, נאחזים ומתבלבלים.\n\nהטענה שלו לא הייתה שבני אדם טיפשים, אלא <strong>שהם שונים מהמודל בדרכים ניתנות לחיזוי</strong>.\n\nהתופעה הראשונה שמיפה: אפקט הבעלות. <strong>ברגע שמשהו שייך לנו, הוא נעשה שווה יותר בעינינו</strong>. החפץ לא השתנה. מה שהשתנה הוא <strong>שלוותר עליו נחווה מעכשיו כהפסד</strong>, ואת האסימטריה הזו פגשנו בדיאלוג הקודם.',
               contentEn: 'Kahneman and Tversky were psychologists writing for economists. Richard Thaler was the economist who brought their findings into economics itself, and <strong>he formulated the difference in a way that stuck</strong>.\n\nThe textbooks, said Thaler, describe a creature he called an "Econ": entirely calculating, consistent, weighing things correctly. In the real world there are human beings. They calculate, but they also forget, cling and get confused.\n\nHis claim was not that human beings are stupid, but that <strong>they differ from the model in predictable ways</strong>.\n\nThe first phenomenon he mapped: the endowment effect. <strong>The moment something belongs to us, it becomes worth more in our eyes</strong>. The object did not change. What changed is that <strong>giving it up is now experienced as a loss</strong>, and we already met that asymmetry in the previous dialogue.',
             },
@@ -3724,10 +3724,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 4, title: 'אם אנחנו יודעים איך אנשים בוחרים, מותר לעצב את הבחירה?', titleEn: 'If we know how people choose, are we permitted to design the choice?', thinker: 'תיילר וסנסטיין', thinkerEn: 'Thaler and Sunstein', thinkerId: 'thaler', xp: 50, sections: [
+          { id: 4, title: 'האתיקה של הדחיפה', titleEn: 'The Ethics of Nudging', thinker: 'תיילר וסנסטיין', thinkerEn: 'Thaler and Sunstein', thinkerId: 'thaler', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'אם אנחנו יודעים איך אנשים בוחרים, מותר לעצב את הבחירה?', titleEn: 'If we know how people choose, are we permitted to design the choice?',
+              title: 'האתיקה של הדחיפה', titleEn: 'The Ethics of Nudging',
               content: 'שלושת הדיאלוגים הקודמים מיפו סטיות. תיילר וכאס סנסטיין שאלו מה עושים עם הידע הזה, ובספרם מ-2008 הציעו תשובה שהפכה למדיניות ברחבי העולם.\n\nהרעיון: <strong>כל בחירה מוצגת בדרך מסוימת</strong>. יש סדר לאפשרויות, יש ברירת מחדל, ויש מה שנמצא בגובה העיניים. הם קראו לזה "ארכיטקטורת בחירה", וטענו שאי אפשר לוותר עליה.\n\nואם כך, <strong>אפשר לעצב אותה בכוונה כך שתסייע לאנשים</strong>.\n\nויש כאן תנאי קפדני: <strong>דחיפה אינה כפייה</strong>. שום אפשרות אינה נאסרת, ושום תמריץ כלכלי אינו משתנה מהותית. להציב פירות בגובה העיניים בקפיטריה זו דחיפה. לאסור משקאות מתוקים זו אינה דחיפה.',
               contentEn: 'The three previous dialogues mapped deviations. Thaler and Cass Sunstein asked what to do with this knowledge, and in their 2008 book they proposed an answer that became policy around the world.\n\nThe idea: <strong>every choice is presented in a particular way</strong>. There is an order to the options, there is a default, and there is what sits at eye level. They called this "choice architecture", and argued that it cannot be dispensed with.\n\nAnd if so, <strong>it can be designed deliberately so as to help people</strong>.\n\nAnd there is a strict condition here: <strong>a nudge is not coercion</strong>. No option is forbidden, and no economic incentive is substantially changed. Placing fruit at eye level in a cafeteria is a nudge. Banning sugary drinks is not a nudge.',
             },
@@ -3785,10 +3785,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 5, title: 'מה קורה כשהסטיות מצטברות לשוק שלם?', titleEn: 'What happens when the deviations accumulate into an entire market?', thinker: 'רוברט שילר', thinkerEn: 'Robert Shiller', thinkerId: 'shiller', xp: 50, sections: [
+          { id: 5, title: 'כשההטיות מצטברות', titleEn: 'When Biases Scale Up', thinker: 'רוברט שילר', thinkerEn: 'Robert Shiller', thinkerId: 'shiller', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'מה קורה כשהסטיות מצטברות לשוק שלם?', titleEn: 'What happens when the deviations accumulate into an entire market?',
+              title: 'כשההטיות מצטברות', titleEn: 'When Biases Scale Up',
               content: 'ארבעת הדיאלוגים עד כה עסקו באדם אחד. רוברט שילר שאל מה קורה כשמיליוני אנשים כאלה נפגשים בשוק אחד.\n\nולשאלה הזו הייתה תשובה מקובלת: לא קורה כלום. גם אם כל אחד סוטה מהמודל, <strong>הסטיות אינן באותו כיוון, ולכן הן מתקזזות זו בזו</strong>. ואם מניה מתומחרת נמוך מדי, מישהו יקנה אותה וירוויח, והקנייה הזו עצמה תעלה את המחיר. ולכן טעות אינה נשארת מונחת על השולחן.\n\nוזו ההנחה שהכלכלה עבדה לפיה: <strong>המחיר בשוק משקף בכל רגע את כל המידע הקיים</strong>. ההנחה הזו קיבלה שם, השערת השוק היעיל, והיא העמדה שהפרק הזה מתמודד איתה מתחילתו.\n\nו<strong>שילר בנה מבחן פשוט להפליא לטענה הזו</strong>.',
               contentEn: 'The four dialogues so far dealt with a single person. Robert Shiller asked what happens when millions of such people meet in one market.\n\nAnd this question had an accepted answer: nothing happens. Even if each person deviates from the model, <strong>the deviations are not in the same direction, and therefore they cancel each other out</strong>. And if a stock is priced too low, someone will buy it and profit, and that very purchase will raise the price. And therefore an error does not remain lying on the table.\n\nAnd this is the assumption economics worked by: <strong>the price in the market reflects at every moment all the information that exists</strong>. This assumption received a name, the efficient market hypothesis, and it is the position this chapter has been contending with from its start.\n\nAnd <strong>Shiller built a remarkably simple test of this claim</strong>.',
             },
@@ -3846,10 +3846,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 6, title: 'ואולי זו בכלל לא טעות?', titleEn: 'And perhaps it is not a mistake at all?', thinker: 'גרד גיגרנצר', thinkerEn: 'Gerd Gigerenzer', thinkerId: 'gigerenzer', xp: 50, sections: [
+          { id: 6, title: 'אולי אין טעות?', titleEn: 'Perhaps Not a Mistake?', thinker: 'גרד גיגרנצר', thinkerEn: 'Gerd Gigerenzer', thinkerId: 'gigerenzer', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'ואולי זו בכלל לא טעות?', titleEn: 'And perhaps it is not a mistake at all?',
+              title: 'אולי אין טעות?', titleEn: 'Perhaps Not a Mistake?',
               content: 'חמשת הדיאלוגים עד כה בנו טיעון אחד: אנחנו סוטים מהמודל באופן שיטתי. גרד גיגרנצר, פסיכולוג גרמני, טוען שהטיעון הזה נשען על הנחה שלא נאמרה בקול.\n\nההנחה: <strong>שיש דרך אחת נכונה להחליט, ושכל מה ששונה ממנה הוא הטיה</strong>.\n\nוגיגרנצר חולק על ההנחה הזאת. <strong>קיצור דרך אינו פגם, הוא כלי</strong>. קיצור דרך אינו פגם, הוא כלי. והשאלה אינה אם הוא תואם לנוסחה, אלא אם הוא מתאים לסביבה שבה משתמשים בו.\n\nלכך הוא קרא רציונליות אקולוגית: התאמה בין הכלי לסביבה. ומכאן ש<strong>אותו קיצור דרך יכול להיות מבריק במקום אחד וכושל במקום אחר, ואין טעם לשפוט אותו בלי ההקשר</strong>.',
               contentEn: 'The five dialogues so far built a single argument: we deviate from the model systematically. Gerd Gigerenzer, a German psychologist, argues that this argument rests on an assumption that was never stated out loud.\n\nThe assumption: that <strong>there is one correct way to decide, and that anything different from it is a bias</strong>.\n\nAnd Gigerenzer disputes this assumption. <strong>A shortcut is not a flaw, it is a tool</strong>. And the question is not whether it matches the formula, but whether it suits the environment in which it is used.\n\nThis he called ecological rationality: a match between the tool and the environment. And from here it follows that <strong>the same shortcut can be brilliant in one place and fail in another, and there is no point in judging it without the context</strong>.',
             },

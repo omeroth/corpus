@@ -1518,13 +1518,13 @@ const corpusData = {
       },
       {
         id: 2,
-        title: 'האם אפשר לדעת כלל?', titleEn: 'Is it possible to know anything at all?',
+        title: 'האם אפשר לדעת כלל?', titleEn: 'Can We Know Anything?',
         thinker: 'רנה דקארט', thinkerEn: 'René Descartes',
         thinkerId: 'descartes', xp: 50,
         sections: [
           {
             type: 'idea',
-            title: 'האם אפשר לדעת כלל?', titleEn: 'Is it possible to know anything?',
+            title: 'האם אפשר לדעת כלל?', titleEn: 'Can We Know Anything?',
             content: 'אתמול הגדרנו ידע כאמונה מוצדקת ואמיתית. אך רנה דקארט שאל שאלה מוקדמת יותר: האם אפשר בכלל לדעת משהו בוודאות? הוא החליט לפקפק בהכול, בחושים, בזיכרון ואפילו במתמטיקה, עד שימצא משהו שאי אפשר לפקפק בו. <strong>מה שמצא שינה את הפילוסופיה לנצח</strong>.',
             contentEn: 'Yesterday we defined knowledge as a justified and true belief. But René Descartes asked an even more preliminary question: Is it even possible to know anything with certainty? He decided to doubt everything, the senses, memory, and even mathematics, until he could find something that could not be doubted. <strong>What he found changed philosophy forever</strong>.',
           },
@@ -1648,13 +1648,13 @@ const corpusData = {
       },
       {
         id: 4,
-        title: 'מה השכל מביא לידע?', titleEn: 'What does the mind bring to knowledge?',
+        title: 'מה השכל מביא לידע?', titleEn: 'What the Mind Brings',
         thinker: 'עמנואל קאנט', thinkerEn: 'Immanuel Kant',
         thinkerId: 'kant', xp: 50,
         sections: [
           {
             type: 'idea',
-            title: 'מה השכל מביא לידע?', titleEn: 'What does the mind bring to knowledge?',
+            title: 'מה השכל מביא לידע?', titleEn: 'What the Mind Brings',
             content: 'יום הראה שהחושים לבדם לא מספיקים, אנחנו מוסיפים פרשנות לכל מה שאנחנו רואים. עמנואל קאנט לקח את זה צעד קדימה: לא רק שאנחנו מוסיפים פרשנות, <strong>אנחנו מוסיפים את המסגרת כולה</strong>. זמן, מרחב וסיבתיות אינם תכונות של העולם כפי שהוא לעצמו, אלא ה"משקפיים" שאנחנו לובשים לפני שאנחנו מסתכלים על העולם.',
             contentEn: 'Hume showed that the senses alone are not enough, we add interpretation to everything we see. Immanuel Kant took this a step further: not only do we add interpretation, <strong>we add the entire framework</strong>. Time, space, and causality are not features of the world as it is in itself, but the "glasses" we put on before we look at the world.',
           },
@@ -1843,7 +1843,7 @@ const corpusData = {
       },
       {
         id: 7,
-        title: 'ספק וידע - סיכום הפרק', titleEn: 'Doubt and Knowledge - Chapter Summary',
+        title: 'סיכום הפרק', titleEn: 'Chapter Summary',
         thinker: 'סיכום', thinkerEn: 'Summary',
         thinkerId: null, xp: 80, isSummary: true,
         sections: [
@@ -2566,13 +2566,13 @@ const corpusData = {
       },
       {
         id: 3,
-        title: 'אולי כל הדילמה נשענת על בלבול?', titleEn: 'Perhaps the whole dilemma rests on a confusion?',
+        title: 'דילמת סרק?', titleEn: 'A False Dilemma?',
         thinker: 'דיוויד יום', thinkerEn: 'David Hume',
         thinkerId: 'hume', xp: 50,
         sections: [
           {
             type: 'idea',
-            title: 'אולי כל הדילמה נשענת על בלבול?', titleEn: 'Perhaps the Whole Dilemma Rests on a Confusion?',
+            title: 'דילמת סרק?', titleEn: 'A False Dilemma?',
             content: 'שני הדיאלוגים הקודמים בנו מלכודת. דיוויד יום טוען ש<strong>המלכודת נשענת על בלבול במילה אחת</strong>.\n\nהשאלה "האם הרצון שלי חופשי" מניחה שחופשי פירושו ללא סיבה. ויום שואל מאיפה ההנחה הזו הגיעה.\n\nבואו נבדוק מתי אנחנו באמת אומרים שאדם לא היה חופשי. כשאיימו עליו. כשכבלו אותו. כשהחזיקו אותו בכוח. <strong>מעולם לא אמרנו על אדם שהוא לא היה חופשי מפני שלהחלטה שלו הייתה סיבה</strong>.\n\nומכאן הטענה: <strong>חופש אינו היעדר סיבות, הוא היעדר כפייה</strong>.\n\nיום קרא לזה "פרויקט של פיוס". הוא לא בא להוכיח שיש בחירה חופשית ולא להפריך אותה, אלא להראות שהוויכוח כולו נובע משימוש לא זהיר במילים.',
             contentEn: 'The two previous dialogues built a trap. David Hume argues that <strong>the trap rests on a confusion over a single word</strong>.\n\nThe question "is my will free" assumes that free means without a cause. And Hume asks where that assumption came from.\n\nLet us check when we actually say that a person was not free. When he was threatened. When he was shackled. When he was held by force. <strong>We never said of a person that he was not free because his decision had a cause</strong>.\n\nAnd from here the claim: <strong>freedom is not the absence of causes, it is the absence of coercion</strong>.\n\nHume called this a "reconciling project". He did not come to prove that there is free choice, nor to refute it, but to show that the entire argument arises from a careless use of words.',
           },
@@ -2633,13 +2633,13 @@ const corpusData = {
       },
       {
         id: 4,
-        title: 'בלי חופש אין מוסר', titleEn: 'Without freedom there is no morality',
+        title: 'בלי חופש אין מוסר', titleEn: 'No Freedom, No Morality',
         thinker: 'עמנואל קאנט', thinkerEn: 'Immanuel Kant',
         thinkerId: 'kant', xp: 50,
         sections: [
           {
             type: 'idea',
-            title: 'בלי חופש אין מוסר', titleEn: 'Without Freedom There Is No Morality',
+            title: 'בלי חופש אין מוסר', titleEn: 'No Freedom, No Morality',
             content: 'יום פירק את הדילמה. עמנואל קאנט טען ש<strong>הפירוק גרוע מהבעיה, מפני שהוא הורס את המוסר</strong>.\n\nקאנט מתחיל ממקום אחר לגמרי. לא מהפיזיקה, אלא מהחוויה המוסרית.\n\nשימו לב מה קורה כשאנחנו מאשימים מישהו. אנחנו אומרים שהוא היה צריך לנהוג אחרת. ו<strong>באמירה הזו כבר הנחנו שהוא היה יכול</strong>.\n\nזה העיקרון שקאנט ניסח: "צריך" מחייב "יכול". <strong>אין טעם לדרוש מאדם משהו שאינו בגדר אפשרותו</strong>.\n\nומכאן הטיעון שלו: אם האדם באמת לא יכול היה לפעול אחרת, אז להאשים אותו זה כמו להאשים אבן שנפלה. ואם כך, כל המוסר מתמוטט.\n\nוהמסקנה: <strong>המוסר אמיתי, ולכן החופש חייב להיות אמיתי</strong>.',
             contentEn: 'Hume dismantled the dilemma. Immanuel Kant argued that <strong>the dismantling is worse than the problem, because it destroys morality</strong>.\n\nKant starts from an entirely different place. Not from physics, but from moral experience.\n\nNotice what happens when we blame someone. We say that he should have acted otherwise. And <strong>in saying that, we have already assumed that he could have</strong>.\n\nThis is the principle Kant formulated: "ought" implies "can". <strong>There is no point in demanding of a person something that is not within his power</strong>.\n\nAnd from here his argument: if the person truly could not have acted otherwise, then blaming him is like blaming a stone that fell. And if so, the whole of morality collapses.\n\nAnd the conclusion: <strong>morality is real, and therefore freedom must be real</strong>.',
           },
@@ -2700,13 +2700,13 @@ const corpusData = {
       },
       {
         id: 5,
-        title: 'ואולי אי אפשר לברוח מהחופש?', titleEn: 'And perhaps there is no escaping freedom?',
+        title: 'אין בריחה מחופש', titleEn: 'Condemned to Be Free',
         thinker: 'ז\'אן-פול סארטר', thinkerEn: 'Jean-Paul Sartre',
         thinkerId: 'sartre', xp: 50,
         sections: [
           {
             type: 'idea',
-            title: 'ואולי אי אפשר לברוח מהחופש?', titleEn: 'Perhaps There Is No Escaping Freedom?',
+            title: 'אין בריחה מחופש', titleEn: 'Condemned to Be Free',
             content: 'ארבעת הדיאלוגים עד כה שאלו אם יש לנו חופש. ז\'אן פול סארטר הופך את השאלה: <strong>האם אפשר להימלט ממנו?</strong>\n\nהוא מתחיל ממשפט שנעשה סיסמה: "הקיום קודם למהות".\n\nסכין נוצרה לשם משהו. יש לה תכלית שקדמה לה, ולכן יש תשובה לשאלה מה היא אמורה להיות. אדם, טוען סארטר, נזרק לעולם בלי תכלית כזו.\n\nומכאן שאין טבע אנושי שקובע מראש מי אתה אמור להיות. <strong>אתה נעשה מי שאתה דרך מה שאתה עושה, ולא לפני כן</strong>.\n\nזה אמנם נשמע משחרר, אבל סארטר מתעקש שזה נורא. אם אין טבע נתון ואין תכלית מוכנה, <strong>אין למי להעביר את האחריות</strong>. כל בחירה היא שלך, ואין שום דבר מחוץ אליך שיצדיק אותה.\n\nולכן לא "זכינו" בחופש, אלא <strong>נידונו לו</strong>.',
             contentEn: 'The four dialogues so far asked whether we have freedom. Jean Paul Sartre reverses the question: <strong>is it possible to escape it?</strong>\n\nHe starts from a sentence that became a slogan: "existence precedes essence".\n\nA knife was created for the sake of something. It has a purpose that preceded it, and therefore there is an answer to the question of what it is supposed to be. A human being, Sartre argues, is thrown into the world without such a purpose.\n\nAnd from here it follows that there is no human nature that determines in advance who you are supposed to be. <strong>You become who you are through what you do, and not before that</strong>.\n\nThis does admittedly sound liberating, but Sartre insists that it is terrible. If there is no given nature and no ready purpose, <strong>there is no one to whom responsibility can be passed</strong>. Every choice is yours, and there is nothing outside you that would justify it.\n\nAnd therefore we did not "win" freedom, <strong>we were condemned to it</strong>.',
           },
@@ -2767,13 +2767,13 @@ const corpusData = {
       },
       {
         id: 6,
-        title: 'מה המוח עושה רגע לפני שהחלטנו?', titleEn: 'What does the brain do a moment before we decided?',
+        title: 'המוח מחליט ראשון', titleEn: 'The Brain Decides First',
         thinker: 'בנג\'מין ליבט', thinkerEn: 'Benjamin Libet',
         thinkerId: 'libet', xp: 50,
         sections: [
           {
             type: 'idea',
-            title: 'מה המוח עושה רגע לפני שהחלטנו?', titleEn: 'What Does the Brain Do a Moment Before We Decide?',
+            title: 'המוח מחליט ראשון', titleEn: 'The Brain Decides First',
             content: 'כל הפרק עד כה היה פילוסופי. <strong>ב-1983 הביא בנג\'מין ליבט את השאלה למעבדה</strong>.\n\nהניסוי פשוט. נבדק יושב מול שעון מיוחד ומתבקש להזיז את אצבעו מתי שבא לו, בלי שום סיבה. בזמן שהוא עושה זאת, אלקטרודות מודדות את פעילות המוח. ובסוף הוא מדווח באיזה רגע בדיוק הרגיש לראשונה את הדחף לזוז.\n\nוהתוצאה הפתיעה. פעילות מוחית שנקראת "פוטנציאל מוכנות" מתחילה כ-550 אלפיות שנייה לפני התנועה. ו<strong>הדיווח על הדחף המודע מגיע רק כ-200 אלפיות שנייה לפניה</strong>.\n\nכלומר <strong>המוח מתחיל להתכונן כשליש שנייה לפני שהאדם יודע שהחליט</strong>.',
             contentEn: 'The whole chapter until now has been philosophical. <strong>In 1983 Benjamin Libet brought the question into the laboratory</strong>.\n\nThe experiment is simple. A subject sits in front of a special clock and is asked to move his finger whenever he feels like it, for no reason at all. While he does so, electrodes measure brain activity. And at the end he reports at exactly which moment he first felt the urge to move.\n\nAnd the result was surprising. Brain activity called the "readiness potential" begins about 550 milliseconds before the movement. And <strong>the report of the conscious urge arrives only about 200 milliseconds before it</strong>.\n\nThat is to say, <strong>the brain begins to prepare about a third of a second before the person knows that he has decided</strong>.',
           },
