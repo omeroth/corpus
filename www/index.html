@@ -25123,6 +25123,43 @@ function isWeekCompleted(weekId) {
   return chapter.days.every(d => state.completedDays[dayKey(weekId, d.id)]);
 }
 
+// Derive the chapter-progress unlock map from the ordered chapter list,
+// so adding a new chapter to content/*.js locks it behind the previous
+// one automatically. Replaces a hand-rolled per-subject map that
+// hard-coded ids 1-4 and left anything else unlocked — philosophy ch5,
+// economics ch5/6, and psychology ch5/6 shipped progress-unlocked
+// because they weren't in the map. Same class of fix as the getW
+// convergent rewrite.
+//
+// Rules preserved from the old map:
+//   - First non-bonus chapter is always unlocked.
+//   - Every subsequent non-bonus chapter unlocks when the previous
+//     non-bonus chapter is complete. Bonus chapters are skipped in
+//     the sequential chain (they don't gate the next regular chapter).
+//   - Bonus chapters unlock when chapter 1 is complete OR the user
+//     has any progress in that bonus chapter (the grandfather clause
+//     for users who entered under the retired promo window).
+//   - Coming-soon chapters are entered too (they always get wkLocked
+//     = true via the separate w.comingSoon term in the caller, so
+//     the map value for them is irrelevant).
+function _buildWeekLockMap(chapters) {
+  const map = {};
+  let prevNonBonusId = null;
+  for (const w of chapters) {
+    if (!w || w.id == null) continue;
+    if (w.isBonus) {
+      map[w.id] = isWeekCompleted(1) || _hasBonusProgress(w.id);
+    } else if (prevNonBonusId === null) {
+      map[w.id] = true;
+      prevNonBonusId = w.id;
+    } else {
+      map[w.id] = isWeekCompleted(prevNonBonusId);
+      prevNonBonusId = w.id;
+    }
+  }
+  return map;
+}
+
 // ⚠ SHIP PREREQUISITE — DO NOT SUBMIT A BUILD CONTAINING THIS GATE
 // UNTIL THE GRANDFATHERING INSERT HAS RUN AGAINST PROD SUPABASE.
 //
@@ -26048,29 +26085,7 @@ function _maybePostSubscriptionBonusReveal(opts) {
 // dialogue" button lands at the same destination as home's continue.
 function _findNextUpLesson() {
   const chapters = getW();
-  const weekLockMap = state.subject === 'economics'
-    ? {
-        1: true,
-        2: isWeekCompleted(1),
-        3: isWeekCompleted(2),
-        'bonusEcon1': isWeekCompleted(1) || _hasBonusProgress('bonusEcon1'),
-        4: isWeekCompleted(3),
-      }
-    : state.subject === 'psychology'
-    ? {
-        1: true,
-        2: isWeekCompleted(1),
-        3: isWeekCompleted(2),
-        'bonusPsy1': isWeekCompleted(1) || _hasBonusProgress('bonusPsy1'),
-        4: isWeekCompleted(3),
-      }
-    : {
-        1: true,
-        2: isWeekCompleted(1),
-        3: isWeekCompleted(2),
-        'bonus1': isWeekCompleted(1) || _hasBonusProgress('bonus1'),
-        4: isWeekCompleted(3),
-      };
+  const weekLockMap = _buildWeekLockMap(chapters);
   let weekId = null, dayId = null, anyLockedRemains = false;
   for (const w of chapters) {
     if (!w || !w.days) continue;
@@ -26233,34 +26248,10 @@ function renderHome() {
     const isEn = state.lang === 'en';
     const chapters = getW();
 
-    // Build weekLockMap once — branched per subject. Bonus chapter now unlocks
-    // after chapter 1 (was: chapters 1 AND 2). 'bonus1' for philosophy, 'bonusEcon1' for economics.
-    const weekLockMap = state.subject === 'economics'
-      ? {
-          1: true,
-          2: isWeekCompleted(1),
-          3: isWeekCompleted(2),
-          // Grandfather: users who opened the bonus under the retired
-          // promo window and completed at least one day keep access
-          // even if chapter 1 is still incomplete.
-          'bonusEcon1': isWeekCompleted(1) || _hasBonusProgress('bonusEcon1'),
-          4: isWeekCompleted(3),
-        }
-      : state.subject === 'psychology'
-      ? {
-          1: true,
-          2: isWeekCompleted(1),
-          3: isWeekCompleted(2),
-          'bonusPsy1': isWeekCompleted(1) || _hasBonusProgress('bonusPsy1'),
-          4: isWeekCompleted(3),
-        }
-      : {
-          1: true,
-          2: isWeekCompleted(1),
-          3: isWeekCompleted(2),
-          'bonus1': isWeekCompleted(1) || _hasBonusProgress('bonus1'),
-          4: isWeekCompleted(3),
-        };
+    // Build weekLockMap once. Derived from the current subject's chapter
+    // list so each new chapter is gated automatically on the previous
+    // non-bonus chapter's completion, with no per-chapter edit here.
+    const weekLockMap = _buildWeekLockMap(chapters);
 
     // Find the single next-up lesson (first non-done, non-locked lesson
     // across all accessible chapters). anyLockedRemains distinguishes

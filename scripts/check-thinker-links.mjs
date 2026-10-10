@@ -815,6 +815,54 @@ for (const { subject, data } of subjects) {
   }
 }
 
+// ─── Emphasis check ──────────────────────────────────────────────────
+//
+// Every shipped chapter uses <strong> emphasis in its dialogue prose
+// to pull the eye to the clause that carries the point. Counts range
+// from 76 (bonus chapters, which are shorter) to 346 across all 17
+// chapters shipped before this check — until I transcribed philosophy
+// ch5, economics ch6, and psychology ch6, all three of which shipped
+// with ZERO strong tags because my transcription scripts stripped the
+// DOCX formatting and never re-applied emphasis in post. Three
+// chapters shipped with none and nobody noticed for days.
+//
+// Rule: a chapter with populated days must have at least one <strong>
+// tag somewhere in its dialogue body fields (idea/explanation/depth
+// content). Zero is almost certainly a missing-formatting bug.
+//
+// Not a density check — the "right" count varies by chapter length
+// and authoring voice. The floor is "any emphasis at all." If a future
+// chapter legitimately has zero (unlikely given 17-of-17 precedent),
+// the chapter can be allowlisted explicitly rather than silencing the
+// check globally.
+const emphasisIssues = [];
+for (const { subject, data } of subjects) {
+  if (!Array.isArray(data.weeks)) continue;
+  for (const week of data.weeks) {
+    if (!week || !Array.isArray(week.days) || week.days.length === 0) continue;
+    let strongCount = 0;
+    for (const day of week.days) {
+      for (const sec of (day.sections || [])) {
+        if (!sec) continue;
+        for (const k of ['content', 'contentEn', 'explanation', 'explanationEn']) {
+          const v = sec[k];
+          if (typeof v !== 'string') continue;
+          const matches = v.match(/<strong\b/g);
+          if (matches) strongCount += matches.length;
+        }
+      }
+    }
+    if (strongCount === 0) {
+      emphasisIssues.push({
+        issue: 'chapter has zero <strong> tags',
+        where: `${subject} chapter ${week.id}`,
+        detail: `No emphasis in any dialogue body across the chapter. ` +
+                `Peer chapters range 76-346. Likely a missing-formatting bug. See AUTHORING.md.`,
+      });
+    }
+  }
+}
+
 // ─── HTML entity check ────────────────────────────────────────────────
 //
 // Content strings are data, not HTML. Any HTML entity (&quot; &amp;
@@ -1077,9 +1125,10 @@ reportTable('Chapter surfacing errors (content ↔ getW mismatch)', surfacingIss
 reportTable('Correct-answer distribution errors (letter > 50% / run ≥ 4)', distributionIssues);
 reportTable('Distractor length-signature errors (correct option strict-longest > 60%)', lengthIssues);
 reportTable('HTML entity errors (content strings should contain literal characters, not entities)', entityIssues);
+reportTable('Chapter emphasis errors (zero <strong> tags across all dialogue bodies)', emphasisIssues);
 reportTable('Unreferenced thinkers (never appear in any dialogue — warning only)', unreferenced);
 
-const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length + surfacingIssues.length + distributionIssues.length + lengthIssues.length + entityIssues.length;
+const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length + surfacingIssues.length + distributionIssues.length + lengthIssues.length + entityIssues.length + emphasisIssues.length;
 if (hardErrorCount > 0) {
   console.error('');
   console.error('╔════════════════════════════════════════════════════════════════════╗');
