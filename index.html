@@ -10522,8 +10522,13 @@
      accent-tinted pill matches the streak/XP token language and reads well
      in both light and dark. */
   .dc-share-btn {
-    /* 12 → 8: shave to help dc-stats fit 375 × 667. */
-    margin-top: 8px;
+    /* 12 → 8 → 4: progressive shaves to help the fit on small
+       viewports. Latest step (8 → 4) is one of two trims that pay
+       for +12 px of top padding on .dc-thinker-screen so the reveal
+       title eyebrow sits lower without shrinking the card. Still
+       leaves 10 px total separation between btn-back-home and this
+       button (gap:6 + margin:4), well above tap-target overlap. */
+    margin-top: 4px;
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -10554,14 +10559,20 @@
   /* Thinker screen */
   .dc-thinker-screen {
     justify-content: flex-start;
-    /* Padding-top absorbs the notch. Padding-bottom adds an extra
-       1× the home-indicator inset so notched devices get real
-       breathing room above the indicator (iPhone 15/16 with safe
-       34 px gets 8 + 34 + 34 = 76 px of clear space between the
-       share button and the home indicator area, matching the ~68 px
-       non-notch devices already have). Non-notch: safe-bottom is 0,
-       so the calc collapses to 8 px — unchanged from today. */
-    padding: calc(8px + var(--safe-top)) 16px calc(8px + var(--safe-bottom) + var(--safe-bottom));
+    /* Padding-top: 20px above the notch so the title eyebrow sits with
+       breathing room rather than hugging the top of the screen. The
+       extra 12px (was 8) is paid for by two tightenings below the
+       card (.dc-card-zone padding 8→4 recovers 8, .dc-share-btn
+       margin-top 8→4 recovers 4) so the chrome's actual vertical
+       budget stays constant and the card width formula's 280 reserve
+       doesn't need to change — card stays the same size on every
+       breakpoint. Padding-bottom still adds 1× the home-indicator
+       inset for the breathing room above the indicator (iPhone 15/16
+       with safe 34 px gets 8 + 34 + 34 = 76 px of clear space
+       between the share button and the home indicator area, matching
+       the ~68 px non-notch devices already have). Non-notch:
+       safe-bottom is 0, so the bottom calc collapses to 8 px. */
+    padding: calc(20px + var(--safe-top)) 16px calc(8px + var(--safe-bottom) + var(--safe-bottom));
     gap: 4px;
     /* No scrollbar. Content fits notched iPhone 15/16 (393 × 852
        with safe 59/34) and every non-notch viewport. Sheen overflow
@@ -10591,11 +10602,15 @@
     align-items: center;
     justify-content: center;
     margin: 0 auto;
-    /* padding 16 → 8: recovers 16 px vertically without changing
-       the card size. Halo (::before) is positioned 120 % × 110 %
-       relative to this box so a smaller padding just moves the halo
-       slightly closer to the card edge — still reads as a glow. */
-    padding: 8px;
+    /* padding 8 → 4: recovers 8 px vertically (one of two trims that
+       pays for +12 px of top padding on .dc-thinker-screen so the
+       title eyebrow sits lower without shrinking the card). Halo
+       (::before) is positioned 120 % × 110 % relative to this box
+       so a smaller padding just moves the halo slightly closer to
+       the card edge — still reads as a glow. Earlier 16 → 8 trim
+       was for the original dc-stats fit; this 8 → 4 trim is for the
+       reveal-title drop pass. */
+    padding: 4px;
     flex-shrink: 0;
   }
   .dc-card-zone::before {
