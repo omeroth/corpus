@@ -25671,25 +25671,13 @@ function _isUserPaidOrTrialNow() {
   return false;
 }
 function _maybeFlagMidChapterPaywall(weekId, dayId) {
-  try {
-    console.log('[midchpw] _maybeFlag entry; weekId=' + weekId + ', dayId=' + dayId +
-      ', subject=' + (state && state.subject) +
-      ', isPaid=' + (state && state.isPaid) +
-      ', grandfathered=' + (state && state.grandfathered) +
-      ', subStatus=' + (state && state.subscription && state.subscription.status) +
-      ', optUntil=' + (state && state.subscriptionOptimistic && state.subscriptionOptimistic.until));
-  } catch(e) {}
-  if (_isUserPaidOrTrialNow()) { try { console.log('[midchpw] bail: paid-or-trial'); } catch(e) {} return; }
-  if (weekId !== 1) { try { console.log('[midchpw] bail: weekId !== 1'); } catch(e) {} return; }
-  if (dayId !== 3 && dayId !== 6) { try { console.log('[midchpw] bail: dayId not 3 or 6 (got ' + dayId + ')'); } catch(e) {} return; }
+  if (_isUserPaidOrTrialNow()) return;
+  if (weekId !== 1) return;
+  if (dayId !== 3 && dayId !== 6) return;
   const subj = state.subject || 'philosophy';
   const key  = subj + '-d' + dayId;
-  if (state.midChapterPaywallShown && state.midChapterPaywallShown[key]) {
-    try { console.log('[midchpw] bail: already shown for key=' + key); } catch(e) {}
-    return;
-  }
+  if (state.midChapterPaywallShown && state.midChapterPaywallShown[key]) return;
   _pendingMidChapterPaywall = { subject: subj, dayId: dayId, source: 'ch1-d' + dayId, key: key };
-  try { console.log('[midchpw] FLAG SET; _pendingMidChapterPaywall=', _pendingMidChapterPaywall); } catch(e) {}
 }
 
 // Headline-only copy, four strings, keyed {trigger}.{lang}. Same copy
@@ -25736,8 +25724,7 @@ function _midChapterPaywallCopy(subject, source) {
 // moment, not a chokepoint.
 function _openMidChapterPaywall() {
   const p = _pendingMidChapterPaywall;
-  if (!p) { try { console.log('[midchpw] open called with no pending flag; bail'); } catch(e) {} return; }
-  try { console.log('[midchpw] open; firing paywall for', p); } catch(e) {}
+  if (!p) return;
   _pendingMidChapterPaywall = null;
   state.midChapterPaywallShown = state.midChapterPaywallShown || {};
   state.midChapterPaywallShown[p.key] = true;
@@ -28610,7 +28597,6 @@ function finishDay() {
 
   // If day already completed - stats only, no thinker card
   if (state.completedDays[key]) {
-    try { console.log('[midchpw] finishDay replay-branch; key=' + key + ', will NOT reach _maybeFlagMidChapterPaywall'); } catch(e) {}
     _showDcStats(
       ui.dayCompleted(day.id),
       isEn ? (day.titleEn || day.title) : day.title,
