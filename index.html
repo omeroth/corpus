@@ -6149,8 +6149,44 @@
   }
 
   /* ── Thinker detail modal ── */
-  .thinker-detail .modal-box { text-align: start; overflow: hidden; }
+  /* Scroll inside the box, not the overlay. The modal-box's intrinsic
+     content on an unlocked thinker with a tall bio (~784 px) exceeds
+     the available viewport on every tested breakpoint (393×852 overflows
+     by ~65 px, 360×640 by ~184). Historically the whole overlay
+     scrolled, which pushed BOTH the share and the close button below
+     the fold — users were scrolling to reach even the close.
+
+     Fix: cap the box at the available viewport height and scroll inside
+     it, with the portrait pinned via position:sticky so the thinker's
+     face stays visible while text scrolls under it.
+
+     overflow-x stays hidden — the portrait img uses margin:0 -24px to
+     bleed past the modal-box padding and reach the box's rounded
+     edge, and that horizontal extension still needs clipping to the
+     box's rounded-rect boundary. Changing from overflow:hidden to
+     overflow-x:hidden + overflow-y:auto preserves the clip in X,
+     opens a scroll in Y. No conflict with the portrait's negative
+     margins — overflow is per-axis in CSS. */
+  .thinker-detail .modal-box {
+    text-align: start;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    max-height: calc(100vh - 40px - var(--safe-top) - var(--safe-bottom));
+  }
   .thinker-detail .modal-box.has-portrait { padding-top: 0; }
+  /* Pin the portrait at the top of the scrollable box so the thinker's
+     face stays visible as the user scrolls through bio + quote +
+     buttons. The portrait img itself keeps its negative-margin bleed;
+     the sticky anchor is the container div. z-index above the text
+     stack so the image covers content as it scrolls under. */
+  #thinker-modal-portrait {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    /* Modal-box background shows if portrait is clear — defensive. */
+    background: var(--surface);
+  }
   /* Locked-teaser variant: opened from a locked pantheon or home-carousel card
      via openThinkerModal(id, { locked: true }). Shows name (with lock glyph),
      era, and the full bio just like the unlocked variant. The quote is hidden
@@ -10541,9 +10577,20 @@
     font-size: 13.5px;
     font-weight: 700;
     cursor: pointer;
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
+  }
+  /* Choreographed fade-in: SCOPED to the completion modal only. On the
+     dialogue-completion screens (dc-stats-screen + dc-thinker-screen)
+     the share button is the last beat of a staged reveal — card at
+     0.9s, metrics at 1.4s, title at 2.2s, stats at 2.5s, share at
+     2.6s. On the thinker modal (opened from a carousel tap, not from
+     a celebration sequence) the user expects immediate interactivity,
+     so the shared .dc-share-btn class must render instantly there.
+     Keep the opacity+animation on #modal-complete only; the thinker
+     modal share button inherits only the visual pill style. */
+  #modal-complete .dc-share-btn {
     opacity: 0;
     animation: dc-fade-up 0.5s ease-out 2.6s forwards;
-    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
   }
   .dc-share-btn:hover { filter: brightness(1.05); }
   .dc-share-btn:active { transform: scale(0.94); }
@@ -10555,7 +10602,25 @@
   .dc-share-thinker-btn { align-self: center; }
   /* Pantheon modal share button — same visual as dc-share-btn but
      shifted onto its own row above the close button, centered. */
-  .thinker-modal-share-btn { margin-top: 12px; align-self: center; }
+  /* Share button on the thinker modal. The parent .dc-share-btn is the
+     muted "secondary pill" sized for the completion screen, where it
+     sits beside two louder primary CTAs (Next Dialogue / Back to Home).
+     On the thinker modal the share is one of only TWO actions (share +
+     close), so it needs to read as a co-equal action, not a background
+     tag. Upgrade: full width, bigger font/padding to match the close
+     button's weight class, stronger border and background so it doesn't
+     disappear against the modal surface. Still a stroke-and-fill
+     secondary — close stays the louder solid primary. */
+  .thinker-modal-share-btn {
+    margin-top: 12px;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    padding: 16px 20px;
+    font-size: 15px;
+    background: rgba(var(--accent-rgb), 0.14);
+    border: 1.5px solid rgba(var(--accent-rgb), 0.45);
+  }
   /* Thinker screen */
   .dc-thinker-screen {
     justify-content: flex-start;
