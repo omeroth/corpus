@@ -28069,24 +28069,15 @@ function showThinkerCardScreen(thinker, chapter, day) {
   } catch(e) {}
 
   // Title copy — blanked during Forge (banner "FORGED IN X" carries
-  // the moment; competing eyebrow text distracts). All other cases
-  // use the commit-4 tier-goal copy.
+  // the moment; competing eyebrow text distracts). Every other reveal
+  // uses the original unconditional label. Earlier branched copy
+  // (per-tier "On the way to bronze/silver/..." for repeats) added
+  // in commit a269900 was reverted — repeat reveals read the same
+  // as first unlocks.
   let _titleEn = '', _titleHe = '';
   if (!_forge.forges) {
-    if (_points === 1) {
-      _titleEn = 'A new thinker joins the pantheon';
-      _titleHe = 'הוגה חדש מצטרף לפנתאון';
-    } else if (_points === 2) {
-      _titleEn = 'On the way to bronze';   _titleHe = 'בדרך לארד';
-    } else if (_points === 4 || _points === 5) {
-      _titleEn = 'On the way to silver';   _titleHe = 'בדרך לכסף';
-    } else if (_points === 7 || _points === 8) {
-      _titleEn = 'On the way to gold';     _titleHe = 'בדרך לזהב';
-    } else if (_points === 10 || _points === 11) {
-      _titleEn = 'On the way to diamond';  _titleHe = 'בדרך ליהלום';
-    } else {
-      _titleEn = 'Diamond';                _titleHe = 'יהלום';
-    }
+    _titleEn = 'A new thinker joins the pantheon';
+    _titleHe = 'הוגה חדש מצטרף לפנתאון';
   }
   document.getElementById('dc-thinker-title').textContent = isEn ? _titleEn : _titleHe;
   // Bio + quote + full portrait live in the pantheon detail modal
@@ -28673,12 +28664,11 @@ function finishDay() {
     state.correctInRow,
     showThinker
       ? {
-          // First unlock keeps its "new thinker" CTA; repeats read
-          // as a quieter Continue since the reveal is no longer a
-          // meeting.
-          label: isNewThinker
-            ? (isEn ? 'A new thinker awaits →' : 'הוגה חדש מחכה ←')
-            : (isEn ? 'Continue' : 'המשיכו'),
+          // Original unconditional label. The isNewThinker branch
+          // (first unlock = "awaits", repeats = "Continue"/"המשיכו")
+          // added in commit a269900 was reverted — repeat reveals
+          // read the same as first unlocks.
+          label: isEn ? 'A new thinker awaits →' : 'הוגה חדש מחכה ←',
           fn: () => showThinkerCardScreen(thinker, chapter, day),
           thinker: true,
         }
