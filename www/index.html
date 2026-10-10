@@ -24558,15 +24558,14 @@ function openStartFirstDialogue() {
 const WELCOME_BACK_COPY = {
   daily: [
     { key: 'ready',    en: "Ready for today's five minutes?", he: "מוכנים לחמש הדקות של היום?" },
-    { key: 'few_mins', en: "A few minutes with a great mind.", he: "כמה דקות עם מוח גדול." },
+    { key: 'few_mins', en: "A few minutes with a great mind.", he: "רעיון אחד, חמש דקות." },
     { key: 'today',    en: "Today's idea is waiting.",         he: "הרעיון של היום מחכה." },
     { key: 'welcome',  en: "Welcome back.",                    he: "ברוכים השבים." },
     { key: 'five_min', en: "Five minutes today.",              he: "חמש דקות היום." },
   ],
   missed: [
     { key: 'good_see', en: "Good to see you.",           he: "טוב לראות אתכם." },
-    { key: 'pickup',   en: "Pick up wherever.",          he: "תמשיכו מאיפה שנוח." },
-    { key: 'no_press', en: "No pressure — just start.",  he: "בלי לחץ — פשוט להתחיל." },
+    { key: 'pickup',   en: "Pick up wherever.",          he: "תמשיכו מאיפה שעצרתם." },
     { key: 'back_on',  en: "Back on it.",                he: "חזרנו לזה." },
   ],
   // Long pool uses a two-line shape: a headline greeting plus a
@@ -24598,7 +24597,6 @@ const WELCOME_BACK_VARIANT_EXPR = {
   // missed
   good_see:         'owl-admiring',
   pickup:           'owl-neutral',
-  no_press:         'owl-neutral',
   back_on:          'owl-determined',
   // long
   pick_up:          'owl-determined',
