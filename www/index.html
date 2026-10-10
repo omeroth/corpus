@@ -10558,13 +10558,13 @@
      accent-tinted pill matches the streak/XP token language and reads well
      in both light and dark. */
   .dc-share-btn {
-    /* 12 → 8 → 4: progressive shaves to help the fit on small
-       viewports. Latest step (8 → 4) is one of two trims that pay
-       for +12 px of top padding on .dc-thinker-screen so the reveal
-       title eyebrow sits lower without shrinking the card. Still
-       leaves 10 px total separation between btn-back-home and this
-       button (gap:6 + margin:4), well above tap-target overlap. */
-    margin-top: 4px;
+    /* 12 → 8 → 4 → 0: progressive shaves. Latest (4 → 0) pays for
+       the second title-drop pass on .dc-thinker-screen. Separation
+       from btn-back-home above now comes purely from the
+       .dc-actions gap (reduced to 4). 4 px between the two reads
+       as a related-group pairing without crowding — both buttons
+       are 44+ px tap-targets, well above overlap. */
+    margin-top: 0;
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -10624,20 +10624,24 @@
   /* Thinker screen */
   .dc-thinker-screen {
     justify-content: flex-start;
-    /* Padding-top: 20px above the notch so the title eyebrow sits with
-       breathing room rather than hugging the top of the screen. The
-       extra 12px (was 8) is paid for by two tightenings below the
-       card (.dc-card-zone padding 8→4 recovers 8, .dc-share-btn
-       margin-top 8→4 recovers 4) so the chrome's actual vertical
-       budget stays constant and the card width formula's 280 reserve
-       doesn't need to change — card stays the same size on every
-       breakpoint. Padding-bottom still adds 1× the home-indicator
-       inset for the breathing room above the indicator (iPhone 15/16
-       with safe 34 px gets 8 + 34 + 34 = 76 px of clear space
-       between the share button and the home indicator area, matching
-       the ~68 px non-notch devices already have). Non-notch:
-       safe-bottom is 0, so the bottom calc collapses to 8 px. */
-    padding: calc(20px + var(--safe-top)) 16px calc(8px + var(--safe-bottom) + var(--safe-bottom));
+    /* Padding-top: 34 px above the notch so the title eyebrow sits
+       with real breathing room rather than hugging the top of the
+       screen. Grew in two passes: 8 → 20 (+12) then 20 → 34 (+14),
+       each paid for by matching trims below the card so the chrome's
+       actual vertical stays flat and the card width formula's 280
+       reserve doesn't need to change — card same size on every
+       breakpoint. Current trims paying for 34 px:
+         .dc-card-zone  padding    8 → 4 → 0  (−16)
+         .dc-share-btn  margin-top 8 → 4 → 0  (−8)
+         .dc-actions    gap        6 → 4      (−4)
+       Total recovered 28, spent 26, 2 px slack. Padding-bottom still
+       adds 1× the home-indicator inset for the breathing room above
+       the indicator (iPhone 15/16 with safe 34 px gets 8 + 34 + 34
+       = 76 px of clear space between the share button and the home
+       indicator area, matching the ~68 px non-notch devices already
+       have). Non-notch: safe-bottom is 0, so the bottom calc
+       collapses to 8 px. */
+    padding: calc(34px + var(--safe-top)) 16px calc(8px + var(--safe-bottom) + var(--safe-bottom));
     gap: 4px;
     /* No scrollbar. Content fits notched iPhone 15/16 (393 × 852
        with safe 59/34) and every non-notch viewport. Sheen overflow
@@ -10667,15 +10671,14 @@
     align-items: center;
     justify-content: center;
     margin: 0 auto;
-    /* padding 8 → 4: recovers 8 px vertically (one of two trims that
-       pays for +12 px of top padding on .dc-thinker-screen so the
-       title eyebrow sits lower without shrinking the card). Halo
-       (::before) is positioned 120 % × 110 % relative to this box
-       so a smaller padding just moves the halo slightly closer to
-       the card edge — still reads as a glow. Earlier 16 → 8 trim
-       was for the original dc-stats fit; this 8 → 4 trim is for the
-       reveal-title drop pass. */
-    padding: 4px;
+    /* padding 8 → 4 → 0: progressive shaves to pay for the
+       title-drop passes on .dc-thinker-screen (+12 then +14 px).
+       Halo (::before) is positioned 120 % × 110 % relative to this
+       box, with a 35 px blur that extends well beyond those
+       percentages, so a 0 padding box still shows the halo as a
+       prominent glow around the card edge. Earlier 16 → 8 was for
+       the dc-stats fit; 8 → 4 → 0 are the two title-drop passes. */
+    padding: 0;
     flex-shrink: 0;
   }
   .dc-card-zone::before {
@@ -10734,13 +10737,17 @@
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    /* gap 8 → 6: two gaps × 2 px = 4 px reclaimed.
+    /* gap 8 → 6 → 4: progressive shaves. The 8 → 6 step was for
+       the dc-stats fit; the 6 → 4 step pays for +14 px of top
+       padding on .dc-thinker-screen (second title-drop pass).
+       Buttons remain 4 px apart — tap-targets at 44+ px each, well
+       above overlap threshold.
        padding-bottom removed entirely: .dc-thinker-screen already
        adds calc(8px + safe-bottom) at its own padding-bottom, so
        any padding here was a double-count of the home-indicator
        inset — on iPhone 15/16 that meant 34 px of extra space
        below the share button, pushing it off the fold. */
-    gap: 6px;
+    gap: 4px;
     width: 100%;
     max-width: 360px;
     margin: 0 auto;
@@ -10782,13 +10789,17 @@
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    /* gap 8 → 6: two gaps × 2 px = 4 px reclaimed.
+    /* gap 8 → 6 → 4: progressive shaves. The 8 → 6 step was for
+       the dc-stats fit; the 6 → 4 step pays for +14 px of top
+       padding on .dc-thinker-screen (second title-drop pass).
+       Buttons remain 4 px apart — tap-targets at 44+ px each, well
+       above overlap threshold.
        padding-bottom removed entirely: .dc-thinker-screen already
        adds calc(8px + safe-bottom) at its own padding-bottom, so
        any padding here was a double-count of the home-indicator
        inset — on iPhone 15/16 that meant 34 px of extra space
        below the share button, pushing it off the fold. */
-    gap: 6px;
+    gap: 4px;
     width: 100%;
     max-width: 360px;
     margin: 0 auto;
@@ -28069,15 +28080,28 @@ function showThinkerCardScreen(thinker, chapter, day) {
   } catch(e) {}
 
   // Title copy — blanked during Forge (banner "FORGED IN X" carries
-  // the moment; competing eyebrow text distracts). Every other reveal
-  // uses the original unconditional label. Earlier branched copy
-  // (per-tier "On the way to bronze/silver/..." for repeats) added
-  // in commit a269900 was reverted — repeat reveals read the same
-  // as first unlocks.
+  // the moment; competing eyebrow text distracts). First unlock
+  // reads "A new thinker joins the pantheon" because that is what
+  // actually happens. Repeats read the tier-goal copy so the user
+  // learns that frames exist and sees where their points are
+  // heading — nothing else in the app surfaces that. Diamond-capped
+  // (points ≥ 13) shows the bare tier word.
   let _titleEn = '', _titleHe = '';
   if (!_forge.forges) {
-    _titleEn = 'A new thinker joins the pantheon';
-    _titleHe = 'הוגה חדש מצטרף לפנתאון';
+    if (_points === 1) {
+      _titleEn = 'A new thinker joins the pantheon';
+      _titleHe = 'הוגה חדש מצטרף לפנתאון';
+    } else if (_points === 2) {
+      _titleEn = 'On the way to bronze';   _titleHe = 'בדרך לארד';
+    } else if (_points === 4 || _points === 5) {
+      _titleEn = 'On the way to silver';   _titleHe = 'בדרך לכסף';
+    } else if (_points === 7 || _points === 8) {
+      _titleEn = 'On the way to gold';     _titleHe = 'בדרך לזהב';
+    } else if (_points === 10 || _points === 11) {
+      _titleEn = 'On the way to diamond';  _titleHe = 'בדרך ליהלום';
+    } else {
+      _titleEn = 'Diamond';                _titleHe = 'יהלום';
+    }
   }
   document.getElementById('dc-thinker-title').textContent = isEn ? _titleEn : _titleHe;
   // Bio + quote + full portrait live in the pantheon detail modal
