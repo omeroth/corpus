@@ -14322,6 +14322,27 @@ async function syncProgressToSupabase() {
     if (error) _reportSyncFailure('daily_reminder', error);
   } catch(e) { _reportSyncFailure('daily_reminder', e); }
   try {
+    // coach_marks_shown: jsonb bucket for one-shot intro seen-flags.
+    // Added in migration 20261010000000_coach_marks_shown.sql. Keys
+    // land here together on every sync so neither can drift from the
+    // other — the client always owns the full object. OR-union on
+    // load (server-true → local-true) means a reinstall or new
+    // device picks up any flag the user has already seen somewhere.
+    // Also carries the migration path for existing users whose
+    // framesExplainerSeen was already set in localStorage before this
+    // column shipped: the first sync after this ships writes the
+    // local true into the server row, and from then on every device
+    // they sign into inherits it.
+    const { error } = await sb.from('user_progress').upsert({
+      user_id: currentUser.id,
+      coach_marks_shown: {
+        framesExplainer: !!state.framesExplainerSeen,
+        streakIntro:     !!state.streakIntroSeen,
+      },
+    }, { onConflict: 'user_id' });
+    if (error) _reportSyncFailure('coach_marks_shown', error);
+  } catch(e) { _reportSyncFailure('coach_marks_shown', e); }
+  try {
     // appearance: added as text column in migration 20260708090000. Same "prefer
     // local" load semantics — server backup, doesn't override device preference.
     const { error } = await sb.from('user_progress').upsert({
@@ -14518,6 +14539,10 @@ async function loadProgressFromSupabase() {
     //                            row is a backup; if the client already has
     //                            an answer, keep it. Server fills in blanks.
     //   onboarding_done        : OR (server true → local true; false leaves alone)
+    //   coach_marks_shown      : OR per key — server-true for any key flips
+    //                            local to true for that key; local-true keys
+    //                            stay true regardless. Same reinstall-backup
+    //                            semantics as onboarding_done.
     //   appearance             : PREFER LOCAL — server row is a backup for
     //                            reinstalls, not an override. On the current
     //                            device, whatever the user chose in Settings
@@ -14559,6 +14584,15 @@ async function loadProgressFromSupabase() {
     if (data.onboarding_done === true) {
       try { localStorage.setItem('corpus_onboarding_done', '1'); } catch(e) {}
     }
+    // coach_marks_shown: OR-merge each known key. Server-true flips
+    // the matching local flag to true (reinstall / new-device backup);
+    // local-true never gets cleared by a missing or false server key.
+    // Unknown keys in the server object are ignored — only keys we
+    // ask for materialize into local state, so a stale client doesn't
+    // half-set a future-dated flag.
+    const _cms = data.coach_marks_shown || {};
+    if (_cms.framesExplainer === true) state.framesExplainerSeen = true;
+    if (_cms.streakIntro     === true) state.streakIntroSeen     = true;
     // streak_repair fields: union-merge both arrays. Union-dedup by
     // brokenAt for streakBreaks (object entries) and by string for
     // streakRepairs. If a repair happened on device A and hasn't synced
@@ -23021,6 +23055,166 @@ window._replayOwlBeat = function () {
   };
 };
 
+// ── Streak-tab intro owl beat ───────────────────────────────────────
+// Mirrors _showFramesOwlBeat / _maybeShowFramesOwlBeat but spotlights
+// the bnav-streak tab and introduces the dedicated streak screen (hero
+// card, badge shelf, next-goal). Shares the same walkthrough chrome
+// (overlay, canvas, owl SVG, bubble, Next button) via the same helpers
+// the frames beat and bonus-unlock coach mark use. One-shot: any
+// dismissal path marks streakIntroSeen so the beat never repeats.
+//
+// Cohort: anyone with streakIntroSeen=false AND the frames explainer
+// already resolved (framesExplainerSeen=true). The explicit frames
+// gate is what guarantees "frames first, streak on the next home
+// render" ordering — both are wired from renderHome, but streak
+// short-circuits until frames has been dismissed. New users running
+// the walkthrough hit a dedicated streak_tab step inside the tour
+// instead; the step marks streakIntroSeen when it renders so this
+// beat never fires for them.
+let _streakIntroBeatStep = null;
+function _showStreakIntroBeat() {
+  const overlay = document.getElementById('onboarding-overlay');
+  const target  = document.getElementById('bnav-streak');
+  if (!overlay || !target) return;
+  if (_streakIntroBeatStep) return; // idempotency
+  const isEn = state.lang === 'en';
+
+  _streakIntroBeatStep = {
+    id: 'streak_intro_beat',
+    expr: 'owl-admiring',
+    spotlight: '#bnav-streak',
+    allowChromeBottom: true,
+    en: 'One dialogue a day builds a streak and earns badges. Watch both grow here.',
+    he: 'דיאלוג אחד ביום בונה רצף וצובר תגים, וכאן אפשר לראות את שניהם.',
+  };
+
+  document.documentElement.classList.add('walkthrough-active');
+  overlay.style.display = 'block';
+  _walkthroughWireCanvas();
+  _walkthroughLockScroll();
+
+  const owl = document.querySelector('.onboarding-owl-float svg');
+  if (owl) {
+    owl.classList.remove('owl-neutral', 'owl-determined', 'owl-admiring', 'owl-action');
+    owl.classList.add('owl-svg', _streakIntroBeatStep.expr);
+  }
+
+  const bubbleText = document.getElementById('onboarding-bubble');
+  const nextBtn    = document.getElementById('onboarding-btn');
+  if (bubbleText) bubbleText.textContent = isEn ? _streakIntroBeatStep.en : _streakIntroBeatStep.he;
+  if (nextBtn) {
+    nextBtn.textContent = isEn ? 'Show me' : 'לראות';
+    nextBtn.onclick     = _streakIntroBeatCta;
+    nextBtn.style.display = '';
+  }
+
+  const dots    = document.getElementById('onboarding-dots');
+  const skipBtn = document.getElementById('walkthrough-skip');
+  if (dots)    dots.style.display    = 'none';
+  if (skipBtn) skipBtn.style.display = 'none';
+
+  try {
+    _phCapture('streak_intro_beat_shown', {
+      subject: state.subject || null,
+      lang:    state.lang || null,
+    });
+  } catch (e) {}
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      _positionOwlAndBubble(_streakIntroBeatStep);
+      setTimeout(() => drawSpotlight(_streakIntroBeatStep), 100);
+    });
+  });
+}
+
+function _streakIntroBeatTeardown() {
+  _walkthroughUnlockScroll();
+  const overlay = document.getElementById('onboarding-overlay');
+  if (overlay) overlay.style.display = 'none';
+  document.documentElement.classList.remove('walkthrough-active');
+  const dots    = document.getElementById('onboarding-dots');
+  const skipBtn = document.getElementById('walkthrough-skip');
+  if (dots)    dots.style.display    = '';
+  if (skipBtn) skipBtn.style.display = '';
+  _streakIntroBeatStep = null;
+}
+
+function _closeStreakIntroBeat(source) {
+  _streakIntroBeatTeardown();
+  // Mark seen unconditionally on any dismissal path so the beat
+  // never repeats. The CTA path (which routes through here before
+  // opening the streak screen) also hits this write.
+  if (!state.streakIntroSeen) {
+    state.streakIntroSeen = true;
+    try { saveState(); } catch (e) { try { saveStateLocal(); } catch (e2) {} }
+  }
+  try {
+    _phCapture('streak_intro_beat_dismissed', {
+      source: source || 'unknown',
+    });
+  } catch (e) {}
+}
+
+function _streakIntroBeatCta() {
+  _closeStreakIntroBeat('cta');
+  // rAF so the overlay's display flip commits before we transition
+  // into the streak screen — same pattern the frames beat CTA uses
+  // before opening the explainer.
+  requestAnimationFrame(() => {
+    try { showStreakScreen(); } catch (e) {}
+  });
+}
+
+function _maybeShowStreakIntroBeat() {
+  if (state.streakIntroSeen) return;
+  // Ordering: never fire while the frames explainer is still the
+  // outstanding one-shot. framesExplainerSeen flips to true the
+  // moment the explainer MODAL opens (double-rAF inside
+  // _showFramesExplainer) — meaning the flag can be true while the
+  // modal is still visible. Gate on the flag AND the live DOM state
+  // of the modal so we never stack on top of a visible explainer.
+  if (!state.framesExplainerSeen) return;
+  const fe = document.getElementById('modal-frames-explainer');
+  if (fe && fe.classList.contains('fe-open')) return;
+  if (state.currentScreen !== 'home') return;
+  // Never during / immediately-after a modal paywall. Mirrors the
+  // frames beat gate.
+  if (_paywallShownThisSession) return;
+  // Never while a walkthrough or any other owl beat is painting —
+  // includes the frames owl beat itself, which shares the overlay.
+  if (document.documentElement.classList.contains('walkthrough-active')) return;
+  if (_framesOwlBeatStep) return;
+  // Streak-repair card wins the top-of-home slot; wait for its
+  // dismiss (same intuition as the frames beat).
+  const repairHolder = document.getElementById('streak-repair-card-holder');
+  if (repairHolder && repairHolder.style.display !== 'none' && repairHolder.innerHTML.trim()) return;
+  // Reuse the shared "no modals active" gate so welcome-back,
+  // thinker detail, library, share, guest-signup, NPS, paywall,
+  // and streak-repair modals all suppress us. The frames explainer
+  // itself is excluded from that gate, but we already short-circuit
+  // on its live DOM state above.
+  if (!_feEverythingClosed()) return;
+  _showStreakIntroBeat();
+}
+
+// On-device replay helper: clears both coach-mark flags so a tester
+// can see the full "frames first, then streak" ordering again.
+// Mirrors _replayOwlBeat; distinct from _replayWalkthrough (which
+// re-runs the tour and both coach marks via their walkthrough entry).
+window._replayStreakIntroBeat = function () {
+  state.streakIntroSeen = false;
+  try { saveStateLocal(); } catch (e) {}
+  _streakIntroBeatTeardown(); // in case a stale beat is up
+  try { _maybeShowStreakIntroBeat(); } catch (e) {}
+  return {
+    streakIntroSeen: state.streakIntroSeen,
+    framesExplainerSeen: state.framesExplainerSeen,
+    currentScreen: state.currentScreen,
+    beatOpen: !!_streakIntroBeatStep,
+  };
+};
+
 // Plate-tap delegation. Capture-phase so we run BEFORE the pantheon
 // .pth-slot button's flip onclick (which fires in bubble). Attached
 // once at boot on containers that persist for the app lifetime.
@@ -23078,8 +23272,16 @@ function defaultState() {
     // once per user at their first launch after this ships. Flag set
     // the moment the modal opens so a mid-animation kill still
     // counts as shown. Reopens via any points-plate tap don't touch
-    // the flag.
+    // the flag. Synced via coach_marks_shown.framesExplainer — see
+    // syncProgressToSupabase / loadProgressFromSupabase for the
+    // reinstall-backup semantics.
     framesExplainerSeen: false,
+    // Streak-tab intro: one-shot owl beat on home render + a
+    // walkthrough step for new users. Introduces the dedicated
+    // streak screen (bnav tab) so users know the badge shelf and
+    // weekly rhythm live there. Synced alongside framesExplainerSeen
+    // in coach_marks_shown.streakIntro.
+    streakIntroSeen: false,
     lang: 'en',
     currentScreen: 'home',
     currentWeek: null,
@@ -26219,6 +26421,15 @@ function renderHome() {
   // introducing the frames feature. Own guards; skips new users
   // (they get the tour → explainer path from _walkthroughFinish).
   try { _maybeShowFramesOwlBeat(); } catch (e) {}
+  // Streak-tab intro owl beat: one-shot coach mark introducing the
+  // dedicated streak screen. Its own gate requires framesExplainerSeen
+  // to be true, so on a home render where the frames beat / explainer
+  // just opened this is a no-op; after the user dismisses frames
+  // (which flips the flag) the next renderHome brings the streak
+  // beat through. New users running the walkthrough hit a dedicated
+  // streak_tab step that pre-marks streakIntroSeen, so this never
+  // fires for them.
+  try { _maybeShowStreakIntroBeat(); } catch (e) {}
   // Wire plate-tap delegation on rv-svg + pantheon-container so
   // tapping any points plate reopens the explainer. Idempotent —
   // attach-once guarded by ._feWired on the target.
@@ -31704,6 +31915,17 @@ const WALKTHROUGH_STEPS = [
     allowChromeTop: true,
     he: 'הרצף גדל בכל יום שמשלימים בו דיאלוג. היום הוא מתחיל.',
     en: 'Your streak grows on every day you complete a dialogue. Today it begins.' },
+  // streak_tab: introduces the dedicated streak screen. Points at the
+  // bnav-streak tab, same spotlight target as the home-render owl
+  // beat used by _showStreakIntroBeat for existing users. Copy
+  // matches the beat verbatim so the message is identical across
+  // cohorts. Marked seen in _walkthroughRenderStep (step-render set)
+  // AND belt-and-suspenders in _walkthroughFinish so completing or
+  // reaching the step both suppress the home-render beat later.
+  { id: 'streak_tab', expr: 'owl-admiring', spotlight: '#bnav-streak',
+    allowChromeBottom: true,
+    he: 'דיאלוג אחד ביום בונה רצף וצובר תגים, וכאן אפשר לראות את שניהם.',
+    en: 'One dialogue a day builds a streak and earns badges. Watch both grow here.' },
   { id: 'closing', expr: 'owl-action',
     // Spotlights the next-up lesson circle (same target as step 2's
     // next_up) so the closing beat has something concrete to point
@@ -32003,6 +32225,16 @@ function _walkthroughRenderStep() {
       subject:    state.subject || null,
       lang:       state.lang || null,
     });
+    // The streak_tab step IS the one-time streak-screen intro for new
+    // users. Mark the persisted flag the moment it renders so the
+    // home-render owl beat (_maybeShowStreakIntroBeat) never fires for
+    // this user later. A user who skips the walkthrough BEFORE
+    // reaching this step keeps streakIntroSeen=false and the home
+    // beat catches them — exactly what we want.
+    if (step.id === 'streak_tab' && !state.streakIntroSeen) {
+      state.streakIntroSeen = true;
+      try { saveState(); } catch (e) { try { saveStateLocal(); } catch (e2) {} }
+    }
   }
 
   // Bring the target into the visible interior BEFORE computing the
@@ -32113,6 +32345,16 @@ function _walkthroughFinish() {
     lang:    state.lang || null,
   });
   _walkthroughTeardown({ setFlag: true });
+  // Belt-and-suspenders: a user who reached the closing step saw the
+  // streak_tab step too (it's two steps earlier in the array), and
+  // _walkthroughRenderStep already marked streakIntroSeen when that
+  // step rendered. Repeat the write here so a DOM race / early
+  // exception on the step-render path doesn't leave the flag false
+  // and surface a duplicate owl beat on the next home render.
+  if (!state.streakIntroSeen) {
+    state.streakIntroSeen = true;
+    try { saveState(); } catch (e) { try { saveStateLocal(); } catch (e2) {} }
+  }
   // Frames explainer (spec §14): the tour just ended — the ONLY moment
   // it opens automatically. Deferred one frame past teardown so the
   // walkthrough overlay's display:none commits before _feEverythingClosed
@@ -34753,6 +34995,16 @@ function showStreakScreen() {
   if (state && state.streakTabOpened === false) {
     state.streakTabOpened = true;
     try { saveStateLocal(); } catch (e) {}
+  }
+  // Any route into the streak screen counts as "intro seen" — once the
+  // user is standing on the screen itself, pointing at the tab later
+  // is redundant. Catches the deep-link / bnav-tap-before-beat case
+  // and the user who taps the bnav while the beat is painting but
+  // bails before pressing "Show me". saveState (not just Local) so
+  // the server bucket picks it up for the reinstall backup.
+  if (!state.streakIntroSeen) {
+    state.streakIntroSeen = true;
+    try { saveState(); } catch (e) { try { saveStateLocal(); } catch (e2) {} }
   }
   updateBottomNav('streak');
   renderStreakScreen();
