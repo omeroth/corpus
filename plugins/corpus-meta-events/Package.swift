@@ -10,7 +10,7 @@ let package = Package(
             targets: ["CorpusMetaEventsPlugin"])
     ],
     dependencies: [
-        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.3.4"),
+        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.4.1"),
         // Meta's iOS SDK, SPM-distributed. 18.x, matching
         // @capgo/capacitor-social-login's dependency range so SPM resolves
         // both plugins against a single copy of the SDK on disk (having two
