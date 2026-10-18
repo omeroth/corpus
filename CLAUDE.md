@@ -272,6 +272,30 @@ It's cheaper to ask than to redo.
 
 ---
 
+## Auditing structure — parse, don't grep
+
+When answering a structural question about data in a file ("how many chapters are in this content file?", "which thinker IDs are referenced?", "do all PNGs under `images/` have at least one reference?"), **parse the data, do not pattern-match the source text**.
+
+Grep-based audits of structured files have produced wrong answers twice in a row:
+
+1. `psychologyData.weeks` was reported as holding only chapters 1–5. The pattern `^    \{\s*id:` matched inline-style entries but silently skipped three multi-line chapter headers (chapter 1 at line 17, bonusPsy1 at ~2465, chapter 6 at ~3524). Chapters 1 and 6 (and bonusPsy1) were invisible to the audit, so an entire chapter was reported missing.
+2. The unreferenced-images sweep reported false positives when a grep for image basenames missed references inside multiline template literals and comment blocks.
+
+### The rule
+
+For any audit of a structured file:
+- Read the file with `fs.readFileSync` and `JSON.parse`/`vm.runInNewContext`/the proper parser, then iterate the data structure.
+- The validator at `scripts/check-thinker-links.mjs` already does this for content: it extracts `corpusData`/`economicsData`/`psychologyData`/`THINKERS`/`THINKERS_EN` with a balanced-brace scan and evaluates them in an isolated vm. Follow the same pattern.
+- Reserve grep for text searches (find a string, find a function name). Not for structural questions.
+
+### What to do when a parser isn't readily available
+
+If the file isn't valid-JSON and the vm sandbox is overkill, use a one-off Node script that `require`s or `import`s the file and inspects the resulting object. The `content/*.js` files are plain CommonJS/global-assigning scripts; a `vm.runInNewContext` on their text produces the data constants directly.
+
+The grep is almost always wrong on an edge case that doesn't exist yet. The parser is correct by construction.
+
+---
+
 ## Complex work — before you touch anything
 
 For anything with more than a few surfaces or a handoff spec (reveal-card rebuild, pantheon overhaul, onboarding restructure), run this loop **before writing code**:
@@ -284,4 +308,4 @@ For anything with more than a few surfaces or a handoff spec (reveal-card rebuil
 
 ---
 
-*Last updated: 2026-09-28*
+*Last updated: 2026-10-17*
