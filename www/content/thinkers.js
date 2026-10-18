@@ -841,6 +841,50 @@ const THINKERS = [
     bio: 'הפסיכולוג הגרמני שחלק על הגישה של כהנמן וטברסקי. טען שקיצורי דרך קוגניטיביים אינם פגם אלא כלי: היוריסטיקה שמתעלמת מרוב המידע עשויה להיות מדויקת ויעילה יותר משיטות מורכבות, אם היא מותאמת לסביבה שבה היא פועלת. מנהל ותיק במכון מקס פלנק בברלין, מחבר "רציונליות לבני תמותה" (2008).',
     quote: '"היוריסטיקה היא אסטרטגיה שמתעלמת מחלק מהמידע, במטרה לקבל החלטות מהר יותר, בחיסכון רב יותר ו/או במדויק יותר משיטות מורכבות יותר."',
   },
+  // ───── Psychology chapter 7 — "Whom does therapy serve?" (new in ch7).
+  // Lacan: D1 + D2. Frances: D4. Illouz: D5. Han: D6. Foucault (D3) is
+  // reused from the ch5 entry above. All four carry subject:'psychology'
+  // explicitly (default-bucket is philosophy — index.html:19370).
+  {
+    id: 'lacan',
+    name: 'ז\'אק לאקאן',
+    era: '1901–1981',
+    emoji: '🪞',
+    image: './images/lacan.webp',
+    subject: 'psychology',
+    bio: 'פסיכואנליטיקאי צרפתי, מהדמויות המשפיעות ביותר בפסיכואנליזה אחרי פרויד. קרא ל"חזרה לפרויד" מתוך טענה שהפסיכואנליזה האמריקאית הפכה אותו לכלי להסתגלות ולחיזוק ה"אני". טען שהלא-מודע מובנה כשפה, ושה"אני" הוא דימוי ולא המרכז של האדם. סמינר שלו, שהתקיים בפריז במשך קרוב לשלושים שנה, הפך לדיאלוג המכונן של הפסיכואנליזה הצרפתית.',
+    quote: '״הלא-מודע מובנה כשפה.״',
+  },
+  {
+    id: 'frances',
+    name: 'אלן פרנסס',
+    era: '1942–',
+    emoji: '📘',
+    image: './images/frances.webp',
+    subject: 'psychology',
+    bio: 'פסיכיאטר אמריקאי שעמד בראש הצוות שכתב את DSM-IV (1994), ספר האבחנות הפסיכיאטרי המרכזי בעולם. בעשור שלאחר מכן התייצב כאחד המבקרים החריפים של ההרחבה שהתרחשה בהגדרת ההפרעות הנפשיות, כולל בעבודתו שלו. בספרו "להציל את הנורמלי" (2013) טבע את המונח "אינפלציית אבחון".',
+    quote: '״חלקו וידוי אשמה, חלקו כתב אישום, וחלקו זעקה.״',
+  },
+  {
+    id: 'illouz',
+    name: 'אווה אילוז',
+    era: '1961–',
+    emoji: '📈',
+    image: './images/illouz.webp',
+    subject: 'psychology',
+    bio: 'סוציולוגית ישראלית ילידת מרוקו, פרופסורה באוניברסיטה העברית בירושלים. חוקרת כיצד שפת הרגש והשפה הכלכלית מעצבות זו את זו. בספרה "אינטימיות קרה: עלייתו של הקפיטליזם הרגשי" (2007) טבעה את המונח "קפיטליזם רגשי": תרבות שבה הרגש הפך למשאב שמנהלים, משפרים ומציגים.',
+    quote: '״קפיטליזם רגשי הוא תרבות שבה השיח והמעשה הרגשיים והכלכליים מעצבים אלה את אלה.״',
+  },
+  {
+    id: 'han',
+    name: 'ביונג-צ\'ול האן',
+    era: '1959–',
+    emoji: '🔥',
+    image: './images/han.webp',
+    subject: 'psychology',
+    bio: 'פילוסוף קוריאני-גרמני, מרצה באוניברסיטה לאמנויות של ברלין. ממשיך את הביקורת של פוקו, אך טוען שחברת המשמעת התחלפה בחברת הישגים: במקום איסורים חיצוניים, האדם מנצל את עצמו מרצון בשם ה"אפשרות". בספרו "חברת העייפות" (2010) תיאר שחיקה ודיכאון לא כפגמים אישיים, אלא כסימפטומים של משטר שבו אין נקודה שבה מותר לעצור.',
+    quote: '״סובייקט ההישגים מנצל את עצמו עד שהוא נשחק עד תום. בכך, הוא ממש חירות שהורסת את עצמה.״',
+  },
 ];
 
 const THINKERS_EN = [
@@ -976,4 +1020,12 @@ const THINKERS_EN = [
   // the full provenance note (paraphrase-vs-verified quote correction
   // made 2026-09-29 during the chapter-5 build).
   { id:'foucault',     name:'Michel Foucault',      era:'1926–1984', emoji:'🗂️', image:'./images/foucault.webp',     subject:'psychology', bio:'A French philosopher and historian. Studied how societies decide what counts as madness, crime, or illness, and how those decisions shift over time. In his book "History of Madness" (1961) he showed that the line between normal and pathological is not a fact of nature but is set by human beings, and shifts with culture.',                                                                                                                            quote:'"The language of psychiatry, which is a monologue by reason about madness, could only have come into existence in such a silence."' },
+  // Psychology chapter 7 — "Whom does therapy serve?" (new in ch7).
+  // Lacan: D1 + D2. Frances: D4. Illouz: D5. Han: D6. Foucault (D3) is
+  // reused from the ch5 entry above. All four carry subject:'psychology'
+  // explicitly.
+  { id:'lacan',    name:'Jacques Lacan',    era:'1901–1981', emoji:'🪞', image:'./images/lacan.webp',           subject:'psychology', bio:'A French psychoanalyst, among the most influential figures in psychoanalysis after Freud. Called for a "return to Freud" with the claim that American psychoanalysis had turned him into a tool for adaptation and ego-strengthening. Argued that the unconscious is structured like a language, and that the "ego" is an image, not the person\'s centre. His seminar, held in Paris for nearly thirty years, became the founding dialogue of French psychoanalysis.',                                                                                                                                                 quote:'"The unconscious is structured like a language."' },
+  { id:'frances',  name:'Allen Frances',    era:'1942–',     emoji:'📘', image:'./images/frances.webp',         subject:'psychology', bio:'An American psychiatrist who headed the task force that wrote the DSM-IV (1994), the central psychiatric diagnostic manual in the world. In the decade that followed he became one of the sharpest critics of the expansion that occurred in the definition of mental disorders, including in his own work. In his book "Saving Normal" (2013) he coined the term "diagnostic inflation".',                                                                                                                                                                                      quote:'"Part confession, part indictment, and part cry."' },
+  { id:'illouz',   name:'Eva Illouz',       era:'1961–',     emoji:'📈', image:'./images/illouz.webp',      subject:'psychology', bio:'An Israeli sociologist born in Morocco, professor at the Hebrew University of Jerusalem. Studies how the language of emotion and the language of the market shape each other. In her book "Cold Intimacies: The Making of Emotional Capitalism" (2007) she coined the term "emotional capitalism": a culture in which emotion has become a resource that is managed, improved and displayed.',                                                                                                                                                                            quote:'"Emotional capitalism is a culture in which emotional and economic discourses and practices mutually shape each other."' },
+  { id:'han',      name:'Byung-Chul Han',   era:'1959–',     emoji:'🔥', image:'./images/han.webp',  subject:'psychology', bio:'A Korean-German philosopher, lecturer at the Berlin University of the Arts. Continues the critique of Foucault, but argues that disciplinary society has been replaced by an achievement society: in place of external prohibitions, the person exploits himself willingly in the name of "possibility". In his book "The Burnout Society" (2010) he described burnout and depression not as personal failures, but as symptoms of a regime in which there is no point at which one is permitted to stop.',                                       quote:'"The achievement-subject exploits itself until it burns out. In the process, it actualizes a self-destructive freedom."' },
 ];
