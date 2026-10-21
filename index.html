@@ -6,11 +6,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>Corpus</title>
+<meta name="description" content="Five minutes a day with history's greatest minds.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Corpus">
 <link rel="apple-touch-icon" href="images/icon-192.png">
 <link rel="manifest" href="manifest.json">
+
+<!-- OG + Twitter tags. Same shape as /t/ pages and /go/. These are
+     web-only — Capacitor's WebView never reads them, and no SPA code
+     looks for them either. They matter for crawlers (Facebook /
+     WhatsApp / LinkedIn / X) hitting corpusapp.io on the web. -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Corpus">
+<meta property="og:description" content="Five minutes a day with history's greatest minds.">
+<meta property="og:image" content="https://corpusapp.io/share/og-get.png">
+<meta property="og:image:secure_url" content="https://corpusapp.io/share/og-get.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://corpusapp.io/">
+<meta property="og:site_name" content="Corpus">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Corpus">
+<meta name="twitter:description" content="Five minutes a day with history's greatest minds.">
+<meta name="twitter:image" content="https://corpusapp.io/share/og-get.png">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@300;400;500;600&family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/posthog-js@1.396.6/dist/array.full.js"></script>
 <script>

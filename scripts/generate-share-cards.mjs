@@ -1022,6 +1022,101 @@ async function renderThinkerCardPortrait({ thinker, subject, lang }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// Brand (get-the-app) OG card renderer
+// ─────────────────────────────────────────────────────────────────────────
+// A single 1200×630 brand card used as the og:image for the generic
+// corpusapp.io landing surfaces (/, /go/). Represents all three
+// subjects via the three onboarding mascots (Socrates = philosophy,
+// Smith = economics, Freud = psychology) inside their respective
+// subject-coloured frames. Carries the Corpus wordmark, the tagline,
+// and the corpusapp.io URL — no per-dialogue or per-thinker chrome.
+//
+// Reuses the same theme palette + typography + _loadThinkerPortrait +
+// _drawCollectiblePanel + font cascade as the dialogue/thinker cards
+// so it inherits the house style and can't drift. Writes to
+// share/og-get.png (lang-neutral; the copy is EN-only for now, matching
+// what the go/ page and the root SPA ship).
+
+async function renderOgGetCard({ THINKERS_EN }) {
+  const W = 1200, H = 630;
+  const canvas = createCanvas(W, H);
+  const ctx = canvas.getContext('2d');
+  ctx.textBaseline = 'top';
+
+  // Background: the philosophy --bg lavender (#F8F5FF) — this is the
+  // app's primary brand surface. Keeps the card recognisable as Corpus
+  // without picking one subject's chroma over the others (the mascot
+  // frames carry each subject's accent).
+  const brandTheme = THEMES.philosophy;
+  ctx.fillStyle = brandTheme.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // ─── Row 1: wordmark (centred, 68px, Nunito Black with the
+  //            house -1.32px tracking matching the auth logo). ───
+  ctx.textAlign = 'center';
+  ctx.font = '68px "Nunito Black", Rubik, sans-serif';
+  ctx.fillStyle = brandTheme.wordmark;
+  ctx.letterSpacing = '-1.32px';
+  ctx.fillText('Corpus', W / 2, 44);
+  ctx.letterSpacing = '0px';
+
+  // ─── Row 2: tagline (two lines, 30px, muted brand ink). ───
+  const taglineLines = [
+    'Five minutes a day with',
+    "history's greatest minds",
+  ];
+  ctx.font = '700 30px Rubik, sans-serif';
+  ctx.fillStyle = brandTheme.question;
+  const lineHeight = 40;
+  let taglineY = 128;
+  for (const line of taglineLines) {
+    ctx.fillText(line, W / 2, taglineY);
+    taglineY += lineHeight;
+  }
+
+  // ─── Row 3: three mascot panels, each in its subject's frame. ───
+  // Mascot order mirrors the SUBJECTS list on home: philosophy →
+  // economics → psychology. Keeps the composition left-to-right
+  // readable and matches the subject drawer order in the app.
+  const MASCOTS = [
+    { id: 'socrates', subject: 'philosophy' },
+    { id: 'smith',    subject: 'economics'  },
+    { id: 'freud',    subject: 'psychology' },
+  ];
+
+  // Panel sizing: 180×322 preserves the 670×1200 collectible aspect
+  // (0.558). Three in a row + 24px gutters fits in a 588px centred
+  // block within the 1200-wide canvas.
+  const panelH = 322;
+  const panelW = Math.round(panelH * (670 / 1200));  // ≈ 180
+  const gap = 24;
+  const rowW = MASCOTS.length * panelW + (MASCOTS.length - 1) * gap;
+  const rowX = Math.round((W - rowW) / 2);
+  const rowY = 228;
+
+  for (let i = 0; i < MASCOTS.length; i++) {
+    const m = MASCOTS[i];
+    const thinker = THINKERS_EN.find(t => t.id === m.id);
+    if (!thinker) continue;
+    const img = await _loadThinkerPortrait(thinker, m.subject);
+    const px = rowX + i * (panelW + gap);
+    _drawCollectiblePanel(ctx, img, thinker, m.subject, px, rowY, panelW, panelH, {
+      radius: 18,
+      frameWidth: 3,
+    });
+  }
+
+  // ─── Row 4: corpusapp.io (centred, 22px gold URL text — same colour
+  //            and weight as the dialogue + thinker cards). ───
+  ctx.textAlign = 'center';
+  ctx.fillStyle = URL_TXT;
+  ctx.font = '700 22px Rubik, sans-serif';
+  ctx.fillText('corpusapp.io', W / 2, H - 50);
+
+  return canvas.toBuffer('image/png');
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // HTML page renderer — one landing page per dialogue × language
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -1633,6 +1728,20 @@ async function main() {
   console.log(`[gen:share] thinker cards → ${path.relative(ROOT, OUT_THINKERS)}`);
   console.log(`[gen:share] thinker pages → ${path.relative(ROOT, OUT_THINKER_PAGES)}`);
 
+  // ─── Brand OG card for /, /go/ — one deterministic 1200×630 PNG. ───
+  // The go/ landing + the SPA both point their og:image at
+  // https://corpusapp.io/share/og-get.png. Written at the share/ root
+  // (not under cards/ or thinkers/) because it is neither per-dialogue
+  // nor per-thinker — it is the brand card.
+  if (CANVAS_ENABLED) {
+    const OUT_SHARE_ROOT = path.join(ROOT, 'share');
+    fs.mkdirSync(OUT_SHARE_ROOT, { recursive: true });
+    const ogBuf = await renderOgGetCard({ THINKERS_EN });
+    const ogFile = path.join(OUT_SHARE_ROOT, 'og-get.png');
+    fs.writeFileSync(ogFile, ogBuf);
+    console.log(`[gen:share] brand card  → ${path.relative(ROOT, ogFile)}`);
+  }
+
   // Post-pass: pngquant compression. Cards render at ~200–330KB uncompressed;
   // quantizing to 70–90% quality drops that to ~50–100KB with no visible loss,
   // which keeps every card under the ~300KB WhatsApp/Twitter OG-image soft cap.
@@ -1664,6 +1773,11 @@ function _compressCards() {
   };
   walk(OUT_CARDS);
   walk(OUT_THINKERS);
+  // Also pick up any PNG written at the share/ root itself — right now
+  // that's just og-get.png (brand card). walk() handles missing dirs so
+  // this is a no-op during pages-only runs.
+  const ogRoot = path.join(ROOT, 'share', 'og-get.png');
+  if (fs.existsSync(ogRoot)) pngs.push(ogRoot);
   if (!pngs.length) return;
   const before = pngs.reduce((a, p) => a + fs.statSync(p).size, 0);
   // Two quality tiers. Portrait share cards get 60-80 (more aggressive)
