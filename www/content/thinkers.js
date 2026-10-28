@@ -117,6 +117,26 @@ const THINKERS = [
     quote: '"עדיף להיות סוקרטס לא מרוצה מאשר שוטה מרוצה."',
   },
   {
+    id: 'hobbes',
+    name: 'תומאס הובס',
+    era: '1588–1679',
+    image: './images/hobbes.webp',
+    emoji: '👑',
+    subject: 'philosophy',
+    bio: 'פילוסוף אנגלי, מחבר "לוויתן". חי בצל מלחמת האזרחים האנגלית ופחד כל חייו מפני הכאוס שבאנרכיה. טען שבני אדם במצב טבעי יחיו חיים "בודדים, עניים, מגעילים, חייתיים וקצרים" - ולכן זקוקים לשלטון חזק שיבטיח ביטחון.',
+    quote: '"לוותר על החירות הטבעית ולהעבירה לריבון - זהו המחיר של השלום."',
+  },
+  {
+    id: 'rousseau',
+    name: 'ז\'אן ז\'אק רוסו',
+    era: '1712–1778',
+    image: './images/rousseau.webp',
+    emoji: '🌿',
+    subject: 'philosophy',
+    bio: 'פילוסוף שוויצרי-צרפתי שעיצב את מחשבת הנאורות ואת רוח המהפכה. טען שהאדם נולד חופשי אך כבול בכבלי הציוויליזציה, ושהקניין הפרטי הוא שהחל את אי-השוויון. הציע כי שלטון לגיטימי מגלם את "הרצון הכללי" של העם.',
+    quote: '"האדם נולד חופשי, ובכל מקום הוא בשלשלאות."',
+  },
+  {
     id: 'nietzsche',
     name: 'פרידריך ניטשה',
     era: '1844–1900',
@@ -513,7 +533,7 @@ const THINKERS = [
     era: '1632–1704',
     emoji: '📜',
     image: './images/locke.webp',
-    subject: 'economics',
+    subject: 'philosophy',
     bio: 'הפילוסוף האנגלי שניסח את הבסיס הפילוסופי לזכות הקניין הפרטי - לא כהסכם חברתי אלא כזכות טבעית הנובעת מבעלות האדם על עצמו.',
     quote: '"לכל אדם יש קניין באישיותו עצמה... עמל גופו ועבודת ידיו הם, כפי שניתן לומר, שלו במלואם."',
   },
@@ -683,7 +703,19 @@ const THINKERS = [
     era: '1921–2002',
     emoji: '⚖️',
     image: './images/rawls.webp',
+    // R36b item 3 — per-subject art slot wired. The `images` map is
+    // consulted by _thinkerImage(t, subject) before falling back to
+    // `image`. The economics file (`./images/rawls-econ.webp`) does
+    // not exist yet — until it's created, `_thinkerImage` returns a
+    // 404-ing URL on the economics side, which is intentional so
+    // the missing-art state is visually loud. Needed asset: 670×1200
+    // webp (same house settings as the other blue economics cards).
+    images: {
+      philosophy: './images/rawls.webp',
+      economics:  './images/rawls-econ.webp',
+    },
     subject: 'economics',
+    subjects: ['economics', 'philosophy'],
     bio: 'הפילוסוף האמריקאי שניסח את "מסך הבערות", ניסוי מחשבתי שמנסה להגדיר חברה צודקת מבלי לדעת מה יהיה מיקומך בה.',
     quote: '״רק מאחורי מסך של בערות, נוכל לבחור עקרונות צדק אמיתיים.״',
   },
@@ -693,7 +725,12 @@ const THINKERS = [
     era: '1938–2002',
     emoji: '🗽',
     image: './images/nozick.webp',
+    images: {
+      philosophy: './images/nozick.webp',
+      economics:  './images/nozick-econ.webp',
+    },
     subject: 'economics',
+    subjects: ['economics', 'philosophy'],
     bio: 'הפילוסוף האמריקאי הליברטריאני שניסח את "צדק כזכאות" כתגובה לרולס: צדק נמדד בתהליך, לא בתוצאה.',
     quote: '״מצב צודק הוא כל מצב שהושג בדרכים צודקות.״',
   },
@@ -905,6 +942,8 @@ const THINKERS_EN = [
   { id:'descartes', name:'Descartes', era:'1596–1650', image:'./images/descartes.webp', emoji:'🕯️', bio:'Father of modern philosophy. Sought a foundation for knowledge that could withstand radical doubt - and found it in the thinking self: "I think, therefore I am."', quote:'"I think, therefore I am."' },
   { id:'kant', name:'Immanuel Kant', era:'1724–1804', image:'./images/kant.webp', emoji:'⚖️', bio:'German philosopher considered one of the greatest of all time. Created the categorical imperative - a universal moral principle grounded in reason, not consequences. Famously lived by an unvarying daily schedule in Königsberg.', quote:'"Act only according to that maxim whereby you can will it to become a universal law."' },
   { id:'mill', name:'John Stuart Mill', era:'1806–1873', image:'./images/mill.webp', emoji:'🌻', bio:'British philosopher and founder of modern utilitarianism. A child prodigy who read Greek at three, and suffered a severe breakdown at 20. Developed the greatest happiness principle and championed individual liberty.', quote:'"It is better to be Socrates dissatisfied than a fool satisfied."' },
+  { id:'hobbes', name:'Thomas Hobbes', era:'1588–1679', image:'./images/hobbes.webp', emoji:'👑', subject:'philosophy', bio:'English philosopher and author of Leviathan. Lived through the English Civil War and feared chaos above all. Argued that humans in a state of nature would live lives "solitary, poor, nasty, brutish, and short" - and so need a strong sovereign to guarantee security.', quote:'"To give up natural liberty and transfer it to a sovereign - this is the price of peace."' },
+  { id:'rousseau', name:'Jean-Jacques Rousseau', era:'1712–1778', image:'./images/rousseau.webp', emoji:'🌿', subject:'philosophy', bio:'Swiss-French philosopher who shaped Enlightenment thought and the spirit of revolution. Argued that man is born free but everywhere lies in the chains of civilization, and that private property began inequality. Proposed that legitimate rule expresses the "general will" of the people.', quote:'"Man is born free, and everywhere he is in chains."' },
   { id:'nietzsche', name:'Friedrich Nietzsche', era:'1844–1900', image:'./images/nietzsche.webp', emoji:'⚡', bio:'German philosopher and the most incisive critic of morality in philosophical history. Did not ask "what is moral?" but "where does morality come from?" - and found resentment lurking behind many noble-sounding values.', quote:'"There are no moral facts. There is only moral interpretation of facts."' },
   { id:'hume', name:'David Hume', era:'1711–1776', image:'./images/hume.webp', emoji:'🌊', bio:'Scottish philosopher and one of the most radical empiricists. Argued that all knowledge flows from experience and that reason alone can prove nothing about the world. His problem of induction remains philosophically unsolved.', quote:'"Custom is the great guide of human life."' },
   { id:'gettier', name:'Edmund Gettier', era:'1927–2021', image:'./images/gettier.webp', emoji:'⚙️', bio:'American philosopher who upended 2500 years of epistemology with a three-page paper in 1963. His counterexamples to the justified-true-belief analysis of knowledge sparked a debate that has never fully closed.', quote:'"Justified true belief - and still not knowledge."' },
@@ -924,7 +963,7 @@ const THINKERS_EN = [
   // Economics thinkers
   { id:'mill-econ', name:'John Stuart Mill', era:'1806–1873', image:'./images/mill1.webp', emoji:'🌻', subject:'economics', bio:'British philosopher and economist. Distinguished between the laws of production (natural) and the laws of distribution (social) - a distinction that changed the history of economic thought.', quote:'"The question for the future is not how to produce more - but how to distribute better."' },
   { id:'smith', name:'Adam Smith', era:'1723–1790', emoji:'🏭', image:'./images/smith.webp', subject:'economics', bio:'The Scottish economist who laid the foundations of modern economics. Famous for the "invisible hand" metaphor - a self-coordinating free market without central planning.', quote:'"It is not from the benevolence of the butcher, the brewer, or the baker that we expect our dinner, but from their regard to their own interest."' },
-  { id:'locke', name:'John Locke', era:'1632–1704', emoji:'📜', image:'./images/locke.webp', subject:'economics', bio:'The English philosopher who formulated the philosophical basis for private property - not as a social agreement but as a natural right derived from a person\'s ownership of themselves.', quote:'"Every man has a property in his own person… the labour of his body, and the work of his hands, we may say, are properly his."' },
+  { id:'locke', name:'John Locke', era:'1632–1704', emoji:'📜', image:'./images/locke.webp', subject:'philosophy', bio:'The English philosopher who formulated the philosophical basis for private property - not as a social agreement but as a natural right derived from a person\'s ownership of themselves.', quote:'"Every man has a property in his own person… the labour of his body, and the work of his hands, we may say, are properly his."' },
   { id:'samuelson', name:'Paul Samuelson', era:'1915–2009', emoji:'📊', image:'./images/samuelson.webp', subject:'economics', bio:'The first American economist to win the Nobel Prize in Economics (1970). His textbook "Economics" (1948) defined the discipline for decades.', quote:'"Economics is the study of how people and nations choose to employ scarce productive resources - labor, capital, land - to produce commodities and distribute them for consumption."' },
   { id:'marx', name:'Karl Marx', era:'1818–1883', emoji:'⚙️', image:'./images/marx.webp', subject:'economics', bio:'The German philosopher and economist who critiqued capitalism from its foundations. In Capital he developed the labor theory of value and analyzed the mechanisms of exploitation built into capitalist production.', quote:'"The history of all hitherto existing society is the history of class struggles."' },
   { id:'walras', name:'Léon Walras', era:'1834–1910', emoji:'🔢', image:'./images/walras.webp', subject:'economics', bio:'The Swiss economist who founded neo-classical economics. Developed the theory of general equilibrium - the idea that it is possible to describe mathematically how all markets in the economy reach balance simultaneously.', quote:'"Prices are the solution to a system of simultaneous equations."' },
@@ -944,8 +983,8 @@ const THINKERS_EN = [
   { id:'piketty', name:'Thomas Piketty', era:'1971–', emoji:'📊', image:'./images/piketty.webp', subject:'economics', bio:'The French economist who measured capital over 300 years, and discovered the formula r > g - the rate of return on capital is always greater than the rate of growth.', quote:'"When the rate of return on capital significantly exceeds the growth rate of the economy - inherited wealth grows faster than the entire economy."' },
   { id:'aquinas', name:'Thomas Aquinas', era:'1225–1274', emoji:'✝️', image:'./images/aquinas.webp', subject:'economics', bio:'A Dominican friar and medieval philosopher who formulated the idea of "the just price," and declared that not everything legal in the market is just.', quote:'"To sell something for more than its real value is a sin, even if no law forbids it."' },
   { id:'pareto', name:'Vilfredo Pareto', era:'1848–1923', emoji:'⚖️', image:'./images/pareto.webp', subject:'economics', bio:'The Italian economist who tried to separate economics from moral questions, and formulated the concept of "Pareto efficiency" which became the foundation of modern economics.', quote:'"An economic state is optimal when it is impossible to improve the welfare of one person without reducing the welfare of another."' },
-  { id:'rawls', name:'John Rawls', era:'1921–2002', emoji:'⚖️', image:'./images/rawls.webp', subject:'economics', bio:'The American philosopher who formulated "the veil of ignorance," a thought experiment that tries to define a just society without knowing what your position in it will be.', quote:'"Only behind a veil of ignorance can we choose true principles of justice."' },
-  { id:'nozick', name:'Robert Nozick', era:'1938–2002', emoji:'🗽', image:'./images/nozick.webp', subject:'economics', bio:'The American libertarian philosopher who formulated "justice as entitlement" as a response to Rawls: justice is measured by process, not by outcome.', quote:'"A just situation is any situation that was achieved through just means."' },
+  { id:'rawls', name:'John Rawls', era:'1921–2002', emoji:'⚖️', image:'./images/rawls.webp', images:{ philosophy:'./images/rawls.webp', economics:'./images/rawls-econ.webp' }, subject:'economics', subjects:['economics','philosophy'], bio:'The American philosopher who formulated "the veil of ignorance," a thought experiment that tries to define a just society without knowing what your position in it will be.', quote:'"Only behind a veil of ignorance can we choose true principles of justice."' },
+  { id:'nozick', name:'Robert Nozick', era:'1938–2002', emoji:'🗽', image:'./images/nozick.webp', images:{ philosophy:'./images/nozick.webp', economics:'./images/nozick-econ.webp' }, subject:'economics', subjects:['economics','philosophy'], bio:'The American libertarian philosopher who formulated "justice as entitlement" as a response to Rawls: justice is measured by process, not by outcome.', quote:'"A just situation is any situation that was achieved through just means."' },
   { id:'hayek', name:'Friedrich Hayek', era:'1899–1992', emoji:'🌬️', image:'./images/hayek.webp', subject:'economics', bio:'The Austrian-British economist who argued that the concept of "social justice" is meaningless: the outcome of a spontaneous process cannot be called "just" or "unjust."', quote:'"Justice can be a property of human behavior, but not of a state that no one intentionally created."' },
   // Economics chapter 5 — "Growth and Development"
   { id:'solow',    name:'Robert Solow',        era:'1924–2023', emoji:'📈', image:'./images/solow.webp',    subject:'economics', bio:'An American economist and Nobel laureate. Showed with U.S. data from 1909 to 1949 that most economic growth cannot be explained by the accumulation of capital, and that the unexplained remainder, later called "the Solow residual", captures technology and productivity. Received the Nobel Prize in 1987.',                                                                                                                    quote:'"I am using the phrase \'technical change\' as a shorthand expression for any kind of shift in the production function."' },

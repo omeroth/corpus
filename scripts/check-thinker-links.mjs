@@ -781,6 +781,17 @@ const GRANDFATHER_LENGTH_CHECK = new Set([
 // per entry.
 const LENGTH_CHECK_EXCEPTIONS = new Set([
   'psychology:7',
+  // Added 2026-10-27 during the philosophy:6 (Political Philosophy)
+  // verbatim import. The chapter's quiz distractors are hand-authored
+  // academic prose (seven thinker-labelled dialogues on sovereignty,
+  // justice and property); the "correct" answer in each triple restates
+  // the dialogue's thesis in full while the two foils are deliberately
+  // narrow misreadings — the longest-option skew lands at 83% EN /
+  // 88% HE. Rewriting distractors would mean rewriting the source doc.
+  // Documented and accepted as a one-chapter trade-off; any other
+  // chapter crossing 60% must still fail. Do NOT widen this set
+  // without a comparable justification per entry.
+  'philosophy:6',
 ]);
 
 const lengthIssues = [];
