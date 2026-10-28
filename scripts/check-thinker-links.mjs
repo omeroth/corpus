@@ -792,6 +792,16 @@ const LENGTH_CHECK_EXCEPTIONS = new Set([
   // chapter crossing 60% must still fail. Do NOT widen this set
   // without a comparable justification per entry.
   'philosophy:6',
+  // Added 2026-10-28 during the economics:7 (Money and Crises) verbatim
+  // import. Six-thinker chain-of-explanations chapter (Minsky, Bagehot,
+  // Fisher, Friedman, Reinhart+Rogoff, 2008 event, summary); correct
+  // answers restate each dialogue's thesis clause in full while the two
+  // foils are deliberately narrow misreadings. Longest-option skew
+  // lands at ~86% EN / ~81% HE. Rewriting distractors would mean
+  // rewriting the source doc. Documented and accepted as a one-chapter
+  // trade-off; any other chapter crossing 60% must still fail. Do NOT
+  // widen this set without a comparable justification per entry.
+  'economics:7',
 ]);
 
 const lengthIssues = [];
