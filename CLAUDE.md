@@ -305,7 +305,8 @@ For anything with more than a few surfaces or a handoff spec (reveal-card rebuil
 3. **Read the reference against your DOM.** If a handoff assumes fixed dimensions, a full-viewport SVG, or a specific viewBox, note it before porting. Don't retune reference values to fit your container — resize the container.
 4. **Baseline the survivors.** Playwright dump of geometry + computed styles for surfaces that must not shift. Save it. That's what "no regression" means at push time.
 5. **Verify twice.** Against the reference (does it look like the handoff?) and against the baseline (did anything else move?). Both must pass before push.
+6. **Scope-creep report.** If, while implementing, you discover that an unauthorized transformation is necessary (a second edit beyond the one the user signed off on — moving content between sections, stripping characters not previously flagged, renaming an identifier the user didn't ask you to rename), stop and report before applying. "It was defensible" and "it was tiny" are not substitutes for a check-in. The user signs off on the scope, not on everything downstream of it that turns out to be convenient.
 
 ---
 
-*Last updated: 2026-10-17*
+*Last updated: 2026-10-28*

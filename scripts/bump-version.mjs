@@ -13,7 +13,24 @@
 //   4. ios/App/App.xcodeproj/project.pbxproj
 //                               — MARKETING_VERSION = ...;
 //                               — CURRENT_PROJECT_VERSION = NNN;
-//                                 (both appear 2× — Debug + Release)
+//                                 (both appear 4× — App Debug/Release +
+//                                 CorpusWidgetExtension Debug/Release.
+//                                 The widget-extension pair MUST match
+//                                 the App pair or the App Store refuses
+//                                 the submission with "Bundle version
+//                                 does not match the extension" — this
+//                                 blocker is why the regexes are
+//                                 global; a single replace covers both
+//                                 targets atomically.)
+//   5. package.json             — "version": "..."
+//                                 (Added 2026-10-28. Historically this
+//                                 drifted silently — package.json
+//                                 showed 1.4.7 while the app shipped
+//                                 1.5.0. Not consumed at runtime but
+//                                 read by npm, GitHub, and anyone who
+//                                 inspects the manifest; keeping it in
+//                                 lockstep removes a reliable source
+//                                 of confusion.)
 //
 // Auto-increments iOS build (CURRENT_PROJECT_VERSION) and Android
 // versionCode by 1 unless --ios / --android is passed.
@@ -39,6 +56,7 @@ const FILES = {
   wwwIndexHtml:   join(REPO, 'www/index.html'),
   androidGradle:  join(REPO, 'android/app/build.gradle'),
   iosPbxproj:     join(REPO, 'ios/App/App.xcodeproj/project.pbxproj'),
+  packageJson:    join(REPO, 'package.json'),
 };
 
 // --- args ---
@@ -117,11 +135,16 @@ const ANDROID_NAME_RE      = /versionName "([\d.]+)"/;
 const ANDROID_CODE_RE      = /versionCode (\d+)/;
 const IOS_MARKETING_RE     = /MARKETING_VERSION = ([\d.]+);/g;
 const IOS_BUILD_RE         = /CURRENT_PROJECT_VERSION = (\d+);/g;
+// Anchor on the top-level "version" field. We only match the first
+// three top-level fields (name/version/...) so a nested "version"
+// inside a dependency pin can't be caught by mistake.
+const PACKAGE_VERSION_RE   = /("version"\s*:\s*)"([\d.]+)"/;
 
 const indexHtml    = readFileSync(FILES.indexHtml, 'utf8');
 const wwwIndexHtml = readFileSync(FILES.wwwIndexHtml, 'utf8');
 const gradle       = readFileSync(FILES.androidGradle, 'utf8');
 const pbxproj      = readFileSync(FILES.iosPbxproj, 'utf8');
+const packageJson  = readFileSync(FILES.packageJson, 'utf8');
 
 function need(re, text, label) {
   const m = text.match(re);
@@ -143,21 +166,37 @@ try {
     androidCode:        parseInt(need(ANDROID_CODE_RE, gradle,   'versionCode in build.gradle'), 10),
     iosMarketing:       needAll(IOS_MARKETING_RE,  pbxproj,      'MARKETING_VERSION in pbxproj'),
     iosBuild:           needAll(IOS_BUILD_RE,      pbxproj,      'CURRENT_PROJECT_VERSION in pbxproj'),
+    packageVersion:     (() => { const m = packageJson.match(PACKAGE_VERSION_RE); if (!m) throw new Error('could not find version in package.json'); return m[2]; })(),
   };
 } catch (e) {
   console.error('bump-version: ' + e.message + ' — refusing to write (would leave surfaces out of sync)');
   process.exit(1);
 }
 
-// Sanity-check iOS pairs match across configs.
+// Sanity-check iOS pairs match across configs. Expect 4 of each
+// now that the CorpusWidgetExtension target lives alongside the
+// App target (Debug + Release × 2 targets = 4 occurrences). A
+// mismatch here used to just block submission silently — now it
+// is an immediate refusal with the full list.
+if (current.iosMarketing.length !== 4 || current.iosBuild.length !== 4) {
+  console.error(
+    `bump-version: expected 4 MARKETING_VERSION and 4 CURRENT_PROJECT_VERSION ` +
+    `entries in pbxproj (App + CorpusWidgetExtension, Debug + Release), ` +
+    `found ${current.iosMarketing.length}/${current.iosBuild.length}. ` +
+    `Fix by hand first.`
+  );
+  process.exit(1);
+}
 const iosMarketingUnique = [...new Set(current.iosMarketing)];
 const iosBuildUnique     = [...new Set(current.iosBuild)];
 if (iosMarketingUnique.length > 1) {
   console.error('bump-version: iOS MARKETING_VERSION differs across configs: ' + current.iosMarketing.join(', ') + ' — fix by hand first');
+  console.error('(App and CorpusWidgetExtension MUST ship with the same marketing version — Apple rejects the submission otherwise.)');
   process.exit(1);
 }
 if (iosBuildUnique.length > 1) {
   console.error('bump-version: iOS CURRENT_PROJECT_VERSION differs across configs: ' + current.iosBuild.join(', ') + ' — fix by hand first');
+  console.error('(App and CorpusWidgetExtension MUST ship with the same build number — Apple rejects the submission otherwise.)');
   process.exit(1);
 }
 const curIosMarketing = iosMarketingUnique[0];
@@ -193,6 +232,8 @@ writeFileSync(FILES.iosPbxproj,
   pbxproj
     .replace(IOS_MARKETING_RE, `MARKETING_VERSION = ${version};`)
     .replace(IOS_BUILD_RE,     `CURRENT_PROJECT_VERSION = ${newIosBuild};`));
+writeFileSync(FILES.packageJson,
+  packageJson.replace(PACKAGE_VERSION_RE, `$1"${version}"`));
 
 // --- summary ---
 console.log('');
@@ -202,6 +243,7 @@ console.log('  android build.gradle  versionName           "' + current.androidN
 console.log('  android build.gradle  versionCode           ' + current.androidCode + ' → ' + newAndroidCode);
 console.log('  ios pbxproj           MARKETING_VERSION     ' + curIosMarketing + ' → ' + version + '  (×' + current.iosMarketing.length + ')');
 console.log('  ios pbxproj           CURRENT_PROJECT_VER   ' + curIosBuild + ' → ' + newIosBuild + '  (×' + current.iosBuild.length + ')');
+console.log('  package.json          version               ' + current.packageVersion + ' → ' + version);
 console.log('');
 console.log('  ⚠  POST-APPROVAL STEP — version.json NOT touched by this bump.');
 console.log('');
