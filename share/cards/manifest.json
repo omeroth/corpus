@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-10T13:50:53.724Z",
+  "generatedAt": "2026-10-30T16:49:45.285Z",
   "items": [
     {
       "weekId": 1,
@@ -425,7 +425,7 @@
       "subject": "philosophy",
       "lang": "en",
       "thinkerId": "descartes",
-      "title": "Is it possible to know anything at all?",
+      "title": "Can We Know Anything?",
       "card": "share/cards/en/phil-3-2.png",
       "page": "d/phil-3-2-en.html"
     },
@@ -465,7 +465,7 @@
       "subject": "philosophy",
       "lang": "en",
       "thinkerId": "kant",
-      "title": "What does the mind bring to knowledge?",
+      "title": "What the Mind Brings",
       "card": "share/cards/en/phil-3-4.png",
       "page": "d/phil-3-4-en.html"
     },
@@ -516,7 +516,7 @@
       "lang": "he",
       "thinkerId": null,
       "kind": "summary",
-      "title": "ספק וידע - סיכום הפרק",
+      "title": "סיכום הפרק",
       "card": "share/cards/he/phil-3-7.png",
       "page": "d/phil-3-7-he.html"
     },
@@ -527,7 +527,7 @@
       "lang": "en",
       "thinkerId": null,
       "kind": "summary",
-      "title": "Doubt and Knowledge - Chapter Summary",
+      "title": "Chapter Summary",
       "card": "share/cards/en/phil-3-7.png",
       "page": "d/phil-3-7-en.html"
     },
@@ -723,7 +723,7 @@
       "subject": "philosophy",
       "lang": "he",
       "thinkerId": "hume",
-      "title": "אולי כל הדילמה נשענת על בלבול?",
+      "title": "דילמת סרק?",
       "card": "share/cards/he/phil-5-3.png",
       "page": "d/phil-5-3-he.html"
     },
@@ -733,7 +733,7 @@
       "subject": "philosophy",
       "lang": "en",
       "thinkerId": "hume",
-      "title": "Perhaps the whole dilemma rests on a confusion?",
+      "title": "A False Dilemma?",
       "card": "share/cards/en/phil-5-3.png",
       "page": "d/phil-5-3-en.html"
     },
@@ -753,7 +753,7 @@
       "subject": "philosophy",
       "lang": "en",
       "thinkerId": "kant",
-      "title": "Without freedom there is no morality",
+      "title": "No Freedom, No Morality",
       "card": "share/cards/en/phil-5-4.png",
       "page": "d/phil-5-4-en.html"
     },
@@ -763,7 +763,7 @@
       "subject": "philosophy",
       "lang": "he",
       "thinkerId": "sartre",
-      "title": "ואולי אי אפשר לברוח מהחופש?",
+      "title": "אין בריחה מחופש",
       "card": "share/cards/he/phil-5-5.png",
       "page": "d/phil-5-5-he.html"
     },
@@ -773,7 +773,7 @@
       "subject": "philosophy",
       "lang": "en",
       "thinkerId": "sartre",
-      "title": "And perhaps there is no escaping freedom?",
+      "title": "Condemned to Be Free",
       "card": "share/cards/en/phil-5-5.png",
       "page": "d/phil-5-5-en.html"
     },
@@ -783,7 +783,7 @@
       "subject": "philosophy",
       "lang": "he",
       "thinkerId": "libet",
-      "title": "מה המוח עושה רגע לפני שהחלטנו?",
+      "title": "המוח מחליט ראשון",
       "card": "share/cards/he/phil-5-6.png",
       "page": "d/phil-5-6-he.html"
     },
@@ -793,7 +793,7 @@
       "subject": "philosophy",
       "lang": "en",
       "thinkerId": "libet",
-      "title": "What does the brain do a moment before we decided?",
+      "title": "The Brain Decides First",
       "card": "share/cards/en/phil-5-6.png",
       "page": "d/phil-5-6-en.html"
     },
@@ -820,12 +820,174 @@
       "page": "d/phil-5-7-en.html"
     },
     {
+      "weekId": 6,
+      "dayId": 1,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "plato",
+      "title": "שלטון המומחים",
+      "card": "share/cards/he/phil-6-1.png",
+      "page": "d/phil-6-1-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 1,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "plato",
+      "title": "The Rule of Experts",
+      "card": "share/cards/en/phil-6-1.png",
+      "page": "d/phil-6-1-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 2,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "hobbes",
+      "title": "ההצדקה לסדר",
+      "card": "share/cards/he/phil-6-2.png",
+      "page": "d/phil-6-2-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 2,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "hobbes",
+      "title": "The Case for Order",
+      "card": "share/cards/en/phil-6-2.png",
+      "page": "d/phil-6-2-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 3,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "locke",
+      "title": "מה שלא ויתרנו עליו",
+      "card": "share/cards/he/phil-6-3.png",
+      "page": "d/phil-6-3-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 3,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "locke",
+      "title": "What We Did Not Surrender",
+      "card": "share/cards/en/phil-6-3.png",
+      "page": "d/phil-6-3-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 4,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "rousseau",
+      "title": "כשהקניין גזל את החירות",
+      "card": "share/cards/he/phil-6-4.png",
+      "page": "d/phil-6-4-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 4,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "rousseau",
+      "title": "When Property Took Our Freedom",
+      "card": "share/cards/en/phil-6-4.png",
+      "page": "d/phil-6-4-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 5,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "mill",
+      "title": "כשהרוב הוא הסכנה",
+      "card": "share/cards/he/phil-6-5.png",
+      "page": "d/phil-6-5-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 5,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "mill",
+      "title": "When the Majority Is the Danger",
+      "card": "share/cards/en/phil-6-5.png",
+      "page": "d/phil-6-5-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 6,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "rawls",
+      "title": "צדק מאחורי המסך",
+      "card": "share/cards/he/phil-6-6.png",
+      "page": "d/phil-6-6-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 6,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "rawls",
+      "title": "Justice Behind the Veil",
+      "card": "share/cards/en/phil-6-6.png",
+      "page": "d/phil-6-6-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 7,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "nozick",
+      "title": "לפני שיש מה לחלק",
+      "card": "share/cards/he/phil-6-7.png",
+      "page": "d/phil-6-7-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 7,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "nozick",
+      "title": "Before Anything Is Shared",
+      "card": "share/cards/en/phil-6-7.png",
+      "page": "d/phil-6-7-en.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 8,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "other",
+      "title": "שבעה הוגים, שאלה אחת",
+      "card": "share/cards/he/phil-6-8.png",
+      "page": "d/phil-6-8-he.html"
+    },
+    {
+      "weekId": 6,
+      "dayId": 8,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "other",
+      "title": "Seven Thinkers, One Question",
+      "card": "share/cards/en/phil-6-8.png",
+      "page": "d/phil-6-8-en.html"
+    },
+    {
       "weekId": 1,
       "dayId": 1,
       "subject": "economics",
       "lang": "he",
       "thinkerId": "samuelson",
-      "title": "השאלות שאי אפשר לברוח מהן",
+      "title": "השאלות שאין מהן מנוס",
       "card": "share/cards/he/econ-1-1.png",
       "page": "d/econ-1-1-he.html"
     },
@@ -835,7 +997,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "samuelson",
-      "title": "The Questions That Cannot Be Escaped",
+      "title": "The Inescapable Questions",
       "card": "share/cards/en/econ-1-1.png",
       "page": "d/econ-1-1-en.html"
     },
@@ -895,7 +1057,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "keynes",
-      "title": "When the Market Does Not Return to Balance",
+      "title": "When Balance Breaks",
       "card": "share/cards/en/econ-1-4.png",
       "page": "d/econ-1-4-en.html"
     },
@@ -915,7 +1077,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "friedman",
-      "title": "The Market as a Guardian of Freedom",
+      "title": "Markets and Freedom",
       "card": "share/cards/en/econ-1-5.png",
       "page": "d/econ-1-5-en.html"
     },
@@ -935,7 +1097,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "sen",
-      "title": "What Does Economics Really Measure?",
+      "title": "What Economics Measures",
       "card": "share/cards/en/econ-1-6.png",
       "page": "d/econ-1-6-en.html"
     },
@@ -1473,7 +1635,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "solow",
-      "title": "למה מדינות עשירות לא נעצרות?",
+      "title": "למה הצמיחה נמשכת",
       "card": "share/cards/he/econ-5-1.png",
       "page": "d/econ-5-1-he.html"
     },
@@ -1483,7 +1645,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "solow",
-      "title": "Why don't rich countries come to a stop?",
+      "title": "Why Growth Persists",
       "card": "share/cards/en/econ-5-1.png",
       "page": "d/econ-5-1-en.html"
     },
@@ -1513,7 +1675,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "north",
-      "title": "למה מדינות לא פשוט מעתיקות מה שעובד?",
+      "title": "למה אי אפשר רק להעתיק?",
       "card": "share/cards/he/econ-5-3.png",
       "page": "d/econ-5-3-he.html"
     },
@@ -1523,7 +1685,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "north",
-      "title": "Why don't countries simply copy what works?",
+      "title": "Why Copying Fails",
       "card": "share/cards/en/econ-5-3.png",
       "page": "d/econ-5-3-en.html"
     },
@@ -1573,7 +1735,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "easterly",
-      "title": "האם אנחנו יודעים איך לגרום לזה לקרות?",
+      "title": "אפשר להנדס צמיחה?",
       "card": "share/cards/he/econ-5-6.png",
       "page": "d/econ-5-6-he.html"
     },
@@ -1583,7 +1745,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "easterly",
-      "title": "Do we know how to make it happen?",
+      "title": "Can Growth Be Engineered?",
       "card": "share/cards/en/econ-5-6.png",
       "page": "d/econ-5-6-en.html"
     },
@@ -1594,7 +1756,7 @@
       "lang": "he",
       "thinkerId": null,
       "kind": "summary",
-      "title": "למה יש מדינות עשירות ועניות?",
+      "title": "עשירות ועניות",
       "card": "share/cards/he/econ-5-7.png",
       "page": "d/econ-5-7-he.html"
     },
@@ -1605,7 +1767,7 @@
       "lang": "en",
       "thinkerId": null,
       "kind": "summary",
-      "title": "Why are some countries rich and others poor?",
+      "title": "Rich Countries, Poor Countries",
       "card": "share/cards/en/econ-5-7.png",
       "page": "d/econ-5-7-en.html"
     },
@@ -1615,7 +1777,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "simon",
-      "title": "האם אנחנו בכלל מסוגלים להיות רציונליים?",
+      "title": "גבולות ההיגיון",
       "card": "share/cards/he/econ-6-1.png",
       "page": "d/econ-6-1-he.html"
     },
@@ -1625,7 +1787,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "simon",
-      "title": "Are we even capable of being rational?",
+      "title": "The Limits of Reason",
       "card": "share/cards/en/econ-6-1.png",
       "page": "d/econ-6-1-en.html"
     },
@@ -1635,7 +1797,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "kahneman",
-      "title": "למה הפסד כואב יותר מרווח משמח",
+      "title": "למה הפסד כואב יותר",
       "card": "share/cards/he/econ-6-2.png",
       "page": "d/econ-6-2-he.html"
     },
@@ -1645,7 +1807,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "kahneman",
-      "title": "Why a loss hurts more than an equal gain pleases",
+      "title": "Why Losing Hurts More",
       "card": "share/cards/en/econ-6-2.png",
       "page": "d/econ-6-2-en.html"
     },
@@ -1655,7 +1817,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "thaler",
-      "title": "למה אותו חפץ שווה פי שניים כשהוא שלנו?",
+      "title": "שווה יותר כשזה שלי",
       "card": "share/cards/he/econ-6-3.png",
       "page": "d/econ-6-3-he.html"
     },
@@ -1665,7 +1827,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "thaler",
-      "title": "Why is the same object worth twice as much when it is ours?",
+      "title": "Worth More Once It's Yours",
       "card": "share/cards/en/econ-6-3.png",
       "page": "d/econ-6-3-en.html"
     },
@@ -1675,7 +1837,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "thaler",
-      "title": "אם אנחנו יודעים איך אנשים בוחרים, מותר לעצב את הבחירה?",
+      "title": "האתיקה של הדחיפה",
       "card": "share/cards/he/econ-6-4.png",
       "page": "d/econ-6-4-he.html"
     },
@@ -1685,7 +1847,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "thaler",
-      "title": "If we know how people choose, are we permitted to design the choice?",
+      "title": "The Ethics of Nudging",
       "card": "share/cards/en/econ-6-4.png",
       "page": "d/econ-6-4-en.html"
     },
@@ -1695,7 +1857,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "shiller",
-      "title": "מה קורה כשהסטיות מצטברות לשוק שלם?",
+      "title": "כשההטיות מצטברות",
       "card": "share/cards/he/econ-6-5.png",
       "page": "d/econ-6-5-he.html"
     },
@@ -1705,7 +1867,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "shiller",
-      "title": "What happens when the deviations accumulate into an entire market?",
+      "title": "When Biases Scale Up",
       "card": "share/cards/en/econ-6-5.png",
       "page": "d/econ-6-5-en.html"
     },
@@ -1715,7 +1877,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "gigerenzer",
-      "title": "ואולי זו בכלל לא טעות?",
+      "title": "אולי אין טעות?",
       "card": "share/cards/he/econ-6-6.png",
       "page": "d/econ-6-6-he.html"
     },
@@ -1725,7 +1887,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "gigerenzer",
-      "title": "And perhaps it is not a mistake at all?",
+      "title": "Perhaps Not a Mistake?",
       "card": "share/cards/en/econ-6-6.png",
       "page": "d/econ-6-6-en.html"
     },
@@ -2183,7 +2345,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "freud",
-      "title": "למה אנחנו חוזרים בדיוק על מה שפגע בנו?",
+      "title": "כפיית החזרה",
       "card": "share/cards/he/psyc-4-1.png",
       "page": "d/psyc-4-1-he.html"
     },
@@ -2193,7 +2355,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "freud",
-      "title": "Why do we repeat exactly what hurt us?",
+      "title": "The Repetition Compulsion",
       "card": "share/cards/en/psyc-4-1.png",
       "page": "d/psyc-4-1-en.html"
     },
@@ -2203,7 +2365,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "klein",
-      "title": "מה אם אנחנו נושאים את האנשים מהעבר בתוכנו?",
+      "title": "האחרים שבתוכנו",
       "card": "share/cards/he/psyc-4-2.png",
       "page": "d/psyc-4-2-he.html"
     },
@@ -2213,7 +2375,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "klein",
-      "title": "What if we carry the people from our past inside us?",
+      "title": "The Others Inside Us",
       "card": "share/cards/en/psyc-4-2.png",
       "page": "d/psyc-4-2-en.html"
     },
@@ -2223,7 +2385,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "anna-freud",
-      "title": "מה אם ההגנות שלנו הן בעצם מה שתוקע אותנו?",
+      "title": "כשההגנות תוקעות",
       "card": "share/cards/he/psyc-4-3.png",
       "page": "d/psyc-4-3-he.html"
     },
@@ -2233,7 +2395,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "anna-freud",
-      "title": "What if our defenses are actually what keeps us stuck?",
+      "title": "When Defenses Trap Us",
       "card": "share/cards/en/psyc-4-3.png",
       "page": "d/psyc-4-3-en.html"
     },
@@ -2243,7 +2405,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "beck",
-      "title": "מה אם הדפוס אינו רגש אלא משפט שאנחנו אומרים לעצמנו?",
+      "title": "התסריט הפנימי",
       "card": "share/cards/he/psyc-4-4.png",
       "page": "d/psyc-4-4-he.html"
     },
@@ -2253,7 +2415,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "beck",
-      "title": "What if the pattern is not an emotion but a sentence we tell ourselves?",
+      "title": "The Stories We Repeat",
       "card": "share/cards/en/psyc-4-4.png",
       "page": "d/psyc-4-4-en.html"
     },
@@ -2263,7 +2425,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "van-der-kolk",
-      "title": "מה אם יש דפוסים שלא יושבים במחשבה?",
+      "title": "דפוסים מתחת למחשבה",
       "card": "share/cards/he/psyc-4-5.png",
       "page": "d/psyc-4-5-he.html"
     },
@@ -2273,7 +2435,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "van-der-kolk",
-      "title": "What if there are patterns that do not sit in thought?",
+      "title": "Patterns Beneath Thought",
       "card": "share/cards/en/psyc-4-5.png",
       "page": "d/psyc-4-5-en.html"
     },
@@ -2283,7 +2445,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "kahneman",
-      "title": "מה אם רוב מה שאנחנו עושים הוכרע לפני שחשבנו?",
+      "title": "הוכרע לפני המחשבה",
       "card": "share/cards/he/psyc-4-6.png",
       "page": "d/psyc-4-6-he.html"
     },
@@ -2293,7 +2455,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "kahneman",
-      "title": "What if most of what we do was decided before we thought?",
+      "title": "Decided Before We Think",
       "card": "share/cards/en/psyc-4-6.png",
       "page": "d/psyc-4-6-en.html"
     },
@@ -2315,7 +2477,7 @@
       "lang": "en",
       "thinkerId": null,
       "kind": "summary",
-      "title": "Why is it so hard to be different?",
+      "title": "Why Change Is Hard",
       "card": "share/cards/en/psyc-4-7.png",
       "page": "d/psyc-4-7-en.html"
     },
@@ -2425,7 +2587,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "freud",
-      "title": "מה אם הסימפטום מנסה לומר משהו?",
+      "title": "הסימפטום מדבר",
       "card": "share/cards/he/psyc-5-1.png",
       "page": "d/psyc-5-1-he.html"
     },
@@ -2435,7 +2597,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "freud",
-      "title": "What if the symptom is trying to say something?",
+      "title": "The Symptom Speaks",
       "card": "share/cards/en/psyc-5-1.png",
       "page": "d/psyc-5-1-en.html"
     },
@@ -2445,7 +2607,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "kohut",
-      "title": "מה אם הסבל אינו מאבק אלא חוסר?",
+      "title": "סבל כחוסר",
       "card": "share/cards/he/psyc-5-2.png",
       "page": "d/psyc-5-2-he.html"
     },
@@ -2455,7 +2617,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "kohut",
-      "title": "What if the suffering is not a struggle but a lack?",
+      "title": "Suffering as Absence",
       "card": "share/cards/en/psyc-5-2.png",
       "page": "d/psyc-5-2-en.html"
     },
@@ -2465,7 +2627,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "bowlby",
-      "title": "מה אם הדיכאון הוא אבל שנתקע?",
+      "title": "אבל שנתקע",
       "card": "share/cards/he/psyc-5-3.png",
       "page": "d/psyc-5-3-he.html"
     },
@@ -2475,7 +2637,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "bowlby",
-      "title": "What if depression is mourning that got stuck?",
+      "title": "Mourning That Got Stuck",
       "card": "share/cards/en/psyc-5-3.png",
       "page": "d/psyc-5-3-en.html"
     },
@@ -2485,7 +2647,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "beck",
-      "title": "מה אם הסבל מתחזק על ידי מה שאנחנו אומרים לעצמנו?",
+      "title": "הקול שמעמיק את הכאב",
       "card": "share/cards/he/psyc-5-4.png",
       "page": "d/psyc-5-4-he.html"
     },
@@ -2495,7 +2657,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "beck",
-      "title": "What if suffering is strengthened by what we say to ourselves?",
+      "title": "The Voice That Deepens Pain",
       "card": "share/cards/en/psyc-5-4.png",
       "page": "d/psyc-5-4-en.html"
     },
@@ -2505,7 +2667,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "van-der-kolk",
-      "title": "מה אם יש סבל שאינו עובר דרך מחשבה?",
+      "title": "סבל מתחת למחשבה",
       "card": "share/cards/he/psyc-5-5.png",
       "page": "d/psyc-5-5-he.html"
     },
@@ -2515,7 +2677,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "van-der-kolk",
-      "title": "What if there is suffering that does not pass through thought?",
+      "title": "Suffering Beneath Thought",
       "card": "share/cards/en/psyc-5-5.png",
       "page": "d/psyc-5-5-en.html"
     },
@@ -2525,7 +2687,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "foucault",
-      "title": "מי קובע איזה סבל נחשב מחלה?",
+      "title": "מה נחשב מחלה?",
       "card": "share/cards/he/psyc-5-6.png",
       "page": "d/psyc-5-6-he.html"
     },
@@ -2535,7 +2697,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "foucault",
-      "title": "Who decides which suffering counts as an illness?",
+      "title": "What Counts as Illness?",
       "card": "share/cards/en/psyc-5-6.png",
       "page": "d/psyc-5-6-en.html"
     },
@@ -2567,7 +2729,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "breuer",
-      "title": "מה אם עצם הדיבור הוא מה שמרפא?",
+      "title": "ריפוי בדיבור",
       "card": "share/cards/he/psyc-6-1.png",
       "page": "d/psyc-6-1-he.html"
     },
@@ -2577,7 +2739,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "breuer",
-      "title": "What if the speaking itself is what heals?",
+      "title": "The Talking Cure",
       "card": "share/cards/en/psyc-6-1.png",
       "page": "d/psyc-6-1-en.html"
     },
@@ -2587,7 +2749,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "rogers",
-      "title": "מה אם לא השיטה מרפאת אלא הקשר?",
+      "title": "הקשר שמרפא",
       "card": "share/cards/he/psyc-6-2.png",
       "page": "d/psyc-6-2-he.html"
     },
@@ -2597,7 +2759,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "rogers",
-      "title": "What if it is not the method that heals but the relationship?",
+      "title": "The Relationship Heals",
       "card": "share/cards/en/psyc-6-2.png",
       "page": "d/psyc-6-2-en.html"
     },
@@ -2607,7 +2769,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "winnicott",
-      "title": "מה אם צריך פחות לתקן ויותר לאפשר?",
+      "title": "לאפשר במקום לתקן",
       "card": "share/cards/he/psyc-6-3.png",
       "page": "d/psyc-6-3-he.html"
     },
@@ -2617,7 +2779,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "winnicott",
-      "title": "What if less repairing and more allowing is needed?",
+      "title": "Allowing Instead of Fixing",
       "card": "share/cards/en/psyc-6-3.png",
       "page": "d/psyc-6-3-en.html"
     },
@@ -2627,7 +2789,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "beck",
-      "title": "מה אם אפשר פשוט לבדוק את המחשבה?",
+      "title": "לבדוק את המחשבה",
       "card": "share/cards/he/psyc-6-4.png",
       "page": "d/psyc-6-4-he.html"
     },
@@ -2637,7 +2799,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "beck",
-      "title": "What if one can simply test the thought?",
+      "title": "Testing the Thought",
       "card": "share/cards/en/psyc-6-4.png",
       "page": "d/psyc-6-4-en.html"
     },
@@ -2647,7 +2809,7 @@
       "subject": "psychology",
       "lang": "he",
       "thinkerId": "frankl",
-      "title": "מה קורה כשאי אפשר לשנות דבר?",
+      "title": "כשאי אפשר לשנות",
       "card": "share/cards/he/psyc-6-5.png",
       "page": "d/psyc-6-5-he.html"
     },
@@ -2657,7 +2819,7 @@
       "subject": "psychology",
       "lang": "en",
       "thinkerId": "frankl",
-      "title": "What happens when nothing can be changed?",
+      "title": "When Change Isn't Possible",
       "card": "share/cards/en/psyc-6-5.png",
       "page": "d/psyc-6-5-en.html"
     },
@@ -2702,6 +2864,148 @@
       "title": "Is the change real?",
       "card": "share/cards/en/psyc-6-7.png",
       "page": "d/psyc-6-7-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "lacan",
+      "title": "חזרה לפרויד",
+      "card": "share/cards/he/psyc-7-1.png",
+      "page": "d/psyc-7-1-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 1,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "lacan",
+      "title": "A Return to Freud",
+      "card": "share/cards/en/psyc-7-1.png",
+      "page": "d/psyc-7-1-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "lacan",
+      "title": "ה\"אני\" הוא דימוי",
+      "card": "share/cards/he/psyc-7-2.png",
+      "page": "d/psyc-7-2-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 2,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "lacan",
+      "title": "The Ego Is an Image",
+      "card": "share/cards/en/psyc-7-2.png",
+      "page": "d/psyc-7-2-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "foucault",
+      "title": "מורשת הווידוי",
+      "card": "share/cards/he/psyc-7-3.png",
+      "page": "d/psyc-7-3-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "foucault",
+      "title": "The Inherited Confession",
+      "card": "share/cards/en/psyc-7-3.png",
+      "page": "d/psyc-7-3-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "frances",
+      "title": "כשהגבול זז",
+      "card": "share/cards/he/psyc-7-4.png",
+      "page": "d/psyc-7-4-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 4,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "frances",
+      "title": "When the Boundary Moves",
+      "card": "share/cards/en/psyc-7-4.png",
+      "page": "d/psyc-7-4-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "illouz",
+      "title": "שפת השוק",
+      "card": "share/cards/he/psyc-7-5.png",
+      "page": "d/psyc-7-5-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 5,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "illouz",
+      "title": "The Language of the Market",
+      "card": "share/cards/en/psyc-7-5.png",
+      "page": "d/psyc-7-5-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": "han",
+      "title": "חברת ההישגים",
+      "card": "share/cards/he/psyc-7-6.png",
+      "page": "d/psyc-7-6-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 6,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": "han",
+      "title": "The Achievement Society",
+      "card": "share/cards/en/psyc-7-6.png",
+      "page": "d/psyc-7-6-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 7,
+      "subject": "psychology",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "חמישה הוגים, שאלה אחת",
+      "card": "share/cards/he/psyc-7-7.png",
+      "page": "d/psyc-7-7-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 7,
+      "subject": "psychology",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "Five Thinkers, One Question",
+      "card": "share/cards/en/psyc-7-7.png",
+      "page": "d/psyc-7-7-en.html"
     }
   ]
 }

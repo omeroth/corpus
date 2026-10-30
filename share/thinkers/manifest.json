@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-10T13:51:01.578Z",
+  "generatedAt": "2026-10-30T16:50:03.815Z",
   "items": [
     {
       "thinkerId": "socrates",
@@ -90,6 +90,26 @@
       "cardLandscape": "share/thinkers/he/mill.png",
       "cardPortrait": "share/thinkers/portrait/he/mill.png",
       "page": "t/mill-he.html"
+    },
+    {
+      "thinkerId": "hobbes",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "תומאס הובס",
+      "era": "1588–1679",
+      "cardLandscape": "share/thinkers/he/hobbes.png",
+      "cardPortrait": "share/thinkers/portrait/he/hobbes.png",
+      "page": "t/hobbes-he.html"
+    },
+    {
+      "thinkerId": "rousseau",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "ז'אן ז'אק רוסו",
+      "era": "1712–1778",
+      "cardLandscape": "share/thinkers/he/rousseau.png",
+      "cardPortrait": "share/thinkers/portrait/he/rousseau.png",
+      "page": "t/rousseau-he.html"
     },
     {
       "thinkerId": "nietzsche",
@@ -453,7 +473,7 @@
     },
     {
       "thinkerId": "locke",
-      "subject": "economics",
+      "subject": "philosophy",
       "lang": "he",
       "name": "ג'ון לוק",
       "era": "1632–1704",
@@ -617,9 +637,19 @@
       "lang": "he",
       "name": "ג'ון רולס",
       "era": "1921–2002",
-      "cardLandscape": "share/thinkers/he/rawls.png",
-      "cardPortrait": "share/thinkers/portrait/he/rawls.png",
-      "page": "t/rawls-he.html"
+      "cardLandscape": "share/thinkers/he/rawls-economics.png",
+      "cardPortrait": "share/thinkers/portrait/he/rawls-economics.png",
+      "page": "t/rawls-economics-he.html"
+    },
+    {
+      "thinkerId": "rawls",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "ג'ון רולס",
+      "era": "1921–2002",
+      "cardLandscape": "share/thinkers/he/rawls-philosophy.png",
+      "cardPortrait": "share/thinkers/portrait/he/rawls-philosophy.png",
+      "page": "t/rawls-philosophy-he.html"
     },
     {
       "thinkerId": "nozick",
@@ -627,9 +657,19 @@
       "lang": "he",
       "name": "רוברט נוזיק",
       "era": "1938–2002",
-      "cardLandscape": "share/thinkers/he/nozick.png",
-      "cardPortrait": "share/thinkers/portrait/he/nozick.png",
-      "page": "t/nozick-he.html"
+      "cardLandscape": "share/thinkers/he/nozick-economics.png",
+      "cardPortrait": "share/thinkers/portrait/he/nozick-economics.png",
+      "page": "t/nozick-economics-he.html"
+    },
+    {
+      "thinkerId": "nozick",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "רוברט נוזיק",
+      "era": "1938–2002",
+      "cardLandscape": "share/thinkers/he/nozick-philosophy.png",
+      "cardPortrait": "share/thinkers/portrait/he/nozick-philosophy.png",
+      "page": "t/nozick-philosophy-he.html"
     },
     {
       "thinkerId": "hayek",
@@ -732,6 +772,46 @@
       "page": "t/gigerenzer-he.html"
     },
     {
+      "thinkerId": "lacan",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "ז'אק לאקאן",
+      "era": "1901–1981",
+      "cardLandscape": "share/thinkers/he/lacan.png",
+      "cardPortrait": "share/thinkers/portrait/he/lacan.png",
+      "page": "t/lacan-he.html"
+    },
+    {
+      "thinkerId": "frances",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "אלן פרנסס",
+      "era": "1942–",
+      "cardLandscape": "share/thinkers/he/frances.png",
+      "cardPortrait": "share/thinkers/portrait/he/frances.png",
+      "page": "t/frances-he.html"
+    },
+    {
+      "thinkerId": "illouz",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "אווה אילוז",
+      "era": "1961–",
+      "cardLandscape": "share/thinkers/he/illouz.png",
+      "cardPortrait": "share/thinkers/portrait/he/illouz.png",
+      "page": "t/illouz-he.html"
+    },
+    {
+      "thinkerId": "han",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "ביונג-צ'ול האן",
+      "era": "1959–",
+      "cardLandscape": "share/thinkers/he/han.png",
+      "cardPortrait": "share/thinkers/portrait/he/han.png",
+      "page": "t/han-he.html"
+    },
+    {
       "thinkerId": "socrates",
       "subject": "philosophy",
       "lang": "en",
@@ -820,6 +900,26 @@
       "cardLandscape": "share/thinkers/en/mill.png",
       "cardPortrait": "share/thinkers/portrait/en/mill.png",
       "page": "t/mill-en.html"
+    },
+    {
+      "thinkerId": "hobbes",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Thomas Hobbes",
+      "era": "1588–1679",
+      "cardLandscape": "share/thinkers/en/hobbes.png",
+      "cardPortrait": "share/thinkers/portrait/en/hobbes.png",
+      "page": "t/hobbes-en.html"
+    },
+    {
+      "thinkerId": "rousseau",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Jean-Jacques Rousseau",
+      "era": "1712–1778",
+      "cardLandscape": "share/thinkers/en/rousseau.png",
+      "cardPortrait": "share/thinkers/portrait/en/rousseau.png",
+      "page": "t/rousseau-en.html"
     },
     {
       "thinkerId": "nietzsche",
@@ -953,7 +1053,7 @@
     },
     {
       "thinkerId": "locke",
-      "subject": "economics",
+      "subject": "philosophy",
       "lang": "en",
       "name": "John Locke",
       "era": "1632–1704",
@@ -1117,9 +1217,19 @@
       "lang": "en",
       "name": "John Rawls",
       "era": "1921–2002",
-      "cardLandscape": "share/thinkers/en/rawls.png",
-      "cardPortrait": "share/thinkers/portrait/en/rawls.png",
-      "page": "t/rawls-en.html"
+      "cardLandscape": "share/thinkers/en/rawls-economics.png",
+      "cardPortrait": "share/thinkers/portrait/en/rawls-economics.png",
+      "page": "t/rawls-economics-en.html"
+    },
+    {
+      "thinkerId": "rawls",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "John Rawls",
+      "era": "1921–2002",
+      "cardLandscape": "share/thinkers/en/rawls-philosophy.png",
+      "cardPortrait": "share/thinkers/portrait/en/rawls-philosophy.png",
+      "page": "t/rawls-philosophy-en.html"
     },
     {
       "thinkerId": "nozick",
@@ -1127,9 +1237,19 @@
       "lang": "en",
       "name": "Robert Nozick",
       "era": "1938–2002",
-      "cardLandscape": "share/thinkers/en/nozick.png",
-      "cardPortrait": "share/thinkers/portrait/en/nozick.png",
-      "page": "t/nozick-en.html"
+      "cardLandscape": "share/thinkers/en/nozick-economics.png",
+      "cardPortrait": "share/thinkers/portrait/en/nozick-economics.png",
+      "page": "t/nozick-economics-en.html"
+    },
+    {
+      "thinkerId": "nozick",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Robert Nozick",
+      "era": "1938–2002",
+      "cardLandscape": "share/thinkers/en/nozick-philosophy.png",
+      "cardPortrait": "share/thinkers/portrait/en/nozick-philosophy.png",
+      "page": "t/nozick-philosophy-en.html"
     },
     {
       "thinkerId": "hayek",
@@ -1460,6 +1580,46 @@
       "cardLandscape": "share/thinkers/en/foucault.png",
       "cardPortrait": "share/thinkers/portrait/en/foucault.png",
       "page": "t/foucault-en.html"
+    },
+    {
+      "thinkerId": "lacan",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Jacques Lacan",
+      "era": "1901–1981",
+      "cardLandscape": "share/thinkers/en/lacan.png",
+      "cardPortrait": "share/thinkers/portrait/en/lacan.png",
+      "page": "t/lacan-en.html"
+    },
+    {
+      "thinkerId": "frances",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Allen Frances",
+      "era": "1942–",
+      "cardLandscape": "share/thinkers/en/frances.png",
+      "cardPortrait": "share/thinkers/portrait/en/frances.png",
+      "page": "t/frances-en.html"
+    },
+    {
+      "thinkerId": "illouz",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Eva Illouz",
+      "era": "1961–",
+      "cardLandscape": "share/thinkers/en/illouz.png",
+      "cardPortrait": "share/thinkers/portrait/en/illouz.png",
+      "page": "t/illouz-en.html"
+    },
+    {
+      "thinkerId": "han",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Byung-Chul Han",
+      "era": "1959–",
+      "cardLandscape": "share/thinkers/en/han.png",
+      "cardPortrait": "share/thinkers/portrait/en/han.png",
+      "page": "t/han-en.html"
     }
   ]
 }
