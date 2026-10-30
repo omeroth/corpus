@@ -4,7 +4,7 @@ import PackageDescription
 // DO NOT MODIFY THIS FILE - managed by Capacitor CLI commands
 let package = Package(
     name: "CapApp-SPM",
-    platforms: [.iOS(.v15)],
+    platforms: [.iOS(.v17)],
     products: [
         .library(
             name: "CapApp-SPM",
@@ -24,7 +24,8 @@ let package = Package(
         .package(name: "RevenuecatPurchasesCapacitor", path: "../../../node_modules/@revenuecat/purchases-capacitor"),
         .package(name: "CorpusInstagramShare", path: "../../../plugins/corpus-instagram-share"),
         .package(name: "CorpusMetaEvents", path: "../../../plugins/corpus-meta-events"),
-        .package(name: "CorpusReview", path: "../../../plugins/corpus-review")
+        .package(name: "CorpusReview", path: "../../../plugins/corpus-review"),
+        .package(name: "CorpusWidgetBridge", path: "../../../plugins/corpus-widget-bridge")
     ],
     targets: [
         .target(
@@ -44,7 +45,8 @@ let package = Package(
                 .product(name: "RevenuecatPurchasesCapacitor", package: "RevenuecatPurchasesCapacitor"),
                 .product(name: "CorpusInstagramShare", package: "CorpusInstagramShare"),
                 .product(name: "CorpusMetaEvents", package: "CorpusMetaEvents"),
-                .product(name: "CorpusReview", package: "CorpusReview")
+                .product(name: "CorpusReview", package: "CorpusReview"),
+                .product(name: "CorpusWidgetBridge", package: "CorpusWidgetBridge")
             ]
         )
     ]

@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(grep:*)",
-      "Bash(sed -n '1226,2117p' /Users/omeroth/CORPUS/index.html)",
-      "Read(//tmp/**)"
-    ]
-  }
-}

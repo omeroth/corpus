@@ -46,6 +46,16 @@ ios/build/
 # www/. Keeping it out of git means the working tree stays clean between syncs.
 ios/App/App/public/
 
+# www/ is a sync-generated mirror produced by `npm run sync-web` from the
+# tracked sources at the repo root (images/, content/, assets/, media/).
+# Only www/index.html is tracked as the Capacitor entrypoint; the rest is
+# derivable and would otherwise double every image diff.
+# Fresh clone must run `npm run sync-web` before `npx cap sync ios`.
+www/images/
+www/content/
+www/assets/
+www/media/
+
 # Android build caches (Gradle-generated).
 android/app/build/
 android/build/
@@ -74,3 +84,38 @@ scripts/fonts/*.ttf
 # Pages under corpusapp.io. Rendered assets the app actually depends
 # on will land in images/ (or an equivalent tracked path), not here.
 thinker-frames-handoff/
+
+# Design reference files (prototype HTML + raw thinker PNGs
+# unzipped from small-thinkers.zip). Local-only — the committed
+# thinker assets live in images/onb-thinkers/ once converted.
+design-ref/
+
+# Capacitor regenerates android/app/src/main/assets/public/ on every
+# `npx cap sync android` by copying www/ (same deal as ios/App/App/public/).
+# Fresh clone must run `npm run sync-web && npx cap sync android` before
+# any Android build.
+android/app/src/main/assets/
+
+# Xcode / SwiftPM user-local scratch (per-user schemes, build state).
+ios/App/CapApp-SPM/.swiftpm/
+ios/App/App.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/configuration/
+
+# Gradle / Kotlin build caches.
+android/.kotlin/
+
+# Widget-preview CLI build output (Swift binary compiled from
+# scripts/widget-preview/preview_main.swift via xcrun swiftc).
+scripts/widget-preview/preview_cli
+
+# Claude CLI session scratch (per-user settings + schedule lock file).
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
+
+# Content-authoring handoff drops (raw .txt sources the authors send
+# before transcription into content/*.js). Not consumed at runtime.
+*-chapter*-en.txt
+*-chapter*-he.txt
+
+# SwiftPM scratch inside Capacitor plugins (build output + per-user scheme state).
+plugins/*/.build/
+plugins/*/.swiftpm/

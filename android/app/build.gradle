@@ -43,6 +43,15 @@ android {
             }
         }
     }
+    // AGP 8.0 flipped buildFeatures.buildConfig to false by default. MainActivity
+    // references BuildConfig.DEBUG to decide whether to inject the Debug-only
+    // __CORPUS_DEBUG_BRIDGE_ANDROID JavascriptInterface (symmetric to the iOS
+    // WKUserScript at atDocumentStart in AppDelegate.swift). Without this
+    // explicit opt-in the Release build fails at compileReleaseJavaWithJavac
+    // with "cannot find symbol BuildConfig".
+    buildFeatures {
+        buildConfig true
+    }
 }
 
 repositories {

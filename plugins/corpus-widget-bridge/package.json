@@ -1,0 +1,25 @@
+{
+  "name": "corpus-widget-bridge",
+  "version": "1.0.0",
+  "description": "Repo-local Capacitor plugin: writes a JSON blob to the App Group shared container (iOS) / SharedPreferences (Android) and triggers a widget-timeline reload. Consumed from index.html via window.Capacitor.Plugins.CorpusWidgetBridge — no JS wrapper build needed.",
+  "files": [
+    "android/src",
+    "android/build.gradle",
+    "ios/Sources",
+    "Package.swift"
+  ],
+  "capacitor": {
+    "ios": {
+      "src": "ios"
+    },
+    "android": {
+      "src": "android"
+    }
+  },
+  "keywords": ["capacitor", "plugin", "widget", "widgetkit", "appgroup"],
+  "author": "Corpus",
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "@capacitor/core": "^8.0.0"
+  }
+}

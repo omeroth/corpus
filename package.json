@@ -5,12 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "sync-web": "rsync -a --delete --exclude='*.DS_Store' index.html Onboarding_new.html manifest.json CNAME version.json assets images content www/",
+    "sync-web": "rsync -a --delete --exclude='*.DS_Store' index.html Onboarding_new.html manifest.json CNAME version.json assets images content media www/",
     "gen:share": "node scripts/generate-share-cards.mjs",
     "bump": "node scripts/bump-version.mjs",
     "mark-live": "node scripts/mark-live.mjs",
     "privacy-check": "node scripts/check-privacy-invariants.mjs",
-    "check-content": "node scripts/check-thinker-links.mjs"
+    "check-content": "node scripts/check-thinker-links.mjs",
+    "render-streak-badges": "node scripts/render-streak-badges.mjs",
+    "render-corpus-flame": "node scripts/render-corpus-flame.mjs",
+    "check-reader-overflow": "node scripts/check-reader-overflow.mjs"
   },
   "repository": {
     "type": "git",
@@ -43,7 +46,8 @@
     "@revenuecat/purchases-capacitor": "^13.4.2",
     "corpus-instagram-share": "file:plugins/corpus-instagram-share",
     "corpus-meta-events": "file:plugins/corpus-meta-events",
-    "corpus-review": "file:plugins/corpus-review"
+    "corpus-review": "file:plugins/corpus-review",
+    "corpus-widget-bridge": "file:plugins/corpus-widget-bridge"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",

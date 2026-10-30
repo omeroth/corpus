@@ -218,6 +218,27 @@ Switch via `showScreen(screenName)`. The function hides all other screens by tog
 
 ---
 
+## Deploy — two-remote mirror
+
+`corpusapp.io` is served by **GitHub Pages on `omeroth/corpus-app`**, not `omeroth/corpus`. The repo has two remotes:
+
+- `origin` → `omeroth/corpus` — source. All day-to-day commits land here. Pages is NOT enabled.
+- `app` → `omeroth/corpus-app` — deploy mirror. Pages IS enabled; custom domain = `corpusapp.io`.
+
+The `.github/workflows/pages.yml` workflow is identical in both repos but only runs on the mirror (`if: github.repository == 'omeroth/corpus-app'`). It assembles `_deploy/` from an **explicit whitelist** — `index.html`, `Onboarding_new.html`, `delete-account.html`, `manifest.json`, `CNAME`, `version.json`, `assets/`, `images/`, `content/`, `share/`, `d/`, `t/`, `go/`, `email/`. Everything else in the repo (`scripts/`, `ios/`, `android/`, `www/`, `node_modules/`, design PNGs) is deliberately NOT copied to the artifact.
+
+**To ship a change that affects the public site** (`d/*.html`, `share/cards/*.png`, `t/*.html`, `index.html` meta tags, etc.):
+
+1. Commit on `origin main` as usual.
+2. `git push app main` to mirror the source branch to the deploy repo.
+3. The Pages workflow runs on corpus-app (~1-2 min). Watch the build at https://github.com/omeroth/corpus-app/actions.
+
+Mirror pushes are **always fast-forward** (the two repos share linear history). If a push to `app` ever rejects as non-fast-forward, something has diverged — stop and surface before forcing. Never force-push to `app/main`.
+
+A deploy that only touched source (CSS/JS/content) WITHOUT running `npm run gen:share` first will not refresh the `/d/*.html` landing pages or the share-card PNGs that external platforms (WhatsApp, iMessage, LinkedIn) use to render preview cards. If the change could affect dialogue titles, thinker metadata, or anything the share generator consumes, run `npm run gen:share` before pushing to `app`.
+
+---
+
 ## Hard constraints (apply to every task)
 
 ### Never

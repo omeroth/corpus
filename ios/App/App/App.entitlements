@@ -4,5 +4,14 @@
 <dict>
   <key>com.apple.developer.applesignin</key>
   <array><string>Default</string></array>
+  <!-- App Group shared with CorpusWidget. The main app writes a JSON
+       blob to this suite (via CorpusWidgetBridge plugin) and the
+       widget extension reads it. Both targets must carry the same
+       entitlement; without it UserDefaults(suiteName:) returns a
+       non-shared instance and the widget never sees the writes. -->
+  <key>com.apple.security.application-groups</key>
+  <array>
+    <string>group.com.corpusapp.corpus.shared</string>
+  </array>
 </dict>
 </plist>

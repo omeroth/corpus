@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>en</string>
+  <key>CFBundleDisplayName</key>
+  <string>Corpus</string>
+  <key>CFBundleExecutable</key>
+  <string>$(EXECUTABLE_NAME)</string>
+  <key>CFBundleIdentifier</key>
+  <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+  <key>CFBundleName</key>
+  <string>$(PRODUCT_NAME)</string>
+  <key>CFBundlePackageType</key>
+  <string>XPC!</string>
+  <key>CFBundleShortVersionString</key>
+  <string>$(MARKETING_VERSION)</string>
+  <key>CFBundleVersion</key>
+  <string>$(CURRENT_PROJECT_VERSION)</string>
+  <key>NSExtension</key>
+  <dict>
+    <key>NSExtensionPointIdentifier</key>
+    <string>com.apple.widgetkit-extension</string>
+  </dict>
+  <!-- Fonts bundled in the extension's Resources/Fonts. Two static
+       Nunito TTFs with explicit PostScript names ("Nunito-Black",
+       "Nunito-ExtraBold"); the view layer selects them directly via
+       Font.custom(name, size:). Nunito only — the widget is English-
+       only, so the previously-bundled Assistant Hebrew faces were
+       removed. ~260 KB total. Resources is a Xcode-16 synchronized
+       folder reference so new files are picked up automatically. -->
+  <key>UIAppFonts</key>
+  <array>
+    <string>Nunito-Black.ttf</string>
+    <string>Nunito-ExtraBold.ttf</string>
+  </array>
+</dict>
+</plist>

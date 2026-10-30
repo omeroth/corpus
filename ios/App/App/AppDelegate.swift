@@ -82,3 +82,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 }
+
+// Round 40 A1 — bridge subclass wired via Main.storyboard (customClass =
+// CorpusBridgeViewController, customModule = App). Under the Debug build
+// configuration we add a WKUserScript at atDocumentStart that sets
+// window.__CORPUS_DEBUG_BUILD = true before any index.html script executes.
+// Release builds (TestFlight, App Store) compile the class but omit the
+// script, so Release WKWebView starts with the flag undefined. Combined
+// with the index.html helper-redaction block near the end of the main
+// <script>, every window.__corpus* / window._replay* helper is deleted and
+// _isDevPremium() returns false regardless of localStorage. WKWebView's
+// isInspectable (Capacitor's CAPInstanceDescriptor.isWebDebuggable) is
+// also false by default in Release, so a Safari Web Inspector cannot
+// attach to a shipped build to set those flags in the first place — the
+// native flag is the belt, the inspector lock is the braces.
+class CorpusBridgeViewController: CAPBridgeViewController {
+    override func webView(with frame: CGRect, configuration: WKWebViewConfiguration) -> WKWebView {
+        #if DEBUG
+        let src = "window.__CORPUS_DEBUG_BUILD = true;"
+        let script = WKUserScript(source: src, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+        configuration.userContentController.addUserScript(script)
+        #endif
+        return WKWebView(frame: frame, configuration: configuration)
+    }
+}

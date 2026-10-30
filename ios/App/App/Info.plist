@@ -24,6 +24,18 @@
 				<string>com.googleusercontent.apps.1010803138404-cs8f3t5vvcqjv0rgldlpm25o07sir1i7</string>
 			</array>
 		</dict>
+		<!-- Deep link from the home-screen widget. corpus://today routes
+		     to the next-up dialogue (or home if the day is done). Handled
+		     by Capacitor's App plugin on the JS side via the appUrlOpen
+		     listener. Added for the WidgetKit extension. -->
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>io.corpusapp.deeplink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>corpus</string>
+			</array>
+		</dict>
 		<!-- Facebook SDK requires an fb<APP_ID> URL scheme registered so
 		     deferred-deep-link callbacks and Meta's account-kit-style
 		     returns can reach the app. We don't currently use any Meta
@@ -69,6 +81,17 @@
 	     compliance question at every submission. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<!-- Background Modes: `audio` is required for AVPictureInPictureController
+	     to keep the widget-tutorial MP4 playing when the user swipes to the
+	     home screen (the whole point of the PiP demo). The AVPlayer is muted
+	     + the audio session is .playback + .mixWithOthers, so this does NOT
+	     actually play audio in the background — the entitlement is just what
+	     iOS requires to allow PiP continuation. See CorpusWidgetBridgePlugin
+	     .swift's TutorialSession for the audio-session setup. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
 	<!-- SKAdNetwork — Apple's privacy-preserving install-attribution
 	     channel. Postbacks are aggregated, delayed, and never carry a
 	     user identifier, which is why Apple's own documentation carves
