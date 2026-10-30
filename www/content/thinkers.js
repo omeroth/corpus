@@ -588,36 +588,6 @@ const THINKERS = [
     quote: '"בטווח הארוך, כולנו מתים."',
   },
   {
-    id: 'minsky',
-    name: 'היימן מינסקי',
-    era: '1919–1996',
-    emoji: '💰',
-    image: './images/minsky.webp',
-    subject: 'economics',
-    bio: 'הכלכלן האמריקאי שטען שהיציבות עצמה היא זרע המשבר הבא: שנות שגשוג מרגילות את כולם לקחת סיכונים גדולים יותר, עד שהמערכת קורסת מתוך עצמה.',
-    quote: '"יציבות היא יוצרת אי־יציבות."',
-  },
-  {
-    id: 'bagehot',
-    name: 'וולטר בייג\'הוט',
-    era: '1826–1877',
-    emoji: '🏛️',
-    image: './images/bagehot.webp',
-    subject: 'economics',
-    bio: 'העיתונאי הכלכלי הבריטי שעריכתו של "האקונומיסט" במאה ה-19 ניסחה את הכלל הקלאסי לבנק המרכזי בזמן פאניקה: להלוות בחופשיות, לכל מי שיש לו ביטחונות טובים, בריבית ענישה.',
-    quote: '"בפאניקה פיננסית, להלוות בחופשיות - זה הדבר היחיד שיעצור אותה."',
-  },
-  {
-    id: 'fisher',
-    name: 'אירווינג פישר',
-    era: '1867–1947',
-    emoji: '📉',
-    image: './images/fisher.webp',
-    subject: 'economics',
-    bio: 'הכלכלן האמריקאי שגילה את מלכודת ההחזרה: כשכולם מנסים להחזיר חובות בבת אחת, המחירים נופלים, החוב גדל יחסית להכנסה, והמערכת שוקעת עמוק יותר. ניבא ב-1929 ש"מחירי המניות הגיעו לרמה שנראית קבועה". הפסיד את הונו במפולת.',
-    quote: '"ככל שהחייבים מחזירים יותר, כך הם חייבים יותר."',
-  },
-  {
     id: 'friedman',
     name: 'מילטון פרידמן',
     era: '1912–2006',
@@ -626,22 +596,6 @@ const THINKERS = [
     subject: 'economics',
     bio: 'הכלכלן האמריקאי מאוניברסיטת שיקגו שטען שהשוק החופשי הוא יסוד החירות האנושית.',
     quote: '"אין ארוחת חינם."',
-  },
-  {
-    // R36 economics ch7 dialogue 5 is a two-person dialogue (Carmen
-    // Reinhart + Kenneth Rogoff). One shared card per the dialogue;
-    // the portrait currently shows ROGOFF only (rogoff.webp, restored
-    // from the Oct-26 batch). Swap to a combined Reinhart+Rogoff
-    // illustration later by replacing images/rogoff.webp without any
-    // other code change.
-    id: 'reinhart-rogoff',
-    name: 'קרמן ריינהרט וקנת רוגוף',
-    era: '1955– / 1953–',
-    emoji: '📊',
-    image: './images/rogoff.webp',
-    subject: 'economics',
-    bio: 'שני כלכלנים מהרווארד שסקרו שמונה מאות שנים של משברים פיננסיים ברחבי העולם, והראו שלמשברים יש דפוסים חוזרים: גאות אשראי, בועת נכסים, זעזוע חיצוני, ואז קריסה. ספרם "This Time Is Different" מראה בדיוק כמה פעמים כבר אמרו שהפעם זה שונה.',
-    quote: '"ההיסטוריה מראה שמשברים הם ציקליים, גם כשכל פעם זה נראה חדש."',
   },
   {
     id: 'sen',
@@ -1015,13 +969,7 @@ const THINKERS_EN = [
   { id:'walras', name:'Léon Walras', era:'1834–1910', emoji:'🔢', image:'./images/walras.webp', subject:'economics', bio:'The Swiss economist who founded neo-classical economics. Developed the theory of general equilibrium - the idea that it is possible to describe mathematically how all markets in the economy reach balance simultaneously.', quote:'"Prices are the solution to a system of simultaneous equations."' },
   { id:'sandel', name:'Michael Sandel', era:'1953–', emoji:'🏛️', image:'./images/sandel.webp', subject:'economics', bio:'American political philosopher at Harvard. Known for his critique of capitalism and his argument that there are spheres of life - education, health, democracy - where money should not decide.', quote:'"The market is not a neutral tool - it injects certain values into domains where other values matter more."' },
   { id:'keynes', name:'John Maynard Keynes', era:'1883–1946', emoji:'💰', image:'./images/keynes.webp', subject:'economics', bio:'The British economist who argued that the market does not always correct itself and that governments must spend money during crises.', quote:'"In the long run, we are all dead."' },
-  { id:'minsky', name:'Hyman Minsky', era:'1919–1996', emoji:'💰', image:'./images/minsky.webp', subject:'economics', bio:'The American economist who argued that stability itself is the seed of the next crisis: years of prosperity accustom everyone to take bigger risks, until the system collapses from within.', quote:'"Stability is destabilizing."' },
-  { id:'bagehot', name:'Walter Bagehot', era:'1826–1877', emoji:'🏛️', image:'./images/bagehot.webp', subject:'economics', bio:'The British economic journalist whose 19th-century editorship of The Economist formulated the classic rule for the central bank in a panic: lend freely, to anyone with good collateral, at a penalty rate.', quote:'"In a financial panic, to lend freely - that is the only thing that will stop it."' },
-  { id:'fisher', name:'Irving Fisher', era:'1867–1947', emoji:'📉', image:'./images/fisher.webp', subject:'economics', bio:'The American economist who discovered the paying-back trap: when everyone tries to repay debt at once, prices fall, debt grows relative to income, and the system sinks deeper. In 1929 he predicted "stock prices have reached a permanently high plateau." He lost his fortune in the crash.', quote:'"The more the debtors pay, the more they owe."' },
   { id:'friedman', name:'Milton Friedman', era:'1912–2006', emoji:'🗽', image:'./images/friedman.webp', subject:'economics', bio:'The American economist from the University of Chicago who argued that the free market is the foundation of human freedom.', quote:'"There\'s no such thing as a free lunch."' },
-  // Portrait currently shows Rogoff only; swap images/rogoff.webp with a combined
-  // Reinhart+Rogoff illustration later without any other code change.
-  { id:'reinhart-rogoff', name:'Carmen Reinhart and Kenneth Rogoff', era:'1955– / 1953–', emoji:'📊', image:'./images/rogoff.webp', subject:'economics', bio:'Two Harvard economists who surveyed eight hundred years of financial crises around the world and showed that crises follow recurring patterns: credit boom, asset bubble, external shock, then collapse. Their book "This Time Is Different" shows exactly how many times people have already said that this time it would be different.', quote:'"History shows crises are cyclical, even when each one looks new."' },
   // Sen quote replaced 2026-09-29 in the card-quote audit. Prior quote
   // "Development is freedom." is a slogan-reformat of Sen's 1999 book
   // title "Development as Freedom" — not a sentence he wrote. Replaced
