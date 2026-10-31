@@ -7118,6 +7118,22 @@
   }
   .auth-btn-apple:hover { background: #1a1a1a; border-color: #1a1a1a; }
   .auth-btn-apple .auth-social-icon { color: var(--on-accent); display: inline-flex; align-items: center; }
+  /* R44b — Sign in with Apple is iOS-only. Android gets Google + email.
+     Covers every entry point: auth screen (#auth-apple-btn, no
+     .auth-btn-apple class), guest / onboarding / signin-required modals
+     (ids below), and the dynamically-rendered paywall + signin-required
+     sheets ([data-act="apple"]). Previously only `.auth-btn-apple` was
+     hidden; the auth-screen primary button and the pop-sheet buttons
+     slipped through. */
+  html.platform-android #auth-apple-btn,
+  html.platform-android #guest-signup-apple-btn,
+  html.platform-android #onb-signup-apple-btn,
+  html.platform-android #signin-required-apple-btn,
+  html.platform-android .auth-btn-apple,
+  html.platform-android [data-act="apple"],
+  html.platform-android .pop-btn-sso[data-act="apple"] {
+    display: none !important;
+  }
   .auth-social-icon {
     font-size: 16px;
     font-weight: 900;
@@ -61508,7 +61524,7 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
       <img id="onb-v7-rp-fig" class="onb-v7-rp-thinker" alt="">
       <div class="onb-v7-rp-bellgroup">
         <div class="onb-v7-rp-bell">
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a1 1 0 00-1 1v1.07A7 7 0 005 11v3.17L3.3 15.88a1 1 0 00.7 1.72h16a1 1 0 00.7-1.72L19 14.17V11a7 7 0 00-6-6.93V3a1 1 0 00-1-1zm-2 17a2 2 0 004 0h-4z"/></svg>
+          <svg viewBox="0 0 64 64" aria-hidden="true"><use href="#icon-bell"/></svg>
         </div>
         <span class="onb-v7-rp-badge" id="onb-v7-rp-badge-text">DAY 6</span>
       </div>
