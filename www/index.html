@@ -34,6 +34,23 @@
 <meta name="twitter:description" content="Five minutes a day with history's greatest minds.">
 <meta name="twitter:image" content="https://corpusapp.io/share/og-get.png">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Rubik:wght@500;700;800;900&family=DM+Sans:wght@300;400;500;600&family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* R44 — Rubik bundled locally (Hebrew + Latin subset, variable
+     weight) so Hebrew text renders in the brand font even when the
+     device is offline. The Google Fonts link above still carries
+     Nunito / DM Sans / Assistant; this @font-face declares the same
+     "Rubik" family so the earlier declaration from Google Fonts and
+     this one coexist (whichever has the glyph for the requested weight
+     is used). Local src wins when offline. */
+  @font-face {
+    font-family: 'Rubik';
+    font-style: normal;
+    font-weight: 300 900;
+    font-display: swap;
+    src: url('./assets/fonts/rubik-var.woff2') format('woff2-variations'),
+         url('./assets/fonts/rubik-var.woff2') format('woff2');
+  }
+</style>
 <script src="https://cdn.jsdelivr.net/npm/posthog-js@1.396.6/dist/array.full.js"></script>
 <script>
   // Native debug-build flag. Set by iOS WKUserScript (CorpusBridgeViewController,
@@ -148,7 +165,7 @@
     pointer-events: none;
   }
   .html-splash-wordmark {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     /* Font-size scales with the shortest viewport edge to keep the same
        proportion across portrait + landscape. Formula: word width ≈
@@ -782,7 +799,7 @@
   }
 
   body {
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     background: linear-gradient(160deg, var(--bg) 0%, var(--surface-2) 100%);
     background-attachment: fixed;
     transition: background-color 350ms ease, color 350ms ease;
@@ -939,7 +956,7 @@
     text-align: start;
   }
   .topbar-logo {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 22px;
     font-weight: 900;
     color: var(--accent-text);
@@ -949,7 +966,7 @@
     background: none;
     border: none;
     color: var(--accent-text);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
@@ -958,7 +975,7 @@
     justify-self: end;
   }
   .topbar-tagline {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 11px;
     font-weight: 700;
     color: var(--text-2);
@@ -977,7 +994,7 @@
   }
   .topbar-back:hover { background: var(--border); }
   .topbar-title {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 17px;
     font-weight: 800;
     flex: 1;
@@ -1067,7 +1084,7 @@
     font-size: 16px;
     font-weight: 600;
     color: var(--ink, #3D1F7A);
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     /* offset the title by the back-btn width so it's visually centered */
     padding-right: 36px;
   }
@@ -1160,12 +1177,12 @@
     font-weight: 700;
     color: var(--ink, #3D1F7A);
     margin-bottom: 8px;
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
   }
   .journey-xp {
     font-size: 14px;
     color: var(--ink-muted, #6B5B95);
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     letter-spacing: 0.5px;
   }
   .journey-current-marker {
@@ -1179,7 +1196,7 @@
     border-radius: 12px;
     letter-spacing: 0.5px;
     margin-bottom: 12px;
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
   }
   .journey-toast {
     position: fixed;
@@ -1191,7 +1208,7 @@
     padding: 12px 20px;
     border-radius: 20px;
     font-size: 14px;
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     z-index: 600;
     opacity: 0;
     transition: opacity 0.3s;
@@ -1217,7 +1234,7 @@
   }
   .stat-pill .stat-icon { font-size: 20px; margin-bottom: 4px; }
   .stat-pill .stat-value {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 20px;
     font-weight: 900;
     color: var(--text);
@@ -1272,7 +1289,7 @@
     margin-bottom: 14px;
   }
   .section-title {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 19px;
     font-weight: 900;
     color: var(--text);
@@ -2130,14 +2147,14 @@
     border-radius: 28px;
     background: radial-gradient(110% 60% at 50% 26%, #FFFFFF 0%, #F6F0FF 45%, #EFE7FB 100%);
     box-shadow: 0 24px 60px rgba(47, 33, 80, 0.35);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     animation: fe-enter 0.38s cubic-bezier(0.34, 1.4, 0.64, 1) both;
   }
   @keyframes fe-enter {
     0%   { opacity: 0; transform: scale(0.9); }
     100% { opacity: 1; transform: scale(1);    }
   }
-  [dir="rtl"] .fe-mx { font-family: 'Assistant', 'Nunito', sans-serif; }
+  [dir="rtl"] .fe-mx { font-family: 'Assistant', 'Nunito', 'Rubik', sans-serif; }
   .fe-close {
     position: absolute;
     inset-block-start: calc(12px + var(--safe-top));
@@ -2879,7 +2896,7 @@
     border-radius: 50%;
     background: rgba(var(--accent-rgb), 0.1);
     color: var(--accent-text);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: 15px;
     display: flex;
@@ -2891,7 +2908,7 @@
   .week-item.locked .week-num { background: var(--border); color: var(--text-muted); border-color: transparent; }
   .week-info { flex: 1; }
   .week-title {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 16px;
     font-weight: 800;
     margin-bottom: 3px;
@@ -3096,7 +3113,7 @@
     margin-bottom: 10px;
   }
   .streak-repair-title {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(20px * var(--text-scale));
     font-weight: 900;
     color: var(--ink);
@@ -3267,7 +3284,7 @@
     text-align: start;
   }
   .start-first-dialogue-title {
-    font-family: 'Nunito', 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'DM Sans', 'Assistant', sans-serif;
     font-size: calc(22px * var(--text-scale));
     line-height: 1.25;
     font-weight: 900;
@@ -3331,7 +3348,7 @@
      is ~392 chars (well under 40vh), but a future long intro won't
      push the options and Continue button off-screen. */
   .streak-repair-intro {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 500;
     font-size: calc(14px * var(--text-scale));
     line-height: 1.45;
@@ -3355,7 +3372,7 @@
     padding: 32px 24px 24px;
   }
   .streak-repair-result-title {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(24px * var(--text-scale));
     font-weight: 900;
     color: var(--ink);
@@ -3373,7 +3390,7 @@
     margin-inline: auto;
   }
   .hero-continue-title {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 19px;
     font-weight: 900;
     color: var(--text);
@@ -3400,7 +3417,7 @@
     background: linear-gradient(90deg, var(--accent), var(--purple-light), var(--accent), var(--purple-light));
     background-size: 200% auto;
     color: var(--on-accent);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: 16px;
     border: none;
@@ -3418,7 +3435,7 @@
 
   /* ── Home: section title ── */
   .home-section-title {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 13px;
     font-weight: 800;
     color: var(--text-2);
@@ -3540,7 +3557,7 @@
     background: rgba(255,255,255,0.9);
     border: 1px solid rgba(var(--accent-rgb), 0.2);
     border-radius: 100px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 13px;
     font-weight: 700;
     color: var(--accent-text);
@@ -3557,7 +3574,7 @@
     -webkit-overflow-scrolling: touch;
   }
   .library-modal-title {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 18px;
     font-weight: 900;
     color: var(--text);
@@ -3606,7 +3623,7 @@
   }
   .day-info { flex: 1; }
   .day-title {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 800;
     font-size: 15px;
     margin-bottom: 2px;
@@ -3848,7 +3865,7 @@
     background: var(--surface);
     border: 1.5px solid var(--accent-soft-border);
     color: var(--accent-text);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 16px;
     font-weight: 800;
     line-height: 1;
@@ -3874,7 +3891,7 @@
   .settings-textsize-preview {
     flex: 1;
     text-align: center;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     color: var(--accent-text);
     line-height: 1;
@@ -4291,7 +4308,7 @@
   /* DEPRECATED (editorial rollout): centered --accent heading. Shadowed by
      .reader-editorial rules (34px, left-aligned, --ink, tighter tracking). */
   .section-heading {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: var(--fs-heading);
     font-weight: 900;
     line-height: var(--lh-tight);
@@ -4330,7 +4347,7 @@
     margin: 8px 0 14px;
   }
   .source-quote p {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: var(--fs-body);
     font-weight: 700;
     line-height: 1.8;
@@ -4368,7 +4385,7 @@
     letter-spacing: 0.06em;
     color: var(--accent-text);
     text-transform: uppercase;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
   }
   /* DEPRECATED (editorial rollout): italic border-inline-start scene-setter.
      Shadowed by .reader-editorial (19px --text-2, no border, more margin). */
@@ -4384,7 +4401,7 @@
   /* DEPRECATED (editorial rollout): 18px 1.1rem question stem. Shadowed by
      .reader-editorial (24px, tighter lh, more margin). */
   .quiz-question {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: var(--fs-strong);
     line-height: var(--lh-body);
     margin-bottom: 20px;
@@ -4404,7 +4421,7 @@
     font-size: var(--fs-body);
     text-align: start;
     transition: background 0.2s ease, border-color 0.2s ease;
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     font-weight: 500;
     color: var(--ink);
     width: 100%;
@@ -4443,7 +4460,7 @@
     font-size: var(--fs-caption);
     font-weight: 800;
     flex-shrink: 0;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     transition: background 0.2s ease, color 0.2s ease;
   }
   .opt-text { flex: 1; line-height: 1.5; }
@@ -4497,7 +4514,7 @@
     font-weight: 800;
     flex-shrink: 0;
     color: var(--accent-dark);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
   }
   .quiz-feedback {
     margin-top: 16px;
@@ -4542,7 +4559,7 @@
   .qfm-icon { font-size: 52px; margin-bottom: 6px; }
   .qfm-xp {
     font-size: 22px; font-weight: 800;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     margin-bottom: 18px;
   }
   .qfm-xp.correct { color: var(--success); }
@@ -4568,7 +4585,7 @@
   .share-modal-text {
     font-size: 16px; line-height: 1.75;
     color: var(--text);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 600;
     margin-bottom: 8px;
   }
@@ -4600,7 +4617,7 @@
     font-size: 13px;
     color: var(--accent-text);
     margin-top: 8px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
   }
 
@@ -4807,9 +4824,9 @@
     line-height: 1.15;
     font-weight: 900;
     color: var(--ink);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
   }
-  [dir="rtl"] .quiz-summary-v2 .qs-hl { font-family: 'Assistant', 'Nunito', sans-serif; }
+  [dir="rtl"] .quiz-summary-v2 .qs-hl { font-family: 'Assistant', 'Nunito', 'Rubik', sans-serif; }
   .quiz-summary-v2 .qs-hl em { font-style: normal; color: var(--accent); }
   .quiz-summary-v2.qs-full .qs-hl em {
     background: linear-gradient(90deg, #F59E0B, #B45309);
@@ -5622,7 +5639,7 @@
   /* ── XP Float animation ── */
   .xp-float {
     position: fixed;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 20px;
     font-weight: 900;
     color: var(--gold);
@@ -5672,7 +5689,7 @@
     letter-spacing: 0.8px;
     cursor: pointer;
     width: 100%;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     transition: all 0.15s;
     margin-top: 8px;
     min-height: 56px;
@@ -5825,7 +5842,7 @@
      chapter list expands inline to the same day list. */
   .modal-emoji { font-size: 56px; margin-bottom: 12px; }
   .modal-title {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 26px;
     font-weight: 900;
     margin-bottom: 8px;
@@ -5844,7 +5861,7 @@
   }
   .modal-xp-item { text-align: center; }
   .modal-xp-value {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 26px;
     font-weight: 900;
     color: var(--gold);
@@ -6175,7 +6192,7 @@
        to read clearly on any light surface, still soft enough not to
        feel modal-heavy. */
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.20), 0 2px 6px rgba(0, 0, 0, 0.08);
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     font-size: 14px;
     font-weight: 600;
     transition: opacity 0.25s ease, transform 0.25s ease;
@@ -6253,7 +6270,7 @@
     color: var(--on-accent);
     padding: 12px 24px;
     border-radius: 99px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 800;
     font-size: 15px;
     z-index: 200;
@@ -6301,7 +6318,7 @@
     padding: 8px 0;
   }
   .thinker-intro-eyebrow {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 13px;
     font-weight: 800;
     color: var(--accent-text);
@@ -6393,7 +6410,7 @@
     display: block;
   }
   .thinker-intro-name {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 30px;
     font-weight: 900;
     color: var(--ink);
@@ -6426,7 +6443,7 @@
     border: none;
     border-radius: 999px;
     padding: 15px 40px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 800;
     font-size: 16px;
     cursor: pointer;
@@ -6978,7 +6995,7 @@
      still pass AA on their own; the same shadow just gives them a
      subtle edge lift for consistency. */
   .auth-logo-text {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 38px;
     font-weight: 900;
     color: #FFFFFF;
@@ -6986,7 +7003,7 @@
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   }
   .auth-tagline {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 15px;
     color: #FFFFFF;
     margin-top: 4px;
@@ -7017,7 +7034,7 @@
     background: none;
     border-radius: 9px;
     padding: 9px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 14px;
     font-weight: 700;
     color: var(--text-muted);
@@ -7035,7 +7052,7 @@
     border: 1.5px solid var(--border);
     border-radius: 12px;
     padding: 12px 16px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 16px;
     color: var(--text);
     outline: none;
@@ -7049,7 +7066,7 @@
     border: none;
     border-radius: 12px;
     padding: 13px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
@@ -7125,13 +7142,13 @@
     color: var(--red);
     min-height: 18px;
     text-align: center;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
   }
   .auth-guest-link {
     background: none;
     border: none;
     color: rgba(255,255,255,0.85);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -7158,7 +7175,7 @@
     background: rgba(0, 0, 0, 0.55);
     color: #FFFFFF;
     border-radius: 999px;
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     font-size: 13px;
     font-weight: 500;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
@@ -7191,7 +7208,7 @@
     border-radius: 8px;
     font-size: 12px;
     font-weight: 700;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     color: var(--text-2);
     cursor: pointer;
     padding: 5px 10px;
@@ -7259,7 +7276,7 @@
     border: none;
     border-radius: 7px;
     padding: 8px 10px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 13px;
     font-weight: 700;
     color: var(--text-muted);
@@ -7525,7 +7542,7 @@
     align-items: center;
     justify-content: center;
     line-height: 1;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     transition: background 0.25s ease, color 0.25s ease;
   }
   .onb-screen.onb-v2 .onb-node-num {
@@ -7614,7 +7631,7 @@
     position: absolute;
     top: calc(20px + 5px);   /* below the bar + 5px gap */
     left: 0;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 400;
     font-size: calc(12px * var(--text-scale));
     color: var(--text-2);
@@ -7732,7 +7749,7 @@
     z-index: 1;
   }
   .onb-hero-card-name {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(17px * var(--text-scale));
     font-weight: 900;
     color: var(--ink);
@@ -7756,7 +7773,7 @@
     max-width: 460px;
   }
   .onb-welcome-head {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(28px * var(--text-scale));
     font-weight: 900;
     line-height: 1.2;
@@ -7833,7 +7850,7 @@
     z-index: 1;
   }
   .onb-beat-fan-name {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(12px * var(--text-scale));
     font-weight: 900;
     color: var(--ink);
@@ -7879,7 +7896,7 @@
     max-width: 460px;
   }
   .onb-beat-head {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(28px * var(--text-scale));
     font-weight: 900;
     line-height: 1.2;
@@ -7937,7 +7954,7 @@
     max-width: 460px;
   }
   .onb-streak-head {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(26px * var(--text-scale));
     font-weight: 900;
     line-height: 1.2;
@@ -7999,7 +8016,7 @@
     justify-content: center;
     /* Was 0.42 → 2.56:1 (fails AA). Bumped to 0.62 → 4.65:1. */
     color: rgba(42, 18, 102, 0.62);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(28px * var(--text-scale));
     font-weight: 900;
   }
@@ -8030,7 +8047,7 @@
     margin-bottom: 28px;
   }
   .onb-goal-head {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(28px * var(--text-scale));
     font-weight: 900;
     line-height: 1.2;
@@ -8080,7 +8097,7 @@
     text-align: center;
   }
   .onb-screen.onb-v2 .onb-v2-head {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: calc(34px * var(--text-scale));
     line-height: 1.15;
@@ -8095,7 +8112,7 @@
   }
   /* Welcome (v11 screen 1) wordmark — MUST match the splash exactly
      so the transition feels seamless. Splash rule (line 106):
-        font-family:'Nunito','Assistant',sans-serif; font-weight:900;
+        font-family:'Nunito','Rubik','Assistant',sans-serif; font-weight:900;
         font-size:min(9.6vw, 9.6vh); letter-spacing:-0.5px;
         line-height:1;
      Position-wise, splash uses flex align-center on the whole
@@ -8113,7 +8130,7 @@
     top: 50%;
     transform: translateY(-50%);
     text-align: center;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: min(9.6vw, 9.6vh);
     letter-spacing: -0.5px;
@@ -8131,7 +8148,7 @@
     bottom: 50%;
     margin-bottom: calc(min(4.8vw, 4.8vh) + 16px);
     text-align: center;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     /* Bumped from 15px to 22px per user request. */
     font-size: calc(22px * var(--text-scale));
@@ -8140,7 +8157,7 @@
     margin-top: 0;
   }
   .onb-screen.onb-v2 .onb-v2-sub {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: calc(22px * var(--text-scale));
     line-height: 1.35;
@@ -8177,7 +8194,7 @@
     color: var(--ink);
     border: 1.5px solid rgba(var(--accent-rgb), 0.22);
     border-radius: 14px;
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(18px * var(--text-scale));
     text-align: center;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -8207,7 +8224,7 @@
   }
 
   .onb-screen.onb-v2 .onb-v2-greeting {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: calc(22px * var(--text-scale));
     color: var(--ink);
@@ -8229,7 +8246,7 @@
     gap: 16px;
   }
   .onb-screen.onb-v2 .onb-v2-slider-value {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: calc(56px * var(--text-scale));
     line-height: 1;
@@ -8240,7 +8257,7 @@
     gap: 8px;
   }
   .onb-screen.onb-v2 .onb-v2-slider-value-unit {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: calc(22px * var(--text-scale));
     color: var(--ink);
@@ -8285,7 +8302,7 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: calc(16px * var(--text-scale));
     color: var(--ink);
@@ -8299,7 +8316,7 @@
     margin: 0 auto;
   }
   .onb-screen.onb-v2 .onb-v2-shock-math {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: calc(22px * var(--text-scale));
     color: var(--ink);
@@ -8349,7 +8366,7 @@
     color: var(--ink);
     border: 1.5px solid rgba(var(--accent-rgb), 0.18);
     border-radius: 14px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: calc(17px * var(--text-scale));
     text-align: start;
@@ -8413,7 +8430,7 @@
      interaction. Same "restrained caption" treatment as other v2
      secondary text (Nunito 500, low opacity). */
   .onb-screen.onb-v2 .onb-v2-hint {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 500;
     font-size: calc(15px * var(--text-scale));
     color: var(--ink);
@@ -8453,7 +8470,7 @@
     text-align: start;
   }
   .onb-screen.onb-v2 .onb-v2-mirror-card-title {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     /* 17 → 15 saves ~2px of line height per title × 3 cards ≈ 6px. */
     font-size: calc(15px * var(--text-scale));
@@ -8484,7 +8501,7 @@
     min-width: 0;
   }
   .onb-screen.onb-v2 .onb-v2-mirror-card-support {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 500;
     font-size: calc(14px * var(--text-scale));
     color: var(--ink);
@@ -8509,7 +8526,7 @@
     padding: 0 8px;
   }
   .onb-screen.onb-v2 .onb-v2-mirror-closing-head {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: calc(22px * var(--text-scale));
     color: var(--ink);
@@ -8517,7 +8534,7 @@
     letter-spacing: -0.01em;
   }
   .onb-screen.onb-v2 .onb-v2-mirror-closing-line {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 500;
     font-size: calc(15px * var(--text-scale));
     color: var(--ink);
@@ -8547,7 +8564,7 @@
     margin-bottom: 4px;
   }
   .onb-screen.onb-v2 .onb-v2-streak-eyebrow {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 800;
     font-size: calc(12px * var(--text-scale));
     letter-spacing: 1.4px;
@@ -8565,7 +8582,7 @@
     background: none;
     border: none;
     padding: 14px 8px 0;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 600;
     font-size: calc(15px * var(--text-scale));
     color: var(--ink);
@@ -8633,7 +8650,7 @@
     background: none;
     border: none;
     padding: 8px 4px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 600;
     font-size: calc(15px * var(--text-scale));
     color: var(--text-muted);
@@ -8669,7 +8686,7 @@
   /* Legal disclosure — small, muted, centered above the buttons.
      Anchor tags inherit the accent link color. */
   .onb-screen.onb-v2 .onb-v2-signup-legal {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(12px * var(--text-scale));
     font-weight: 500;
     color: var(--text-muted);
@@ -8719,7 +8736,7 @@
     box-shadow: 0 10px 28px -14px rgba(var(--accent-rgb), 0.35);
   }
   .onb-screen.onb-v2 .onb-v2-journey-card-head {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 800;
     font-size: calc(17px * var(--text-scale));
     color: var(--ink);
@@ -8731,7 +8748,7 @@
     background: var(--accent);
     color: #FFFFFF;
     border-radius: 999px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 800;
     font-size: calc(16px * var(--text-scale));
     letter-spacing: 0.01em;
@@ -8769,14 +8786,14 @@
     display: block;
   }
   .onb-screen.onb-v2 .onb-v2-journey-tile-label {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: calc(12px * var(--text-scale));
     color: var(--ink);
     line-height: 1.2;
   }
   .onb-screen.onb-v2 .onb-v2-journey-stat {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: calc(14px * var(--text-scale));
     color: var(--ink);
@@ -8819,7 +8836,7 @@
      head is start-aligned (RTL-aware); features carry an icon on the
      start edge with a stacked title + supporting paragraph. */
   .onb-screen.onb-v2 .onb-v2-journey-section-head {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 800;
     font-size: calc(17px * var(--text-scale));
     color: var(--ink);
@@ -8869,14 +8886,14 @@
     min-width: 0;
   }
   .onb-screen.onb-v2 .onb-v2-journey-feature-title {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 800;
     font-size: calc(15px * var(--text-scale));
     color: var(--ink);
     line-height: 1.3;
   }
   .onb-screen.onb-v2 .onb-v2-journey-feature-desc {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 500;
     font-size: calc(13px * var(--text-scale));
     color: var(--ink);
@@ -8979,7 +8996,7 @@
   }
   .onb-screen.onb-v2 .onb-v2-timeline-title {
     display: block;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: calc(20px * var(--text-scale));
     color: var(--ink);
@@ -8987,7 +9004,7 @@
     margin-bottom: 4px;
   }
   .onb-screen.onb-v2 .onb-v2-timeline-desc {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(16px * var(--text-scale));
     color: var(--text-2);
     line-height: 1.45;
@@ -9054,7 +9071,7 @@
     border: 2px solid var(--border);
     border-radius: 16px;
     padding: 20px 22px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(24px * var(--text-scale));
     font-weight: 500;
     font-style: italic;
@@ -9084,7 +9101,7 @@
   /* Taste-2 punch line (step 20) — bolded closer that only philosophy
      uses in the current mockup. Hidden via inline style when empty. */
   .onb-screen.onb-v2 .onb-v2-taste-2-punch {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 800;
     color: var(--ink);
     text-align: start;
@@ -9125,7 +9142,7 @@
     user-select: none;
   }
   .onb-screen.onb-v2 .onb-v2-toggle-label {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: calc(15px * var(--text-scale));
     color: var(--ink);
@@ -9210,7 +9227,7 @@
     height: 100%;
   }
   .onb-screen.onb-v2 .onb-v2-trial-benefit-text {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(15px * var(--text-scale));
     font-weight: 600;
     line-height: 1.4;
@@ -9267,7 +9284,7 @@
     border: 2px solid var(--accent);
   }
   #onb-v2-paywall .paywall-timeline-body {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(14px * var(--text-scale));
     line-height: 1.4;
     color: var(--text);
@@ -9301,7 +9318,7 @@
     flex-shrink: 0;
   }
   #onb-v2-paywall .paywall-no-payment-label {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(13px * var(--text-scale));
     font-weight: 900;
     color: var(--auth-success);
@@ -9329,14 +9346,14 @@
   }
   .onb-screen.onb-v2 .onb-v2-review-stars {
     color: var(--amber);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(16px * var(--text-scale));
     letter-spacing: 3px;
     line-height: 1;
     margin-bottom: 10px;
   }
   .onb-screen.onb-v2 .onb-v2-review-quote {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(16px * var(--text-scale));
     font-weight: 500;
     line-height: 1.5;
@@ -9344,7 +9361,7 @@
     margin: 0 0 10px;
   }
   .onb-screen.onb-v2 .onb-v2-review-name {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(13px * var(--text-scale));
     font-weight: 900;
     letter-spacing: 0.02em;
@@ -9406,7 +9423,7 @@
      bonus-unlock chest reveal so the celebration reads as the same
      visual family. */
   .onb-screen.onb-v2 .onb-v2-first-card-eyebrow {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: calc(12px * var(--text-scale));
     letter-spacing: 0.12em;
@@ -9467,7 +9484,7 @@
     background: var(--surface-2);
   }
   .onb-screen.onb-v2 .onb-v2-first-card-name {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: calc(18px * var(--text-scale));
     color: var(--ink);
@@ -9476,7 +9493,7 @@
     margin: 0 0 2px;
   }
   .onb-screen.onb-v2 .onb-v2-first-card-role {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: calc(13px * var(--text-scale));
     color: var(--text-2);
@@ -9489,7 +9506,7 @@
      flame and the head. Amber to echo the flame; sized big enough
      to carry the streak cue on its own (eyebrow was dropped). */
   .onb-screen.onb-v2 .onb-v2-streak-number {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: calc(60px * var(--text-scale));
     line-height: 1;
@@ -9551,7 +9568,7 @@
     color: var(--accent);
   }
   .onb-screen.onb-v2 .onb-v2-snapshot-title {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: calc(12px * var(--text-scale));
     color: var(--ink);
@@ -9559,7 +9576,7 @@
     letter-spacing: 0.01em;
   }
   .onb-screen.onb-v2 .onb-v2-snapshot-value {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: calc(22px * var(--text-scale));
     color: var(--accent);
@@ -9567,7 +9584,7 @@
     margin: 3px 0;
   }
   .onb-screen.onb-v2 .onb-v2-snapshot-caption {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: calc(12px * var(--text-scale));
     color: var(--text-2);
@@ -9692,7 +9709,7 @@
     border: none;
     border-bottom: 5px solid rgba(0, 0, 0, 0.14);
     border-radius: 999px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 800;
     font-size: calc(17px * var(--text-scale));
     padding: 14px 20px;
@@ -9787,7 +9804,7 @@
     max-width: 460px;
   }
   .onb-beat-head {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(26px * var(--text-scale));
     font-weight: 900;
     line-height: 1.2;
@@ -9816,7 +9833,7 @@
     font-size: calc(17px * var(--text-scale));
     font-weight: 800;
     color: var(--ink);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
   }
   .onb-goal-hint {
     font-size: calc(13px * var(--text-scale));
@@ -11691,7 +11708,7 @@
   }
   .paywall-close:hover { background: var(--surface-2); color: var(--ink); }
   .paywall-brand {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 22px; font-weight: 900;
     color: var(--accent);
     margin: 0 0 20px;
@@ -11701,7 +11718,7 @@
      accent color, sits above the headline. Hidden when empty so the
      default paywall layout is untouched. */
   .paywall-eyebrow {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 12px;
     font-weight: 800;
     color: var(--accent);
@@ -11717,7 +11734,7 @@
      headline and the price cards. :empty collapses it cleanly. */
   .paywall-sub:empty { display: none; }
   .paywall-headline {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(26px * var(--text-scale));
     font-weight: 900;
     color: var(--ink);
@@ -11928,7 +11945,7 @@
     color: var(--surface);
     padding: 12px 18px;
     border-radius: 999px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 14px;
     font-weight: 700;
     box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.35);
@@ -11989,7 +12006,7 @@
     margin-bottom: 24px;
   }
   .welcome-back-headline {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(24px * var(--text-scale));
     font-weight: 900;
     color: var(--ink);
@@ -12002,7 +12019,7 @@
      element empty and :empty below collapses it to zero-height so
      the layout stays identical. */
   .welcome-back-sub {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(17px * var(--text-scale));
     font-weight: 600;
     color: var(--text-2);
@@ -12056,7 +12073,7 @@
     margin-bottom: 12px;
   }
   .endowment-head {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(28px * var(--text-scale));
     font-weight: 900;
     color: var(--ink);
@@ -12162,7 +12179,7 @@
     background: var(--accent-tint);
     border: 1px solid var(--accent-soft-border);
     color: var(--ink);
-    font-family: 'Nunito', 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'DM Sans', 'Assistant', sans-serif;
     font-size: calc(13px * var(--text-scale));
     font-weight: 700;
     line-height: 1.2;
@@ -12186,7 +12203,7 @@
   }
   #modal-guest-signup .modal-title {
     color: var(--ink);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(24px * var(--text-scale));
     font-weight: 900;
     line-height: 1.2;
@@ -12303,7 +12320,7 @@
   .nps-dismiss:active { transform: scale(0.9); }
   .nps-question {
     color: var(--ink);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(19px * var(--text-scale));
     font-weight: 800;
     line-height: 1.3;
@@ -12328,7 +12345,7 @@
     color: var(--ink);
     border: 1px solid rgba(var(--accent-rgb), 0.28);
     border-radius: 8px;
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     font-size: 14px;
     font-weight: 600;
     text-align: center;
@@ -12341,14 +12358,14 @@
   .nps-your-score {
     text-align: center;
     color: var(--text-2);
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 8px;
   }
   .nps-branch-prompt {
     color: var(--ink);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(17px * var(--text-scale));
     font-weight: 700;
     line-height: 1.35;
@@ -12363,7 +12380,7 @@
     color: var(--ink);
     border: 1px solid rgba(var(--accent-rgb), 0.22);
     border-radius: 12px;
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     font-size: 15px;
     line-height: 1.4;
     resize: vertical;
@@ -12374,7 +12391,7 @@
   #nps-store-btn { margin-top: 8px; }
   .nps-thanks {
     color: var(--ink);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(18px * var(--text-scale));
     font-weight: 700;
     line-height: 1.35;
@@ -12440,7 +12457,7 @@
   }
   body.on-subject-screen:not(.drawer-open) .subj-title {
     color: var(--ink);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(26px * var(--text-scale));
     font-weight: 900;
     letter-spacing: -0.015em;
@@ -12588,7 +12605,7 @@
     padding: 16px 20px;
   }
   .subj-cinematic-name {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: calc(20px * var(--text-scale));
     font-weight: 900;
     line-height: 1.15;
@@ -12801,6 +12818,11 @@
   }
   html.dark .level-card-header .ch-free-pill { background: rgba(255, 255, 255, 0.92); }
   .level-card-header .ch-free-pill > span { font-size: 13px; }
+  /* R44 — inline SVG gift icon replaces the 🎁 emoji so Android and
+     iOS render the identical mark. Sized to match the pill text; takes
+     currentColor so dark mode and accent swaps continue to work. */
+  .ic-gift { width: 14px; height: 14px; display: inline-block; vertical-align: -2px; color: var(--accent); flex-shrink: 0; }
+  .ic-gift-fab { width: 28px; height: 28px; color: #FFFFFF; vertical-align: middle; }
 
   /* v7 bottom sheet content for #modal-ch6-gift. The outer shell
      styling comes from the shared .pop-v7 / .pop-wrap rules; this
@@ -13331,7 +13353,7 @@
     font-weight: 900;
     color: var(--accent-text);
     line-height: 1;
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     letter-spacing: -0.03em;
   }
   .metric-label {
@@ -13362,7 +13384,7 @@
     font-size: 80px;
     font-weight: 900;
     line-height: 1;
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     letter-spacing: -0.03em;
   }
   .dc-xp-value { color: var(--accent-text); }
@@ -13383,7 +13405,7 @@
     padding: 16px 48px;
     font-size: 17px;
     font-weight: 700;
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     cursor: pointer;
     opacity: 1;
     animation: dc-fade-up 0.5s ease-out 2.2s both;
@@ -13399,7 +13421,7 @@
     border: none;
     font-size: 15px;
     font-weight: 600;
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     cursor: pointer;
     padding: 8px 16px;
     border-radius: 50px;
@@ -13428,7 +13450,7 @@
     color: var(--accent-text);
     border: 1px solid rgba(var(--accent-rgb), 0.25);
     border-radius: 50px;
-    font-family: 'DM Sans', 'Assistant', sans-serif;
+    font-family: 'DM Sans', 'Rubik', 'Assistant', sans-serif;
     font-size: 13.5px;
     font-weight: 700;
     cursor: pointer;
@@ -14078,7 +14100,7 @@
     background: var(--surface-2); color: var(--accent-text);
     display: flex; align-items: center; justify-content: center;
     font-weight: 900; font-size: 15px; flex-shrink: 0;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     transition: background 300ms ease, color 300ms ease;
   }
   .level-card.expanded .level-num { background: var(--accent-badge-bg); color: var(--accent-badge-fg); }
@@ -14087,7 +14109,7 @@
   .level-eyebrow {
     font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
     color: var(--accent-text); text-transform: uppercase;
-    font-family: 'Nunito', 'Assistant', sans-serif; margin-bottom: 2px;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif; margin-bottom: 2px;
   }
   .level-title { font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.3; }
   .level-card.locked-week .level-eyebrow,
@@ -14202,7 +14224,7 @@
   .practice-card-eyebrow {
     font-size: 10px; font-weight: 800; letter-spacing: 0.1em;
     color: var(--accent-text); text-transform: uppercase;
-    font-family: 'Nunito', 'Assistant', sans-serif; margin-bottom: 2px;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif; margin-bottom: 2px;
   }
   .practice-card-title {
     font-size: 14px; font-weight: 700; color: var(--ink);
@@ -14213,7 +14235,7 @@
     background: var(--accent); color: var(--on-accent);
     border: none; border-radius: 999px;
     padding: 10px 18px; font-size: 13px; font-weight: 800;
-    font-family: 'Nunito', 'Assistant', sans-serif; cursor: pointer;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif; cursor: pointer;
     flex-shrink: 0;
     box-shadow: 0 2px 0 var(--accent-dark);
     white-space: nowrap;
@@ -14253,7 +14275,7 @@
      #screen-subject.theme-<X> overrides --accent on scroll settle.
      Reading --accent directly picks up the closer scope. See
      previewSubjectTheme() + _initSubjCarousel() for the swap. */
-  .subj-logo { font-family: 'Nunito', 'Assistant', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: var(--accent); margin-bottom: 20px; }
+  .subj-logo { font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: var(--accent); margin-bottom: 20px; }
   .subj-title { font-size: 24px; font-weight: 700; color: var(--ink); margin-bottom: 8px; letter-spacing: -0.02em; }
   .subj-subtitle { font-size: 14px; font-weight: 400; color: var(--accent); opacity: 0.65; line-height: 1.5; }
   .subj-carousel-wrap { flex: 1; display: flex; align-items: center; min-height: 0; overflow: visible; }
@@ -14402,7 +14424,7 @@
     background: var(--accent);
     color: var(--on-accent);
     padding: calc(10px + var(--safe-top)) 16px 10px;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700;
     font-size: 14px;
     display: none;
@@ -14462,7 +14484,7 @@
     flex-direction: column;
     padding: calc(16px + var(--safe-top)) 18px calc(20px + var(--safe-bottom));
     color: #2A1266;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
   }
   .onb-screen.onb-v7.onb-active { display: flex; }
   /* Dark-mode: keep the app's existing dark base (no purple field). */
@@ -14512,7 +14534,7 @@
   .onb-screen.onb-v7 .onb-v7-close:active { opacity: 0.6; }
   .onb-screen.onb-v7 .onb-v7-close svg { display: block; }
   .onb-screen.onb-v7 .onb-v7-back {
-    font: 900 20px 'Nunito', sans-serif;
+    font: 900 20px 'Nunito', 'Rubik', sans-serif;
     color: #B9B4D4;
     cursor: pointer;
     line-height: 1;
@@ -14540,7 +14562,7 @@
   }
   .onb-screen.onb-v7 .onb-v7-lang {
     margin-inline-start: auto;
-    font: 800 12px 'Nunito', sans-serif;
+    font: 800 12px 'Nunito', 'Rubik', sans-serif;
     border: 1.5px solid #E5E5EA;
     border-radius: 20px;
     padding: 3px 10px;
@@ -14784,7 +14806,7 @@
     margin-top: 12px;
     background: var(--v7-acc);
     color: #FFFFFF;
-    font: 900 15px 'Nunito', sans-serif;
+    font: 900 15px 'Nunito', 'Rubik', sans-serif;
     letter-spacing: 0.8px;
     text-transform: uppercase;
     border-radius: 14px;
@@ -14821,7 +14843,7 @@
     margin-top: 10px;
     background: #FFFFFF;
     color: var(--v7-acc);
-    font: 900 12.5px 'Nunito', sans-serif;
+    font: 900 12.5px 'Nunito', 'Rubik', sans-serif;
     letter-spacing: 0.3px;
     text-transform: uppercase;
     border-radius: 14px;
@@ -14890,7 +14912,7 @@
     border: 2px solid #E5E5EA;
     border-radius: 13px;
     padding: 13px 14px;
-    font: 800 17px 'Nunito', sans-serif;
+    font: 800 17px 'Nunito', 'Rubik', sans-serif;
     color: #3C3C46;
     width: 100%;
     outline: none;
@@ -14935,7 +14957,7 @@
 
   /* Wordmark + tagline for step 1 (welcome). */
   .onb-screen.onb-v7 .onb-v7-wmk {
-    font: 900 38px 'Nunito', sans-serif;
+    font: 900 38px 'Nunito', 'Rubik', sans-serif;
     color: #7C4DFF;
     letter-spacing: -0.5px;
     margin-top: 12px;
@@ -15001,7 +15023,7 @@
   }
   .onb-screen.onb-v7 .onb-v7-slider-value {
     text-align: center;
-    font: 900 30px 'Nunito', sans-serif;
+    font: 900 30px 'Nunito', 'Rubik', sans-serif;
     color: var(--v7-acc);
     margin: 10px 0 8px;
   }
@@ -15660,7 +15682,7 @@
     box-shadow: 0 3px 0 rgba(245, 241, 255, 0.08);
   }
   .onb-screen.onb-v7 .onb-v7-quote {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 21px;
     font-weight: 700;
     font-style: italic;
@@ -15716,7 +15738,7 @@
     -webkit-overflow-scrolling: touch;
   }
   .onb-screen.onb-v7 .onb-v7-prose {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 17px;
     font-weight: 500;
     line-height: 1.5;
@@ -15734,7 +15756,7 @@
      Thinker row (80px fig) + bubble head + prose + optional punch. */
   /* taste-2 and taste-q inherit the base --v7-fig-h: 120px from .onb-v7-row. */
   .onb-screen.onb-v7 .onb-v7-punch {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: 14px;
     line-height: 1.4;
@@ -15755,7 +15777,7 @@
   /* taste-q thinker row inherits --v7-fig-h: 120px. */
   /* taste-q scenario — centered prose above the thinker row. */
   .onb-screen.onb-v7 .onb-v7-tasteq-scenario {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-size: 16px;
     font-weight: 500;
     line-height: 1.4;
@@ -15805,7 +15827,7 @@
     --v7-fig-h: 68px;
   }
   .onb-screen.onb-v7 .onb-v7-fc-eyebrow {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: 12.5px;
     letter-spacing: 0.14em;
@@ -16621,7 +16643,7 @@
     background: transparent;
     border: none;
     color: var(--v7-acc-d);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 800;
     font-size: 15px;
     padding: 10px;
@@ -16920,7 +16942,7 @@
   #screen-profile.profile-v7 .hv-signin {
     background: none; border: none;
     color: var(--accent-text);
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 700; font-size: 14px;
     padding: 0 6px;
     cursor: pointer;
@@ -17430,7 +17452,7 @@
     left: 110px;
     display: flex;
     gap: 2px;
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Nunito', 'Rubik', sans-serif;
     font-weight: 900;
     color: rgba(42, 18, 102, 0.4);
     font-size: 12px;
@@ -17559,7 +17581,7 @@
   }
   .hv-pop-text { min-width: 0; }
   .hv-pop-title {
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: 17px;
     color: var(--ink);
@@ -17583,7 +17605,7 @@
     padding: 12px 16px;
     border-radius: 10px;
     border: none;
-    font-family: 'Nunito', 'Assistant', sans-serif;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     font-weight: 900;
     font-size: 15px;
     letter-spacing: 0.5px;
@@ -22345,6 +22367,18 @@
     /* Round 35c — vertical float removed. First meeting keeps only
        the back→face flip (.rv-flp.rv-turn → rd-land). No hover. */
   }
+  /* R44 — once the reveal has settled (rv-done), pin the flipper's
+     outer transform to zero. Android WebView was leaving a sub-pixel
+     residual rotateY on the compositor layer after .rv-turn settled;
+     iOS Safari did not. preserve-3d / backface / inner face transforms
+     stay as they are so the already-flipped front face remains visible
+     and the stage flex sizing is unchanged. */
+  body.on-reader-v7 #dc-thinker-screen.rv-v7 .rv-root.rv-done .rv-flp,
+  body.on-reader-v7 #dc-thinker-screen.rv-v7 .rv-root.rv-done .rv-flp.rv-turn {
+    transform: rotateY(0) !important;
+    animation: none !important;
+    transition: none !important;
+  }
   /* Round 35c — rd-hov and rd-hov-flat keyframes removed; the float
      was a vector for sub-pixel wobble on-device. */
   /* The .rv-charge + .rv-turn classes replace the base animation
@@ -25634,6 +25668,16 @@
       <path d="M18 22 Q18 8 32 8 Q46 8 46 22 Q46 30 38 34 Q32 36 32 40" fill="none" stroke="url(#ic-mystery-q-grad)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
       <circle cx="32" cy="55" r="4.5" fill="url(#ic-mystery-q-grad)"/>
     </symbol>
+    <!-- R44 — platform-neutral replacements for emoji glyphs so Android
+         and iOS render the same brand mark. Used by the "🎁 Free" pill,
+         the ch6 gift sheet trigger, and the Level-up / Trophy modal. -->
+    <symbol id="icon-gift" viewBox="0 0 24 24">
+      <path d="M20 7h-3.1a3 3 0 0 0-4.9-3.3A3 3 0 0 0 7.1 7H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h1v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8h1a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1Zm-6-2a1 1 0 1 1 1 1h-1V5Zm-5 0a1 1 0 0 1 2 0v1H9a1 1 0 0 1 0-1Zm2 15H7v-8h4v8Zm2 0v-8h4v8h-4Zm6-10h-6V8h6v2ZM5 10V8h6v2H5Z" fill="currentColor"/>
+      <path d="M11 8h2v4h-2z" fill="#FFFFFF" opacity=".35"/>
+    </symbol>
+    <symbol id="icon-trophy" viewBox="0 0 24 24">
+      <path d="M19 4h-2V3a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v1H5a2 2 0 0 0-2 2v2a4 4 0 0 0 4 4h.3a5 5 0 0 0 3.7 3.9V18H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-2.1a5 5 0 0 0 3.7-3.9h.3a4 4 0 0 0 4-4V6a2 2 0 0 0-2-2ZM7 10a2 2 0 0 1-2-2V6h2v4Zm10 0V6h2v2a2 2 0 0 1-2 2Z" fill="currentColor"/>
+    </symbol>
   </defs>
 </svg>
 
@@ -26672,7 +26716,7 @@
 <!-- Level up modal -->
 <div class="modal-overlay levelup-modal" id="modal-levelup">
   <div class="modal-box">
-    <div class="modal-emoji">🏆</div>
+    <div class="modal-emoji" aria-hidden="true"><svg viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:middle"><use href="#icon-trophy"/></svg></div>
     <div class="modal-title" id="modal-levelup-title">עלית רמה!</div>
     <div class="modal-subtitle" id="levelup-text"></div>
     <button class="nav-btn levelup-modal-btn" id="modal-amazing-btn" onclick="closeLevelUp()">מדהים!</button>
@@ -26685,7 +26729,7 @@
     <div id="thinker-modal-portrait"></div>
     <div class="thinker-detail-header">
       <div>
-        <div style="font-family:'Nunito',sans-serif;font-size:20px;font-weight:800;color:var(--text)" id="thinker-modal-name"></div>
+        <div style="font-family:'Nunito','Rubik',sans-serif;font-size:20px;font-weight:800;color:var(--text)" id="thinker-modal-name"></div>
         <div style="font-size:13px;color:var(--text-muted);margin-top:2px" id="thinker-modal-era"></div>
       </div>
       <div class="thinker-detail-emoji" id="thinker-modal-emoji"></div>
@@ -44207,7 +44251,7 @@ function _mountCh6GiftBtn() {
   btn.setAttribute('aria-label', isEn ? 'You have a gift' : 'יש לכם מתנה');
   // Red dot omitted when seen; the gift tile remains tappable as a
   // re-entry point into the sheet but without the notification affordance.
-  btn.innerHTML = '🎁' + (seen ? '' : '<span class="ch6-gift-dot" aria-hidden="true"></span>');
+  btn.innerHTML = '<svg class="ic-gift ic-gift-fab" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-gift"/></svg>' + (seen ? '' : '<span class="ch6-gift-dot" aria-hidden="true"></span>');
   btn.onclick = _openCh6GiftSheet;
   home.appendChild(btn);
   // Caption pill — only mounted BEFORE the user has opened the sheet.
@@ -44245,7 +44289,7 @@ function _openCh6GiftSheet() {
     ? 'Seven thinkers on the right to rule.'
     : 'שבעה הוגים על הזכות לשלוט.';
   const chTitle = isEn ? 'Political Philosophy' : 'פילוסופיה פוליטית';
-  const freePill = isEn ? '🎁 Free' : '🎁 חינם';
+  const freePill = '<svg class="ic-gift" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-gift"/></svg>' + (isEn ? 'Free' : 'חינם');
   // R38d — hierarchy swap: primary CTA is "See the chapter" (the
   // meaningful next action), secondary is "Got it, thanks" (closes).
   // Analytics `cta` values stay 'see_chapter' / 'thanks', keyed off
@@ -44272,7 +44316,7 @@ function _openCh6GiftSheet() {
             '<div class="level-eyebrow">' + chapterEyebrow + '</div>' +
             '<div class="level-title">' + chTitle + '</div>' +
           '</div>' +
-          '<div class="ch-free-pill" aria-hidden="true"><span>🎁</span> ' + (isEn ? 'Free' : 'חינם') + '</div>' +
+          '<div class="ch-free-pill" aria-hidden="true"><svg class="ic-gift" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-gift"/></svg>' + (isEn ? 'Free' : 'חינם') + '</div>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -45411,7 +45455,7 @@ function renderHome() {
         // pill is just the signal, not a bypass.
         const isFreeChapter = (FREE_CHAPTERS[state.subject] || []).includes(w.id);
         const freePill = isFreeChapter
-          ? `<div class="ch-free-pill" aria-hidden="true"><span>🎁</span> ${isEn ? 'Free' : 'חינם'}</div>`
+          ? `<div class="ch-free-pill" aria-hidden="true"><svg class="ic-gift" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-gift"/></svg>${isEn ? 'Free' : 'חינם'}</div>`
           : '';
         header.innerHTML = `
           <div class="level-num">${numDisplay}</div>
@@ -48513,16 +48557,22 @@ function _rvV7FitCard(root) {
   try {
     const dcScreen = document.getElementById('dc-thinker-screen');
     if (!dcScreen || !root || !root.isConnected) return;
-    const pc = root.querySelector('.rv-pc');
-    if (!pc) return; // .rv-flp (first-meeting) is already height-driven
+    // Target either the met-again / upgrade card (.rv-pc) or the
+    // first-meeting flipper (.rv-flp). Both branches can land tight
+    // against the pill / plate below on short Android viewports.
+    const pc = root.querySelector('.rv-pc') || root.querySelector('.rv-flp');
+    if (!pc) return;
     const stage = root.querySelector('.rv-stage');
     if (!stage) return;
     // SHORT-VIEWPORT GUARD. On iPhone 393×852 (viewport ≥ 820) the
     // existing CSS clamp already lands the card at 250 px with the
     // other elements tight below; this helper must be a no-op there so
     // the pre-R43 baseline is pixel-exact. On Android (effective
-    // viewport ~814) and smaller, enforce a 16 px gap above the plate
-    // by shrinking the card and adding margin-top on .rv-body.
+    // viewport ~814) and smaller, enforce a 16 px gap below the card
+    // (above the pill/plate line) by extending .rv-body's margin-top;
+    // for .rv-pc branches we also shrink the card width because the
+    // stage grows to the card's height; .rv-flp is height-driven (its
+    // flex stage auto-shrinks) so a margin-top on .rv-body is enough.
     const viewportH = dcScreen.getBoundingClientRect().height || window.innerHeight;
     if (viewportH >= 820) return;
     const body = root.querySelector('.rv-body');
@@ -48533,12 +48583,15 @@ function _rvV7FitCard(root) {
     const currentGap = bodyRect.top - stageRect.bottom;
     if (currentGap >= DESIRED_GAP) return;
     const shrinkPx = DESIRED_GAP - currentGap;
-    const cssW = parseFloat(getComputedStyle(pc).width) || 0;
-    const newW = cssW - (shrinkPx * 1140 / 1890);
-    if (newW > 0 && newW < cssW) {
-      pc.style.width = newW + 'px';
-      body.style.marginTop = shrinkPx + 'px';
+    const isPc = pc.classList.contains('rv-pc');
+    if (isPc) {
+      const cssW = parseFloat(getComputedStyle(pc).width) || 0;
+      const newW = cssW - (shrinkPx * 1140 / 1890);
+      if (newW > 0 && newW < cssW) {
+        pc.style.width = newW + 'px';
+      }
     }
+    body.style.marginTop = shrinkPx + 'px';
   } catch (_) {}
 }
 
@@ -48643,6 +48696,7 @@ function _renderV7ThinkerReveal(thinker, chapter, day, nextInfo) {
     confLayer.className = 'rv-conf';
     dcScreen.insertBefore(root, dcScreen.firstChild);
     try { _rvHydrateComposed(root); } catch (_) {}
+    try { _rvV7FitCard(root); } catch (_) {}
     try {
       // R35j — mount canvas rays into .rv-rrays (card-stage halo).
       const rrays = root.querySelector('.rv-rrays');
