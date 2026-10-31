@@ -14549,7 +14549,7 @@
 
   /* ── Middle area: content holder, flex-centered ── */
   .onb-screen.onb-v7 .onb-v7-mid {
-    flex: 1;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -14559,6 +14559,16 @@
     justify-content: flex-start;
     text-align: center;
     min-height: 0;
+    /* R42 — let .onb-v7-mid be the single scroll surface when content
+       exceeds the usable height instead of letting .onb-screen's
+       `overflow: hidden` clip it. On short Android viewports (360×560
+       with full-size hero images, e.g. onb-v2-first-card at step 21)
+       the content was being hidden under the bottom CTA. The 12 px
+       padding-bottom reserves breathing room between the last
+       content element and the CTA holder below in the flex column so
+       the final line of text never butts up against the button. */
+    overflow-y: auto;
+    padding-bottom: 12px;
     /* 4px internal gutter so card borders / shadows don't get clipped
        by the outer overflow:hidden. */
     padding-inline: 4px;
@@ -15802,11 +15812,16 @@
     animation: p3-rise 0.5s ease-out 0.3s both;
   }
   .onb-screen.onb-v7 .onb-v7-fc-card {
-    /* ~60% of screen height on large phones (clamp 300px minimum,
-       ~56vh ideal, 420px cap). The portrait is 9:16, so a 56vh
-       card ≈ 522px tall on a 932px screen (56%). SE media query
-       overrides to a smaller card below. */
-    height: clamp(300px, 56vh, 460px);
+    /* R42 — lowered the clamp floor from 300 → 180 px AND dropped the
+       vh target from 56 → 46 so the thinker hero on step 21
+       (onb-v2-first-card) shrinks far enough that both "He's yours."
+       AND the "Every thinker you read joins your collection." sub
+       stay above the CONTINUE CTA on Android edge-to-edge builds
+       (safe-top ~51 + safe-bottom ~48 insets leave ~610 px CSS height
+       on a 360×712 device, vs ~640 the previous clamp was tuned for).
+       Combined with .onb-v7-mid now scrolling, no variant can overlap
+       the CTA regardless of viewport height. */
+    height: clamp(180px, 46vh, 420px);
     aspect-ratio: 9 / 16;
     width: auto;
     margin: 0 auto 14px;
@@ -58823,9 +58838,26 @@ window.__corpusTour = async function (name, opts) {
   // either primes the profile + reload-resumes, OR, if the profile
   // is already loaded, dispatches to the resume handler directly so
   // repeated clip captures don't eat a reload between every clip.
-  const REEL_TOURS = ['launch-demo-boot','home-scroll','first-reveal-tour','pantheon-view','subjects-swap','streak-view','reveal-gold-socrates','reveal-diamond-socrates','ch6-gift-sheet','paywall-top'];
+  const REEL_TOURS = ['launch-demo-boot','home-scroll','first-reveal-tour','pantheon-view','subjects-swap','streak-view','reveal-gold-socrates','reveal-diamond-socrates','ch6-gift-sheet','paywall-top','reading-intro','quiz-one','summary-view'];
   if (REEL_TOURS.includes(name)) {
-    if (window.__CORPUS_TEST_PROFILE_ACTIVE !== 'launch-demo') {
+    // Detect launch-demo signature in localStorage — survives app
+    // termination between clip captures (TEST_PROFILE_ACTIVE is a
+    // runtime global and dies with the WebView). Without this,
+    // every cold-launch openurl triggers a prime+reload cycle that
+    // flashes the WebView mid-recording. Signature: streak 12 +
+    // debug Socrates=12 — both are launch-demo-specific values that
+    // no real user state would ever hit.
+    let onLaunchDemo = window.__CORPUS_TEST_PROFILE_ACTIVE === 'launch-demo';
+    if (!onLaunchDemo) {
+      try {
+        const s = JSON.parse(localStorage.getItem('corpus_state') || '{}');
+        if (s && s._debugThinkerPoints && s._debugThinkerPoints.socrates === 12 && s.dailyStreak === 12) {
+          window.__CORPUS_TEST_PROFILE_ACTIVE = 'launch-demo';
+          onLaunchDemo = true;
+        }
+      } catch (_) {}
+    }
+    if (!onLaunchDemo) {
       __corpusTestProfile('launch-demo');
       logStep('reload with launch-demo profile for ' + name);
       try { sessionStorage.setItem('__corpus_tour_resume', JSON.stringify({ name, lang: opts.lang||null, theme: opts.theme||null })); } catch (_) {}
@@ -59130,6 +59162,76 @@ async function _corpusTourResume() {
     await sleep(400);
     try { showPaywall({ reason: 'chapter_lock', chapter: 2 }); } catch (_) {}
     await sleep(2500);
+    return;
+  }
+  if (name === 'reading-intro') {
+    // Clip 1: open ch1 d1 reader, let the thinker intro + bubble settle,
+    // then advance twice via the real Continue button so the clip
+    // captures a thinker-with-speech beat + two reader transitions at
+    // natural reading pace.
+    try { openReader(1, 1); } catch (_) {}
+    await sleep(2000);
+    await tap('#reader-next-btn', 'tap Continue (1)');
+    await sleep(1600);
+    await tap('#reader-next-btn', 'tap Continue (2)');
+    await sleep(1600);
+    logStep('reading-intro complete');
+    return;
+  }
+  if (name === 'quiz-one') {
+    // Clip 2: open ch1 d1 reader, advance until a quiz section mounts,
+    // tap the CORRECT option (looked up from the content's correctIndex
+    // so we actually see the "correct" feedback bar, not the "try again"
+    // one), then hold on the feedback bar.
+    try { openReader(1, 1); } catch (_) {}
+    await sleep(1500);
+    // Advance through text sections until .quiz-option appears.
+    for (let i = 0; i < 25; i++) {
+      const atQuiz = document.querySelector('.quiz-option');
+      if (atQuiz) break;
+      const nb = document.getElementById('reader-next-btn');
+      if (nb && nb.offsetParent !== null) { nb.click(); }
+      await sleep(650);
+    }
+    await sleep(600);
+    // Look up correctIndex from state.currentWeek/currentDay +
+    // state.currentSection against the content data.
+    try {
+      const ws = getW();
+      const w = ws.find(x => x.id === state.currentWeek);
+      const d = w && w.days.find(x => x.id === state.currentDay);
+      const sec = d && d.sections[state.currentSection];
+      const ci = (sec && typeof sec.correctIndex === 'number') ? sec.correctIndex : 0;
+      const opts = document.querySelectorAll('.quiz-option');
+      if (opts[ci]) { opts[ci].click(); logStep('tap correct option #' + ci); }
+    } catch (_) {}
+    // Feedback bar + +XP animation sits visible for ~2 s on real device.
+    await sleep(2800);
+    logStep('quiz-one complete');
+    return;
+  }
+  if (name === 'summary-view') {
+    // Clip 3: show the end-of-dialogue stats screen (title + XP + streak).
+    // Seed reader state so finishDay reads a clean "first-try correct"
+    // record, then jump directly through _showDcStats with the real
+    // finishDay-style args. Avoids having to walk the whole dialogue
+    // which would blow the clip's 4-8 s budget.
+    try { showScreen('home'); } catch (_) {}
+    await sleep(400);
+    state.currentWeek = 1; state.currentDay = 1;
+    state.quizAttempts = {};
+    state.readerXP = 50;
+    const chapter = getW().find(w => w.id === 1);
+    const day = chapter && chapter.days.find(d => d.id === 1);
+    const isEn = state.lang === 'en';
+    const title = isEn ? 'Dialogue complete!' : 'הדיאלוג הושלם!';
+    const subtitle = (day && (isEn ? (day.titleEn || day.title) : day.title)) || '';
+    document.body.classList.add('on-reader-v7');
+    const modal = document.getElementById('modal-complete');
+    if (modal) modal.classList.add('active');
+    try { _showDcStats(title, subtitle, 50, state.dailyStreak || 12, { label: isEn ? 'Next Dialogue' : 'הדיאלוג הבא', fn: () => {} }, {}); } catch (_) {}
+    await sleep(3200);
+    logStep('summary-view complete');
     return;
   }
 }
