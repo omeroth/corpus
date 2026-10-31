@@ -10294,8 +10294,15 @@
   /* Round 15 — intermediate compact rules for iPhone 15 Pro-class
      viewports with the real safe-area eating headroom (393×852 → ~759
      usable). Round 16 — hide the third benefit row at this breakpoint
-     as the last-resort compactor so plans never overlap benefits. */
-  @media (max-height: 820px) {
+     as the last-resort compactor so plans never overlap benefits.
+     R43 — breakpoint lowered 820 → 760. On Android edge-to-edge the
+     effective innerHeight at 393×852 reports ~814 (status bar + gesture
+     nav eaten before CSS even sees the viewport), which was hitting the
+     820 breakpoint and hiding the third benefit row even on devices
+     with plenty of vertical room. 760 keeps the compactor on iPhone SE
+     and older short-stock viewports but leaves iPhone 15 Pro + Android
+     Pixels running the full three-row layout. */
+  @media (max-height: 760px) {
     .pwv7-band { padding: calc(env(safe-area-inset-top, 0px) + 10px) 20px 12px; gap: 6px; }
     .pwv7-fan { height: 112px; width: 220px; margin: 0 auto; }
     .pwv7-fan > div { width: 70px; }
