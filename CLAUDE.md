@@ -239,6 +239,24 @@ A deploy that only touched source (CSS/JS/content) WITHOUT running `npm run gen:
 
 ---
 
+## Capacitor native build — always sync BOTH platforms
+
+The iOS and Android apps load `index.html` from a per-platform bundled copy that Capacitor mirrors from `www/`. The sync is a two-step pipeline and **both platforms must be synced together** — syncing only one lets the other ship a stale index.html, which is how the 2.0 Android smoke test ended up running the 1.5.0 web code on a 2.0 Debug APK.
+
+**Every time** web-side source (`index.html`, `content/`, `images/`, `assets/`, `media/`) changes, run **this exact sequence** before any native build:
+
+```bash
+npm run sync-web
+npx cap sync ios
+npx cap sync android
+```
+
+Both `npx cap sync ios` and `npx cap sync android` must run — never only one. Pre-flight check: `shasum -a 256 index.html ios/App/App/public/index.html android/app/src/main/assets/public/index.html` must return three identical hashes. If any disagree, re-run the sync pipeline.
+
+The same rule applies to any `cp index.html <installed-bundle>/public/index.html` hot-swap into a running simulator or emulator: hot-swap on **all platforms you intend to screenshot**, not just the one you're actively looking at. A hot-swap on iOS alone leaves Android on last session's bytes.
+
+---
+
 ## Hard constraints (apply to every task)
 
 ### Never
