@@ -29335,10 +29335,20 @@ function _renderPaywall() {
     const tp = _ONB_COPY.paywallTrial;
     const tmpl = isEn ? tp.legal.en : tp.legal.he;
     legalEl.textContent = tmpl.replace('{price}', sel.priceString).replace('{period}', sel.periodLabel);
-  } else if (isEn) {
-    legalEl.textContent = 'Auto-renews for ' + sel.priceString + ' ' + sel.periodLabel + ' until canceled. Cancel anytime in App Store settings.';
   } else {
-    legalEl.textContent = 'מתחדש אוטומטית ב-' + sel.priceString + ' ' + sel.periodLabel + ' עד ביטול. אפשר לבטל בכל עת בהגדרות ה-App Store.';
+    // R43 — platform-correct store name. iOS + web fall back to App
+    // Store copy (RevenueCat routes web subscriptions through Apple too);
+    // Android shows Google Play. Reads from the live Capacitor platform
+    // (set once on boot into the <html> class — see the platform-class
+    // bootstrap near the top of the script block).
+    const _plat = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || 'ios';
+    const _store = _plat === 'android' ? 'Google Play' : 'App Store';
+    if (isEn) {
+      legalEl.textContent = 'Auto-renews for ' + sel.priceString + ' ' + sel.periodLabel + ' until canceled. Cancel anytime in ' + _store + ' settings.';
+    } else {
+      // HE: "Google Play" stays Latin — the store brand doesn't translate.
+      legalEl.textContent = 'מתחדש אוטומטית ב-' + sel.priceString + ' ' + sel.periodLabel + ' עד ביטול. אפשר לבטל בכל עת בהגדרות ה-' + _store + '.';
+    }
   }
 
   // Terms + Privacy links
@@ -49563,7 +49573,14 @@ function showThinkerCardScreen(thinker, chapter, day) {
   // isolated from the legacy #dc-thinker-screen DOM. If V8 is
   // disabled OR throws / returns false, the legacy v7 renderer still
   // runs below unchanged.
-  if (window._rvV8_ENABLED !== false && typeof showThinkerRevealV8 === 'function') {
+  // R43 — V8 only fires when EXPLICITLY opted in via
+  // `window._rvV8_ENABLED = true` (set manually in Debug). The old
+  // `!== false` check fired V8 on `undefined` too, so any session that
+  // transiently cleared the flag would land on the rejected V8 shell
+  // (Android regression where #rv8 "Plato levelled up" pill buttons +
+  // small plate rendered instead of the iOS legacy #dc-thinker-screen
+  // + canvas card). Tightened to `=== true`.
+  if (window._rvV8_ENABLED === true && typeof showThinkerRevealV8 === 'function') {
     // Compute nextInfo roughly as the legacy path does (used only
     // for the primary CTA label + handler branch).
     let nextInfo = null;
@@ -59317,13 +59334,24 @@ try {
     App.addListener('backButton', () => {
       try {
         // Layer 1: mid-animation reveal — do NOT skip the reward commit.
+        //   R43: the shipping path is the legacy #dc-thinker-screen inside
+        //   #modal-complete; the V8 #rv8 shell is dev-only now (fires
+        //   only on `window._rvV8_ENABLED === true`). Check both so a
+        //   Debug session that happens to be on V8 still gates correctly.
+        const legacyRv = document.getElementById('dc-thinker-screen');
+        const legacyRvActive = legacyRv && getComputedStyle(legacyRv).display !== 'none';
         const rv8 = document.getElementById('rv8');
         if (rv8) {
           const ctas = document.getElementById('rv8-ctas');
-          if (ctas && ctas.classList.contains('rv8-gated')) {
-            // Celebration in-flight; CTAs still gated. Swallow and wait.
-            return;
-          }
+          if (ctas && ctas.classList.contains('rv8-gated')) return; // V8 mid-celebration
+        }
+        if (legacyRvActive) {
+          // Legacy mid-animation = the arrival/forge sequence hasn't
+          // added `.rv-done` to #rv-root yet, OR the CTA row is still
+          // flagged `.rv-cta-gated`. Either state → swallow.
+          const rvRoot = document.querySelector('#dc-thinker-screen .rv-root');
+          if (rvRoot && !rvRoot.classList.contains('rv-done')) return;
+          if (document.querySelector('.rd-cta.rv-cta-gated')) return;
         }
         // Layer 2: top-most open modal/sheet (ch6 gift, card detail, NPS,
         // welcome-back, etc.) — paywall skipped, it has its own layer.
@@ -59353,7 +59381,18 @@ try {
           _exitPaywall('close_x');
           return;
         }
-        // Layer 4: reveal — teardown + home (same as rv8 Home CTA).
+        // Layer 4: reveal — close through the real continue/home path so
+        //   state cleanup matches the on-screen button.
+        //   Legacy (iOS + default Android): #modal-continue-btn →
+        //     closeCompleteModal(). V8 (Debug opt-in): _rv8Teardown +
+        //     goHome, same as the rv8 Home CTA.
+        if (legacyRvActive) {
+          const cont = document.getElementById('modal-continue-btn');
+          if (cont) { cont.click(); return; }
+          try { closeCompleteModal && closeCompleteModal(); } catch (_) {}
+          try { goHome(); } catch (_) {}
+          return;
+        }
         if (rv8) {
           try { _rv8Teardown(); } catch (_) {}
           try { goHome(); } catch (_) {}
