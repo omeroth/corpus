@@ -48498,6 +48498,50 @@ function _rvV7UngateCta(tier) {
   } catch(_){}
 }
 
+// R43 — fit the .rv-pc card into the actually-available vertical space
+// so the plate + "N more to…" label + CTA cluster never sit under it.
+// The CSS clamp `calc((100vh - 430px) * 1140 / 1890)` assumes 430 px of
+// chrome; on Android (effective viewport ~814 px) the real chrome is a
+// few pixels taller and the card overlaps the plate. We measure the
+// actual chrome once at mount and, if the available height would make
+// the card SMALLER than the CSS-computed width, cap `.rv-pc` width
+// inline. On iPhone 393×852 the CSS clamp still wins (250 px) and this
+// helper is a no-op → pixel-exact baseline preserved. R35 "sized once
+// at mount" holds: we read measurements once and set a single inline
+// width that no later animation changes.
+function _rvV7FitCard(root) {
+  try {
+    const dcScreen = document.getElementById('dc-thinker-screen');
+    if (!dcScreen || !root || !root.isConnected) return;
+    const pc = root.querySelector('.rv-pc');
+    if (!pc) return; // .rv-flp (first-meeting) is already height-driven
+    const stage = root.querySelector('.rv-stage');
+    if (!stage) return;
+    // SHORT-VIEWPORT GUARD. On iPhone 393×852 (viewport ≥ 820) the
+    // existing CSS clamp already lands the card at 250 px with the
+    // other elements tight below; this helper must be a no-op there so
+    // the pre-R43 baseline is pixel-exact. On Android (effective
+    // viewport ~814) and smaller, enforce a 16 px gap above the plate
+    // by shrinking the card and adding margin-top on .rv-body.
+    const viewportH = dcScreen.getBoundingClientRect().height || window.innerHeight;
+    if (viewportH >= 820) return;
+    const body = root.querySelector('.rv-body');
+    if (!body) return;
+    const DESIRED_GAP = 16;
+    const stageRect = stage.getBoundingClientRect();
+    const bodyRect = body.getBoundingClientRect();
+    const currentGap = bodyRect.top - stageRect.bottom;
+    if (currentGap >= DESIRED_GAP) return;
+    const shrinkPx = DESIRED_GAP - currentGap;
+    const cssW = parseFloat(getComputedStyle(pc).width) || 0;
+    const newW = cssW - (shrinkPx * 1140 / 1890);
+    if (newW > 0 && newW < cssW) {
+      pc.style.width = newW + 'px';
+      body.style.marginTop = shrinkPx + 'px';
+    }
+  } catch (_) {}
+}
+
 function _renderV7ThinkerReveal(thinker, chapter, day, nextInfo) {
   const dcScreen = document.getElementById('dc-thinker-screen');
   if (!dcScreen) return false;
@@ -48761,6 +48805,7 @@ function _renderV7ThinkerReveal(thinker, chapter, day, nextInfo) {
     `;
     dcScreen.insertBefore(root, dcScreen.firstChild);
     try { _rvHydrateComposed(root); } catch (_) {}
+    try { _rvV7FitCard(root); } catch (_) {}
     try {
       // R35j — mount canvas rays into .rv-rrays (card-stage halo).
       const rrays = root.querySelector('.rv-rrays');
@@ -48816,6 +48861,7 @@ function _renderV7ThinkerReveal(thinker, chapter, day, nextInfo) {
   confLayer.className = 'rv-conf';
   dcScreen.insertBefore(root, dcScreen.firstChild);
     try { _rvHydrateComposed(root); } catch (_) {}
+    try { _rvV7FitCard(root); } catch (_) {}
     try {
       // R35j — mount canvas rays into .rv-rrays (card-stage halo).
       const rrays = root.querySelector('.rv-rrays');
