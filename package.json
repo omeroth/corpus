@@ -44,6 +44,7 @@
     "@capgo/capacitor-social-login": "^8.3.22",
     "@napi-rs/canvas": "^1.0.2",
     "@revenuecat/purchases-capacitor": "^13.4.2",
+    "chrome-remote-interface": "^0.34.0",
     "corpus-instagram-share": "file:plugins/corpus-instagram-share",
     "corpus-meta-events": "file:plugins/corpus-meta-events",
     "corpus-review": "file:plugins/corpus-review",
