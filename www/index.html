@@ -59281,6 +59281,113 @@ try {
   }
 } catch (_) {}
 
+// R42 — Android hardware Back-button handler. iOS doesn't have a hardware
+// back and Capacitor's default handler on Android would blindly navigate
+// in the WebView OR minimize when the WebView has no history — users ended
+// up with sheets, paywalls and reveals that swallowed the key with no
+// response.
+//
+// This one handler walks the TOP-most interactive layer first and closes
+// through the same path the layer's own X / close button uses, so every
+// torn-state guard still runs (R41c paywall exit, R35 reveal teardown,
+// per-screen onboarding back wiring, etc.). The hard rule: never navigate
+// out of a reveal while the celebration is mid-animation — the reward is
+// committed when the CTA cluster ungates, and skipping before then would
+// leave the user with a half-applied frame upgrade.
+//
+// Layer order (topmost first):
+//   1. mid-animation reveal celebration → swallow (safety guard)
+//   2. open popup / sheet / modal — ch6 gift, card detail, NPS, welcome-
+//      back, etc. Uses _popV7CloseSheet(id) for pop-v7 sheets and falls
+//      back to .active off for legacy modal shells. Paywall skipped here
+//      (gets its own path below so R41c runs).
+//   3. paywall → _exitPaywall('close_x') — same path as the X button
+//   4. reveal screen → _rv8Teardown() + goHome() — same as rv8 Home CTA
+//   5. reader screen → #rd-close click — same path as the reader X
+//   6. onboarding step → active screen's .onb-v7-back click (per-screen
+//      back wiring; step 1 has no back button → swallow)
+//   7. non-home tab → goHome()
+//   8. home → App.minimizeApp() (standard Android home behaviour)
+try {
+  if (window.Capacitor && window.Capacitor.getPlatform
+      && window.Capacitor.getPlatform() === 'android'
+      && window.Capacitor.Plugins && window.Capacitor.Plugins.App
+      && typeof window.Capacitor.Plugins.App.addListener === 'function') {
+    const App = window.Capacitor.Plugins.App;
+    App.addListener('backButton', () => {
+      try {
+        // Layer 1: mid-animation reveal — do NOT skip the reward commit.
+        const rv8 = document.getElementById('rv8');
+        if (rv8) {
+          const ctas = document.getElementById('rv8-ctas');
+          if (ctas && ctas.classList.contains('rv8-gated')) {
+            // Celebration in-flight; CTAs still gated. Swallow and wait.
+            return;
+          }
+        }
+        // Layer 2: top-most open modal/sheet (ch6 gift, card detail, NPS,
+        // welcome-back, etc.) — paywall skipped, it has its own layer.
+        const openModals = Array.from(document.querySelectorAll('.modal-overlay.active'))
+          .filter(m => m.id !== 'modal-paywall')
+          .filter(m => { const cs = getComputedStyle(m); return cs.display !== 'none' && cs.visibility !== 'hidden'; });
+        if (openModals.length) {
+          // Top = highest z-index.
+          const top = openModals.slice().sort((a, b) =>
+            (parseInt(getComputedStyle(b).zIndex) || 0) - (parseInt(getComputedStyle(a).zIndex) || 0)
+          )[0];
+          if (top.classList.contains('pop-v7') && typeof _popV7CloseSheet === 'function') {
+            _popV7CloseSheet(top.id);
+            return;
+          }
+          // Legacy modal: run its own close button if present, otherwise
+          // drop .active + hide.
+          const explicitClose = top.querySelector('[aria-label="Close"], .modal-close, .paywall-close, [onclick*="close"]');
+          if (explicitClose) { explicitClose.click(); return; }
+          top.classList.remove('active');
+          top.style.display = 'none';
+          return;
+        }
+        // Layer 3: paywall — same path as its X.
+        const paywall = document.getElementById('modal-paywall');
+        if (paywall && paywall.classList.contains('active') && typeof _exitPaywall === 'function') {
+          _exitPaywall('close_x');
+          return;
+        }
+        // Layer 4: reveal — teardown + home (same as rv8 Home CTA).
+        if (rv8) {
+          try { _rv8Teardown(); } catch (_) {}
+          try { goHome(); } catch (_) {}
+          return;
+        }
+        // Layer 5: reader — click the real X.
+        if (state && state.currentScreen === 'reader') {
+          const closeBtn = document.getElementById('rd-close');
+          if (closeBtn) { closeBtn.click(); return; }
+          try { goBack(); } catch (_) {}
+          return;
+        }
+        // Layer 6: onboarding — click the active screen's back arrow
+        // (hardcoded per-screen target so null slots like step 6 skip
+        // automatically). Step 1 has no back → swallow.
+        const activeOnb = document.querySelector('.onb-screen.onb-active');
+        if (activeOnb) {
+          const back = activeOnb.querySelector('.onb-v7-back');
+          if (back) back.click();
+          return;
+        }
+        // Layer 7: non-home tab → home.
+        const cur = state && state.currentScreen;
+        if (cur && cur !== 'home') {
+          try { goHome(); } catch (_) {}
+          return;
+        }
+        // Layer 8: home → minimize to the Android launcher.
+        if (typeof App.minimizeApp === 'function') App.minimizeApp();
+      } catch (_) { /* never let a handler crash leak native state */ }
+    });
+  }
+} catch (_) {}
+
 // Resume a tour after the reload the setup phase triggers. Runs on
 // every boot; the hash marker is the gate.
 try {
