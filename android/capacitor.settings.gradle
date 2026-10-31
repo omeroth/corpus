@@ -40,3 +40,6 @@ project(':corpus-meta-events').projectDir = new File('../plugins/corpus-meta-eve
 
 include ':corpus-review'
 project(':corpus-review').projectDir = new File('../plugins/corpus-review/android')
+
+include ':corpus-widget-bridge'
+project(':corpus-widget-bridge').projectDir = new File('../plugins/corpus-widget-bridge/android')

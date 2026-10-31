@@ -22,6 +22,7 @@ dependencies {
     implementation project(':revenuecat-purchases-capacitor')
     implementation project(':corpus-meta-events')
     implementation project(':corpus-review')
+    implementation project(':corpus-widget-bridge')
 
 }
 
