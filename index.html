@@ -12834,11 +12834,6 @@
   }
   html.dark .level-card-header .ch-free-pill { background: rgba(255, 255, 255, 0.92); }
   .level-card-header .ch-free-pill > span { font-size: 13px; }
-  /* R44 — inline SVG gift icon replaces the 🎁 emoji so Android and
-     iOS render the identical mark. Sized to match the pill text; takes
-     currentColor so dark mode and accent swaps continue to work. */
-  .ic-gift { width: 14px; height: 14px; display: inline-block; vertical-align: -2px; color: var(--accent); flex-shrink: 0; }
-  .ic-gift-fab { width: 28px; height: 28px; color: #FFFFFF; vertical-align: middle; }
 
   /* v7 bottom sheet content for #modal-ch6-gift. The outer shell
      styling comes from the shared .pop-v7 / .pop-wrap rules; this
@@ -25684,13 +25679,8 @@
       <path d="M18 22 Q18 8 32 8 Q46 8 46 22 Q46 30 38 34 Q32 36 32 40" fill="none" stroke="url(#ic-mystery-q-grad)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
       <circle cx="32" cy="55" r="4.5" fill="url(#ic-mystery-q-grad)"/>
     </symbol>
-    <!-- R44 — platform-neutral replacements for emoji glyphs so Android
-         and iOS render the same brand mark. Used by the "🎁 Free" pill,
-         the ch6 gift sheet trigger, and the Level-up / Trophy modal. -->
-    <symbol id="icon-gift" viewBox="0 0 24 24">
-      <path d="M20 7h-3.1a3 3 0 0 0-4.9-3.3A3 3 0 0 0 7.1 7H4a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h1v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8h1a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1Zm-6-2a1 1 0 1 1 1 1h-1V5Zm-5 0a1 1 0 0 1 2 0v1H9a1 1 0 0 1 0-1Zm2 15H7v-8h4v8Zm2 0v-8h4v8h-4Zm6-10h-6V8h6v2ZM5 10V8h6v2H5Z" fill="currentColor"/>
-      <path d="M11 8h2v4h-2z" fill="#FFFFFF" opacity=".35"/>
-    </symbol>
+    <!-- R44 — platform-neutral trophy for the Level-up modal (replaces
+         the 🏆 emoji). -->
     <symbol id="icon-trophy" viewBox="0 0 24 24">
       <path d="M19 4h-2V3a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v1H5a2 2 0 0 0-2 2v2a4 4 0 0 0 4 4h.3a5 5 0 0 0 3.7 3.9V18H9a1 1 0 0 0 0 2h6a1 1 0 0 0 0-2h-2v-2.1a5 5 0 0 0 3.7-3.9h.3a4 4 0 0 0 4-4V6a2 2 0 0 0-2-2ZM7 10a2 2 0 0 1-2-2V6h2v4Zm10 0V6h2v2a2 2 0 0 1-2 2Z" fill="currentColor"/>
     </symbol>
@@ -44267,7 +44257,7 @@ function _mountCh6GiftBtn() {
   btn.setAttribute('aria-label', isEn ? 'You have a gift' : 'יש לכם מתנה');
   // Red dot omitted when seen; the gift tile remains tappable as a
   // re-entry point into the sheet but without the notification affordance.
-  btn.innerHTML = '<svg class="ic-gift ic-gift-fab" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-gift"/></svg>' + (seen ? '' : '<span class="ch6-gift-dot" aria-hidden="true"></span>');
+  btn.innerHTML = '🎁' + (seen ? '' : '<span class="ch6-gift-dot" aria-hidden="true"></span>');
   btn.onclick = _openCh6GiftSheet;
   home.appendChild(btn);
   // Caption pill — only mounted BEFORE the user has opened the sheet.
@@ -44305,7 +44295,7 @@ function _openCh6GiftSheet() {
     ? 'Seven thinkers on the right to rule.'
     : 'שבעה הוגים על הזכות לשלוט.';
   const chTitle = isEn ? 'Political Philosophy' : 'פילוסופיה פוליטית';
-  const freePill = '<svg class="ic-gift" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-gift"/></svg>' + (isEn ? 'Free' : 'חינם');
+  const freePill = isEn ? '🎁 Free' : '🎁 חינם';
   // R38d — hierarchy swap: primary CTA is "See the chapter" (the
   // meaningful next action), secondary is "Got it, thanks" (closes).
   // Analytics `cta` values stay 'see_chapter' / 'thanks', keyed off
@@ -44332,7 +44322,7 @@ function _openCh6GiftSheet() {
             '<div class="level-eyebrow">' + chapterEyebrow + '</div>' +
             '<div class="level-title">' + chTitle + '</div>' +
           '</div>' +
-          '<div class="ch-free-pill" aria-hidden="true"><svg class="ic-gift" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-gift"/></svg>' + (isEn ? 'Free' : 'חינם') + '</div>' +
+          '<div class="ch-free-pill" aria-hidden="true"><span>🎁</span> ' + (isEn ? 'Free' : 'חינם') + '</div>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -45471,7 +45461,7 @@ function renderHome() {
         // pill is just the signal, not a bypass.
         const isFreeChapter = (FREE_CHAPTERS[state.subject] || []).includes(w.id);
         const freePill = isFreeChapter
-          ? `<div class="ch-free-pill" aria-hidden="true"><svg class="ic-gift" viewBox="0 0 24 24" aria-hidden="true"><use href="#icon-gift"/></svg>${isEn ? 'Free' : 'חינם'}</div>`
+          ? `<div class="ch-free-pill" aria-hidden="true"><span>🎁</span> ${isEn ? 'Free' : 'חינם'}</div>`
           : '';
         header.innerHTML = `
           <div class="level-num">${numDisplay}</div>
