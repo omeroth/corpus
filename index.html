@@ -1686,6 +1686,46 @@
   .pf-reminder-toggle input:checked + .pf-reminder-toggle-slider::before { transform: translateX(18px); }
   [dir="rtl"] .pf-reminder-toggle input:checked + .pf-reminder-toggle-slider::before { transform: translateX(-18px); }
 
+  /* R46 Fix 1 — inline hint shown under the Daily reminder row when the
+     user's intent is ON but the OS is blocking notifications. Hidden by
+     default; `updateReminderUI` and `renderProfileV7` toggle `.show` from
+     JS when dailyReminder.enabled && osPermission === 'denied'. The link
+     portion uses accent + underline so it reads as tappable without an
+     extra chevron. */
+  .pf-reminder-hint {
+    display: none;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    padding-inline-start: 44px;
+    padding-inline-end: 12px;
+    margin: -4px 0 10px;
+  }
+  .pf-reminder-hint.show { display: block; }
+  .pf-reminder-hint-link {
+    color: var(--accent);
+    text-decoration: underline;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 700;
+  }
+  /* v7 host variant — matches the pf7-row indent so the hint sits under
+     the label column, not under the icon. */
+  .pf7-reminder-hint {
+    display: none;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+    padding-inline-start: 48px;
+    padding-inline-end: 16px;
+    margin: -4px 0 8px;
+  }
+  .pf7-reminder-hint.show { display: block; }
+
   .pf-logout-btn {
     display: block;
     margin: 16px 16px 8px;
@@ -26504,6 +26544,12 @@
               <span class="pf-reminder-toggle-slider"></span>
             </label>
           </div>
+          <!-- R46 Fix 1 hint — visible when enabled && osPermission === 'denied'.
+               updateReminderUI toggles `.show` and swaps copy per language. -->
+          <div id="pf-reminder-hint" class="pf-reminder-hint">
+            <span id="pf-reminder-hint-text"></span>
+            <button type="button" id="pf-reminder-hint-link" class="pf-reminder-hint-link" onclick="_openOsNotifSettings()"></button>
+          </div>
         </div>
 
         <!-- Haptics toggle — reuses the reminder row shape so the rhythm
@@ -33107,28 +33153,41 @@ async function _onbV2CtaNotifContinue() {
   try { _phCapture('notification_prompt_response', { response: wantsReminder ? 'yes' : 'not_now', source: 'onboarding_step31' }); } catch(e) {}
   if (wantsReminder) {
     state.dailyReminder = Object.assign(
-      { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
+      { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false, osPermission: 'unknown' },
       state.dailyReminder || {},
       { enabled: true, prePromptDeferred: false }
     );
     let osResult = 'unavailable';
     if (_isNotifPluginAvailable()) {
-      osResult = await _requestNotifPermission();
+      // R46 Fix 2 — wrap the awaited permission request so a throw from
+      // the plugin bridge (Android cold-start registration race, iOS
+      // WKWebView stall) still falls through to the save below.
+      // 'request_threw' is kept distinct from 'unavailable' so the
+      // analytics bucket stays visible.
+      try {
+        osResult = await _requestNotifPermission();
+      } catch (e) {
+        console.warn('[Reminder] onboarding _requestNotifPermission threw:', e);
+        osResult = 'request_threw';
+      }
       state.dailyReminder.permissionAsked = true;
+      // R46 Fix 1 — osPermission tracks the OS answer; the user's
+      // `enabled` intent is NEVER flipped by this read. Reconcile and
+      // the Profile hint read osPermission to decide what to do when
+      // the user wants reminders but the OS currently blocks them.
+      state.dailyReminder.osPermission = osResult;
       if (osResult === 'granted') {
         // Fire-and-forget reconcile — schedules the 14-day window.
         // Today's notif gets cancelled when finishDay runs after the
         // first dialogue completes.
         _reconcileReminders().catch(e => console.warn('[Reminder] onboarding-grant reconcile failed:', e));
-      } else {
-        state.dailyReminder.enabled = false;
       }
     }
     try { saveState(); } catch(e) { try { saveStateLocal(); } catch(e2) {} }
     try { _phCapture('notification_os_result', { result: osResult, source: 'onboarding_step31' }); } catch(e) {}
   } else {
     state.dailyReminder = Object.assign(
-      { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false },
+      { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false, osPermission: 'unknown' },
       state.dailyReminder || {},
       { enabled: false, prePromptDeferred: true }
     );
@@ -38618,7 +38677,12 @@ function defaultState() {
     // only personalizes when false, so a user's explicit choice is always
     // respected. Backfilled for pre-flag users in the normalize block below:
     // any time !== '20:00' is inferred as explicitly set.
-    dailyReminder: { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false, timeExplicitlySet: false },
+    // osPermission: last-known OS notification permission result. Separate
+    // from `enabled` (user intent) so a flaky OS "denied" read never
+    // overwrites the user's choice. Values: 'unknown' | 'granted' |
+    // 'denied' | 'unavailable' | 'request_threw'. The Profile hint reads
+    // this to tell the user when the OS is blocking their enabled toggle.
+    dailyReminder: { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false, timeExplicitlySet: false, osPermission: 'unknown' },
     // Haptic feedback preference. Default on. _haptic() reads this before
     // every native call; the toggle lives in Profile → Settings.
     hapticsEnabled: true,
@@ -38703,7 +38767,7 @@ function loadState() {
   // Normalize state.dailyReminder for existing users whose persisted state predates this field.
   // Shape: { enabled, time, permissionAsked, prePromptDeferred, timeExplicitlySet }.
   state.dailyReminder = Object.assign(
-    { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false, timeExplicitlySet: false },
+    { enabled: true, time: '20:00', permissionAsked: false, prePromptDeferred: false, timeExplicitlySet: false, osPermission: 'unknown' },
     state.dailyReminder || {}
   );
   // One-shot migration: default reminder time moved 19:00 → 20:00. Anyone
@@ -42001,6 +42065,30 @@ function _isNotifPluginAvailable() {
             window.Capacitor.Plugins.LocalNotifications);
 }
 
+// R46 Fix 1 — opens the user's OS notification settings page from the
+// Profile hint ("Notifications are off in system settings. Open settings").
+// iOS WKWebView accepts the `app-settings:` URL scheme and jumps straight
+// to the Corpus settings page. Android has no equivalent URL scheme that
+// a WebView can navigate to, so we fall back to a short toast with a
+// manual breadcrumb; a future round can add a native plugin or
+// cross-platform intent helper. Returns true if a deep link fired.
+function _openOsNotifSettings() {
+  try {
+    const plat = (window.Capacitor && window.Capacitor.getPlatform) ? window.Capacitor.getPlatform() : 'web';
+    if (plat === 'ios') {
+      window.location.href = 'app-settings:';
+      return true;
+    }
+    const isEn = state.lang === 'en';
+    if (typeof _showToast === 'function') {
+      _showToast(isEn
+        ? 'Open your phone Settings and allow notifications for Corpus.'
+        : 'פתחו הגדרות ואפשרו התראות ל-Corpus.');
+    }
+  } catch (e) { console.warn('[Reminder] _openOsNotifSettings failed:', e); }
+  return false;
+}
+
 // Returns 'granted' | 'denied' | 'prompt' | 'unavailable'.
 async function _checkNotifPermission() {
   if (!_isNotifPluginAvailable()) return 'unavailable';
@@ -42275,31 +42363,53 @@ async function rescheduleReminderFromToday() {
 // then ensures the schedule reflects the new state.
 async function setReminder(patch) {
   state.dailyReminder = Object.assign(
-    { enabled: true, time: '20:00', permissionAsked: false },
+    { enabled: true, time: '20:00', permissionAsked: false, osPermission: 'unknown' },
     state.dailyReminder || {},
     patch || {}
   );
+  // R46 Fix 3 — early save is the user-intent durability checkpoint.
+  // Toggle flip + time change land here even if the tail await below
+  // throws, is interrupted, or the user kills the app during the OS
+  // prompt. The terminal save at the bottom (try/finally) atomically
+  // persists permissionAsked + osPermission mutations from the await
+  // ladder; no second mid-await save is needed.
   saveState();
   if (!_isNotifPluginAvailable()) return state.dailyReminder;
-  if (state.dailyReminder.enabled) {
-    let perm = await _checkNotifPermission();
-    if (perm === 'prompt' || perm === 'prompt-with-rationale') {
-      perm = await _requestNotifPermission();
-      state.dailyReminder.permissionAsked = true;
-      saveState();
-    }
-    if (perm === 'granted') {
-      // Route through reconcile so completed days in the window get
-      // skipped and every scheduled evening carries the current pool copy.
-      await _reconcileReminders();
+  try {
+    if (state.dailyReminder.enabled) {
+      let perm = await _checkNotifPermission();
+      if (perm === 'prompt' || perm === 'prompt-with-rationale') {
+        // R46 Fix 2 — same throw-shield as the onboarding path.
+        try {
+          perm = await _requestNotifPermission();
+        } catch (e) {
+          console.warn('[Reminder] setReminder _requestNotifPermission threw:', e);
+          perm = 'request_threw';
+        }
+        state.dailyReminder.permissionAsked = true;
+      }
+      // R46 Fix 1 — record the OS answer separately from `enabled`.
+      // The user keeps their toggle ON even if the OS currently denies;
+      // the Profile hint explains the situation and points at Settings.
+      state.dailyReminder.osPermission = perm;
+      if (perm === 'granted') {
+        // Route through reconcile so completed days in the window get
+        // skipped and every scheduled evening carries the current pool copy.
+        await _reconcileReminders();
+      } else {
+        // OS blocks or didn't respond — cancel anything pending, but
+        // leave `enabled` untouched. The next reconcile (foreground
+        // visibilitychange, finishDay) re-checks and will schedule as
+        // soon as the OS reports granted.
+        await _cancelAllReminders();
+      }
     } else {
-      // User declined OS permission → flip the intent off so UI reflects reality.
-      state.dailyReminder.enabled = false;
-      saveState();
       await _cancelAllReminders();
     }
-  } else {
-    await _cancelAllReminders();
+  } finally {
+    // Terminal save. Always runs, even if a reconcile / cancel threw,
+    // so permissionAsked + osPermission mutations above are durable.
+    saveState();
   }
   return state.dailyReminder;
 }
@@ -42323,7 +42433,15 @@ async function maybeRequestReminderPermission() {
   const r = state.dailyReminder || {};
   if (!r.enabled || r.permissionAsked) return;
   if (r.prePromptDeferred) return;
-  const perm = await _requestNotifPermission();
+  // R46 Fix 2 — wrap the awaited prompt so a plugin throw doesn't
+  // skip the permissionAsked persistence below.
+  let perm;
+  try {
+    perm = await _requestNotifPermission();
+  } catch (e) {
+    console.warn('[Reminder] maybeRequest _requestNotifPermission threw:', e);
+    perm = 'request_threw';
+  }
   // Persist the flipped flag BEFORE any further await. The prior ordering
   // awaited _reconcileReminders between flipping the flag and saveState;
   // a throw from reconcile (plugin bridge timeout on Android cold start,
@@ -42333,10 +42451,14 @@ async function maybeRequestReminderPermission() {
   // finishDay walked the same path. Observed as 16 users in the safety-
   // net-miss bucket between 2026-08-16 and 2026-09-29.
   state.dailyReminder.permissionAsked = true;
-  if (perm !== 'granted') {
-    // Permission denied → reflect in state so the Profile toggle shows OFF.
-    state.dailyReminder.enabled = false;
-  }
+  // R46 Fix 1 — track the OS answer separately. We never overwrite the
+  // user's `enabled` here: the Android POST_NOTIFICATIONS flow has
+  // several ways to return a stale "denied" immediately after the user
+  // taps Allow (areNotificationsEnabled race, pre-channel false, pre-
+  // Tiramisu silent decline), and we don't want those readings to
+  // silently flip the user's preference. The Profile hint reads
+  // osPermission to tell the user what to do.
+  state.dailyReminder.osPermission = perm;
   saveState();
   if (perm === 'granted') {
     // Fire-and-forget. Reconcile failure can no longer unwind the
@@ -59802,6 +59924,25 @@ function updateReminderUI() {
   }
   const toggle = document.getElementById('pf-reminder-toggle');
   if (toggle) toggle.checked = !!r.enabled;
+  // R46 Fix 1 — hint renders when the user wants reminders but the OS
+  // currently blocks notifications for the app. We DO NOT flip `enabled`
+  // on an OS-denied read anymore (see setReminder /
+  // maybeRequestReminderPermission / _onbV2CtaNotifContinue), so the
+  // only way the user learns that nothing is scheduling is this inline
+  // line + tappable Settings link.
+  const hint = document.getElementById('pf-reminder-hint');
+  if (hint) {
+    const showHint = !!r.enabled && r.osPermission === 'denied';
+    hint.classList.toggle('show', showHint);
+    if (showHint) {
+      const hintText = document.getElementById('pf-reminder-hint-text');
+      const hintLink = document.getElementById('pf-reminder-hint-link');
+      if (hintText) hintText.textContent = isEn
+        ? 'Notifications are off in system settings. '
+        : 'ההתראות כבויות בהגדרות המערכת. ';
+      if (hintLink) hintLink.textContent = isEn ? 'Open settings' : 'פתחו הגדרות';
+    }
+  }
 }
 
 function _onReminderToggle(ev) {
@@ -59928,7 +60069,10 @@ function renderProfileV7() {
   // renderer reads, so nothing drifts between the two.
   const curLang   = state.lang === 'he' ? 'he' : 'en';
   const curApp    = state.appearance || 'system';
-  const curRem    = !!(state.reminder && state.reminder.enabled);
+  const curRem    = !!(state.dailyReminder && state.dailyReminder.enabled);
+  // R46 Fix 1 — hint flag: user intent is ON but the OS currently blocks
+  // notifications. Rendered as an inline row under the toggle.
+  const remHintOn = curRem && state.dailyReminder && state.dailyReminder.osPermission === 'denied';
   const curHap    = state.hapticsEnabled !== false;  // default on
   // Dialogue count across every subject — state.completedDays stores
   // `${subject}-${weekId}-${dayId}: true` entries, so a value filter
@@ -60027,6 +60171,7 @@ function renderProfileV7() {
         <span class="pf7-lb">${T('Daily reminder', 'תזכורת יומית')}</span>
         <button type="button" class="pf7-tg ${curRem ? 'on' : ''}" data-k="rem" aria-pressed="${curRem}"></button>
       </div>
+      <div class="pf7-reminder-hint ${remHintOn ? 'show' : ''}">${T('Notifications are off in system settings. ', 'ההתראות כבויות בהגדרות המערכת. ')}<button type="button" class="pf-reminder-hint-link" onclick="_openOsNotifSettings()">${T('Open settings', 'פתחו הגדרות')}</button></div>
       <div class="pf7-row">
         <span class="pf7-ri">${_PF7_ICONS.hap}</span>
         <span class="pf7-lb">${T('Haptics', 'רטט')}</span>
