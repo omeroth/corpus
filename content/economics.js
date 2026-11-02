@@ -3975,10 +3975,10 @@ const economicsData = {
       title: 'כסף ומשברים',
       titleEn: 'Money and Crises',
       days: [
-          { id: 1, title: 'מה אם השקט עצמו מייצר את המשבר?', titleEn: 'What If the Calm Itself Produces the Crisis?', thinker: 'היימן מינסקי', thinkerEn: 'Hyman Minsky', thinkerId: 'minsky', xp: 50, sections: [
+          { id: 1, title: 'היציבות מולידה את הנפילה', titleEn: 'Stability Breeds the Fall', thinker: 'היימן מינסקי', thinkerEn: 'Hyman Minsky', thinkerId: 'minsky', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'הרעיון של היום', titleEn: 'Today\'s Idea',
+              title: 'היציבות מולידה את הנפילה', titleEn: 'Stability Breeds the Fall',
               content: 'שילר הראה שהשוק נע יותר ממה שהעובדות מצדיקות. היימן מינסקי שאל מה קורה כשהתנועה נשברת, ונתן תשובה מטרידה.\nההסבר המקובל למשבר הוא זעזוע חיצוני: מלחמה, מגפה, קפיצת מחירים. משהו מכה במערכת מבחוץ.\n<strong>מינסקי טען שזה הפוך</strong>. <strong>המשבר נוצר מבפנים, והדלק שלו הוא דווקא השקט שקדם לו</strong>.\nההיגיון פשוט ולא נוח. כשהכל יציב שנים ארוכות, מי שלקח סיכון הרוויח. הזהירים נשארו מאחור, והנועזים תוגמלו. ואז כולם לומדים את השיעור ומגדילים סיכון.\nהבנקים מרפים תנאי אשראי, כי שנים שלא היו חדלויות פירעון. הלווים מגדילים מינוף, כי המחירים רק עלו. ו<strong>לאט לאט המערכת נעשית שברירית, בלי שאיש עשה משהו יוצא דופן</strong>.',
               contentEn: 'Shiller showed that the market moves more than the facts justify. Hyman Minsky asked what happens when the movement breaks, and gave a disturbing answer.\nThe accepted explanation of a crisis is an external shock: a war, a pandemic, a jump in prices. Something strikes the system from outside.\n<strong>Minsky argued that it is the reverse</strong>. <strong>The crisis is created from within, and its fuel is precisely the calm that preceded it</strong>.\nThe logic is simple and uncomfortable. When everything is stable for many years, those who took risks profited. The cautious were left behind, and the bold were rewarded. Then everyone learns the lesson and takes on more risk.\nBanks loosen credit terms, because for years there have been no defaults. Borrowers increase their leverage, because prices have only gone up. And <strong>slowly the system becomes fragile, without anyone having done anything out of the ordinary</strong>.',
             },
@@ -4036,10 +4036,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 2, title: 'מה עושים ברגע הפאניקה?', titleEn: 'What Do You Do at the Moment of Panic?', thinker: 'וולטר בייג\'הוט', thinkerEn: 'Walter Bagehot', thinkerId: 'bagehot', xp: 50, sections: [
+          { id: 2, title: 'רגע הפאניקה', titleEn: 'The Moment of Panic', thinker: 'וולטר בייג\'הוט', thinkerEn: 'Walter Bagehot', thinkerId: 'bagehot', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'הרעיון של היום', titleEn: 'Today\'s Idea',
+              title: 'רגע הפאניקה', titleEn: 'The Moment of Panic',
               content: 'מינסקי הסביר איך מגיעים לקצה. וולטר בייג\'הוט, עורך "האקונומיסט" במאה ה-19, שאל שאלה מעשית: מה עושים ברגע שהפאניקה כבר כאן?\nוהוא התחיל מבעיה שקל לפספס. <strong>בנק יכול לקרוס גם כשהוא בריא לגמרי</strong>.\nהסיבה פשוטה: הכסף שהופקד בבנק אינו יושב בכספת, הוא הולווה החוצה. ולכן, אם כל המפקידים יבואו באותו יום, אין בנק בעולם שיכול לשלם לכולם. גם בנק מצוין.\nומכאן ש<strong>פאניקה מגשימה את עצמה</strong>. מי שחושב שאחרים ירוצו לבנק, ירוץ בעצמו, וזו החלטה נכונה מבחינתו גם אם הבנק תקין.\nוהפתרון של בייג\'הוט: <strong>חייב להיות מישהו שמוכן להלוות דווקא כשאיש אחר אינו מוכן</strong>. מכאן נולד התפקיד שאנחנו מכירים היום כמלווה של מוצא אחרון, והוא תפקידו של הבנק המרכזי.',
               contentEn: 'Minsky explained how we reach the edge. Walter Bagehot, editor of The Economist in the nineteenth century, asked a practical question: what do you do at the moment the panic is already here?\nAnd he started from a problem that is easy to miss. <strong>A bank can collapse even when it is entirely healthy</strong>.\nThe reason is simple: the money deposited in a bank does not sit in a vault, it has been lent out. Therefore, if all the depositors come on the same day, there is no bank in the world that can pay everyone. Even an excellent bank.\nHence <strong>a panic is self-fulfilling</strong>. Whoever thinks that others will run to the bank will run themselves, and this is the right decision from their point of view even if the bank is sound.\nAnd Bagehot\'s solution: <strong>there must be someone willing to lend precisely when no one else is willing</strong>. From here was born the role we know today as the lender of last resort, which is the role of the central bank.',
             },
@@ -4097,10 +4097,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 3, title: 'למה החזרת חוב יכולה להחמיר את המשבר?', titleEn: 'Why Can Paying Back Debt Make the Crisis Worse?', thinker: 'אירווינג פישר', thinkerEn: 'Irving Fisher', thinkerId: 'fisher', xp: 50, sections: [
+          { id: 3, title: 'כשההחזר מכאיב', titleEn: 'When Paying Back Hurts', thinker: 'אירווינג פישר', thinkerEn: 'Irving Fisher', thinkerId: 'fisher', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'הרעיון של היום', titleEn: 'Today\'s Idea',
+              title: 'כשההחזר מכאיב', titleEn: 'When Paying Back Hurts',
               content: 'בייג\'הוט עסק ברגע הפאניקה. אירווינג פישר שאל מה קורה בשנים שאחריו, והייתה לו סיבה אישית.\nבאוקטובר 1929, ימים ספורים לפני הקריסה, הוא הצהיר בפומבי שמחירי המניות הגיעו "לרמה גבוהה וקבועה". הוא עצמו קנה מניות בכסף מושאל. הוא איבד את כל הונו.\nוארבע שנים אחר כך פרסם את המאמר שהסביר בדיוק את המנגנון שהרס אותו.\nהטענה: שני גורמים מייצרים שפל גדול. <strong>חוב גדול מדי בהתחלה, וירידת מחירים מיד אחריו</strong>.\nו<strong>כל אחד מהם לבדו נסבל</strong>. חוב גדול בתקופה יציבה מתנהל. ירידת מחירים בלי חוב מכאיבה ועוברת. אבל <strong>כששניהם נפגשים, הם מזינים זה את זה</strong>.',
               contentEn: 'Bagehot dealt with the moment of panic. Irving Fisher asked what happens in the years after it, and he had a personal reason.\nIn October 1929, just days before the crash, he declared publicly that stock prices had reached "a permanently high plateau." He himself bought stocks with borrowed money. He lost his entire fortune.\nAnd four years later he published the paper that explained exactly the mechanism that ruined him.\nThe claim: two factors produce a great depression. <strong>Too much debt at the start, and a fall in prices immediately after it</strong>.\nAnd <strong>each of them alone is bearable</strong>. Large debt in a stable period can be managed. A fall in prices without debt hurts and passes. But <strong>when the two meet, they feed each other</strong>.',
             },
@@ -4158,10 +4158,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 4, title: 'ואולי זה בכלל לא כשל של השוק?', titleEn: 'What If It Wasn\'t a Market Failure at All?', thinker: 'מילטון פרידמן', thinkerEn: 'Milton Friedman', thinkerId: 'friedman', xp: 50, sections: [
+          { id: 4, title: 'כשהמדינה שמטה את הקרקע', titleEn: 'When the State Pulled the Rug', thinker: 'מילטון פרידמן', thinkerEn: 'Milton Friedman', thinkerId: 'friedman', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'הרעיון של היום', titleEn: 'Today\'s Idea',
+              title: 'כשהמדינה שמטה את הקרקע', titleEn: 'When the State Pulled the Rug',
               content: 'פישר האשים את החוב ואת ירידת המחירים. מילטון פרידמן שאל שאלה אחרת: למה בכלל המחירים ירדו כל כך?\nיחד עם אנה שוורץ הוא אסף נתונים כספיים של כמעט מאה שנה, ופרסם ב-1963 ספר שהפך את ההסבר המקובל לשפל הגדול.\nוהממצא המרכזי: <strong>בין 1929 ל-1933 כמות הכסף במשק האמריקאי התכווצה בכשליש</strong>.\nוזו לא הייתה גזירת טבע. הפדרל ריזרב, שהוקם בדיוק כדי למנוע דבר כזה, עמד מנגד בזמן שארבעה גלי פאניקה בנקאית שטפו את המדינה.\nומכאן המסקנה שהפכה את התמונה: <strong>השפל הגדול לא הוכיח שהשוק החופשי נכשל</strong>. <strong>הוא הוכיח שהמוסד שאמור היה לייצב אותו נכשל</strong>.',
               contentEn: 'Fisher blamed the debt and the fall in prices. Milton Friedman asked a different question: why did prices fall so much in the first place?\nTogether with Anna Schwartz, he collected monetary data spanning nearly a hundred years, and in 1963 published a book that transformed the accepted explanation of the Great Depression.\nThe central finding: <strong>between 1929 and 1933, the money supply in the American economy shrank by about a third</strong>.\nAnd this was no act of nature. The Federal Reserve, created precisely to prevent such a thing, stood aside while four waves of bank panic swept the country.\nHence the conclusion that changed the picture: <strong>the Great Depression did not prove that the free market had failed</strong>. <strong>It proved that the institution meant to stabilize it had failed</strong>.',
             },
@@ -4219,10 +4219,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 5, title: 'למה זה ממשיך לקרות?', titleEn: 'Why Does It Keep Happening?', thinker: 'ריינהרט ורוגוף', thinkerEn: 'Reinhart and Rogoff', thinkerId: 'reinhart-rogoff', xp: 50, sections: [
+          { id: 5, title: 'הדפוס שחוזר שוב ושוב', titleEn: 'The Pattern That Keeps Returning', thinker: 'ריינהרט ורוגוף', thinkerEn: 'Reinhart and Rogoff', thinkerId: 'reinhart-rogoff', xp: 50, sections: [
             {
               type: 'idea',
-              title: 'הרעיון של היום', titleEn: 'Today\'s Idea',
+              title: 'הדפוס שחוזר שוב ושוב', titleEn: 'The Pattern That Keeps Returning',
               content: 'ארבעה הסברים שונים למשברים. קרמן ריינהרט וקנת\' רוגוף שאלו שאלה אחרת: <strong>אם אנחנו מבינים את זה כל כך טוב, למה זה חוזר שוב ושוב?</strong>\nוכדי לענות, הם עשו משהו שאיש לא עשה לפניהם בהיקף כזה. הם <strong>אספו נתונים על 66 מדינות לאורך שמונה מאות שנים</strong>: חדלויות פירעון, פאניקות בנקאיות, גלי אינפלציה.\nוהתוצאה הייתה שהדפוס חוזר על עצמו בעקשנות. משתנים השמות, הטכנולוגיה והמכשירים הפיננסיים, והרצף נשאר כמעט זהה.\nושם הספר שלהם הוא הפואנטה. "הפעם זה שונה" הוא <strong>המשפט שנאמר לפני כל משבר, ודווקא הוא הסימן המובהק ביותר שהוא מתקרב</strong>.',
               contentEn: 'Four different explanations for crises. Carmen Reinhart and Kenneth Rogoff asked a different question: <strong>if we understand this so well, why does it keep coming back?</strong>\nAnd to answer, they did something no one had done before them on this scale. They <strong>collected data on 66 countries over eight hundred years</strong>: sovereign defaults, banking panics, waves of inflation.\nAnd the result was that the pattern repeats itself stubbornly. The names, the technology and the financial instruments change, and the sequence remains almost identical.\nAnd the title of their book is the punchline. "This time is different" is <strong>the sentence spoken before every crisis, and it is precisely the clearest sign that one is approaching</strong>.',
             },
@@ -4280,10 +4280,10 @@ const economicsData = {
             },
             { type: 'quiz_summary' }
           ] },
-          { id: 6, title: 'כשכל ההסברים נפגשו במקום אחד', titleEn: 'When All the Explanations Met in One Place', thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary', thinkerId: null, xp: 50, isSummary: true, sections: [
+          { id: 6, title: 'משבר אחד, כל ההסברים', titleEn: 'One Crisis, Every Explanation', thinker: 'סיכום פרק', thinkerEn: 'Chapter Summary', thinkerId: null, xp: 50, isSummary: true, sections: [
             {
               type: 'idea',
-              title: 'הרעיון של היום', titleEn: 'Today\'s Idea',
+              title: 'משבר אחד, כל ההסברים', titleEn: 'One Crisis, Every Explanation',
               content: '15 בספטמבר 2008. בנק ההשקעות ליהמן ברדרס, שעמד על תילו מאז המאה ה-19, מגיש בקשה לפשיטת רגל. עם נכסים של יותר מ-600 מיליארד דולר, זו <strong>פשיטת הרגל הגדולה בתולדות ארצות הברית</strong>.\nוהדיאלוג הזה אינו על הוגה חדש. הוא על האירוע שבו כל חמשת ההסברים שראינו נפגשו.\nוהשרשרת הייתה כזו. משכנתאות ניתנו ללווים שסיכוייהם להחזיר היו נמוכים. המשכנתאות נארזו לניירות ערך, חברות הדירוג העניקו להם ציונים גבוהים, והם נמכרו למשקיעים בכל העולם.\nוכל המבנה נשען על הנחה אחת: <strong>שמחירי הדיור ימשיכו לעלות</strong>.',
               contentEn: 'September 15, 2008. The investment bank Lehman Brothers, which had stood since the nineteenth century, files for bankruptcy. With assets of more than 600 billion dollars, it is <strong>the largest bankruptcy in American history</strong>.\nAnd this dialogue is not about a new thinker. It is about the event in which all five explanations we have seen met.\nAnd the chain went like this. Mortgages were given to borrowers with a low chance of repaying. The mortgages were packaged into securities, the rating agencies gave them high grades, and they were sold to investors around the world.\nAnd the entire structure rested on one assumption: <strong>that housing prices would continue to rise</strong>.',
             },

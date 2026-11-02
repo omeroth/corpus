@@ -3878,7 +3878,7 @@ const corpusData = {
           { type: 'quiz_summary' }
         ] },
   ],
-  },,
+  },
   {
     id: 8,
     title: 'פילוסופיה של המדע', titleEn: 'Philosophy of Science',

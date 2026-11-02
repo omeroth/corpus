@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-02T14:34:42.886Z",
+  "generatedAt": "2026-11-02T15:14:45.065Z",
   "items": [
     {
       "weekId": 1,
@@ -2061,7 +2061,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "minsky",
-      "title": "מה אם השקט עצמו מייצר את המשבר?",
+      "title": "היציבות מולידה את הנפילה",
       "card": "share/cards/he/econ-7-1.png",
       "page": "d/econ-7-1-he.html"
     },
@@ -2071,7 +2071,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "minsky",
-      "title": "What If the Calm Itself Produces the Crisis?",
+      "title": "Stability Breeds the Fall",
       "card": "share/cards/en/econ-7-1.png",
       "page": "d/econ-7-1-en.html"
     },
@@ -2081,7 +2081,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "bagehot",
-      "title": "מה עושים ברגע הפאניקה?",
+      "title": "רגע הפאניקה",
       "card": "share/cards/he/econ-7-2.png",
       "page": "d/econ-7-2-he.html"
     },
@@ -2091,7 +2091,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "bagehot",
-      "title": "What Do You Do at the Moment of Panic?",
+      "title": "The Moment of Panic",
       "card": "share/cards/en/econ-7-2.png",
       "page": "d/econ-7-2-en.html"
     },
@@ -2101,7 +2101,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "fisher",
-      "title": "למה החזרת חוב יכולה להחמיר את המשבר?",
+      "title": "כשההחזר מכאיב",
       "card": "share/cards/he/econ-7-3.png",
       "page": "d/econ-7-3-he.html"
     },
@@ -2111,7 +2111,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "fisher",
-      "title": "Why Can Paying Back Debt Make the Crisis Worse?",
+      "title": "When Paying Back Hurts",
       "card": "share/cards/en/econ-7-3.png",
       "page": "d/econ-7-3-en.html"
     },
@@ -2121,7 +2121,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "friedman",
-      "title": "ואולי זה בכלל לא כשל של השוק?",
+      "title": "כשהמדינה שמטה את הקרקע",
       "card": "share/cards/he/econ-7-4.png",
       "page": "d/econ-7-4-he.html"
     },
@@ -2131,7 +2131,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "friedman",
-      "title": "What If It Wasn't a Market Failure at All?",
+      "title": "When the State Pulled the Rug",
       "card": "share/cards/en/econ-7-4.png",
       "page": "d/econ-7-4-en.html"
     },
@@ -2141,7 +2141,7 @@
       "subject": "economics",
       "lang": "he",
       "thinkerId": "reinhart-rogoff",
-      "title": "למה זה ממשיך לקרות?",
+      "title": "הדפוס שחוזר שוב ושוב",
       "card": "share/cards/he/econ-7-5.png",
       "page": "d/econ-7-5-he.html"
     },
@@ -2151,7 +2151,7 @@
       "subject": "economics",
       "lang": "en",
       "thinkerId": "reinhart-rogoff",
-      "title": "Why Does It Keep Happening?",
+      "title": "The Pattern That Keeps Returning",
       "card": "share/cards/en/econ-7-5.png",
       "page": "d/econ-7-5-en.html"
     },
@@ -2162,7 +2162,7 @@
       "lang": "he",
       "thinkerId": null,
       "kind": "summary",
-      "title": "כשכל ההסברים נפגשו במקום אחד",
+      "title": "משבר אחד, כל ההסברים",
       "card": "share/cards/he/econ-7-6.png",
       "page": "d/econ-7-6-he.html"
     },
@@ -2173,7 +2173,7 @@
       "lang": "en",
       "thinkerId": null,
       "kind": "summary",
-      "title": "When All the Explanations Met in One Place",
+      "title": "One Crisis, Every Explanation",
       "card": "share/cards/en/econ-7-6.png",
       "page": "d/econ-7-6-en.html"
     },
