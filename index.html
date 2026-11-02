@@ -27004,7 +27004,7 @@ if (typeof corpusData === 'undefined' || typeof economicsData === 'undefined'
 // App Store release. The iOS-only update-banner checkForUpdate() compares
 // this against corpusapp.io/version.json to decide whether to prompt the
 // user to grab the newest App Store build.
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.0.1';
 
 // ── Haptics ────────────────────────────────────────────────────────────
 // Single entry point for every haptic in the app. Kinds:
@@ -45899,6 +45899,11 @@ const CAROUSEL_ORDER = {
     // D1 Simon, D3 Thaler (also D4 Thaler-and-Sunstein under same id),
     // D5 Shiller, D6 Gigerenzer. Order: dialogue of first appearance.
     'simon', 'thaler', 'shiller', 'gigerenzer',
+    // Ch7: Money and Crises. Friedman (ch1) already listed above (D4).
+    // D1 Minsky, D2 Bagehot, D3 Fisher, D5 Reinhart-and-Rogoff (shared
+    // card on the Rogoff portrait until a joint illustration lands).
+    // D6 is the chapter summary (no card).
+    'minsky', 'bagehot', 'fisher', 'reinhart-rogoff',
   ],
   psychology: [
     // Ch1: What is the mind?

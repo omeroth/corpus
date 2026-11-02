@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-30T16:50:03.815Z",
+  "generatedAt": "2026-11-02T13:24:38.657Z",
   "items": [
     {
       "thinkerId": "socrates",
@@ -772,6 +772,46 @@
       "page": "t/gigerenzer-he.html"
     },
     {
+      "thinkerId": "minsky",
+      "subject": "economics",
+      "lang": "he",
+      "name": "היימן מינסקי",
+      "era": "1919–1996",
+      "cardLandscape": "share/thinkers/he/minsky.png",
+      "cardPortrait": "share/thinkers/portrait/he/minsky.png",
+      "page": "t/minsky-he.html"
+    },
+    {
+      "thinkerId": "bagehot",
+      "subject": "economics",
+      "lang": "he",
+      "name": "וולטר בייג'הוט",
+      "era": "1826–1877",
+      "cardLandscape": "share/thinkers/he/bagehot.png",
+      "cardPortrait": "share/thinkers/portrait/he/bagehot.png",
+      "page": "t/bagehot-he.html"
+    },
+    {
+      "thinkerId": "fisher",
+      "subject": "economics",
+      "lang": "he",
+      "name": "אירווינג פישר",
+      "era": "1867–1947",
+      "cardLandscape": "share/thinkers/he/fisher.png",
+      "cardPortrait": "share/thinkers/portrait/he/fisher.png",
+      "page": "t/fisher-he.html"
+    },
+    {
+      "thinkerId": "reinhart-rogoff",
+      "subject": "economics",
+      "lang": "he",
+      "name": "ריינהרט ורוגוף",
+      "era": "1955– · 1953–",
+      "cardLandscape": "share/thinkers/he/reinhart-rogoff.png",
+      "cardPortrait": "share/thinkers/portrait/he/reinhart-rogoff.png",
+      "page": "t/reinhart-rogoff-he.html"
+    },
+    {
       "thinkerId": "lacan",
       "subject": "psychology",
       "lang": "he",
@@ -1350,6 +1390,46 @@
       "cardLandscape": "share/thinkers/en/gigerenzer.png",
       "cardPortrait": "share/thinkers/portrait/en/gigerenzer.png",
       "page": "t/gigerenzer-en.html"
+    },
+    {
+      "thinkerId": "minsky",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Hyman Minsky",
+      "era": "1919–1996",
+      "cardLandscape": "share/thinkers/en/minsky.png",
+      "cardPortrait": "share/thinkers/portrait/en/minsky.png",
+      "page": "t/minsky-en.html"
+    },
+    {
+      "thinkerId": "bagehot",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Walter Bagehot",
+      "era": "1826–1877",
+      "cardLandscape": "share/thinkers/en/bagehot.png",
+      "cardPortrait": "share/thinkers/portrait/en/bagehot.png",
+      "page": "t/bagehot-en.html"
+    },
+    {
+      "thinkerId": "fisher",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Irving Fisher",
+      "era": "1867–1947",
+      "cardLandscape": "share/thinkers/en/fisher.png",
+      "cardPortrait": "share/thinkers/portrait/en/fisher.png",
+      "page": "t/fisher-en.html"
+    },
+    {
+      "thinkerId": "reinhart-rogoff",
+      "subject": "economics",
+      "lang": "en",
+      "name": "Reinhart and Rogoff",
+      "era": "1955– · 1953–",
+      "cardLandscape": "share/thinkers/en/reinhart-rogoff.png",
+      "cardPortrait": "share/thinkers/portrait/en/reinhart-rogoff.png",
+      "page": "t/reinhart-rogoff-en.html"
     },
     {
       "thinkerId": "wundt",

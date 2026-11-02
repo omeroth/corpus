@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-30T16:49:45.285Z",
+  "generatedAt": "2026-11-02T13:24:29.483Z",
   "items": [
     {
       "weekId": 1,
@@ -1912,6 +1912,128 @@
       "title": "Are we really rational?",
       "card": "share/cards/en/econ-6-7.png",
       "page": "d/econ-6-7-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 1,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "minsky",
+      "title": "מה אם השקט עצמו מייצר את המשבר?",
+      "card": "share/cards/he/econ-7-1.png",
+      "page": "d/econ-7-1-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 1,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "minsky",
+      "title": "What If the Calm Itself Produces the Crisis?",
+      "card": "share/cards/en/econ-7-1.png",
+      "page": "d/econ-7-1-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 2,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "bagehot",
+      "title": "מה עושים ברגע הפאניקה?",
+      "card": "share/cards/he/econ-7-2.png",
+      "page": "d/econ-7-2-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 2,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "bagehot",
+      "title": "What Do You Do at the Moment of Panic?",
+      "card": "share/cards/en/econ-7-2.png",
+      "page": "d/econ-7-2-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 3,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "fisher",
+      "title": "למה החזרת חוב יכולה להחמיר את המשבר?",
+      "card": "share/cards/he/econ-7-3.png",
+      "page": "d/econ-7-3-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 3,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "fisher",
+      "title": "Why Can Paying Back Debt Make the Crisis Worse?",
+      "card": "share/cards/en/econ-7-3.png",
+      "page": "d/econ-7-3-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 4,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "friedman",
+      "title": "ואולי זה בכלל לא כשל של השוק?",
+      "card": "share/cards/he/econ-7-4.png",
+      "page": "d/econ-7-4-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 4,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "friedman",
+      "title": "What If It Wasn't a Market Failure at All?",
+      "card": "share/cards/en/econ-7-4.png",
+      "page": "d/econ-7-4-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 5,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": "reinhart-rogoff",
+      "title": "למה זה ממשיך לקרות?",
+      "card": "share/cards/he/econ-7-5.png",
+      "page": "d/econ-7-5-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 5,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": "reinhart-rogoff",
+      "title": "Why Does It Keep Happening?",
+      "card": "share/cards/en/econ-7-5.png",
+      "page": "d/econ-7-5-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 6,
+      "subject": "economics",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "כשכל ההסברים נפגשו במקום אחד",
+      "card": "share/cards/he/econ-7-6.png",
+      "page": "d/econ-7-6-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 6,
+      "subject": "economics",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "When All the Explanations Met in One Place",
+      "card": "share/cards/en/econ-7-6.png",
+      "page": "d/econ-7-6-en.html"
     },
     {
       "weekId": 1,

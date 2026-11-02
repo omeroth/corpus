@@ -878,6 +878,77 @@ const THINKERS = [
     bio: 'הפסיכולוג הגרמני שחלק על הגישה של כהנמן וטברסקי. טען שקיצורי דרך קוגניטיביים אינם פגם אלא כלי: היוריסטיקה שמתעלמת מרוב המידע עשויה להיות מדויקת ויעילה יותר משיטות מורכבות, אם היא מותאמת לסביבה שבה היא פועלת. מנהל ותיק במכון מקס פלנק בברלין, מחבר "רציונליות לבני תמותה" (2008).',
     quote: '"היוריסטיקה היא אסטרטגיה שמתעלמת מחלק מהמידע, במטרה לקבל החלטות מהר יותר, בחיסכון רב יותר ו/או במדויק יותר משיטות מורכבות יותר."',
   },
+  // ───── Economics chapter 7 — "Money and Crises". Minsky (D1), Bagehot
+  // (D2), Fisher (D3), Reinhart-and-Rogoff (D5) are new; Friedman (D4) is
+  // reused from chapter 1. D6 is the chapter summary (thinkerId: null,
+  // isSummary: true), no card. Reinhart and Rogoff share one card using
+  // the Rogoff portrait (./images/rogoff.webp) until a joint illustration
+  // lands — same Deci-and-Ryan / Kahneman-and-Tversky pattern used
+  // elsewhere, with a combined display name on the dialogue thinker.
+  //
+  // Source-quote provenance on the three verified-and-corrected sources:
+  //   Minsky  → attribution shifted from Can "It" Happen Again? (1982, as the
+  //             docx had it) to John Maynard Keynes (Columbia University
+  //             Press, 1975, p. 126), the only verifiable source for the
+  //             "Stability, even of an expansion, is destabilizing…" line.
+  //             The 1982 attribution the docx carried is a secondary-source
+  //             error, repeated across the web. "the more adventuresome"
+  //             restored (dropped in some citations).
+  //   Bagehot → short form with ellipsis; the quote is in Lombard Street ch
+  //             II (Project Gutenberg lines 1230–1232). The docx had "a
+  //             monetary market" — Bagehot writes "the money market"
+  //             throughout the book (and the book's subtitle is "A
+  //             Description of the Money Market"); corrected to his
+  //             wording, trailing clause "when a foreign drain is added to
+  //             a domestic drain" cut with a Unicode ellipsis.
+  //   Fisher  → "key" → "chief secret" (per the 1933 Econometrica paper,
+  //             §17 p. 344, verified from the FRASER-hosted scan); "Here is
+  //             the great paradox" → "Then we have the great paradox" (per
+  //             source); mid-sentence "mass effect of the stampede"
+  //             clause cut with an ellipsis to preserve the two signature
+  //             sentences cleanly.
+  // Bernanke, Reinhart+Rogoff and the FCIC quotes are verified direct and
+  // ship as the docx has them. No em-dashes in any copy.
+  {
+    id: 'minsky',
+    name: 'היימן מינסקי',
+    era: '1919–1996',
+    emoji: '🌊',
+    image: './images/minsky.webp',
+    subject: 'economics',
+    bio: 'הכלכלן האמריקאי שטען שהמשברים הפיננסיים אינם זעזועים חיצוניים אלא תוצר פנימי של השקט שקדם להם. פיתח את "השערת חוסר היציבות הפיננסית" והבחין בין מימון מגודר, ספקולטיבי ופונזי. נותר בשולי הזרם המרכזי כמעט כל חייו, ושמו חזר לכותרות ב-2008, כש"רגע מינסקי" הפך למונח שגור.',
+    quote: '״יציבות, גם של התרחבות, היא מערערת יציבות, משום שהמימון הנועז יותר של השקעות משתלם למובילים, והאחרים הולכים בעקבותיהם.״',
+  },
+  {
+    id: 'bagehot',
+    name: 'וולטר בייג\'הוט',
+    era: '1826–1877',
+    emoji: '🏛️',
+    image: './images/bagehot.webp',
+    subject: 'economics',
+    bio: 'עורך העיתון "האקונומיסט" במאה התשע עשרה, שניסח את תפקידו של הבנק המרכזי כמלווה של מוצא אחרון: ברגע של פאניקה יש ללוות בהיקף גדול, בריבית גבוהה ונגד ביטחונות טובים, כדי להציל בנקים נזילים ולהפיל חדלי פירעון. ספרו "לומברד סטריט" (1873) נותר הטקסט המכונן של פעולת בנק מרכזי במשבר.',
+    quote: '״הלוואות גדולות מאוד בריבית גבוהה מאוד הן התרופה הטובה ביותר למחלה החמורה ביותר של שוק הכסף…״',
+  },
+  {
+    id: 'fisher',
+    name: 'אירווינג פישר',
+    era: '1867–1947',
+    emoji: '📉',
+    image: './images/fisher.webp',
+    subject: 'economics',
+    bio: 'הכלכלן האמריקאי שימים ספורים לפני התרסקות 1929 הצהיר שהמניות הגיעו ל"רמה גבוהה קבועה", והפסיד את כל הונו. ארבע שנים לאחר מכן פרסם את "התיאוריה של דפלציית חוב במשבר גדול", שהסבירה את המנגנון שהרס אותו: חוב גדול וירידת מחירים ניזונים זה מזה, והמאמץ של כל פרט להקטין את חובו מכביד עליו עוד יותר.',
+    quote: '״עצם המאמץ של פרטים להקל את נטל חובותיהם מגדיל אותו… ואז עומד בפנינו הפרדוקס הגדול שהוא, לדעתי, הסוד המרכזי של רוב, אם לא כל, השפל הגדול: ככל שהחייבים משלמים יותר, כך הם חייבים יותר.״',
+  },
+  {
+    id: 'reinhart-rogoff',
+    name: 'ריינהרט ורוגוף',
+    era: '1955– · 1953–',
+    emoji: '🔁',
+    image: './images/rogoff.webp',
+    subject: 'economics',
+    bio: 'קרמן ריינהרט וקנת\' רוגוף אספו נתונים על 66 מדינות לאורך שמונה מאות שנה, והראו שדפוס המשברים הפיננסיים חוזר על עצמו: הון זורם פנימה, חוב מצטבר, מחירי נכסים עולים, ואז מגיע ההסבר למה "הפעם זה שונה". בספרם מ-2009 פירקו את האמונה שמדינות עשירות חסינות ממשברים בנקאיים.',
+    quote: '״משפט המפתח ב״הפעם זה שונה״ טמון באמונה המושרשת שהמשברים הפיננסיים הם דברים שקורים לאנשים אחרים, במדינות אחרות, בזמנים אחרים.״',
+  },
   // ───── Psychology chapter 7 — "Whom does therapy serve?" (new in ch7).
   // Lacan: D1 + D2. Frances: D4. Illouz: D5. Han: D6. Foucault (D3) is
   // reused from the ch5 entry above. All four carry subject:'psychology'
@@ -1016,6 +1087,15 @@ const THINKERS_EN = [
   { id:'thaler',     name:'Richard Thaler',   era:'1945–',     emoji:'🪙', image:'./images/thaler.webp',     subject:'economics', bio:'The American economist who brought psychology into economics. Studied the "endowment effect", by which people demand more money to give up an object than they will pay to acquire it, and "mental accounting", in which money is divided in the head into separate pots with different rules. Together with Cass Sunstein developed the idea of the "nudge": designing the environment so that the choices that serve us are the easy ones. Received the Nobel Prize in Economics in 2017.', quote:'"Mental accounting is the set of cognitive operations used by individuals and households to organize, evaluate, and keep track of financial activities."' },
   { id:'shiller',    name:'Robert Shiller',   era:'1946–',     emoji:'🎢', image:'./images/shiller.webp',    subject:'economics', bio:'The American economist who showed that stock prices move far more than the facts justify, five to thirteen times more. Linked psychology to market economics and published "Irrational Exuberance" in 2000, just before the dot-com bubble burst, and in its 2005 edition warned about the housing market. Received the Nobel Prize in Economics in 2013.',                                                                                                                                                                                                                               quote:'"Measures of stock price volatility over the past century appear to be far too high, five to thirteen times too high, to be attributed to new information about future real dividends."' },
   { id:'gigerenzer', name:'Gerd Gigerenzer',  era:'1947–',     emoji:'🧭', image:'./images/gigerenzer.webp', subject:'economics', bio:'The German psychologist who disputed Kahneman and Tversky\'s approach. Argued that cognitive shortcuts are not flaws but tools: a heuristic that ignores most of the information can be more accurate and more efficient than complex methods, when it is matched to the environment in which it operates. Long-time director at the Max Planck Institute in Berlin and author of "Rationality for Mortals" (2008).',                                                                                                                                               quote:'"A heuristic is a strategy that ignores part of the information, with the goal of making decisions more quickly, frugally, and/or accurately than more complex methods."' },
+  // Economics chapter 7 — "Money and Crises". Minsky, Bagehot, Fisher
+  // are new; Friedman reused from ch1; Reinhart-and-Rogoff share one card
+  // using the Rogoff portrait until a joint illustration lands. D6 is the
+  // chapter summary (no card). Full source-quote provenance on each of
+  // the three corrected lines is in the matching HE entries above.
+  { id:'minsky',          name:'Hyman Minsky',          era:'1919–1996', emoji:'🌊',  image:'./images/minsky.webp',  subject:'economics', bio:'The American economist who argued that financial crises are not external shocks but an internal product of the calm that preceded them. Developed the "financial instability hypothesis" and distinguished between hedge, speculative, and Ponzi finance. Remained on the margins of the mainstream almost all his life; his name returned to the headlines in 2008, when "the Minsky moment" became a common term.', quote:'"Stability, even of an expansion, is destabilizing in that the more adventuresome financing of investment pays off to the leaders, and others follow."' },
+  { id:'bagehot',         name:'Walter Bagehot',        era:'1826–1877', emoji:'🏛️', image:'./images/bagehot.webp', subject:'economics', bio:'Nineteenth-century editor of The Economist, who defined the central bank\'s role as the lender of last resort: at the moment of panic, lend generously, at a high rate, against good collateral, to save illiquid banks while letting insolvent ones fall. His book "Lombard Street" (1873) remains the founding text on how a central bank should act in a crisis.', quote:'"Very large loans at very high rates are the best remedy for the worst malady of the money market…"' },
+  { id:'fisher',          name:'Irving Fisher',         era:'1867–1947', emoji:'📉', image:'./images/fisher.webp',  subject:'economics', bio:'The American economist who, days before the 1929 crash, publicly declared that stock prices had reached "a permanently high plateau" and lost his entire fortune. Four years later he published "The Debt-Deflation Theory of Great Depressions", which explained the mechanism that ruined him: a large debt and a fall in prices feed each other, and each individual\'s effort to reduce their debt makes it heavier.', quote:'"The very effort of individuals to lessen their burden of debts increases it… Then we have the great paradox which, I submit, is the chief secret of most, if not all, great depressions: The more the debtors pay, the more they owe."' },
+  { id:'reinhart-rogoff', name:'Reinhart and Rogoff',   era:'1955– · 1953–', emoji:'🔁', image:'./images/rogoff.webp', subject:'economics', bio:'Carmen Reinhart and Kenneth Rogoff collected data on 66 countries across eight hundred years and showed that the pattern of financial crises repeats itself: capital flows in, debt accumulates, asset prices rise, and then comes the explanation of why "this time is different". Their 2009 book dismantled the belief that rich countries are immune to banking crises.', quote:'"The essence of the this-time-is-different syndrome is the firmly held belief that financial crises are things that happen to other people, in other countries, at other times."' },
   // Psychology thinkers
   { id:'wundt',   name:'Wilhelm Wundt',    era:'1832–1920', emoji:'🧪', image:'./images/wundt.webp',   subject:'psychology', bio:'The German psychologist who founded the world\'s first psychological laboratory, in Leipzig in 1879. Declared that the mind is a subject for scientific inquiry - not for philosophical speculation. His method was abandoned; his idea still rules.',                                                                                                                                                                            quote:'"The book which I here present to the public is an attempt to mark out a new domain of science."' },
   { id:'james',   name:'William James',    era:'1842–1910', emoji:'🌊', image:'./images/james.webp',   subject:'psychology', bio:'An American philosopher-psychologist at Harvard. Argued against Wundt that consciousness is not a chain of discrete moments - it is a river. Coined the term "stream of consciousness" and founded functional psychology: not what consciousness is made of, but what it does.',                                                                                                                                    quote:'"Consciousness does not appear to itself chopped up in bits. It is nothing jointed - it flows."' },
