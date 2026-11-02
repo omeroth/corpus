@@ -792,6 +792,16 @@ const LENGTH_CHECK_EXCEPTIONS = new Set([
   // chapter crossing 60% must still fail. Do NOT widen this set
   // without a comparable justification per entry.
   'philosophy:6',
+  // Added 2026-11-02 during the economics:7 (Money and Crises) verbatim
+  // import. Same shape as the two entries above: the chapter's quiz
+  // distractors are hand-authored one-liners while the correct answer
+  // restates the dialogue's thesis in full (strict-longest at 14/18 =
+  // 78% in both HE and EN). Rewriting distractors would mean rewriting
+  // the source doc. One-chapter trade-off to fix in a later release
+  // by widening the wrong options to match the correct option's
+  // length and specificity. Do NOT widen this set without a comparable
+  // justification per entry.
+  'economics:7',
 ]);
 
 const lengthIssues = [];
