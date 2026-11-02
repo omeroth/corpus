@@ -258,8 +258,19 @@ const THINKERS = [
     name: 'ויליאם ג\'יימס',
     era: '1842–1910',
     emoji: '🌊',
+    // James crosses two subjects. In psychology ch1 he's the stream-of-
+    // consciousness thinker; in philosophy ch7 ("God, Faith and Proof")
+    // he's the pragmatist arguing the right to believe without proof.
+    // Same person, one id. Kahneman-shape multi-subject entry: `image`
+    // is the psychology fallback (his primary bucket), `images{}` holds
+    // the per-subject portrait, `subject` stays psychology as primary.
     image: './images/james.webp',
+    images: {
+      psychology: './images/james.webp',
+      philosophy: './images/james-philo.webp',
+    },
     subject: 'psychology',
+    subjects: ['psychology', 'philosophy'],
     bio: 'פילוסוף-פסיכולוג אמריקאי מהרווארד. טען כנגד וונדט שהתודעה איננה שרשרת של רגעים בדידים - היא נהר. הגה את המושג "זרם התודעה" וייסד את הפסיכולוגיה הפונקציונלית: לא ממה עשויה התודעה, אלא מה היא עושה.',
     quote: '"התודעה אינה מצטיירת לעצמה כקטועה לחתיכות. אין בה דבר שאפשר לחבר - היא זורמת."',
   },
@@ -682,8 +693,21 @@ const THINKERS = [
     name: 'תומאס אקווינס',
     era: '1225–1274',
     emoji: '✝️',
+    // Aquinas crosses two subjects. In economics he's the just-price
+    // thinker; in philosophy ch7 ("God, Faith and Proof") he's the
+    // cosmological-argument thinker. Kahneman-shape multi-subject
+    // entry: single id, `image` is the fallback (economics file, matching
+    // his primary subject), `images{}` holds the per-subject portrait,
+    // `subject` stays economics as primary (where he debuted), and
+    // `subjects` lists both so the validator doesn't flag a philosophy
+    // dialogue referencing an economics-only id.
     image: './images/aquinas.webp',
+    images: {
+      economics:  './images/aquinas.webp',
+      philosophy: './images/aquinas-philo.webp',
+    },
     subject: 'economics',
+    subjects: ['economics', 'philosophy'],
     bio: 'נזיר דומיניקני ופילוסוף מימי הביניים שניסח את הרעיון של "המחיר הצודק", וקבע שלא כל מה שחוקי בשוק הוא צודק.',
     quote: '״למכור דבר ביותר מערכו האמיתי הוא חטא, אפילו אם אין חוק שאוסר זאת.״',
   },
@@ -949,6 +973,41 @@ const THINKERS = [
     bio: 'קרמן ריינהרט וקנת\' רוגוף אספו נתונים על 66 מדינות לאורך שמונה מאות שנה, והראו שדפוס המשברים הפיננסיים חוזר על עצמו: הון זורם פנימה, חוב מצטבר, מחירי נכסים עולים, ואז מגיע ההסבר למה "הפעם זה שונה". בספרם מ-2009 פירקו את האמונה שמדינות עשירות חסינות ממשברים בנקאיים.',
     quote: '״משפט המפתח ב״הפעם זה שונה״ טמון באמונה המושרשת שהמשברים הפיננסיים הם דברים שקורים לאנשים אחרים, במדינות אחרות, בזמנים אחרים.״',
   },
+  // ───── Philosophy chapter 7 — "God, Faith and Proof". Anselm (D1),
+  // Leibniz (D4), Kierkegaard (D5) are new; Aquinas (D2) gained a second
+  // subject bucket via the multi-subject rewrite above (economics →
+  // economics+philosophy, kahneman pattern); Hume (D3) and James (D6)
+  // are already defined above — Hume keeps his single-subject entry;
+  // James gained a second subject bucket via the rewrite above
+  // (psychology → psychology+philosophy, same pattern). D7 is the
+  // chapter summary (thinkerId: null, isSummary: true), no card.
+  {
+    id: 'anselm',
+    name: 'אנסלם מקנטרברי',
+    era: '1033–1109',
+    emoji: '🕊️',
+    image: './images/anselm.webp',
+    bio: 'נזיר בנדיקטיני וארכיבישוף מקנטרברי. ניסח במנחיו "פרוסלוגיון" (1078) את הטיעון שהתקבל שמו "האונטולוגי": אלוהים הוא "זה שאין להעלות על הדעת גדול ממנו", ועצם ההגדרה הזו מחייבת לדעתו שהוא קיים. הטיעון עורר מחלוקת כבר בחייו, והוא עדיין נדון עד היום.',
+    quote: '״וְהִנֵּה בְּוַדַּאי, זֶה שֶׁאֵין לְהַעֲלוֹת עַל הַדַּעַת גָּדוֹל מִמֶּנּוּ אֵינוֹ יָכוֹל לִהְיוֹת בַּשֵּׂכֶל בִּלְבַד.״',
+  },
+  {
+    id: 'leibniz',
+    name: 'גוטפריד וילהלם לייבניץ',
+    era: '1646–1716',
+    emoji: '⚖️',
+    image: './images/leibniz.webp',
+    bio: 'פילוסוף ומתמטיקאי גרמני, אחד הפולימתים הגדולים של המאה השבע עשרה. פיתח במקביל לניוטון את החשבון הדיפרנציאלי, ובפילוסופיה ניסה להסביר את הסבל בעולם בטענה שאלוהים, בשל טובו ויכולתו, בחר לברוא את "העולם הטוב ביותר האפשרי". וולטר לעג לרעיון ב"קנדיד" (1759), והוויכוח על טענת הטיאודיציאה לא נפסק מאז.',
+    quote: '״העולם הנוכחי הוא הטוב ביותר שבין העולמות האפשריים.״',
+  },
+  {
+    id: 'kierkegaard',
+    name: 'סרן קירקגור',
+    era: '1813–1855',
+    emoji: '🪜',
+    image: './images/kierkegaard.webp',
+    bio: 'פילוסוף דני, נחשב לאבי האקזיסטנציאליזם. חלק על ההרגל להציג את האמונה כמסקנה הגיונית ממה שהתגלה בעולם. בספריו "חיל ורעדה" (1843) ו"פחד ורעד" טען שהאמונה היא "קפיצה": מעשה של הפרט, לא ראיה, ודווקא כשהנתונים אינם מכריעים היא נדרשת.',
+    quote: '״האמונה היא דווקא אותו פרדוקס: שהפרט כפרט עומד מעל לכלל.״',
+  },
   // ───── Psychology chapter 7 — "Whom does therapy serve?" (new in ch7).
   // Lacan: D1 + D2. Frances: D4. Illouz: D5. Han: D6. Foucault (D3) is
   // reused from the ch5 entry above. All four carry subject:'psychology'
@@ -1052,7 +1111,7 @@ const THINKERS_EN = [
   { id:'kahneman', name:'Daniel Kahneman', era:'1934–2024', emoji:'🧠', image:'./images/kahneman-econ.webp', images:{ economics:'./images/kahneman-econ.webp', psychology:'./images/kahneman-psy.webp' }, subject:'economics', subjects:['economics','psychology'], bio:'The Israeli-American psychologist who won the Nobel Prize in Economics in 2002 for revealing the cognitive biases that influence economic decisions.', quote:'"A loss of $100 is felt about twice as strongly as a gain of $100."' },
   { id:'ricardo', name:'David Ricardo', era:'1772–1823', emoji:'🌾', image:'./images/ricardo.webp', subject:'economics', bio:'The British economist who formulated the law of diminishing marginal returns and the theory of income distribution between classes.', quote:'"As more and more labor is added to the same quantity of land - the additional unit of labor will add less production than the previous one."' },
   { id:'piketty', name:'Thomas Piketty', era:'1971–', emoji:'📊', image:'./images/piketty.webp', subject:'economics', bio:'The French economist who measured capital over 300 years, and discovered the formula r > g - the rate of return on capital is always greater than the rate of growth.', quote:'"When the rate of return on capital significantly exceeds the growth rate of the economy - inherited wealth grows faster than the entire economy."' },
-  { id:'aquinas', name:'Thomas Aquinas', era:'1225–1274', emoji:'✝️', image:'./images/aquinas.webp', subject:'economics', bio:'A Dominican friar and medieval philosopher who formulated the idea of "the just price," and declared that not everything legal in the market is just.', quote:'"To sell something for more than its real value is a sin, even if no law forbids it."' },
+  { id:'aquinas', name:'Thomas Aquinas', era:'1225–1274', emoji:'✝️', image:'./images/aquinas.webp', images:{ economics:'./images/aquinas.webp', philosophy:'./images/aquinas-philo.webp' }, subject:'economics', subjects:['economics','philosophy'], bio:'A Dominican friar and medieval philosopher who formulated the idea of "the just price," and declared that not everything legal in the market is just.', quote:'"To sell something for more than its real value is a sin, even if no law forbids it."' },
   { id:'pareto', name:'Vilfredo Pareto', era:'1848–1923', emoji:'⚖️', image:'./images/pareto.webp', subject:'economics', bio:'The Italian economist who tried to separate economics from moral questions, and formulated the concept of "Pareto efficiency" which became the foundation of modern economics.', quote:'"An economic state is optimal when it is impossible to improve the welfare of one person without reducing the welfare of another."' },
   { id:'rawls', name:'John Rawls', era:'1921–2002', emoji:'⚖️', image:'./images/rawls.webp', images:{ philosophy:'./images/rawls.webp', economics:'./images/rawls-econ.webp' }, subject:'economics', subjects:['economics','philosophy'], bio:'The American philosopher who formulated "the veil of ignorance," a thought experiment that tries to define a just society without knowing what your position in it will be.', quote:'"Only behind a veil of ignorance can we choose true principles of justice."' },
   { id:'nozick', name:'Robert Nozick', era:'1938–2002', emoji:'🗽', image:'./images/nozick.webp', images:{ philosophy:'./images/nozick.webp', economics:'./images/nozick-econ.webp' }, subject:'economics', subjects:['economics','philosophy'], bio:'The American libertarian philosopher who formulated "justice as entitlement" as a response to Rawls: justice is measured by process, not by outcome.', quote:'"A just situation is any situation that was achieved through just means."' },
@@ -1096,9 +1155,17 @@ const THINKERS_EN = [
   { id:'bagehot',         name:'Walter Bagehot',        era:'1826–1877', emoji:'🏛️', image:'./images/bagehot.webp', subject:'economics', bio:'Nineteenth-century editor of The Economist, who defined the central bank\'s role as the lender of last resort: at the moment of panic, lend generously, at a high rate, against good collateral, to save illiquid banks while letting insolvent ones fall. His book "Lombard Street" (1873) remains the founding text on how a central bank should act in a crisis.', quote:'"Very large loans at very high rates are the best remedy for the worst malady of the money market…"' },
   { id:'fisher',          name:'Irving Fisher',         era:'1867–1947', emoji:'📉', image:'./images/fisher.webp',  subject:'economics', bio:'The American economist who, days before the 1929 crash, publicly declared that stock prices had reached "a permanently high plateau" and lost his entire fortune. Four years later he published "The Debt-Deflation Theory of Great Depressions", which explained the mechanism that ruined him: a large debt and a fall in prices feed each other, and each individual\'s effort to reduce their debt makes it heavier.', quote:'"The very effort of individuals to lessen their burden of debts increases it… Then we have the great paradox which, I submit, is the chief secret of most, if not all, great depressions: The more the debtors pay, the more they owe."' },
   { id:'reinhart-rogoff', name:'Reinhart and Rogoff',   era:'1955– · 1953–', emoji:'🔁', image:'./images/rogoff.webp', subject:'economics', bio:'Carmen Reinhart and Kenneth Rogoff collected data on 66 countries across eight hundred years and showed that the pattern of financial crises repeats itself: capital flows in, debt accumulates, asset prices rise, and then comes the explanation of why "this time is different". Their 2009 book dismantled the belief that rich countries are immune to banking crises.', quote:'"The essence of the this-time-is-different syndrome is the firmly held belief that financial crises are things that happen to other people, in other countries, at other times."' },
+  // Philosophy chapter 7 — "God, Faith and Proof". Anselm (D1), Leibniz (D4),
+  // Kierkegaard (D5) are new; Aquinas (D2) and James (D6) gained a second
+  // subject bucket via the multi-subject rewrites above (Kahneman pattern:
+  // single id, images{} map, primary subject preserved, subjects[] carries
+  // both buckets). Hume is single-subject and reused unchanged.
+  { id:'anselm',      name:'Anselm of Canterbury',       era:'1033–1109', emoji:'🕊️', image:'./images/anselm.webp',      bio:'A Benedictine monk and Archbishop of Canterbury. In his "Proslogion" (1078) he formulated what later became known as the "ontological argument": God is "that than which nothing greater can be conceived", and the definition itself requires his existence. The argument was already contested in his own lifetime, and it is still debated today.',                                                                                                                                                             quote:'"Certainly that than which a greater cannot be conceived cannot exist in the understanding alone."' },
+  { id:'leibniz',     name:'Gottfried Wilhelm Leibniz',  era:'1646–1716', emoji:'⚖️', image:'./images/leibniz.webp',     bio:'A German philosopher and mathematician, one of the great polymaths of the seventeenth century. Developed the differential calculus in parallel with Newton, and in philosophy tried to explain suffering in the world by arguing that God, because of his goodness and ability, chose to create "the best of all possible worlds". Voltaire mocked the idea in "Candide" (1759), and the debate over theodicy has not stopped since.',                               quote:'"The present world is the best of all possible worlds."' },
+  { id:'kierkegaard', name:'Søren Kierkegaard',          era:'1813–1855', emoji:'🪜', image:'./images/kierkegaard.webp', bio:'A Danish philosopher, considered the father of existentialism. He contested the habit of presenting faith as a logical conclusion from what is revealed in the world. In "Fear and Trembling" (1843) he argued that faith is a "leap": an act of the individual, not evidence, and that it is precisely when the data do not decide the matter that faith is called for.',                                                                                                              quote:'"Faith is precisely this paradox, that the single individual as the single individual is higher than the universal."' },
   // Psychology thinkers
   { id:'wundt',   name:'Wilhelm Wundt',    era:'1832–1920', emoji:'🧪', image:'./images/wundt.webp',   subject:'psychology', bio:'The German psychologist who founded the world\'s first psychological laboratory, in Leipzig in 1879. Declared that the mind is a subject for scientific inquiry - not for philosophical speculation. His method was abandoned; his idea still rules.',                                                                                                                                                                            quote:'"The book which I here present to the public is an attempt to mark out a new domain of science."' },
-  { id:'james',   name:'William James',    era:'1842–1910', emoji:'🌊', image:'./images/james.webp',   subject:'psychology', bio:'An American philosopher-psychologist at Harvard. Argued against Wundt that consciousness is not a chain of discrete moments - it is a river. Coined the term "stream of consciousness" and founded functional psychology: not what consciousness is made of, but what it does.',                                                                                                                                    quote:'"Consciousness does not appear to itself chopped up in bits. It is nothing jointed - it flows."' },
+  { id:'james',   name:'William James',    era:'1842–1910', emoji:'🌊', image:'./images/james.webp',   images:{ psychology:'./images/james.webp', philosophy:'./images/james-philo.webp' }, subject:'psychology', subjects:['psychology','philosophy'], bio:'An American philosopher-psychologist at Harvard. Argued against Wundt that consciousness is not a chain of discrete moments - it is a river. Coined the term "stream of consciousness" and founded functional psychology: not what consciousness is made of, but what it does.',                                                                                                                                    quote:'"Consciousness does not appear to itself chopped up in bits. It is nothing jointed - it flows."' },
   { id:'freud',   name:'Sigmund Freud',    era:'1856–1939', emoji:'🛋', image:'./images/freud.webp',   subject:'psychology', bio:'An Austrian physician from Vienna who invented psychoanalysis in the late 19th century. Discovered that most mental activity happens beneath the surface, in the unconscious, shaping every conscious act. Overturned the Western picture of the self.',                                                                                                                                                             quote:'"The division of the psychical into what is conscious and what is unconscious is the fundamental premise of psycho-analysis."' },
   { id:'jung',    name:'Carl Gustav Jung', era:'1875–1961', emoji:'🌀', image:'./images/jung.webp',    subject:'psychology', bio:'A Swiss psychologist, Freud\'s senior student and later his rival. Argued that beneath the personal unconscious lies a collective unconscious - a layer shared by all humans, holding archetypes that recur across myths, dreams, and stories in every culture.',                                                                                                                                                    quote:'"In addition to our immediate consciousness, there exists a second psychic system of a collective, universal, and impersonal nature which is identical in all individuals."' },
   { id:'skinner', name:'B. F. Skinner',    era:'1904–1990', emoji:'🐦', image:'./images/skinner.webp', subject:'psychology', bio:'An American psychologist at Harvard who led the radical-behaviorist revolution. Argued that all talk of an inner "mind" is empty speculation - psychology can only be a science if it measures observable behavior and its consequences: reinforcements and punishments.',                                                                                                                                                quote:'"A person does not act upon the world, the world acts upon him."' },

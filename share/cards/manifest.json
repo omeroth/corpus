@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-02T13:24:29.483Z",
+  "generatedAt": "2026-11-02T14:34:42.886Z",
   "items": [
     {
       "weekId": 1,
@@ -980,6 +980,148 @@
       "title": "Seven Thinkers, One Question",
       "card": "share/cards/en/phil-6-8.png",
       "page": "d/phil-6-8-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 1,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "anselm",
+      "title": "הוכחה מתוך הגדרה",
+      "card": "share/cards/he/phil-7-1.png",
+      "page": "d/phil-7-1-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 1,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "anselm",
+      "title": "God From Definition Alone",
+      "card": "share/cards/en/phil-7-1.png",
+      "page": "d/phil-7-1-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 2,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "aquinas",
+      "title": "השרשרת חייבת להתחיל",
+      "card": "share/cards/he/phil-7-2.png",
+      "page": "d/phil-7-2-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 2,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "aquinas",
+      "title": "The Chain Must Start",
+      "card": "share/cards/en/phil-7-2.png",
+      "page": "d/phil-7-2-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 3,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "hume",
+      "title": "מה שתיכנון אינו מוכיח",
+      "card": "share/cards/he/phil-7-3.png",
+      "page": "d/phil-7-3-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 3,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "hume",
+      "title": "What Design Does Not Prove",
+      "card": "share/cards/en/phil-7-3.png",
+      "page": "d/phil-7-3-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 4,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "leibniz",
+      "title": "העולם האפשרי הטוב ביותר",
+      "card": "share/cards/he/phil-7-4.png",
+      "page": "d/phil-7-4-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 4,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "leibniz",
+      "title": "The Best Possible World",
+      "card": "share/cards/en/phil-7-4.png",
+      "page": "d/phil-7-4-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 5,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "kierkegaard",
+      "title": "אמונה אינה מסקנה",
+      "card": "share/cards/he/phil-7-5.png",
+      "page": "d/phil-7-5-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 5,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "kierkegaard",
+      "title": "Faith Is Not a Conclusion",
+      "card": "share/cards/en/phil-7-5.png",
+      "page": "d/phil-7-5-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 6,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "james",
+      "title": "הזכות להאמין",
+      "card": "share/cards/he/phil-7-6.png",
+      "page": "d/phil-7-6-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 6,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "james",
+      "title": "The Right to Believe",
+      "card": "share/cards/en/phil-7-6.png",
+      "page": "d/phil-7-6-en.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 7,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "שישה הוגים, שאלה אחת",
+      "card": "share/cards/he/phil-7-7.png",
+      "page": "d/phil-7-7-he.html"
+    },
+    {
+      "weekId": 7,
+      "dayId": 7,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": null,
+      "kind": "summary",
+      "title": "Six Thinkers, One Question",
+      "card": "share/cards/en/phil-7-7.png",
+      "page": "d/phil-7-7-en.html"
     },
     {
       "weekId": 1,

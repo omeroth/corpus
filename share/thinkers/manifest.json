@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-02T13:24:38.657Z",
+  "generatedAt": "2026-11-02T14:34:52.553Z",
   "items": [
     {
       "thinkerId": "socrates",
@@ -237,9 +237,19 @@
       "lang": "he",
       "name": "ויליאם ג'יימס",
       "era": "1842–1910",
-      "cardLandscape": "share/thinkers/he/james.png",
-      "cardPortrait": "share/thinkers/portrait/he/james.png",
-      "page": "t/james-he.html"
+      "cardLandscape": "share/thinkers/he/james-psychology.png",
+      "cardPortrait": "share/thinkers/portrait/he/james-psychology.png",
+      "page": "t/james-psychology-he.html"
+    },
+    {
+      "thinkerId": "james",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "ויליאם ג'יימס",
+      "era": "1842–1910",
+      "cardLandscape": "share/thinkers/he/james-philosophy.png",
+      "cardPortrait": "share/thinkers/portrait/he/james-philosophy.png",
+      "page": "t/james-philosophy-he.html"
     },
     {
       "thinkerId": "freud",
@@ -617,9 +627,19 @@
       "lang": "he",
       "name": "תומאס אקווינס",
       "era": "1225–1274",
-      "cardLandscape": "share/thinkers/he/aquinas.png",
-      "cardPortrait": "share/thinkers/portrait/he/aquinas.png",
-      "page": "t/aquinas-he.html"
+      "cardLandscape": "share/thinkers/he/aquinas-economics.png",
+      "cardPortrait": "share/thinkers/portrait/he/aquinas-economics.png",
+      "page": "t/aquinas-economics-he.html"
+    },
+    {
+      "thinkerId": "aquinas",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "תומאס אקווינס",
+      "era": "1225–1274",
+      "cardLandscape": "share/thinkers/he/aquinas-philosophy.png",
+      "cardPortrait": "share/thinkers/portrait/he/aquinas-philosophy.png",
+      "page": "t/aquinas-philosophy-he.html"
     },
     {
       "thinkerId": "pareto",
@@ -810,6 +830,36 @@
       "cardLandscape": "share/thinkers/he/reinhart-rogoff.png",
       "cardPortrait": "share/thinkers/portrait/he/reinhart-rogoff.png",
       "page": "t/reinhart-rogoff-he.html"
+    },
+    {
+      "thinkerId": "anselm",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "אנסלם מקנטרברי",
+      "era": "1033–1109",
+      "cardLandscape": "share/thinkers/he/anselm.png",
+      "cardPortrait": "share/thinkers/portrait/he/anselm.png",
+      "page": "t/anselm-he.html"
+    },
+    {
+      "thinkerId": "leibniz",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "גוטפריד וילהלם לייבניץ",
+      "era": "1646–1716",
+      "cardLandscape": "share/thinkers/he/leibniz.png",
+      "cardPortrait": "share/thinkers/portrait/he/leibniz.png",
+      "page": "t/leibniz-he.html"
+    },
+    {
+      "thinkerId": "kierkegaard",
+      "subject": "philosophy",
+      "lang": "he",
+      "name": "סרן קירקגור",
+      "era": "1813–1855",
+      "cardLandscape": "share/thinkers/he/kierkegaard.png",
+      "cardPortrait": "share/thinkers/portrait/he/kierkegaard.png",
+      "page": "t/kierkegaard-he.html"
     },
     {
       "thinkerId": "lacan",
@@ -1237,9 +1287,19 @@
       "lang": "en",
       "name": "Thomas Aquinas",
       "era": "1225–1274",
-      "cardLandscape": "share/thinkers/en/aquinas.png",
-      "cardPortrait": "share/thinkers/portrait/en/aquinas.png",
-      "page": "t/aquinas-en.html"
+      "cardLandscape": "share/thinkers/en/aquinas-economics.png",
+      "cardPortrait": "share/thinkers/portrait/en/aquinas-economics.png",
+      "page": "t/aquinas-economics-en.html"
+    },
+    {
+      "thinkerId": "aquinas",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Thomas Aquinas",
+      "era": "1225–1274",
+      "cardLandscape": "share/thinkers/en/aquinas-philosophy.png",
+      "cardPortrait": "share/thinkers/portrait/en/aquinas-philosophy.png",
+      "page": "t/aquinas-philosophy-en.html"
     },
     {
       "thinkerId": "pareto",
@@ -1432,6 +1492,36 @@
       "page": "t/reinhart-rogoff-en.html"
     },
     {
+      "thinkerId": "anselm",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Anselm of Canterbury",
+      "era": "1033–1109",
+      "cardLandscape": "share/thinkers/en/anselm.png",
+      "cardPortrait": "share/thinkers/portrait/en/anselm.png",
+      "page": "t/anselm-en.html"
+    },
+    {
+      "thinkerId": "leibniz",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Gottfried Wilhelm Leibniz",
+      "era": "1646–1716",
+      "cardLandscape": "share/thinkers/en/leibniz.png",
+      "cardPortrait": "share/thinkers/portrait/en/leibniz.png",
+      "page": "t/leibniz-en.html"
+    },
+    {
+      "thinkerId": "kierkegaard",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "Søren Kierkegaard",
+      "era": "1813–1855",
+      "cardLandscape": "share/thinkers/en/kierkegaard.png",
+      "cardPortrait": "share/thinkers/portrait/en/kierkegaard.png",
+      "page": "t/kierkegaard-en.html"
+    },
+    {
       "thinkerId": "wundt",
       "subject": "psychology",
       "lang": "en",
@@ -1447,9 +1537,19 @@
       "lang": "en",
       "name": "William James",
       "era": "1842–1910",
-      "cardLandscape": "share/thinkers/en/james.png",
-      "cardPortrait": "share/thinkers/portrait/en/james.png",
-      "page": "t/james-en.html"
+      "cardLandscape": "share/thinkers/en/james-psychology.png",
+      "cardPortrait": "share/thinkers/portrait/en/james-psychology.png",
+      "page": "t/james-psychology-en.html"
+    },
+    {
+      "thinkerId": "james",
+      "subject": "philosophy",
+      "lang": "en",
+      "name": "William James",
+      "era": "1842–1910",
+      "cardLandscape": "share/thinkers/en/james-philosophy.png",
+      "cardPortrait": "share/thinkers/portrait/en/james-philosophy.png",
+      "page": "t/james-philosophy-en.html"
     },
     {
       "thinkerId": "freud",
