@@ -802,6 +802,17 @@ const LENGTH_CHECK_EXCEPTIONS = new Set([
   // length and specificity. Do NOT widen this set without a comparable
   // justification per entry.
   'economics:7',
+  // Added 2026-11-02 during the philosophy:7 (God, Faith and Proof)
+  // verbatim import. Same shape as every entry above but even more
+  // skewed: strict-longest at 100% HE and 90% EN (every HE quiz, and
+  // 19 of 21 EN quizzes). The chapter's quiz pairs are hand-authored
+  // theological / argumentative positions (correct option: a two- or
+  // three-clause named thesis; wrong options: short dismissive
+  // negations of the thesis). Rewriting distractors would mean
+  // rewriting the source doc. One-chapter trade-off to fix in a later
+  // release by widening the wrong options; same policy as the three
+  // entries above.
+  'philosophy:7',
 ]);
 
 const lengthIssues = [];
