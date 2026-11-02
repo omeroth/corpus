@@ -170,6 +170,67 @@ for (const { constName, subject } of SUBJECTS_TO_EXTRACT) {
   subjects.push({ subject, constName, data: value });
 }
 
+// ─── Weeks-array shape check ────────────────────────────────────────────
+// Added 2026-11-02 after commit 159a4ee landed with a stray `},,` in
+// content/philosophy.js that evaluated to a hole in corpusData.weeks
+// (`[a,,b]` parses as `[a, undefined, b]`). The hole was syntax-valid
+// JavaScript — every other check downstream here passed, and the only
+// place it blew up was renderHome's bonus-chapter hoist, where the
+// filter+findIndex path doesn't guard against undefined entries.
+//
+// Catches: splice-produced holes, trailing-comma holes, explicit
+// `undefined` / `null` entries, and entries missing a usable id.
+// Every subject's weeks[] must be a dense array of objects with a
+// numeric-or-string id. Shape-of-data is this validator's point of
+// existence — "syntax-valid file with a hole in the array" is exactly
+// the class of bug this check exists to catch.
+const shapeIssues = [];
+for (const { subject, constName, data } of subjects) {
+  const weeks = data.weeks;
+  if (!Array.isArray(weeks)) {
+    shapeIssues.push({ issue: 'weeks is not an array', subject, detail: `${constName}.weeks is ${typeof weeks}` });
+    continue;
+  }
+  // Dense-array check: a trailing comma / splice `,,` leaves a hole that
+  // `in` returns false for and `[i]` returns undefined for. Walk every
+  // index explicitly — forEach/filter skip holes, so they'd miss it.
+  for (let i = 0; i < weeks.length; i++) {
+    if (!(i in weeks)) {
+      shapeIssues.push({
+        issue: 'weeks array has a hole',
+        subject,
+        detail: `${constName}.weeks[${i}] is a hole (likely a stray comma / splice bug — JS parses [a,,b] as [a, undefined, b])`,
+      });
+      continue;
+    }
+    const w = weeks[i];
+    if (w === undefined || w === null) {
+      shapeIssues.push({
+        issue: 'weeks entry is ' + (w === null ? 'null' : 'undefined'),
+        subject,
+        detail: `${constName}.weeks[${i}] is ${w}`,
+      });
+      continue;
+    }
+    if (typeof w !== 'object') {
+      shapeIssues.push({
+        issue: 'weeks entry is not an object',
+        subject,
+        detail: `${constName}.weeks[${i}] is a ${typeof w}`,
+      });
+      continue;
+    }
+    const idType = typeof w.id;
+    if (idType !== 'number' && idType !== 'string') {
+      shapeIssues.push({
+        issue: 'weeks entry has invalid id',
+        subject,
+        detail: `${constName}.weeks[${i}].id is ${JSON.stringify(w.id)} (${idType}); expected number or string`,
+      });
+    }
+  }
+}
+
 const thinkers = {};
 for (const name of THINKER_CONST_NAMES) {
   const literal = extractConstLiteral(scriptSrc, name);
@@ -1161,6 +1222,7 @@ const totalSubjects = subjects.map(s => s.subject).join(', ') || '(none)';
 console.log(`Loaded subjects: ${totalSubjects}`);
 console.log(`THINKERS: ${heIndex.size}, THINKERS_EN: ${enIndex.size}, referenced by dialogues: ${referencedIds.size}`);
 
+reportTable('Weeks-array shape errors (holes / undefined / null / bad id)', shapeIssues);
 reportTable('Days with no thinkerId (informational — reviewer eyeballs)', noThinkerRows);
 reportTable('Forward-check errors (unknown id / subject mismatch / missing portrait)', forwardIssues);
 reportTable('Cross-array consistency errors (HE ↔ EN)', arrayIssues);
@@ -1174,7 +1236,7 @@ reportTable('HTML entity errors (content strings should contain literal characte
 reportTable('Chapter emphasis errors (zero <strong> tags across all dialogue bodies)', emphasisIssues);
 reportTable('Unreferenced thinkers (never appear in any dialogue — warning only)', unreferenced);
 
-const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length + surfacingIssues.length + distributionIssues.length + lengthIssues.length + entityIssues.length + emphasisIssues.length;
+const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length + surfacingIssues.length + distributionIssues.length + lengthIssues.length + entityIssues.length + emphasisIssues.length + shapeIssues.length;
 if (hardErrorCount > 0) {
   console.error('');
   console.error('╔════════════════════════════════════════════════════════════════════╗');
