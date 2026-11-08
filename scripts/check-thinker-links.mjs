@@ -1210,6 +1210,84 @@ try {
   });
 }
 
+// ─── Deictic-quiz check (added after the philosophy ch1/d7 bug) ──────
+// A quiz question whose text refers to something external ("this
+// statement", "המשפט הזה", etc.) is only coherent if the section
+// carries an intro / introEn field holding that referent. Without it,
+// the renderer shows "Does this sentence reflect …?" with no sentence,
+// which is what shipped in philosophy ch1/d6, ch1/d7, ch2/d1, ch2/d3
+// until the fix landed. The streak-repair sampler already filters
+// deictic questions via _isDeicticQuestion at index.html:~41089, but
+// nothing was guarding the authored content itself — this check is
+// that guard.
+// Only phrases that genuinely require EXTERNAL context go here. "הטענה
+// הזו" ("this claim") is EXCLUDED on purpose: the economics + psychology
+// authoring pattern quotes the claim inside the question text itself
+// ("חבר אומר: '…' איך מרקס היה מערער על הטענה הזו?"), mirroring the
+// English "this claim" exclusion in EN_DEICTICS below. Only
+// "sentence / quote / text / assertion / passage" variants + "הטענה
+// הבאה" ("the following claim") actually need an intro field to parse.
+const HE_DEICTICS = [
+  'המשפט הזה', 'המשפט הבא', 'הטענה הבאה',
+  'הציטוט הזה', 'הציטוט הבא', 'הטקסט הזה', 'הטקסט הבא',
+  'האמירה הזו', 'האמירה הבאה', 'הקטע הזה', 'הקטע הבא',
+];
+// English phrases that genuinely require external context. "this
+// claim" and "this dilemma" are EXCLUDED on purpose: the existing
+// authoring pattern quotes the claim inside the question text itself
+// ("A friend says: '…' How would Marx challenge this claim?"), so
+// those are self-contained and would false-positive this check.
+// Trailing \b keeps "statement" from matching inside "statements", which
+// is the plural form that in practice refers to the options list (e.g.
+// "Which of the following statements …?" — the options ARE the
+// statements, not a separate intro field). philosophy ch3/d7 section[5]
+// is the real example this exclusion protects against.
+const EN_DEICTICS = /\bthis (sentence|statement|quote|passage|text|assertion)\b|\bthe (following|above) (sentence|statement|quote|passage|text|claim|assertion|scenario)\b|\btrue or false\b/i;
+const deicticIssues = [];
+function _questionIsDeictic(text, isEn) {
+  if (!text) return false;
+  if (isEn) return EN_DEICTICS.test(text);
+  return HE_DEICTICS.some(m => text.indexOf(m) >= 0);
+}
+for (const s of subjects) {
+  const subject = s.subject;
+  const weeks = s.data && s.data.weeks ? s.data.weeks : [];
+  for (const w of weeks) {
+    if (!w || !Array.isArray(w.days)) continue;
+    for (const d of w.days) {
+      if (!d || !Array.isArray(d.sections)) continue;
+      d.sections.forEach((sec, sectIdx) => {
+        if (!sec || sec.type !== 'quiz') return;
+        const questions = sec.questions || [sec];
+        questions.forEach((q, qIdx) => {
+          const heDeictic = _questionIsDeictic(q.question,   false);
+          const enDeictic = _questionIsDeictic(q.questionEn, true);
+          if (!heDeictic && !enDeictic) return;
+          const hasIntroHe = !!(sec.intro || q.intro);
+          const hasIntroEn = !!(sec.introEn || q.introEn);
+          // HE needs an HE intro; EN needs an EN intro. Flag per language.
+          if (heDeictic && !hasIntroHe) {
+            deicticIssues.push({
+              subject, chapter: w.id, day: d.id,
+              section: sectIdx, qIdx: sec.questions ? qIdx : null,
+              lang: 'he',
+              detail: `"${(q.question || '').slice(0, 60)}" refers to external content but section has no intro field`,
+            });
+          }
+          if (enDeictic && !hasIntroEn) {
+            deicticIssues.push({
+              subject, chapter: w.id, day: d.id,
+              section: sectIdx, qIdx: sec.questions ? qIdx : null,
+              lang: 'en',
+              detail: `"${(q.questionEn || '').slice(0, 60)}" refers to external content but section has no introEn field`,
+            });
+          }
+        });
+      });
+    }
+  }
+}
+
 // ─── Report ──────────────────────────────────────────────────────────────
 
 function reportTable(title, rows) {
@@ -1234,9 +1312,10 @@ reportTable('Correct-answer distribution errors (letter > 50% / run ≥ 4)', dis
 reportTable('Distractor length-signature errors (correct option strict-longest > 60%)', lengthIssues);
 reportTable('HTML entity errors (content strings should contain literal characters, not entities)', entityIssues);
 reportTable('Chapter emphasis errors (zero <strong> tags across all dialogue bodies)', emphasisIssues);
+reportTable('Deictic quiz questions missing intro ("this statement" / "המשפט הזה" with no intro field)', deicticIssues);
 reportTable('Unreferenced thinkers (never appear in any dialogue — warning only)', unreferenced);
 
-const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length + surfacingIssues.length + distributionIssues.length + lengthIssues.length + entityIssues.length + emphasisIssues.length + shapeIssues.length;
+const hardErrorCount = forwardIssues.length + arrayIssues.length + tagIssues.length + quizIssues.length + orderIssues.length + surfacingIssues.length + distributionIssues.length + lengthIssues.length + entityIssues.length + emphasisIssues.length + shapeIssues.length + deicticIssues.length;
 if (hardErrorCount > 0) {
   console.error('');
   console.error('╔════════════════════════════════════════════════════════════════════╗');

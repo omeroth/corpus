@@ -21388,7 +21388,39 @@
      Thinker (96px) + v7 question bubble, option cards (A/B/C), and
      feedback bar that slides up from the bottom. */
   #screen-reader.reader-v7 .section-card[data-sec="quiz"] .quiz-eyebrow { display: none; }
-  #screen-reader.reader-v7 .section-card[data-sec="quiz"] .quiz-intro-v2 { display: none; }
+  /* The quiz intro / statement card. Mirrors .rp-scenario (streak
+     repair) in weight + rhythm so a "does this statement reflect …"
+     question has the referent visible between the thinker bubble and
+     the options. The v7 quiz wrap JS (search index.html for
+     'rd-qq' at ~47206) moves .quiz-intro-v2 INTO the first
+     .quiz-block AFTER .rd-qq, so the stacking order is
+     thinker-bubble → statement-card → options. Legacy reader (not v7)
+     keeps rendering the intro above the quiz-block via the original
+     .quiz-intro-v2 rule at ~4432; no override needed there.
+     Font-size scales with --text-scale so the card stays legible at
+     TEXT_SIZE_MAX (145%); RTL swaps the border side via inset-inline. */
+  #screen-reader.reader-v7 .section-card[data-sec="quiz"] .quiz-intro-v2 {
+    display: block;
+    border: 2px solid #E5E5EA;
+    border-radius: 14px;
+    background: var(--surface, #FFFFFF);
+    box-shadow: 0 3px 0 #E5E5EA;
+    padding: 10px 12px;
+    margin: 0 0 12px;
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-size: calc(14.5px * var(--text-scale, 1));
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--ink, var(--text));
+  }
+  html.dark #screen-reader.reader-v7 .section-card[data-sec="quiz"] .quiz-intro-v2 {
+    background: #211E2E;
+    border-color: #34304A;
+    box-shadow: 0 3px 0 #34304A;
+  }
+  html[dir="rtl"] #screen-reader.reader-v7 .section-card[data-sec="quiz"] .quiz-intro-v2 {
+    font-family: 'Rubik', 'Nunito', system-ui, sans-serif;
+  }
   /* Thinker + question bubble pair (per quiz-block). Injected via JS. */
   /* Round 24 — thinker + bubble pair: thinker aligned to TOP of the row
      (not bottom) and the bubble tail at a fixed offset from the bubble
@@ -47195,11 +47227,23 @@ function renderReader() {
       quizBtnBar.appendChild(quizRow);
     }
 
-    // v7: wrap each quiz-question in a thinker+bubble (.rd-qq) row.
+    // v7: wrap each quiz-question in a thinker+bubble (.rd-qq) row,
+    // and reposition .quiz-intro-v2 (the per-section intro / statement
+    // card that holds the "this statement" referent) from its default
+    // slot ABOVE the first quiz-block into the first quiz-block AFTER
+    // .rd-qq so the stacking order reads thinker-bubble → statement
+    // card → options. Required for questions like philosophy ch1/d7
+    // section[5] whose question text ("Does this sentence accurately
+    // reflect …?") is incoherent without the statement visible beside
+    // the options. The v7 .quiz-intro-v2 CSS at ~21391 styles it as a
+    // quoted statement card; legacy reader keeps rendering it in place
+    // above the quiz-block.
     if (document.body.classList.contains('on-reader-v7')) {
       try {
         const slug = _rdSubjectSlug();
-        card.querySelectorAll('.quiz-block').forEach(block => {
+        const intro = card.querySelector('.quiz-intro-v2');
+        let introMoved = false;
+        card.querySelectorAll('.quiz-block').forEach((block, blockIdx) => {
           const qText = block.querySelector('.quiz-question');
           if (!qText) return;
           const qq = document.createElement('div');
@@ -47209,6 +47253,15 @@ function renderReader() {
             <div class="rd-gb">${qText.textContent}</div>
           `;
           block.replaceChild(qq, qText);
+          // Intro lives once per section but renders between bubble
+          // and options. Attach to the first block only; multi-question
+          // sections (none in the current content for sections that
+          // carry an intro) would still show the intro on the first
+          // question which is the right place for shared context.
+          if (intro && !introMoved && blockIdx === 0) {
+            block.insertBefore(intro, qq.nextSibling);
+            introMoved = true;
+          }
         });
       } catch(_) {}
     }
