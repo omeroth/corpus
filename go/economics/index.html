@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Get Corpus</title>
+<meta name="description" content="Five minutes a day with history's greatest minds.">
+
+<!-- OG + Twitter tags. Convention matches the per-thinker share pages
+     under /t/: absolute https og:image, image dims declared, locale
+     one-per-page. og:type=website since this is a landing surface
+     (not a profile, not an article). og:image regenerates alongside
+     the other share cards via `npm run gen:share`. -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Corpus">
+<meta property="og:description" content="Five minutes a day with history's greatest minds.">
+<meta property="og:image" content="https://corpusapp.io/share/corpus-go-og-economics.png?v=1">
+<meta property="og:image:secure_url" content="https://corpusapp.io/share/corpus-go-og-economics.png?v=1">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://corpusapp.io/go/economics/">
+<meta property="og:site_name" content="Corpus">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Corpus">
+<meta name="twitter:description" content="Five minutes a day with history's greatest minds.">
+<meta name="twitter:image" content="https://corpusapp.io/share/corpus-go-og-economics.png?v=1">
+<style>
+  :root { --ink:#2F2150; --accent:#7B4FD4; --bg:#F8F5FF; }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:var(--bg); color:var(--ink);
+    font-family:"Nunito","Helvetica Neue",Arial,sans-serif; padding:24px;
+  }
+  .wrap { text-align:center; max-width:420px; width:100%; }
+  .mark { font-size:32px; font-weight:900; color:var(--accent); margin:0 0 8px; }
+  .sub { font-size:17px; font-weight:600; margin:0 0 32px; opacity:.75; }
+  .btn {
+    display:block; width:100%; padding:16px 20px; margin:12px 0;
+    border-radius:999px; text-decoration:none; font-weight:800; font-size:17px;
+    background:var(--accent); color:#fff;
+  }
+  .btn.alt { background:#fff; color:var(--ink); border:2px solid rgba(47,33,80,.15); }
+  .note { margin-top:24px; font-size:14px; opacity:.6; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="mark">Corpus</p>
+    <p class="sub">Five minutes a day with history's greatest minds.</p>
+    <a class="btn" id="ios" href="https://apps.apple.com/us/app/corpus-ideas-worth-knowing/id6781227385">Download on the App Store</a>
+    <a class="btn alt" id="android" href="https://play.google.com/store/apps/details?id=com.corpusapp.corpus&referrer=utm_source%3Ddirect%26utm_medium%3Dnone%26utm_campaign%3Deconomics">Get it on Google Play</a>
+    <p class="note" id="note">Opening the store&hellip;</p>
+  </div>
+<script>
+(function () {
+  // Pull utm_source and utm_medium from the URL query, sanitise each to
+  // [a-z0-9_-]{1,32}, and fall back to direct/none when missing or empty
+  // after sanitising. utm_campaign is FIXED per page — this one is
+  // "philosophy" — and is never read from the query, so a shared link
+  // cannot override the per-surface attribution.
+  function sanitize(v) {
+    if (typeof v !== 'string') return '';
+    v = v.toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    return v.slice(0, 32);
+  }
+  var qs = new URLSearchParams(window.location.search);
+  var src = sanitize(qs.get('utm_source')) || 'direct';
+  var med = sanitize(qs.get('utm_medium')) || 'none';
+  var camp = 'economics';
+  // Play Store's INSTALL_REFERRER expects a single URL-encoded query
+  // string as the referrer value — inner & becomes %26, inner = becomes
+  // %3D. encodeURIComponent does both.
+  var referrer = encodeURIComponent(
+    'utm_source=' + src + '&utm_medium=' + med + '&utm_campaign=' + camp
+  );
+  var playHref = 'https://play.google.com/store/apps/details?id=com.corpusapp.corpus&referrer=' + referrer;
+  var androidEl = document.getElementById('android');
+  if (androidEl) androidEl.href = playHref;
+
+  // Platform-detect redirect. Reads the href we just set above so the
+  // automatic redirect and a manual tap on the Play button hit the
+  // identical URL.
+  var ua = navigator.userAgent || "";
+  var isIOS = /iPad|iPhone|iPod/.test(ua) ||
+              (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var isAndroid = /Android/i.test(ua);
+  var target = null;
+  if (isIOS) target = document.getElementById("ios").href;
+  else if (isAndroid) target = document.getElementById("android").href;
+  if (target) {
+    window.location.replace(target);
+  } else {
+    document.getElementById("note").textContent = "Choose your platform above.";
+  }
+})();
+</script>
+</body>
+</html>
