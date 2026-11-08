@@ -32748,7 +32748,7 @@ function _onbComplete() {
   // ignore the "already completed a dialogue" gate (which normally
   // protects returning users) — the v2 flow always leaves the user
   // with one completed dialogue, but the walkthrough hasn't run yet.
-  try { _walkthroughStartIfEligible({ bypassCompletionGate: true }); } catch(e) {}
+  try { _walkthroughStartIfEligible({ bypassCompletionGate: true, autoOpenFirstDialogue: true }); } catch(e) {}
 }
 
 // Screen 1 (welcome) CTA — advance to screen 2.
@@ -53965,10 +53965,14 @@ function _walkthroughShouldStart(opts) {
   // Existing-user gates — same intuition as the initUI onboarding gate.
   // Any signal of prior use blocks the walkthrough so returning users
   // don't get a first-time tour on top of their existing home. The v2
-  // onboarding path passes { bypassCompletionGate: true } because the
-  // flow always leaves the user with one completed dialogue by design
-  // (step 15) — the "existing user" signal is a legitimate signal for
-  // legacy paths but not for a user who just finished v2 onboarding.
+  // onboarding path passes { bypassCompletionGate: true } because at
+  // _onbComplete time state.completedDays is still empty — no step in
+  // the current v2 flow calls _commitDialogueCompletion (the taste
+  // steps 18–21 render preview UI without writing a completion row),
+  // so the "completedDays > 0 ⇒ existing user" shorthand below would
+  // falsely clear a brand-new user who just finished onboarding only
+  // because legacy paths that did write a completion still need to
+  // block the tour.
   if (opts && opts.bypassCompletionGate) return true;
   if (localStorage.getItem('corpus_first_dialogue_completed_at')) return false;
   const completedCount = Object.keys(state.completedDays || {}).length;
@@ -53976,11 +53980,28 @@ function _walkthroughShouldStart(opts) {
   return true;
 }
 
+// Set by _walkthroughStartIfEligible when the caller passes
+// autoOpenFirstDialogue:true; read by _walkthroughFinish to decide whether
+// to auto-open dialogue 1 instead of firing the frames explainer. Module-
+// level rather than threaded through opts because _walkthroughFinish runs
+// in response to a DOM click (closing-step OK button) and doesn't receive
+// the original start options. Reset to false in both branches of
+// _walkthroughFinish so a dev _replayWalkthrough (which passes no opts)
+// can't inherit a stale true from a prior run.
+let _walkthroughAutoOpenAfter = false;
+
 function _walkthroughStartIfEligible(opts) {
   if (!_walkthroughShouldStart(opts)) return;
   if (state.currentScreen !== 'home') return;
   const overlay = document.getElementById('onboarding-overlay');
   if (!overlay) return;
+  // Latch autoOpenFirstDialogue for the _walkthroughFinish branch. Only
+  // set here (after the eligibility + screen + DOM checks pass) so a
+  // start attempt that no-ops doesn't leave the flag set for the next
+  // real start. Dev-replay path (_replayWalkthrough) passes no opts and
+  // therefore always sets this to false, preserving today's "lands on
+  // home" behaviour for a settings-triggered replay.
+  _walkthroughAutoOpenAfter = !!(opts && opts.autoOpenFirstDialogue);
   _walkthroughStepIdx = 0;
   _walkthroughStepsSeen.clear();
   document.documentElement.classList.add('walkthrough-active');
@@ -54395,13 +54416,26 @@ function _walkthroughShortcutBail() {
   _walkthroughTeardown({ setFlag: true });
 }
 
-// v2 users have already read a full dialogue during onboarding (step
-// 15), so the walkthrough finish should NOT auto-open another reader.
-// Land the user on home with everything in place — streak lit, first
-// thinker card unlocked, next dialogue queued visually as "next up" —
-// and let them come back tomorrow. Legacy paths (any pre-v2 user
-// whose corpus_walkthrough_done flag isn't set) end here too; the
-// closing beat's "come back tomorrow" copy is coherent in both cases.
+// Two terminal behaviours depending on how the walkthrough was started:
+//
+//   autoOpenFirstDialogue path (set by _onbComplete) — open the user's
+//   first uncompleted dialogue in getW(state.subject) via openReader,
+//   with entry='walkthrough_end'. The v2 flow doesn't write a
+//   completedDays row (step 15 is the "mirror" reflection screen, the
+//   taste at 18–21 renders preview UI only — see _commitDialogueCompletion
+//   at ~39242 for the single real completion writer), so for a brand-new
+//   user the walker lands on (week[0].id, week[0].days[0].id). The frames
+//   explainer is skipped here; the user will meet it on the first
+//   .rv-plate tap after the reveal (trigger='plate_tap' at ~38454),
+//   which is exactly what the auto-opened dialogue produces at its end.
+//
+//   Default path (dev _replayWalkthrough, legacy pre-v2 user, or
+//   anywhere else the start happens without the autoOpenFirstDialogue
+//   opt) — fall through to _maybeShowFramesExplainerAtTourEnd, matching
+//   today's behaviour. Also the fallback inside the auto-open path
+//   when getW() is empty or canAccessWeek says no: never leave the
+//   user on a blank screen; the frames explainer sits on top of the
+//   home surface _onbComplete already rendered.
 function _walkthroughFinish() {
   _phCapture('walkthrough_completed', {
     subject: state.subject || null,
@@ -54418,13 +54452,68 @@ function _walkthroughFinish() {
     state.streakIntroSeen = true;
     try { saveState(); } catch (e) { try { saveStateLocal(); } catch (e2) {} }
   }
-  // Frames explainer (spec §14): the tour just ended — the ONLY moment
-  // it opens automatically. Deferred one frame past teardown so the
-  // walkthrough overlay's display:none commits before _feEverythingClosed
-  // samples the DOM. Existing users past the tour never reach this path
-  // (their corpus_walkthrough_done was set on some earlier launch, so
-  // _walkthroughShouldStart short-circuits and this function is never
-  // called); they only see the explainer via plate taps.
+  // Snapshot + reset the auto-open latch. Reading into a local makes
+  // sure neither the openReader branch below nor a subsequent dev
+  // _replayWalkthrough can observe a stale true after this call.
+  const _autoOpen = _walkthroughAutoOpenAfter;
+  _walkthroughAutoOpenAfter = false;
+
+  if (_autoOpen) {
+    // Walk getW(state.subject) for the first uncompleted (week, day).
+    // state.subject is guaranteed by _onbComplete (defaults to
+    // 'philosophy' when the onboarding subject-select step was
+    // skipped); if getW() returns empty for the configured subject
+    // or the first uncompleted chapter isn't accessible, drop
+    // through to the frames-explainer fallback so the user never
+    // sees a blank screen.
+    let target = null;
+    try {
+      const weeks = (typeof getW === 'function') ? getW(state.subject) : [];
+      for (const w of (weeks || [])) {
+        if (!w || !Array.isArray(w.days)) continue;
+        for (const d of w.days) {
+          if (!d) continue;
+          const key = dayKey(w.id, d.id, state.subject);
+          if (!state.completedDays || !state.completedDays[key]) {
+            target = { weekId: w.id, dayId: d.id };
+            break;
+          }
+        }
+        if (target) break;
+      }
+    } catch (e) { target = null; }
+
+    const accessible = !!(target
+      && (typeof canAccessWeek !== 'function'
+          || canAccessWeek(state.subject, target.weekId)));
+
+    if (target && accessible) {
+      try {
+        _phCapture('walkthrough_dialogue_autoopen', {
+          subject: state.subject || null,
+          week_id: target.weekId,
+          day_id:  target.dayId,
+        });
+      } catch (e) {}
+      try {
+        openReader(target.weekId, target.dayId, { entry: 'walkthrough_end' });
+        return;
+      } catch (e) {
+        // openReader threw — fall through to the explainer path so
+        // the user still has a coherent next surface.
+      }
+    }
+    // Deliberate fall-through: no uncompleted dialogue, not accessible,
+    // or openReader threw. Behave as the default path below.
+  }
+
+  // Default / fallback: frames explainer over the home surface.
+  // Deferred one frame past teardown so the walkthrough overlay's
+  // display:none commits before _feEverythingClosed samples the DOM.
+  // Existing users past the tour never reach this path (their
+  // corpus_walkthrough_done was set on some earlier launch, so
+  // _walkthroughShouldStart short-circuits and this function is
+  // never called); they only see the explainer via plate taps.
   requestAnimationFrame(() => {
     try { _maybeShowFramesExplainerAtTourEnd(); } catch (e) {}
   });

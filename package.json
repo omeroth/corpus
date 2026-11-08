@@ -13,7 +13,8 @@
     "check-content": "node scripts/check-thinker-links.mjs",
     "render-streak-badges": "node scripts/render-streak-badges.mjs",
     "render-corpus-flame": "node scripts/render-corpus-flame.mjs",
-    "check-reader-overflow": "node scripts/check-reader-overflow.mjs"
+    "check-reader-overflow": "node scripts/check-reader-overflow.mjs",
+    "check-walkthrough-autoopen": "node scripts/check-walkthrough-autoopen.mjs"
   },
   "repository": {
     "type": "git",
