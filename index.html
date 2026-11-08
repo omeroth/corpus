@@ -29760,24 +29760,43 @@ async function startPurchase() {
         offering_id: _offeringId,
         source_mode: _paywallMode,
       }); } catch(e) {}
-      // Meta App Events: fb_mobile_subscribe with the purchase value so
-      // SKAdNetwork attribution can credit the campaign that drove the
-      // install. Meta's standard event name — do not rename. _valueToSum
-      // is Meta's convention for the numeric weight of the event.
-      // Price / currency read from the resolved RC package (sel.pkg is
-      // guaranteed truthy on this branch — early-return above bails
-      // when sel.pkg is null).
+      // Meta App Events: branch by whether the purchase actually applied
+      // a free trial. Meta's standard event names: fb_mobile_start_trial
+      // for a purchase that includes an intro free-trial phase,
+      // fb_mobile_subscribe for a direct paid purchase. Ads Manager
+      // needs the two signals distinct to optimise campaigns for trial-
+      // start vs paid-subscriber events.
+      //
+      // Source of truth is the entitlement RC just activated, not a
+      // guess from paywall mode. RC sets periodType to "TRIAL" on the
+      // active entitlement when the purchase redeemed a free-trial
+      // intro offer (iOS StoreKit intro period, or Play
+      // base-plan+offer with a freePhase). "NORMAL" / "INTRO" (paid-
+      // intro, non-free) / "PROMOTIONAL" all count as paid for our
+      // conversion purposes. Field is camelCase on the Capacitor SDK,
+      // snake_case on the RC server webhook — check both so the branch
+      // stays correct if the SDK shape ever flips.
+      //
+      // _valueToSum is the plugin's convention for the numeric weight
+      // of the event. Price / currency read from the resolved RC
+      // package (sel.pkg is guaranteed truthy on this branch — the
+      // early-return above bails when sel.pkg is null).
       try {
-        const _priceStr = sel.pkg.product && sel.pkg.product.priceString;
-        const _priceNum = sel.pkg.product && typeof sel.pkg.product.price === 'number' ? sel.pkg.product.price : null;
-        const _ccy      = (sel.pkg.product && sel.pkg.product.currencyCode) || 'USD';
-        const _params   = { fb_currency: _ccy };
+        const _ent       = result.customerInfo.entitlements.active[PAYWALL_ENTITLEMENT_ID];
+        const _periodRaw = _ent && (_ent.periodType || _ent.period_type);
+        const _isTrial   = typeof _periodRaw === 'string' && /trial/i.test(_periodRaw);
+        const _priceNum  = sel.pkg.product && typeof sel.pkg.product.price === 'number' ? sel.pkg.product.price : null;
+        const _ccy       = (sel.pkg.product && sel.pkg.product.currencyCode) || 'USD';
+        const _params    = { fb_currency: _ccy };
         if (_priceNum != null) _params._valueToSum = _priceNum;
+        const _eventName = _isTrial ? 'fb_mobile_start_trial' : 'fb_mobile_subscribe';
         window.Capacitor?.Plugins?.CorpusMetaEvents?.logEvent({
-          name: 'fb_mobile_subscribe',
+          name:   _eventName,
           params: _params,
         });
-      } catch(e) {}
+      } catch(e) {
+        console.warn('[Meta] purchase event log failed (non-fatal):', e);
+      }
       // Nudge loadSubscription to catch the webhook write. If it hasn't
       // landed yet, optimistic keeps access alive until it does. Explicit
       // .catch() rather than try/catch — try/catch around an un-awaited
