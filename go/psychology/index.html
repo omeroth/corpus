@@ -90,8 +90,77 @@
               (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   var isAndroid = /Android/i.test(ua);
   var target = null;
-  if (isIOS) target = document.getElementById("ios").href;
-  else if (isAndroid) target = document.getElementById("android").href;
+  var destination = 'store-choice';
+  if (isIOS)          { target = document.getElementById("ios").href;     destination = 'ios'; }
+  else if (isAndroid) { target = document.getElementById("android").href; destination = 'android'; }
+
+  // distinct_id: stable per browser, persisted under a key that posthog-js
+  // never reads from, so the landing-page identity cannot leak into the
+  // app's SDK state and vice versa. localStorage access is wrapped in
+  // try/catch because Safari private mode throws on access even for
+  // reads. crypto.randomUUID is on modern browsers; the Math.random
+  // fallback covers older WebViews. First-visit value is written back
+  // so subsequent /go/ hits in the same browser carry the same id and
+  // PostHog can collapse them into one person.
+  var DID_KEY = 'corpus_go_did';
+  var distinctId = null;
+  try { distinctId = localStorage.getItem(DID_KEY); } catch (_) {}
+  if (!distinctId) {
+    if (window.crypto && typeof crypto.randomUUID === 'function') {
+      distinctId = crypto.randomUUID();
+    } else {
+      distinctId = 'go-' +
+        Math.random().toString(36).slice(2, 10) +
+        Math.random().toString(36).slice(2, 10);
+    }
+    try { localStorage.setItem(DID_KEY, distinctId); } catch (_) {}
+  }
+
+  // Fire-and-forget beacon to PostHog BEFORE navigation. sendBeacon
+  // puts the request on the browser's unload-safe queue, which the UA
+  // is required to complete even after window.location.replace. The
+  // fetch(keepalive:true) fallback handles the rare UAs without
+  // sendBeacon (old Android WebView) with the same don't-wait semantic.
+  // No posthog-js, no super properties, no cookies written by any
+  // library — the only localStorage write on this origin is the
+  // distinct_id above under DID_KEY, which posthog-js never looks at.
+  // subject is null on the bare /go/ root (camp='general') so queries
+  // can separate the root hit from the subject-specific pages.
+  var subject = (camp === 'general') ? null : camp;
+  try {
+    var body = JSON.stringify({
+      api_key: 'phc_vUupVqSRdBay7mQ4Aswudhu8mFHnych6PKNRpP6BHoS4',
+      event: 'go_redirect',
+      properties: {
+        distinct_id:     distinctId,
+        source:          'landing',
+        utm_source:      src,
+        utm_medium:      med,
+        utm_campaign:    camp,
+        subject:         subject,
+        destination:     destination,
+        destination_url: target,
+        $current_url:    window.location.href,
+      },
+    });
+    var sent = false;
+    if (navigator.sendBeacon) {
+      sent = navigator.sendBeacon(
+        'https://us.i.posthog.com/e/',
+        new Blob([body], { type: 'text/plain' })
+      );
+    }
+    if (!sent && typeof fetch === 'function') {
+      fetch('https://us.i.posthog.com/e/', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    body,
+        keepalive: true,
+        mode:    'no-cors',
+      }).catch(function(){});
+    }
+  } catch (_) {}
+
   if (target) {
     window.location.replace(target);
   } else {
