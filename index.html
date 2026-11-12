@@ -45382,15 +45382,20 @@ function renderHome() {
     // Numbering is unaffected either way — the levelNum counter below
     // skips bonus chapters entirely.
     let chaptersOrdered = chapters;
-    const _bonusChapter = chapters.find(w => w && w.isBonus);
+    // Hoist bonus chapters above chapter 1 for returning users. Picks up
+    // ALL bonuses in insertion order — previously this used .find()
+    // which returned only the first, so a second bonus (added
+    // 2026-11-12) disappeared from home for returning users. New users
+    // keep the natural getW() ordering.
+    const _bonusChapters = chapters.filter(w => w && w.isBonus);
     const _isNewUser = Object.keys(state.completedDays || {}).length === 0;
-    if (_bonusChapter && !_isNewUser) {
+    if (_bonusChapters.length && !_isNewUser) {
       const _withoutBonus = chapters.filter(w => !w || !w.isBonus);
-      const _c1Idx = _withoutBonus.findIndex(w => w.id === 1);
+      const _c1Idx = _withoutBonus.findIndex(w => w && w.id === 1);
       if (_c1Idx >= 0) {
         chaptersOrdered = [
           ..._withoutBonus.slice(0, _c1Idx),
-          _bonusChapter,
+          ..._bonusChapters,
           ..._withoutBonus.slice(_c1Idx),
         ];
       }
@@ -46355,8 +46360,16 @@ function _renderThinkerIntro(day, opts) {
   const bioEl = document.getElementById('thinker-intro-bio');
   const btn = document.getElementById('thinker-intro-btn');
 
-  if (isUnlocked && t) {
-    eyebrow.textContent = isEn ? 'Now featuring' : 'נדבר עכשיו על';
+  // Portrait always shows when the thinker record resolves to an image
+  // (every thinker in content/thinkers.js does — 88/88 per the
+  // 2026-11-12 audit). The eyebrow still toggles "Now featuring" vs
+  // "Your next thinker" so the lock state reads, and the name is still
+  // hidden on first-meet. The paired v7 renderer below applies the same
+  // rule. If you want strict mystery behaviour back, put `isUnlocked`
+  // on the inner introImg check.
+  const _introImg = t ? _thinkerImage(t, state.subject) : '';
+  if (t && _introImg) {
+    eyebrow.textContent = isUnlocked ? (isEn ? 'Now featuring' : 'נדבר עכשיו על') : (isEn ? 'Your next thinker' : 'ההוגה הבא');
     if (mystery) mystery.style.display = 'none';
     portrait.style.display = '';
     // Frame color follows the CURRENT dialogue's subject, not the thinker's
@@ -46367,12 +46380,16 @@ function _renderThinkerIntro(day, opts) {
     // state.subject is authoritative at reader time; t.subject is the
     // fallback for the (very unlikely) case where it's unset.
     portrait.dataset.subject = state.subject || t.subject || 'philosophy';
-    const _introImg = _thinkerImage(t, state.subject);
-    portrait.innerHTML = _introImg ? `<img src="${_introImg}" alt="${t.name}">` : '';
-    nameEl.style.display = '';
-    nameEl.textContent = t.name;
+    portrait.innerHTML = `<img src="${_introImg}" alt="${t.name}">`;
+    if (isUnlocked) {
+      nameEl.style.display = '';
+      nameEl.textContent = t.name;
+    } else {
+      nameEl.style.display = 'none';
+      nameEl.textContent = '';
+    }
   } else {
-    // Not yet unlocked (or thinker record missing) → golden mystery coin, no name.
+    // Thinker record missing OR has no image — fallback to mystery.
     eyebrow.textContent = isEn ? 'Your next thinker' : 'ההוגה הבא';
     portrait.style.display = 'none';
     portrait.innerHTML = '';
@@ -46416,18 +46433,28 @@ function _renderThinkerIntroV7(overlay, ctx) {
   const { t, day, isEn, isUnlocked, isReopen } = ctx;
   const T = (en, he) => isEn ? en : he;
 
-  // Mystery card for first-meet; real card (portrait art, current frame
-  // via inherited --accent-rim) for repeat visits. "Now featuring" vs
-  // "Your next thinker" eyebrows match the legacy copy exactly.
+  // Portrait when the thinker has one; mystery card only when the image
+  // genuinely can't be resolved. Before 2026-11-12 the real-card branch
+  // also required isUnlocked=true, which meant the "Your next thinker"
+  // preview showed the ? mystery variant on EVERY first-meet, even
+  // though every thinker in content/thinkers.js ships with a working
+  // portrait (88/88 in the 2026-11-12 audit — see /tmp/preview-audit.mjs).
+  // The eyebrow still toggles "Now featuring" vs "Your next thinker" so
+  // the lock state continues to read; what changes is that first-meet
+  // previews now show the face instead of a question mark. If you want
+  // the strict-mystery behaviour back, add `isUnlocked && ` to the
+  // condition below — but the audit shows there's never a data reason
+  // to hide the portrait.
   const _subj = state.subject || t.subject || 'philosophy';
   const slug = ({ philosophy: 'socrates', economics: 'smith', psychology: 'freud' })[_subj] || 'socrates';
   const introImg = t ? (_thinkerImage(t, _subj) || '') : '';
   let cardMarkup;
-  if (isUnlocked && introImg) {
+  if (introImg) {
     cardMarkup = `<div class="rdi-real" data-subject="${_subj}"><img src="${introImg}" alt=""></div>`;
   } else {
-    // Mystery card: subject gradient (reads --accent / --accent-rim / --accent-dark)
-    // + 4 twinkling sparkles + shine sweep.
+    // Fallback mystery card: subject gradient + 4 twinkling sparkles +
+    // shine sweep. Reached only when the thinker record is missing an
+    // image entirely (no occurrence in current content as of 2026-11-12).
     cardMarkup = `
       <div class="rdi-mwrap">
         <div class="rdi-mys" aria-hidden="true"><div class="rd-shine"></div></div>
