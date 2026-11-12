@@ -874,6 +874,14 @@ const LENGTH_CHECK_EXCEPTIONS = new Set([
   // release by widening the wrong options; same policy as the three
   // entries above.
   'philosophy:7',
+  // Added 2026-11-12 during the philosophy:bonus2 (Is Our Attention
+  // Free?) verbatim import. Same shape as the entries above: each quiz
+  // pairs a full-sentence correct answer (restating the dialogue's
+  // Spinoza / Hume / Libet / Kant / Sartre thesis) with two short
+  // distractors that are deliberate misreadings. Strict-longest hits
+  // 14/15 (93%) HE and 15/15 (100%) EN. Author approved import as-is;
+  // rewriting distractors would mean rewriting the source doc.
+  'philosophy:bonus2',
 ]);
 
 const lengthIssues = [];

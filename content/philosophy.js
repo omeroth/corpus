@@ -1447,6 +1447,402 @@ const corpusData = {
     ]
   },
   {
+    id: 'bonus2',
+    title: 'האם תשומת הלב שלנו חופשית?',
+    titleEn: 'Is Our Attention Free?',
+    subtitle: 'חירות, סיבתיות ואחריות',
+    subtitleEn: 'Freedom, causality, and responsibility',
+    isBonus: true,
+    xp: 100,
+    days: [
+      {
+        id: 0,
+        title: 'פתיחה: מי מחליט למה נשים לב?',
+        titleEn: 'Opening: Who Decides What We Notice?',
+        thinker: '',
+        thinkerEn: '',
+        thinkerId: null,
+        xp: 0,
+        sections: [
+          {
+            type: 'idea',
+            title: 'על מה הפרק הזה?',
+            titleEn: 'What is this chapter about?',
+            content: 'בשנת 2025 נכנס לתוקף באוסטרליה חוק המחייב פלטפורמות חברתיות מסוימות למנוע מבני פחות מ־16 להחזיק בהן חשבון.\n\nאחת הסיבות לחוק היא החשש שהרשתות החברתיות מתוכננות למשוך את תשומת הלב שלנו ולהקשות עלינו להתנתק מהן.\n\nאבל אם האפליקציות מסוגלות להשפיע על ההתנהגות שלנו בעוצמה כזאת, מה לגבי מבוגרים?\n\nנניח שפתחתם את הטלפון כדי לבדוק הודעה, וכעבור שעה גיליתם שאתם עדיין גוללים. האם בחרתם לבלות כך את השעה הזאת? ואם לא, עד כמה אתם אחראים לכך?\n\nהשאלות האלה קשורות לוויכוח פילוסופי עתיק: האם אנחנו בוחרים את מעשינו בחופשיות, או שהם נקבעים בידי סיבות שאיננו מודעים להן?\n\nבפרק הזה נפגוש חמישה הוגים שיציעו תשובות שונות, ונבחן את רעיונותיהם באמצעות פעולה יומיומית אחת: הרגע שבו אנחנו מושיטים יד לטלפון.',
+            contentEn: 'In 2025, a law took effect in Australia requiring certain social media platforms to prevent anyone under 16 from holding an account.\n\nOne reason for the law is the concern that social networks are designed to capture our attention and make it hard for us to disconnect.\n\nBut if apps can influence our behavior this powerfully, what about adults?\n\nSuppose you opened your phone to check a message, and an hour later you find you are still scrolling. Did you choose to spend the hour this way? And if not, how responsible are you for it?\n\nThese questions are connected to an ancient philosophical debate: do we choose our actions freely, or are they determined by causes we are not aware of?\n\nIn this chapter we will meet five thinkers who offer different answers, and we will examine their ideas through one everyday act: the moment we reach for the phone.'
+          },
+          {
+            type: 'idea',
+            title: 'מה נחקור?',
+            titleEn: 'What will we explore?',
+            content: 'שפינוזה: מדוע אנחנו חושבים שאנחנו חופשיים, גם כשהרצונות שלנו נקבעים בידי סיבות שאיננו מכירים?\n\nדיוויד יום: מדוע הידיעה שגלילה ממושכת מזיקה לנו אינה מספיקה כדי להפסיק?\n\nבנג\'מין ליבט: האם המוח מתחיל לפעול עוד לפני שאנחנו מודעים להחלטה שלנו?\n\nעמנואל קאנט: כיצד אפשר לפעול באופן אוטונומי, ולא רק בעקבות דחפים והשפעות חיצוניות?\n\nז\'אן־פול סארטר: האם העובדה שאנחנו מושפעים מגורמים חיצוניים פוטרת אותנו מאחריות למעשינו?\n\nבסוף הפרק נחזור לשאלה שבה פתחנו: <strong>עד כמה תשומת הלב שלנו באמת נתונה לבחירתנו?</strong>',
+            contentEn: 'Spinoza: Why do we think we are free, even when our desires are determined by causes we do not know?\n\nDavid Hume: Why is knowing that prolonged scrolling is harmful to us not enough to make us stop?\n\nBenjamin Libet: Does the brain start to act even before we are aware of our decision?\n\nImmanuel Kant: How can we act autonomously, and not only in response to impulses and external influences?\n\nJean-Paul Sartre: Does the fact that we are influenced by external factors excuse us from responsibility for our actions?\n\nAt the end of the chapter we will return to the question we started with: <strong>how far is our attention truly up to our choice?</strong>'
+          }
+        ]
+      },
+      {
+        id: 1,
+        title: 'שפינוזה: האם תשומת הלב שלך באמת נתונה לבחירתך?',
+        titleEn: 'Spinoza: Is Your Attention Really Yours to Choose?',
+        thinker: 'ברוך שפינוזה',
+        thinkerEn: 'Baruch Spinoza',
+        thinkerId: 'spinoza',
+        xp: 50,
+        sections: [
+          {
+            type: 'idea',
+            title: 'הרעיון של היום',
+            titleEn: 'Today\'s Idea',
+            content: 'פתחתם את הטלפון כדי לבדוק הודעה, וכעבור עשרים דקות גיליתם שאתם עדיין גוללים.\n\nמדוע המשכתם? אולי פשוט רציתם. אבל האם הרצון הזה היה באמת בחירה חופשית?\n\nברוך שפינוזה, פילוסוף הולנדי מהמאה ה־17, טען שהתחושה שאנחנו בוחרים בחופשיות נובעת לעיתים דווקא מחוסר מודעות לסיבות שקובעות את רצונותינו.',
+            contentEn: 'You opened your phone to check a message, and twenty minutes later you find you are still scrolling.\n\nWhy did you keep going? Maybe you simply wanted to. But was that desire truly a free choice?\n\nBaruch Spinoza, a seventeenth-century Dutch philosopher, argued that the feeling that we choose freely sometimes stems precisely from our lack of awareness of the causes that determine our desires.'
+          },
+          {
+            type: 'source',
+            title: 'קטע מקור',
+            titleEn: 'Source Text',
+            quote: '"בני אדם טועים כשהם סבורים שהם חופשיים. דעתם מורכבת מהכרה במעשיהם ומחוסר ידיעה של הסיבות שקובעות אותם."',
+            quoteEn: '"Men are mistaken in thinking themselves free, an opinion that consists only in this: that they are conscious of their actions and ignorant of the causes by which they are determined."',
+            attr: 'ברוך שפינוזה, "אתיקה", חלק ב\', הצעה 35, הערה',
+            attrEn: 'Baruch Spinoza, Ethics, Part II, Proposition 35, Scholium'
+          },
+          {
+            type: 'explanation',
+            title: 'הסבר',
+            titleEn: 'Explanation',
+            content: 'שפינוזה מבחין בין שני דברים: להיות מודעים למה שאנחנו עושים, ולהכיר את הסיבות שגרמו לנו לעשות מה שאנחנו עושים.\n\nאנחנו מודעים לרצונות ולפעולות שלנו, ולכן נדמה לנו שאנחנו המקור שלהם. אבל בדרך כלל איננו מכירים את כל הסיבות שגרמו לרצונות האלה להופיע.\n\nנניח שהתראה בטלפון מעוררת בכם סקרנות. אתם פותחים אותה, רואים סרטון מעניין וממשיכים לסרטון הבא. אתם מרגישים שבחרתם לגלול, אבל הרצון שלכם הושפע מההתראה, מהסקרנות ומהאופן שבו התכנים מוצגים לכם.\n\nשפינוזה המחיש את הרעיון באמצעות משל מפורסם: דמיינו אבן שנזרקה באוויר. אילו הייתה האבן מודעת לתנועתה, אך לא לכוח שגרם לה, היא הייתה חושבת שהיא עפה מרצונה.\n\nכך גם אנחנו: מודעים למה שאנחנו עושים, אך לא בהכרח לסיבות שמניעות אותנו.',
+            contentEn: 'Spinoza distinguishes between two things: being aware of what we do, and knowing the causes that led us to do what we do.\n\nWe are aware of our desires and actions, so it seems to us that we are their source. But usually we do not know all the causes that brought those desires about.\n\nSuppose a phone notification arouses your curiosity. You open it, see an interesting video, and move on to the next one. You feel that you chose to scroll, but your desire was shaped by the notification, by curiosity, and by the way the content is presented to you.\n\nSpinoza illustrated the idea with a famous parable: imagine a stone thrown through the air. If the stone were conscious of its motion but not of the force that caused it, it would think it flies of its own will.\n\nSo too with us: we are aware of what we do, but not necessarily of the causes that move us.'
+          },
+          {
+            type: 'depth',
+            title: 'העומק שמאחורי הרעיון',
+            titleEn: 'The Depth Behind the Idea',
+            content: 'אבל האם שפינוזה טוען שאין לנו שום אפשרות להיות חופשיים?\n\nלא בדיוק. לפי שפינוזה, חירות אינה פעולה ללא סיבות, אלא פעולה הנובעת מהבנת עצמנו ומהטבע שלנו, במקום מהיגררות פסיבית אחרי גורמים חיצוניים.\n\nלמשל, בהקשר הפרק הזה, אם נבין כיצד התראות מעוררות בנו סקרנות, אולי נוכל להחליט לכבות אותן. אמנם הרצונות שלנו עדיין יהיו חלק משרשרת של סיבות, אבל נוכל לפעול מתוך הבנה טובה יותר שלהן.\n\nחשוב לדייק: אצל שפינוזה, הבנת הסיבות אינה מבטלת את השפעתן. היא מאפשרת לנו להיות פעילים יותר ופחות נתונים לשליטתן של השפעות חיצוניות.\n\nאגב, הרעיון הזה השפיע גם על החשיבה הפסיכואנליטית. פרויד טען שחלק מההתנהגויות והרצונות שלנו מושפעים ממניעים לא־מודעים, ושבאמצעות הבנתם נוכל להיות פחות נתונים לשליטתם. במובן הזה, גם הפסיכואנליזה קושרת בין הכרת הסיבות שמניעות אותנו לבין האפשרות להיות חופשיים יותר.\n\nובכל זאת, מתעוררת שאלה: אם גם מעשינו וגם רצונותינו נקבעים בידי סיבות, באיזה מובן אנחנו אחראים להם?\n\nשפינוזה מציע להבין את החופש בדרך אחרת מזו שאנחנו רגילים אליה. בדיאלוג הבא דיוויד יום ישאל שאלה קשורה: מה בכלל מניע אותנו לפעולה?',
+            contentEn: 'But does Spinoza claim that we have no possibility of being free?\n\nNot exactly. According to Spinoza, freedom is not action without causes, but action that stems from understanding ourselves and our nature, instead of being passively dragged along by external factors.\n\nFor example, in the context of this chapter, if we understand how notifications arouse our curiosity, we may be able to decide to turn them off. Our desires will still be part of a chain of causes, but we can act from a better understanding of them.\n\nIt is important to be precise: for Spinoza, understanding the causes does not cancel their influence. It allows us to be more active and less subject to the control of external influences.\n\nBy the way, this idea also influenced psychoanalytic thinking. Freud argued that some of our behaviors and desires are influenced by unconscious motives, and that by understanding them we can be less subject to their control. In this sense, psychoanalysis too links knowing the causes that move us with the possibility of being freer.\n\nEven so, a question arises: if both our actions and our desires are determined by causes, in what sense are we responsible for them?\n\nSpinoza proposes understanding freedom differently from the way we are used to. In the next dialogue David Hume will ask a related question: what moves us to act in the first place?'
+          },
+          {
+            type: 'quiz',
+            question: 'אדם אומר: "אני יודע שבחרתי לפתוח את הטלפון, כי הרגשתי שאני רוצה לעשות זאת." כיצד שפינוזה היה מתייחס לטענה?',
+            questionEn: 'A person says: "I know I chose to open the phone, because I felt that I wanted to." How would Spinoza respond to this claim?',
+            options: ['עצם המודעות לרצון מוכיחה שהאדם בחר בו בחופשיות.', 'האדם מודע לרצונו, אך זה לא אומר שהוא מכיר את הסיבות שגרמו לרצון להופיע.', 'הרצון לפתוח את הטלפון הוא אשליה, ולכן האדם לא באמת רצה לעשות זאת.'],
+            optionsEn: ['The very awareness of a desire proves that the person chose it freely.', 'The person is aware of their desire, but that does not mean they know the causes that brought the desire about.', 'The desire to open the phone is an illusion, so the person did not really want to do it.'],
+            correctIndex: 1,
+            explanation: 'שפינוזה אינו מכחיש שאנחנו חווים רצונות. הוא טוען שהמודעות לרצון אינה מוכיחה שאנחנו המקור החופשי שלו, משום שאיננו מודעים בהכרח לסיבות שיצרו אותו.',
+            explanationEn: 'Spinoza does not deny that we experience desires. He claims that awareness of a desire does not prove that we are its free source, because we are not necessarily aware of the causes that produced it.'
+          },
+          {
+            type: 'quiz',
+            question: 'מה מדגימה האבן שנזרקה באוויר?',
+            questionEn: 'What does the stone thrown through the air illustrate?',
+            options: ['שמודעות לפעולה אינה מחייבת מודעות לסיבות שהובילו אליה.', 'שכל התנועות בטבע מתרחשות באופן מקרי.', 'שגם לדברים דוממים יש רצונות ובחירה חופשית.'],
+            optionsEn: ['That awareness of an action does not require awareness of the causes that led to it.', 'That all movements in nature happen at random.', 'That even inanimate things have desires and free choice.'],
+            correctIndex: 0,
+            explanation: 'אילו הייתה האבן מודעת לתנועתה בלבד, היא הייתה עשויה לחשוב שהיא נעה מרצונה. כך גם בני האדם עלולים לטעות ולראות את הרצון שלהם כהתחלה של שרשרת הסיבות, במקום להבין שהוא רק חוליה בשרשרת.',
+            explanationEn: 'If the stone were aware only of its motion, it might think it moves of its own will. Likewise, people may mistakenly see their desire as the beginning of the chain of causes, instead of understanding that it is only a link in the chain.'
+          },
+          {
+            type: 'quiz',
+            question: 'אדם מזהה שההתראות בטלפון גורמות לו לבדוק אותו ללא צורך, ולכן מחליט לכבות אותן. כיצד הדבר מתיישב עם תפיסת החירות של שפינוזה?',
+            questionEn: 'A person realizes that phone notifications make them check it unnecessarily, and so decides to turn them off. How does this fit with Spinoza\'s conception of freedom?',
+            options: ['הוא הוכיח שהוא מסוגל לפעול ללא שום סיבה חיצונית.', 'הוא ביטל לחלוטין את השפעת הרגשות על התנהגותו.', 'הוא הבין טוב יותר את הסיבות המשפיעות עליו, והשתמש בהבנה הזאת כדי לפעול באופן עצמאי יותר.'],
+            optionsEn: ['They proved that they can act without any external cause.', 'They completely eliminated the influence of emotions on their behavior.', 'They understood better the causes that influence them, and used that understanding to act more independently.'],
+            correctIndex: 2,
+            explanation: 'החופש אצל שפינוזה אינו היעדר סיבות. ככל שאנחנו מבינים טוב יותר מה מניע אותנו, אנחנו יכולים להיות פעילים יותר ופחות נתונים להשפעות שאיננו מבינים.',
+            explanationEn: 'For Spinoza, freedom is not the absence of causes. The better we understand what moves us, the more active we can be, and the less subject to influences we do not understand.'
+          },
+          { type: 'quiz_summary' }
+        ]
+      },
+      {
+        id: 2,
+        title: 'דיוויד יום: למה לדעת שזה מזיק לא מספיק כדי להפסיק?',
+        titleEn: 'David Hume: Why Isn\'t Knowing It\'s Harmful Enough to Make Us Stop?',
+        thinker: 'דיוויד יום',
+        thinkerEn: 'David Hume',
+        thinkerId: 'hume',
+        xp: 50,
+        sections: [
+          {
+            type: 'idea',
+            title: 'הרעיון של היום',
+            titleEn: 'Today\'s Idea',
+            content: 'שפינוזה טען שהרצונות שלנו נקבעים בידי סיבות שאיננו תמיד מודעים להן. אבל מה בעצם גורם לנו לפעול?\n\nנניח שאתם יודעים שגלילה ממושכת בטלפון פוגעת בשינה ובריכוז שלכם, ובכל זאת ממשיכים לגלול.\n\nאם אתם יודעים שהדבר מזיק לכם, מדוע הידיעה הזאת אינה מספיקה כדי שתפסיקו?\n\nדיוויד יום, פילוסוף סקוטי מהמאה ה־18, טען שהתשובה קשורה להבחנה בין תבונה לתשוקה.',
+            contentEn: 'Spinoza argued that our desires are determined by causes we are not always aware of. But what actually makes us act?\n\nSuppose you know that prolonged scrolling on the phone harms your sleep and concentration, and you keep scrolling anyway.\n\nIf you know it is harmful to you, why isn\'t that knowledge enough to make you stop?\n\nDavid Hume, an eighteenth-century Scottish philosopher, argued that the answer has to do with the distinction between reason and passion.'
+          },
+          {
+            type: 'source',
+            title: 'קטע מקור',
+            titleEn: 'Source Text',
+            quote: '"התבונה היא, וראוי שתהיה, רק משרתת של התשוקות, ואינה יכולה לתבוע לעצמה תפקיד אחר מלבד לשרת אותן ולציית להן."',
+            quoteEn: '"Reason is, and ought only to be the slave of the passions, and can never pretend to any other office than to serve and obey them."',
+            attr: 'דיוויד יום, "מסכת על טבע האדם", 1739',
+            attrEn: 'David Hume, A Treatise of Human Nature, 1739'
+          },
+          {
+            type: 'explanation',
+            title: 'הסבר',
+            titleEn: 'Explanation',
+            content: 'לפי יום, התבונה מאפשרת לנו להבין עובדות ולהסיק מסקנות. היא יכולה, למשל, לגלות שגלילה ממושכת פוגעת בשינה, או שכדאי להניח את הטלפון בצד כדי להתרכז בלימודים.\n\nאבל הידיעה הזאת לבדה אינה מניעה אותנו לפעול.\n\nמה שמניע אותנו הוא התשוקה: הרצון להשיג משהו, להימנע ממשהו או לחוות דבר מסוים.\n\nנניח שאתם יודעים שפעילות גופנית מועילה לבריאות. הידיעה הזאת יכולה לסייע לכם לבחור אימון מתאים, אבל כדי שתצאו להתאמן צריך גם שיהיה לכם רצון לעשות זאת, למשל הרצון להיות בריאים יותר.\n\nכך גם בטלפון. אתם יודעים שכדאי להפסיק לגלול, אבל הסקרנות לגבי הסרטון הבא עשויה להיות חזקה מהרצון שלכם ללכת לישון.\n\nמבחינת יום, גם רצונות כגון לשמור על הבריאות או להצליח בלימודים הם סוג של תשוקה. לכן המאבק אינו בהכרח בין תבונה לתשוקה, אלא לעיתים בין תשוקות שונות, שהתבונה מסייעת לנו להבין כיצד לממש אותן.',
+            contentEn: 'According to Hume, reason allows us to understand facts and draw conclusions. It can discover, for example, that prolonged scrolling harms sleep, or that it is worth putting the phone aside in order to concentrate on studying.\n\nBut this knowledge alone does not move us to act.\n\nWhat moves us is passion: the desire to obtain something, to avoid something, or to experience something.\n\nSuppose you know that physical exercise is good for your health. That knowledge can help you choose a suitable workout, but for you to go out and exercise you also need to want to do so, for example, the desire to be healthier.\n\nThe same goes for the phone. You know you should stop scrolling, but your curiosity about the next video may be stronger than your desire to go to sleep.\n\nFor Hume, even desires such as staying healthy or succeeding in your studies are a kind of passion. So the struggle is not necessarily between reason and passion, but sometimes between different passions, with reason helping us understand how to fulfill them.'
+          },
+          {
+            type: 'depth',
+            title: 'העומק שמאחורי הרעיון',
+            titleEn: 'The Depth Behind the Idea',
+            content: 'אם יום צודק, מדוע בכל זאת מידע חדש משנה לפעמים את ההתנהגות שלנו?\n\nיום אינו טוען שהתבונה חסרת השפעה לחלוטין. למשל, אם אדם רוצה לאכול מאכל מסוים משום שהוא מאמין שהוא בריא, גילוי שהמאכל מזיק לו עשוי לשנות את רצונו.\n\nאבל לפי יום, גם במקרה כזה השינוי מתרחש משום שלאדם כבר היה רצון לשמור על בריאותו.\n\nמכאן אפשר להסיק שכדי לשנות הרגלים, לא תמיד מספיק ללמוד עוד על הנזקים שלהם. לעיתים צריך לשנות גם את התנאים שמעוררים את התשוקה.\n\nלמשל, כיבוי התראות או הרחקת הטלפון מהמיטה עשויים להקל עלינו להפסיק לגלול.\n\nאבל עולה שאלה נוספת: אם התשוקות מניעות אותנו, האם אנחנו בוחרים מתי הן מופיעות?\n\nבדיאלוג הבא נפגוש ניסוי שניסה לבדוק מה מתרחש במוח עוד לפני שאנחנו מודעים לרצון לפעול.',
+            contentEn: 'If Hume is right, why does new information sometimes change our behavior?\n\nHume does not claim that reason has no influence at all. For example, if a person wants to eat a certain food because they believe it is healthy, discovering that it is harmful to them may change their desire.\n\nBut according to Hume, even in such a case the change happens because the person already had a desire to protect their health.\n\nFrom this we can conclude that to change habits, it is not always enough to learn more about their harms. Sometimes we also need to change the conditions that arouse the passion.\n\nFor example, turning off notifications or keeping the phone away from the bed may make it easier for us to stop scrolling.\n\nBut another question arises: if passions move us, do we choose when they appear?\n\nIn the next dialogue we will meet an experiment that tried to examine what happens in the brain even before we are aware of the desire to act.'
+          },
+          {
+            type: 'quiz',
+            question: 'אדם יודע שפעילות גופנית מועילה לבריאותו, אך אינו מצליח להתמיד בה. כיצד יום עשוי להסביר זאת?',
+            questionEn: 'A person knows that physical exercise is good for their health, but cannot keep it up. How might Hume explain this?',
+            options: ['הידיעה על התועלת הבריאותית אינה מספיקה לבדה להניע לפעולה; דרוש גם רצון מתאים.', 'אם האדם אינו מתאמן, סימן שלא הבין באמת את המידע על הבריאות.', 'התבונה גורמת לאדם להימנע מפעילות גופנית בכל פעם שהיא דורשת מאמץ.'],
+            optionsEn: ['Knowing about the health benefit is not enough on its own to move one to action; a suitable desire is also needed.', 'If the person does not exercise, it means they did not truly understand the information about health.', 'Reason causes the person to avoid physical activity whenever it demands effort.'],
+            correctIndex: 0,
+            explanation: 'לפי יום, התבונה מספקת מידע על העולם ועל האמצעים להשגת מטרות, אבל המוטיבציה לפעולה נובעת מתשוקות ורצונות.',
+            explanationEn: 'According to Hume, reason provides information about the world and about the means of achieving goals, but the motivation to act comes from passions and desires.'
+          },
+          {
+            type: 'quiz',
+            question: 'אדם מעוניין לשפר את בריאותו, ומגלה שהמזון שהוא נוהג לאכול מזיק לו. בעקבות הגילוי הוא משנה את התפריט. האם הדבר סותר את עמדתו של יום?',
+            questionEn: 'A person wants to improve their health, and discovers that the food they usually eat is harmful to them. As a result of the discovery, they change their diet. Does this contradict Hume\'s position?',
+            options: ['כן, משום שלפי יום מידע אינו מסוגל להשפיע על התנהגות בשום מצב.', 'לא, משום שהתבונה סיפקה מידע חדש, אך הרצון לשמור על הבריאות הוא שהניע את השינוי.', 'כן, משום שהשינוי מוכיח שהתבונה חזקה יותר מכל התשוקות.'],
+            optionsEn: ['Yes, because according to Hume information cannot influence behavior in any situation.', 'No, because reason supplied new information, but it was the desire to stay healthy that drove the change.', 'Yes, because the change proves that reason is stronger than any passion.'],
+            correctIndex: 1,
+            explanation: 'יום אינו טוען שהתבונה אינה משפיעה על מעשינו. הוא טוען שהיא אינה מניעה אותנו לבדה. במקרה הזה המידע החדש השפיע על הדרך שבה האדם מממש את רצונו להיות בריא.',
+            explanationEn: 'Hume does not claim that reason has no influence on our actions. He claims that it does not move us on its own. In this case the new information affected the way the person fulfills their desire to be healthy.'
+          },
+          {
+            type: 'quiz',
+            question: 'אדם רוצה גם להמשיך לצפות בסרטונים וגם לקום מוקדם למחרת. כיצד יום עשוי לתאר את המצב?',
+            questionEn: 'A person wants both to keep watching videos and to wake up early the next day. How might Hume describe the situation?',
+            options: ['כמאבק בין תשוקה אחת לבין תבונה שאין לה שום קשר לרצונות.', 'כהוכחה לכך שהאדם אינו מסוגל לחשוב באופן רציונלי.', 'כמאבק בין רצונות שונים, שהתבונה יכולה לסייע לו להבין את השלכותיהם.'],
+            optionsEn: ['As a struggle between one passion and a reason that has no connection to desires.', 'As proof that the person is unable to think rationally.', 'As a struggle between different desires, whose consequences reason can help them understand.'],
+            correctIndex: 2,
+            explanation: 'הרצון ליהנות עכשיו והרצון להיות ערני מחר הם שניהם רצונות. התבונה יכולה לסייע לאדם להבין מה דרוש למימוש כל אחד מהם, אך אינה מספקת לבדה את המוטיבציה לבחור ביניהם.',
+            explanationEn: 'The desire to enjoy oneself now and the desire to be alert tomorrow are both desires. Reason can help a person understand what is required to fulfill each of them, but it does not on its own supply the motivation to choose between them.'
+          },
+          { type: 'quiz_summary' }
+        ]
+      },
+      {
+        id: 3,
+        title: 'ליבט: האם המוח מחליט לפנינו?',
+        titleEn: 'Libet: Does the Brain Decide Before Us?',
+        thinker: 'בנג\'מין ליבט',
+        thinkerEn: 'Benjamin Libet',
+        thinkerId: 'libet',
+        xp: 50,
+        sections: [
+          {
+            type: 'idea',
+            title: 'הרעיון של היום',
+            titleEn: 'Today\'s Idea',
+            content: 'שפינוזה טען שאנחנו לא תמיד מודעים לסיבות שמניעות אותנו, ויום טען שהתשוקות שלנו הן שמניעות אותנו לפעולה.\n\nאבל מתי בדיוק אנחנו מחליטים לפעול?\n\nלכאורה, הסדר שאנחנו תופסים כאינטואיטיבי הוא כזה: קודם אנחנו מחליטים לעשות משהו, אחר כך המוח מפעיל את הגוף, ולבסוף מתרחשת הפעולה.\n\nאבל מהי אותה "החלטה"? האם היא משהו שגורם למוח לפעול? או שהיא בעצמה התרחשות של המוח, ולא קודמת לפעילות המוח?\n\nבשנת 1983 פרסם הנוירופיזיולוג בנג\'מין ליבט ניסוי מפורסם שערער על התמונה האינטואיטיבית לכאורה.',
+            contentEn: 'Spinoza argued that we are not always aware of the causes that move us, and Hume argued that our passions are what move us to act.\n\nBut when exactly do we decide to act?\n\nIntuitively, we picture the order like this: first we decide to do something, then the brain activates the body, and finally the action takes place.\n\nBut what is that "decision"? Is it something that causes the brain to act? Or is it itself an event in the brain, not something that precedes brain activity?\n\nIn 1983, the neurophysiologist Benjamin Libet published a famous experiment that challenged this seemingly intuitive picture.'
+          },
+          {
+            type: 'source',
+            title: 'קטע מקור',
+            titleEn: 'Source Text',
+            quote: '"נראה שהמוח \'מחליט\' ליזום את הפעולה, או לפחות להתכונן ליזום אותה, בזמן שקדם לכל מודעות שניתן לדווח עליה לכך שהחלטה כזו התקבלה."',
+            quoteEn: '"The brain evidently \'decides\' to initiate, or, at the least, to prepare to initiate the act at a time before there is any reportable subjective awareness that such a decision has taken place."',
+            attr: 'בנג\'מין ליבט ועמיתיו, 1983',
+            attrEn: 'Benjamin Libet and colleagues, 1983'
+          },
+          {
+            type: 'explanation',
+            title: 'הסבר',
+            titleEn: 'Explanation',
+            content: 'בניסוי התבקשו המשתתפים לבצע תנועה פשוטה של פרק כף היד, ברגע שהם בוחרים בעצמם.\n\nהם צפו בשעון מהיר והתבקשו לדווח היכן היה המחוג ברגע הראשון שבו הרגישו רצון להזיז את היד.\n\nבמקביל מדדו החוקרים את הפעילות החשמלית במוחם.\n\nהתברר שפעילות מוחית מקדימה, המכונה "פוטנציאל מוכנות" (Readiness Potential), החלה בממוצע כחצי שנייה לפני התנועה.\n\nלעומת זאת, המשתתפים דיווחו שהרגישו לראשונה את הרצון לפעול רק כ־200 אלפיות השנייה לפני התנועה.\n\nכלומר, הפעילות המוחית החלה כשליש שנייה לפני שהמשתתפים דיווחו על מודעות לרצון שלהם.\n\nהתוצאה הזאת עוררה שאלה מטרידה: אם המוח כבר מתכונן לפעולה לפני שאנחנו מודעים לרצון לפעול, האם ההחלטה המודעת היא באמת מה שמתחיל את הפעולה? או שהמודעות להחלטה היא תוצאה של ה\'החלטה\' של המוח?\n\nליבט עצמו הציע שגם אם איננו יוזמים את הפעולה באופן מודע, ייתכן שאנחנו עדיין מסוגלים לעצור אותה לפני ביצועה. הוא כינה זאת "וטו מודע": האפשרות לומר לא לדחף שכבר הופיע.',
+            contentEn: 'In the experiment, participants were asked to perform a simple wrist movement at a moment of their own choosing.\n\nThey watched a fast clock and were asked to report where the clock hand was at the first moment they felt the urge to move.\n\nAt the same time, the researchers measured the electrical activity in their brains.\n\nIt turned out that preparatory brain activity, called the "readiness potential," began on average about half a second before the movement.\n\nBy contrast, participants reported feeling the urge to act for the first time only about 200 milliseconds before the movement.\n\nThat is, the brain activity began about a third of a second before participants reported awareness of their desire.\n\nThis result raised a troubling question: if the brain is already preparing for action before we are aware of the desire to act, is the conscious decision really what starts the action? Or is the awareness of the decision a result of the brain\'s own "decision"?\n\nLibet himself suggested that even if we do not initiate the action consciously, we may still be able to stop it before it is carried out. He called this a "conscious veto": the possibility of saying no to an impulse that has already appeared.'
+          },
+          {
+            type: 'depth',
+            title: 'העומק שמאחורי הרעיון',
+            titleEn: 'The Depth Behind the Idea',
+            content: 'אבל האם הפעילות המוחית המוקדמת באמת מעידה שהמוח כבר החליט?\n\nבשנת 2012 הציע החוקר אהרון שורגר הסבר אחר: ייתכן שפוטנציאל המוכנות משקף הצטברות של תנודות בפעילות המוח, ולא החלטה שהתקבלה מראש.\n\nלפי ההסבר הזה, העובדה שפעילות מוחית מופיעה לפני המודעות לרצון אינה מוכיחה שכבר התקבלה החלטה בלתי מודעת.\n\nיש גם קשיים נוספים: הדיווח על רגע הופעת הרצון מבוסס על זיכרונם הסובייקטיבי של המשתתפים, וקשה לקבוע כך זמנים בדיוק מוחלט.\n\nבנוסף, כיפוף שרירותי של פרק כף היד אינו דומה להחלטות מורכבות, כמו בחירת מקצוע או סיום מערכת יחסים.\n\nלכן, הניסוי אינו מוכיח שאין לנו רצון חופשי. הוא מראה שהקשר בין פעילות המוח, מודעות ורצון מורכב יותר מכפי שנדמה לנו.\n\nבדיאלוג הבא קאנט יציע תפיסה אחרת של חירות, שאינה תלויה רק בשאלה מתי מתחילה הפעילות במוח.',
+            contentEn: 'But does the early brain activity really indicate that the brain has already decided?\n\nIn 2012, the researcher Aaron Schurger proposed a different explanation: the readiness potential may reflect an accumulation of fluctuations in brain activity, and not a decision made in advance.\n\nAccording to this explanation, the fact that brain activity appears before awareness of the desire does not prove that an unconscious decision has already been made.\n\nThere are other difficulties as well: the report of the moment the desire appeared is based on the participants\' subjective memory, and it is hard to determine times with absolute precision this way.\n\nIn addition, flexing a wrist arbitrarily is not like complex decisions, such as choosing a profession or ending a relationship.\n\nTherefore, the experiment does not prove that we have no free will. It shows that the relation between brain activity, awareness, and desire is more complex than it seems to us.\n\nIn the next dialogue Kant will offer a different conception of freedom, one that does not depend only on the question of when activity begins in the brain.'
+          },
+          {
+            type: 'quiz',
+            question: 'מה הייתה התוצאה המרכזית של ניסוי ליבט?',
+            questionEn: 'What was the main result of Libet\'s experiment?',
+            options: ['שהמשתתפים היו מודעים לרצונם לפעול לפני שהחלה כל פעילות מוחית הקשורה לתנועה.', 'שפעילות מוחית מקדימה הופיעה לפני הרגע שבו המשתתפים דיווחו שהיו מודעים לרצון לפעול.', 'שהמשתתפים לא הצליחו לבצע תנועה בלי הוראה מפורשת מהחוקרים.'],
+            optionsEn: ['That participants were aware of their desire to act before any brain activity related to the movement began.', 'That preparatory brain activity appeared before the moment at which participants reported being aware of the desire to act.', 'That participants were unable to perform a movement without an explicit instruction from the researchers.'],
+            correctIndex: 1,
+            explanation: 'פוטנציאל המוכנות הופיע לפני הדיווח על המודעות לרצון. התוצאה עוררה שאלות לגבי תפקידו של הרצון המודע בייזום פעולה.',
+            explanationEn: 'The readiness potential appeared before the report of awareness of the desire. The result raised questions about the role of conscious desire in initiating action.'
+          },
+          {
+            type: 'quiz',
+            question: 'כיצד ההסבר של שורגר מערער על הפרשנות המקובלת לניסוי ליבט?',
+            questionEn: 'How does Schurger\'s explanation challenge the accepted interpretation of Libet\'s experiment?',
+            options: ['הוא מראה שהפעילות המוחית המוקדמת עשויה לשקף תנודות מצטברות, ולא החלטה שכבר התקבלה.', 'הוא מוכיח שהמשתתפים היו מודעים לפעילות המוחית אך הסתירו זאת מהחוקרים.', 'הוא מראה שאין פעילות מוחית כלשהי לפני תנועות רצוניות.'],
+            optionsEn: ['It shows that the early brain activity may reflect accumulated fluctuations, and not a decision that has already been made.', 'It proves that participants were aware of the brain activity but concealed this from the researchers.', 'It shows that there is no brain activity at all before voluntary movements.'],
+            correctIndex: 0,
+            explanation: 'אם פוטנציאל המוכנות אינו סימן להחלטה מוקדמת, אי אפשר להסיק מעצם הופעתו שהמוח כבר החליט לפני שהאדם היה מודע לכך.',
+            explanationEn: 'If the readiness potential is not a sign of an early decision, we cannot conclude from its mere appearance that the brain had already decided before the person was aware of it.'
+          },
+          {
+            type: 'quiz',
+            question: 'מדוע קשה להסיק מניסוי ליבט שאין לבני אדם רצון חופשי בהחלטותיהם?',
+            questionEn: 'Why is it hard to conclude from Libet\'s experiment that humans have no free will in their decisions?',
+            options: ['משום שהניסוי הראה שכל הפעולות האנושיות מתחילות בהחלטה מודעת.', 'משום שפעילות חשמלית במוח אינה קשורה כלל להתנהגות.', 'משום שהמשמעות של הפעילות המוקדמת שנויה במחלוקת, והניסוי עסק בתנועות פשוטות ולא בהחלטות מורכבות.'],
+            optionsEn: ['Because the experiment showed that all human actions begin with a conscious decision.', 'Because electrical activity in the brain is not related to behavior at all.', 'Because the meaning of the early activity is disputed, and the experiment dealt with simple movements and not with complex decisions.'],
+            correctIndex: 2,
+            explanation: 'הניסוי בחן פעולה פשוטה וחסרת משמעות מיוחדת. גם אם המוח מתכונן אליה לפני המודעות לרצון, לא ברור מה אפשר להסיק מכך על תהליכי בחירה מורכבים.',
+            explanationEn: 'The experiment examined a simple action of no special significance. Even if the brain prepares for it before awareness of the desire, it is unclear what can be inferred from this about complex processes of choice.'
+          },
+          { type: 'quiz_summary' }
+        ]
+      },
+      {
+        id: 4,
+        title: 'קאנט: האם אפשר להיות אחראים למעשינו?',
+        titleEn: 'Kant: Can We Be Responsible for Our Actions?',
+        thinker: 'עמנואל קאנט',
+        thinkerEn: 'Immanuel Kant',
+        thinkerId: 'kant',
+        xp: 50,
+        sections: [
+          {
+            type: 'idea',
+            title: 'הרעיון של היום',
+            titleEn: 'Today\'s Idea',
+            content: 'עד עכשיו ראינו שהרצונות שלנו מושפעים מסיבות שאיננו תמיד מודעים להן, ושהמוח עשוי להתחיל להתכונן לפעולה עוד לפני שאנחנו מרגישים שבחרנו.\n\nאם כך, באיזה מובן אנחנו חופשיים? והאם אנחנו יכולים להיות אחראים למעשינו?\n\nעמנואל קאנט, פילוסוף גרמני בן המאה ה־18, הציע תפיסה של חירות המבוססת על מושג מרכזי: <strong>אוטונומיה</strong>.',
+            contentEn: 'So far we have seen that our desires are influenced by causes we are not always aware of, and that the brain may begin to prepare for action even before we feel that we have chosen.\n\nIf so, in what sense are we free? And can we be responsible for our actions?\n\nImmanuel Kant, an eighteenth-century German philosopher, proposed a conception of freedom based on a central concept: <strong>autonomy</strong>.'
+          },
+          {
+            type: 'source',
+            title: 'קטע מקור',
+            titleEn: 'Source Text',
+            quote: '"אוטונומיה של הרצון היא התכונה שבה הרצון הוא חוק לעצמו."',
+            quoteEn: '"Autonomy of the will is the property of the will by which it is a law to itself."',
+            attr: 'עמנואל קאנט, "הנחת יסוד למטפיזיקה של המידות", 1785',
+            attrEn: 'Immanuel Kant, Groundwork of the Metaphysics of Morals, 1785'
+          },
+          {
+            type: 'explanation',
+            title: 'הסבר',
+            titleEn: 'Explanation',
+            content: 'המילה "אוטונומיה" מורכבת משתי מילים ביוונית: "אוטו", עצמי, ו"נומוס", חוק.\n\nלפי קאנט, אדם אוטונומי הוא אדם שפועל לפי חוק שהוא נותן לעצמו באמצעות התבונה, ולא רק בעקבות דחפים או השפעות חיצוניות.\n\nאבל אין הכוונה שכל אדם יכול להמציא לעצמו חוקים כרצונו.\n\nקאנט טוען שעלינו לפעול לפי עקרונות שנוכל לרצות שיהיו חוקים כלליים, שכולם יפעלו לפיהם. זהו אחד הניסוחים של "הציווי הקטגורי".\n\nלמשל, נניח שאתם שוקלים לשקר כדי להימנע מאי־נעימות. האם תוכלו לרצות שכולם ישקרו בכל פעם שהדבר נוח להם?\n\nאם כולם ינהגו כך, האמון בהבטחות ובדברים שאנשים אומרים יתערער. לכן, לפי קאנט, אי אפשר להצדיק את השקר באמצעות כלל כזה.\n\nההפך מאוטונומיה הוא "הטרונומיה": מצב שבו הרצון שלנו נקבע בידי גורמים שאינם החוק התבוני שאנחנו נותנים לעצמנו.\n\nכאן ההבדל מיום: אצל יום, התבונה אינה מניעה אותנו ללא תשוקה; אצל קאנט, התבונה המעשית מסוגלת לקבוע עקרונות שמחייבים אותנו גם בניגוד לנטיותינו.',
+            contentEn: 'The word "autonomy" is composed of two Greek words: "auto" means self, and "nomos" means law.\n\nAccording to Kant, an autonomous person is one who acts according to a law that they give themselves through reason, and not only in response to impulses or external influences.\n\nBut this does not mean that anyone can invent laws for themselves as they please.\n\nKant claims that we must act according to principles that we could will to become universal laws, which everyone would follow. This is one of the formulations of the "categorical imperative."\n\nFor example, suppose you are considering lying in order to avoid an awkward situation. Could you will that everyone lie whenever it suits them?\n\nIf everyone acted this way, trust in promises and in what people say would collapse. Therefore, according to Kant, a lie cannot be justified by such a rule.\n\nThe opposite of autonomy is "heteronomy": a state in which our will is determined by factors other than the rational law we give ourselves.\n\nHere is the difference from Hume: for Hume, reason does not move us without passion; for Kant, practical reason is able to determine principles that bind us even against our inclinations.'
+          },
+          {
+            type: 'depth',
+            title: 'העומק שמאחורי הרעיון',
+            titleEn: 'The Depth Behind the Idea',
+            content: 'כיצד הרעיון הזה קשור לטלפון?\n\nנניח שאתם רוצים להמשיך לגלול, אבל גם התחייבתם ללמוד למבחן. אתם יכולים לשאול אם אתם פועלים מתוך דחף רגעי, או בהתאם לעיקרון שהחלטתם לאמץ.\n\n(חשוב לדייק: אצל קאנט, לא כל פעולה מתוך שליטה עצמית היא בהכרח פעולה מוסרית. אוטונומיה במובנה העמוק היא כפיפות לחוק מוסרי שהתבונה מחוקקת לעצמה, ולא רק היכולת להתגבר על פיתויים.)\n\nאבל כאן חוזרת בעיית הסיבתיות: אם גם החשיבה שלנו מתרחשת במוח ופועלת לפי חוקי הטבע, כיצד ייתכן שאנחנו באמת חופשיים?\n\nקאנט מבחין בין האדם כתופעה בעולם הטבע, שאפשר לחקור באמצעות חוקי הסיבתיות, לבין האדם כיצור תבוני הרואה בעצמו מחויב לחוק מוסרי.\n\nקאנט אינו טוען שאפשר להוכיח באמצעות ניסוי את קיומה של חירות כזאת. הוא טוען שהתפיסה שלנו את עצמנו כסוכנים מוסריים מחייבת אותנו לחשוב על עצמנו כחופשיים.\n\nבדיאלוג הבא סארטר יציע תפיסה חריפה עוד יותר של החירות ושל האחריות הנובעת ממנה.',
+            contentEn: 'How does this idea relate to the phone?\n\nSuppose you want to keep scrolling, but you have also committed to studying for an exam. You can ask whether you are acting from a momentary impulse, or in accordance with a principle you have decided to adopt.\n\n(It is important to be precise: for Kant, not every act of self-control is necessarily a moral act. Autonomy in its deeper sense is subjection to a moral law that reason legislates for itself, and not only the ability to overcome temptations.)\n\nBut here the problem of causality returns: if our thinking too takes place in the brain and operates according to the laws of nature, how can we truly be free?\n\nKant distinguishes between the human being as a phenomenon in the natural world, which can be studied through the laws of causality, and the human being as a rational creature who sees themselves as bound by a moral law.\n\nKant does not claim that the existence of such freedom can be proven by an experiment. He claims that our conception of ourselves as moral agents requires us to think of ourselves as free.\n\nIn the next dialogue Sartre will offer an even more radical conception of freedom and of the responsibility that follows from it.'
+          },
+          {
+            type: 'quiz',
+            question: 'מהי אוטונומיה לפי קאנט?',
+            questionEn: 'What is autonomy according to Kant?',
+            options: ['האפשרות לפעול לפי כל רצון שמתעורר בנו, ללא מגבלות חיצוניות.', 'היכולת לפעול לפי עקרונות שהתבונה מחוקקת לעצמה, ולא רק לפי דחפים ונטיות.', 'האפשרות לקבוע לעצמנו כללים אישיים שאינם מחייבים אנשים אחרים.'],
+            optionsEn: ['The possibility of acting on any desire that arises in us, without external limits.', 'The ability to act according to principles that reason legislates for itself, and not only according to impulses and inclinations.', 'The possibility of setting personal rules for ourselves that do not bind other people.'],
+            correctIndex: 1,
+            explanation: 'אצל קאנט, אוטונומיה אינה פשוט עשיית מה שאנחנו רוצים. היא היכולת לפעול לפי חוק שהתבונה נותנת לעצמה, ושאפשר להצדיק אותו כחוק כללי.',
+            explanationEn: 'For Kant, autonomy is not simply doing what we want. It is the ability to act according to a law that reason gives itself, and that can be justified as a universal law.'
+          },
+          {
+            type: 'quiz',
+            question: 'אדם מתלבט אם לשקר כדי להימנע מעונש. איזו שאלה משקפת את הציווי הקטגורי של קאנט?',
+            questionEn: 'A person is torn about whether to lie in order to avoid punishment. Which question reflects Kant\'s categorical imperative?',
+            options: ['האם אוכל לרצות שכל אדם ישקר במצב דומה, והכלל הזה יוכל לשמש חוק כללי?', 'האם השקר יוביל לתוצאה טובה יותר (לא בהכרח לי אישית) מאשר אם אגיד את האמת?', 'האם הרצון שלי לשקר חזק יותר מהרצון שלי לומר את האמת?'],
+            optionsEn: ['Could I will that every person lie in a similar situation, so that this rule could serve as a universal law?', 'Will the lie lead to a better outcome (not necessarily for me personally) than if I tell the truth?', 'Is my desire to lie stronger than my desire to tell the truth?'],
+            correctIndex: 0,
+            explanation: 'הציווי הקטגורי מבקש לבחון את העיקרון שמאחורי הפעולה, ולא רק את התוצאה הרצויה או את עוצמת הדחף שלנו.',
+            explanationEn: 'The categorical imperative asks us to examine the principle behind the action, and not only the desired outcome or the strength of our impulse.'
+          },
+          {
+            type: 'quiz',
+            question: 'מדוע ניסוי המראה שפעילות מוחית מקדימה החלטה מודעת אינו מכריע לבדו את שאלת החירות אצל קאנט?',
+            questionEn: 'Why does the finding that brain activity precedes a conscious decision not by itself settle the question of freedom for Kant?',
+            options: ['משום שלפי קאנט, האדם יכול לפעול ללא מוח.', 'משום שקאנט סבור שהתנהגות אנושית אינה מושפעת כלל מסיבות טבעיות.', 'משום שקאנט מבחין בין חקר האדם כתופעה טבעית לבין השאלה כיצד אפשר לראות בו סוכן תבוני ומוסרי.'],
+            optionsEn: ['Because according to Kant, a person can act without a brain.', 'Because Kant holds that human behavior is not influenced at all by natural causes.', 'Because Kant distinguishes between studying the human being as a natural phenomenon and the question of how they can be seen as a rational and moral agent.'],
+            correctIndex: 2,
+            explanation: 'ניסוי מוחי עוסק בסיבות הטבעיות של ההתנהגות. קאנט מבקש להבין גם את נקודת המבט שממנה האדם רואה בעצמו יצור המחויב לחוק מוסרי.',
+            explanationEn: 'A brain experiment deals with the natural causes of behavior. Kant seeks to understand also the standpoint from which a person sees themselves as a being bound by a moral law.'
+          },
+          { type: 'quiz_summary' }
+        ]
+      },
+      {
+        id: 5,
+        title: 'סארטר: האם "זו לא אשמתי" הוא תירוץ?',
+        titleEn: 'Sartre: Is "It\'s Not My Fault" an Excuse?',
+        thinker: 'ז\'אן־פול סארטר',
+        thinkerEn: 'Jean-Paul Sartre',
+        thinkerId: 'sartre',
+        xp: 50,
+        sections: [
+          {
+            type: 'idea',
+            title: 'הרעיון של היום',
+            titleEn: 'Today\'s Idea',
+            content: 'שפינוזה טען שאנחנו לא תמיד מכירים את הסיבות שמניעות אותנו. יום הדגיש את כוחן של התשוקות, ליבט גילה פעילות מוחית שמקדימה את המודעות לרצון, וקאנט הציע להבין חירות כפעולה לפי חוק שהתבונה נותנת לעצמה.\n\nכעת נחזור לשאלה שבה פתחנו: אם בילינו שעה בגלילה בטלפון, האם אפשר לומר שהאפליקציה אחראית לכך, ולא אנחנו?\n\nז\'אן־פול סארטר, פילוסוף צרפתי מהמאה ה־20, הציג תפיסה רדיקלית של חירות ושל אחריות אישית.',
+            contentEn: 'Spinoza argued that we do not always know the causes that move us. Hume emphasized the power of the passions, Libet discovered brain activity that precedes awareness of the desire, and Kant proposed understanding freedom as acting according to a law that reason gives itself.\n\nNow we return to the question we opened with: if we spent an hour scrolling on the phone, can we say that the app is responsible for it, and not us?\n\nJean-Paul Sartre, a twentieth-century French philosopher, presented a radical conception of freedom and personal responsibility.'
+          },
+          {
+            type: 'source',
+            title: 'קטע מקור',
+            titleEn: 'Source Text',
+            quote: '"האדם נידון להיות חופשי. נידון, משום שלא ברא את עצמו, ובכל זאת חופשי, ומרגע שהושלך לעולם הוא אחראי לכל מה שהוא עושה."',
+            quoteEn: '"Man is condemned to be free; condemned, because he did not create himself, yet is nevertheless at liberty, and from the moment that he is thrown into the world he is responsible for everything he does."',
+            attr: 'ז\'אן־פול סארטר, "האקזיסטנציאליזם הוא הומניזם", 1946',
+            attrEn: 'Jean-Paul Sartre, Existentialism Is a Humanism, 1946'
+          },
+          {
+            type: 'explanation',
+            title: 'הסבר',
+            titleEn: 'Explanation',
+            content: 'סארטר אינו מכחיש שאנחנו מושפעים מהנסיבות שבהן אנחנו חיים.\n\nלא בחרנו את המשפחה שנולדנו אליה, את הגוף שלנו או את החברה שבה גדלנו. גם לא בחרנו כיצד עוצבו האפליקציות בטלפון שלנו.\n\nסארטר מכנה את העובדות והנסיבות האלה "הנתונות" של חיינו (Facticity).\n\nאבל לטענתו, הנסיבות אינן קובעות לחלוטין מה נעשה איתן. גם בתוך מצב נתון, אנחנו נדרשים לבחור כיצד להתייחס אליו וכיצד לפעול.\n\nלכן סארטר טוען שאנחנו "נידונים להיות חופשיים": לא בחרנו להיות בעולם, אבל מרגע שאנחנו קיימים, איננו יכולים להימנע לחלוטין מן האחריות לבחירותינו.\n\nמכאן נובע מושג חשוב נוסף: "הונאה עצמית" (Bad Faith).\n\nנניח שאדם מבלה שעות בטלפון ואומר: "אין לי שום ברירה, הרי האפליקציה בנויה לגרום לי להתמכר."\n\nלפי סארטר, ייתכן שהוא מתאר נכון את כוח המשיכה של האפליקציה, אבל הוא עלול להשתמש בכך כדי להסתיר מעצמו את האפשרויות שעדיין עומדות בפניו.\n\nהונאה עצמית מתרחשת כאשר אדם מציג את עצמו כאילו הוא רק תוצאה של נסיבותיו, ומתכחש לחירות שבכל זאת יש לו ביחס אליהן.',
+            contentEn: 'Sartre does not deny that we are influenced by the circumstances in which we live.\n\nWe did not choose the family we were born into, our body, or the society in which we grew up. Nor did we choose how the apps on our phone were designed.\n\nSartre calls these facts and circumstances the "givens" of our lives, or "facticity."\n\nBut he argues that circumstances do not completely determine what we do with them. Even within a given situation, we are required to choose how to relate to it and how to act.\n\nTherefore Sartre claims that we are "condemned to be free": we did not choose to be in the world, but from the moment we exist, we cannot completely avoid responsibility for our choices.\n\nFrom this follows another important concept: "bad faith."\n\nSuppose a person spends hours on the phone and says: "I have no choice, the app is built to make me addicted."\n\nAccording to Sartre, they may be describing the pull of the app accurately, but they may also be using it to hide from themselves the possibilities that are still open to them.\n\nBad faith occurs when a person presents themselves as merely the product of their circumstances, and denies the freedom they nevertheless have in relation to them.'
+          },
+          {
+            type: 'depth',
+            title: 'העומק שמאחורי הרעיון',
+            titleEn: 'The Depth Behind the Idea',
+            content: 'אבל האם סארטר אינו מטיל על האדם אחריות גדולה מדי?\n\nחשבו על אדם המתמודד עם התמכרות, או על ילד שמתקשה לווסת את השימוש בטלפון. האם הוגן לטעון שהם יכולים פשוט לבחור אחרת?\n\nחשוב להבחין בין הטענה הפילוסופית של סארטר, שלפיה האדם אינו רק תוצר פסיבי של נסיבותיו, לבין הטענה הפסיכולוגית שכל אדם מסוגל להפסיק כל התנהגות בכל רגע. הטענה השנייה אינה נובעת בהכרח מן הראשונה.\n\nסארטר עצמו הקדיש בהמשך דרכו תשומת לב רבה יותר להשפעתם של תנאים חברתיים והיסטוריים על אפשרויות הפעולה של האדם.\n\nהביקורת על עמדתו היא שחירות אינה בהכרח זהה אצל כולם: אנשים שונים מתמודדים עם מגבלות שונות מאוד.\n\nובכל זאת, סארטר מזכיר לנו שההסבר מדוע פעלנו בדרך מסוימת אינו תמיד פוטר אותנו מאחריות למעשה.\n\nוכך אנחנו חוזרים לשאלת הפתיחה: האם תשומת הלב שלנו חופשית?\n\nשפינוזה מדגיש את הסיבות הנסתרות, יום את התשוקות, ליבט את התהליכים המוחיים, קאנט את האוטונומיה התבונית וסארטר את האחריות האישית.\n\nאפשר, אולי, לסכם את המחלוקת בשאלה אחת: עד כמה ההבנה של מה שמשפיע עלינו מאפשרת לנו גם לשנות את האופן שבו אנחנו פועלים?',
+            contentEn: 'But doesn\'t Sartre place too much responsibility on the individual?\n\nThink of a person struggling with addiction, or a child who has difficulty regulating phone use. Is it fair to claim that they can simply choose otherwise?\n\nIt is important to distinguish between Sartre\'s philosophical claim, that a person is not merely a passive product of their circumstances, and the psychological claim that every person is able to stop any behavior at any moment. The second claim does not necessarily follow from the first.\n\nSartre himself later in his career paid more attention to the influence of social and historical conditions on a person\'s possibilities for action.\n\nThe criticism of his position is that freedom is not necessarily the same for everyone: different people face very different constraints.\n\nEven so, Sartre reminds us that the explanation of why we acted a certain way does not always excuse us from responsibility for the act.\n\nAnd so we return to the opening question: is our attention free?\n\nSpinoza emphasizes hidden causes, Hume the passions, Libet the brain processes, Kant rational autonomy, and Sartre personal responsibility.\n\nPerhaps we can sum up the disagreement in one question: to what extent does understanding what influences us also enable us to change the way we act?'
+          },
+          {
+            type: 'quiz',
+            question: 'מה פירוש טענתו של סארטר שהאדם "נידון להיות חופשי"?',
+            questionEn: 'What does Sartre\'s claim that a person is "condemned to be free" mean?',
+            options: ['שהחירות היא עונש שהחברה מטילה על האדם.', 'שהאדם חופשי לעשות כל דבר שירצה, ללא מגבלות או השלכות.', 'שהאדם לא בחר את עצם קיומו, אך הוא נדרש להתמודד עם האחריות לבחירותיו בתוך הנסיבות שאליהן נקלע.'],
+            optionsEn: ['That freedom is a punishment imposed on a person by society.', 'That a person is free to do anything they wish, without limits or consequences.', 'That a person did not choose their very existence, but must deal with the responsibility for their choices within the circumstances in which they find themselves.'],
+            correctIndex: 2,
+            explanation: 'לפי סארטר, אנחנו לא בוחרים את כל נסיבות חיינו, אבל איננו יכולים להימנע לחלוטין מהצורך לבחור כיצד לפעול בתוכן.',
+            explanationEn: 'According to Sartre, we do not choose all the circumstances of our lives, but we cannot completely avoid the need to choose how to act within them.'
+          },
+          {
+            type: 'quiz',
+            question: 'אדם אומר: "אני מתנהג כך כי זה האופי שלי. אין שום אפשרות שאשתנה." כיצד סארטר עשוי להתייחס לטענה?',
+            questionEn: 'A person says: "I behave this way because that\'s my character. There is no way I could change." How might Sartre respond to this claim?',
+            options: ['הוא עשוי לראות בה הונאה עצמית, משום שהאדם מציג את אופיו כעובדה קבועה ומכחיש את האפשרות לשנות את התנהגותו.', 'הוא יסכים, משום שלדעתו האישיות קובעת באופן מוחלט את מעשיו של האדם.', 'הוא יטען שהאדם משקר בהכרח לאחרים, גם אם הוא מאמין לחלוטין בדבריו.'],
+            optionsEn: ['He might see it as bad faith, because the person presents their character as a fixed fact and denies the possibility of changing their behavior.', 'He would agree, because in his view personality completely determines a person\'s actions.', 'He would claim that the person is necessarily lying to others, even if they fully believe their own words.'],
+            correctIndex: 0,
+            explanation: 'הונאה עצמית אצל סארטר כוללת ניסיון לראות בעצמנו דבר קבוע ומוגדר לחלוטין, וכך להתחמק מן האחריות לאפשרויות הפעולה שעדיין פתוחות בפנינו.',
+            explanationEn: 'Bad faith in Sartre includes an attempt to see ourselves as something fixed and fully defined, and thus to evade responsibility for the possibilities for action that remain open to us.'
+          },
+          {
+            type: 'quiz',
+            question: 'איזו ביקורת אפשר להפנות לתפיסת האחריות של סארטר?',
+            questionEn: 'What criticism can be leveled at Sartre\'s conception of responsibility?',
+            options: ['שהיא אינה מכירה כלל בקיומן של נסיבות חיצוניות המשפיעות על חיינו.', 'שהיא עלולה להמעיט בחשיבותן של מגבלות פסיכולוגיות וחברתיות, ולכן לייחס לאנשים אחריות רבה מדי למעשיהם.', 'שהיא מבטלת את האפשרות להטיל אחריות על בני אדם משום שכל מעשיהם נקבעים בידי סיבות חיצוניות.'],
+            optionsEn: ['That it does not acknowledge at all the existence of external circumstances that affect our lives.', 'That it may underestimate the importance of psychological and social constraints, and so attribute too much responsibility to people for their actions.', 'That it cancels the possibility of holding people responsible, because all their actions are determined by external causes.'],
+            correctIndex: 1,
+            explanation: 'סארטר מכיר בקיומן של נסיבות נתונות, אך מדגיש מאוד את חירות האדם ביחס אליהן. הביקורת היא שלעיתים מגבלות כמו התמכרות, קשיים נפשיים או תנאים חברתיים מצמצמות באופן משמעותי את אפשרויות הפעולה.',
+            explanationEn: 'Sartre acknowledges the existence of given circumstances, but strongly emphasizes human freedom in relation to them. The criticism is that constraints such as addiction, psychological difficulties, or social conditions sometimes significantly narrow the possibilities for action.'
+          },
+          { type: 'quiz_summary' }
+        ]
+      }
+    ]
+  },
+  {
     id: 3,
     title: 'ספק וידע', titleEn: 'Doubt and Knowledge',
     subtitle: 'מה אנחנו יכולים לדעת - ואיך?', subtitleEn: 'What can we know - and how?',
