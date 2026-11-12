@@ -1780,6 +1780,403 @@ const economicsData = {
       ]
     },
     {
+        id: 'bonusEcon2',
+        title: 'האם הבינה המלאכותית תיקח את העבודה שלך?',
+        titleEn: 'Will AI Take Your Job?',
+        subtitle: 'מה חמישה כלכלנים יכולים ללמד אותנו על AI ועבודה',
+        subtitleEn: 'What five economists can teach us about AI and work',
+        isBonus: true,
+        subject: "economics",
+        xp: 100,
+        days: [
+          {
+            id: 0,
+            title: 'פתיחה: האם מכונות באמת לוקחות עבודות?',
+            titleEn: 'Opening: Are Machines Really Taking Jobs?',
+            thinker: '',
+            thinkerEn: '',
+            thinkerId: null,
+            xp: 0,
+            sections: [
+              {
+                type: 'idea',
+                title: 'על מה הפרק הזה?',
+                titleEn: 'What is this chapter about?',
+                content: 'בכל מקום שואלים אם הבינה המלאכותית תיקח את העבודה שלנו. לפי מחקר של גולדמן זקס מספטמבר 2026, ההשפעה על התעסוקה במשק כולו מוגבלת עד כה, אבל בענפים מסוימים, כמו מוקדי שירות, התעסוקה נמוכה בהרבה מהמגמה הצפויה. בקנדה, מחקר של הלשכה הסטטיסטית מסוף אוקטובר 2026 לא מצא עדות רחבה לכך שהבינה המלאכותית צמצמה את הגיוס, אך החשש מפני עבודות בתחילת הדרך נשאר.\n\nהחשש עצמו אינו חדש. הוא ישן מבינה מלאכותית, ומהמחשב עצמו.\n\nבפרק הזה נפגוש חמישה כלכלנים שניסו לענות על השאלה במשך יותר ממאתיים שנה, ונראה מה הם עדיין יכולים ללמד אותנו על הרגע הנוכחי.',
+                contentEn: 'Everywhere you look, people are asking whether AI will take our jobs. According to a Goldman Sachs study from September 2026, the effect on employment across the economy has been limited so far, but in certain sectors, such as call centers, employment is well below the expected trend. In Canada, a Statistics Canada study from late October 2026 found no broad evidence that AI has reduced hiring, though the worry about entry-level jobs remains.\n\nThe fear itself is not new. It is older than AI, and older than the computer.\n\nIn this chapter we meet five economists who have tried to answer the question for more than two hundred years, and see what they can still teach us about the present moment.'
+              },
+              {
+                type: 'idea',
+                title: 'מה נחקור?',
+                titleEn: 'What will we explore?',
+                content: '<strong>דייוויד ריקרדו</strong>: האם מכונות יכולות לפגוע בעובדים, גם כשהן משפרות את הרווחים של בעליהן?\n\nקרל מרקס: של מי המכונה, ולכן מי מרוויח ממנה?\n\nג\'ון מיינרד קיינס: ומה אם המכונות דווקא ישחררו אותנו מהצורך לעבוד כל כך הרבה?\n\nהרברט סיימון: למה כל כך קשה לחזות מה מכונות יעשו?\n\n<strong>דארון אסמוגלו</strong>: האם הכיוון שבו הטכנולוגיה מתפתחת הוא בחירה?\n\nבסוף הפרק נחזור לשאלה שבה פתחנו: האם הבינה המלאכותית תיקח את העבודה שלך, ואיזה חלק מהתשובה תלוי בנו?',
+                contentEn: '<strong>David Ricardo</strong>: Can machines hurt workers, even when they improve their owners\' profits?\n\nKarl Marx: Whose machine is it, and therefore who profits from it?\n\nJohn Maynard Keynes: What if machines actually free us from having to work so much?\n\nHerbert Simon: Why is it so hard to predict what machines will do?\n\n<strong>Daron Acemoglu</strong>: Is the direction technology takes a choice?\n\nAt the end of the chapter we return to the question we started with: will AI take your job, and how much of the answer depends on us?'
+              }
+            ]
+          },
+          {
+            id: 1,
+            title: 'ריקרדו: האם מכונות יכולות לפגוע בעובדים?',
+            titleEn: 'Ricardo: Can Machines Hurt Workers?',
+            thinker: 'דייוויד ריקרדו',
+            thinkerEn: 'David Ricardo',
+            thinkerId: 'ricardo',
+            xp: 50,
+            sections: [
+              {
+                type: 'idea',
+                title: 'הרעיון של היום',
+                titleEn: 'Today\'s Idea',
+                content: 'בשנה האחרונה בכל מקום נשאלת השאלה: האם בינה מלאכותית תיקח את העבודה שלנו? לפי מחקר של גולדמן זקס מספטמבר 2026, ההשפעה על התעסוקה במשק כולו מוגבלת עד כה, אבל בענפים מסוימים, כמו מוקדי שירות, התעסוקה נמוכה בהרבה מהמגמה הצפויה.\n\nהחשש הזה אינו חדש. לפני יותר ממאתיים שנה שאל את אותה שאלה דייוויד ריקרדו, כלכלן בריטי ומי שנחשב לאחד הגדולים בין תומכי השוק החופשי.\n\nוהתשובה שלו הפתיעה: הוא שינה את דעתו.',
+                contentEn: 'Over the past year the question has come up everywhere: will AI take our jobs? According to a Goldman Sachs study from September 2026, the effect on employment across the economy has been limited so far, but in certain sectors, such as call centers, employment is well below the expected trend.\n\nThis fear is not new. More than two hundred years ago, David Ricardo, a British economist regarded as one of the greatest defenders of the free market, asked the very same question.\n\nAnd his answer was surprising: he changed his mind.'
+              },
+              {
+                type: 'source',
+                title: 'קטע מקור',
+                titleEn: 'Source Text',
+                quote: '"הדעה שמחזיקים בה הפועלים, שהשימוש במכונות מזיק לעיתים קרובות לאינטרסים שלהם, אינה מבוססת על דעה קדומה וטעות, אלא תואמת את העקרונות הנכונים של הכלכלה המדינית."',
+                quoteEn: '"That the opinion entertained by the labouring class, that the employment of machinery is frequently detrimental to their interests, is not founded on prejudice and error, but is conformable to the correct principles of political economy."',
+                attr: 'דייוויד ריקרדו, "עקרונות הכלכלה המדינית והמיסוי", פרק 31, 1821',
+                attrEn: 'David Ricardo, On the Principles of Political Economy and Taxation, Chapter 31, 1821'
+              },
+              {
+                type: 'explanation',
+                title: 'הסבר',
+                titleEn: 'Explanation',
+                content: 'בתחילת דרכו האמין ריקרדו שמכונות שחוסכות עבודה הן תועלת לכולם. ב-1821, במהדורה השלישית של ספרו, הוסיף פרק חדש וכתב שהוא טעה.\n\nהנה ההיגיון שלו, בצורה פשוטה. דמיינו מאפייה: במקום לשכור עוד שלושה אופים, בעליה קונה תנור אוטומטי. הכסף שהלך על התנור לא הלך לשכר.\n\nאם בעל מפעל משקיע חלק מהכסף בבניית מכונה, נשאר פחות כסף לשכר. בטווח הקצר, פחות עובדים יקבלו עבודה.\n\nהרווח של בעל המפעל יכול להישאר כפי שהיה, או לעלות. אבל הביקוש לעובדים יורד, ואיתו גם התוצר הכולל, לפחות בטווח הקצר.\n\nריקרדו כתב את הפרק כמה שנים אחרי שפועלים בצפון אנגליה ניפצו מכונות אריגה, בתנועה שנודעה כלודיטים. הוא התייחס לחששם ברצינות.\n\nריקרדו הסיק שהעובדים אינם טועים כשהם חוששים ממכונות. החשש שלהם מבוסס. הוא לא אמר שזה כך תמיד, אלא שזה כך "לעיתים קרובות".\n\nוהחשיבות של הרעיון: כלכלן שתמך בשוק חופשי הודה שהשוק לא מבטיח שכולם ירוויחו מההתקדמות.',
+                contentEn: 'Early in his career, Ricardo believed that labor-saving machines benefit everyone. In 1821, in the third edition of his book, he added a new chapter and wrote that he had been wrong.\n\nHere is his logic, in simple form. Imagine a bakery: instead of hiring three more bakers, its owner buys an automatic oven. The money that went into the oven did not go into wages.\n\nIf a factory owner invests part of his money in building a machine, there is less money left for wages. In the short run, fewer workers get jobs.\n\nThe factory owner\'s profit can stay the same, or even rise. But demand for workers falls, and with it total output, at least in the short run.\n\nRicardo wrote the chapter a few years after workers in northern England smashed weaving machines, in a movement known as the Luddites. He took their fear seriously.\n\nRicardo concluded that workers are not wrong to fear machines. Their fear is well founded. He did not say it is always so, but that it is so "frequently."\n\nAnd here is why the idea matters: an economist who supported the free market admitted that the market does not guarantee that everyone will gain from progress.'
+              },
+              {
+                type: 'depth',
+                title: 'העומק שמאחורי הרעיון',
+                titleEn: 'The Depth Behind the Idea',
+                content: 'אבל האם ריקרדו צדק בטווח הארוך? ההיסטוריה מראה תמונה מורכבת.\n\nמכונות הוזילו מוצרים, מה שהגדיל את הביקוש להם ויצר ענפים חדשים, ובסופו של דבר התעסוקה גדלה. אלא שהיסטוריונים מצביעים על עשורים בתקופת המהפכה התעשייתית שבהם התפוקה לעובד עלתה והשכר כמעט לא.\n\nכלומר, "בטווח הארוך" עשוי להיות ארוך מאוד, ובינתיים אנשים אמיתיים משלמים את המחיר. גם ריקרדו הבין שבהמשך, כשהרווחים מושקעים מחדש, התוצר יכול לגדול. השאלה שלו הייתה מה קורה למי שנפל בדרך. פועל אריגה בן חמישים אינו הופך בקלות למתכנת.\n\nובעידן ה-AI, כשהמכונה חושבת ולא רק מזיזה דברים, השאלה חריפה אף יותר.\n\nואולי הלקח הגדול הוא שהשאלה אינה "האם טכנולוגיה טובה או רעה", אלא "מי מרוויח ומי משלם, ומתי".\n\nבדיאלוג הבא קרל מרקס יוסיף שאלה: למי שייכת המכונה, ולכן למי שייכים הרווחים?',
+                contentEn: 'But was Ricardo right in the long run? History shows a mixed picture.\n\nMachines made goods cheaper, which increased demand for them and created new industries, and in the end employment grew. But historians point to decades during the Industrial Revolution in which output per worker rose and wages barely did.\n\nIn other words, "the long run" can be very long, and in the meantime real people pay the price. Even Ricardo understood that later on, when profits are reinvested, output can grow. His question was what happens to those who fall along the way. A fifty-year-old weaver does not easily become a programmer.\n\nAnd in the age of AI, when the machine thinks and does not only move things, the question is even sharper.\n\nPerhaps the great lesson is that the question is not "is technology good or bad," but "who gains and who pays, and when."\n\nIn the next dialogue, Karl Marx adds a question: who owns the machine, and therefore who owns the profits?'
+              },
+              {
+                type: 'quiz',
+                question: 'מה שינה ריקרדו בדעתו ב-1821?',
+                questionEn: 'What did Ricardo change his mind about in 1821?',
+                options: ['הוא הפסיק לתמוך בשוק חופשי', 'הוא הודה שמכונות עלולות לפגוע בעובדים, ושהחשש שלהם מבוסס', 'הוא טען שמכונות אינן משפיעות על התעסוקה'],
+                optionsEn: ['He stopped supporting the free market', 'He admitted that machines can hurt workers, and that their fear is well founded', 'He argued that machines do not affect employment'],
+                correctIndex: 1,
+                explanation: 'ריקרדו האמין בתחילה שמכונות הן תועלת לכולם. ב-1821 כתב שהחשש של הפועלים אינו דעה קדומה אלא תואם את העקרונות הכלכליים הנכונים.',
+                explanationEn: 'Ricardo originally believed machines benefit everyone. In 1821 he wrote that the workers\' fear is not prejudice but conforms to the correct principles of economics.'
+              },
+              {
+                type: 'quiz',
+                question: 'מדוע לפי ריקרדו מכונה יכולה להפחית את הביקוש לעובדים?',
+                questionEn: 'According to Ricardo, why can a machine reduce demand for workers?',
+                options: ['משום שהכסף שמושקע בבניית המכונה אינו משמש לתשלום שכר', 'משום שמכונות אינן מייצרות כלום', 'משום שהעובדים מסרבים לעבוד לצד מכונות'],
+                optionsEn: ['Because the money invested in building the machine is not used to pay wages', 'Because machines produce nothing', 'Because workers refuse to work alongside machines'],
+                correctIndex: 0,
+                explanation: 'אם בעל המפעל מקצה כסף למכונה, נשאר פחות לשכר, ולכן בטווח הקצר פחות עובדים מועסקים, גם אם הרווח של בעל המפעל נשמר.',
+                explanationEn: 'If the factory owner allocates money to a machine, less is left for wages, so in the short run fewer workers are employed, even if the owner\'s profit is maintained.'
+              },
+              {
+                type: 'quiz',
+                question: 'מהי ההסתייגות המרכזית לטענה של ריקרדו?',
+                questionEn: 'What is the main reservation about Ricardo\'s claim?',
+                options: ['שמכונות לא הועילו לאף אחד', 'שבטווח הארוך מכונות מוזילות מוצרים ויוצרות ענפים חדשים, אך "הטווח הארוך" עשוי להיות ארוך, ואנשים משלמים את המחיר בינתיים', 'שריקרדו התנגד לכל טכנולוגיה'],
+                optionsEn: ['That machines did not help anyone', 'That in the long run machines make goods cheaper and create new industries, but "the long run" can be long, and people pay the price in the meantime', 'That Ricardo opposed all technology'],
+                correctIndex: 1,
+                explanation: 'ההיסטוריה מראה שהתעסוקה גדלה בסופו של דבר, אבל גם תקופות ארוכות שבהן העובדים לא נהנו מההתקדמות.',
+                explanationEn: 'History shows that employment did eventually grow, but also long periods in which workers did not share in the progress.'
+              },
+              { type: 'quiz_summary' }
+            ]
+          },
+          {
+            id: 2,
+            title: 'מרקס: של מי המכונה?',
+            titleEn: 'Marx: Whose Machine Is It?',
+            thinker: 'קרל מרקס',
+            thinkerEn: 'Karl Marx',
+            thinkerId: 'marx',
+            xp: 50,
+            sections: [
+              {
+                type: 'idea',
+                title: 'הרעיון של היום',
+                titleEn: 'Today\'s Idea',
+                content: 'ריקרדו הודה שמכונות עלולות לפגוע בעובדים, לפחות בטווח הקצר. אבל קרל מרקס, פילוסוף וכלכלן גרמני מהמאה ה-19, שאל שאלה אחרת: לא "האם המכונה טובה או רעה", אלא "של מי היא".\n\nכשחברה מכניסה בינה מלאכותית ומצמצמת עלויות, מי מקבל את החיסכון? העובדים, הלקוחות או הבעלים?\n\nעל כך עסק מרקס בספרו הגדול, "הקפיטל".',
+                contentEn: 'Ricardo admitted that machines can hurt workers, at least in the short run. But Karl Marx, a 19th-century German philosopher and economist, asked a different question: not "is the machine good or bad," but "whose is it."\n\nWhen a company brings in AI and cuts costs, who gets the savings? The workers, the customers, or the owners?\n\nMarx addressed this in his great work, Capital.'
+              },
+              {
+                type: 'source',
+                title: 'קטע מקור',
+                titleEn: 'Source Text',
+                quote: '"אפשר היה לכתוב היסטוריה שלמה של ההמצאות שנעשו מאז 1830, למטרה היחידה לספק להון נשק נגד מרידות מעמד הפועלים."',
+                quoteEn: '"It would be possible to write quite a history of the inventions, made since 1830, for the sole purpose of supplying capital with weapons against the revolts of the working-class."',
+                attr: 'קרל מרקס, "הקפיטל", כרך א\', פרק 15, 1867',
+                attrEn: 'Karl Marx, Capital, Volume 1, Chapter 15, 1867'
+              },
+              {
+                type: 'explanation',
+                title: 'הסבר',
+                titleEn: 'Explanation',
+                content: 'מרקס לא טען שמכונות הן רעות. להפך, הוא ראה בהן כוח אדיר שיכול לחסוך עבודה.\n\nאבל לטענתו, כשהמכונה שייכת לבעל ההון, הוא הוא שמחליט איך להשתמש בה.\n\nחזרו למאפייה: בעליה קונה תנור אוטומטי. הוא יכול לקצר לכולם את יום העבודה ולהשאיר את השכר. אבל הוא יכול גם לפטר שניים ולהשאיר לעצמו את הרווח.\n\nמרקס טען שבכלכלה שבה הרווח הוא המניע, הבחירה השנייה היא הסבירה יותר.\n\nבימיו של מרקס, מכונות אפשרו להחליף בעלי מקצוע מיומנים בפועלים לא מיומנים, ואפילו בילדים, בשכר נמוך בהרבה.\n\nהוא הוסיף עוד תובנה: אנשים שנפלטו מהעבודה יוצרים "צבא עתודה" של מובטלים. הנוכחות שלהם מקשה על העובדים שנשארו לדרוש שכר גבוה, כי תמיד יש מי שמוכן לעבוד תמורת פחות.\n\nוכך, לפי מרקס, המכונה אינה רק כלי ייצור. היא גם כלי כוח: היא משנה את מאזן הכוחות בין מי שמעסיק למי שמועסק.',
+                contentEn: 'Marx did not claim that machines are bad. On the contrary, he saw in them an enormous power that can save labor.\n\nBut, he argued, when the machine belongs to the owner of capital, it is the owner who decides how to use it.\n\nBack to the bakery: its owner buys an automatic oven. He can shorten everyone\'s workday and keep the wages. But he can also fire two people and keep the profit for himself.\n\nMarx argued that in an economy where profit is the driving motive, the second choice is the more likely one.\n\nIn Marx\'s day, machines made it possible to replace skilled tradesmen with unskilled workers, and even with children, at far lower wages.\n\nHe added another insight: people pushed out of work form a "reserve army" of the unemployed. Their presence makes it harder for the remaining workers to demand higher wages, because there is always someone willing to work for less.\n\nAnd so, according to Marx, the machine is not only a tool of production. It is also a tool of power: it shifts the balance of power between employer and employee.'
+              },
+              {
+                type: 'depth',
+                title: 'העומק שמאחורי הרעיון',
+                titleEn: 'The Depth Behind the Idea',
+                content: 'לפי פרשנות נפוצה, מרקס חזה שמצבם של העובדים יידרדר, ושהמערכת תקרוס. זה לא קרה. בהמשך המאה ה-19 והמאה ה-20 השכר הריאלי במדינות עשירות עלה בהרבה, בין השאר בזכות איגודי עובדים וחקיקה.\n\nוגם הקביעה שהמצאות נעשות רק כדי להכניע עובדים היא מוגזמת: מכונות נוצרות ממניעים רבים, ובהם סקרנות וצורך אמיתי.\n\nועם זאת, השאלה של מרקס נשארת חיה: מי מקבל את הרווחים של טכנולוגיה חדשה? כמה חברות מחזיקות היום את מערכות הבינה המלאכותית החזקות ביותר, וזה מחזיר את השאלה הישנה על בעלות.\n\nואולי הוויכוח האמיתי אינו על המכונה אלא על הכללים: מי קובע איך מתחלקים הרווחים, ובאיזה מנגנון.\n\nמרקס סבר שרק שינוי בבעלות על אמצעי הייצור יפתור זאת. רבים חולקים: אפשר לחלק רווחים גם בלי לבטל את הקניין הפרטי, למשל באמצעות מסים, איגודי עובדים ומניות לעובדים.\n\nלכן כדאי לשאול לא רק מה המכונה יכולה לעשות, אלא גם מי יושב מאחוריה.\n\nבדיאלוג הבא קיינס יציע תשובה אופטימית יותר: אולי המכונות ישחררו אותנו מהצורך לעבוד כל כך הרבה.',
+                contentEn: 'According to a common interpretation, Marx predicted that workers\' conditions would deteriorate and that the system would collapse. That did not happen. Over the rest of the 19th century and the 20th, real wages in wealthy countries rose substantially, partly thanks to labor unions and legislation.\n\nAnd the claim that inventions are made only to subdue workers is an exaggeration: machines are created from many motives, including curiosity and genuine need.\n\nStill, Marx\'s question remains alive: who receives the gains of a new technology? A handful of companies today hold the most powerful AI systems, which brings the old question of ownership back.\n\nPerhaps the real debate is not about the machine but about the rules: who decides how the gains are shared, and through what mechanism.\n\nMarx believed that only a change in the ownership of the means of production would solve this. Many disagree: gains can be shared without abolishing private property, for example through taxes, labor unions, and employee ownership.\n\nSo it is worth asking not only what the machine can do, but also who is sitting behind it.\n\nIn the next dialogue, Keynes offers a more optimistic answer: perhaps machines will free us from having to work so much.'
+              },
+              {
+                type: 'quiz',
+                question: 'מהי השאלה המרכזית של מרקס לגבי מכונות?',
+                questionEn: 'What is Marx\'s central question about machines?',
+                options: ['האם מכונות מהירות יותר מבני אדם', 'האם צריך לאסור מכונות', 'של מי המכונה, ולכן מי מחליט איך להשתמש בה ומי מקבל את הרווחים'],
+                optionsEn: ['Whether machines are faster than humans', 'Whether machines should be banned', 'Whose machine it is, and therefore who decides how to use it and who receives the gains'],
+                correctIndex: 2,
+                explanation: 'מרקס לא התנגד למכונות. הוא טען שכאשר הן שייכות לבעל ההון, הוא מחליט איך להשתמש בהן, ולכן הן משנות גם את יחסי הכוחות.',
+                explanationEn: 'Marx did not oppose machines. He argued that when they belong to the owner of capital, the owner decides how to use them, and so they also change the balance of power.'
+              },
+              {
+                type: 'quiz',
+                question: 'מהו "צבא העתודה" של מרקס?',
+                questionEn: 'What is Marx\'s "reserve army"?',
+                options: ['קבוצת עובדים בלתי מיומנים שמרקס הצדיק', 'אנשים שנפלטו מהעבודה, ושהימצאותם מקשה על העובדים שנשארו לדרוש שכר גבוה', 'יחידה צבאית שמגנה על מפעלים'],
+                optionsEn: ['A group of unskilled workers whom Marx defended', 'People pushed out of work, whose presence makes it harder for the remaining workers to demand higher wages', 'A military unit that protects factories'],
+                correctIndex: 1,
+                explanation: 'כשיש הרבה מובטלים, העובדים המועסקים מתקשים לדרוש שכר גבוה, כי יש מי שמוכן לעבוד תמורת פחות.',
+                explanationEn: 'When there are many unemployed people, employed workers find it hard to demand higher wages, because someone is willing to work for less.'
+              },
+              {
+                type: 'quiz',
+                question: 'איזו ביקורת על מרקס נכונה?',
+                questionEn: 'Which criticism of Marx is correct?',
+                options: ['שהוא חזה שמצב העובדים יידרדר והמערכת תקרוס, אך השכר הריאלי עלה ברוב המדינות העשירות', 'שהשכר הריאלי במדינות עשירות לא עלה אחרי תקופתו, בניגוד לצפי שלו', 'שהוא התעלם לחלוטין מהשפעת מכונות'],
+                optionsEn: ['That he predicted workers\' conditions would deteriorate and the system would collapse, yet real wages rose in most wealthy countries', 'That real wages in wealthy countries did not rise after his time, contrary to his expectation', 'That he completely ignored the effect of machines'],
+                correctIndex: 0,
+                explanation: 'בהמשך המאה ה-19 והמאה ה-20 השכר הריאלי במדינות עשירות עלה בהרבה, בין השאר בזכות איגודי עובדים וחקיקה.',
+                explanationEn: 'Over the rest of the 19th century and the 20th, real wages in wealthy countries rose substantially, partly thanks to labor unions and legislation.'
+              },
+              { type: 'quiz_summary' }
+            ]
+          },
+          {
+            id: 3,
+            title: 'קיינס: ומה אם המכונות ישחררו אותנו?',
+            titleEn: 'Keynes: What If Machines Free Us?',
+            thinker: 'ג\'ון מיינרד קיינס',
+            thinkerEn: 'John Maynard Keynes',
+            thinkerId: 'keynes',
+            xp: 50,
+            sections: [
+              {
+                type: 'idea',
+                title: 'הרעיון של היום',
+                titleEn: 'Today\'s Idea',
+                content: 'ריקרדו חשש שמכונות יפגעו בעובדים, ומרקס שאל מי הבעלים שלהן. ג\'ון מיינרד קיינס, כלכלן בריטי, שאל שאלה שלישית: ומה אם בסוף המכונות דווקא ישחררו אותנו?\n\nב-1930, בעיצומו של השפל הגדול, כתב קיינס מאמר שנקרא "האפשרויות הכלכליות של נכדינו". הוא ניסה לדמיין איך ייראה העולם בעוד מאה שנה.\n\nהמאה הזאת מסתיימת ב-2030.',
+                contentEn: 'Ricardo feared that machines would hurt workers, and Marx asked who owns them. John Maynard Keynes, a British economist, asked a third question: what if, in the end, machines actually free us?\n\nIn 1930, in the depths of the Great Depression, Keynes wrote an essay called "Economic Possibilities for our Grandchildren." He tried to imagine what the world would look like a hundred years later.\n\nThat century ends in 2030.'
+              },
+              {
+                type: 'source',
+                title: 'קטע מקור',
+                titleEn: 'Source Text',
+                quote: '"אנחנו לוקים במחלה חדשה, ששמה אולי טרם נשמע בפני חלק מהקוראים, אך עוד נשמע עליה רבות בשנים הבאות: אבטלה טכנולוגית. הכוונה לאבטלה שנוצרת כשהגילוי של דרכים לחסוך בעבודה מקדים את הקצב שבו אנחנו מוצאים שימושים חדשים לעבודה."',
+                quoteEn: '"We are being afflicted with a new disease of which some readers may not yet have heard the name, but of which they will hear a great deal in the years to come: namely, technological unemployment. This means unemployment due to our discovery of means of economising the use of labour outrunning the pace at which we can find new uses for labour."',
+                attr: 'ג\'ון מיינרד קיינס, "האפשרויות הכלכליות של נכדינו", 1930',
+                attrEn: 'John Maynard Keynes, Economic Possibilities for our Grandchildren, 1930'
+              },
+              {
+                type: 'explanation',
+                title: 'הסבר',
+                titleEn: 'Explanation',
+                content: 'קיינס הכיר את הפחד מאבטלה טכנולוגית, והוא אף נתן לו שם. אבל הוא סבר שמדובר ב"שלב זמני של חוסר התאמה". הוא כתב זאת כשהאבטלה הייתה גבוהה מאוד, ובכל זאת היה אופטימי.\n\nלדעתו, בעתיד הרחוק התועלת של המכונות תהיה גדולה בהרבה מהנזק. הוא צפה שבתוך מאה שנה רמת החיים במדינות המתקדמות תהיה גבוהה פי ארבעה עד פי שמונה.\n\nואם הכול כל כך גבוה, כמה נצטרך לעבוד? קיינס חשב ש"משמרות של שלוש שעות או שבוע עבודה של חמש עשרה שעות" יספיקו כדי לספק את רוב האנשים.\n\nהוא הבחין בין שני סוגי צרכים. צרכים מוחלטים הם דברים שאנחנו זקוקים להם, כמו אוכל ורהיטים. צרכים יחסיים הם דברים שאנחנו רוצים כדי להרגיש טובים יותר מאחרים. את הראשונים אפשר לסיים, חשב קיינס, ובעקבות זאת נוכל לעבוד פחות.',
+                contentEn: 'Keynes knew the fear of technological unemployment, and he even gave it a name. But he believed it was only a "temporary phase of maladjustment." He wrote this when unemployment was very high, and was optimistic all the same.\n\nIn his view, in the distant future the benefit of machines would be far greater than the harm. He predicted that within a hundred years the standard of living in the advanced countries would be four to eight times higher.\n\nAnd if everything is that much higher, how much will we need to work? Keynes thought that "three-hour shifts or a fifteen-hour week" would be enough to satisfy most people.\n\nHe distinguished between two kinds of needs. Absolute needs are things we require, like food and furniture. Relative needs are things we want in order to feel better than others. The first can be satisfied, Keynes thought, and as a result we will be able to work less.'
+              },
+              {
+                type: 'depth',
+                title: 'העומק שמאחורי הרעיון',
+                titleEn: 'The Depth Behind the Idea',
+                content: 'מה קרה בפועל? בחלק הראשון קיינס צדק: רמת החיים במדינות עשירות אכן עלתה בהרבה, ושעות העבודה השבועיות ירדו לעומת תחילת המאה ה-20.\n\nאבל שבוע של חמש עשרה שעות לא הגיע, ורוב האנשים עדיין עובדים כארבעים שעות בשבוע.\n\nלמה? ייתכן שקיינס העריך בחסר את הצרכים היחסיים: כשכולם עשירים יותר, אנחנו רוצים עוד, כדי להישאר מעל האחרים. וייתכן שהרווחים לא התחלקו בצורה שמאפשרת לכולם לעבוד פחות.\n\nוזה מחזיר אותנו לשאלה של מרקס: גם כשיש יותר, השאלה היא מי נהנה.\n\nובעידן הבינה המלאכותית, השאלה של קיינס חוזרת. אם הפריון יעלה, האם נעבוד פחות, או נרצה יותר? זו שאלה של ערכים, לא רק של כלכלה.\n\nקיינס עצמו הזהיר שהמעבר לעולם של פנאי לא יהיה קל, כי רבים אינם יודעים מה לעשות בזמן פנוי.\n\nבדיאלוג הבא הרברט סיימון ינסה לחזות, כמו קיינס, מה יעשו מכונות. ונראה כמה קשה לחזות.',
+                contentEn: 'What happened in practice? On the first part, Keynes was right: the standard of living in wealthy countries did rise enormously, and weekly working hours fell compared with the early 20th century.\n\nBut the fifteen-hour week never arrived, and most people still work around forty hours a week.\n\nWhy? Perhaps Keynes underestimated relative needs: when everyone is richer, we want more, in order to stay ahead of others. And perhaps the gains were not distributed in a way that lets everyone work less.\n\nThis brings us back to Marx\'s question: even when there is more, the question is who enjoys it.\n\nAnd in the age of AI, Keynes\'s question returns. If productivity rises, will we work less, or want more? That is a question of values, not only of economics.\n\nKeynes himself warned that the transition to a world of leisure would not be easy, because many people do not know what to do with free time.\n\nIn the next dialogue, Herbert Simon tries to predict, like Keynes, what machines will do. And we will see how hard prediction is.'
+              },
+              {
+                type: 'quiz',
+                question: 'מה סבר קיינס לגבי אבטלה טכנולוגית?',
+                questionEn: 'What did Keynes believe about technological unemployment?',
+                options: ['שהיא קבועה ותחמיר עם הזמן', 'שהיא בעיה זמנית, ושבעתיד הרחוק המכונות יעלו את רמת החיים ויאפשרו לעבוד פחות', 'שהיא אינה קיימת'],
+                optionsEn: ['That it is permanent and will worsen over time', 'That it is a temporary problem, and that in the distant future machines will raise the standard of living and allow us to work less', 'That it does not exist'],
+                correctIndex: 1,
+                explanation: 'קיינס כינה זאת "שלב זמני של חוסר התאמה". הוא צפה שבתוך מאה שנה רמת החיים תעלה פי ארבעה עד פי שמונה, ושיספיקו שעות עבודה מועטות.',
+                explanationEn: 'Keynes called it a "temporary phase of maladjustment." He predicted that within a hundred years the standard of living would rise four to eight times, and that few working hours would suffice.'
+              },
+              {
+                type: 'quiz',
+                question: 'מה ההבדל בין צרכים מוחלטים ליחסיים אצל קיינס?',
+                questionEn: 'What is the difference between absolute and relative needs in Keynes?',
+                options: ['צרכים מוחלטים הם דברים שמנסים להשיג כדי להרגיש טובים יותר מאחרים, ויחסיים הם אוכל ורהיטים', 'אין הבדל', 'צרכים מוחלטים הם מה שאנחנו זקוקים לו וניתן לסיימו, ויחסיים הם מה שאנחנו רוצים כדי להרגיש טובים יותר מאחרים'],
+                optionsEn: ['Absolute needs are things we strive for in order to feel better than others, and relative needs are food and furniture', 'There is no difference', 'Absolute needs are what we require and can be satisfied, and relative needs are what we want in order to feel better than others'],
+                correctIndex: 2,
+                explanation: 'קיינס חשב שאת הצרכים המוחלטים אפשר לסיים, ולכן נוכל לעבוד פחות. הצרכים היחסיים, לעומת זאת, אינם נגמרים.',
+                explanationEn: 'Keynes thought absolute needs can be satisfied, and so we will be able to work less. Relative needs, by contrast, never run out.'
+              },
+              {
+                type: 'quiz',
+                question: 'מדוע לא הגיע שבוע של חמש עשרה שעות כפי שצפה קיינס?',
+                questionEn: 'Why did the fifteen-hour week that Keynes predicted not arrive?',
+                options: ['ייתכן שהצרכים היחסיים לא נגמרים, והרווחים לא התחלקו בצורה שמאפשרת לכולם לעבוד פחות', 'משום שרמת החיים לא עלתה', 'משום שמכונות הפסיקו לחסוך עבודה'],
+                optionsEn: ['Perhaps relative needs never run out, and the gains were not distributed in a way that lets everyone work less', 'Because the standard of living did not rise', 'Because machines stopped saving labor'],
+                correctIndex: 0,
+                explanation: 'רמת החיים עלתה, אבל כשכולם עשירים יותר, אנחנו רוצים עוד, והרווחים אינם מתחלקים בהכרח שווה.',
+                explanationEn: 'The standard of living rose, but when everyone is richer, we want more, and the gains are not necessarily shared equally.'
+              },
+              { type: 'quiz_summary' }
+            ]
+          },
+          {
+            id: 4,
+            title: 'סיימון: למה כל כך קשה לחזות מה מכונות יעשו?',
+            titleEn: 'Simon: Why Is It So Hard to Predict?',
+            thinker: 'הרברט סיימון',
+            thinkerEn: 'Herbert Simon',
+            thinkerId: 'simon',
+            xp: 50,
+            sections: [
+              {
+                type: 'idea',
+                title: 'הרעיון של היום',
+                titleEn: 'Today\'s Idea',
+                content: 'קיינס ניסה לחזות את העתיד, ושגה בחלק ממנו. עכשיו נפגוש מי שניסה לעשות זאת בצורה מדויקת יותר, ושגה בדרך אחרת.\n\nהרברט סיימון, שזכה בפרס נובל לכלכלה ב-1978 ונחשב לאחד מאבות הבינה המלאכותית, כתב ב-1960 משפט שנשמע מוכר מאוד בימינו.\n\nכל כותרת שמבטיחה שבתוך כמה שנים מכונות יעשו את כל העבודות שלנו מזכירה אותו. מה קרה לו?',
+                contentEn: 'Keynes tried to predict the future, and got part of it wrong. Now we meet someone who tried to do it more precisely, and went wrong in a different way.\n\nHerbert Simon, who won the Nobel Prize in Economics in 1978 and is considered one of the fathers of artificial intelligence, wrote a sentence in 1960 that sounds very familiar today.\n\nEvery headline that promises that within a few years machines will do all our jobs echoes it. What happened to him?'
+              },
+              {
+                type: 'source',
+                title: 'קטע מקור',
+                titleEn: 'Source Text',
+                quote: '"מבחינה טכנולוגית, כפי שטענתי קודם, מכונות יהיו מסוגלות, בתוך עשרים שנה, לעשות כל עבודה שאדם יכול לעשות."',
+                quoteEn: '"Technologically, as I have argued, machines will be capable, within twenty years, of doing any work that a man can do."',
+                attr: 'הרברט סיימון, "The New Science of Management Decision", 1960',
+                attrEn: 'Herbert Simon, The New Science of Management Decision, 1960'
+              },
+              {
+                type: 'explanation',
+                title: 'הסבר',
+                titleEn: 'Explanation',
+                content: 'סיימון ידע על מה הוא מדבר: הוא בנה בעצמו תוכנות מוקדמות של בינה מלאכותית. ובכל זאת, ב-1980 מכונות לא עשו כל עבודה של אדם, וגם היום הן לא עושות.\n\nשני דברים הוא לא הביא בחשבון.\n\nהראשון: הוא העריך יתר על המידה כמה מהר המכונות יתקדמו. התחום נתקל בקשיים שלא נראו מראש.\n\nהשני, והמעניין יותר: סיימון עצמו כתב באותו הקשר שיכולת אינה זהה להחלפה. מכונה שמסוגלת לעשות משימה לא בהכרח תחליף עובד, אם היא יקרה מדי, או אם היא עושה רק חלק מהעבודה.\n\nהוא אפילו חישב: מחשב ששכירותו עשרת אלפים דולר בחודש כדאי רק אם הוא מחליף כעשרה עובדים בניהול ביניים.\n\nדוגמה: כשהוצבו כספומטים, צפו שהם יחסלו את הפקידים בבנקים. אבל בארצות הברית מספר הפקידים דווקא גדל במשך שנים רבות, כי הכספומט הוזיל את פתיחת הסניפים, והפקידים עסקו יותר בשירות ובמכירות.\n\nהסיבה: עבודה היא אוסף של משימות, ומכונה מחליפה משימות, לא תמיד משרות.',
+                contentEn: 'Simon knew what he was talking about: he himself built some of the earliest AI programs. And yet, in 1980 machines were not doing every human job, and they still are not today.\n\nThere are two things he did not take into account.\n\nThe first: he overestimated how fast machines would advance. The field ran into difficulties that were not visible in advance.\n\nThe second, and the more interesting: Simon himself wrote in the same context that capability is not the same as replacement. A machine that can do a task will not necessarily replace a worker, if it is too expensive, or if it does only part of the job.\n\nHe even calculated it: a computer that rents for ten thousand dollars a month is worthwhile only if it replaces about ten workers in middle management.\n\nAn example: when ATMs were introduced, people expected them to wipe out bank tellers. But in the United States the number of tellers actually grew for many years, because the ATM made opening branches cheaper, and tellers spent more time on service and sales.\n\nThe reason: a job is a bundle of tasks, and a machine replaces tasks, not always jobs.'
+              },
+              {
+                type: 'depth',
+                title: 'העומק שמאחורי הרעיון',
+                titleEn: 'The Depth Behind the Idea',
+                content: 'סיימון צדק לפחות בדבר אחד: הוא סבר שבני אדם ישמרו על יתרון בעבודות שדורשות טיפול גמיש בסביבה פיזית, ובשירות פנים אל פנים. גם היום רובוטים מתקשים בהרבה בעבודות פיזיות גמישות.\n\nאבל הסדר שבו התקדמו הדברים הפתיע: מכונות כבר כותבות טקסטים ותוכנה, משימות שרבים חשבו שיישארו אנושיות עוד זמן רב. כלומר, גם כשמנחשים נכון חלק מהתמונה, קשה לדעת מה יגיע ראשון.\n\nמה הלקח? לא שהבינה המלאכותית של היום היא הבטחה ריקה. ייתכן מאוד שהפעם זה שונה. הלקח הוא שתחזיות על "כמה זמן" ו"אילו משרות" שגויות באופן שיטתי, גם כשהן באות ממומחים גדולים.\n\nיש כאן גם קשר לפרק על כלכלה התנהגותית: סיימון הוא מי שהציג את הרציונליות המוגבלת, והיא תקפה גם לכלכלנים כשהם חוזים את העתיד. מי שמבטיח תאריך מדויק, מנחש.\n\nומכאן שהשאלה הנכונה פחות "מה המכונה יכולה לעשות", ויותר "אילו משימות היא תחליף, ואילו תיצור".\n\nבדיאלוג האחרון דארון אסמוגלו ישאל בדיוק את זה: האם הטכנולוגיה מחליפה משימות או יוצרת חדשות, והאם זו בחירה.',
+                contentEn: 'Simon was right in at least one respect: he believed humans would keep an advantage in jobs that require flexible handling of a physical environment, and in face-to-face service. Even today, robots struggle far more with flexible physical work.\n\nBut the order in which things advanced was surprising: machines already write text and software, tasks many thought would stay human for a long time. In other words, even when you guess part of the picture right, it is hard to know what will arrive first.\n\nWhat is the lesson? Not that today\'s AI is an empty promise. It may well be different this time. The lesson is that forecasts about "how long" and "which jobs" are systematically wrong, even when they come from great experts.\n\nThere is also a link here to the chapter on behavioral economics: Simon is the one who introduced bounded rationality, and it applies to economists too when they predict the future. Whoever promises an exact date is guessing.\n\nSo the right question is less "what can the machine do," and more "which tasks will it replace, and which will it create."\n\nIn the final dialogue, Daron Acemoglu asks exactly that: does technology replace tasks or create new ones, and is it a choice?'
+              },
+              {
+                type: 'quiz',
+                question: 'מה סיימון לא הביא בחשבון בתחזית של 1960?',
+                questionEn: 'What did Simon fail to take into account in his 1960 prediction?',
+                options: ['שמכונה שמסוגלת לעשות משימה לא בהכרח תחליף עובד, ושהמכונות יתקדמו לאט ממה שציפה', 'שמכונות לא ידעו לחשב', 'שאין עוד עובדים'],
+                optionsEn: ['That a machine capable of a task will not necessarily replace a worker, and that machines would advance more slowly than he expected', 'That machines would not know how to calculate', 'That there would be no more workers'],
+                correctIndex: 0,
+                explanation: 'סיימון העריך יתר על המידה את המהירות, וגם כתב בעצמו שיכולת אינה זהה להחלפה, כי עלות ומשימות חלקיות משפיעות.',
+                explanationEn: 'Simon overestimated the speed, and also wrote himself that capability is not the same as replacement, because cost and partial tasks matter.'
+              },
+              {
+                type: 'quiz',
+                question: 'מה לימדה הדוגמה של הכספומטים?',
+                questionEn: 'What did the ATM example teach?',
+                options: ['שמכונה תמיד מחסלת את המשרה שהיא מחליפה', 'שמכונה מחליפה משימות, ולא תמיד משרות, ולפעמים משרות גדלות בגלל הוזלה', 'שכספומטים אינם עובדים'],
+                optionsEn: ['That a machine always eliminates the job it replaces', 'That a machine replaces tasks, not always jobs, and sometimes jobs grow because of cost reductions', 'That ATMs do not work'],
+                correctIndex: 1,
+                explanation: 'הכספומט הוזיל את פתיחת הסניפים, והפקידים עסקו יותר בשירות ובמכירות, ולכן המשרות לא נעלמו מיד.',
+                explanationEn: 'The ATM made opening branches cheaper, and tellers spent more time on service and sales, so the jobs did not disappear right away.'
+              },
+              {
+                type: 'quiz',
+                question: 'מהו הלקח מהתחזית של סיימון?',
+                questionEn: 'What is the lesson from Simon\'s prediction?',
+                options: ['שהבינה המלאכותית היא הבטחה ריקה', 'שאסור לדבר על העתיד', 'שתחזיות על "כמה זמן" ו"אילו משרות" שגויות באופן שיטתי, גם כשהן של מומחים, ושכדאי לשאול אילו משימות מוחלפות'],
+                optionsEn: ['That AI is an empty promise', 'That one should not talk about the future', 'That forecasts about "how long" and "which jobs" are systematically wrong, even when made by experts, and that it is worth asking which tasks are replaced'],
+                correctIndex: 2,
+                explanation: 'הלקח אינו שהטכנולוגיה חסרת כוח, אלא שהתחזיות המדויקות קשות, והשאלה הטובה יותר היא אילו משימות מוחלפות ואילו נוצרות.',
+                explanationEn: 'The lesson is not that the technology is powerless, but that precise predictions are hard, and the better question is which tasks are replaced and which are created.'
+              },
+              { type: 'quiz_summary' }
+            ]
+          },
+          {
+            id: 5,
+            title: 'אסמוגלו: האם הכיוון של הטכנולוגיה הוא בחירה?',
+            titleEn: 'Acemoglu: Is the Direction of Technology a Choice?',
+            thinker: 'דארון אסמוגלו',
+            thinkerEn: 'Daron Acemoglu',
+            thinkerId: 'acemoglu',
+            xp: 50,
+            sections: [
+              {
+                type: 'idea',
+                title: 'הרעיון של היום',
+                titleEn: 'Today\'s Idea',
+                content: 'ריקרדו חשש שמכונות יפגעו בעובדים. מרקס שאל של מי המכונה. קיינס קיווה שהן ישחררו אותנו, וסיימון הראה כמה קשה לחזות. עכשיו נחזור לשאלה שבה פתחנו: האם הבינה המלאכותית תיקח את העבודה שלך?\n\nדארון אסמוגלו, כלכלן טורקי-אמריקאי מ-MIT שזכה בפרס נובל לכלכלה ב-2024, טוען שהשאלה הזאת מנוסחת לא נכון.\n\nלדעתו, הטכנולוגיה אינה כוח טבע עם כיוון אחד. יש לה כיוונים שונים, ואת הכיוון אפשר לבחור.',
+                contentEn: 'Ricardo feared machines would hurt workers. Marx asked whose machine it is. Keynes hoped they would free us, and Simon showed how hard prediction is. Now we return to the question we started with: will AI take your job?\n\nDaron Acemoglu, a Turkish-American economist at MIT who won the Nobel Prize in Economics in 2024, argues that this question is framed wrongly.\n\nIn his view, technology is not a force of nature with a single direction. It has different directions, and the direction can be chosen.'
+              },
+              {
+                type: 'source',
+                title: 'קטע מקור',
+                titleEn: 'Source Text',
+                quote: '"אוטומציה תמיד מקטינה את חלקה של העבודה בערך המוסף, ועשויה להפחית את הביקוש לעבודה גם כשהיא מעלה את הפריון."',
+                quoteEn: '"Automation always reduces the labor share in value added and may reduce the demand for labor even as it raises productivity."',
+                attr: 'דארון אסמוגלו ופסקואל רסטרפו, "Automation and New Tasks", 2019',
+                attrEn: 'Daron Acemoglu and Pascual Restrepo, Automation and New Tasks, 2019'
+              },
+              {
+                type: 'explanation',
+                title: 'הסבר',
+                titleEn: 'Explanation',
+                content: 'אסמוגלו ורסטרפו מבחינים בין שני כוחות שפועלים בו זמנית.\n\nהכוח הראשון הוא "אפקט ההחלפה": כשמכונה מבצעת משימה שבעבר ביצע אדם, העובד מאבד אותה. זה מה שחששו ממנו ריקרדו ומרקס.\n\nהכוח השני הוא "אפקט היצירה מחדש": טכנולוגיה יוצרת גם משימות חדשות שבהן בני אדם יכולים לתרום. לפני כמאה שנה לא היו מתכנתים, ולפני עשרים שנה לא היו מנהלי רשתות חברתיות.\n\nהשאלה אם העבודה תיעלם תלויה ביחס בין שני הכוחות. כשהיצירה מחדש חזקה, העבודה גדלה. כשההחלפה חזקה ממנה, העבודה נפגעת, גם אם התוצר עולה.\n\nכלומר, ההשפעה של הבינה המלאכותית אינה גזרה, אלא תוצאה של בחירות של חברות, ממשלות ומשתמשים.\n\nאסמוגלו מזהיר מסוג של אוטומציה שהוא מכנה "בינונית": היא מחליפה עובדים, אבל כמעט אינה מעלה את הפריון. דוגמה אחת היא קופות עצמיות בחנויות.',
+                contentEn: 'Acemoglu and Restrepo distinguish between two forces that operate at the same time.\n\nThe first force is the "displacement effect": when a machine performs a task that a person used to perform, the worker loses it. This is what Ricardo and Marx feared.\n\nThe second force is the "reinstatement effect": technology also creates new tasks in which humans can contribute. A century ago there were no programmers, and twenty years ago there were no social media managers.\n\nWhether work disappears depends on the balance between the two forces. When reinstatement is strong, work grows. When displacement is stronger, work suffers, even if output rises.\n\nIn other words, the impact of AI is not a decree, but the result of choices made by companies, governments, and users.\n\nAcemoglu warns against a kind of automation he calls "so-so": it replaces workers, but barely raises productivity. One example is self-checkout machines in stores.'
+              },
+              {
+                type: 'depth',
+                title: 'העומק שמאחורי הרעיון',
+                titleEn: 'The Depth Behind the Idea',
+                content: 'מכאן הטענה המרכזית של אסמוגלו וסיימון ג\'ונסון בספרם "כוח והתקדמות": התקדמות טכנולוגית אינה מבטיחה שגשוג משותף. זה תלוי באילו כיוונים בוחרים לפתח, ומי מחליט.\n\nוהוא מציע דוגמה: לפי הטענה שלו, חברות רבות מעדיפות לפתח טכנולוגיות שמחליפות עובדים, ולא שמסייעות להם, ובין הסיבות גם מסים נמוכים יותר על הון מאשר על עבודה.\n\nויש גם ביקורת. לא ברור כמה אפשר באמת לכוון טכנולוגיה, ומי היה אמור לעשות זאת. וייתכן שדווקא ניסיון לכוון יפגע בחדשנות.\n\nאפשר לראות שהדיאלוגים של הפרק משלימים זה את זה. ריקרדו הראה שהחשש מבוסס. מרקס שאל מי מרוויח. קיינס שאל מה נעשה עם התועלת. סיימון הזהיר מתחזיות. ואסמוגלו אומר שהתשובה תלויה בבחירות שלנו.\n\nמה זה אומר עבורך? ייתכן שהשאלה האישית אינה אם העבודה תיעלם, אלא אילו מהמשימות שלך יוחלפו, ואילו יהפכו חשובות יותר, כמו שיפוט, אחריות ויחסי אנוש.\n\nוכך, האם הבינה המלאכותית תיקח את העבודה שלך? אולי חלק ממנה. השאלה החשובה היא אילו משימות יוחלפו, אילו חדשות ייווצרו, ומי יחליט.',
+                contentEn: 'From here comes the central claim of Acemoglu and Simon Johnson in their book Power and Progress: technological progress does not guarantee shared prosperity. It depends on which directions we choose to develop, and who decides.\n\nHe offers an example: according to his claim, many companies prefer to develop technologies that replace workers rather than help them, and among the reasons is that capital is taxed less than labor.\n\nThere is also criticism. It is not clear how much technology can really be steered, or who would be supposed to do it. And an attempt to steer it might harm innovation.\n\nYou can see that the dialogues in this chapter complement each other. Ricardo showed that the fear is well founded. Marx asked who profits. Keynes asked what we do with the benefit. Simon warned against forecasts. And Acemoglu says the answer depends on our choices.\n\nWhat does this mean for you? Perhaps the personal question is not whether your job will disappear, but which of your tasks will be replaced, and which will become more important, such as judgment, responsibility, and human relationships.\n\nSo, will AI take your job? Perhaps part of it. The important question is which tasks will be replaced, which new ones will be created, and who will decide.'
+              },
+              {
+                type: 'quiz',
+                question: 'מהו "אפקט ההחלפה" ומהו "אפקט היצירה מחדש"?',
+                questionEn: 'What are the "displacement effect" and the "reinstatement effect"?',
+                options: ['החלפה היא יצירת משרות חדשות, ויצירה מחדש היא פיטורים', 'שניהם אותו דבר', 'החלפה היא שמכונה מבצעת משימה שבעבר ביצע אדם, ויצירה מחדש היא שטכנולוגיה יוצרת משימות חדשות שבהן בני אדם תורמים'],
+                optionsEn: ['Displacement is the creation of new jobs, and reinstatement is layoffs', 'They are the same thing', 'Displacement is a machine performing a task a person used to perform, and reinstatement is technology creating new tasks in which humans contribute'],
+                correctIndex: 2,
+                explanation: 'שני הכוחות פועלים בו זמנית, וההשפעה על התעסוקה תלויה ביחס ביניהם.',
+                explanationEn: 'Both forces operate at the same time, and the effect on employment depends on the balance between them.'
+              },
+              {
+                type: 'quiz',
+                question: 'מהי אוטומציה "בינונית" לפי אסמוגלו?',
+                questionEn: 'What is "so-so" automation according to Acemoglu?',
+                options: ['אוטומציה שמחליפה עובדים אך כמעט אינה מעלה את הפריון', 'אוטומציה שמעלה מאוד את הפריון', 'אוטומציה שאינה עובדת'],
+                optionsEn: ['Automation that replaces workers but barely raises productivity', 'Automation that raises productivity greatly', 'Automation that does not work'],
+                correctIndex: 0,
+                explanation: 'אוטומציה כזאת פוגעת בעובדים בלי להביא תועלת גדולה למשק, למשל קופות עצמיות בחנויות.',
+                explanationEn: 'This kind of automation hurts workers without bringing a large benefit to the economy, for example self-checkout machines in stores.'
+              },
+              {
+                type: 'quiz',
+                question: 'מהי הטענה המרכזית של אסמוגלו וג\'ונסון ב"כוח והתקדמות"?',
+                questionEn: 'What is the central claim of Acemoglu and Johnson in Power and Progress?',
+                options: ['שטכנולוגיה תמיד מביאה שגשוג לכולם', 'שהתקדמות טכנולוגית אינה מבטיחה שגשוג משותף, ושהכיוון שבו היא מתפתחת הוא בחירה', 'שאסור לפתח טכנולוגיה חדשה'],
+                optionsEn: ['That technology always brings prosperity to everyone', 'That technological progress does not guarantee shared prosperity, and that the direction it develops in is a choice', 'That no new technology should be developed'],
+                correctIndex: 1,
+                explanation: 'התוצאות תלויות באילו טכנולוגיות מפתחים, ומי מחליט. הכיוון אינו כורח.',
+                explanationEn: 'The results depend on which technologies are developed, and who decides. The direction is not inevitable.'
+              },
+              { type: 'quiz_summary' }
+            ]
+          }
+        ]
+      },
+    {
       id: 3,
       title: 'הון ועבודה',
       titleEn: 'Capital and Labor',
