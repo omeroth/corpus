@@ -28153,6 +28153,11 @@ async function syncProgressToSupabase() {
         // "<subject>-<chapter>". No DB migration (JSONB).
         freeChapterStarted:   Object.assign({}, state.freeChapterStarted || {}),
         freeChapterCompleted: Object.assign({}, state.freeChapterCompleted || {}),
+        // NEW-badge (2026-11-12 bonus swap). Ships the per-bonus
+        // {firstShownAt, dismissed, reason} bucket so dismissals and
+        // "already shown here" stamps travel between devices. Pull
+        // side merges with priority — see _mergeBonusNewBadgeEntry.
+        bonusNewBadge: Object.assign({}, state.bonusNewBadge || {}),
       },
     }, { onConflict: 'user_id' });
     if (error) _reportSyncFailure('coach_marks_shown', error);
@@ -28455,6 +28460,11 @@ async function loadProgressFromSupabase() {
     if (_cms.freeChapterCompleted && typeof _cms.freeChapterCompleted === 'object') {
       state.freeChapterCompleted = Object.assign({}, state.freeChapterCompleted || {}, _cms.freeChapterCompleted);
     }
+    // NEW-badge: per-bonus merge using the priority rule in
+    // _mergeBonusNewBadgeEntry. A real tap/expired dismissal on any
+    // device wins; an auto fresh-install dismissal from a new-device
+    // boot never overrides an eligible entry already stored elsewhere.
+    try { _mergeBonusNewBadgeFromCloud(_cms.bonusNewBadge); } catch(_){}
     // streak_repair fields: union-merge both arrays. Union-dedup by
     // brokenAt for streakBreaks (object entries) and by string for
     // streakRepairs. If a repair happened on device A and hasn't synced
@@ -38853,26 +38863,23 @@ function loadState() {
   } else {
     state.bonusUnlockShown = {};
   }
-  // NEW-badge init (2026-11-12 swap of bonus1/bonusEcon1 → bonus2/bonusEcon2).
-  // Eligibility is decided once per device based on whether the user had
-  // ANY completion history at the time of the update. Returning users see
-  // the badge the next time the bonus card renders; fresh installs mark
-  // both as dismissed so they never see "NEW" for a chapter they never
-  // had anything else for. Missing fields are hydrated on every load.
-  if (!state.bonusNewBadge || typeof state.bonusNewBadge !== 'object') {
-    const hadHistory = state.completedDays && Object.keys(state.completedDays).length > 0;
-    state.bonusNewBadge = {
-      bonus2:      { firstShownAt: 0, dismissed: !hadHistory },
-      bonusEcon2:  { firstShownAt: 0, dismissed: !hadHistory },
-    };
-  } else {
+  // NEW-badge hydrate (2026-11-12 swap). Decision was initially made here
+  // from local completedDays — but on a new device / reinstall, cloud
+  // progress hasn't been pulled yet when loadState runs, so a returning
+  // user with an empty local blob would be mis-tagged as fresh-install
+  // and silently auto-dismissed. Eligibility is now decided after the
+  // cloud pull in _decideBonusNewBadgeEligibilityOnce; here we only
+  // hydrate entries the store already has, and normalise the field
+  // types for entries that came in from a cloud merge.
+  if (state.bonusNewBadge && typeof state.bonusNewBadge === 'object') {
     for (const bid of ['bonus2', 'bonusEcon2']) {
-      if (!state.bonusNewBadge[bid] || typeof state.bonusNewBadge[bid] !== 'object') {
-        const hadHistory = state.completedDays && Object.keys(state.completedDays).length > 0;
-        state.bonusNewBadge[bid] = { firstShownAt: 0, dismissed: !hadHistory };
-      } else {
-        state.bonusNewBadge[bid].firstShownAt = +state.bonusNewBadge[bid].firstShownAt || 0;
-        state.bonusNewBadge[bid].dismissed = !!state.bonusNewBadge[bid].dismissed;
+      const e = state.bonusNewBadge[bid];
+      if (e && typeof e === 'object') {
+        e.firstShownAt = +e.firstShownAt || 0;
+        e.dismissed = !!e.dismissed;
+        if (e.reason !== 'tap' && e.reason !== 'expired' && e.reason !== 'auto') {
+          delete e.reason;
+        }
       }
     }
   }
@@ -55081,18 +55088,42 @@ function _hasBonusProgress(bonusChapterId) {
 // === NEW-badge on freshly-added bonus cards ===
 // Shown for 14 days after first render, cleared on first tap of that
 // card (even if the tap lands on a lock/paywall). Fires analytics
-// events once per bonus per user. Missing / partial state is tolerated
-// — loadState() hydrates the field; these helpers are defensive too.
+// events once per bonus per user.
+//
+// Two-phase decision because cloud progress arrives AFTER loadState:
+//   Phase 1 — loadState(): hydrate any entries already in the local
+//     blob (own device's prior sessions, cloud-merged rows). Do NOT
+//     decide eligibility — a returning user on a new device has an
+//     empty local completedDays until the pull merges in.
+//   Phase 2 — _decideBonusNewBadgeEligibilityOnce(): runs AFTER the
+//     parallel auth reads settle (both signed-in and guest paths
+//     funnel through enterAppState). For any entry still missing,
+//     decide from the now-merged completedDays:
+//       non-empty → {firstShownAt:0, dismissed:false}   = eligible
+//       empty     → {firstShownAt:0, dismissed:true, reason:'auto'}
+//                                                       = fresh install
+//
+// Dismissal provenance: reason='tap'|'expired' for real dismissals,
+// reason='auto' for the fresh-install default. The merge rule in
+// _mergeBonusNewBadgeEntry uses provenance so an auto-dismissal from
+// one device never silences an eligible entry from another.
 const _BONUS_NEW_BADGE_IDS = ['bonus2', 'bonusEcon2'];
 const _BONUS_NEW_BADGE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
+// Cleared when a NEW cloud pull starts (enterAppState) so the decision
+// re-runs after each sign-in. Kept session-scoped: once decided this
+// boot, don't re-decide on every renderHome.
+let _bonusNewBadgeDecided = false;
 function _bonusNewBadgeEntry(bonusId) {
   if (!state.bonusNewBadge) state.bonusNewBadge = {};
-  if (!state.bonusNewBadge[bonusId]) state.bonusNewBadge[bonusId] = { firstShownAt: 0, dismissed: false };
   return state.bonusNewBadge[bonusId];
 }
 function _shouldShowBonusNewBadge(bonusId) {
   if (!_BONUS_NEW_BADGE_IDS.includes(bonusId)) return false;
+  // Phase 1: no entry yet means the eligibility decision hasn't run
+  // (cloud pull hasn't settled). Render nothing — not a badge, not a
+  // write. The decision gets taken AFTER the pull.
   const e = _bonusNewBadgeEntry(bonusId);
+  if (!e) return false;
   if (e.dismissed) return false;
   if (!e.firstShownAt) return true;
   return (Date.now() - e.firstShownAt) < _BONUS_NEW_BADGE_TTL_MS;
@@ -55100,18 +55131,30 @@ function _shouldShowBonusNewBadge(bonusId) {
 function _markBonusNewBadgeShown(bonusId) {
   if (!_BONUS_NEW_BADGE_IDS.includes(bonusId)) return;
   const e = _bonusNewBadgeEntry(bonusId);
-  if (e.firstShownAt || e.dismissed) return;
+  if (!e || e.firstShownAt || e.dismissed) return;
   e.firstShownAt = Date.now();
   try { saveStateLocal(); } catch(_){}
   try { _phCapture('bonus_new_badge_shown', { chapter_id: bonusId }); } catch(_){}
 }
 function _dismissBonusNewBadge(bonusId, reason) {
   if (!_BONUS_NEW_BADGE_IDS.includes(bonusId)) return;
-  const e = _bonusNewBadgeEntry(bonusId);
-  if (e.dismissed) return;
+  if (!state.bonusNewBadge) state.bonusNewBadge = {};
+  let e = state.bonusNewBadge[bonusId];
+  if (!e) {
+    // Dismissing before the decision has fired (e.g. user taps the
+    // card before the pull completes). Stamp the entry directly so
+    // the dismissal still carries the right provenance.
+    e = state.bonusNewBadge[bonusId] = { firstShownAt: 0, dismissed: false };
+  }
+  if (e.dismissed && (e.reason === 'tap' || e.reason === 'expired')) return;
   e.dismissed = true;
+  e.reason = (reason === 'expired' || reason === 'auto') ? reason : 'tap';
   try { saveStateLocal(); } catch(_){}
-  try { _phCapture('bonus_new_badge_dismissed', { chapter_id: bonusId, reason: reason || 'tap' }); } catch(_){}
+  // 'auto' reason is the fresh-install default and isn't a user-facing
+  // dismissal event; don't fire analytics for it.
+  if (e.reason !== 'auto') {
+    try { _phCapture('bonus_new_badge_dismissed', { chapter_id: bonusId, reason: e.reason }); } catch(_){}
+  }
 }
 function _maybeExpireBonusNewBadges() {
   if (!state.bonusNewBadge) return;
@@ -55121,8 +55164,81 @@ function _maybeExpireBonusNewBadges() {
     if ((Date.now() - e.firstShownAt) >= _BONUS_NEW_BADGE_TTL_MS) _dismissBonusNewBadge(bid, 'expired');
   }
 }
+// Called once per boot AFTER the auth/sync parallel reads settle.
+// Signed-in users wait for the merged completedDays; guests fall
+// through immediately (loadProgressFromSupabase returns on !currentUser).
+function _decideBonusNewBadgeEligibilityOnce() {
+  if (_bonusNewBadgeDecided) return;
+  _bonusNewBadgeDecided = true;
+  if (!state.bonusNewBadge) state.bonusNewBadge = {};
+  const hasHistory = state.completedDays && Object.keys(state.completedDays).length > 0;
+  let dirty = false;
+  for (const bid of _BONUS_NEW_BADGE_IDS) {
+    if (state.bonusNewBadge[bid]) continue;  // cloud or earlier session decided already
+    state.bonusNewBadge[bid] = hasHistory
+      ? { firstShownAt: 0, dismissed: false }
+      : { firstShownAt: 0, dismissed: true, reason: 'auto' };
+    dirty = true;
+  }
+  if (dirty) {
+    try { saveStateLocal(); } catch(_){}
+    // If home is already up when the decision lands (signed-in slow
+    // pull), repaint so the eligible badge appears without a reload.
+    try {
+      if (state && state.currentScreen === 'home' && typeof renderHome === 'function') renderHome();
+    } catch(_){}
+  }
+}
+// Priority score for a single entry. Higher wins the merge; the auto
+// fresh-install dismissal sits BELOW every eligible / shown state so a
+// new-device auto-decision never overrides another device's history.
+//   4 — {dismissed:true, reason:'tap' | 'expired'}   real dismissal (sticky)
+//   3 — {dismissed:false, firstShownAt > 0}          shown but not dismissed
+//   2 — {dismissed:false, firstShownAt == 0}         decided eligible, unseen
+//   1 — {dismissed:true, reason:'auto'}              fresh-install default
+//   0 — undefined / missing
+function _bonusNewBadgeEntryPriority(e) {
+  if (!e || typeof e !== 'object') return 0;
+  if (e.dismissed && (e.reason === 'tap' || e.reason === 'expired')) return 4;
+  if (!e.dismissed && +e.firstShownAt > 0) return 3;
+  if (!e.dismissed) return 2;
+  return 1;  // auto / unknown-reason dismissal
+}
+function _mergeBonusNewBadgeEntry(a, b) {
+  const pa = _bonusNewBadgeEntryPriority(a);
+  const pb = _bonusNewBadgeEntryPriority(b);
+  if (pa === 0) return b || undefined;
+  if (pb === 0) return a;
+  if (pa > pb) return a;
+  if (pb > pa) return b;
+  // Tie on priority 3 → earliest shown wins (both saw the badge, keep the first stamp).
+  if (pa === 3) return (+a.firstShownAt <= +b.firstShownAt) ? a : b;
+  return a;  // priority 4, 2, 1 ties: either is equivalent
+}
+// Cloud-pull entry point. Merges a remote {bonus2:{...}, bonusEcon2:{...}}
+// bucket (read from coach_marks_shown.bonusNewBadge) into state.bonusNewBadge.
+// After this returns, _decideBonusNewBadgeEligibilityOnce will fill any
+// still-missing entries from the now-merged completedDays.
+function _mergeBonusNewBadgeFromCloud(remote) {
+  if (!remote || typeof remote !== 'object') return;
+  if (!state.bonusNewBadge) state.bonusNewBadge = {};
+  for (const bid of _BONUS_NEW_BADGE_IDS) {
+    const r = remote[bid];
+    if (!r || typeof r !== 'object') continue;
+    // Normalise fields before merging so a stale client's shape doesn't
+    // leak through.
+    const rN = {
+      firstShownAt: +r.firstShownAt || 0,
+      dismissed: !!r.dismissed,
+    };
+    if (r.reason === 'tap' || r.reason === 'expired' || r.reason === 'auto') rN.reason = r.reason;
+    const local = state.bonusNewBadge[bid];
+    state.bonusNewBadge[bid] = _mergeBonusNewBadgeEntry(local, rN);
+  }
+}
 window.__corpusResetBonusBadge = function () {
   state.bonusNewBadge = undefined;
+  _bonusNewBadgeDecided = false;
   try { saveStateLocal(); } catch(_){}
   console.log('[__corpusResetBonusBadge] cleared. Reload the app.');
 };
@@ -55561,6 +55677,10 @@ async function enterAppState(user) {
   // syncProgressToSupabase gates every push on this — see the guard at
   // the top of that function for why.
   _progressLoaded = false;
+  // Re-arm the NEW-badge decision gate. It fires once per boot, AFTER
+  // the parallel reads below settle — so the decision sees the merged
+  // completedDays, not whatever was in localStorage pre-pull.
+  _bonusNewBadgeDecided = false;
   console.log('[Auth] Entering app as:', user ? user.email : 'guest');
   if (user && user.email === 'roth.omer@gmail.com') {
     try { posthog.opt_out_capturing(); } catch(e) {}
@@ -55620,6 +55740,11 @@ async function enterAppState(user) {
     clearTimeout(_loadingStripTimer);
     if (_loadingStripEl) _loadingStripEl.classList.remove('visible');
   }
+  // NEW-badge decision. Cloud pull has merged (success, no-data, or
+  // timeout) and guests' loadProgressFromSupabase returned on the
+  // !currentUser guard — in every case state.completedDays is now
+  // the final truth for this boot. Decide eligibility from that.
+  try { _decideBonusNewBadgeEligibilityOnce(); } catch(_){}
   if (user) {
     try {
       const identities = user.identities || [];
