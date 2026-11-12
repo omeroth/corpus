@@ -17092,6 +17092,59 @@
     transform: translateY(2px);
     box-shadow: 0 2px 0 #D9690B;
   }
+  /* NEW-badge sticker on freshly-added bonus cards. Rendered inside
+     .hv-bonus-card so it inherits the card's positioning context
+     (the card is position: sticky above — any stacking context works).
+     The card sets no overflow, so the badge protrudes above the top
+     edge freely. Mirrored for RTL via logical inset-inline-end + a
+     negative rotation. Shimmer is a clipped ::before sweep. */
+  .bonus-new-badge {
+    position: absolute;
+    top: -9px;
+    inset-inline-end: 14px;
+    z-index: 2;
+    background: #FFC93C;
+    color: #3B2A00;
+    box-shadow: 0 2px 0 #D9A21C;
+    border-radius: 999px;
+    padding: 4px 11px;
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-weight: 900;
+    font-size: 12px;
+    line-height: 1;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    pointer-events: none;
+    overflow: hidden;
+    transform: rotate(4deg);
+    transform-origin: center;
+  }
+  html[lang="he"] .bonus-new-badge {
+    font-family: 'Rubik', system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: 0;
+    transform: rotate(-4deg);
+  }
+  .bonus-new-badge::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: -40%;
+    width: 40%;
+    background: linear-gradient(100deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.6) 50%,
+      rgba(255, 255, 255, 0) 100%);
+    animation: bonusNewBadgeShimmer 2.8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes bonusNewBadgeShimmer {
+    0%, 40%   { transform: translateX(0); }
+    70%, 100% { transform: translateX(400%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bonus-new-badge::before { animation: none; }
+  }
   #screen-home.home-v7 .hv-chapter-bonus .hv-bonus-card-header {
     display: flex; align-items: center; gap: 12px;
   }
@@ -38800,6 +38853,29 @@ function loadState() {
   } else {
     state.bonusUnlockShown = {};
   }
+  // NEW-badge init (2026-11-12 swap of bonus1/bonusEcon1 → bonus2/bonusEcon2).
+  // Eligibility is decided once per device based on whether the user had
+  // ANY completion history at the time of the update. Returning users see
+  // the badge the next time the bonus card renders; fresh installs mark
+  // both as dismissed so they never see "NEW" for a chapter they never
+  // had anything else for. Missing fields are hydrated on every load.
+  if (!state.bonusNewBadge || typeof state.bonusNewBadge !== 'object') {
+    const hadHistory = state.completedDays && Object.keys(state.completedDays).length > 0;
+    state.bonusNewBadge = {
+      bonus2:      { firstShownAt: 0, dismissed: !hadHistory },
+      bonusEcon2:  { firstShownAt: 0, dismissed: !hadHistory },
+    };
+  } else {
+    for (const bid of ['bonus2', 'bonusEcon2']) {
+      if (!state.bonusNewBadge[bid] || typeof state.bonusNewBadge[bid] !== 'object') {
+        const hadHistory = state.completedDays && Object.keys(state.completedDays).length > 0;
+        state.bonusNewBadge[bid] = { firstShownAt: 0, dismissed: !hadHistory };
+      } else {
+        state.bonusNewBadge[bid].firstShownAt = +state.bonusNewBadge[bid].firstShownAt || 0;
+        state.bonusNewBadge[bid].dismissed = !!state.bonusNewBadge[bid].dismissed;
+      }
+    }
+  }
   // Migrate legacy chapterCompleteShown keys ({1:true, 2:true, ...}) to the
   // subject-scoped format ({philosophy-1:true, ...}). See helper for the
   // full attribution heuristic. Also runs from loadProgressFromSupabase
@@ -45148,6 +45224,7 @@ function _hvPickSubject(id) {
 function renderHome() {
   const ui = u();
   _hvMeasureTopbar();
+  try { _maybeExpireBonusNewBadges(); } catch (e) {}
   _hvBindTopbarResize();
   // Round 23 — replay any first-meeting reveal that was missed because
   // the user exited on the quiz_summary (via X / background / pagehide)
@@ -45478,6 +45555,13 @@ function renderHome() {
           if (card.__bonusHandling) return;
           card.__bonusHandling = true;
           setTimeout(() => { card.__bonusHandling = false; }, 400);
+          // NEW-badge: dismiss on first tap regardless of what the tap
+          // resolves to (paywall, toast, or expand). The badge is a
+          // visual "hey, look" — once the user acknowledges the card,
+          // it's done its job.
+          try { _dismissBonusNewBadge(w.id, 'tap'); } catch(_){}
+          const _badge = card.querySelector(':scope > .bonus-new-badge');
+          if (_badge) _badge.remove();
           try {
             _phCapture('bonus_card_tapped', {
               subject: state.subject || null,
@@ -45630,6 +45714,19 @@ function renderHome() {
             ${wkLocked ? `<div class="bonus-countdown">${cd}</div>` : ''}
           </div>
         `;
+        // NEW-badge sticker (bonus2 / bonusEcon2 only, 14-day window,
+        // dismissed on tap). Appended AFTER innerHTML so the sticker
+        // survives any subsequent repaint of the card body.
+        try {
+          if (_shouldShowBonusNewBadge(w.id)) {
+            const badge = document.createElement('span');
+            badge.className = 'bonus-new-badge';
+            badge.setAttribute('aria-hidden', 'true');
+            badge.textContent = isEn ? 'NEW' : 'חדש';
+            card.appendChild(badge);
+            _markBonusNewBadgeShown(w.id);
+          }
+        } catch (e) {}
       } else {
         const header = document.createElement('div');
         header.className = 'level-card-header';
@@ -54980,6 +55077,55 @@ function _hasBonusProgress(bonusChapterId) {
   }
   return false;
 }
+
+// === NEW-badge on freshly-added bonus cards ===
+// Shown for 14 days after first render, cleared on first tap of that
+// card (even if the tap lands on a lock/paywall). Fires analytics
+// events once per bonus per user. Missing / partial state is tolerated
+// — loadState() hydrates the field; these helpers are defensive too.
+const _BONUS_NEW_BADGE_IDS = ['bonus2', 'bonusEcon2'];
+const _BONUS_NEW_BADGE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
+function _bonusNewBadgeEntry(bonusId) {
+  if (!state.bonusNewBadge) state.bonusNewBadge = {};
+  if (!state.bonusNewBadge[bonusId]) state.bonusNewBadge[bonusId] = { firstShownAt: 0, dismissed: false };
+  return state.bonusNewBadge[bonusId];
+}
+function _shouldShowBonusNewBadge(bonusId) {
+  if (!_BONUS_NEW_BADGE_IDS.includes(bonusId)) return false;
+  const e = _bonusNewBadgeEntry(bonusId);
+  if (e.dismissed) return false;
+  if (!e.firstShownAt) return true;
+  return (Date.now() - e.firstShownAt) < _BONUS_NEW_BADGE_TTL_MS;
+}
+function _markBonusNewBadgeShown(bonusId) {
+  if (!_BONUS_NEW_BADGE_IDS.includes(bonusId)) return;
+  const e = _bonusNewBadgeEntry(bonusId);
+  if (e.firstShownAt || e.dismissed) return;
+  e.firstShownAt = Date.now();
+  try { saveStateLocal(); } catch(_){}
+  try { _phCapture('bonus_new_badge_shown', { chapter_id: bonusId }); } catch(_){}
+}
+function _dismissBonusNewBadge(bonusId, reason) {
+  if (!_BONUS_NEW_BADGE_IDS.includes(bonusId)) return;
+  const e = _bonusNewBadgeEntry(bonusId);
+  if (e.dismissed) return;
+  e.dismissed = true;
+  try { saveStateLocal(); } catch(_){}
+  try { _phCapture('bonus_new_badge_dismissed', { chapter_id: bonusId, reason: reason || 'tap' }); } catch(_){}
+}
+function _maybeExpireBonusNewBadges() {
+  if (!state.bonusNewBadge) return;
+  for (const bid of _BONUS_NEW_BADGE_IDS) {
+    const e = state.bonusNewBadge[bid];
+    if (!e || e.dismissed || !e.firstShownAt) continue;
+    if ((Date.now() - e.firstShownAt) >= _BONUS_NEW_BADGE_TTL_MS) _dismissBonusNewBadge(bid, 'expired');
+  }
+}
+window.__corpusResetBonusBadge = function () {
+  state.bonusNewBadge = undefined;
+  try { saveStateLocal(); } catch(_){}
+  console.log('[__corpusResetBonusBadge] cleared. Reload the app.');
+};
 
 // Toast shown when the user tries to reach the locked bonus chapter
 // via the ?open=bonus-econ deep link or by tapping the locked card
