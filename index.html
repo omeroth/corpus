@@ -42723,7 +42723,7 @@ function getWeekProgress(weekId) {
 }
 
 function getPrevWeekProgress(weekId) {
-  if (weekId === 'bonus1') return getBonusProgress();
+  if (weekId === 'bonus2') return getBonusProgress();
   const weekOrder = [1, 2, 3, 4];
   const idx = weekOrder.indexOf(weekId);
   if (idx <= 0) return 1;
@@ -43115,8 +43115,8 @@ function _onCelebrationQueueEmpty() {
 function _highlightBonusCardOnHome() {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      const bonusId = state.subject === 'economics' ? 'bonusEcon1'
-                    : state.subject === 'psychology' ? 'bonusPsy1' : 'bonus1';
+      const bonusId = state.subject === 'economics' ? 'bonusEcon2'
+                    : state.subject === 'psychology' ? 'bonusPsy1' : 'bonus2';
       const bonusCard = document.getElementById('level-card-' + bonusId);
       if (!bonusCard) return;
       try {
@@ -54939,7 +54939,7 @@ function _consumePendingDeepLink() {
   // window and completed at least one day retain access — see
   // _hasBonusProgress. Same grandfather that the level card and
   // carousel apply.
-  if (!isWeekCompleted(1) && !_hasBonusProgress('bonusEcon1')) {
+  if (!isWeekCompleted(1) && !_hasBonusProgress('bonusEcon2')) {
     _phCapture('bonus_link_landed', {
       subject: 'economics',
       opened: false,
@@ -54948,11 +54948,11 @@ function _consumePendingDeepLink() {
     try { _showBonusLockToast(); } catch (e) {}
     return false;
   }
-  const wk = getW().find(w => w.id === 'bonusEcon1');
+  const wk = getW().find(w => w.id === 'bonusEcon2');
   const day = wk && wk.days && wk.days[0];
   if (day) {
     _phCapture('bonus_link_landed', { subject: 'economics', opened: true });
-    openReader('bonusEcon1', day.id);
+    openReader('bonusEcon2', day.id);
     return true;
   }
   _phCapture('bonus_link_landed', {
