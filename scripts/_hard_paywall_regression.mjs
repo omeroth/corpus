@@ -356,6 +356,175 @@ for (const [lang, line, signOut, del] of [
   await ctx.close();
 }
 
+// Case J — Edge-case gates from e7c9cfc follow-up:
+//   Ja. Finished user on a new device: signs in with no local flags
+//       but server-restored onbAnswers.completedAt → home, no paywall.
+//   Jb. Finished user via completedDays non-empty (completedAt absent)
+//       → home, no paywall.
+//   Jc. Paid user mid-onboarding at step 35 → _onbV2PreparePaywall
+//       detects entitlement, completes onboarding, no paywall shown.
+//   Jd. Cross-account escrow bypass: user A signs out (escrow + uid=A),
+//       user B signs in (currentUser.id=B, no onbAnswers) → escrow
+//       cleared, user B goes to home.
+//   Je. Same-account re-sign-in from escrow → hard paywall still fires
+//       (regression on top of Jd to make sure the mismatch handler
+//       doesn't break the happy path).
+
+// Helper — simulate what enterAppUi would do for a post-sign-in gate.
+// freshPage can't drive the real enterApp because the browser Supabase
+// mock doesn't carry sessions; instead we seed state the way the
+// server-load would, call enterAppUi in isolation, and inspect the
+// routing outcome.
+async function simulatePostSignIn({ lang='en', subject='philosophy', theme='light', vw=393, vh=852,
+    serverOnbAnswers={}, serverCompletedDays={}, isPaid=false, userId='user-A', escrow=null, escrowUid=null }) {
+  const ctx = await browser.newContext({ viewport: { width: vw, height: vh }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
+  const page = await ctx.newPage();
+  await page.addInitScript((args) => {
+    window.__CORPUS_DEBUG_BUILD = true;
+    window.Capacitor = { isNativePlatform:()=>false, getPlatform:()=>'ios', Plugins:{ Haptics:{impact:async()=>({})}, SplashScreen:{hide:async()=>({})}, App:{addListener:()=>({remove:()=>{}}), minimizeApp:()=>{}}, Preferences:{get:async()=>({})}, StatusBar:{setStyle:async()=>({})} } };
+    try { localStorage.clear(); } catch(_){}
+    localStorage.setItem('corpus_subject', args.subject);
+    localStorage.setItem('corpus_lang', args.lang);
+    localStorage.setItem('corpus_onboarding_flow_version', '7');
+    if (args.escrow) localStorage.setItem('corpus_hard_paywall_escrow', args.escrow);
+    if (args.escrowUid) localStorage.setItem('corpus_hard_paywall_escrow_uid', args.escrowUid);
+  }, { lang, subject, theme, escrow, escrowUid });
+  await page.goto(`http://127.0.0.1:${app.port}/index.html`, { waitUntil: 'load' });
+  await page.waitForTimeout(500);
+  await page.evaluate(({ serverOnbAnswers, serverCompletedDays, isPaid, userId }) => {
+    // Simulate the state enterAppState would have populated post-server-load.
+    state.onbAnswers = Object.assign({}, serverOnbAnswers);
+    state.completedDays = Object.assign({}, serverCompletedDays);
+    state.isPaid = !!isPaid;
+    currentUser = { id: userId };
+    // appStarted must be false for enterAppUi to produce a routing
+    // decision rather than early-returning. The real sign-in path
+    // resets it via _onbPaywallSignOut or authLogout before the
+    // SIGNED_IN subscriber re-runs enterApp.
+    try { appStarted = false; } catch(_){}
+    // Ensure state.currentScreen is empty so enterAppUi takes the
+    // normal "arrived from auth screen" branch instead of the
+    // reader-ejection defer-zone.
+    state.currentScreen = 'auth';
+  }, { serverOnbAnswers, serverCompletedDays, isPaid, userId });
+  await page.evaluate(() => { try { enterAppUi(); } catch(e){ console.error('enterAppUi threw', e); } });
+  await page.waitForTimeout(400);
+  const outcome = await page.evaluate(() => ({
+    currentScreen: state.currentScreen,
+    homeVisible:   getComputedStyle(document.getElementById('screen-home')).display !== 'none',
+    pwActive:      document.getElementById('onb-v2-paywall').classList.contains('onb-active'),
+    pwVisible:     getComputedStyle(document.getElementById('onb-v2-paywall')).display !== 'none',
+    done:          localStorage.getItem('corpus_onboarding_done'),
+    step:          localStorage.getItem('corpus_onboarding_step'),
+    escrow:        localStorage.getItem('corpus_hard_paywall_escrow'),
+    escrowUid:     localStorage.getItem('corpus_hard_paywall_escrow_uid'),
+  }));
+  return { ctx, page, outcome };
+}
+
+// Ja — finished user (completedAt present) on new device, signs in.
+{
+  const { ctx, outcome } = await simulatePostSignIn({
+    serverOnbAnswers: { source: 'instagram', completedAt: '2026-10-01' },
+    userId: 'user-finished-A',
+  });
+  if (outcome.done === '1' && outcome.homeVisible && !outcome.pwActive && !outcome.escrow)
+    pass('Ja finished user (completedAt) new device → home, no paywall, done set, escrow clear');
+  else fail('Ja finished user routing', JSON.stringify(outcome));
+  await ctx.close();
+}
+
+// Jb — finished user signaled only by non-empty completedDays.
+{
+  const { ctx, outcome } = await simulatePostSignIn({
+    serverOnbAnswers: { source: 'instagram' },  // no completedAt
+    serverCompletedDays: { 'philosophy-1-1': true, 'philosophy-1-2': true },
+    userId: 'user-finished-B',
+  });
+  if (outcome.done === '1' && outcome.homeVisible && !outcome.pwActive)
+    pass('Jb finished via completedDays → home, no paywall');
+  else fail('Jb completedDays-only routing', JSON.stringify(outcome));
+  await ctx.close();
+}
+
+// Jc — paid user mid-onboarding at step 35. Set escrow to force the
+// resume-to-step-35 branch; the paid guard inside _onbV2PreparePaywall
+// should still complete onboarding.
+{
+  const { ctx, page } = await simulatePostSignIn({
+    serverOnbAnswers: { source: 'instagram' },
+    isPaid: true,
+    userId: 'user-paid',
+    escrow: '1',
+    escrowUid: 'user-paid',
+  });
+  // enterAppUi should have taken the paid-user guard and gone to home
+  // directly (never calling _onbShowStep(35)).
+  const outcome = await page.evaluate(() => ({
+    currentScreen: state.currentScreen,
+    homeVisible:   getComputedStyle(document.getElementById('screen-home')).display !== 'none',
+    pwActive:      document.getElementById('onb-v2-paywall').classList.contains('onb-active'),
+    done:          localStorage.getItem('corpus_onboarding_done'),
+    escrow:        localStorage.getItem('corpus_hard_paywall_escrow'),
+  }));
+  if (outcome.done === '1' && !outcome.pwActive && !outcome.escrow)
+    pass('Jc paid user mid-onboarding → home, escrow cleared, no paywall');
+  else fail('Jc paid routing', JSON.stringify(outcome));
+  // Also: if a paid user DOES get routed to the paywall step via the
+  // normal _onbShowStep(35) path (lapsed restore on a fresh device,
+  // dev-tool jump), the paid guard inside _onbShowStep must catch it
+  // and run _onbComplete inline — the paywall shell must never be
+  // painted.
+  await page.evaluate(() => {
+    state.isPaid = true;
+    state.onbAnswers = { source: 'instagram' };
+    localStorage.removeItem('corpus_onboarding_done');
+    try { _onbShowStep(35); } catch(_) {}
+  });
+  await page.waitForTimeout(300);
+  const after = await page.evaluate(() => ({
+    pwActive: document.getElementById('onb-v2-paywall').classList.contains('onb-active'),
+    pwDisplay: getComputedStyle(document.getElementById('onb-v2-paywall')).display,
+    homeVisible: getComputedStyle(document.getElementById('screen-home')).display !== 'none',
+    done: localStorage.getItem('corpus_onboarding_done'),
+  }));
+  if (after.done === '1' && after.homeVisible && !after.pwActive && after.pwDisplay === 'none')
+    pass('Jc paid user forced through _onbShowStep(35) → _onbComplete → home, paywall never painted');
+  else fail('Jc paid guard inside _onbShowStep', JSON.stringify(after));
+  await ctx.close();
+}
+
+// Jd — cross-account escrow bypass. User A signed out (escrow=1,
+// uid=A), User B signs in on same device. B has no onbAnswers and no
+// completedDays (new account) → B should go to onboarding step 1, not
+// the paywall, AND the escrow must be cleared.
+{
+  const { ctx, outcome } = await simulatePostSignIn({
+    serverOnbAnswers: {},
+    userId: 'user-B',
+    escrow: '1',
+    escrowUid: 'user-A',  // escrow belongs to a different account
+  });
+  if (!outcome.escrow && !outcome.escrowUid && !outcome.pwActive)
+    pass('Jd cross-account sign-in → escrow cleared (uid mismatch), no paywall');
+  else fail('Jd cross-account escrow bypass', JSON.stringify(outcome));
+  await ctx.close();
+}
+
+// Je — regression: same-account re-sign-in still hits the paywall.
+{
+  const { ctx, outcome } = await simulatePostSignIn({
+    serverOnbAnswers: { source: 'instagram' },  // no completedAt yet
+    userId: 'user-A',
+    escrow: '1',
+    escrowUid: 'user-A',
+  });
+  if (outcome.pwActive && outcome.pwVisible && outcome.step === '35' && outcome.escrow === '1')
+    pass('Je same-account re-sign-in → paywall still shown (escrow intact)');
+  else fail('Je same-account resume regression', JSON.stringify(outcome));
+  await ctx.close();
+}
+
 // Case I — screenshots.
 const SHOTS = [];
 for (const lang of ['en','he']) for (const theme of ['light','dark']) for (const [vw,vh] of [[393,852],[360,640]]) SHOTS.push({ lang, theme, vw, vh });

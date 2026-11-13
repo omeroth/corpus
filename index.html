@@ -32914,6 +32914,17 @@ function _onbShowStep(n) {
     return;
   }
   const id = slotEntry;
+  // Entitled-user bypass for the onboarding paywall: a paid / trial
+  // user who somehow lands on step 35 (lapsed restore on a fresh
+  // device, a dev-tool jump, a flow-version rewrite that bumped the
+  // paywall slot) should never see the onboarding paywall. Complete
+  // onboarding inline and return — _onbComplete renders home.
+  if (id === 'onb-v2-paywall'
+      && typeof _isUserPaidOrTrialNow === 'function'
+      && _isUserPaidOrTrialNow()) {
+    _onbComplete();
+    return;
+  }
   if (!id) {
     // Partial-ladder ship (v11 acts building out commit by commit):
     // this step's DOM isn't built yet. Land on home WITHOUT marking
@@ -33023,10 +33034,12 @@ function _onbComplete() {
   const today = _streakDay();
   state.onbAnswers = state.onbAnswers || {};
   state.onbAnswers.completedAt = today;
-  // Clear the hard-paywall escrow — onboarding resolved, so a later
-  // sign-out should not force the user back into hard-paywall mode
-  // the next time they encounter the paywall post-onboarding.
+  // Clear the hard-paywall escrow (and the uid stamp) — onboarding
+  // resolved, so a later sign-out should not force the user back
+  // into hard-paywall mode the next time they encounter the paywall
+  // post-onboarding.
   try { localStorage.removeItem('corpus_hard_paywall_escrow'); } catch (_) {}
+  try { localStorage.removeItem('corpus_hard_paywall_escrow_uid'); } catch (_) {}
   // Defensive: clear the two body classes that hide chrome via CSS.
   // body.on-subject-screen and body.drawer-open both apply
   // visibility:hidden to .topbar / .stats-subheader / .bottom-nav
@@ -33604,7 +33617,17 @@ function _onbPaywallHardMode() {
 // Account stays intact on Supabase (scope: 'local' logout clears the
 // device token only).
 async function _onbPaywallSignOut() {
-  try { localStorage.setItem('corpus_hard_paywall_escrow', '1'); } catch (_) {}
+  // Snapshot the signing-out user's id alongside the escrow flag so a
+  // DIFFERENT account signing in later on the same device can tell the
+  // escrow isn't theirs and clear it (see the mismatch handler in
+  // enterAppUi). Written before the wipe — authLogout nulls
+  // currentUser, which would otherwise erase the uid we want to stamp.
+  try {
+    const _uid = (currentUser && currentUser.id) || '';
+    localStorage.setItem('corpus_hard_paywall_escrow', '1');
+    if (_uid) localStorage.setItem('corpus_hard_paywall_escrow_uid', _uid);
+    else localStorage.removeItem('corpus_hard_paywall_escrow_uid');
+  } catch (_) {}
   _signOutInProgress = true;
   _explicitSignOut = true;
   _enteredWithExpiredToken = false;
@@ -33648,6 +33671,17 @@ function _onbPaywallDelete() {
 }
 
 function _onbV2PreparePaywall() {
+  // Belt-and-braces: an entitled / trial user must never see the
+  // onboarding paywall, even if they somehow landed on step 35 (a
+  // lapsed user who restored on a fresh device, a reinstall that
+  // bypassed the enterAppUi gate because state hadn't synced yet, a
+  // developer-premium override). _onbComplete clears the escrow,
+  // writes the completedAt marker + corpus_onboarding_done, and
+  // renders home — exactly the outcome we want here.
+  if (typeof _isUserPaidOrTrialNow === 'function' && _isUserPaidOrTrialNow()) {
+    try { _onbComplete(); } catch (_) {}
+    return;
+  }
   const isEn = state.lang === 'en';
   const screen = document.getElementById('onb-v2-paywall');
   if (screen && typeof _onbV7Acc === 'function') _onbV7Acc(screen);
@@ -56491,20 +56525,71 @@ function enterAppUi() {
   // corpus_onboarding_step, so the normal resume gate would land them
   // at step 1 and walk the whole flow again. But state.onbAnswers was
   // restored from the server during enterAppState, and if it carries a
-  // source answer the user has already passed step 36. The escrow flag
-  // is a second trigger — set by _onbPaywallSignOut, survives the wipe
-  // — so even a cross-account sign-in into a fresh profile keeps them
-  // on the paywall until onboarding resolves. Both paths resume at
-  // step 35 (the paywall screen itself).
+  // source answer OR a completedAt marker the user has already been
+  // through the question. The escrow flag is a second trigger — set by
+  // _onbPaywallSignOut, survives the wipe — so even a cross-account
+  // sign-in into a fresh profile keeps them on the paywall until
+  // onboarding resolves. Both paths resume at step 35 (the paywall
+  // screen itself).
+  //
+  // Three guards must run BEFORE the intercept kicks in — all of them
+  // route the user to home instead of the paywall:
+  //
+  //   1. Already-finished-on-another-device. corpus_onboarding_done
+  //      lives in localStorage only, so a user who finished onboarding
+  //      on device A and signs in on device B won't have the flag
+  //      locally. The server-synced equivalents are
+  //      state.onbAnswers.completedAt (written by _onbComplete) and a
+  //      non-empty state.completedDays (populated post-onboarding by
+  //      the first finishDay). Either one proves "this account already
+  //      cleared onboarding"; set the local flag and skip the gate.
+  //   2. Paid / trial user. An entitled account must never see the
+  //      onboarding paywall. If we get here with an active entitlement,
+  //      mark onboarding done and route to home.
+  //   3. Stale escrow from a different account. The escrow flag lives
+  //      on the device; if user A signs out from the hard paywall and
+  //      user B later signs in on the same device, the flag belongs to
+  //      A's session and shouldn't affect B. We stamp
+  //      corpus_hard_paywall_escrow_uid alongside the flag at sign-out;
+  //      a cross-account sign-in finds the mismatch here and clears it.
+  try {
+    const _esUid = localStorage.getItem('corpus_hard_paywall_escrow_uid') || '';
+    const _curUid = (currentUser && currentUser.id) || '';
+    if (localStorage.getItem('corpus_hard_paywall_escrow') === '1'
+        && _esUid && _curUid && _esUid !== _curUid) {
+      localStorage.removeItem('corpus_hard_paywall_escrow');
+      localStorage.removeItem('corpus_hard_paywall_escrow_uid');
+    }
+  } catch (_) {}
   if (!localStorage.getItem('corpus_onboarding_done')) {
-    const _hasSrc = state && state.onbAnswers && state.onbAnswers.source;
-    const _escrow = (function(){ try { return localStorage.getItem('corpus_hard_paywall_escrow') === '1'; } catch(_){ return false; } })();
-    if (_hasSrc || _escrow) {
-      try { localStorage.setItem('corpus_onboarding_step', '35'); } catch(_) {}
-      try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(_) {}
-      _onboardingBooted = true;
-      try { _onbShowStep(35); } catch(_) {}
-      return;
+    // Guard 1: server-side "finished" marker.
+    const _serverFinished = !!(state && state.onbAnswers && state.onbAnswers.completedAt)
+      || !!(state && state.completedDays && Object.keys(state.completedDays).length > 0);
+    if (_serverFinished) {
+      try { localStorage.setItem('corpus_onboarding_done', '1'); } catch (_) {}
+      try { localStorage.removeItem('corpus_hard_paywall_escrow'); } catch (_) {}
+      try { localStorage.removeItem('corpus_hard_paywall_escrow_uid'); } catch (_) {}
+      try { localStorage.removeItem('corpus_onboarding_step'); } catch (_) {}
+      // Fall through to the home-landing branches below. The existing
+      // `if (!localStorage.getItem('corpus_onboarding_step') && !done)`
+      // gate becomes a no-op (done is now set), so enterAppUi lands on
+      // home via its earlier renderHome + showScreen('home') calls.
+    } else if (typeof _isUserPaidOrTrialNow === 'function' && _isUserPaidOrTrialNow()) {
+      // Guard 2: entitled user never sees the onboarding paywall.
+      try { localStorage.setItem('corpus_onboarding_done', '1'); } catch (_) {}
+      try { localStorage.removeItem('corpus_hard_paywall_escrow'); } catch (_) {}
+      try { localStorage.removeItem('corpus_hard_paywall_escrow_uid'); } catch (_) {}
+      try { localStorage.removeItem('corpus_onboarding_step'); } catch (_) {}
+    } else {
+      const _hasSrc = state && state.onbAnswers && state.onbAnswers.source;
+      const _escrow = (function(){ try { return localStorage.getItem('corpus_hard_paywall_escrow') === '1'; } catch(_){ return false; } })();
+      if (_hasSrc || _escrow) {
+        try { localStorage.setItem('corpus_onboarding_step', '35'); } catch(_) {}
+        try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(_) {}
+        _onboardingBooted = true;
+        try { _onbShowStep(35); } catch(_) {}
+        return;
+      }
     }
   }
   // Onboarding v2: the post-signup goal-picker chain is gone. v2 sets
