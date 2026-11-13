@@ -15317,6 +15317,81 @@
     border-color: var(--v7-acc-l);
   }
 
+  /* Source-step overrides. Reuses .onb-v2-card chrome; bumps the icon
+     slot to 42px for the custom icons in images/onboarding/source-icons/
+     and renders them via <img> instead of the inline <svg><use>
+     template path (external SVGs drop in without needing a <defs>
+     symbol). Icons are the user's own neutral category symbols in app
+     style — no brand color override here. */
+  .onb-screen.onb-v7 #onb-v2-source-options .onb-v2-card-icon {
+    width: 42px;
+    height: 42px;
+  }
+  .onb-screen.onb-v7 #onb-v2-source-options .onb-v2-card-icon img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+  }
+  /* "Other" text-field. Revealed on tap of the Other card; same visual
+     weight as the card list so it reads as part of the same column. */
+  .onb-screen.onb-v7 .onb-v7-source-other-wrap {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .onb-screen.onb-v7 .onb-v7-source-other-wrap.is-open {
+    display: flex;
+  }
+  .onb-screen.onb-v7 .onb-v7-source-other-input {
+    width: 100%;
+    padding: calc(12px * var(--text-scale, 1)) 16px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1.5px solid rgba(var(--accent-rgb), 0.18);
+    border-radius: 14px;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(16.5px * var(--text-scale));
+    line-height: 1.35;
+    text-align: start;
+    direction: inherit;
+  }
+  .onb-screen.onb-v7 .onb-v7-source-other-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  html.dark .onb-screen.onb-v7 .onb-v7-source-other-input {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  /* Skip link under the CTA holder. No background, muted gray. */
+  .onb-screen.onb-v7 .onb-v7-source-skip {
+    background: none;
+    border: none;
+    color: var(--text-2);
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 10px 16px;
+    cursor: pointer;
+    text-align: center;
+    width: 100%;
+    margin-top: 2px;
+  }
+  .onb-screen.onb-v7 .onb-v7-source-skip:active { opacity: 0.6; }
+  .onb-screen.onb-v7 .onb-v7-source-sub {
+    margin-top: 6px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .onb-screen.onb-v7 .onb-v7-source-head {
+    text-align: center;
+    margin-top: 8px;
+  }
+
   /* Hint under the bubble on Q1/Q2 ("pick up to 3"). Rendered by
      _onbV2PrepareMsel into .onb-v7-greeting; this scopes the color
      to a muted gray so it reads as a sub-line beneath the bold head. */
@@ -33574,6 +33649,176 @@ function _onbV2CtaTasteQ() {
   if (_onbV2TasteQPicked === null) return;
   _onbAdvanceStep(20, 21);
 }
+
+// ===== Source step (visual-only, not in _ONB_STEP_TO_ID) =====
+//
+// "How did you hear about Corpus?" — single-choice option list with
+// a per-row icon slot (images/onboarding/source-icons/source-<id>.svg
+// via <img>, no inline <defs>). Options defined as plain data below;
+// labels are nominative plain-text, no brand styling. iOS and Android
+// only see their own store row. Order is shuffled once per device
+// (Fisher-Yates) and persisted so revisits are stable; used_before
+// and other always sit at the end.
+//
+// This step is NOT yet wired into _ONB_STEP_TO_ID or any transition —
+// flow wiring follows in a later commit. Reachable this commit only
+// via window.__corpusShowSourceStep() from the Web Inspector.
+const _ONB_SOURCE_OPTIONS = [
+  { id: 'instagram',   en: 'Instagram',                   he: 'אינסטגרם',          icon: 'source-instagram' },
+  { id: 'tiktok',      en: 'TikTok',                      he: 'טיקטוק',            icon: 'source-tiktok' },
+  { id: 'friend',      en: 'A friend or family member',   he: 'חבר או בן משפחה',   icon: 'source-friend' },
+  { id: 'app_store',   en: 'App Store',                   he: 'App Store',         icon: 'source-store', platform: 'ios' },
+  { id: 'google_play', en: 'Google Play',                 he: 'Google Play',       icon: 'source-store', platform: 'android' },
+  { id: 'google',      en: 'Google search',               he: 'חיפוש בגוגל',       icon: 'source-google' },
+  { id: 'linkedin',    en: 'LinkedIn',                    he: 'לינקדאין',          icon: 'source-linkedin' },
+  { id: 'threads',     en: 'Threads',                     he: 'Threads',           icon: 'source-threads' },
+  { id: 'ai',          en: 'ChatGPT or another AI tool',  he: 'ChatGPT או כלי AI אחר', icon: 'source-ai' },
+  { id: 'used_before', en: "I've used Corpus before",     he: 'השתמשתי ב-Corpus בעבר', icon: 'source-used-before' },
+  { id: 'other',       en: 'Other',                       he: 'אחר',               icon: 'source-other' },
+];
+const _ONB_SOURCE_TAIL = ['used_before', 'other'];
+
+function _onbSourcePlatform() {
+  try {
+    if (window.Capacitor && typeof window.Capacitor.getPlatform === 'function') {
+      return window.Capacitor.getPlatform();  // 'ios' | 'android' | 'web'
+    }
+  } catch (_) {}
+  return 'web';
+}
+
+// Fisher-Yates in-place shuffle of a copy.
+function _onbSourceShuffle(ids) {
+  const a = ids.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Stable per-device order. Filters out the wrong-platform store row,
+// shuffles everything that's not in _ONB_SOURCE_TAIL, appends the
+// tail. Persisted so revisits look identical. "web" (desktop debug)
+// sees both store rows so authors can review both without switching
+// platforms.
+function _onbSourceStableOrder() {
+  let stored = null;
+  try {
+    const raw = localStorage.getItem('corpus_onboarding_source_order');
+    if (raw) stored = JSON.parse(raw);
+  } catch (_) {}
+  if (Array.isArray(stored) && stored.length) {
+    const known = new Set(_ONB_SOURCE_OPTIONS.map(o => o.id));
+    const clean = stored.filter(id => known.has(id));
+    if (clean.length === stored.length) return clean;
+  }
+  const platform = _onbSourcePlatform();
+  const all = _ONB_SOURCE_OPTIONS
+    .filter(o => !o.platform || o.platform === platform || platform === 'web')
+    .map(o => o.id);
+  const tail = all.filter(id => _ONB_SOURCE_TAIL.includes(id));
+  const head = all.filter(id => !_ONB_SOURCE_TAIL.includes(id));
+  const order = _onbSourceShuffle(head).concat(tail);
+  try { localStorage.setItem('corpus_onboarding_source_order', JSON.stringify(order)); } catch (_) {}
+  return order;
+}
+
+// Card HTML builder — mirrors _onbV2CardHTML's icon + label flex row
+// but renders an external <img> instead of an inline <svg><use>.
+function _onbSourceCardHTML(opt, isEn) {
+  const label = isEn ? opt.en : opt.he;
+  const safe  = String(label).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return '<span class="onb-v2-card-icon" aria-hidden="true">' +
+           '<img src="images/onboarding/source-icons/' + opt.icon + '.svg" alt="" draggable="false">' +
+         '</span>' +
+         '<span class="onb-v2-card-label">' + safe + '</span>';
+}
+
+function _onbV2PrepareSource() {
+  const isEn = state.lang === 'en';
+  const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  setText('onb-v2-source-head', isEn ? 'How did you hear about Corpus?' : 'איך שמעת על Corpus?');
+  setText('onb-v2-source-sub',  isEn ? 'It helps us find more people like you.' : 'זה עוזר לנו למצוא עוד אנשים כמוך.');
+  setText('onb-v2-source-skip', isEn ? 'Skip' : 'דילוג');
+  setText('onb-v2-source-other-cta', isEn ? 'Continue' : 'המשך');
+  const inp = document.getElementById('onb-v2-source-other-input');
+  if (inp) {
+    inp.placeholder = isEn ? 'Where?' : 'איפה?';
+    inp.value = '';
+  }
+  const otherWrap = document.getElementById('onb-v2-source-other-wrap');
+  if (otherWrap) otherWrap.classList.remove('is-open');
+
+  const list = document.getElementById('onb-v2-source-options');
+  if (!list) return;
+  const order = _onbSourceStableOrder();
+  const byId = {};
+  for (const o of _ONB_SOURCE_OPTIONS) byId[o.id] = o;
+  list.innerHTML = '';
+  for (const id of order) {
+    const opt = byId[id];
+    if (!opt) continue;
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'onb-v2-card';
+    card.dataset.sourceId = opt.id;
+    card.innerHTML = _onbSourceCardHTML(opt, isEn);
+    card.onclick = () => _onbV2SourceTap(opt.id);
+    list.appendChild(card);
+  }
+}
+
+// Tap handler — visual-only: logs choice to console. "other" reveals
+// the inline text field instead of advancing. Real advance / state
+// writes / PostHog event land in the flow-wiring commit.
+function _onbV2SourceTap(id) {
+  if (id === 'other') {
+    const wrap = document.getElementById('onb-v2-source-other-wrap');
+    if (wrap) wrap.classList.add('is-open');
+    setTimeout(() => {
+      const inp = document.getElementById('onb-v2-source-other-input');
+      if (inp) try { inp.focus(); } catch (_) {}
+    }, 50);
+    console.log('[source] other revealed');
+    return;
+  }
+  const order = (() => {
+    try { return JSON.parse(localStorage.getItem('corpus_onboarding_source_order') || '[]'); } catch (_) { return []; }
+  })();
+  const position = order.indexOf(id);
+  console.log('[source] selected:', id, 'position_shown:', position);
+}
+function _onbV2CtaSourceOther() {
+  const inp = document.getElementById('onb-v2-source-other-input');
+  const text = (inp && inp.value || '').trim().slice(0, 60);
+  console.log('[source] other submit:', JSON.stringify(text));
+}
+function _onbV2CtaSourceSkip() {
+  console.log('[source] skipped');
+}
+
+// Debug-only opener. Hides every other onb-screen, then shows the
+// source step and calls its prepare. Also applies the user's current
+// lang/theme so EN/HE and light/dark review is one-call. Does NOT
+// write any state field and does NOT touch corpus_onboarding_step.
+window.__corpusShowSourceStep = function () {
+  try {
+    document.querySelectorAll('.onb-screen').forEach(s => {
+      s.style.display = 'none';
+      s.classList.remove('onb-active');
+    });
+    _onbV2PrepareSource();
+    const el = document.getElementById('onb-v2-source');
+    if (el) {
+      el.style.display = 'flex';
+      el.classList.add('onb-active');
+    }
+    console.log('[__corpusShowSourceStep] opened. Reload or navigate away to exit.');
+  } catch (e) {
+    console.error('[__corpusShowSourceStep] error:', e);
+  }
+};
 
 // Step 21 (first-card reveal) — advance to streak.
 function _onbV2CtaFirstCard() { _onbAdvanceStep(21, 22); }
@@ -61957,6 +62202,35 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
      happy after any tap — it's a reveal, not a test) + bubble
      (scenario) + question head + option cards. CTA enables after any
      pick. Correct answer always highlights green regardless of pick. -->
+<!-- SOURCE step (visual-only, not wired into _ONB_STEP_TO_ID).
+     Reachable via window.__corpusShowSourceStep() only. Flow wiring
+     follows in a later commit per option B.
+     Head + sub centered above a single-choice option list. "Other"
+     reveals an inline text field + Continue button under the list;
+     empty text is allowed. Skip link below the CTA holder. Options
+     render via _onbV2CardHTML variant that uses <img src=...> instead
+     of the inline <svg><use> pattern (external SVG files drop in with
+     no <defs> symbol). Icons come from images/onboarding/source-icons/;
+     they are neutral category symbols authored by the user, labels are
+     plain-text nominative references in app typography. -->
+<div id="onb-v2-source" class="onb-screen onb-v2 onb-v7 onb-bg-themed" style="display:none">
+  <div class="onb-v7-top">
+    <div class="onb-v7-bar"><i style="width: 70%"></i></div>
+  </div>
+  <div class="onb-v7-mid">
+    <h1 class="onb-v7-source-head" id="onb-v2-source-head"></h1>
+    <p class="onb-v7-sub onb-v7-source-sub" id="onb-v2-source-sub"></p>
+    <div class="onb-v7-opt-list" id="onb-v2-source-options"></div>
+    <div class="onb-v7-source-other-wrap" id="onb-v2-source-other-wrap">
+      <input type="text" class="onb-v7-source-other-input" id="onb-v2-source-other-input" maxlength="60" autocomplete="off" spellcheck="false">
+      <button type="button" class="onb-v7-btn" id="onb-v2-source-other-cta" onclick="_onbV2CtaSourceOther()"></button>
+    </div>
+  </div>
+  <div class="onb-v7-cta-holder">
+    <button type="button" class="onb-v7-source-skip" id="onb-v2-source-skip" onclick="_onbV2CtaSourceSkip()"></button>
+  </div>
+</div>
+
 <div id="onb-v2-taste-q" class="onb-screen onb-v2 onb-v7 onb-bg-themed" style="display:none">
   <div class="onb-v7-top">
     <button type="button" class="onb-v7-back" onclick="_onbAdvanceStep(20, 19)" aria-label="Back">←</button>
