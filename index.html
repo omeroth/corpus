@@ -45725,13 +45725,24 @@ function renderHome() {
         const cd = isEn
           ? (remaining === 1 ? '1 dialogue to go' : (remaining + ' dialogues to go'))
           : (remaining === 1 ? 'עוד דיאלוג אחד ונפתח' : ('עוד ' + remaining + ' דיאלוגים ונפתח'));
+        // Progress bar + countdown render ONLY while ch1 isn't done,
+        // i.e. while the bonus is ORDER-locked. wkLocked also fires
+        // for the paywall gate (user completed ch1 but isn't paid);
+        // in that case remaining is 0, the countdown text would read
+        // "0 dialogues to go" and the bar would be 100%, which both
+        // read as nonsense and hide the real reason the card is
+        // locked (paywall). Gate on remaining > 0 so the card falls
+        // through to the plain title-only layout when ch1 is done —
+        // tapping it still opens the paywall via the shared bonus
+        // tap handler. Guarantees the countdown can never show 0.
+        const showOrderCountdown = wkLocked && remaining > 0;
         card.innerHTML = `
           <div class="level-num">${numDisplay}</div>
           <div class="hv-bonus-text">
             <div class="level-eyebrow">${eyebrow}</div>
             <div class="level-title">${weekTitle}</div>
-            ${wkLocked ? `<div class="bonus-progress"><div class="bonus-progress-fill" style="width:${pct}%"></div></div>` : ''}
-            ${wkLocked ? `<div class="bonus-countdown">${cd}</div>` : ''}
+            ${showOrderCountdown ? `<div class="bonus-progress"><div class="bonus-progress-fill" style="width:${pct}%"></div></div>` : ''}
+            ${showOrderCountdown ? `<div class="bonus-countdown">${cd}</div>` : ''}
           </div>
         `;
         // NEW-badge sticker (bonus2 / bonusEcon2 only, 14-day window,
