@@ -1,3 +1,7 @@
+# Regression-script screenshot output (local-only verification bulk).
+scripts/source-step-shots/
+scripts/hard-paywall-shots/
+
 # Python helper scripts (not part of the app)
 *.py
 __pycache__/

@@ -16481,6 +16481,58 @@
     font-size: 12.5px;
     margin: 2px 0 0;
   }
+  /* Hard-mode subscription-required line. Fires between .paywall-sub
+     and the cards when _onbPaywallHardMode() returns true (non-organic
+     source). Hidden otherwise. Muted neutral; no accent, no border —
+     the line is a statement, not a CTA, and shouldn't visually compete
+     with the real CTA button below the cards. */
+  .onb-screen.onb-v7#onb-v2-paywall .paywall-required-line {
+    display: none;
+    text-align: center;
+    color: var(--text-2);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 4px 0 2px;
+    padding: 0 8px;
+  }
+  .onb-screen.onb-v7#onb-v2-paywall.pw-hard .paywall-required-line {
+    display: block;
+  }
+  /* Hard-mode footer: Sign out · Delete account. Inherits the same
+     visual style as .paywall-links (Terms · Privacy) so the two rows
+     read as a single legal-area group. Appears directly under
+     .paywall-links in hard mode only. */
+  .onb-screen.onb-v7#onb-v2-paywall .paywall-hard-footer {
+    display: none;
+    font-size: 12.5px;
+    margin: 4px 0 0;
+    text-align: center;
+  }
+  .onb-screen.onb-v7#onb-v2-paywall.pw-hard .paywall-hard-footer {
+    display: block;
+  }
+  .onb-screen.onb-v7#onb-v2-paywall .paywall-hard-footer a {
+    color: var(--text-2);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+  .onb-screen.onb-v7#onb-v2-paywall .paywall-hard-footer a:active { opacity: 0.6; }
+  .onb-screen.onb-v7#onb-v2-paywall .paywall-hard-footer .paywall-links-sep {
+    color: var(--text-2);
+    padding: 0 6px;
+  }
+  /* Hard-mode X hide. Lives on the shell class so it's one declaration
+     to flip; keeps the close button in the DOM for aria/keyboard
+     consistency across soft/hard modes but makes it visually gone and
+     untappable. Visibility: hidden preserves the layout slot so the
+     progress bar's padding-inline-end (set by _onbV2PreparePaywall at
+     ~33523) doesn't change between modes. */
+  .onb-screen.onb-v7#onb-v2-paywall.pw-hard #onb-v2-paywall-skip {
+    visibility: hidden;
+    pointer-events: none;
+  }
   /* SE scale-down for the paywall internals. */
   @media (max-height: 700px) {
     .onb-screen.onb-v7#onb-v2-paywall .paywall-brand { display: none; }
@@ -16503,6 +16555,8 @@
     .onb-screen.onb-v7#onb-v2-paywall .paywall-restore { margin-top: 2px; font-size: 11px; padding: 2px 0; }
     .onb-screen.onb-v7#onb-v2-paywall .paywall-legal { font-size: 10px; margin: 2px 0 0; line-height: 1.25; }
     .onb-screen.onb-v7#onb-v2-paywall .paywall-links { font-size: 10.5px; margin: 1px 0 0; }
+    .onb-screen.onb-v7#onb-v2-paywall .paywall-required-line { font-size: 11.5px; margin: 2px 0 1px; }
+    .onb-screen.onb-v7#onb-v2-paywall .paywall-hard-footer { font-size: 10.5px; margin: 2px 0 0; }
   }
 
   /* ── Journey (step 26) — tightened card + features for no-scroll
@@ -30337,6 +30391,24 @@ function enterAsGuest() {
   // Guest entry: reveal the app without auth.
   // Do NOT set appStarted (leave false so the real enterApp runs on sign-in).
   // Do NOT set currentUser (leave null — that's how the engine knows it's a guest).
+  // Hard-paywall escrow: if a user just signed out from the hard
+  // onboarding paywall, "continue as guest" must NOT land them on
+  // home. The escrow flag (survives the sign-out wipe) tells us to
+  // keep the user on the paywall until onboarding is otherwise
+  // resolved. The paywall's prepare will see the same flag and lock
+  // itself into hard mode even though state.onbAnswers is empty.
+  try {
+    if (localStorage.getItem('corpus_hard_paywall_escrow') === '1'
+        && !localStorage.getItem('corpus_onboarding_done')) {
+      hideAuthScreen();
+      _phCapture('onboarding_auth_choice', { choice: 'guest', method: null });
+      try { localStorage.setItem('corpus_onboarding_step', '35'); } catch(_) {}
+      try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(_) {}
+      _onboardingBooted = true;
+      try { _onbShowStep(35); } catch(_) {}
+      return;
+    }
+  } catch (_) {}
   hideAuthScreen();
   // Funnel: onboarding_auth_choice with choice='guest'.
   _phCapture('onboarding_auth_choice', { choice: 'guest', method: null });
@@ -30888,6 +30960,19 @@ function _syncIntroIframeAppearance() {
 // fired here from the message listener.
 
 function _phCapture(event, props) {
+  // Debug-build-only sink. Appends every _phCapture call to an in-page
+  // array so Playwright assertions can verify event firing without
+  // relying on the real PostHog transport. Fires BEFORE the debug
+  // analytics opt-out gate below so a debug build (which suppresses
+  // real PostHog) still records events for the assertion sink. Keyed
+  // by window.__CORPUS_DEBUG_BUILD; a production build will never
+  // set the flag and the sink stays untouched.
+  try {
+    if (window.__CORPUS_DEBUG_BUILD === true) {
+      if (!Array.isArray(window.__corpusPhLog)) window.__corpusPhLog = [];
+      window.__corpusPhLog.push({ event: event, props: props || {}, t: Date.now() });
+    }
+  } catch (_) {}
   // R39c — analytics opt-out convention for debug / dev builds. The
   // existing debug flags (_corpus_debug, _corpus_dev_test,
   // _corpus_dev_premium) also gate the DevTools helpers; mirroring
@@ -32938,6 +33023,10 @@ function _onbComplete() {
   const today = _streakDay();
   state.onbAnswers = state.onbAnswers || {};
   state.onbAnswers.completedAt = today;
+  // Clear the hard-paywall escrow — onboarding resolved, so a later
+  // sign-out should not force the user back into hard-paywall mode
+  // the next time they encounter the paywall post-onboarding.
+  try { localStorage.removeItem('corpus_hard_paywall_escrow'); } catch (_) {}
   // Defensive: clear the two body classes that hide chrome via CSS.
   // body.on-subject-screen and body.drawer-open both apply
   // visibility:hidden to .topbar / .stats-subheader / .bottom-nav
@@ -33482,6 +33571,82 @@ async function _onbV2CtaNotifContinue() {
 //     timeline + no-payment-due pill) was dropped on 2026-09-16
 //     when the App Store Connect Introductory Offers section
 //     turned out to be missing from the account.
+// Hard-mode predicate for the ONBOARDING paywall only. Returns true
+// when the X must be hidden and the Sign out / Delete footer visible.
+//
+// Rule (see onboarding-source branch spec):
+//   - source in {app_store, google_play, used_before}  → NOT hard (X visible)
+//   - source is undefined / null / '' (older build users; legacy skip) → NOT hard
+//   - source is any other value (instagram, tiktok, friend, google,
+//     linkedin, threads, ai, other)                    → HARD (X hidden)
+//   - corpus_hard_paywall_escrow flag set (user just signed out from
+//     a hard paywall and state.onbAnswers was wiped by authLogout; we
+//     must keep them in hard mode until onboarding resolves or they
+//     sign back in and the server restores their source field)       → HARD
+function _onbPaywallHardMode() {
+  try {
+    if (localStorage.getItem('corpus_hard_paywall_escrow') === '1') return true;
+  } catch (_) {}
+  const src = (state && state.onbAnswers && state.onbAnswers.source) || null;
+  if (src == null || src === '') return false;
+  if (src === 'app_store' || src === 'google_play' || src === 'used_before') return false;
+  return true;
+}
+
+// Sign out from the HARD onboarding paywall. Mirrors authLogout's
+// teardown sequence but:
+//   1. Sets the escrow flag BEFORE the wipe so the guest / X paths on
+//      the auth screen can tell they must return the user to the
+//      paywall and not to home. The flag is not in USER_SCOPED_KEYS,
+//      so _wipeUserDataPreserveDevice leaves it intact.
+//   2. Lands on the AUTH screen (showAuthScreen with no onDismiss →
+//      X hidden), never on home. The signed-out user can only sign in.
+// Account stays intact on Supabase (scope: 'local' logout clears the
+// device token only).
+async function _onbPaywallSignOut() {
+  try { localStorage.setItem('corpus_hard_paywall_escrow', '1'); } catch (_) {}
+  _signOutInProgress = true;
+  _explicitSignOut = true;
+  _enteredWithExpiredToken = false;
+  try {
+    try { saveStateLocal(); } catch(_) {}
+    try { await sb.auth.signOut({ scope: 'local' }); } catch(e) {}
+    try { await _logOutRC(); } catch(e) {}
+    currentUser = null;
+    appStarted = false;
+    _progressLoaded = false;
+    const preserved = _wipeUserDataPreserveDevice();
+    state = defaultState();
+    state.lang = preserved.lang;
+    state.subject = preserved.subject;
+    state.appearance = preserved.appearance;
+    state.hapticsEnabled = preserved.hapticsEnabled;
+    if (preserved.dailyReminder) state.dailyReminder = preserved.dailyReminder;
+    try { _writeWidgetData(); } catch (_) {}
+    // Close the paywall screen before showing auth so the onb-screen
+    // doesn't paint through.
+    try {
+      const pw = document.getElementById('onb-v2-paywall');
+      if (pw) { pw.style.display = 'none'; pw.classList.remove('onb-active'); }
+    } catch (_) {}
+    try {
+      if (typeof showAuthScreen === 'function') showAuthScreen({});
+    } catch (_) {}
+    try { _phCapture('onboarding_paywall_signout', { from: 'hard' }); } catch (_) {}
+  } finally {
+    _explicitSignOut = false;
+    _signOutInProgress = false;
+  }
+}
+
+// Delete account from the HARD onboarding paywall. Hands off to the
+// existing showDeleteAccountConfirm → deleteAccount flow — no custom
+// teardown needed.
+function _onbPaywallDelete() {
+  try { _phCapture('onboarding_paywall_delete_tapped', { from: 'hard' }); } catch (_) {}
+  if (typeof showDeleteAccountConfirm === 'function') showDeleteAccountConfirm();
+}
+
 function _onbV2PreparePaywall() {
   const isEn = state.lang === 'en';
   const screen = document.getElementById('onb-v2-paywall');
@@ -33535,16 +33700,40 @@ function _onbV2PreparePaywall() {
     }
   });
   _renderPaywall();
+  // Hard-mode: X hidden, subscription-required line shown, Sign out /
+  // Delete footer shown. See _onbPaywallHardMode for the gating rule.
+  const hard = _onbPaywallHardMode();
+  try {
+    const shell = document.getElementById('onb-v2-paywall');
+    if (shell) shell.classList.toggle('pw-hard', hard);
+    const line = document.getElementById('onb-v2-paywall-required-line');
+    if (line) line.textContent = isEn
+      ? 'A subscription is needed to continue. 7 days free, cancel anytime.'
+      : 'כדי להמשיך צריך מנוי. 7 ימים בחינם, אפשר לבטל בכל רגע.';
+    const signOut = document.getElementById('onb-v2-paywall-signout');
+    if (signOut) signOut.textContent = isEn ? 'Sign out' : 'התנתקות';
+    const del = document.getElementById('onb-v2-paywall-delete');
+    if (del) del.textContent = isEn ? 'Delete account' : 'מחיקת חשבון';
+    const footer = document.querySelector('#onb-v2-paywall .paywall-hard-footer');
+    if (footer) footer.setAttribute('aria-hidden', hard ? 'false' : 'true');
+  } catch(_) {}
   try {
     // Latch source for the whole paywall session so every follow-up
     // event in this paywall instance stamps 'onboarding'. See the
     // modal paywall_shown site for the full rationale.
     _activePaywallSource = 'onboarding';
-    posthog.capture('paywall_shown', {
+    // Routed through _phCapture (instead of posthog.capture) so the
+    // debug sink (window.__corpusPhLog) can see paywall_shown in
+    // Playwright assertions. Payload extended with hard + source for
+    // the onboarding paywall only; the modal paywall_shown call
+    // elsewhere is unchanged.
+    _phCapture('paywall_shown', {
       source:        _activePaywallSource,
       subject:       state.subject || null,
       trial_enabled: TRIAL_ENABLED,
       offering_id:   (_paywallActiveOffering() && _paywallActiveOffering().identifier) || null,
+      hard:          hard,
+      onb_source:    (state.onbAnswers && state.onbAnswers.source) || null,
     });
   } catch(e) {}
 }
@@ -56297,6 +56486,27 @@ function enterAppUi() {
   // Resume any celebration queue persisted from a prior session that
   // closed mid-play. Session-guarded so this fires at most once per open.
   try { _resumeCelebrationsIfPending(); } catch(e) {}
+  // Hard-paywall resume: user signed out from the hard onboarding
+  // paywall and is now signing back in. authLogout wiped
+  // corpus_onboarding_step, so the normal resume gate would land them
+  // at step 1 and walk the whole flow again. But state.onbAnswers was
+  // restored from the server during enterAppState, and if it carries a
+  // source answer the user has already passed step 36. The escrow flag
+  // is a second trigger — set by _onbPaywallSignOut, survives the wipe
+  // — so even a cross-account sign-in into a fresh profile keeps them
+  // on the paywall until onboarding resolves. Both paths resume at
+  // step 35 (the paywall screen itself).
+  if (!localStorage.getItem('corpus_onboarding_done')) {
+    const _hasSrc = state && state.onbAnswers && state.onbAnswers.source;
+    const _escrow = (function(){ try { return localStorage.getItem('corpus_hard_paywall_escrow') === '1'; } catch(_){ return false; } })();
+    if (_hasSrc || _escrow) {
+      try { localStorage.setItem('corpus_onboarding_step', '35'); } catch(_) {}
+      try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(_) {}
+      _onboardingBooted = true;
+      try { _onbShowStep(35); } catch(_) {}
+      return;
+    }
+  }
   // Onboarding v2: the post-signup goal-picker chain is gone. v2 sets
   // the daily goal inline (step 12 / Q3) so no separate migration prompt
   // is needed for users who complete v2. Users on the old flow who
@@ -60483,6 +60693,17 @@ try {
           try { goBack(); } catch (_) {}
           return;
         }
+        // Layer 5b: hard onboarding paywall. The paywall has no back
+        // arrow (progress bar + close-X top row only), and in hard
+        // mode the X is hidden — there is nothing to click. Native
+        // back must minimize the app to the Android launcher instead
+        // of dismissing / skipping the paywall. Soft mode falls
+        // through to layer 6, which clicks the X.
+        const activePw = document.querySelector('#onb-v2-paywall.onb-active');
+        if (activePw && typeof _onbPaywallHardMode === 'function' && _onbPaywallHardMode()) {
+          if (typeof App.minimizeApp === 'function') App.minimizeApp();
+          return;
+        }
         // Layer 6: onboarding — click the active screen's back arrow
         // (hardcoded per-screen target so null slots like step 6 skip
         // automatically). Step 1 has no back → swallow.
@@ -62577,6 +62798,11 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
       <h1 class="paywall-headline"></h1>
     </div>
     <p class="paywall-sub"></p>
+    <!-- Hard-mode subscription-required line. Populated + visibility
+         toggled by _onbV2PreparePaywall; CSS display is driven by the
+         .pw-hard class on the paywall shell. Copy carries the "7 days
+         free, cancel anytime" phrasing per TRIAL_ENABLED=true. -->
+    <p class="paywall-required-line" id="onb-v2-paywall-required-line"></p>
     <!-- Trial-mode Today / Day 6 / Day 7 timeline. Populated + shown
          by _renderPaywall when TRIAL_ENABLED is true; hidden inline
          when the flag is off (see _renderPaywall's trialOn branch). -->
@@ -62610,6 +62836,15 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
       <a href="#" class="paywall-terms" onclick="event.preventDefault(); _openLegalUrl('terms');"></a>
       <span class="paywall-links-sep">·</span>
       <a href="#" class="paywall-privacy" onclick="event.preventDefault(); _openLegalUrl('privacy');"></a>
+    </div>
+    <!-- Hard-mode footer: Sign out · Delete account. Hidden by default,
+         shown only when the paywall shell carries .pw-hard. Sign out
+         lands on the auth screen (never home) via _onbPaywallSignOut;
+         Delete opens the existing showDeleteAccountConfirm flow. -->
+    <div class="paywall-hard-footer" aria-hidden="true">
+      <a href="#" class="paywall-signout" id="onb-v2-paywall-signout" onclick="event.preventDefault(); _onbPaywallSignOut();"></a>
+      <span class="paywall-links-sep">·</span>
+      <a href="#" class="paywall-deleteaccount" id="onb-v2-paywall-delete" onclick="event.preventDefault(); _onbPaywallDelete();"></a>
     </div>
    </div>
   </div>
