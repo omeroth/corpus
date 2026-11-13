@@ -17092,6 +17092,72 @@
     transform: translateY(2px);
     box-shadow: 0 2px 0 #D9690B;
   }
+  /* NEW-badge sticker on freshly-added bonus cards. Rendered inside
+     .hv-bonus-card so it inherits the card's positioning context
+     (the card is position: sticky above — any stacking context works).
+     The card sets no overflow, so the badge protrudes BELOW the
+     bottom edge (past the 4px darker ledge) freely. Mirrored for RTL
+     via logical inset-inline-end + a negative rotation. Shimmer is
+     a clipped ::before sweep. The next sibling chapter is pushed
+     down by the :has() rule below so the pill can hang off the
+     bottom without clipping into the next card. */
+  .bonus-new-badge {
+    position: absolute;
+    bottom: -12px;
+    inset-inline-end: 14px;
+    z-index: 2;
+    background: #FFC93C;
+    color: #3B2A00;
+    box-shadow: 0 3px 0 #D9A21C;
+    border-radius: 999px;
+    padding: 6px 15px;
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-weight: 900;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    pointer-events: none;
+    overflow: hidden;
+    /* Negative tilt in EN points the end-edge UP toward the card's
+       top-right corner, so the sticker reads "lifting into the card"
+       instead of "slipping off the bottom". Mirrored in RTL below. */
+    transform: rotate(-4deg);
+    transform-origin: center;
+  }
+  /* Only while the badge is in the DOM: add just enough margin below
+     the bonus chapter wrapper so the pill's ~12px overhang doesn't
+     crash into the next chapter card. Plain CSS :has() —
+     supported everywhere the app runs (WebKit 15.4+, Capacitor WK). */
+  #screen-home.home-v7 .hv-chapter-bonus:has(.bonus-new-badge) {
+    margin-bottom: 16px;
+  }
+  html[lang="he"] .bonus-new-badge {
+    font-family: 'Rubik', system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: 0;
+    transform: rotate(4deg);
+  }
+  .bonus-new-badge::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    left: -40%;
+    width: 40%;
+    background: linear-gradient(100deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.6) 50%,
+      rgba(255, 255, 255, 0) 100%);
+    animation: bonusNewBadgeShimmer 2.8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes bonusNewBadgeShimmer {
+    0%, 40%   { transform: translateX(0); }
+    70%, 100% { transform: translateX(400%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bonus-new-badge::before { animation: none; }
+  }
   #screen-home.home-v7 .hv-chapter-bonus .hv-bonus-card-header {
     display: flex; align-items: center; gap: 12px;
   }
@@ -28100,6 +28166,11 @@ async function syncProgressToSupabase() {
         // "<subject>-<chapter>". No DB migration (JSONB).
         freeChapterStarted:   Object.assign({}, state.freeChapterStarted || {}),
         freeChapterCompleted: Object.assign({}, state.freeChapterCompleted || {}),
+        // NEW-badge (2026-11-12 bonus swap). Ships the per-bonus
+        // {firstShownAt, dismissed, reason} bucket so dismissals and
+        // "already shown here" stamps travel between devices. Pull
+        // side merges with priority — see _mergeBonusNewBadgeEntry.
+        bonusNewBadge: Object.assign({}, state.bonusNewBadge || {}),
       },
     }, { onConflict: 'user_id' });
     if (error) _reportSyncFailure('coach_marks_shown', error);
@@ -28402,6 +28473,11 @@ async function loadProgressFromSupabase() {
     if (_cms.freeChapterCompleted && typeof _cms.freeChapterCompleted === 'object') {
       state.freeChapterCompleted = Object.assign({}, state.freeChapterCompleted || {}, _cms.freeChapterCompleted);
     }
+    // NEW-badge: per-bonus merge using the priority rule in
+    // _mergeBonusNewBadgeEntry. A real tap/expired dismissal on any
+    // device wins; an auto fresh-install dismissal from a new-device
+    // boot never overrides an eligible entry already stored elsewhere.
+    try { _mergeBonusNewBadgeFromCloud(_cms.bonusNewBadge); } catch(_){}
     // streak_repair fields: union-merge both arrays. Union-dedup by
     // brokenAt for streakBreaks (object entries) and by string for
     // streakRepairs. If a repair happened on device A and hasn't synced
@@ -28912,6 +28988,20 @@ let _paywallContext = null;
 // showPaywall / prep without an onClose is unaffected.
 let _paywallOnClose = null;
 
+// The `source` value stamped on paywall_shown — captured at open time
+// so every follow-up event in the same paywall session (paywall_cta_tapped,
+// paywall_purchase_*, paywall_restore_*, paywall_dismissed,
+// paywall_signin_gate_*) can echo it back, making placement-level
+// conversion queries a single groupBy instead of a cross-event join.
+// Set in both paywall_shown call sites (modal showPaywall and the
+// onboarding paywall prep), cleared in _exitPaywall after
+// paywall_dismissed fires so the dismiss event also carries it. Null
+// means "no active paywall" — events that read it during that window
+// fall back to 'unknown' via _paywallSource() rather than omitting the
+// field, so a query that filters on source never silently drops rows.
+let _activePaywallSource = null;
+function _paywallSource() { return _activePaywallSource || 'unknown'; }
+
 // Round 9 — shared .pop-v7 bottom-sheet helpers. Each callsite builds
 // an inner DOM, hands it to _popV7MountSheet, and the shared code
 // handles .pop-v7/.active toggle, scroll lock, backdrop tap, swipe
@@ -29207,8 +29297,12 @@ function showPaywall(opts) {
     //                    (ch1 → ch2 and ch6 → ch7 are the live cases).
     //                    Lets the funnel measure "did the free chapter
     //                    convert?" without a second query.
+    // Latch source for the whole paywall session so every follow-up
+    // event (cta_tapped, dismissed, purchase_*, restore_*,
+    // signin_gate_*) stamps the same placement value.
+    _activePaywallSource = opts.source || 'unknown';
     posthog.capture('paywall_shown', {
-      source: opts.source || 'unknown',
+      source: _activePaywallSource,
       subject: opts.subject || state.subject || null,
       week_id: typeof opts.weekId !== 'undefined' ? opts.weekId : null,
       day_id:  typeof opts.dayId  !== 'undefined' ? opts.dayId  : null,
@@ -29283,11 +29377,18 @@ function _exitPaywall(reason) {
   _lastPaywallDismissedAt = Date.now();
   try {
     posthog.capture('paywall_dismissed', {
+      source:           _paywallSource(),
       package_selected: _paywallSelectedPkg,
       source_mode:      _paywallMode,
       reason:           reason || 'unknown',
     });
   } catch(e) {}
+  // Clear the session latch AFTER paywall_dismissed captures it so a
+  // subsequent showPaywall starts a fresh session with a fresh source.
+  // Anything that reads _paywallSource() past this point (e.g. a late
+  // async callback from the prior session) sees 'unknown', which is
+  // the intended behaviour per spec #5.
+  _activePaywallSource = null;
   _paywallReturnTo = null;
   _paywallContext = null;
   // Fire the single-shot onClose hook if the caller passed one. Read
@@ -29601,7 +29702,7 @@ async function _requestSignInForPurchase(intent) {
       if (cancelBtn) cancelBtn.addEventListener('click', () => { try { _signInRequiredCancel(); } catch(_){} });
     }
   } catch (_) {}
-  try { _phCapture('paywall_signin_gate_shown', { intent: _signInGateIntent }); } catch(e) {}
+  try { _phCapture('paywall_signin_gate_shown', { intent: _signInGateIntent, source: _paywallSource() }); } catch(e) {}
 }
 
 function _closeSignInRequired() {
@@ -29611,7 +29712,7 @@ function _closeSignInRequired() {
 }
 
 function _signInRequiredCancel() {
-  try { _phCapture('paywall_signin_gate_cancel', { intent: _signInGateIntent }); } catch(e) {}
+  try { _phCapture('paywall_signin_gate_cancel', { intent: _signInGateIntent, source: _paywallSource() }); } catch(e) {}
   _signInGateIntent = null;
   _closeSignInRequired();
 }
@@ -29681,6 +29782,7 @@ async function startPurchase() {
   // reports actual intent — this event is the counterpart that counts
   // every tap regardless of outcome.
   try { posthog.capture('paywall_cta_tapped', {
+    source: _paywallSource(),
     intent: 'purchase',
     source_mode: _paywallMode,
     package_selected: _paywallSelectedPkg,
@@ -29713,6 +29815,7 @@ async function startPurchase() {
   _renderPaywall();
   const _offeringId = (_paywallActiveOffering() && _paywallActiveOffering().identifier) || null;
   try { posthog.capture('paywall_purchase_started', {
+    source: _paywallSource(),
     package_id: sel.pkg.identifier,
     offering_id: _offeringId,
     source_mode: _paywallMode,
@@ -29787,6 +29890,7 @@ async function startPurchase() {
         } catch (e) {}
       })();
       try { posthog.capture('paywall_purchase_succeeded', {
+        source: _paywallSource(),
         package_id: sel.pkg.identifier,
         is_trial: TRIAL_ENABLED && _paywallMode === 'onboarding',
         offering_id: _offeringId,
@@ -29869,6 +29973,7 @@ async function startPurchase() {
                   '— _exitPaywall NOT called, onClose stays:', typeof _paywallOnClose);
       // Purchase came back without the entitlement — treat as failure.
       try { posthog.capture('paywall_purchase_failed', {
+        source: _paywallSource(),
         package_id: sel.pkg.identifier, error_code: 'no_entitlement',
       }); } catch(e) {}
     }
@@ -29885,6 +29990,7 @@ async function startPurchase() {
     const cancelled = !!(e && (e.userCancelled || (e.errorCode === '1') || /cancel/i.test(String(e && e.message))));
     if (cancelled) {
       try { posthog.capture('paywall_purchase_cancelled', {
+        source:      _paywallSource(),
         package_id:  sel.pkg.identifier,
         source_mode: _paywallMode,
       }); } catch(_) {}
@@ -29892,6 +29998,7 @@ async function startPurchase() {
       const msg = (e && e.message) || 'Purchase failed';
       _showToast(state.lang === 'en' ? ('Purchase failed: ' + msg) : ('הרכישה נכשלה: ' + msg));
       try { posthog.capture('paywall_purchase_failed', {
+        source: _paywallSource(),
         package_id: sel.pkg.identifier,
         error_code: (e && (e.errorCode || e.code)) || 'unknown',
       }); } catch(_) {}
@@ -29907,6 +30014,7 @@ async function restorePurchases() {
   // is captured even when the call short-circuits — same rationale as
   // paywall_cta_tapped in startPurchase.
   try { posthog.capture('paywall_cta_tapped', {
+    source: _paywallSource(),
     intent: 'restore',
     source_mode: _paywallMode,
     is_signed_in: !!currentUser,
@@ -29919,7 +30027,7 @@ async function restorePurchases() {
   const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
   if (!P) return;
   const isEn = state.lang === 'en';
-  try { posthog.capture('paywall_restore_tapped'); } catch(e) {}
+  try { posthog.capture('paywall_restore_tapped', { source: _paywallSource() }); } catch(e) {}
   try {
     const info = await P.restorePurchases();
     // Same tripwire as startPurchase — surface every returned entitlement
@@ -29947,7 +30055,7 @@ async function restorePurchases() {
       })();
       // Explicit .catch() — try/catch would not catch the async rejection.
       loadSubscription().catch(e => console.error('[Sub] loadSubscription (restore) failed:', e));
-      try { posthog.capture('paywall_restore_result', { found: true }); } catch(e) {}
+      try { posthog.capture('paywall_restore_result', { source: _paywallSource(), found: true }); } catch(e) {}
       const returnTo = _paywallReturnTo;
       const wasModalMode = _paywallMode === 'modal';
       _exitPaywall('restore_success');
@@ -29965,7 +30073,7 @@ async function restorePurchases() {
         }, 500);
       }
     } else {
-      try { posthog.capture('paywall_restore_result', { found: false }); } catch(e) {}
+      try { posthog.capture('paywall_restore_result', { source: _paywallSource(), found: false }); } catch(e) {}
       const plat = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || 'ios';
       const storeName = plat === 'android' ? (isEn ? 'Google Play account' : 'חשבון Google Play')
                                            : (isEn ? 'Apple ID' : 'Apple ID');
@@ -33327,8 +33435,12 @@ function _onbV2PreparePaywall() {
   });
   _renderPaywall();
   try {
+    // Latch source for the whole paywall session so every follow-up
+    // event in this paywall instance stamps 'onboarding'. See the
+    // modal paywall_shown site for the full rationale.
+    _activePaywallSource = 'onboarding';
     posthog.capture('paywall_shown', {
-      source:        'onboarding',
+      source:        _activePaywallSource,
       subject:       state.subject || null,
       trial_enabled: TRIAL_ENABLED,
       offering_id:   (_paywallActiveOffering() && _paywallActiveOffering().identifier) || null,
@@ -38800,6 +38912,26 @@ function loadState() {
   } else {
     state.bonusUnlockShown = {};
   }
+  // NEW-badge hydrate (2026-11-12 swap). Decision was initially made here
+  // from local completedDays — but on a new device / reinstall, cloud
+  // progress hasn't been pulled yet when loadState runs, so a returning
+  // user with an empty local blob would be mis-tagged as fresh-install
+  // and silently auto-dismissed. Eligibility is now decided after the
+  // cloud pull in _decideBonusNewBadgeEligibilityOnce; here we only
+  // hydrate entries the store already has, and normalise the field
+  // types for entries that came in from a cloud merge.
+  if (state.bonusNewBadge && typeof state.bonusNewBadge === 'object') {
+    for (const bid of ['bonus2', 'bonusEcon2']) {
+      const e = state.bonusNewBadge[bid];
+      if (e && typeof e === 'object') {
+        e.firstShownAt = +e.firstShownAt || 0;
+        e.dismissed = !!e.dismissed;
+        if (e.reason !== 'tap' && e.reason !== 'expired' && e.reason !== 'auto') {
+          delete e.reason;
+        }
+      }
+    }
+  }
   // Migrate legacy chapterCompleteShown keys ({1:true, 2:true, ...}) to the
   // subject-scoped format ({philosophy-1:true, ...}). See helper for the
   // full attribution heuristic. Also runs from loadProgressFromSupabase
@@ -42723,7 +42855,7 @@ function getWeekProgress(weekId) {
 }
 
 function getPrevWeekProgress(weekId) {
-  if (weekId === 'bonus1') return getBonusProgress();
+  if (weekId === 'bonus2') return getBonusProgress();
   const weekOrder = [1, 2, 3, 4];
   const idx = weekOrder.indexOf(weekId);
   if (idx <= 0) return 1;
@@ -43115,8 +43247,8 @@ function _onCelebrationQueueEmpty() {
 function _highlightBonusCardOnHome() {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      const bonusId = state.subject === 'economics' ? 'bonusEcon1'
-                    : state.subject === 'psychology' ? 'bonusPsy1' : 'bonus1';
+      const bonusId = state.subject === 'economics' ? 'bonusEcon2'
+                    : state.subject === 'psychology' ? 'bonusPsy1' : 'bonus2';
       const bonusCard = document.getElementById('level-card-' + bonusId);
       if (!bonusCard) return;
       try {
@@ -45148,6 +45280,7 @@ function _hvPickSubject(id) {
 function renderHome() {
   const ui = u();
   _hvMeasureTopbar();
+  try { _maybeExpireBonusNewBadges(); } catch (e) {}
   _hvBindTopbarResize();
   // Round 23 — replay any first-meeting reveal that was missed because
   // the user exited on the quiz_summary (via X / background / pagehide)
@@ -45382,15 +45515,20 @@ function renderHome() {
     // Numbering is unaffected either way — the levelNum counter below
     // skips bonus chapters entirely.
     let chaptersOrdered = chapters;
-    const _bonusChapter = chapters.find(w => w && w.isBonus);
+    // Hoist bonus chapters above chapter 1 for returning users. Picks up
+    // ALL bonuses in insertion order — previously this used .find()
+    // which returned only the first, so a second bonus (added
+    // 2026-11-12) disappeared from home for returning users. New users
+    // keep the natural getW() ordering.
+    const _bonusChapters = chapters.filter(w => w && w.isBonus);
     const _isNewUser = Object.keys(state.completedDays || {}).length === 0;
-    if (_bonusChapter && !_isNewUser) {
+    if (_bonusChapters.length && !_isNewUser) {
       const _withoutBonus = chapters.filter(w => !w || !w.isBonus);
-      const _c1Idx = _withoutBonus.findIndex(w => w.id === 1);
+      const _c1Idx = _withoutBonus.findIndex(w => w && w.id === 1);
       if (_c1Idx >= 0) {
         chaptersOrdered = [
           ..._withoutBonus.slice(0, _c1Idx),
-          _bonusChapter,
+          ..._bonusChapters,
           ..._withoutBonus.slice(_c1Idx),
         ];
       }
@@ -45473,6 +45611,13 @@ function renderHome() {
           if (card.__bonusHandling) return;
           card.__bonusHandling = true;
           setTimeout(() => { card.__bonusHandling = false; }, 400);
+          // NEW-badge: dismiss on first tap regardless of what the tap
+          // resolves to (paywall, toast, or expand). The badge is a
+          // visual "hey, look" — once the user acknowledges the card,
+          // it's done its job.
+          try { _dismissBonusNewBadge(w.id, 'tap'); } catch(_){}
+          const _badge = card.querySelector(':scope > .bonus-new-badge');
+          if (_badge) _badge.remove();
           try {
             _phCapture('bonus_card_tapped', {
               subject: state.subject || null,
@@ -45616,15 +45761,39 @@ function renderHome() {
         const cd = isEn
           ? (remaining === 1 ? '1 dialogue to go' : (remaining + ' dialogues to go'))
           : (remaining === 1 ? 'עוד דיאלוג אחד ונפתח' : ('עוד ' + remaining + ' דיאלוגים ונפתח'));
+        // Progress bar + countdown render ONLY while ch1 isn't done,
+        // i.e. while the bonus is ORDER-locked. wkLocked also fires
+        // for the paywall gate (user completed ch1 but isn't paid);
+        // in that case remaining is 0, the countdown text would read
+        // "0 dialogues to go" and the bar would be 100%, which both
+        // read as nonsense and hide the real reason the card is
+        // locked (paywall). Gate on remaining > 0 so the card falls
+        // through to the plain title-only layout when ch1 is done —
+        // tapping it still opens the paywall via the shared bonus
+        // tap handler. Guarantees the countdown can never show 0.
+        const showOrderCountdown = wkLocked && remaining > 0;
         card.innerHTML = `
           <div class="level-num">${numDisplay}</div>
           <div class="hv-bonus-text">
             <div class="level-eyebrow">${eyebrow}</div>
             <div class="level-title">${weekTitle}</div>
-            ${wkLocked ? `<div class="bonus-progress"><div class="bonus-progress-fill" style="width:${pct}%"></div></div>` : ''}
-            ${wkLocked ? `<div class="bonus-countdown">${cd}</div>` : ''}
+            ${showOrderCountdown ? `<div class="bonus-progress"><div class="bonus-progress-fill" style="width:${pct}%"></div></div>` : ''}
+            ${showOrderCountdown ? `<div class="bonus-countdown">${cd}</div>` : ''}
           </div>
         `;
+        // NEW-badge sticker (bonus2 / bonusEcon2 only, 14-day window,
+        // dismissed on tap). Appended AFTER innerHTML so the sticker
+        // survives any subsequent repaint of the card body.
+        try {
+          if (_shouldShowBonusNewBadge(w.id)) {
+            const badge = document.createElement('span');
+            badge.className = 'bonus-new-badge';
+            badge.setAttribute('aria-hidden', 'true');
+            badge.textContent = isEn ? 'NEW' : 'חדש';
+            card.appendChild(badge);
+            _markBonusNewBadgeShown(w.id);
+          }
+        } catch (e) {}
       } else {
         const header = document.createElement('div');
         header.className = 'level-card-header';
@@ -54934,7 +55103,7 @@ function _consumePendingDeepLink() {
   // window and completed at least one day retain access — see
   // _hasBonusProgress. Same grandfather that the level card and
   // carousel apply.
-  if (!isWeekCompleted(1) && !_hasBonusProgress('bonusEcon1')) {
+  if (!isWeekCompleted(1) && !_hasBonusProgress('bonusEcon2')) {
     _phCapture('bonus_link_landed', {
       subject: 'economics',
       opened: false,
@@ -54943,11 +55112,11 @@ function _consumePendingDeepLink() {
     try { _showBonusLockToast(); } catch (e) {}
     return false;
   }
-  const wk = getW().find(w => w.id === 'bonusEcon1');
+  const wk = getW().find(w => w.id === 'bonusEcon2');
   const day = wk && wk.days && wk.days[0];
   if (day) {
     _phCapture('bonus_link_landed', { subject: 'economics', opened: true });
-    openReader('bonusEcon1', day.id);
+    openReader('bonusEcon2', day.id);
     return true;
   }
   _phCapture('bonus_link_landed', {
@@ -54975,6 +55144,164 @@ function _hasBonusProgress(bonusChapterId) {
   }
   return false;
 }
+
+// === NEW-badge on freshly-added bonus cards ===
+// Shown for 14 days after first render, cleared on first tap of that
+// card (even if the tap lands on a lock/paywall). Fires analytics
+// events once per bonus per user.
+//
+// Two-phase decision because cloud progress arrives AFTER loadState:
+//   Phase 1 — loadState(): hydrate any entries already in the local
+//     blob (own device's prior sessions, cloud-merged rows). Do NOT
+//     decide eligibility — a returning user on a new device has an
+//     empty local completedDays until the pull merges in.
+//   Phase 2 — _decideBonusNewBadgeEligibilityOnce(): runs AFTER the
+//     parallel auth reads settle (both signed-in and guest paths
+//     funnel through enterAppState). For any entry still missing,
+//     decide from the now-merged completedDays:
+//       non-empty → {firstShownAt:0, dismissed:false}   = eligible
+//       empty     → {firstShownAt:0, dismissed:true, reason:'auto'}
+//                                                       = fresh install
+//
+// Dismissal provenance: reason='tap'|'expired' for real dismissals,
+// reason='auto' for the fresh-install default. The merge rule in
+// _mergeBonusNewBadgeEntry uses provenance so an auto-dismissal from
+// one device never silences an eligible entry from another.
+const _BONUS_NEW_BADGE_IDS = ['bonus2', 'bonusEcon2'];
+const _BONUS_NEW_BADGE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
+// Cleared when a NEW cloud pull starts (enterAppState) so the decision
+// re-runs after each sign-in. Kept session-scoped: once decided this
+// boot, don't re-decide on every renderHome.
+let _bonusNewBadgeDecided = false;
+function _bonusNewBadgeEntry(bonusId) {
+  if (!state.bonusNewBadge) state.bonusNewBadge = {};
+  return state.bonusNewBadge[bonusId];
+}
+function _shouldShowBonusNewBadge(bonusId) {
+  if (!_BONUS_NEW_BADGE_IDS.includes(bonusId)) return false;
+  // Phase 1: no entry yet means the eligibility decision hasn't run
+  // (cloud pull hasn't settled). Render nothing — not a badge, not a
+  // write. The decision gets taken AFTER the pull.
+  const e = _bonusNewBadgeEntry(bonusId);
+  if (!e) return false;
+  if (e.dismissed) return false;
+  if (!e.firstShownAt) return true;
+  return (Date.now() - e.firstShownAt) < _BONUS_NEW_BADGE_TTL_MS;
+}
+function _markBonusNewBadgeShown(bonusId) {
+  if (!_BONUS_NEW_BADGE_IDS.includes(bonusId)) return;
+  const e = _bonusNewBadgeEntry(bonusId);
+  if (!e || e.firstShownAt || e.dismissed) return;
+  e.firstShownAt = Date.now();
+  try { saveStateLocal(); } catch(_){}
+  try { _phCapture('bonus_new_badge_shown', { chapter_id: bonusId }); } catch(_){}
+}
+function _dismissBonusNewBadge(bonusId, reason) {
+  if (!_BONUS_NEW_BADGE_IDS.includes(bonusId)) return;
+  if (!state.bonusNewBadge) state.bonusNewBadge = {};
+  let e = state.bonusNewBadge[bonusId];
+  if (!e) {
+    // Dismissing before the decision has fired (e.g. user taps the
+    // card before the pull completes). Stamp the entry directly so
+    // the dismissal still carries the right provenance.
+    e = state.bonusNewBadge[bonusId] = { firstShownAt: 0, dismissed: false };
+  }
+  if (e.dismissed && (e.reason === 'tap' || e.reason === 'expired')) return;
+  e.dismissed = true;
+  e.reason = (reason === 'expired' || reason === 'auto') ? reason : 'tap';
+  try { saveStateLocal(); } catch(_){}
+  // 'auto' reason is the fresh-install default and isn't a user-facing
+  // dismissal event; don't fire analytics for it.
+  if (e.reason !== 'auto') {
+    try { _phCapture('bonus_new_badge_dismissed', { chapter_id: bonusId, reason: e.reason }); } catch(_){}
+  }
+}
+function _maybeExpireBonusNewBadges() {
+  if (!state.bonusNewBadge) return;
+  for (const bid of _BONUS_NEW_BADGE_IDS) {
+    const e = state.bonusNewBadge[bid];
+    if (!e || e.dismissed || !e.firstShownAt) continue;
+    if ((Date.now() - e.firstShownAt) >= _BONUS_NEW_BADGE_TTL_MS) _dismissBonusNewBadge(bid, 'expired');
+  }
+}
+// Called once per boot AFTER the auth/sync parallel reads settle.
+// Signed-in users wait for the merged completedDays; guests fall
+// through immediately (loadProgressFromSupabase returns on !currentUser).
+function _decideBonusNewBadgeEligibilityOnce() {
+  if (_bonusNewBadgeDecided) return;
+  _bonusNewBadgeDecided = true;
+  if (!state.bonusNewBadge) state.bonusNewBadge = {};
+  const hasHistory = state.completedDays && Object.keys(state.completedDays).length > 0;
+  let dirty = false;
+  for (const bid of _BONUS_NEW_BADGE_IDS) {
+    if (state.bonusNewBadge[bid]) continue;  // cloud or earlier session decided already
+    state.bonusNewBadge[bid] = hasHistory
+      ? { firstShownAt: 0, dismissed: false }
+      : { firstShownAt: 0, dismissed: true, reason: 'auto' };
+    dirty = true;
+  }
+  if (dirty) {
+    try { saveStateLocal(); } catch(_){}
+    // If home is already up when the decision lands (signed-in slow
+    // pull), repaint so the eligible badge appears without a reload.
+    try {
+      if (state && state.currentScreen === 'home' && typeof renderHome === 'function') renderHome();
+    } catch(_){}
+  }
+}
+// Priority score for a single entry. Higher wins the merge; the auto
+// fresh-install dismissal sits BELOW every eligible / shown state so a
+// new-device auto-decision never overrides another device's history.
+//   4 — {dismissed:true, reason:'tap' | 'expired'}   real dismissal (sticky)
+//   3 — {dismissed:false, firstShownAt > 0}          shown but not dismissed
+//   2 — {dismissed:false, firstShownAt == 0}         decided eligible, unseen
+//   1 — {dismissed:true, reason:'auto'}              fresh-install default
+//   0 — undefined / missing
+function _bonusNewBadgeEntryPriority(e) {
+  if (!e || typeof e !== 'object') return 0;
+  if (e.dismissed && (e.reason === 'tap' || e.reason === 'expired')) return 4;
+  if (!e.dismissed && +e.firstShownAt > 0) return 3;
+  if (!e.dismissed) return 2;
+  return 1;  // auto / unknown-reason dismissal
+}
+function _mergeBonusNewBadgeEntry(a, b) {
+  const pa = _bonusNewBadgeEntryPriority(a);
+  const pb = _bonusNewBadgeEntryPriority(b);
+  if (pa === 0) return b || undefined;
+  if (pb === 0) return a;
+  if (pa > pb) return a;
+  if (pb > pa) return b;
+  // Tie on priority 3 → earliest shown wins (both saw the badge, keep the first stamp).
+  if (pa === 3) return (+a.firstShownAt <= +b.firstShownAt) ? a : b;
+  return a;  // priority 4, 2, 1 ties: either is equivalent
+}
+// Cloud-pull entry point. Merges a remote {bonus2:{...}, bonusEcon2:{...}}
+// bucket (read from coach_marks_shown.bonusNewBadge) into state.bonusNewBadge.
+// After this returns, _decideBonusNewBadgeEligibilityOnce will fill any
+// still-missing entries from the now-merged completedDays.
+function _mergeBonusNewBadgeFromCloud(remote) {
+  if (!remote || typeof remote !== 'object') return;
+  if (!state.bonusNewBadge) state.bonusNewBadge = {};
+  for (const bid of _BONUS_NEW_BADGE_IDS) {
+    const r = remote[bid];
+    if (!r || typeof r !== 'object') continue;
+    // Normalise fields before merging so a stale client's shape doesn't
+    // leak through.
+    const rN = {
+      firstShownAt: +r.firstShownAt || 0,
+      dismissed: !!r.dismissed,
+    };
+    if (r.reason === 'tap' || r.reason === 'expired' || r.reason === 'auto') rN.reason = r.reason;
+    const local = state.bonusNewBadge[bid];
+    state.bonusNewBadge[bid] = _mergeBonusNewBadgeEntry(local, rN);
+  }
+}
+window.__corpusResetBonusBadge = function () {
+  state.bonusNewBadge = undefined;
+  _bonusNewBadgeDecided = false;
+  try { saveStateLocal(); } catch(_){}
+  console.log('[__corpusResetBonusBadge] cleared. Reload the app.');
+};
 
 // Toast shown when the user tries to reach the locked bonus chapter
 // via the ?open=bonus-econ deep link or by tapping the locked card
@@ -55410,6 +55737,10 @@ async function enterAppState(user) {
   // syncProgressToSupabase gates every push on this — see the guard at
   // the top of that function for why.
   _progressLoaded = false;
+  // Re-arm the NEW-badge decision gate. It fires once per boot, AFTER
+  // the parallel reads below settle — so the decision sees the merged
+  // completedDays, not whatever was in localStorage pre-pull.
+  _bonusNewBadgeDecided = false;
   console.log('[Auth] Entering app as:', user ? user.email : 'guest');
   if (user && user.email === 'roth.omer@gmail.com') {
     try { posthog.opt_out_capturing(); } catch(e) {}
@@ -55469,6 +55800,11 @@ async function enterAppState(user) {
     clearTimeout(_loadingStripTimer);
     if (_loadingStripEl) _loadingStripEl.classList.remove('visible');
   }
+  // NEW-badge decision. Cloud pull has merged (success, no-data, or
+  // timeout) and guests' loadProgressFromSupabase returned on the
+  // !currentUser guard — in every case state.completedDays is now
+  // the final truth for this boot. Decide eligibility from that.
+  try { _decideBonusNewBadgeEligibilityOnce(); } catch(_){}
   if (user) {
     try {
       const identities = user.identities || [];

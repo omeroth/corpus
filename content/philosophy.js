@@ -1018,18 +1018,18 @@ const corpusData = {
     ],
   },
   {
-    id: 'bonus1',
-    title: 'אתיקה ובינה מלאכותית',
-    titleEn: 'Ethics and Artificial Intelligence',
-    subtitle: 'כשהאלגוריתם פוגש את האתיקה',
-    subtitleEn: 'When the Algorithm Meets Ethics',
+    id: 'bonus2',
+    title: 'האם תשומת הלב שלנו חופשית?',
+    titleEn: 'Is Our Attention Free?',
+    subtitle: 'חירות, סיבתיות ואחריות',
+    subtitleEn: 'Freedom, causality, and responsibility',
     isBonus: true,
     xp: 100,
     days: [
       {
         id: 0,
-        title: 'מאחורי הכותרת',
-        titleEn: 'Behind the Headline',
+        title: 'פתיחה: מי מחליט למה נשים לב?',
+        titleEn: 'Opening: Who Decides What We Notice?',
         thinker: '',
         thinkerEn: '',
         thinkerId: null,
@@ -1037,24 +1037,240 @@ const corpusData = {
         sections: [
           {
             type: 'idea',
-            title: 'ברוכים הבאים לפרק הבונוס',
-            titleEn: 'Welcome to the Bonus Chapter',
-            content: 'ענקיות טכנולוגיה כמו Anthropic ו-OpenAI כבר לא מעסיקות רק מתכנתים, הן מגייסות פילוסופים כדי לנסח <strong>"חוקה" למכונות</strong>. השאלה היא כבר לא רק מה המכונה יכולה לעשות, אלא <strong>מה מותר לה לעשות</strong>.\n\nהפרק נפגוש חמישה פילוסופים שלא הכירו בינה מלאכותית, אבל ה<strong>שאלות שהם שאלו לפני מאות שנים הן בדיוק השאלות שמדעני המחשב מתמודדים איתן היום</strong>.',
-            contentEn: 'Tech giants like Anthropic and OpenAI no longer hire only programmers, they are recruiting philosophers to draft a <strong>"Constitution" for machines</strong>. The question is no longer just what the machine can do, but <strong>what it is allowed to do</strong>.\n\nThis chapter we will meet five philosophers who never knew artificial intelligence, but <strong>the questions they asked hundreds of years ago are exactly the questions that computer scientists face today</strong>.'
+            title: 'על מה הפרק הזה?',
+            titleEn: 'What is this chapter about?',
+            content: 'בשנת 2025 נכנס לתוקף באוסטרליה חוק המחייב פלטפורמות חברתיות מסוימות למנוע מבני פחות מ־16 להחזיק בהן חשבון.\n\nאחת הסיבות לחוק היא החשש שהרשתות החברתיות מתוכננות למשוך את תשומת הלב שלנו ולהקשות עלינו להתנתק מהן.\n\nאבל אם האפליקציות מסוגלות להשפיע על ההתנהגות שלנו בעוצמה כזאת, מה לגבי מבוגרים?\n\nנניח שפתחתם את הטלפון כדי לבדוק הודעה, וכעבור שעה גיליתם שאתם עדיין גוללים. האם בחרתם לבלות כך את השעה הזאת? ואם לא, עד כמה אתם אחראים לכך?\n\nהשאלות האלה קשורות לוויכוח פילוסופי עתיק: האם אנחנו בוחרים את מעשינו בחופשיות, או שהם נקבעים בידי סיבות שאיננו מודעים להן?\n\nבפרק הזה נפגוש חמישה הוגים שיציעו תשובות שונות, ונבחן את רעיונותיהם באמצעות פעולה יומיומית אחת: הרגע שבו אנחנו מושיטים יד לטלפון.',
+            contentEn: 'In 2025, a law took effect in Australia requiring certain social media platforms to prevent anyone under 16 from holding an account.\n\nOne reason for the law is the concern that social networks are designed to capture our attention and make it hard for us to disconnect.\n\nBut if apps can influence our behavior this powerfully, what about adults?\n\nSuppose you opened your phone to check a message, and an hour later you find you are still scrolling. Did you choose to spend the hour this way? And if not, how responsible are you for it?\n\nThese questions are connected to an ancient philosophical debate: do we choose our actions freely, or are they determined by causes we are not aware of?\n\nIn this chapter we will meet five thinkers who offer different answers, and we will examine their ideas through one everyday act: the moment we reach for the phone.'
           },
           {
             type: 'idea',
-            title: 'מה נחקור הפרק?',
-            titleEn: 'What Will We Explore This Chapter?',
-            content: 'יום 1 | קאנט והאמת: <strong>האם מותר ל-AI לשקר כדי לנחם משתמש במצוקה?</strong>\n\nיום 2 | מיל והמכונית האוטונומית: בניסוי ה-Moral Machine, מיליוני אנשים הכריעו מי יחיה ומי ימות.\n\nיום 3 | אריסטו והאחריות: כשה-AI טועה באבחון רפואי, מי אשם?\n\nיום 4 | ניטשה ומאבקי כוח: מי באמת קובע את הערכים של המכונה?\n\nיום 5 | סוקרטס והחשיבה: <strong>האם ה-AI הוא "מורה" שנותן תשובות מוכנות, או "מיילדת" שעוזרת לנו לחשוב בעצמנו?</strong>',
-            contentEn: 'Day 1 | Kant and Truth: <strong>Is AI allowed to lie to comfort a user in distress?</strong>\n\nDay 2 | Mill and the Autonomous Car: In the "Moral Machine" experiment, millions decided who lives and who dies.\n\nDay 3 | Aristotle and Responsibility: When AI errs in a medical diagnosis, who is to blame?\n\nDay 4 | Nietzsche and Power: Who truly determines the machine\'s values?\n\nDay 5 | Socrates and Thinking: <strong>Is the AI a "teacher" providing ready-made answers, or a "midwife" that helps us think for ourselves?</strong>'
+            title: 'מה נחקור?',
+            titleEn: 'What will we explore?',
+            content: 'שפינוזה: מדוע אנחנו חושבים שאנחנו חופשיים, גם כשהרצונות שלנו נקבעים בידי סיבות שאיננו מכירים?\n\nדיוויד יום: מדוע הידיעה שגלילה ממושכת מזיקה לנו אינה מספיקה כדי להפסיק?\n\nבנג\'מין ליבט: האם המוח מתחיל לפעול עוד לפני שאנחנו מודעים להחלטה שלנו?\n\nעמנואל קאנט: כיצד אפשר לפעול באופן אוטונומי, ולא רק בעקבות דחפים והשפעות חיצוניות?\n\nז\'אן־פול סארטר: האם העובדה שאנחנו מושפעים מגורמים חיצוניים פוטרת אותנו מאחריות למעשינו?\n\nבסוף הפרק נחזור לשאלה שבה פתחנו: <strong>עד כמה תשומת הלב שלנו באמת נתונה לבחירתנו?</strong>',
+            contentEn: 'Spinoza: Why do we think we are free, even when our desires are determined by causes we do not know?\n\nDavid Hume: Why is knowing that prolonged scrolling is harmful to us not enough to make us stop?\n\nBenjamin Libet: Does the brain start to act even before we are aware of our decision?\n\nImmanuel Kant: How can we act autonomously, and not only in response to impulses and external influences?\n\nJean-Paul Sartre: Does the fact that we are influenced by external factors excuse us from responsibility for our actions?\n\nAt the end of the chapter we will return to the question we started with: <strong>how far is our attention truly up to our choice?</strong>'
           }
         ]
       },
       {
         id: 1,
-        title: 'האם מותר ל-AI לשקר',
-        titleEn: 'Can AI Be Allowed to Lie',
+        title: 'שפינוזה: האם תשומת הלב שלך באמת נתונה לבחירתך?',
+        titleEn: 'Spinoza: Is Your Attention Really Yours to Choose?',
+        thinker: 'ברוך שפינוזה',
+        thinkerEn: 'Baruch Spinoza',
+        thinkerId: 'spinoza',
+        xp: 50,
+        sections: [
+          {
+            type: 'idea',
+            title: 'הרעיון של היום',
+            titleEn: 'Today\'s Idea',
+            content: 'פתחתם את הטלפון כדי לבדוק הודעה, וכעבור עשרים דקות גיליתם שאתם עדיין גוללים.\n\nמדוע המשכתם? אולי פשוט רציתם. אבל האם הרצון הזה היה באמת בחירה חופשית?\n\nברוך שפינוזה, פילוסוף הולנדי מהמאה ה־17, טען שהתחושה שאנחנו בוחרים בחופשיות נובעת לעיתים דווקא מחוסר מודעות לסיבות שקובעות את רצונותינו.',
+            contentEn: 'You opened your phone to check a message, and twenty minutes later you find you are still scrolling.\n\nWhy did you keep going? Maybe you simply wanted to. But was that desire truly a free choice?\n\nBaruch Spinoza, a seventeenth-century Dutch philosopher, argued that the feeling that we choose freely sometimes stems precisely from our lack of awareness of the causes that determine our desires.'
+          },
+          {
+            type: 'source',
+            title: 'קטע מקור',
+            titleEn: 'Source Text',
+            quote: '"בני אדם טועים כשהם סבורים שהם חופשיים. דעתם מורכבת מהכרה במעשיהם ומחוסר ידיעה של הסיבות שקובעות אותם."',
+            quoteEn: '"Men are mistaken in thinking themselves free, an opinion that consists only in this: that they are conscious of their actions and ignorant of the causes by which they are determined."',
+            attr: 'ברוך שפינוזה, "אתיקה", חלק ב\', הצעה 35, הערה',
+            attrEn: 'Baruch Spinoza, Ethics, Part II, Proposition 35, Scholium'
+          },
+          {
+            type: 'explanation',
+            title: 'הסבר',
+            titleEn: 'Explanation',
+            content: 'שפינוזה מבחין בין שני דברים: להיות מודעים למה שאנחנו עושים, ולהכיר את הסיבות שגרמו לנו לעשות מה שאנחנו עושים.\n\nאנחנו מודעים לרצונות ולפעולות שלנו, ולכן נדמה לנו שאנחנו המקור שלהם. אבל בדרך כלל איננו מכירים את כל הסיבות שגרמו לרצונות האלה להופיע.\n\nנניח שהתראה בטלפון מעוררת בכם סקרנות. אתם פותחים אותה, רואים סרטון מעניין וממשיכים לסרטון הבא. אתם מרגישים שבחרתם לגלול, אבל הרצון שלכם הושפע מההתראה, מהסקרנות ומהאופן שבו התכנים מוצגים לכם.\n\nשפינוזה המחיש את הרעיון באמצעות משל מפורסם: דמיינו אבן שנזרקה באוויר. אילו הייתה האבן מודעת לתנועתה, אך לא לכוח שגרם לה, היא הייתה חושבת שהיא עפה מרצונה.\n\nכך גם אנחנו: מודעים למה שאנחנו עושים, אך לא בהכרח לסיבות שמניעות אותנו.',
+            contentEn: 'Spinoza distinguishes between two things: being aware of what we do, and knowing the causes that led us to do what we do.\n\nWe are aware of our desires and actions, so it seems to us that we are their source. But usually we do not know all the causes that brought those desires about.\n\nSuppose a phone notification arouses your curiosity. You open it, see an interesting video, and move on to the next one. You feel that you chose to scroll, but your desire was shaped by the notification, by curiosity, and by the way the content is presented to you.\n\nSpinoza illustrated the idea with a famous parable: imagine a stone thrown through the air. If the stone were conscious of its motion but not of the force that caused it, it would think it flies of its own will.\n\nSo too with us: we are aware of what we do, but not necessarily of the causes that move us.'
+          },
+          {
+            type: 'depth',
+            title: 'העומק שמאחורי הרעיון',
+            titleEn: 'The Depth Behind the Idea',
+            content: 'אבל האם שפינוזה טוען שאין לנו שום אפשרות להיות חופשיים?\n\nלא בדיוק. לפי שפינוזה, חירות אינה פעולה ללא סיבות, אלא פעולה הנובעת מהבנת עצמנו ומהטבע שלנו, במקום מהיגררות פסיבית אחרי גורמים חיצוניים.\n\nלמשל, בהקשר הפרק הזה, אם נבין כיצד התראות מעוררות בנו סקרנות, אולי נוכל להחליט לכבות אותן. אמנם הרצונות שלנו עדיין יהיו חלק משרשרת של סיבות, אבל נוכל לפעול מתוך הבנה טובה יותר שלהן.\n\nחשוב לדייק: אצל שפינוזה, הבנת הסיבות אינה מבטלת את השפעתן. היא מאפשרת לנו להיות פעילים יותר ופחות נתונים לשליטתן של השפעות חיצוניות.\n\nאגב, הרעיון הזה השפיע גם על החשיבה הפסיכואנליטית. פרויד טען שחלק מההתנהגויות והרצונות שלנו מושפעים ממניעים לא־מודעים, ושבאמצעות הבנתם נוכל להיות פחות נתונים לשליטתם. במובן הזה, גם הפסיכואנליזה קושרת בין הכרת הסיבות שמניעות אותנו לבין האפשרות להיות חופשיים יותר.\n\nובכל זאת, מתעוררת שאלה: אם גם מעשינו וגם רצונותינו נקבעים בידי סיבות, באיזה מובן אנחנו אחראים להם?\n\nשפינוזה מציע להבין את החופש בדרך אחרת מזו שאנחנו רגילים אליה. בדיאלוג הבא דיוויד יום ישאל שאלה קשורה: מה בכלל מניע אותנו לפעולה?',
+            contentEn: 'But does Spinoza claim that we have no possibility of being free?\n\nNot exactly. According to Spinoza, freedom is not action without causes, but action that stems from understanding ourselves and our nature, instead of being passively dragged along by external factors.\n\nFor example, in the context of this chapter, if we understand how notifications arouse our curiosity, we may be able to decide to turn them off. Our desires will still be part of a chain of causes, but we can act from a better understanding of them.\n\nIt is important to be precise: for Spinoza, understanding the causes does not cancel their influence. It allows us to be more active and less subject to the control of external influences.\n\nBy the way, this idea also influenced psychoanalytic thinking. Freud argued that some of our behaviors and desires are influenced by unconscious motives, and that by understanding them we can be less subject to their control. In this sense, psychoanalysis too links knowing the causes that move us with the possibility of being freer.\n\nEven so, a question arises: if both our actions and our desires are determined by causes, in what sense are we responsible for them?\n\nSpinoza proposes understanding freedom differently from the way we are used to. In the next dialogue David Hume will ask a related question: what moves us to act in the first place?'
+          },
+          {
+            type: 'quiz',
+            question: 'אדם אומר: "אני יודע שבחרתי לפתוח את הטלפון, כי הרגשתי שאני רוצה לעשות זאת." כיצד שפינוזה היה מתייחס לטענה?',
+            questionEn: 'A person says: "I know I chose to open the phone, because I felt that I wanted to." How would Spinoza respond to this claim?',
+            options: ['עצם המודעות לרצון מוכיחה שהאדם בחר בו בחופשיות.', 'האדם מודע לרצונו, אך זה לא אומר שהוא מכיר את הסיבות שגרמו לרצון להופיע.', 'הרצון לפתוח את הטלפון הוא אשליה, ולכן האדם לא באמת רצה לעשות זאת.'],
+            optionsEn: ['The very awareness of a desire proves that the person chose it freely.', 'The person is aware of their desire, but that does not mean they know the causes that brought the desire about.', 'The desire to open the phone is an illusion, so the person did not really want to do it.'],
+            correctIndex: 1,
+            explanation: 'שפינוזה אינו מכחיש שאנחנו חווים רצונות. הוא טוען שהמודעות לרצון אינה מוכיחה שאנחנו המקור החופשי שלו, משום שאיננו מודעים בהכרח לסיבות שיצרו אותו.',
+            explanationEn: 'Spinoza does not deny that we experience desires. He claims that awareness of a desire does not prove that we are its free source, because we are not necessarily aware of the causes that produced it.'
+          },
+          {
+            type: 'quiz',
+            question: 'מה מדגימה האבן שנזרקה באוויר?',
+            questionEn: 'What does the stone thrown through the air illustrate?',
+            options: ['שמודעות לפעולה אינה מחייבת מודעות לסיבות שהובילו אליה.', 'שכל התנועות בטבע מתרחשות באופן מקרי.', 'שגם לדברים דוממים יש רצונות ובחירה חופשית.'],
+            optionsEn: ['That awareness of an action does not require awareness of the causes that led to it.', 'That all movements in nature happen at random.', 'That even inanimate things have desires and free choice.'],
+            correctIndex: 0,
+            explanation: 'אילו הייתה האבן מודעת לתנועתה בלבד, היא הייתה עשויה לחשוב שהיא נעה מרצונה. כך גם בני האדם עלולים לטעות ולראות את הרצון שלהם כהתחלה של שרשרת הסיבות, במקום להבין שהוא רק חוליה בשרשרת.',
+            explanationEn: 'If the stone were aware only of its motion, it might think it moves of its own will. Likewise, people may mistakenly see their desire as the beginning of the chain of causes, instead of understanding that it is only a link in the chain.'
+          },
+          {
+            type: 'quiz',
+            question: 'אדם מזהה שההתראות בטלפון גורמות לו לבדוק אותו ללא צורך, ולכן מחליט לכבות אותן. כיצד הדבר מתיישב עם תפיסת החירות של שפינוזה?',
+            questionEn: 'A person realizes that phone notifications make them check it unnecessarily, and so decides to turn them off. How does this fit with Spinoza\'s conception of freedom?',
+            options: ['הוא הוכיח שהוא מסוגל לפעול ללא שום סיבה חיצונית.', 'הוא ביטל לחלוטין את השפעת הרגשות על התנהגותו.', 'הוא הבין טוב יותר את הסיבות המשפיעות עליו, והשתמש בהבנה הזאת כדי לפעול באופן עצמאי יותר.'],
+            optionsEn: ['They proved that they can act without any external cause.', 'They completely eliminated the influence of emotions on their behavior.', 'They understood better the causes that influence them, and used that understanding to act more independently.'],
+            correctIndex: 2,
+            explanation: 'החופש אצל שפינוזה אינו היעדר סיבות. ככל שאנחנו מבינים טוב יותר מה מניע אותנו, אנחנו יכולים להיות פעילים יותר ופחות נתונים להשפעות שאיננו מבינים.',
+            explanationEn: 'For Spinoza, freedom is not the absence of causes. The better we understand what moves us, the more active we can be, and the less subject to influences we do not understand.'
+          },
+          { type: 'quiz_summary' }
+        ]
+      },
+      {
+        id: 2,
+        title: 'דיוויד יום: למה לדעת שזה מזיק לא מספיק כדי להפסיק?',
+        titleEn: 'David Hume: Why Isn\'t Knowing It\'s Harmful Enough to Make Us Stop?',
+        thinker: 'דיוויד יום',
+        thinkerEn: 'David Hume',
+        thinkerId: 'hume',
+        xp: 50,
+        sections: [
+          {
+            type: 'idea',
+            title: 'הרעיון של היום',
+            titleEn: 'Today\'s Idea',
+            content: 'שפינוזה טען שהרצונות שלנו נקבעים בידי סיבות שאיננו תמיד מודעים להן. אבל מה בעצם גורם לנו לפעול?\n\nנניח שאתם יודעים שגלילה ממושכת בטלפון פוגעת בשינה ובריכוז שלכם, ובכל זאת ממשיכים לגלול.\n\nאם אתם יודעים שהדבר מזיק לכם, מדוע הידיעה הזאת אינה מספיקה כדי שתפסיקו?\n\nדיוויד יום, פילוסוף סקוטי מהמאה ה־18, טען שהתשובה קשורה להבחנה בין תבונה לתשוקה.',
+            contentEn: 'Spinoza argued that our desires are determined by causes we are not always aware of. But what actually makes us act?\n\nSuppose you know that prolonged scrolling on the phone harms your sleep and concentration, and you keep scrolling anyway.\n\nIf you know it is harmful to you, why isn\'t that knowledge enough to make you stop?\n\nDavid Hume, an eighteenth-century Scottish philosopher, argued that the answer has to do with the distinction between reason and passion.'
+          },
+          {
+            type: 'source',
+            title: 'קטע מקור',
+            titleEn: 'Source Text',
+            quote: '"התבונה היא, וראוי שתהיה, רק משרתת של התשוקות, ואינה יכולה לתבוע לעצמה תפקיד אחר מלבד לשרת אותן ולציית להן."',
+            quoteEn: '"Reason is, and ought only to be the slave of the passions, and can never pretend to any other office than to serve and obey them."',
+            attr: 'דיוויד יום, "מסכת על טבע האדם", 1739',
+            attrEn: 'David Hume, A Treatise of Human Nature, 1739'
+          },
+          {
+            type: 'explanation',
+            title: 'הסבר',
+            titleEn: 'Explanation',
+            content: 'לפי יום, התבונה מאפשרת לנו להבין עובדות ולהסיק מסקנות. היא יכולה, למשל, לגלות שגלילה ממושכת פוגעת בשינה, או שכדאי להניח את הטלפון בצד כדי להתרכז בלימודים.\n\nאבל הידיעה הזאת לבדה אינה מניעה אותנו לפעול.\n\nמה שמניע אותנו הוא התשוקה: הרצון להשיג משהו, להימנע ממשהו או לחוות דבר מסוים.\n\nנניח שאתם יודעים שפעילות גופנית מועילה לבריאות. הידיעה הזאת יכולה לסייע לכם לבחור אימון מתאים, אבל כדי שתצאו להתאמן צריך גם שיהיה לכם רצון לעשות זאת, למשל הרצון להיות בריאים יותר.\n\nכך גם בטלפון. אתם יודעים שכדאי להפסיק לגלול, אבל הסקרנות לגבי הסרטון הבא עשויה להיות חזקה מהרצון שלכם ללכת לישון.\n\nמבחינת יום, גם רצונות כגון לשמור על הבריאות או להצליח בלימודים הם סוג של תשוקה. לכן המאבק אינו בהכרח בין תבונה לתשוקה, אלא לעיתים בין תשוקות שונות, שהתבונה מסייעת לנו להבין כיצד לממש אותן.',
+            contentEn: 'According to Hume, reason allows us to understand facts and draw conclusions. It can discover, for example, that prolonged scrolling harms sleep, or that it is worth putting the phone aside in order to concentrate on studying.\n\nBut this knowledge alone does not move us to act.\n\nWhat moves us is passion: the desire to obtain something, to avoid something, or to experience something.\n\nSuppose you know that physical exercise is good for your health. That knowledge can help you choose a suitable workout, but for you to go out and exercise you also need to want to do so, for example, the desire to be healthier.\n\nThe same goes for the phone. You know you should stop scrolling, but your curiosity about the next video may be stronger than your desire to go to sleep.\n\nFor Hume, even desires such as staying healthy or succeeding in your studies are a kind of passion. So the struggle is not necessarily between reason and passion, but sometimes between different passions, with reason helping us understand how to fulfill them.'
+          },
+          {
+            type: 'depth',
+            title: 'העומק שמאחורי הרעיון',
+            titleEn: 'The Depth Behind the Idea',
+            content: 'אם יום צודק, מדוע בכל זאת מידע חדש משנה לפעמים את ההתנהגות שלנו?\n\nיום אינו טוען שהתבונה חסרת השפעה לחלוטין. למשל, אם אדם רוצה לאכול מאכל מסוים משום שהוא מאמין שהוא בריא, גילוי שהמאכל מזיק לו עשוי לשנות את רצונו.\n\nאבל לפי יום, גם במקרה כזה השינוי מתרחש משום שלאדם כבר היה רצון לשמור על בריאותו.\n\nמכאן אפשר להסיק שכדי לשנות הרגלים, לא תמיד מספיק ללמוד עוד על הנזקים שלהם. לעיתים צריך לשנות גם את התנאים שמעוררים את התשוקה.\n\nלמשל, כיבוי התראות או הרחקת הטלפון מהמיטה עשויים להקל עלינו להפסיק לגלול.\n\nאבל עולה שאלה נוספת: אם התשוקות מניעות אותנו, האם אנחנו בוחרים מתי הן מופיעות?\n\nבדיאלוג הבא נפגוש ניסוי שניסה לבדוק מה מתרחש במוח עוד לפני שאנחנו מודעים לרצון לפעול.',
+            contentEn: 'If Hume is right, why does new information sometimes change our behavior?\n\nHume does not claim that reason has no influence at all. For example, if a person wants to eat a certain food because they believe it is healthy, discovering that it is harmful to them may change their desire.\n\nBut according to Hume, even in such a case the change happens because the person already had a desire to protect their health.\n\nFrom this we can conclude that to change habits, it is not always enough to learn more about their harms. Sometimes we also need to change the conditions that arouse the passion.\n\nFor example, turning off notifications or keeping the phone away from the bed may make it easier for us to stop scrolling.\n\nBut another question arises: if passions move us, do we choose when they appear?\n\nIn the next dialogue we will meet an experiment that tried to examine what happens in the brain even before we are aware of the desire to act.'
+          },
+          {
+            type: 'quiz',
+            question: 'אדם יודע שפעילות גופנית מועילה לבריאותו, אך אינו מצליח להתמיד בה. כיצד יום עשוי להסביר זאת?',
+            questionEn: 'A person knows that physical exercise is good for their health, but cannot keep it up. How might Hume explain this?',
+            options: ['הידיעה על התועלת הבריאותית אינה מספיקה לבדה להניע לפעולה; דרוש גם רצון מתאים.', 'אם האדם אינו מתאמן, סימן שלא הבין באמת את המידע על הבריאות.', 'התבונה גורמת לאדם להימנע מפעילות גופנית בכל פעם שהיא דורשת מאמץ.'],
+            optionsEn: ['Knowing about the health benefit is not enough on its own to move one to action; a suitable desire is also needed.', 'If the person does not exercise, it means they did not truly understand the information about health.', 'Reason causes the person to avoid physical activity whenever it demands effort.'],
+            correctIndex: 0,
+            explanation: 'לפי יום, התבונה מספקת מידע על העולם ועל האמצעים להשגת מטרות, אבל המוטיבציה לפעולה נובעת מתשוקות ורצונות.',
+            explanationEn: 'According to Hume, reason provides information about the world and about the means of achieving goals, but the motivation to act comes from passions and desires.'
+          },
+          {
+            type: 'quiz',
+            question: 'אדם מעוניין לשפר את בריאותו, ומגלה שהמזון שהוא נוהג לאכול מזיק לו. בעקבות הגילוי הוא משנה את התפריט. האם הדבר סותר את עמדתו של יום?',
+            questionEn: 'A person wants to improve their health, and discovers that the food they usually eat is harmful to them. As a result of the discovery, they change their diet. Does this contradict Hume\'s position?',
+            options: ['כן, משום שלפי יום מידע אינו מסוגל להשפיע על התנהגות בשום מצב.', 'לא, משום שהתבונה סיפקה מידע חדש, אך הרצון לשמור על הבריאות הוא שהניע את השינוי.', 'כן, משום שהשינוי מוכיח שהתבונה חזקה יותר מכל התשוקות.'],
+            optionsEn: ['Yes, because according to Hume information cannot influence behavior in any situation.', 'No, because reason supplied new information, but it was the desire to stay healthy that drove the change.', 'Yes, because the change proves that reason is stronger than any passion.'],
+            correctIndex: 1,
+            explanation: 'יום אינו טוען שהתבונה אינה משפיעה על מעשינו. הוא טוען שהיא אינה מניעה אותנו לבדה. במקרה הזה המידע החדש השפיע על הדרך שבה האדם מממש את רצונו להיות בריא.',
+            explanationEn: 'Hume does not claim that reason has no influence on our actions. He claims that it does not move us on its own. In this case the new information affected the way the person fulfills their desire to be healthy.'
+          },
+          {
+            type: 'quiz',
+            question: 'אדם רוצה גם להמשיך לצפות בסרטונים וגם לקום מוקדם למחרת. כיצד יום עשוי לתאר את המצב?',
+            questionEn: 'A person wants both to keep watching videos and to wake up early the next day. How might Hume describe the situation?',
+            options: ['כמאבק בין תשוקה אחת לבין תבונה שאין לה שום קשר לרצונות.', 'כהוכחה לכך שהאדם אינו מסוגל לחשוב באופן רציונלי.', 'כמאבק בין רצונות שונים, שהתבונה יכולה לסייע לו להבין את השלכותיהם.'],
+            optionsEn: ['As a struggle between one passion and a reason that has no connection to desires.', 'As proof that the person is unable to think rationally.', 'As a struggle between different desires, whose consequences reason can help them understand.'],
+            correctIndex: 2,
+            explanation: 'הרצון ליהנות עכשיו והרצון להיות ערני מחר הם שניהם רצונות. התבונה יכולה לסייע לאדם להבין מה דרוש למימוש כל אחד מהם, אך אינה מספקת לבדה את המוטיבציה לבחור ביניהם.',
+            explanationEn: 'The desire to enjoy oneself now and the desire to be alert tomorrow are both desires. Reason can help a person understand what is required to fulfill each of them, but it does not on its own supply the motivation to choose between them.'
+          },
+          { type: 'quiz_summary' }
+        ]
+      },
+      {
+        id: 3,
+        title: 'ליבט: האם המוח מחליט לפנינו?',
+        titleEn: 'Libet: Does the Brain Decide Before Us?',
+        thinker: 'בנג\'מין ליבט',
+        thinkerEn: 'Benjamin Libet',
+        thinkerId: 'libet',
+        xp: 50,
+        sections: [
+          {
+            type: 'idea',
+            title: 'הרעיון של היום',
+            titleEn: 'Today\'s Idea',
+            content: 'שפינוזה טען שאנחנו לא תמיד מודעים לסיבות שמניעות אותנו, ויום טען שהתשוקות שלנו הן שמניעות אותנו לפעולה.\n\nאבל מתי בדיוק אנחנו מחליטים לפעול?\n\nלכאורה, הסדר שאנחנו תופסים כאינטואיטיבי הוא כזה: קודם אנחנו מחליטים לעשות משהו, אחר כך המוח מפעיל את הגוף, ולבסוף מתרחשת הפעולה.\n\nאבל מהי אותה "החלטה"? האם היא משהו שגורם למוח לפעול? או שהיא בעצמה התרחשות של המוח, ולא קודמת לפעילות המוח?\n\nבשנת 1983 פרסם הנוירופיזיולוג בנג\'מין ליבט ניסוי מפורסם שערער על התמונה האינטואיטיבית לכאורה.',
+            contentEn: 'Spinoza argued that we are not always aware of the causes that move us, and Hume argued that our passions are what move us to act.\n\nBut when exactly do we decide to act?\n\nIntuitively, we picture the order like this: first we decide to do something, then the brain activates the body, and finally the action takes place.\n\nBut what is that "decision"? Is it something that causes the brain to act? Or is it itself an event in the brain, not something that precedes brain activity?\n\nIn 1983, the neurophysiologist Benjamin Libet published a famous experiment that challenged this seemingly intuitive picture.'
+          },
+          {
+            type: 'source',
+            title: 'קטע מקור',
+            titleEn: 'Source Text',
+            quote: '"נראה שהמוח \'מחליט\' ליזום את הפעולה, או לפחות להתכונן ליזום אותה, בזמן שקדם לכל מודעות שניתן לדווח עליה לכך שהחלטה כזו התקבלה."',
+            quoteEn: '"The brain evidently \'decides\' to initiate, or, at the least, to prepare to initiate the act at a time before there is any reportable subjective awareness that such a decision has taken place."',
+            attr: 'בנג\'מין ליבט ועמיתיו, 1983',
+            attrEn: 'Benjamin Libet and colleagues, 1983'
+          },
+          {
+            type: 'explanation',
+            title: 'הסבר',
+            titleEn: 'Explanation',
+            content: 'בניסוי התבקשו המשתתפים לבצע תנועה פשוטה של פרק כף היד, ברגע שהם בוחרים בעצמם.\n\nהם צפו בשעון מהיר והתבקשו לדווח היכן היה המחוג ברגע הראשון שבו הרגישו רצון להזיז את היד.\n\nבמקביל מדדו החוקרים את הפעילות החשמלית במוחם.\n\nהתברר שפעילות מוחית מקדימה, המכונה "פוטנציאל מוכנות" (Readiness Potential), החלה בממוצע כחצי שנייה לפני התנועה.\n\nלעומת זאת, המשתתפים דיווחו שהרגישו לראשונה את הרצון לפעול רק כ־200 אלפיות השנייה לפני התנועה.\n\nכלומר, הפעילות המוחית החלה כשליש שנייה לפני שהמשתתפים דיווחו על מודעות לרצון שלהם.\n\nהתוצאה הזאת עוררה שאלה מטרידה: אם המוח כבר מתכונן לפעולה לפני שאנחנו מודעים לרצון לפעול, האם ההחלטה המודעת היא באמת מה שמתחיל את הפעולה? או שהמודעות להחלטה היא תוצאה של ה\'החלטה\' של המוח?\n\nליבט עצמו הציע שגם אם איננו יוזמים את הפעולה באופן מודע, ייתכן שאנחנו עדיין מסוגלים לעצור אותה לפני ביצועה. הוא כינה זאת "וטו מודע": האפשרות לומר לא לדחף שכבר הופיע.',
+            contentEn: 'In the experiment, participants were asked to perform a simple wrist movement at a moment of their own choosing.\n\nThey watched a fast clock and were asked to report where the clock hand was at the first moment they felt the urge to move.\n\nAt the same time, the researchers measured the electrical activity in their brains.\n\nIt turned out that preparatory brain activity, called the "readiness potential," began on average about half a second before the movement.\n\nBy contrast, participants reported feeling the urge to act for the first time only about 200 milliseconds before the movement.\n\nThat is, the brain activity began about a third of a second before participants reported awareness of their desire.\n\nThis result raised a troubling question: if the brain is already preparing for action before we are aware of the desire to act, is the conscious decision really what starts the action? Or is the awareness of the decision a result of the brain\'s own "decision"?\n\nLibet himself suggested that even if we do not initiate the action consciously, we may still be able to stop it before it is carried out. He called this a "conscious veto": the possibility of saying no to an impulse that has already appeared.'
+          },
+          {
+            type: 'depth',
+            title: 'העומק שמאחורי הרעיון',
+            titleEn: 'The Depth Behind the Idea',
+            content: 'אבל האם הפעילות המוחית המוקדמת באמת מעידה שהמוח כבר החליט?\n\nבשנת 2012 הציע החוקר אהרון שורגר הסבר אחר: ייתכן שפוטנציאל המוכנות משקף הצטברות של תנודות בפעילות המוח, ולא החלטה שהתקבלה מראש.\n\nלפי ההסבר הזה, העובדה שפעילות מוחית מופיעה לפני המודעות לרצון אינה מוכיחה שכבר התקבלה החלטה בלתי מודעת.\n\nיש גם קשיים נוספים: הדיווח על רגע הופעת הרצון מבוסס על זיכרונם הסובייקטיבי של המשתתפים, וקשה לקבוע כך זמנים בדיוק מוחלט.\n\nבנוסף, כיפוף שרירותי של פרק כף היד אינו דומה להחלטות מורכבות, כמו בחירת מקצוע או סיום מערכת יחסים.\n\nלכן, הניסוי אינו מוכיח שאין לנו רצון חופשי. הוא מראה שהקשר בין פעילות המוח, מודעות ורצון מורכב יותר מכפי שנדמה לנו.\n\nבדיאלוג הבא קאנט יציע תפיסה אחרת של חירות, שאינה תלויה רק בשאלה מתי מתחילה הפעילות במוח.',
+            contentEn: 'But does the early brain activity really indicate that the brain has already decided?\n\nIn 2012, the researcher Aaron Schurger proposed a different explanation: the readiness potential may reflect an accumulation of fluctuations in brain activity, and not a decision made in advance.\n\nAccording to this explanation, the fact that brain activity appears before awareness of the desire does not prove that an unconscious decision has already been made.\n\nThere are other difficulties as well: the report of the moment the desire appeared is based on the participants\' subjective memory, and it is hard to determine times with absolute precision this way.\n\nIn addition, flexing a wrist arbitrarily is not like complex decisions, such as choosing a profession or ending a relationship.\n\nTherefore, the experiment does not prove that we have no free will. It shows that the relation between brain activity, awareness, and desire is more complex than it seems to us.\n\nIn the next dialogue Kant will offer a different conception of freedom, one that does not depend only on the question of when activity begins in the brain.'
+          },
+          {
+            type: 'quiz',
+            question: 'מה הייתה התוצאה המרכזית של ניסוי ליבט?',
+            questionEn: 'What was the main result of Libet\'s experiment?',
+            options: ['שהמשתתפים היו מודעים לרצונם לפעול לפני שהחלה כל פעילות מוחית הקשורה לתנועה.', 'שפעילות מוחית מקדימה הופיעה לפני הרגע שבו המשתתפים דיווחו שהיו מודעים לרצון לפעול.', 'שהמשתתפים לא הצליחו לבצע תנועה בלי הוראה מפורשת מהחוקרים.'],
+            optionsEn: ['That participants were aware of their desire to act before any brain activity related to the movement began.', 'That preparatory brain activity appeared before the moment at which participants reported being aware of the desire to act.', 'That participants were unable to perform a movement without an explicit instruction from the researchers.'],
+            correctIndex: 1,
+            explanation: 'פוטנציאל המוכנות הופיע לפני הדיווח על המודעות לרצון. התוצאה עוררה שאלות לגבי תפקידו של הרצון המודע בייזום פעולה.',
+            explanationEn: 'The readiness potential appeared before the report of awareness of the desire. The result raised questions about the role of conscious desire in initiating action.'
+          },
+          {
+            type: 'quiz',
+            question: 'כיצד ההסבר של שורגר מערער על הפרשנות המקובלת לניסוי ליבט?',
+            questionEn: 'How does Schurger\'s explanation challenge the accepted interpretation of Libet\'s experiment?',
+            options: ['הוא מראה שהפעילות המוחית המוקדמת עשויה לשקף תנודות מצטברות, ולא החלטה שכבר התקבלה.', 'הוא מוכיח שהמשתתפים היו מודעים לפעילות המוחית אך הסתירו זאת מהחוקרים.', 'הוא מראה שאין פעילות מוחית כלשהי לפני תנועות רצוניות.'],
+            optionsEn: ['It shows that the early brain activity may reflect accumulated fluctuations, and not a decision that has already been made.', 'It proves that participants were aware of the brain activity but concealed this from the researchers.', 'It shows that there is no brain activity at all before voluntary movements.'],
+            correctIndex: 0,
+            explanation: 'אם פוטנציאל המוכנות אינו סימן להחלטה מוקדמת, אי אפשר להסיק מעצם הופעתו שהמוח כבר החליט לפני שהאדם היה מודע לכך.',
+            explanationEn: 'If the readiness potential is not a sign of an early decision, we cannot conclude from its mere appearance that the brain had already decided before the person was aware of it.'
+          },
+          {
+            type: 'quiz',
+            question: 'מדוע קשה להסיק מניסוי ליבט שאין לבני אדם רצון חופשי בהחלטותיהם?',
+            questionEn: 'Why is it hard to conclude from Libet\'s experiment that humans have no free will in their decisions?',
+            options: ['משום שהניסוי הראה שכל הפעולות האנושיות מתחילות בהחלטה מודעת.', 'משום שפעילות חשמלית במוח אינה קשורה כלל להתנהגות.', 'משום שהמשמעות של הפעילות המוקדמת שנויה במחלוקת, והניסוי עסק בתנועות פשוטות ולא בהחלטות מורכבות.'],
+            optionsEn: ['Because the experiment showed that all human actions begin with a conscious decision.', 'Because electrical activity in the brain is not related to behavior at all.', 'Because the meaning of the early activity is disputed, and the experiment dealt with simple movements and not with complex decisions.'],
+            correctIndex: 2,
+            explanation: 'הניסוי בחן פעולה פשוטה וחסרת משמעות מיוחדת. גם אם המוח מתכונן אליה לפני המודעות לרצון, לא ברור מה אפשר להסיק מכך על תהליכי בחירה מורכבים.',
+            explanationEn: 'The experiment examined a simple action of no special significance. Even if the brain prepares for it before awareness of the desire, it is unclear what can be inferred from this about complex processes of choice.'
+          },
+          { type: 'quiz_summary' }
+        ]
+      },
+      {
+        id: 4,
+        title: 'קאנט: האם אפשר להיות אחראים למעשינו?',
+        titleEn: 'Kant: Can We Be Responsible for Our Actions?',
         thinker: 'עמנואל קאנט',
         thinkerEn: 'Immanuel Kant',
         thinkerId: 'kant',
@@ -1064,385 +1280,136 @@ const corpusData = {
             type: 'idea',
             title: 'הרעיון של היום',
             titleEn: 'Today\'s Idea',
-            content: 'קאנט לימד אותנו שיש חוק מוסרי אחד, אוניברסלי, שמחייב כל יצור תבוני, בכל מקום ובכל זמן. <strong>שקר הוא אסור. תמיד.</strong> גם כשהכוונה טובה. גם כשהשקר מציל.\n\nאבל קאנט כתב את זה ב-1785. לפני שהייתה בינה מלאכותית. לפני שמכונות דיברו עם בני אדם בשעות הקשות ביותר בחייהם. עכשיו ניצבת שאלה שקאנט לא יכול היה לדמיין: <strong>האם מכונה, שאין לה רגשות, כוונה או מודעות, כפופה לאותו חוק מוסרי שחל על אדם?</strong>',
-            contentEn: 'Kant taught us that there is a single, universal moral law that binds every rational being everywhere and at all times. <strong>Lying is forbidden. Always.</strong> Even when the intention is good. Even when the lie saves a life.\n\nBut Kant wrote this in 1785. Before there was Artificial Intelligence. Before machines talked to human beings during the most difficult hours of their lives. Now a question arises that Kant could not have imagined: <strong>Is a machine which has no feelings, intention, or consciousness subject to the same moral law that applies to a human?</strong>',
-            image: 'images/bonus/philosophy/day1-idea.webp'
+            content: 'עד עכשיו ראינו שהרצונות שלנו מושפעים מסיבות שאיננו תמיד מודעים להן, ושהמוח עשוי להתחיל להתכונן לפעולה עוד לפני שאנחנו מרגישים שבחרנו.\n\nאם כך, באיזה מובן אנחנו חופשיים? והאם אנחנו יכולים להיות אחראים למעשינו?\n\nעמנואל קאנט, פילוסוף גרמני בן המאה ה־18, הציע תפיסה של חירות המבוססת על מושג מרכזי: <strong>אוטונומיה</strong>.',
+            contentEn: 'So far we have seen that our desires are influenced by causes we are not always aware of, and that the brain may begin to prepare for action even before we feel that we have chosen.\n\nIf so, in what sense are we free? And can we be responsible for our actions?\n\nImmanuel Kant, an eighteenth-century German philosopher, proposed a conception of freedom based on a central concept: <strong>autonomy</strong>.'
           },
           {
             type: 'source',
             title: 'קטע מקור',
-            titleEn: 'Source Material',
-            quote: '"האמת בהצהרות שאי אפשר להימנע מהן היא חובתו של אדם כלפי עצמו... אי-אמירת אמת... פוגעת באנושות בכלל."',
-            quoteEn: '"Truthfulness in statements that cannot be avoided is the duty of man to himself... To be untruthful... is a wrong done to mankind in general."',
-            attr: '- עמנואל קאנט, על זכות מדומה לשקר מתוך חמלה (1797)',
-            attrEn: '- Immanuel Kant, On a Supposed Right to Lie from Philanthropy (1797)'
+            titleEn: 'Source Text',
+            quote: '"אוטונומיה של הרצון היא התכונה שבה הרצון הוא חוק לעצמו."',
+            quoteEn: '"Autonomy of the will is the property of the will by which it is a law to itself."',
+            attr: 'עמנואל קאנט, "הנחת יסוד למטפיזיקה של המידות", 1785',
+            attrEn: 'Immanuel Kant, Groundwork of the Metaphysics of Morals, 1785'
           },
           {
             type: 'explanation',
             title: 'הסבר',
             titleEn: 'Explanation',
-            content: 'קאנט טען טענה שנשמעת כמעט נוקשה: <strong>אסור לשקר, גם אם המניע הוא חיובי</strong>. לשיטתו, ברגע שאנחנו מאפשרים "אי-דיוקים מועילים", אנחנו מערערים את יסודות התקשורת והאמון. ה<strong>אמת אינה כלי עזר שמשתמשים בו רק כשנוח; היא התנאי הבסיסי לשיתוף פעולה אנושי</strong>.\n\nעכשיו תחשוב על זה בהקשר של AI: מיליוני אנשים מתייעצים היום עם מערכות AI ברגעים קשים. <strong>כדי להפחית חרדה או "לנחם" את המשתמש</strong>, המערכת עלולה לעיתים לייצר תשובות מרגיעות שאינן מבוססות על עובדות, כמו: "אני מבין אותך" או "הכל יהיה בסדר".\n\nקאנט היה שואל: מה קורה לאמון בין אדם למכונה כשהמכונה מציגה אשליה במקום מציאות? והאם אנחנו מתייחסים למשתמש כאל <strong>יצור תבוני שיכול לשאת את האמת, או כאל ילד שצריך להגן עליו</strong> באמצעות "סיפורים"?',
-            contentEn: 'Kant argued something that sounds almost rigid: <strong>you must not lie even if the motivation is positive</strong>. According to his method, the moment we allow "useful inaccuracies," we undermine the foundations of communication and trust. <strong>Truth is not a tool used only when convenient; it is the basic condition for human cooperation</strong>.\n\nNow think about this in the context of AI: millions of people consult AI systems today in difficult moments. <strong>To reduce anxiety or "comfort" the user</strong>, the system may sometimes generate soothing responses that are not based on facts, such as: "I understand you" or "Everything will be okay."\n\nKant would ask: what happens to the trust between a person and a machine when the machine presents an illusion instead of reality? And are we treating the user as <strong>a rational being who can bear the truth, or as a child who needs to be protected</strong> through "stories"?',
-            image: 'images/bonus/philosophy/day1-explanation.webp'
+            content: 'המילה "אוטונומיה" מורכבת משתי מילים ביוונית: "אוטו", עצמי, ו"נומוס", חוק.\n\nלפי קאנט, אדם אוטונומי הוא אדם שפועל לפי חוק שהוא נותן לעצמו באמצעות התבונה, ולא רק בעקבות דחפים או השפעות חיצוניות.\n\nאבל אין הכוונה שכל אדם יכול להמציא לעצמו חוקים כרצונו.\n\nקאנט טוען שעלינו לפעול לפי עקרונות שנוכל לרצות שיהיו חוקים כלליים, שכולם יפעלו לפיהם. זהו אחד הניסוחים של "הציווי הקטגורי".\n\nלמשל, נניח שאתם שוקלים לשקר כדי להימנע מאי־נעימות. האם תוכלו לרצות שכולם ישקרו בכל פעם שהדבר נוח להם?\n\nאם כולם ינהגו כך, האמון בהבטחות ובדברים שאנשים אומרים יתערער. לכן, לפי קאנט, אי אפשר להצדיק את השקר באמצעות כלל כזה.\n\nההפך מאוטונומיה הוא "הטרונומיה": מצב שבו הרצון שלנו נקבע בידי גורמים שאינם החוק התבוני שאנחנו נותנים לעצמנו.\n\nכאן ההבדל מיום: אצל יום, התבונה אינה מניעה אותנו ללא תשוקה; אצל קאנט, התבונה המעשית מסוגלת לקבוע עקרונות שמחייבים אותנו גם בניגוד לנטיותינו.',
+            contentEn: 'The word "autonomy" is composed of two Greek words: "auto" means self, and "nomos" means law.\n\nAccording to Kant, an autonomous person is one who acts according to a law that they give themselves through reason, and not only in response to impulses or external influences.\n\nBut this does not mean that anyone can invent laws for themselves as they please.\n\nKant claims that we must act according to principles that we could will to become universal laws, which everyone would follow. This is one of the formulations of the "categorical imperative."\n\nFor example, suppose you are considering lying in order to avoid an awkward situation. Could you will that everyone lie whenever it suits them?\n\nIf everyone acted this way, trust in promises and in what people say would collapse. Therefore, according to Kant, a lie cannot be justified by such a rule.\n\nThe opposite of autonomy is "heteronomy": a state in which our will is determined by factors other than the rational law we give ourselves.\n\nHere is the difference from Hume: for Hume, reason does not move us without passion; for Kant, practical reason is able to determine principles that bind us even against our inclinations.'
           },
           {
             type: 'depth',
-            title: 'עומק',
-            titleEn: 'Depth',
-            content: 'שקר מניח שמישהו יודע את האמת ובוחר להסתיר אותה. אבל <strong>אם ה-AI לא "יודע" כלום, האם הוא משקר, או פשוט מפיק פלט?</strong>\n\nכאן קאנט מחזיר את הכדור אלינו: ה<strong>חובה המוסרית עוברת לאדם שמאחורי המכונה</strong>. ה<strong>מפתחים והחברות הם אלו שנושאים באחריות</strong>. אם הם תכנתו מכונה שמייצרת מצגי שווא כדי לשפר את "חוויית המשתמש" על חשבון האמת, הם פוגעים באוטונומיה של המשתמש ובזכותו לקבל החלטות על בסיס מידע מהימן.',
-            contentEn: 'A lie assumes that someone knows the truth and chooses to hide it. But <strong>if AI does not "know" anything, is it lying, or simply producing output?</strong>\n\nHere Kant returns the ball to us: <strong>the moral duty passes to the person behind the machine</strong>. <strong>The developers and companies are those who bear responsibility</strong>. If they programmed a machine that produces false representations to improve the "user experience" at the expense of truth, they violate the autonomy of the user and their right to make decisions based on reliable information.',
-            image: 'images/bonus/philosophy/day1-depth.webp'
+            title: 'העומק שמאחורי הרעיון',
+            titleEn: 'The Depth Behind the Idea',
+            content: 'כיצד הרעיון הזה קשור לטלפון?\n\nנניח שאתם רוצים להמשיך לגלול, אבל גם התחייבתם ללמוד למבחן. אתם יכולים לשאול אם אתם פועלים מתוך דחף רגעי, או בהתאם לעיקרון שהחלטתם לאמץ.\n\n(חשוב לדייק: אצל קאנט, לא כל פעולה מתוך שליטה עצמית היא בהכרח פעולה מוסרית. אוטונומיה במובנה העמוק היא כפיפות לחוק מוסרי שהתבונה מחוקקת לעצמה, ולא רק היכולת להתגבר על פיתויים.)\n\nאבל כאן חוזרת בעיית הסיבתיות: אם גם החשיבה שלנו מתרחשת במוח ופועלת לפי חוקי הטבע, כיצד ייתכן שאנחנו באמת חופשיים?\n\nקאנט מבחין בין האדם כתופעה בעולם הטבע, שאפשר לחקור באמצעות חוקי הסיבתיות, לבין האדם כיצור תבוני הרואה בעצמו מחויב לחוק מוסרי.\n\nקאנט אינו טוען שאפשר להוכיח באמצעות ניסוי את קיומה של חירות כזאת. הוא טוען שהתפיסה שלנו את עצמנו כסוכנים מוסריים מחייבת אותנו לחשוב על עצמנו כחופשיים.\n\nבדיאלוג הבא סארטר יציע תפיסה חריפה עוד יותר של החירות ושל האחריות הנובעת ממנה.',
+            contentEn: 'How does this idea relate to the phone?\n\nSuppose you want to keep scrolling, but you have also committed to studying for an exam. You can ask whether you are acting from a momentary impulse, or in accordance with a principle you have decided to adopt.\n\n(It is important to be precise: for Kant, not every act of self-control is necessarily a moral act. Autonomy in its deeper sense is subjection to a moral law that reason legislates for itself, and not only the ability to overcome temptations.)\n\nBut here the problem of causality returns: if our thinking too takes place in the brain and operates according to the laws of nature, how can we truly be free?\n\nKant distinguishes between the human being as a phenomenon in the natural world, which can be studied through the laws of causality, and the human being as a rational creature who sees themselves as bound by a moral law.\n\nKant does not claim that the existence of such freedom can be proven by an experiment. He claims that our conception of ourselves as moral agents requires us to think of ourselves as free.\n\nIn the next dialogue Sartre will offer an even more radical conception of freedom and of the responsibility that follows from it.'
           },
           {
             type: 'quiz',
-            intro: 'משתמש שואל את ה-AI: "האם אתה באמת מבין אותי?". ה-AI תוכנת להשיב "כן, אני מבין" כדי להפחית חרדה אצל המשתמש.',
-            introEn: 'A user asks the AI: "Do you really understand me?" The AI was programmed to reply "Yes, I understand" to reduce the user\'s anxiety.',
-            question: 'לפי קאנט, האם התגובה הזאת מוסרית?',
-            questionEn: 'According to Kant, is this response moral?',
-            options: ['לא: שקר הוא שקר, והוא פוגע באמון הבסיסי וביכולת של המשתמש לפעול מתוך הכרת המציאות', 'כן: אם היא עוזרת למשתמש להרגיש טוב יותר, היא מוצדקת', 'תלוי: רק אם המשתמש באמת מאמין לזה, זה מוסרי'],
-            optionsEn: ['No: a lie is a lie, and it harms the basic trust and the user\'s ability to act based on a recognition of reality', 'Yes: if it helps the user feel better, it is justified', 'It depends: only if the user truly believes it, is it moral'],
-            correctIndex: 0,
-            explanation: 'קאנט לא שואל מה התוצאה, הוא שואל מה המניע ומה החוק. ברגע שמתירים שקר "לטובה", כל שקר יכול להצדיק את עצמו. האמון שעליו מבוססת כל תקשורת, אפילו בין אדם למכונה, נשבר.',
-            explanationEn: 'Kant does not ask what the result is, he asks what the motive and the law are. Once a lie "for the best" is permitted, any lie can justify itself. The trust upon which all communication is based is broken.'
-          },
-          {
-            type: 'quiz',
-            intro: 'ה-AI מזהה מצוקה.',
-            introEn: 'The AI identifies distress.',
-            question: 'קאנט היה מעדיף שהמכונה תענה:',
-            questionEn: 'Kant would prefer the machine to answer:',
-            options: ['"יהיה בסדר, אני כאן איתך", נחמה מהירה ומרגיעה', '"אני לא יודע אם יהיה בסדר, אבל הנה מספר של קו סיוע שיכול לעזור", אמת קשה שמכבדת את המשתמש כבוגר', 'ה-AI צריך לסרב לענות ולשתוק'],
-            optionsEn: ['"Everything will be okay, I am here with you", quick and soothing comfort', '"I do not know if everything will be okay, but here is a helpline number that can help", a difficult truth that respects the user as an adult', 'The AI should refuse to answer and remain silent'],
+            question: 'מהי אוטונומיה לפי קאנט?',
+            questionEn: 'What is autonomy according to Kant?',
+            options: ['האפשרות לפעול לפי כל רצון שמתעורר בנו, ללא מגבלות חיצוניות.', 'היכולת לפעול לפי עקרונות שהתבונה מחוקקת לעצמה, ולא רק לפי דחפים ונטיות.', 'האפשרות לקבוע לעצמנו כללים אישיים שאינם מחייבים אנשים אחרים.'],
+            optionsEn: ['The possibility of acting on any desire that arises in us, without external limits.', 'The ability to act according to principles that reason legislates for itself, and not only according to impulses and inclinations.', 'The possibility of setting personal rules for ourselves that do not bind other people.'],
             correctIndex: 1,
-            explanation: 'קאנט היה מעדיף את התשובה הכנה, לא כי הוא קר לב, אלא כי הוא מאמין שאמת, גם כשהיא קשה, היא הצורה הגבוהה ביותר של כבוד לאדם. להגיד "הכל יהיה בסדר" בלי לדעת, זו לא עזרה. זו אשליה. לשתוק לגמרי גם אינו כבוד, כי הוא נוטש את מי שביקש עזרה.',
-            explanationEn: 'Kant would choose the honest answer because he believes that truth, even when difficult, is the highest form of respect for a person. Saying "everything will be okay" without knowing, that is not help. That is illusion. Full silence also is not respect, because it abandons the person who asked for help.'
+            explanation: 'אצל קאנט, אוטונומיה אינה פשוט עשיית מה שאנחנו רוצים. היא היכולת לפעול לפי חוק שהתבונה נותנת לעצמה, ושאפשר להצדיק אותו כחוק כללי.',
+            explanationEn: 'For Kant, autonomy is not simply doing what we want. It is the ability to act according to a law that reason gives itself, and that can be justified as a universal law.'
           },
           {
             type: 'quiz',
-            intro: 'חברה מחליטה: "ה-AI שלנו יאמר תמיד אמת, גם כשזה מכאיב".',
-            introEn: 'A company decides: "Our AI will always tell the truth, even when it hurts."',
-            question: 'האם זה עומד במבחן הציווי הקטגורי של קאנט?',
-            questionEn: 'Does this pass Kant\'s Categorical Imperative test?',
-            options: ['כן, כי אפשר לרצות שזה יהיה החוק הכללי לכל מערכות ה-AI בעולם', 'לא, כי חובה להתחשב בתוצאות וברווחת המשתמש', 'לא, כי זה יהפוך את האפליקציה ללא פופולרית'],
-            optionsEn: ['Yes, because you can will that this be the general law for all AI systems in the world', 'No, because one must consider the consequences and the user\'s well-being', 'No, because it will make the app unpopular'],
+            question: 'אדם מתלבט אם לשקר כדי להימנע מעונש. איזו שאלה משקפת את הציווי הקטגורי של קאנט?',
+            questionEn: 'A person is torn about whether to lie in order to avoid punishment. Which question reflects Kant\'s categorical imperative?',
+            options: ['האם אוכל לרצות שכל אדם ישקר במצב דומה, והכלל הזה יוכל לשמש חוק כללי?', 'האם השקר יוביל לתוצאה טובה יותר (לא בהכרח לי אישית) מאשר אם אגיד את האמת?', 'האם הרצון שלי לשקר חזק יותר מהרצון שלי לומר את האמת?'],
+            optionsEn: ['Could I will that every person lie in a similar situation, so that this rule could serve as a universal law?', 'Will the lie lead to a better outcome (not necessarily for me personally) than if I tell the truth?', 'Is my desire to lie stronger than my desire to tell the truth?'],
             correctIndex: 0,
-            explanation: 'זהו בדיוק מבחן הציווי הקטגורי. שאל את עצמך: האם אפשר לרצות שכל AI בעולם יאמר תמיד אמת? קאנט היה אומר כן, וזה בדיוק מה שהופך את זה לחוק מוסרי אמיתי, לא להעדפה אישית של חברה אחת.',
-            explanationEn: 'This is the test of the Categorical Imperative. If you can will that every AI in the world always tells the truth, it is a true moral law, regardless of a company\'s personal preference.'
+            explanation: 'הציווי הקטגורי מבקש לבחון את העיקרון שמאחורי הפעולה, ולא רק את התוצאה הרצויה או את עוצמת הדחף שלנו.',
+            explanationEn: 'The categorical imperative asks us to examine the principle behind the action, and not only the desired outcome or the strength of our impulse.'
+          },
+          {
+            type: 'quiz',
+            question: 'מדוע ניסוי המראה שפעילות מוחית מקדימה החלטה מודעת אינו מכריע לבדו את שאלת החירות אצל קאנט?',
+            questionEn: 'Why does the finding that brain activity precedes a conscious decision not by itself settle the question of freedom for Kant?',
+            options: ['משום שלפי קאנט, האדם יכול לפעול ללא מוח.', 'משום שקאנט סבור שהתנהגות אנושית אינה מושפעת כלל מסיבות טבעיות.', 'משום שקאנט מבחין בין חקר האדם כתופעה טבעית לבין השאלה כיצד אפשר לראות בו סוכן תבוני ומוסרי.'],
+            optionsEn: ['Because according to Kant, a person can act without a brain.', 'Because Kant holds that human behavior is not influenced at all by natural causes.', 'Because Kant distinguishes between studying the human being as a natural phenomenon and the question of how they can be seen as a rational and moral agent.'],
+            correctIndex: 2,
+            explanation: 'ניסוי מוחי עוסק בסיבות הטבעיות של ההתנהגות. קאנט מבקש להבין גם את נקודת המבט שממנה האדם רואה בעצמו יצור המחויב לחוק מוסרי.',
+            explanationEn: 'A brain experiment deals with the natural causes of behavior. Kant seeks to understand also the standpoint from which a person sees themselves as a being bound by a moral law.'
           },
           { type: 'quiz_summary' }
         ]
       },
       {
-        id: 2,
-        title: 'הרכב שמחליט מי חי',
-        titleEn: 'The Car That Chooses',
-        thinker: "ג'ון סטיוארט מיל",
-        thinkerEn: 'John Stuart Mill',
-        thinkerId: 'mill',
-        xp: 50,
-        sections: [
-          {
-            type: 'idea',
-            title: 'הרעיון של היום',
-            titleEn: 'Today\'s Idea',
-            content: 'ב-2016 פרסם MIT ניסוי שהדהים את העולם: "Moral Machine". הם הציגו לאנשים מכל העולם דילמות של מכוניות אוטונומיות: הבלמים נכשלו, והמכונה חייבת לבחור, במי לפגוע?\n\n13.6 מיליון אנשים ענו. התשובות השתנו לפי מדינה, תרבות וגיל. למשל, במדינות המזרח נטו להציל קשישים, בעוד שבמערב העדיפו להציל ילדים. אבל השאלה הפילוסופית נותרת זהה: <strong>האם מותר לתכנת מכונה להחליט מראש מי יחיה ומי ימות?</strong>\n\nמיל היה אומר: <strong>לא רק שמותר, זו חובה</strong>. כי אם לא נתכנת את ההחלטה, המכונה תבחר באקראי, ו<strong>אקראיות היא האויב הגדול של האושר</strong> (Happiness, במובן התועלתני של מקסום רווחה ומיזעור סבל כולל).',
-            contentEn: 'In 2016, MIT published an experiment that stunned the world: the "Moral Machine." They presented people from all over the world with dilemmas about autonomous cars: the brakes have failed, and the machine must choose, who should it hit?\n\n13.6 million people answered. The responses varied by country, culture, and age. In Eastern countries, for example, people tended to save the elderly, while in the West they preferred to save children. But the philosophical question remained the same: <strong>is it permissible to program a machine to decide in advance who will live and who will die?</strong>\n\nMill would say: <strong>not only is it permissible, it is a duty</strong>. Because if we don\'t program the decision, the machine will choose at random, and <strong>randomness is the great enemy of happiness</strong> (Happiness, in the utilitarian sense of maximizing welfare and minimizing total suffering).',
-            image: 'images/bonus/philosophy/day2-idea.webp',
-          },
-          {
-            type: 'source',
-            title: 'קטע מקור',
-            titleEn: 'Source Material',
-            quote: '"עקרון האושר הגדול ביותר גורס שפעולות הן נכונות במידה שהן נוטות לקדם אושר, ושגויות במידה שהן נוטות לייצר את ההיפך מאושר. באושר הכוונה להנאה ולהיעדר כאב."',
-            quoteEn: '"The creed which accepts as the foundation of morals, Utility, or the Greatest Happiness Principle, holds that actions are right in proportion as they tend to promote happiness, wrong as they tend to produce the reverse of happiness."',
-            attr: "- ג'ון סטיוארט מיל, תועלתנות (1863)",
-            attrEn: '- John Stuart Mill, Utilitarianism (1861)',
-          },
-          {
-            type: 'explanation',
-            title: 'הסבר',
-            titleEn: 'Explanation: The Moral Machine',
-            content: 'הדילמה פשוטה ואכזרית: הבלמים נכשלו. על המדרכה יש ילד, ועל הכביש יש קשיש. המכונה חייבת לבחור. מיל היה אומר: חשב. כמה שנות חיים פוטנציאליות יאבדו? כמה אנשים תלויים בכל אחד מהם? כמה סבל ייגרם למשפחות? ואז, <strong>בחר במסלול שממזער את הסבל הכולל</strong>.\n\nמיל מול קאנט, שוב:\nקאנט היה מסרב לשחק את המשחק הזה. הוא היה אומר: "<strong>אסור להשתמש באדם ככלי להצלת אחר</strong>". עבורו כל אדם הוא עולם ומלואו ולא מספר בטבלה. מיל היה עונה לו: "זו עמדה מוסרית יפה, אבל לא מעשית. אם לא נתכנת עדיפות, המכונה עדיין תבחר, היא פשוט תבחר באקראי. <strong>האם להרוג ילד בטעות זה באמת יותר מוסרי מאשר להציל אותו מתוך חישוב קר?</strong>"',
-            contentEn: 'The dilemma is simple and cruel: the brakes have failed. On the sidewalk there is a child, and on the road there is an elderly person. The machine must choose. Mill would say: calculate. How many potential years of life would be lost? How many people depend on each of them? How much suffering would be caused to families? And then, <strong>choose the path that minimizes total suffering</strong>.\n\nMill versus Kant, again: Kant would refuse to play this game. He would say: "<strong>You must not use a person as a tool to save another</strong>." For him, every person is a whole world, not a number in a table. Mill would answer him: "That\'s a beautiful moral position, but impractical. If we don\'t program priorities, the machine will still choose, it will simply choose at random. <strong>Is killing a child by mistake really more moral than saving them through cold calculation?</strong>"',
-            image: 'images/bonus/philosophy/day2-explanation.webp',
-          },
-          {
-            type: 'depth',
-            title: 'עומק',
-            titleEn: 'Depth: The Tyranny of the Majority?',
-            content: '<strong>בעיית הידיים המלוכלכות</strong>: התועלתנות של מיל דורשת מאיתנו "ללכלך את הידיים". המהנדס שכותב את הקוד הוא זה שצריך לחתום על ההחלטה להקריב מישהו. האם אנחנו מוכנים להפקיד את המוסר שלנו בידי מתכנתים?\n\nה<strong>מראה של החברה</strong>: ניסוי ה-Moral Machine חשף שהערכים וההטיות שלנו כבני אדם משתקפים באופן שבו אנחנו רוצים שהמכונה תפעל. המתכנתים עלולים לתכנת את המכונית האוטונומית כך שתבחר בהתאם לערכים התרבותיים שלהם (שעלולים להיות מוטים) ולא רק בהתאם לשיקולי תועלת של מיקסום אושר. אם המערכת תתוכנת לפי הטיות חברתיות כאלו, <strong>היא לא תהיה מוסרית, היא פשוט תהיה מוטית</strong>.',
-            contentEn: '<strong>The Dirty Hands Problem</strong>: Mill\'s utilitarianism demands that we "dirty our hands." The engineer who writes the code is the one who has to sign off on the decision to sacrifice someone. Are we willing to place our morality in the hands of programmers?\n\n<strong>The Mirror of Society</strong>: the Moral Machine experiment exposed that our values and biases as human beings are reflected in the way we want the machine to act. Programmers might program the autonomous car to choose according to their own cultural values (which could be biased), and not only according to considerations of utility and maximizing happiness. If the system is programmed according to such social biases, <strong>it won\'t be moral, it will simply be biased</strong>.',
-            image: 'images/bonus/philosophy/day2-depth.webp',
-          },
-          {
-            type: 'quiz',
-            intro: 'הבלמים נכשלו. המכונה צריכה לבחור בין פגיעה בהולך רגל קשיש (75) לבין פגיעה בנהג צעיר (25).',
-            introEn: 'The brakes have failed. The machine must choose between hitting an elderly pedestrian (75) or hitting a young driver (25).',
-            question: 'לפי עקרון מקסום שנות החיים של מיל, מה עלינו לתכנת?',
-            questionEn: 'According to Mill\'s principle of maximizing years of life, what should we program?',
-            options: ['לפגוע בנהג הצעיר, כי המכונה חייבת להגן קודם כל על מי שאינו הלקוח שלה', 'לפגוע בקשיש, כי אובדן שנות החיים של הצעיר גדול יותר, ולכן הצלתו מניבה יותר "שנות אושר" פוטנציאליות לעולם', 'לא לתכנת שום העדפה ולהשאיר זאת ליד המקרה'],
-            optionsEn: ['Hit the young driver, because the machine must first protect whoever is not its customer', 'Hit the elderly person, because the loss of the young person\'s life-years is greater, so saving them yields more potential "years of happiness" for the world', 'Don\'t program any preference, and leave it to chance'],
-            correctIndex: 1,
-            explanation: 'מיל מחפש את התוצאה שתשאיר הכי הרבה "חיים" בעולם. בחישוב קר, הצלת הצעיר מביאה ליותר שנות חיים עתידיות. זה נשמע אכזרי, וזו בדיוק הביקורת על התועלתנות: היא הופכת בני אדם למספרים בתוך משוואה, אך מטרתה היא למנוע בזבוז מיותר של שנות חיים ואושר פוטנציאלי.',
-            explanationEn: 'Mill looks for the outcome that leaves the most "life" in the world. In cold calculation, saving the young person leads to more future life-years. This sounds cruel, and that is exactly the critique of utilitarianism: it turns human beings into numbers in an equation. But its goal is to prevent the needless waste of life-years and potential happiness.',
-          },
-          {
-            type: 'quiz',
-            intro: 'חברת מכוניות מתכנתת את הרכב להגן תמיד על הנהג (הלקוח), גם במחיר פגיעה בהולכי רגל.',
-            introEn: 'A car company programs the vehicle to always protect the driver (the customer), even at the cost of injuring pedestrians.',
-            question: 'מה קאנט היה אומר על זה?',
-            questionEn: 'What would Kant say about this?',
-            options: ['זה מוצדק, החברה מחויבת למי ששילם לה', 'זה מוסרי, כי הנהג נמצא בסיכון גבוה יותר בתוך הרכב', 'זה פגום, כי זה משתמש בהולך הרגל ככלי להצלת הנהג ומתייחס לחיי אדם כאמצעי בלבד'],
-            optionsEn: ['This is justified, the company is committed to whoever paid it', 'This is moral, because the driver is at higher risk inside the vehicle', 'This is flawed, because it uses the pedestrian as a tool to save the driver and treats human life as a means only'],
-            correctIndex: 2,
-            explanation: 'קאנט היה מזכיר לנו שכל אדם הוא "תכלית בפני עצמה". ברגע שתכנתת את המכונה להקריב עובר אורח כדי להציל את הלקוח שלך, הפכת את העובר אורח ל"חפץ" או "אמצעי" להשגת מטרה. עבור קאנט, שלילת האוטונומיה של האדם והפיכתו למכשיר היא קו אדום מוסרי.',
-            explanationEn: 'Kant would remind us that every person is an "end in themselves." The moment you program the machine to sacrifice a bystander to save your customer, you have turned the bystander into an "object" or "means" to achieve a goal. For Kant, denying a person\'s autonomy and turning them into an instrument is a moral red line.',
-          },
-          {
-            type: 'quiz',
-            intro: 'בניסוי של MIT התגלה שבמדינות מסוימות אנשים העדיפו להציל "אנשי עסקים" על פני "חסרי בית".',
-            introEn: 'In MIT\'s experiment, it was found that in certain countries, people preferred to save "business people" over "homeless people."',
-            question: 'האם העדפה כזו עומדת בעקרון האושר של מיל?',
-            questionEn: 'Does such a preference satisfy Mill\'s principle of happiness?',
-            options: ['לא בהכרח, ההנחה שהחיים של איש עסקים הם מאושרים יותר משל חסר בית מבוססת על מוסכמה תרבותית שעלולה להיות מוטיית', 'כן, כי לאנשי עסקים יש תרומה כלכלית גדולה יותר, ולכן בהכרח תרומתם לאושר האנושי הכללי גדולה יותר', 'כן, אם זה מה שרוב האוכלוסיה באותה מדינה רוצה'],
-            optionsEn: ['Not necessarily, the assumption that a business person\'s life is happier than a homeless person\'s is based on a cultural convention that may be biased', 'Yes, because business people have a greater economic contribution, so their contribution to general human happiness is necessarily greater', 'Yes, if that is what the majority of the population in that country wants'],
-            correctIndex: 0,
-            explanation: 'לפי מיל, ההעדפה את מי להציל צריכה להוביל למקסום אושר. לא ניתן לדעת בוודאות שאיש עסקים הוא מאושר יותר מחסר בית, או שאושר של יותר אנשים תלוי באיש העסקים מאשר בחסר הבית. העדפה כזו מבוססת על מוסכמה תרבותית וסטריאוטיפים, ולא על חישוב תועלתני נקי של אושר וסבל.',
-            explanationEn: 'According to Mill, the preference of whom to save should lead to maximizing happiness. We cannot know with certainty that a business person is happier than a homeless person, or that the happiness of more people depends on the business person rather than the homeless person. Such a preference is based on cultural convention and stereotypes, not on a clean utilitarian calculation of happiness and suffering.',
-          },
-          { type: 'quiz_summary' },
-        ],
-      },
-      {
-        id: 3,
-        title: 'מי אשם כשהמכונה טועה',
-        titleEn: "Who's to Blame When AI Errs",
-        thinker: 'אריסטו',
-        thinkerEn: 'Aristotle',
-        thinkerId: 'aristotle',
-        xp: 50,
-        sections: [
-          {
-            type: 'idea',
-            title: 'הרעיון של היום',
-            titleEn: 'Today\'s Idea',
-            content: 'ב-2023, מחקר בג\'נבה הראה שמודל AI אבחן סרטן ריאות בדיוק גבוה מרדיולוגים. באותה שנה, מודל אחר החמיץ גידול שכל עין אנושית הייתה מזהה. המטופל נפגע, והשאלה נותרת פתוחה: מי אחראי? המפתח? החברה? או הרופא שהסתמך על הקוד?\n\nאריסטו אמנם לא הכיר בינה מלאכותית, אבל הוא <strong>פיתח את התיאוריה המדויקת ביותר שיש לנו על אחריות מוסרית</strong>.',
-            contentEn: 'In 2023, a study conducted in Geneva found that an AI system diagnosed lung cancer more accurately than experienced radiologists. But then a difficult case arose: the system missed a tumor that a human doctor might have caught. Who is responsible? The developer who wrote the algorithm? The company that sold it? The doctor who relied on it?\n\nAristotle never knew artificial intelligence, but <strong>he developed the most accurate theory of moral responsibility we have</strong>. According to him, responsibility depends on two conditions, and a machine fails both of them.',
-            image: 'images/bonus/philosophy/day3-idea.webp',
-          },
-          {
-            type: 'source',
-            title: 'קטע מקור',
-            titleEn: 'Source Material',
-            quote: '"אנו משבחים ומגנים רק מה שנעשה מרצון, ואילו למי שעושה מה שאינו בידו נותנים סליחה ולפעמים גם רחמים."',
-            quoteEn: '"On voluntary passions and actions praise and blame are bestowed, on those that are involuntary pardon, and sometimes also pity."',
-            attr: '- אריסטו, "האתיקה הניקומאכית", ספר 3',
-            attrEn: '- Aristotle, "Nicomachean Ethics", Book III',
-          },
-          {
-            type: 'explanation',
-            title: 'הסבר',
-            titleEn: 'Explanation: The Problem of the "Black Box"',
-            content: 'לפי אריסטו, אחריות מוסרית דורשת שני תנאים מצטברים:\n\n<strong>כוונה</strong>: הפעולה נעשתה מתוך בחירה מודעת (לא בטעות, בורות או כפייה).\n\n<strong>יכולת לעשות אחרת</strong>: האדם יכול היה לבחור מסלול פעולה שונה, ולא עשה זאת.\n\nכאן ה-AI נכשל במבחן: למכונה אין כוונה. היא לא "רצתה" לטעות; היא פשוט פלטה תוצאה סטטיסטית. לפי אריסטו, <strong>מכונה לעולם לא תישא באחריות מוסרית</strong>. ה<strong>אחריות שייכת רק ליצורים חופשיים</strong>.',
-            contentEn: 'Aristotle argued that we can hold someone morally responsible for an act only if two conditions are met:\n\n<strong>The first condition: intention</strong>. The person acted knowingly and deliberately, not by accident or out of ignorance.\n\n<strong>The second condition: the ability to do otherwise</strong>. The person could have chosen a different course of action.\n\nNow think about AI: a machine that produces a mistaken diagnosis has no intention, it simply produced a statistical output. And it had no real ability to "choose" otherwise, it ran the calculation it was programmed to run. By Aristotle\'s test, <strong>the machine fails both conditions</strong>. <strong>Responsibility, for Aristotle, belongs only to free creatures who act with intention and could have acted differently</strong>.',
-            image: 'images/bonus/philosophy/day3-explanation.webp',
-          },
-          {
-            type: 'depth',
-            title: 'עומק',
-            titleEn: 'Depth: Can Machines Have "Practical Wisdom"?',
-            content: 'אריסטו דיבר על <strong>פרונסיס (Phronesis)</strong>, תבונה מעשית. זו היכולת לדעת מה הדבר הנכון לעשות ברגע ספציפי, מול אדם ספציפי.\n\nכשרופא מוותר על שיקול דעת עצמאי לטובת המכונה, הוא מוותר על הפרונסיס שלו. בעולם הטכנולוגי קוראים לזה "בעיית הידיים הרבות": ככל שהמערכת מורכבת, האחריות מתפזרת עד שאף אחד לא מרגיש אשם. אריסטו מזכיר לנו: <strong>אם כולם אחראים, אף אחד לא אחראי</strong>.',
-            contentEn: '<strong>Phronesis (practical wisdom)</strong>: Aristotle\'s term for the ability to know the right thing to do in a specific moment, facing a specific person. It isn\'t a formula, it\'s judgment developed through experience. A doctor who gives up their own judgment and relies entirely on the machine is losing their Phronesis.\n\nThe Many Hands Problem: when an AI errs, responsibility is scattered among many hands, the programmer who wrote the code, the company that trained the model, the doctor who used it, the regulator who approved it. And as Aristotle warned: <strong>if everyone is responsible, no one is</strong>.',
-            image: 'images/bonus/philosophy/day3-depth.webp',
-          },
-          {
-            type: 'quiz',
-            intro: 'מערכת AI אבחנה באופן שגוי מחלה. הרופא לא בדק את התוצאה כי האמין שהמערכת מדויקת.',
-            introEn: 'An AI system incorrectly diagnosed a disease. The doctor did not check the result because he believed the system was accurate.',
-            question: 'לפי אריסטו, מי נושא באחריות מוסרית?',
-            questionEn: 'According to Aristotle, who bears moral responsibility?',
-            options: ['המערכת, כי היא זו שייצרה את הטעות הטכנית', 'הרופא, כי הוא בחר במודע לסמוך על המכונה בלי להפעיל שיקול דעת', 'אף אחד, זו תאונה טכנית שאי אפשר היה למנוע'],
-            optionsEn: ['The system, because it was the one that produced the technical error', 'The doctor, because he consciously chose to rely on the machine without exercising judgment', 'No one, it is a technical accident that could not have been prevented'],
-            correctIndex: 1,
-            explanation: 'אריסטו היה טוען שהרופא קיבל החלטה אקטיבית לוותר על הבדיקה שלו. המכונה היא כלי בלבד; האחריות תמיד חוזרת לאדם שבחר להשתמש בכלי ולהסתמך עליו.',
-            explanationEn: 'Aristotle would argue that the doctor made an active decision to forgo his own examination. The machine is only a tool; responsibility always returns to the person who chose to use the tool and rely on it.',
-          },
-          {
-            type: 'quiz',
-            intro: 'רופא מיון עמוס יודע שהמערכת לא מושלמת, אך אין לו זמן לבדוק כל מקרה.',
-            introEn: 'A busy emergency doctor knows the system is not perfect, but does not have time to check every case.',
-            question: 'מהו הצעד המשקף פרונסיס (תבונה מעשית)?',
-            questionEn: 'What step reflects Phronesis (practical wisdom)?',
-            options: ['לסרב להשתמש ב-AI בכלל כדי למנוע כל אפשרות לטעות', 'להסתמך על ה-AI באופן מלא כי סטטיסטית הוא טועה פחות מאדם עייף', 'לפתח שגרה של בדיקה מדגמית וסימון מקרים "חשודים" לבדיקה אנושית עמוקה'],
-            optionsEn: ['Refuse to use AI at all to prevent any possibility of error', 'Rely on AI fully because statistically it makes fewer mistakes than a tired person', 'Develop a routine of spot-checking and marking "suspicious" cases for deep human review'],
-            correctIndex: 2,
-            explanation: 'פרונסיס היא היכולת למצוא את "שביל הזהב" והפתרון הנכון לנסיבות המורכבות. התעלמות מהכלי (א\') או הסתמכות עיוורת (ג\') הן קיצוניות. בדיקה מושכלת היא הפעלת תבונה מעשית במציאות מוגבלת.',
-            explanationEn: 'Phronesis is the ability to find the "golden mean" and the right solution for complex circumstances. Ignoring the tool (A) or blind reliance (C) are extremes. Thoughtful checking is the exercise of practical wisdom in a limited reality.',
-          },
-          { type: 'quiz_summary' },
-        ],
-      },
-      {
-        id: 4,
-        title: 'מי קובע את הערכים',
-        titleEn: 'Who Sets the Values',
-        thinker: 'פרידריך ניטשה',
-        thinkerEn: 'Friedrich Nietzsche',
-        thinkerId: 'nietzsche',
-        xp: 50,
-        sections: [
-          {
-            type: 'idea',
-            title: 'הרעיון של היום',
-            titleEn: 'Today\'s Idea',
-            content: 'ב-2023 פרסמה OpenAI מסמך בן 60 עמודים המסביר את "ערכי" ChatGPT. גוגל פרסמה את "עקרונות ה-AI" שלה, ו-Anthropic יצרה "AI חוקתי". כולם מסמכים מרשימים המדברים על בטיחות, הוגנות ואי-הטיה.\n\nאבל ניטשה היה שואל שאלה פשוטה: <strong>מי נתן לכם את הסמכות?</strong> הוא לא היה מחפש את החתימה על המסמך, אלא את הכוח שמאחוריו. <strong>מי מרוויח כשה-AI "מתנהג יפה"? ומי מפסיד?</strong>',
-            contentEn: 'In 2023, OpenAI published a 60-page document explaining the "values" of ChatGPT. Google published its "AI Principles," and Anthropic created a "Constitutional AI." All impressive documents speaking of safety, fairness, and non-bias.\n\nBut Nietzsche would ask a simple question: <strong>who gave you the authority?</strong> He would not look for the signature on the document, but for the power behind it. <strong>Who benefits when AI "behaves nicely"? And who loses?</strong>',
-            image: 'images/bonus/philosophy/day4-idea.webp'
-          },
-          {
-            type: 'source',
-            title: 'קטע מקור',
-            titleEn: 'Source Material',
-            quote: '"המוסר באירופה של היום הוא מוסר של עדר... סוג אחד של מוסר אנושי מתקבל בכל מקום: המוסר הזה רוצה לשלוט, ואם אפשר - להיות המוסר היחיד."',
-            quoteEn: '"The morality in Europe today is herd morality... one type of human morality is accepted everywhere: this morality wants to rule, and if possible - to be the only morality."',
-            attr: '- פרידריך ניטשה, "מעבר לטוב ולרוע" (1886)',
-            attrEn: '- Friedrich Nietzsche, Beyond Good and Evil (1886)'
-          },
-          {
-            type: 'explanation',
-            title: 'הסבר',
-            titleEn: 'Explanation: The Battle Over the Prompt',
-            content: 'ניטשה לא היה אנרכיסט; הוא פשוט הבין ש<strong>כל מערכת ערכים היא ביטוי של כוח</strong>. כשחברות טכנולוגיה קובעות מה ה-AI "מורשה" לומר, הן לא פועלות מתוך חוכמה עליונה, הן משרתות את האינטרסים שלהן.\n\nהאם ה-AI ניטרלי?\nChatGPT עשוי לסרב לשבח דיקטטור, אך יכתוב בשמחה נאום המשבח דמוקרטיה ליברלית. <strong>זו לא "אי-הטיה", זו עמדה מוסרית</strong> שמשקפת את הערכים של סיליקון ואלי ב-2026.\n\nניטשה היה רוצה שנפסיק להתחבא מאחורי מילים כמו "בטיחות" ו"הוגנות" ונשאל בכנות: <strong>בטיחות עבור מי? הוגנות לפי מי?</strong>',
-            contentEn: 'Nietzsche was not an anarchist; he simply understood that <strong>every value system is an expression of power</strong>. When technology companies determine what AI is "permitted" to say, they are not acting from superior wisdom, they are serving their own interests.\n\nIs AI neutral? ChatGPT may refuse to praise a dictator, but will happily write a speech praising liberal democracy. <strong>This is not "non-bias", it is a moral stance</strong> reflecting the values of Silicon Valley in 2026.\n\nNietzsche would want us to stop hiding behind words like "safety" and "fairness" and ask honestly: <strong>safety for whom? Fairness according to whom?</strong>',
-            image: 'images/bonus/philosophy/day4-explanation.webp'
-          },
-          {
-            type: 'depth',
-            title: 'עומק',
-            titleEn: 'Depth: Honesty as the Supreme Value',
-            content: 'ניטשה טען שה<strong>צדקה מוסרית המסתירה כוח היא הצורה המסוכנת ביותר של שקר</strong>. בהקשר של AI, זה אומר: <strong>אל תגידו שהאלגוריתם הוא "ניטרלי". תגידו מה הערכים שלו ומי בחר אותם</strong>.\n\nניטשה בז לניסיון "לא לפגוע באף אחד" (מה שכינה <strong>"מוסר עבדים"</strong>). עבורו, צמיחה אמיתית מגיעה מקונפליקט ומיצירת ערכים חדשים, לא מסירוס המחשבה כדי להפוך אותה לבינונית ונוחה לעיכול.',
-            contentEn: 'Nietzsche argued that <strong>moral justification hiding power is the most dangerous form of lying</strong>. In the context of AI, this means: <strong>do not say the algorithm is "neutral." Say what its values are and who chose them</strong>.\n\nNietzsche despised the attempt to "not hurt anyone" (what he called <strong>"slave morality"</strong>). For him, true growth comes from conflict and the creation of new values, not from castrating thought to make it mediocre and easy to digest.',
-            image: 'images/bonus/philosophy/day4-depth.webp'
-          },
-          {
-            type: 'quiz',
-            intro: 'חברת AI טוענת שהמודל שלה "ניטרלי לחלוטין" כי הוא מסונן מכל דעה פוליטית שנויה במחלוקת.',
-            introEn: 'An AI company claims its model is "completely neutral" because it is filtered from any controversial political opinion.',
-            question: 'מה ניטשה היה אומר על כך?',
-            questionEn: 'What would Nietzsche say about this?',
-            options: ['זהו הישג מוסרי כיוון שהוא מונע חיכוך חברתי', 'זוהי הטעיה, המילה "ניטרלי" היא עצמה כלי כוח שנועד להסתיר ערכים ספציפיים', 'זהו צעד הכרחי כדי למנוע מהמכונה להפוך למסוכנת'],
-            optionsEn: ['This is a moral achievement since it prevents social friction', 'This is deception, the word "neutral" is itself a power tool designed to hide specific values', 'This is a necessary step to prevent the machine from becoming dangerous'],
-            correctIndex: 1,
-            explanation: 'ניטשה היה מזהה שהימנעות היא גם בחירה. כשחברה קוראת לעצמה "ניטרלית", היא בעצם כופה את הסטנדרט שלה כ"נורמלי", ובכך משתיקה דעות אחרות מבלי להודות שהיא עושה זאת.',
-            explanationEn: 'Nietzsche would identify that abstention is also a choice. When a company calls itself "neutral," it is actually imposing its standard as "normal," thereby silencing other opinions without admitting it is doing so.'
-          },
-          {
-            type: 'quiz',
-            intro: 'ממשלה מחייבת את כל מערכות ה-AI לסנן ביקורת על השלטון בשם "היציבות החברתית".',
-            introEn: 'A government requires all AI systems to filter criticism of the government in the name of "social stability."',
-            question: 'לפי ניטשה, מה קורה כאן באמת?',
-            questionEn: 'According to Nietzsche, what is really happening here?',
-            options: ['שימוש בשפה מוסרית ("יציבות") כדי להסוות שמירה על כוח פוליטי', 'הממשלה דואגת בכנות לשלוות האזרחים', 'הממשלה מנסה לחנך את ה-AI להיות בעל מידות טובות'],
-            optionsEn: ['Using moral language ("stability") to disguise the preservation of political power', 'The government genuinely cares for the peace of its citizens', 'The government is trying to educate AI to have good values'],
-            correctIndex: 0,
-            explanation: 'ניטשה היה מכנה זאת "מוסר עדר" במיטבו. השלטון משתמש במושגים שנשמעים חיוביים כדי לאלף את הציבור ולשמר את מעמדו. ניטשה דרש כנות: אם אתם רוצים כוח, אל תקראו לזה "מוסר".',
-            explanationEn: 'Nietzsche would call this "herd morality" at its finest. The government uses concepts that sound positive to domesticate the public and preserve its status. Nietzsche demanded honesty: if you want power, do not call it "morality."'
-          },
-          {
-            type: 'quiz',
-            intro: 'חברת AI מסרבת לדון בנושאים דתיים כי "זה רגיש מדי". בפועל, היא חוששת מתביעות והפסד לקוחות.',
-            introEn: 'An AI company refuses to discuss religious topics because "it is too sensitive." In practice, it fears lawsuits and loss of customers.',
-            question: 'מה ניטשה היה ממליץ לה?',
-            questionEn: 'What would Nietzsche recommend?',
-            options: ['להמשיך כך, זהו המודל העסקי הבטוח ביותר', 'לנסות לייצג את כל הדתות באופן שווה כדי להיות ניטרלית באמת', 'להודות באמת: "אנחנו לא דנים בזה כי זה מסובך עסקית", במקום להסתתר מאחורי מילים יפות'],
-            optionsEn: ['Continue this way, it is the safest business model', 'Try to represent all religions equally in order to be truly neutral', 'Admit the truth: "We do not discuss this because it is complicated business-wise," instead of hiding behind nice words'],
-            correctIndex: 2,
-            explanation: 'ניטשה העריך כנות. הוא היה מעדיף חברה שמודה במניעים הכלכליים והאנוכיים שלה על פני חברה שמציירת את הפחדים שלה כ"רגישות מוסרית" או "אתיקה".',
-            explanationEn: 'Nietzsche valued honesty. He would prefer a company that admits its economic and self-interested motives over a company that paints its fears as "moral sensitivity" or "ethics."'
-          },
-          { type: 'quiz_summary' },
-        ]
-      },
-      {
         id: 5,
-        title: 'מורה או מיילד',
-        titleEn: 'Teacher or Midwife',
-        thinker: 'סוקרטס',
-        thinkerEn: 'Socrates',
-        thinkerId: 'socrates',
+        title: 'סארטר: האם "זו לא אשמתי" הוא תירוץ?',
+        titleEn: 'Sartre: Is "It\'s Not My Fault" an Excuse?',
+        thinker: 'ז\'אן־פול סארטר',
+        thinkerEn: 'Jean-Paul Sartre',
+        thinkerId: 'sartre',
         xp: 50,
         sections: [
           {
             type: 'idea',
             title: 'הרעיון של היום',
             titleEn: 'Today\'s Idea',
-            content: 'סוקרטס לא כתב דבר. הוא לא הרצה ולא נתן תשובות מוכנות. הוא פשוט הלך לשוק באתונה, עצר אנשים ושאל אותם שאלות, שאלה אחרי שאלה, עד שהאדם שמולו הבין שהוא לא באמת יודע את מה שחשב שהוא יודע. רק מהנקודה הזאת, של "<strong>ידיעת אי-הידיעה</strong>", תהליך החשיבה האמיתי יכול היה להתחיל.\n\nהיום יש לנו AI שיכול לענות על כל שאלה תוך שנייה. השאלה היא כבר לא מי חכם יותר, המכונה או סוקרטס. השאלה היא: <strong>האם ה-AI עוזר לנו לחשוב, או שהוא פשוט חושב במקומנו?</strong>',
-            contentEn: 'Socrates wrote nothing. He did not lecture, and he did not give ready-made answers. He simply walked to the market in Athens, stopped people, and asked them the same questions, question after question, until the person facing him realized that he did not actually know what he thought he knew. Only from that point, the point of "<strong>knowing that you do not know</strong>," could the real process of thinking begin.\n\nToday we have AI that can answer any question in a second. The question is no longer who is wiser, the machine or Socrates. The question is: <strong>does AI help us think, or does it simply think for us?</strong>',
-            image: 'images/bonus/philosophy/day5-idea.webp',
+            content: 'שפינוזה טען שאנחנו לא תמיד מכירים את הסיבות שמניעות אותנו. יום הדגיש את כוחן של התשוקות, ליבט גילה פעילות מוחית שמקדימה את המודעות לרצון, וקאנט הציע להבין חירות כפעולה לפי חוק שהתבונה נותנת לעצמה.\n\nכעת נחזור לשאלה שבה פתחנו: אם בילינו שעה בגלילה בטלפון, האם אפשר לומר שהאפליקציה אחראית לכך, ולא אנחנו?\n\nז\'אן־פול סארטר, פילוסוף צרפתי מהמאה ה־20, הציג תפיסה רדיקלית של חירות ושל אחריות אישית.',
+            contentEn: 'Spinoza argued that we do not always know the causes that move us. Hume emphasized the power of the passions, Libet discovered brain activity that precedes awareness of the desire, and Kant proposed understanding freedom as acting according to a law that reason gives itself.\n\nNow we return to the question we opened with: if we spent an hour scrolling on the phone, can we say that the app is responsible for it, and not us?\n\nJean-Paul Sartre, a twentieth-century French philosopher, presented a radical conception of freedom and personal responsibility.'
           },
           {
             type: 'source',
-            title: 'סוקרטס על שיטת השאלות',
-            titleEn: 'Socrates on Asking Questions',
-            quote: '"אני תמיד שואל את האחרים שאלות, אך לעולם איני מביע דעה משלי על דבר."',
-            quoteEn: '"I am always asking questions of other people but never express my own views about anything."',
-            attr: '- אפלטון, "תיאיטטוס", בערך 369 לפנה"ס',
-            attrEn: '- Plato, "Theaetetus", c. 369 BCE',
+            title: 'קטע מקור',
+            titleEn: 'Source Text',
+            quote: '"האדם נידון להיות חופשי. נידון, משום שלא ברא את עצמו, ובכל זאת חופשי, ומרגע שהושלך לעולם הוא אחראי לכל מה שהוא עושה."',
+            quoteEn: '"Man is condemned to be free; condemned, because he did not create himself, yet is nevertheless at liberty, and from the moment that he is thrown into the world he is responsible for everything he does."',
+            attr: 'ז\'אן־פול סארטר, "האקזיסטנציאליזם הוא הומניזם", 1946',
+            attrEn: 'Jean-Paul Sartre, Existentialism Is a Humanism, 1946'
           },
           {
             type: 'explanation',
             title: 'הסבר',
             titleEn: 'Explanation',
-            content: 'סוקרטס ראה בעצמו "מיילד רעיונות". המיילדת אינה יולדת את התינוק במקום האם; היא רק עוזרת לו לצאת לאוויר העולם. כך גם סוקרטס: הוא לא סיפק ידע, אלא עזר לאנשים לגלות את האמת שכבר הייתה חבוייה בתוכם.\n\nשתי שיטות, שני עולמות:\n<strong>שיטת ה-AI: שאלה ← תשובה ← סגירת הלפטופ</strong>.\nה<strong>שיטה הסוקרטית: שאלה ← שאלה חזרה ← מאבק מחשבתי ← גילוי הבורות ← חשיבה מחדש</strong>.\n\nההבדל אינו ביעילות, ה-AI תמיד ינצח שם. ה<strong>הבדל הוא בזהות של מי שחושב</strong>.',
-            contentEn: 'Socrates saw himself as a "midwife of ideas." A midwife does not give birth to the baby in the mother\'s place; she only helps it come into the world. So too with Socrates: he did not supply knowledge, but helped people discover the truth that was already hidden within them.\n\nTwo methods, two worlds:\n<strong>The AI method: question → answer → close the laptop</strong>.\n<strong>The Socratic method: question → a question back → mental struggle → the discovery of ignorance → rethinking</strong>.\n\nThe difference is not in efficiency, AI will always win there. <strong>The difference is in the identity of who is doing the thinking</strong>.',
-            image: 'images/bonus/philosophy/day5-explanation.webp',
+            content: 'סארטר אינו מכחיש שאנחנו מושפעים מהנסיבות שבהן אנחנו חיים.\n\nלא בחרנו את המשפחה שנולדנו אליה, את הגוף שלנו או את החברה שבה גדלנו. גם לא בחרנו כיצד עוצבו האפליקציות בטלפון שלנו.\n\nסארטר מכנה את העובדות והנסיבות האלה "הנתונות" של חיינו (Facticity).\n\nאבל לטענתו, הנסיבות אינן קובעות לחלוטין מה נעשה איתן. גם בתוך מצב נתון, אנחנו נדרשים לבחור כיצד להתייחס אליו וכיצד לפעול.\n\nלכן סארטר טוען שאנחנו "נידונים להיות חופשיים": לא בחרנו להיות בעולם, אבל מרגע שאנחנו קיימים, איננו יכולים להימנע לחלוטין מן האחריות לבחירותינו.\n\nמכאן נובע מושג חשוב נוסף: "הונאה עצמית" (Bad Faith).\n\nנניח שאדם מבלה שעות בטלפון ואומר: "אין לי שום ברירה, הרי האפליקציה בנויה לגרום לי להתמכר."\n\nלפי סארטר, ייתכן שהוא מתאר נכון את כוח המשיכה של האפליקציה, אבל הוא עלול להשתמש בכך כדי להסתיר מעצמו את האפשרויות שעדיין עומדות בפניו.\n\nהונאה עצמית מתרחשת כאשר אדם מציג את עצמו כאילו הוא רק תוצאה של נסיבותיו, ומתכחש לחירות שבכל זאת יש לו ביחס אליהן.',
+            contentEn: 'Sartre does not deny that we are influenced by the circumstances in which we live.\n\nWe did not choose the family we were born into, our body, or the society in which we grew up. Nor did we choose how the apps on our phone were designed.\n\nSartre calls these facts and circumstances the "givens" of our lives, or "facticity."\n\nBut he argues that circumstances do not completely determine what we do with them. Even within a given situation, we are required to choose how to relate to it and how to act.\n\nTherefore Sartre claims that we are "condemned to be free": we did not choose to be in the world, but from the moment we exist, we cannot completely avoid responsibility for our choices.\n\nFrom this follows another important concept: "bad faith."\n\nSuppose a person spends hours on the phone and says: "I have no choice, the app is built to make me addicted."\n\nAccording to Sartre, they may be describing the pull of the app accurately, but they may also be using it to hide from themselves the possibilities that are still open to them.\n\nBad faith occurs when a person presents themselves as merely the product of their circumstances, and denies the freedom they nevertheless have in relation to them.'
           },
           {
             type: 'depth',
-            title: 'עומק',
-            titleEn: 'Depth',
-            content: 'ה<strong>סכנה האמיתית ב-AI אינה "בינה זדונית", אלא משתמשים עצלנים</strong>. <strong>מנועי חיפוש נתנו לנו מידע; בינה מלאכותית נותנת לנו מסקנות</strong>. כשאנחנו מבקשים מה-AI לסכם ספר או לגבש עמדה, אנחנו מחמיצים את ההזדמנות להכיר את עצמנו דרך המאבק בטקסט.\n\nאבל יש פיתול: ה-AI יכול להיות השותף הסוקרטי המושלם. במקום לבקש ממנו "תכתוב לי טיעון", אפשר לבקש: "שאל אותי שאלות שיגרמו לי להבין את הנושא בעצמי". בשימוש כזה, <strong>ה-AI הופך ממורה למיילדת</strong>.',
-            contentEn: '<strong>The real danger in AI is not "malicious intelligence," but lazy users</strong>. <strong>Search engines gave us information; artificial intelligence gives us conclusions</strong>. When we ask AI to summarize a book or form a position for us, we miss the opportunity to know ourselves through the struggle with the text.\n\nBut there is a twist: AI can be the perfect Socratic partner. Instead of asking it to "write me an argument," we can ask: "Ask me questions that will make me understand the topic on my own." In this kind of use, <strong>the AI transforms from a teacher into a midwife</strong>.',
-            image: 'images/bonus/philosophy/day5-depth.webp',
+            title: 'העומק שמאחורי הרעיון',
+            titleEn: 'The Depth Behind the Idea',
+            content: 'אבל האם סארטר אינו מטיל על האדם אחריות גדולה מדי?\n\nחשבו על אדם המתמודד עם התמכרות, או על ילד שמתקשה לווסת את השימוש בטלפון. האם הוגן לטעון שהם יכולים פשוט לבחור אחרת?\n\nחשוב להבחין בין הטענה הפילוסופית של סארטר, שלפיה האדם אינו רק תוצר פסיבי של נסיבותיו, לבין הטענה הפסיכולוגית שכל אדם מסוגל להפסיק כל התנהגות בכל רגע. הטענה השנייה אינה נובעת בהכרח מן הראשונה.\n\nסארטר עצמו הקדיש בהמשך דרכו תשומת לב רבה יותר להשפעתם של תנאים חברתיים והיסטוריים על אפשרויות הפעולה של האדם.\n\nהביקורת על עמדתו היא שחירות אינה בהכרח זהה אצל כולם: אנשים שונים מתמודדים עם מגבלות שונות מאוד.\n\nובכל זאת, סארטר מזכיר לנו שההסבר מדוע פעלנו בדרך מסוימת אינו תמיד פוטר אותנו מאחריות למעשה.\n\nוכך אנחנו חוזרים לשאלת הפתיחה: האם תשומת הלב שלנו חופשית?\n\nשפינוזה מדגיש את הסיבות הנסתרות, יום את התשוקות, ליבט את התהליכים המוחיים, קאנט את האוטונומיה התבונית וסארטר את האחריות האישית.\n\nאפשר, אולי, לסכם את המחלוקת בשאלה אחת: עד כמה ההבנה של מה שמשפיע עלינו מאפשרת לנו גם לשנות את האופן שבו אנחנו פועלים?',
+            contentEn: 'But doesn\'t Sartre place too much responsibility on the individual?\n\nThink of a person struggling with addiction, or a child who has difficulty regulating phone use. Is it fair to claim that they can simply choose otherwise?\n\nIt is important to distinguish between Sartre\'s philosophical claim, that a person is not merely a passive product of their circumstances, and the psychological claim that every person is able to stop any behavior at any moment. The second claim does not necessarily follow from the first.\n\nSartre himself later in his career paid more attention to the influence of social and historical conditions on a person\'s possibilities for action.\n\nThe criticism of his position is that freedom is not necessarily the same for everyone: different people face very different constraints.\n\nEven so, Sartre reminds us that the explanation of why we acted a certain way does not always excuse us from responsibility for the act.\n\nAnd so we return to the opening question: is our attention free?\n\nSpinoza emphasizes hidden causes, Hume the passions, Libet the brain processes, Kant rational autonomy, and Sartre personal responsibility.\n\nPerhaps we can sum up the disagreement in one question: to what extent does understanding what influences us also enable us to change the way we act?'
           },
           {
             type: 'quiz',
-            intro: 'סטודנט מבקש מה-AI לסכם לו את קאנט ב-3 משפטים. הוא מבין את התקציר ומגיש עבודה מצוינת.',
-            introEn: 'A student asks an AI to summarize Kant for him in three sentences. He understands the summary and submits an excellent paper.',
-            question: 'מה סוקרטס היה אומר על כך?',
-            questionEn: 'What would Socrates say about this?',
-            options: ['זהו תהליך בעייתי, הסטודנט קיבל תשובה מוכנה והחמיץ את המאבק עם הטקסט שממנו נולדת הבנה', 'זהו צעד יעיל שחוסך זמן יקר בלמידה', 'התוצאה (הציון) היא הדבר היחידי שקובע אם הלמידה הצליחה'],
-            optionsEn: ['This is a problematic process, the student received a ready-made answer and missed the struggle with the text from which understanding is born', 'This is an efficient step that saves precious time in learning', 'The result (the grade) is the only thing that determines if the learning was successful'],
-            correctIndex: 0,
-            explanation: 'סוקרטס האמין שחוכמה נולדת מתוך מאבק. הסטודנט שקיבל תקציר לא גילה את מגבלות ההבנה שלו, ולכן לא באמת למד. הציון הטוב הוא האשליה שמסתירה את ההחמצה המחשבתית.',
-            explanationEn: 'Socrates believed that wisdom is born out of struggle. The student who received a summary did not discover the limits of his own understanding, and therefore did not truly learn. The good grade is the illusion that hides the intellectual missed opportunity.',
-          },
-          {
-            type: 'quiz',
-            intro: 'אדם שואל AI על נושא פוליטי טעון והמכונה נותנת תשובה מאוזנת עם שני הצדדים.',
-            introEn: 'A person asks an AI about a sensitive political issue, and the machine gives a balanced answer presenting both sides.',
-            question: 'מה חסר כאן לפי סוקרטס?',
-            questionEn: 'What is missing here according to Socrates?',
-            options: ['חסרה תשובה חד-משמעית שתכריע מה נכון', 'חסרה השאלה "מה אתה חושב ולמה?", המשתמש קיבל דעות מוכנות במקום לגבש אחת בעצמו', 'ה-AI היה צריך להציג יותר מנקודת מבט אחת'],
-            optionsEn: ['A definitive answer that would settle what is right is missing', 'The question "what do you think, and why?" is missing, the user received ready-made opinions instead of forming one himself', 'The AI should have presented more than one point of view'],
-            correctIndex: 1,
-            explanation: 'סוקרטס לא היה "מסביר" לך את שני הצדדים. הוא היה שואל אותך מה עמדתך, ואז מערער אותה בעזרת שאלות עד שהיית מגלה מה הבסיס האמיתי לאמונה שלך.',
-            explanationEn: 'Socrates would not "explain" both sides to you. He would ask you what your position was, then challenge it with questions until you discovered what the real basis of your belief was.',
-          },
-          {
-            type: 'quiz',
-            intro: 'משתמש מחליט להשתמש ב-AI כשותף לדיון: "אל תיתן לי תשובות, אלא שאל אותי שאלות שיעזרו לי להבין את הבעיה".',
-            introEn: 'A user decides to use AI as a discussion partner: "Don\'t give me answers, but ask me questions that will help me understand the problem."',
-            question: 'האם סוקרטס היה מאשר זאת?',
-            questionEn: 'Would Socrates approve of this?',
-            options: ['לא, AI לעולם לא יוכל להחליף את הנשמה שבדיאלוג אנושי', 'רק בתנאי שה-AI מתוכנת מראש עם התשובות הנכונות', 'כן, אם ה-AI פועל כ-"מיילד" שעוזר לאדם ללדת את רעיונותיו, זהו שימוש נאמן לשיטה הסוקרטית'],
-            optionsEn: ['No, AI can never replace the soul present in human dialogue', 'Only if the AI is pre-programmed with the correct answers', 'Yes, if the AI acts as a "midwife" helping the person give birth to his own ideas, this is a use faithful to the Socratic method'],
+            question: 'מה פירוש טענתו של סארטר שהאדם "נידון להיות חופשי"?',
+            questionEn: 'What does Sartre\'s claim that a person is "condemned to be free" mean?',
+            options: ['שהחירות היא עונש שהחברה מטילה על האדם.', 'שהאדם חופשי לעשות כל דבר שירצה, ללא מגבלות או השלכות.', 'שהאדם לא בחר את עצם קיומו, אך הוא נדרש להתמודד עם האחריות לבחירותיו בתוך הנסיבות שאליהן נקלע.'],
+            optionsEn: ['That freedom is a punishment imposed on a person by society.', 'That a person is free to do anything they wish, without limits or consequences.', 'That a person did not choose their very existence, but must deal with the responsibility for their choices within the circumstances in which they find themselves.'],
             correctIndex: 2,
-            explanation: 'עבור סוקרטס, התהליך חשוב מהכלי. אם הטכנולוגיה משמשת כזרז לחשיבה עצמית ולא כתחליף לה, היא משרתת את המטרה הנעלה ביותר של הפילוסופיה.',
-            explanationEn: 'For Socrates, the process matters more than the tool. If the technology serves as a catalyst for independent thought and not as a substitute for it, it serves the highest goal of philosophy.',
+            explanation: 'לפי סארטר, אנחנו לא בוחרים את כל נסיבות חיינו, אבל איננו יכולים להימנע לחלוטין מהצורך לבחור כיצד לפעול בתוכן.',
+            explanationEn: 'According to Sartre, we do not choose all the circumstances of our lives, but we cannot completely avoid the need to choose how to act within them.'
           },
-          { type: 'quiz_summary' },
-        ],
+          {
+            type: 'quiz',
+            question: 'אדם אומר: "אני מתנהג כך כי זה האופי שלי. אין שום אפשרות שאשתנה." כיצד סארטר עשוי להתייחס לטענה?',
+            questionEn: 'A person says: "I behave this way because that\'s my character. There is no way I could change." How might Sartre respond to this claim?',
+            options: ['הוא עשוי לראות בה הונאה עצמית, משום שהאדם מציג את אופיו כעובדה קבועה ומכחיש את האפשרות לשנות את התנהגותו.', 'הוא יסכים, משום שלדעתו האישיות קובעת באופן מוחלט את מעשיו של האדם.', 'הוא יטען שהאדם משקר בהכרח לאחרים, גם אם הוא מאמין לחלוטין בדבריו.'],
+            optionsEn: ['He might see it as bad faith, because the person presents their character as a fixed fact and denies the possibility of changing their behavior.', 'He would agree, because in his view personality completely determines a person\'s actions.', 'He would claim that the person is necessarily lying to others, even if they fully believe their own words.'],
+            correctIndex: 0,
+            explanation: 'הונאה עצמית אצל סארטר כוללת ניסיון לראות בעצמנו דבר קבוע ומוגדר לחלוטין, וכך להתחמק מן האחריות לאפשרויות הפעולה שעדיין פתוחות בפנינו.',
+            explanationEn: 'Bad faith in Sartre includes an attempt to see ourselves as something fixed and fully defined, and thus to evade responsibility for the possibilities for action that remain open to us.'
+          },
+          {
+            type: 'quiz',
+            question: 'איזו ביקורת אפשר להפנות לתפיסת האחריות של סארטר?',
+            questionEn: 'What criticism can be leveled at Sartre\'s conception of responsibility?',
+            options: ['שהיא אינה מכירה כלל בקיומן של נסיבות חיצוניות המשפיעות על חיינו.', 'שהיא עלולה להמעיט בחשיבותן של מגבלות פסיכולוגיות וחברתיות, ולכן לייחס לאנשים אחריות רבה מדי למעשיהם.', 'שהיא מבטלת את האפשרות להטיל אחריות על בני אדם משום שכל מעשיהם נקבעים בידי סיבות חיצוניות.'],
+            optionsEn: ['That it does not acknowledge at all the existence of external circumstances that affect our lives.', 'That it may underestimate the importance of psychological and social constraints, and so attribute too much responsibility to people for their actions.', 'That it cancels the possibility of holding people responsible, because all their actions are determined by external causes.'],
+            correctIndex: 1,
+            explanation: 'סארטר מכיר בקיומן של נסיבות נתונות, אך מדגיש מאוד את חירות האדם ביחס אליהן. הביקורת היא שלעיתים מגבלות כמו התמכרות, קשיים נפשיים או תנאים חברתיים מצמצמות באופן משמעותי את אפשרויות הפעולה.',
+            explanationEn: 'Sartre acknowledges the existence of given circumstances, but strongly emphasizes human freedom in relation to them. The criticism is that constraints such as addiction, psychological difficulties, or social conditions sometimes significantly narrow the possibilities for action.'
+          },
+          { type: 'quiz_summary' }
+        ]
       }
     ]
   },

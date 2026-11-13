@@ -824,9 +824,9 @@ for (const { subject, data } of subjects) {
 const LENGTH_RULE_THRESHOLD = 0.60;
 const GRANDFATHER_LENGTH_CHECK = new Set([
   'philosophy:1', 'philosophy:2', 'philosophy:3', 'philosophy:4',
-  'philosophy:5', 'philosophy:bonus1',
+  'philosophy:5',
   'economics:1',  'economics:2',  'economics:3',  'economics:4',
-  'economics:5',  'economics:6',  'economics:bonusEcon1',
+  'economics:5',  'economics:6',
   'psychology:1', 'psychology:2', 'psychology:3', 'psychology:4',
   'psychology:5', 'psychology:6', 'psychology:bonusPsy1',
 ]);
@@ -874,6 +874,22 @@ const LENGTH_CHECK_EXCEPTIONS = new Set([
   // release by widening the wrong options; same policy as the three
   // entries above.
   'philosophy:7',
+  // Added 2026-11-12 during the philosophy:bonus2 (Is Our Attention
+  // Free?) verbatim import. Same shape as the entries above: each quiz
+  // pairs a full-sentence correct answer (restating the dialogue's
+  // Spinoza / Hume / Libet / Kant / Sartre thesis) with two short
+  // distractors that are deliberate misreadings. Strict-longest hits
+  // 14/15 (93%) HE and 15/15 (100%) EN. Author approved import as-is;
+  // rewriting distractors would mean rewriting the source doc.
+  'philosophy:bonus2',
+  // Added 2026-11-12 during the economics:bonusEcon2 (Will AI Take Your
+  // Job?) verbatim import. Same shape as philosophy:bonus2 above: each
+  // quiz pairs a full-sentence correct answer (restating the dialogue's
+  // Ricardo / Marx / Keynes / Simon / Acemoglu thesis) with two short
+  // distractors that are deliberate misreadings. Strict-longest hits
+  // 15/15 (100%) HE and 15/15 (100%) EN. Author approved import as-is;
+  // rewriting distractors would mean rewriting the source doc.
+  'economics:bonusEcon2',
 ]);
 
 const lengthIssues = [];

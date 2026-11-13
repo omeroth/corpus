@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-02T15:14:45.065Z",
+  "generatedAt": "2026-11-13T09:57:13.108Z",
   "items": [
     {
       "weekId": 1,
@@ -288,104 +288,104 @@
       "page": "d/phil-2-7-en.html"
     },
     {
-      "weekId": "bonus1",
+      "weekId": "bonus2",
       "dayId": 1,
       "subject": "philosophy",
       "lang": "he",
-      "thinkerId": "kant",
-      "title": "האם מותר ל-AI לשקר",
-      "card": "share/cards/he/phil-bonus1-1.png",
-      "page": "d/phil-bonus1-1-he.html"
+      "thinkerId": "spinoza",
+      "title": "שפינוזה: האם תשומת הלב שלך באמת נתונה לבחירתך?",
+      "card": "share/cards/he/phil-bonus2-1.png",
+      "page": "d/phil-bonus2-1-he.html"
     },
     {
-      "weekId": "bonus1",
+      "weekId": "bonus2",
       "dayId": 1,
       "subject": "philosophy",
       "lang": "en",
+      "thinkerId": "spinoza",
+      "title": "Spinoza: Is Your Attention Really Yours to Choose?",
+      "card": "share/cards/en/phil-bonus2-1.png",
+      "page": "d/phil-bonus2-1-en.html"
+    },
+    {
+      "weekId": "bonus2",
+      "dayId": 2,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "hume",
+      "title": "דיוויד יום: למה לדעת שזה מזיק לא מספיק כדי להפסיק?",
+      "card": "share/cards/he/phil-bonus2-2.png",
+      "page": "d/phil-bonus2-2-he.html"
+    },
+    {
+      "weekId": "bonus2",
+      "dayId": 2,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "hume",
+      "title": "David Hume: Why Isn't Knowing It's Harmful Enough to Make Us Stop?",
+      "card": "share/cards/en/phil-bonus2-2.png",
+      "page": "d/phil-bonus2-2-en.html"
+    },
+    {
+      "weekId": "bonus2",
+      "dayId": 3,
+      "subject": "philosophy",
+      "lang": "he",
+      "thinkerId": "libet",
+      "title": "ליבט: האם המוח מחליט לפנינו?",
+      "card": "share/cards/he/phil-bonus2-3.png",
+      "page": "d/phil-bonus2-3-he.html"
+    },
+    {
+      "weekId": "bonus2",
+      "dayId": 3,
+      "subject": "philosophy",
+      "lang": "en",
+      "thinkerId": "libet",
+      "title": "Libet: Does the Brain Decide Before Us?",
+      "card": "share/cards/en/phil-bonus2-3.png",
+      "page": "d/phil-bonus2-3-en.html"
+    },
+    {
+      "weekId": "bonus2",
+      "dayId": 4,
+      "subject": "philosophy",
+      "lang": "he",
       "thinkerId": "kant",
-      "title": "Can AI Be Allowed to Lie",
-      "card": "share/cards/en/phil-bonus1-1.png",
-      "page": "d/phil-bonus1-1-en.html"
+      "title": "קאנט: האם אפשר להיות אחראים למעשינו?",
+      "card": "share/cards/he/phil-bonus2-4.png",
+      "page": "d/phil-bonus2-4-he.html"
     },
     {
-      "weekId": "bonus1",
-      "dayId": 2,
-      "subject": "philosophy",
-      "lang": "he",
-      "thinkerId": "mill",
-      "title": "הרכב שמחליט מי חי",
-      "card": "share/cards/he/phil-bonus1-2.png",
-      "page": "d/phil-bonus1-2-he.html"
-    },
-    {
-      "weekId": "bonus1",
-      "dayId": 2,
-      "subject": "philosophy",
-      "lang": "en",
-      "thinkerId": "mill",
-      "title": "The Car That Chooses",
-      "card": "share/cards/en/phil-bonus1-2.png",
-      "page": "d/phil-bonus1-2-en.html"
-    },
-    {
-      "weekId": "bonus1",
-      "dayId": 3,
-      "subject": "philosophy",
-      "lang": "he",
-      "thinkerId": "aristotle",
-      "title": "מי אשם כשהמכונה טועה",
-      "card": "share/cards/he/phil-bonus1-3.png",
-      "page": "d/phil-bonus1-3-he.html"
-    },
-    {
-      "weekId": "bonus1",
-      "dayId": 3,
-      "subject": "philosophy",
-      "lang": "en",
-      "thinkerId": "aristotle",
-      "title": "Who's to Blame When AI Errs",
-      "card": "share/cards/en/phil-bonus1-3.png",
-      "page": "d/phil-bonus1-3-en.html"
-    },
-    {
-      "weekId": "bonus1",
-      "dayId": 4,
-      "subject": "philosophy",
-      "lang": "he",
-      "thinkerId": "nietzsche",
-      "title": "מי קובע את הערכים",
-      "card": "share/cards/he/phil-bonus1-4.png",
-      "page": "d/phil-bonus1-4-he.html"
-    },
-    {
-      "weekId": "bonus1",
+      "weekId": "bonus2",
       "dayId": 4,
       "subject": "philosophy",
       "lang": "en",
-      "thinkerId": "nietzsche",
-      "title": "Who Sets the Values",
-      "card": "share/cards/en/phil-bonus1-4.png",
-      "page": "d/phil-bonus1-4-en.html"
+      "thinkerId": "kant",
+      "title": "Kant: Can We Be Responsible for Our Actions?",
+      "card": "share/cards/en/phil-bonus2-4.png",
+      "page": "d/phil-bonus2-4-en.html"
     },
     {
-      "weekId": "bonus1",
+      "weekId": "bonus2",
       "dayId": 5,
       "subject": "philosophy",
       "lang": "he",
-      "thinkerId": "socrates",
-      "title": "מורה או מיילד",
-      "card": "share/cards/he/phil-bonus1-5.png",
-      "page": "d/phil-bonus1-5-he.html"
+      "thinkerId": "sartre",
+      "title": "סארטר: האם \"זו לא אשמתי\" הוא תירוץ?",
+      "card": "share/cards/he/phil-bonus2-5.png",
+      "page": "d/phil-bonus2-5-he.html"
     },
     {
-      "weekId": "bonus1",
+      "weekId": "bonus2",
       "dayId": 5,
       "subject": "philosophy",
       "lang": "en",
-      "thinkerId": "socrates",
-      "title": "Teacher or Midwife",
-      "card": "share/cards/en/phil-bonus1-5.png",
-      "page": "d/phil-bonus1-5-en.html"
+      "thinkerId": "sartre",
+      "title": "Sartre: Is \"It's Not My Fault\" an Excuse?",
+      "card": "share/cards/en/phil-bonus2-5.png",
+      "page": "d/phil-bonus2-5-en.html"
     },
     {
       "weekId": 3,
@@ -1408,104 +1408,104 @@
       "page": "d/econ-2-7-en.html"
     },
     {
-      "weekId": "bonusEcon1",
+      "weekId": "bonusEcon2",
       "dayId": 1,
       "subject": "economics",
       "lang": "he",
-      "thinkerId": "smith",
-      "title": "הפחד שמזיז מחירים",
-      "card": "share/cards/he/econ-bonusEcon1-1.png",
-      "page": "d/econ-bonusEcon1-1-he.html"
+      "thinkerId": "ricardo",
+      "title": "ריקרדו: האם מכונות יכולות לפגוע בעובדים?",
+      "card": "share/cards/he/econ-bonusEcon2-1.png",
+      "page": "d/econ-bonusEcon2-1-he.html"
     },
     {
-      "weekId": "bonusEcon1",
+      "weekId": "bonusEcon2",
       "dayId": 1,
       "subject": "economics",
       "lang": "en",
-      "thinkerId": "smith",
-      "title": "The Fear That Moves Prices",
-      "card": "share/cards/en/econ-bonusEcon1-1.png",
-      "page": "d/econ-bonusEcon1-1-en.html"
+      "thinkerId": "ricardo",
+      "title": "Ricardo: Can Machines Hurt Workers?",
+      "card": "share/cards/en/econ-bonusEcon2-1.png",
+      "page": "d/econ-bonusEcon2-1-en.html"
     },
     {
-      "weekId": "bonusEcon1",
+      "weekId": "bonusEcon2",
       "dayId": 2,
       "subject": "economics",
       "lang": "he",
-      "thinkerId": "jevons",
-      "title": "כשהשוליים קובעים הכל",
-      "card": "share/cards/he/econ-bonusEcon1-2.png",
-      "page": "d/econ-bonusEcon1-2-he.html"
+      "thinkerId": "marx",
+      "title": "מרקס: של מי המכונה?",
+      "card": "share/cards/he/econ-bonusEcon2-2.png",
+      "page": "d/econ-bonusEcon2-2-he.html"
     },
     {
-      "weekId": "bonusEcon1",
+      "weekId": "bonusEcon2",
       "dayId": 2,
       "subject": "economics",
       "lang": "en",
-      "thinkerId": "jevons",
-      "title": "When the Margin Rules",
-      "card": "share/cards/en/econ-bonusEcon1-2.png",
-      "page": "d/econ-bonusEcon1-2-en.html"
+      "thinkerId": "marx",
+      "title": "Marx: Whose Machine Is It?",
+      "card": "share/cards/en/econ-bonusEcon2-2.png",
+      "page": "d/econ-bonusEcon2-2-en.html"
     },
     {
-      "weekId": "bonusEcon1",
+      "weekId": "bonusEcon2",
       "dayId": 3,
       "subject": "economics",
       "lang": "he",
-      "thinkerId": "aquinas",
-      "title": "מחיר צודק או ניצול",
-      "card": "share/cards/he/econ-bonusEcon1-3.png",
-      "page": "d/econ-bonusEcon1-3-he.html"
+      "thinkerId": "keynes",
+      "title": "קיינס: ומה אם המכונות ישחררו אותנו?",
+      "card": "share/cards/he/econ-bonusEcon2-3.png",
+      "page": "d/econ-bonusEcon2-3-he.html"
     },
     {
-      "weekId": "bonusEcon1",
+      "weekId": "bonusEcon2",
       "dayId": 3,
       "subject": "economics",
       "lang": "en",
-      "thinkerId": "aquinas",
-      "title": "Just Price or Exploitation",
-      "card": "share/cards/en/econ-bonusEcon1-3.png",
-      "page": "d/econ-bonusEcon1-3-en.html"
+      "thinkerId": "keynes",
+      "title": "Keynes: What If Machines Free Us?",
+      "card": "share/cards/en/econ-bonusEcon2-3.png",
+      "page": "d/econ-bonusEcon2-3-en.html"
     },
     {
-      "weekId": "bonusEcon1",
+      "weekId": "bonusEcon2",
       "dayId": 4,
       "subject": "economics",
       "lang": "he",
-      "thinkerId": "ricardo",
-      "title": "מי מתעשר מהמשבר",
-      "card": "share/cards/he/econ-bonusEcon1-4.png",
-      "page": "d/econ-bonusEcon1-4-he.html"
+      "thinkerId": "simon",
+      "title": "סיימון: למה כל כך קשה לחזות מה מכונות יעשו?",
+      "card": "share/cards/he/econ-bonusEcon2-4.png",
+      "page": "d/econ-bonusEcon2-4-he.html"
     },
     {
-      "weekId": "bonusEcon1",
+      "weekId": "bonusEcon2",
       "dayId": 4,
       "subject": "economics",
       "lang": "en",
-      "thinkerId": "ricardo",
-      "title": "Who Profits From Crisis",
-      "card": "share/cards/en/econ-bonusEcon1-4.png",
-      "page": "d/econ-bonusEcon1-4-en.html"
+      "thinkerId": "simon",
+      "title": "Simon: Why Is It So Hard to Predict?",
+      "card": "share/cards/en/econ-bonusEcon2-4.png",
+      "page": "d/econ-bonusEcon2-4-en.html"
     },
     {
-      "weekId": "bonusEcon1",
+      "weekId": "bonusEcon2",
       "dayId": 5,
       "subject": "economics",
       "lang": "he",
-      "thinkerId": "sen",
-      "title": "מי באמת שילם",
-      "card": "share/cards/he/econ-bonusEcon1-5.png",
-      "page": "d/econ-bonusEcon1-5-he.html"
+      "thinkerId": "acemoglu",
+      "title": "אסמוגלו: האם הכיוון של הטכנולוגיה הוא בחירה?",
+      "card": "share/cards/he/econ-bonusEcon2-5.png",
+      "page": "d/econ-bonusEcon2-5-he.html"
     },
     {
-      "weekId": "bonusEcon1",
+      "weekId": "bonusEcon2",
       "dayId": 5,
       "subject": "economics",
       "lang": "en",
-      "thinkerId": "sen",
-      "title": "Who Really Paid",
-      "card": "share/cards/en/econ-bonusEcon1-5.png",
-      "page": "d/econ-bonusEcon1-5-en.html"
+      "thinkerId": "acemoglu",
+      "title": "Acemoglu: Is the Direction of Technology a Choice?",
+      "card": "share/cards/en/econ-bonusEcon2-5.png",
+      "page": "d/econ-bonusEcon2-5-en.html"
     },
     {
       "weekId": 3,

@@ -119,3 +119,6 @@ scripts/widget-preview/preview_cli
 # SwiftPM scratch inside Capacitor plugins (build output + per-user scheme state).
 plugins/*/.build/
 plugins/*/.swiftpm/
+
+# Gradle build output inside Capacitor plugins' android shim projects.
+plugins/*/android/build/

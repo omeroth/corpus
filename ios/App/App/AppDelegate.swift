@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import FBSDKCoreKit
 import WebKit
 
 @UIApplicationMain
@@ -8,6 +9,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Meta (Facebook) SDK bootstrap — must run HERE, before the
+        // ApplicationDelegate.shared.application(...) forwarding call just
+        // below. Previously initializeSDK() lived inside the plugin's
+        // load(), which Capacitor fires AFTER didFinishLaunchingWithOptions
+        // returns — so the hook had no initialized SDK to activate, the
+        // session never started, and Meta's Test Events / Events Manager
+        // saw zero events of any kind on iOS. The fix moves both the
+        // configuration flags and the init call up to this method so the
+        // SDK is live by the time the hook forwards launchOptions.
+        //
+        // The four Settings assignments below are the iOS half of the
+        // app-store privacy commitment: the ATT flag stays off, the
+        // IDFA-collection flag stays off, app-activation auto-logging is
+        // on, and SKAdNetwork reporting is on. The DO-NOT-CHANGE header
+        // in plugins/corpus-meta-events/ios/Sources/
+        // CorpusMetaEventsPlugin/CorpusMetaEventsPlugin.swift explains
+        // why each value is load-bearing for the App Store Connect
+        // privacy label; read it before touching any of the four.
+        // scripts/check-privacy-invariants.mjs enforces these exact
+        // assignments and the two SDK calls below via positive assertions.
+        Settings.shared.isAdvertiserTrackingEnabled = false
+        Settings.shared.isAdvertiserIDCollectionEnabled = false
+        Settings.shared.isAutoLogAppEventsEnabled = true
+        Settings.shared.isSKAdNetworkReportEnabled = true
+        ApplicationDelegate.shared.initializeSDK()
+        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
+
         // Re-inject safe-area insets when the device rotates so the layout
         // adapts (e.g. notch shifts to the side in landscape).
         NotificationCenter.default.addObserver(
@@ -69,9 +97,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        // Called when the app was launched with a url. Feel free to add additional processing here,
-        // but if you want the App API to support tracking app url opens, make sure to keep this call
-        return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
+        // Called when the app was launched with a url. Forward to BOTH
+        // Meta's ApplicationDelegate (handles the fb<appId>:// scheme for
+        // post-install deferred attribution and the Facebook Login
+        // callback) and Capacitor's ApplicationDelegateProxy (handles
+        // custom URL schemes, deep links, and OAuth callbacks for
+        // Apple/Google sign-in). OR'ing the return values lets each
+        // handler claim its own URLs; neither returns true for a URL it
+        // doesn't own, so there is no conflict, and Capacitor's existing
+        // deep-link handling is preserved intact.
+        let fbHandled  = ApplicationDelegate.shared.application(app, open: url, options: options)
+        let capHandled = ApplicationDelegateProxy.shared.application(app, open: url, options: options)
+        return fbHandled || capHandled
     }
 
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
