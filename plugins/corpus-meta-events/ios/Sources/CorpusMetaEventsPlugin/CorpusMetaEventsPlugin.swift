@@ -62,14 +62,22 @@ import UIKit
 //      guarded by check-privacy-invariants.mjs; whether 18.x reads that
 //      key is undocumented in the changelog, so keep the guard.
 //
-// The plugin.load() below sets the remaining safety flags to their safe
-// values BEFORE SDK initialization. Ordering matters: if any event is
-// logged before these flags are set, Meta's SDK reads the pre-set
-// defaults (which favor tracking, not privacy).
+// SDK initialization (the four Settings flags + initializeSDK() +
+// ApplicationDelegate.shared.application(_:didFinishLaunchingWithOptions:)
+// forwarding) lives in ios/App/App/AppDelegate.swift, NOT in this
+// plugin. The plugin.load() lifecycle hook runs AFTER Capacitor bridge
+// init, which is AFTER AppDelegate.didFinishLaunchingWithOptions
+// returns — so if init lived here, the AppDelegate hook would have
+// nothing to activate and the FB SDK session would never start (that
+// was the 2026-11-12 bug where Meta Test Events saw zero activity on
+// iOS). scripts/check-privacy-invariants.mjs enforces the four safe-
+// value assignments and the two SDK calls over there via positive
+// assertions.
 //
 // Test after any config change: on a fresh install, no ATT prompt should
 // appear; Meta Events Manager should show events as "unidentified" (no
-// linked advertiser id / Meta profile id).
+// linked advertiser id / Meta profile id), and fb_mobile_activate_app
+// should fire within seconds of app open.
 // ═══════════════════════════════════════════════════════════════════════════
 
 @objc(CorpusMetaEventsPlugin)
@@ -80,36 +88,10 @@ public class CorpusMetaEventsPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "logEvent", returnType: CAPPluginReturnPromise)
     ]
 
-    public override func load() {
-        // Rules 2 + 3 enforced HERE, before SDK init. Rule 5 (subscription
-        // auto-log) no longer has a code path to enforce on iOS —
-        // Settings.isAutoLogSubscriptionsEnabled was removed from the
-        // public API in FB SDK 18.x; see the header block above for the
-        // full note. Rule 2's assignment prints a runtime deprecation
-        // warning from the SDK in 18.x (expected) and is otherwise a
-        // no-op — kept as belt-and-braces + to satisfy the privacy-check
-        // positive-assertion.
-        Settings.shared.isAdvertiserTrackingEnabled = false
-        Settings.shared.isAdvertiserIDCollectionEnabled = false
-        // Auto-log app-activation events is OK — those don't carry IDFA once
-        // the two flags above are set. Auto-log subscription events used to
-        // be a distinct concern under rule 5 (Meta's SKPaymentQueue hook
-        // could attach receipt data with identifiers); in 18.x it's a
-        // server-side gate not a client flag, so there's no code to guard.
-        Settings.shared.isAutoLogAppEventsEnabled = true
-        // SKAdNetwork reporting: opt in. This is Apple's privacy-preserving
-        // attribution channel and is orthogonal to IDFA/tracking. Meta reads
-        // aggregated conversion signals from Apple, never per-user data.
-        Settings.shared.isSKAdNetworkReportEnabled = true
-
-        // Initialize the SDK after flags are set. The app-level
-        // ApplicationDelegate.application(_:didFinishLaunchingWithOptions:)
-        // call happens from AppDelegate.swift (Capacitor host) — this
-        // load() runs during Capacitor bridge init, which precedes the
-        // JS runtime by design, so our flags are always the ones in
-        // force when any event fires.
-        ApplicationDelegate.shared.initializeSDK()
-    }
+    // No load() override: the FB SDK is initialized in AppDelegate.swift
+    // (see the header block above for the ordering explanation). By the
+    // time Capacitor instantiates this plugin, AppEvents.shared is live
+    // and ready to accept logEvent calls.
 
     @objc func logEvent(_ call: CAPPluginCall) {
         guard let name = call.getString("name"), !name.isEmpty else {

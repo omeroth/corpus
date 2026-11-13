@@ -92,17 +92,28 @@ const STRUCTURED_CHECKS = [
     ] },
 ];
 
-// Positive assertions on plugin files themselves: not just "the flag NAME
-// appears in the comment" but "the flag is actually being set to the safe
-// value in the load() call". If a well-meaning refactor removes the safe-
-// value line while leaving the comment intact, this catches it.
+// Positive assertions: not just "the flag NAME appears in the comment" but
+// "the flag is actually being set to the safe value in real code". If a
+// well-meaning refactor removes the safe-value line while leaving the
+// comment intact, this catches it.
+//
+// The two iOS assertions moved from the plugin to AppDelegate.swift on
+// 2026-11-12 when the FB SDK init was lifted out of plugin.load() into
+// AppDelegate.didFinishLaunchingWithOptions (so the SDK session actually
+// starts — previously it did not, which killed Meta's Test Events on
+// iOS). The two new SDK-call assertions below pin the fix in place so a
+// future refactor can't silently regress it.
 const POSITIVE_CHECKS = [
-  { file: 'plugins/corpus-meta-events/ios/Sources/CorpusMetaEventsPlugin/CorpusMetaEventsPlugin.swift',
+  { file: 'ios/App/App/AppDelegate.swift',
     checks: [
-      { name: 'iOS plugin must set isAdvertiserTrackingEnabled = false',
+      { name: 'iOS AppDelegate must set isAdvertiserTrackingEnabled = false',
         need: /isAdvertiserTrackingEnabled\s*=\s*false\b/ },
-      { name: 'iOS plugin must set isAdvertiserIDCollectionEnabled = false',
+      { name: 'iOS AppDelegate must set isAdvertiserIDCollectionEnabled = false',
         need: /isAdvertiserIDCollectionEnabled\s*=\s*false\b/ },
+      { name: 'iOS AppDelegate must call ApplicationDelegate.shared.initializeSDK()',
+        need: /ApplicationDelegate\.shared\.initializeSDK\s*\(\s*\)/ },
+      { name: 'iOS AppDelegate must forward didFinishLaunchingWithOptions to ApplicationDelegate.shared',
+        need: /ApplicationDelegate\.shared\.application\s*\([^)]*didFinishLaunchingWithOptions/ },
     ] },
   { file: 'plugins/corpus-meta-events/android/src/main/java/com/corpusapp/metaevents/CorpusMetaEventsPlugin.java',
     checks: [
