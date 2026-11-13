@@ -28988,6 +28988,20 @@ let _paywallContext = null;
 // showPaywall / prep without an onClose is unaffected.
 let _paywallOnClose = null;
 
+// The `source` value stamped on paywall_shown — captured at open time
+// so every follow-up event in the same paywall session (paywall_cta_tapped,
+// paywall_purchase_*, paywall_restore_*, paywall_dismissed,
+// paywall_signin_gate_*) can echo it back, making placement-level
+// conversion queries a single groupBy instead of a cross-event join.
+// Set in both paywall_shown call sites (modal showPaywall and the
+// onboarding paywall prep), cleared in _exitPaywall after
+// paywall_dismissed fires so the dismiss event also carries it. Null
+// means "no active paywall" — events that read it during that window
+// fall back to 'unknown' via _paywallSource() rather than omitting the
+// field, so a query that filters on source never silently drops rows.
+let _activePaywallSource = null;
+function _paywallSource() { return _activePaywallSource || 'unknown'; }
+
 // Round 9 — shared .pop-v7 bottom-sheet helpers. Each callsite builds
 // an inner DOM, hands it to _popV7MountSheet, and the shared code
 // handles .pop-v7/.active toggle, scroll lock, backdrop tap, swipe
@@ -29283,8 +29297,12 @@ function showPaywall(opts) {
     //                    (ch1 → ch2 and ch6 → ch7 are the live cases).
     //                    Lets the funnel measure "did the free chapter
     //                    convert?" without a second query.
+    // Latch source for the whole paywall session so every follow-up
+    // event (cta_tapped, dismissed, purchase_*, restore_*,
+    // signin_gate_*) stamps the same placement value.
+    _activePaywallSource = opts.source || 'unknown';
     posthog.capture('paywall_shown', {
-      source: opts.source || 'unknown',
+      source: _activePaywallSource,
       subject: opts.subject || state.subject || null,
       week_id: typeof opts.weekId !== 'undefined' ? opts.weekId : null,
       day_id:  typeof opts.dayId  !== 'undefined' ? opts.dayId  : null,
@@ -29359,11 +29377,18 @@ function _exitPaywall(reason) {
   _lastPaywallDismissedAt = Date.now();
   try {
     posthog.capture('paywall_dismissed', {
+      source:           _paywallSource(),
       package_selected: _paywallSelectedPkg,
       source_mode:      _paywallMode,
       reason:           reason || 'unknown',
     });
   } catch(e) {}
+  // Clear the session latch AFTER paywall_dismissed captures it so a
+  // subsequent showPaywall starts a fresh session with a fresh source.
+  // Anything that reads _paywallSource() past this point (e.g. a late
+  // async callback from the prior session) sees 'unknown', which is
+  // the intended behaviour per spec #5.
+  _activePaywallSource = null;
   _paywallReturnTo = null;
   _paywallContext = null;
   // Fire the single-shot onClose hook if the caller passed one. Read
@@ -29677,7 +29702,7 @@ async function _requestSignInForPurchase(intent) {
       if (cancelBtn) cancelBtn.addEventListener('click', () => { try { _signInRequiredCancel(); } catch(_){} });
     }
   } catch (_) {}
-  try { _phCapture('paywall_signin_gate_shown', { intent: _signInGateIntent }); } catch(e) {}
+  try { _phCapture('paywall_signin_gate_shown', { intent: _signInGateIntent, source: _paywallSource() }); } catch(e) {}
 }
 
 function _closeSignInRequired() {
@@ -29687,7 +29712,7 @@ function _closeSignInRequired() {
 }
 
 function _signInRequiredCancel() {
-  try { _phCapture('paywall_signin_gate_cancel', { intent: _signInGateIntent }); } catch(e) {}
+  try { _phCapture('paywall_signin_gate_cancel', { intent: _signInGateIntent, source: _paywallSource() }); } catch(e) {}
   _signInGateIntent = null;
   _closeSignInRequired();
 }
@@ -29757,6 +29782,7 @@ async function startPurchase() {
   // reports actual intent — this event is the counterpart that counts
   // every tap regardless of outcome.
   try { posthog.capture('paywall_cta_tapped', {
+    source: _paywallSource(),
     intent: 'purchase',
     source_mode: _paywallMode,
     package_selected: _paywallSelectedPkg,
@@ -29789,6 +29815,7 @@ async function startPurchase() {
   _renderPaywall();
   const _offeringId = (_paywallActiveOffering() && _paywallActiveOffering().identifier) || null;
   try { posthog.capture('paywall_purchase_started', {
+    source: _paywallSource(),
     package_id: sel.pkg.identifier,
     offering_id: _offeringId,
     source_mode: _paywallMode,
@@ -29863,6 +29890,7 @@ async function startPurchase() {
         } catch (e) {}
       })();
       try { posthog.capture('paywall_purchase_succeeded', {
+        source: _paywallSource(),
         package_id: sel.pkg.identifier,
         is_trial: TRIAL_ENABLED && _paywallMode === 'onboarding',
         offering_id: _offeringId,
@@ -29945,6 +29973,7 @@ async function startPurchase() {
                   '— _exitPaywall NOT called, onClose stays:', typeof _paywallOnClose);
       // Purchase came back without the entitlement — treat as failure.
       try { posthog.capture('paywall_purchase_failed', {
+        source: _paywallSource(),
         package_id: sel.pkg.identifier, error_code: 'no_entitlement',
       }); } catch(e) {}
     }
@@ -29961,6 +29990,7 @@ async function startPurchase() {
     const cancelled = !!(e && (e.userCancelled || (e.errorCode === '1') || /cancel/i.test(String(e && e.message))));
     if (cancelled) {
       try { posthog.capture('paywall_purchase_cancelled', {
+        source:      _paywallSource(),
         package_id:  sel.pkg.identifier,
         source_mode: _paywallMode,
       }); } catch(_) {}
@@ -29968,6 +29998,7 @@ async function startPurchase() {
       const msg = (e && e.message) || 'Purchase failed';
       _showToast(state.lang === 'en' ? ('Purchase failed: ' + msg) : ('הרכישה נכשלה: ' + msg));
       try { posthog.capture('paywall_purchase_failed', {
+        source: _paywallSource(),
         package_id: sel.pkg.identifier,
         error_code: (e && (e.errorCode || e.code)) || 'unknown',
       }); } catch(_) {}
@@ -29983,6 +30014,7 @@ async function restorePurchases() {
   // is captured even when the call short-circuits — same rationale as
   // paywall_cta_tapped in startPurchase.
   try { posthog.capture('paywall_cta_tapped', {
+    source: _paywallSource(),
     intent: 'restore',
     source_mode: _paywallMode,
     is_signed_in: !!currentUser,
@@ -29995,7 +30027,7 @@ async function restorePurchases() {
   const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
   if (!P) return;
   const isEn = state.lang === 'en';
-  try { posthog.capture('paywall_restore_tapped'); } catch(e) {}
+  try { posthog.capture('paywall_restore_tapped', { source: _paywallSource() }); } catch(e) {}
   try {
     const info = await P.restorePurchases();
     // Same tripwire as startPurchase — surface every returned entitlement
@@ -30023,7 +30055,7 @@ async function restorePurchases() {
       })();
       // Explicit .catch() — try/catch would not catch the async rejection.
       loadSubscription().catch(e => console.error('[Sub] loadSubscription (restore) failed:', e));
-      try { posthog.capture('paywall_restore_result', { found: true }); } catch(e) {}
+      try { posthog.capture('paywall_restore_result', { source: _paywallSource(), found: true }); } catch(e) {}
       const returnTo = _paywallReturnTo;
       const wasModalMode = _paywallMode === 'modal';
       _exitPaywall('restore_success');
@@ -30041,7 +30073,7 @@ async function restorePurchases() {
         }, 500);
       }
     } else {
-      try { posthog.capture('paywall_restore_result', { found: false }); } catch(e) {}
+      try { posthog.capture('paywall_restore_result', { source: _paywallSource(), found: false }); } catch(e) {}
       const plat = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || 'ios';
       const storeName = plat === 'android' ? (isEn ? 'Google Play account' : 'חשבון Google Play')
                                            : (isEn ? 'Apple ID' : 'Apple ID');
@@ -33403,8 +33435,12 @@ function _onbV2PreparePaywall() {
   });
   _renderPaywall();
   try {
+    // Latch source for the whole paywall session so every follow-up
+    // event in this paywall instance stamps 'onboarding'. See the
+    // modal paywall_shown site for the full rationale.
+    _activePaywallSource = 'onboarding';
     posthog.capture('paywall_shown', {
-      source:        'onboarding',
+      source:        _activePaywallSource,
       subject:       state.subject || null,
       trial_enabled: TRIAL_ENABLED,
       offering_id:   (_paywallActiveOffering() && _paywallActiveOffering().identifier) || null,
