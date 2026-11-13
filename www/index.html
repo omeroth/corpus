@@ -17103,7 +17103,7 @@
      bottom without clipping into the next card. */
   .bonus-new-badge {
     position: absolute;
-    bottom: -22px;
+    bottom: -12px;
     inset-inline-end: 14px;
     z-index: 2;
     background: #FFC93C;
@@ -17119,21 +17119,24 @@
     text-transform: uppercase;
     pointer-events: none;
     overflow: hidden;
-    transform: rotate(4deg);
+    /* Negative tilt in EN points the end-edge UP toward the card's
+       top-right corner, so the sticker reads "lifting into the card"
+       instead of "slipping off the bottom". Mirrored in RTL below. */
+    transform: rotate(-4deg);
     transform-origin: center;
   }
   /* Only while the badge is in the DOM: add just enough margin below
-     the bonus chapter wrapper so the pill's ~22px overhang (bottom:-22)
-     doesn't crash into the next chapter card. Plain CSS :has() —
+     the bonus chapter wrapper so the pill's ~12px overhang doesn't
+     crash into the next chapter card. Plain CSS :has() —
      supported everywhere the app runs (WebKit 15.4+, Capacitor WK). */
   #screen-home.home-v7 .hv-chapter-bonus:has(.bonus-new-badge) {
-    margin-bottom: 26px;
+    margin-bottom: 16px;
   }
   html[lang="he"] .bonus-new-badge {
     font-family: 'Rubik', system-ui, sans-serif;
     font-weight: 800;
     letter-spacing: 0;
-    transform: rotate(-4deg);
+    transform: rotate(4deg);
   }
   .bonus-new-badge::before {
     content: '';
