@@ -13031,20 +13031,20 @@
     text-align: start;
   }
   #modal-bonus-info .bonusg-list li {
-    display: flex; flex-direction: column;
-    gap: 2px;
     padding: 8px 12px;
     background: rgba(123, 79, 212, 0.06);
     border-radius: 10px;
+    font-size: 14px; line-height: 1.35;
+    color: var(--text);
   }
   html.dark #modal-bonus-info .bonusg-list li { background: rgba(255, 255, 255, 0.05); }
-  #modal-bonus-info .bonusg-list-title {
-    font-size: 14px; font-weight: 800; line-height: 1.3;
+  #modal-bonus-info .bonusg-list-lead {
+    font-weight: 900;
     color: var(--ink);
   }
-  html.dark #modal-bonus-info .bonusg-list-title { color: var(--text); }
-  #modal-bonus-info .bonusg-list-thinker {
-    font-size: 12.5px; font-weight: 700; line-height: 1.25;
+  html.dark #modal-bonus-info .bonusg-list-lead { color: var(--text); }
+  #modal-bonus-info .bonusg-list-rest {
+    font-weight: 600;
     color: var(--text-2);
   }
 
@@ -45446,18 +45446,39 @@ function _openBonusSheet() {
   const subjLine = (_BONUS_BTN_SUBJECT_LINE[subject] || _BONUS_BTN_SUBJECT_LINE.philosophy)[isEn ? 'en' : 'he'];
   const eyebrow = isEn ? 'New bonus chapter' : 'פרק בונוס חדש';
   const ctaPrimary = isEn ? 'Open the chapter' : 'לפתיחת הפרק';
-  // Build the dialogue list (skip day 0 intros and summary-only days).
+  // Build the dialogue list (skip day 0 intros). Row format:
+  //   thinker days    — lead is the FULL thinker name (from the day's
+  //                     thinker field — the dialogue title's lastname-
+  //                     only prefix would duplicate), followed by the
+  //                     question part of the title (text after the
+  //                     first colon).
+  //   no-thinker days — lead is the text before the first colon
+  //                     (e.g. psychology D5 "Polymarket and Kalshi"),
+  //                     followed by the rest.
+  const questionAfterColon = (s) => {
+    const str = String(s || '');
+    const idx = str.indexOf(':');
+    return idx < 0 ? str.trim() : str.slice(idx + 1).trim();
+  };
+  const esc = (s) => String(s || '').replace(/</g, '&lt;');
   const listHtml = (wk && Array.isArray(wk.days))
     ? '<ul class="bonusg-list">' + wk.days
         .filter(d => d && d.id !== 0)
         .map(d => {
           const title = isEn ? (d.titleEn || d.title) : (d.title || d.titleEn);
           const thinker = isEn ? (d.thinkerEn || d.thinker || '') : (d.thinker || d.thinkerEn || '');
-          const titleEsc = String(title).replace(/</g, '&lt;');
-          const thinkerEsc = String(thinker).replace(/</g, '&lt;');
+          let lead, rest;
+          if (thinker && d.thinkerId) {
+            lead = thinker;
+            rest = questionAfterColon(title);
+          } else {
+            const idx = String(title || '').indexOf(':');
+            if (idx < 0) { lead = String(title || '').trim(); rest = ''; }
+            else { lead = String(title).slice(0, idx).trim(); rest = String(title).slice(idx + 1).trim(); }
+          }
           return '<li>' +
-                   '<span class="bonusg-list-title">' + titleEsc + '</span>' +
-                   (thinkerEsc ? '<span class="bonusg-list-thinker">' + thinkerEsc + '</span>' : '') +
+                   '<span class="bonusg-list-lead">' + esc(lead) + '</span>' +
+                   (rest ? ' <span class="bonusg-list-rest">' + esc(rest) + '</span>' : '') +
                  '</li>';
         })
         .join('') + '</ul>'
@@ -46952,7 +46973,7 @@ const CAROUSEL_ORDER = {
     // already listed above (D3), Frances (D4), Illouz (D5), Han (D6).
     // Four new ids this chapter.
     'lacan', 'frances', 'illouz', 'han',
-    // bonusPsy2: When Is the Crowd Wise? Kahneman (ch4) already listed
+    // bonusPsy2: Can You Trust the Crowd? Kahneman (ch4) already listed
     // above (D3). D5 (Polymarket + Kalshi) is a no-thinker summary day
     // and quotes Surowiecki as the source author only. Three new ids.
     'galton', 'asch', 'festinger',

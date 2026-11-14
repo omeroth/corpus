@@ -2463,8 +2463,8 @@ const psychologyData = {
     },
     {
       id: 'bonusPsy2',
-      title: 'מתי ההמון חכם?',
-      titleEn: 'When Is the Crowd Wise?',
+      title: 'האם אפשר לסמוך על ההמון?',
+      titleEn: 'Can You Trust the Crowd?',
       subtitle: 'ארבעה חוקרים על חוכמת ההמונים ושוקי תחזיות',
       subtitleEn: 'Four researchers on the wisdom of crowds and prediction markets',
       isBonus: true,
@@ -2490,8 +2490,8 @@ const psychologyData = {
               type: 'idea',
               title: 'מה נחקור?',
               titleEn: 'What will we explore?',
-              content: 'פרנסיס גלטון: כיצד הניחושים של 787 אנשים הצליחו להעריך בדיוק מפתיע את משקלו של שור?\n\nסולומון אש: מדוע אנשים מסכימים לפעמים עם הרוב גם כשהם יודעים שהוא טועה?\n\nדניאל כהנמן: מה ההבדל בין טעויות שמתקזזות לבין טעויות שנשארות גם כשאנשים רבים חושבים יחד?\n\nליאון פסטינגר: כיצד הרצון להיות צודקים משפיע על האמונות והשיפוטים שלנו?\n\nפולימרקט וקאלשי: האם שוקי תחזיות מצליחים להתגבר על הבעיות האלה ולנצל את חוכמת ההמונים?\n\nבסוף הפרק נחזור לשאלה שבה פתחנו: <strong>מתי כדאי לסמוך על דעת ההמון?</strong>',
-              contentEn: 'Francis Galton: How did the guesses of 787 people manage to estimate an ox\'s weight with surprising accuracy?\n\nSolomon Asch: Why do people sometimes agree with the majority even when they know it is wrong?\n\nDaniel Kahneman: What is the difference between errors that cancel out and errors that remain even when many people think together?\n\nLeon Festinger: How does the desire to be right affect our beliefs and judgments?\n\nPolymarket and Kalshi: Do prediction markets manage to overcome these problems and harness the wisdom of crowds?\n\nAt the end of the chapter we will return to the question we started with: <strong>when is it worth trusting the opinion of the crowd?</strong>'
+              content: '<strong>פרנסיס גלטון:</strong> כיצד הניחושים של 787 אנשים הצליחו להעריך בדיוק מפתיע את משקלו של שור?\n\n<strong>סולומון אש:</strong> מדוע אנשים מסכימים לפעמים עם הרוב גם כשהם יודעים שהוא טועה?\n\n<strong>דניאל כהנמן:</strong> מה ההבדל בין טעויות שמתקזזות לבין טעויות שנשארות גם כשאנשים רבים חושבים יחד?\n\n<strong>ליאון פסטינגר:</strong> כיצד הרצון להיות צודקים משפיע על האמונות והשיפוטים שלנו?\n\n<strong>פולימרקט וקאלשי:</strong> האם שוקי תחזיות מצליחים להתגבר על הבעיות האלה ולנצל את חוכמת ההמונים?\n\nבסוף הפרק נחזור לשאלה שבה פתחנו: <strong>מתי כדאי לסמוך על דעת ההמון?</strong>',
+              contentEn: '<strong>Francis Galton:</strong> How did the guesses of 787 people manage to estimate an ox\'s weight with surprising accuracy?\n\n<strong>Solomon Asch:</strong> Why do people sometimes agree with the majority even when they know it is wrong?\n\n<strong>Daniel Kahneman:</strong> What is the difference between errors that cancel out and errors that remain even when many people think together?\n\n<strong>Leon Festinger:</strong> How does the desire to be right affect our beliefs and judgments?\n\n<strong>Polymarket and Kalshi:</strong> Do prediction markets manage to overcome these problems and harness the wisdom of crowds?\n\nAt the end of the chapter we will return to the question we started with: <strong>when is it worth trusting the opinion of the crowd?</strong>'
             }
           ]
         },
