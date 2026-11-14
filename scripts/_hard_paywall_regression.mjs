@@ -525,6 +525,273 @@ async function simulatePostSignIn({ lang='en', subject='philosophy', theme='ligh
   await ctx.close();
 }
 
+// Case K — Frame monitor. For each scenario that must NOT paint the
+// paywall, install a MutationObserver that records every change to
+// #onb-v2-paywall's display + .onb-active class, plus sample the
+// element's computed display on every rAF for the duration of the
+// test. If no frame + no observed mutation shows the paywall visible,
+// PASS. Covers the bug: mid-flow signup must never flash the paywall.
+
+async function recordPaywallFrames(page, durationMs = 1500) {
+  await page.evaluate(() => {
+    window.__pwFrames = [];
+    window.__pwMutations = [];
+    const el = document.getElementById('onb-v2-paywall');
+    if (!el) return;
+    const obs = new MutationObserver(muts => {
+      for (const m of muts) {
+        window.__pwMutations.push({
+          attr: m.attributeName,
+          display: getComputedStyle(el).display,
+          active: el.classList.contains('onb-active'),
+          at: performance.now(),
+        });
+      }
+    });
+    obs.observe(el, { attributes: true, attributeFilter: ['style', 'class'] });
+    window.__pwObserver = obs;
+    const sample = () => {
+      try {
+        window.__pwFrames.push({
+          display: getComputedStyle(el).display,
+          active: el.classList.contains('onb-active'),
+          visible: el.offsetParent !== null,
+          at: performance.now(),
+        });
+      } catch(_){}
+      window.__pwRAF = requestAnimationFrame(sample);
+    };
+    window.__pwRAF = requestAnimationFrame(sample);
+  });
+  await page.waitForTimeout(durationMs);
+  const summary = await page.evaluate(() => {
+    try { if (window.__pwObserver) window.__pwObserver.disconnect(); } catch(_){}
+    try { if (window.__pwRAF) cancelAnimationFrame(window.__pwRAF); } catch(_){}
+    const frames = window.__pwFrames || [];
+    const muts   = window.__pwMutations || [];
+    const everVisible = frames.some(f => f.visible && f.display !== 'none');
+    const mutVisible  = muts.some(m => m.display !== 'none' && m.active);
+    return {
+      frameCount: frames.length,
+      mutCount:   muts.length,
+      everVisible: everVisible || mutVisible,
+      firstVisibleFrame: frames.find(f => f.visible && f.display !== 'none') || null,
+      firstVisibleMut: muts.find(m => m.display !== 'none' && m.active) || null,
+    };
+  });
+  return summary;
+}
+
+// K-a — new user, source=instagram, SIGNED_IN at step 23. enterAppUi
+// runs; the intercept must NOT jump to step 35.
+{
+  const ctx = await browser.newContext({ viewport: { width: 393, height: 852 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => {
+    window.__CORPUS_DEBUG_BUILD = true;
+    window.Capacitor = { isNativePlatform:()=>false, getPlatform:()=>'ios', Plugins:{ Haptics:{impact:async()=>({})}, SplashScreen:{hide:async()=>({})}, App:{addListener:()=>({remove:()=>{}}), minimizeApp:()=>{}}, Preferences:{get:async()=>({})}, StatusBar:{setStyle:async()=>({})} } };
+    try { localStorage.clear(); } catch(_){}
+    localStorage.setItem('corpus_subject', 'philosophy');
+    localStorage.setItem('corpus_lang', 'en');
+    localStorage.setItem('corpus_onboarding_step', '23');
+    localStorage.setItem('corpus_onboarding_flow_version', '7');
+  });
+  await page.goto(`http://127.0.0.1:${app.port}/index.html`, { waitUntil: 'load' });
+  await page.waitForTimeout(500);
+  await page.evaluate(() => {
+    state.onbAnswers = { source: 'instagram' };
+    state.completedDays = {};
+    state.isPaid = false;
+    currentUser = { id: 'user-new-A' };
+    try { appStarted = false; } catch(_){}
+    state.currentScreen = 'auth';
+  });
+  const framesStart = Date.now();
+  const paywallPromise = recordPaywallFrames(page, 1200);
+  // Fire enterAppUi — what the SIGNED_IN subscriber ultimately does.
+  // Then simulate the postAuthContinue inline advance 23→24, which
+  // races in production.
+  await page.evaluate(() => {
+    try { enterAppUi(); } catch(e) { console.error(e); }
+    try { _onbAdvanceStep(23, 24); } catch(e) {}
+  });
+  const summary = await paywallPromise;
+  const outcome = await page.evaluate(() => ({
+    pwActive: document.getElementById('onb-v2-paywall').classList.contains('onb-active'),
+    pwDisplay: getComputedStyle(document.getElementById('onb-v2-paywall')).display,
+    step: localStorage.getItem('corpus_onboarding_step'),
+  }));
+  if (!summary.everVisible && !outcome.pwActive && outcome.pwDisplay === 'none')
+    pass('Ka new user @23 sign-in: paywall never painted across ' + summary.frameCount + ' frames');
+  else fail('Ka new user signup flash', JSON.stringify({ summary, outcome, durationMs: Date.now()-framesStart }));
+  await ctx.close();
+}
+
+// K-b — new user, source=app_store. Same path, same expectation: no
+// flash. Also assert the eventual paywall render (when the user does
+// reach step 35 naturally) IS soft, not hard.
+{
+  const ctx = await browser.newContext({ viewport: { width: 393, height: 852 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => {
+    window.__CORPUS_DEBUG_BUILD = true;
+    window.Capacitor = { isNativePlatform:()=>false, getPlatform:()=>'ios', Plugins:{ Haptics:{impact:async()=>({})}, SplashScreen:{hide:async()=>({})}, App:{addListener:()=>({remove:()=>{}}), minimizeApp:()=>{}}, Preferences:{get:async()=>({})}, StatusBar:{setStyle:async()=>({})} } };
+    try { localStorage.clear(); } catch(_){}
+    localStorage.setItem('corpus_subject', 'philosophy');
+    localStorage.setItem('corpus_lang', 'en');
+    localStorage.setItem('corpus_onboarding_step', '23');
+    localStorage.setItem('corpus_onboarding_flow_version', '7');
+  });
+  await page.goto(`http://127.0.0.1:${app.port}/index.html`, { waitUntil: 'load' });
+  await page.waitForTimeout(500);
+  await page.evaluate(() => {
+    state.onbAnswers = { source: 'app_store' };
+    state.completedDays = {};
+    state.isPaid = false;
+    currentUser = { id: 'user-new-B' };
+    try { appStarted = false; } catch(_){}
+    state.currentScreen = 'auth';
+  });
+  const pr = recordPaywallFrames(page, 1200);
+  await page.evaluate(() => {
+    try { enterAppUi(); } catch(e) { console.error(e); }
+    try { _onbAdvanceStep(23, 24); } catch(e) {}
+  });
+  const summary = await pr;
+  if (!summary.everVisible) pass('Kb new user @23 soft-source sign-in: paywall never painted across ' + summary.frameCount + ' frames');
+  else fail('Kb new user soft-source flash', JSON.stringify(summary));
+  // Now jump the user to 35 naturally — at the end of onboarding — and
+  // confirm the paywall paints in SOFT mode (X visible).
+  await page.evaluate(() => {
+    try { _onbShowStep(35); } catch(e) {}
+  });
+  await page.waitForTimeout(300);
+  const info = await page.evaluate(() => ({
+    pwActive: document.getElementById('onb-v2-paywall').classList.contains('onb-active'),
+    pwHard: document.getElementById('onb-v2-paywall').classList.contains('pw-hard'),
+    skipVisible: getComputedStyle(document.getElementById('onb-v2-paywall-skip')).visibility !== 'hidden',
+  }));
+  if (info.pwActive && !info.pwHard && info.skipVisible) pass('Kb paywall at step 35 reaches SOFT mode for app_store');
+  else fail('Kb step 35 soft', JSON.stringify(info));
+  await ctx.close();
+}
+
+// K-c — hard user signs out at paywall + back in → hard paywall.
+// Reuses the escrow setup; asserts the paywall DOES appear in hard
+// mode after enterAppUi (this is the one scenario where it SHOULD).
+{
+  const ctx = await browser.newContext({ viewport: { width: 393, height: 852 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => {
+    window.__CORPUS_DEBUG_BUILD = true;
+    window.Capacitor = { isNativePlatform:()=>false, getPlatform:()=>'ios', Plugins:{ Haptics:{impact:async()=>({})}, SplashScreen:{hide:async()=>({})}, App:{addListener:()=>({remove:()=>{}}), minimizeApp:()=>{}}, Preferences:{get:async()=>({})}, StatusBar:{setStyle:async()=>({})} } };
+    try { localStorage.clear(); } catch(_){}
+    localStorage.setItem('corpus_subject', 'philosophy');
+    localStorage.setItem('corpus_lang', 'en');
+    localStorage.setItem('corpus_onboarding_flow_version', '7');
+    localStorage.setItem('corpus_hard_paywall_escrow', '1');
+    localStorage.setItem('corpus_hard_paywall_escrow_uid', 'user-hard-A');
+  });
+  await page.goto(`http://127.0.0.1:${app.port}/index.html`, { waitUntil: 'load' });
+  await page.waitForTimeout(500);
+  await page.evaluate(() => {
+    state.onbAnswers = { source: 'instagram' };
+    state.completedDays = {};
+    state.isPaid = false;
+    currentUser = { id: 'user-hard-A' };
+    try { appStarted = false; } catch(_){}
+    state.currentScreen = 'auth';
+    try { enterAppUi(); } catch(e) { console.error(e); }
+  });
+  await page.waitForTimeout(400);
+  const info = await page.evaluate(() => ({
+    pwActive: document.getElementById('onb-v2-paywall').classList.contains('onb-active'),
+    pwHard: document.getElementById('onb-v2-paywall').classList.contains('pw-hard'),
+    pwVisible: getComputedStyle(document.getElementById('onb-v2-paywall')).display !== 'none',
+    step: localStorage.getItem('corpus_onboarding_step'),
+  }));
+  if (info.pwActive && info.pwHard && info.pwVisible && info.step === '35')
+    pass('Kc hard user sign-out → sign-in: hard paywall painted at step 35');
+  else fail('Kc hard resume regression', JSON.stringify(info));
+  await ctx.close();
+}
+
+// K-d — existing finished user signs in during onboarding. Paywall
+// must never flash — the finished gate marks done=1 and routes home.
+{
+  const ctx = await browser.newContext({ viewport: { width: 393, height: 852 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => {
+    window.__CORPUS_DEBUG_BUILD = true;
+    window.Capacitor = { isNativePlatform:()=>false, getPlatform:()=>'ios', Plugins:{ Haptics:{impact:async()=>({})}, SplashScreen:{hide:async()=>({})}, App:{addListener:()=>({remove:()=>{}}), minimizeApp:()=>{}}, Preferences:{get:async()=>({})}, StatusBar:{setStyle:async()=>({})} } };
+    try { localStorage.clear(); } catch(_){}
+    localStorage.setItem('corpus_subject', 'philosophy');
+    localStorage.setItem('corpus_lang', 'en');
+    localStorage.setItem('corpus_onboarding_step', '12');
+    localStorage.setItem('corpus_onboarding_flow_version', '7');
+  });
+  await page.goto(`http://127.0.0.1:${app.port}/index.html`, { waitUntil: 'load' });
+  await page.waitForTimeout(500);
+  await page.evaluate(() => {
+    // Returning finished user: server restored completedAt + completedDays.
+    state.onbAnswers = { source: 'instagram', completedAt: '2026-08-01' };
+    state.completedDays = { 'philosophy-1-1': true, 'philosophy-1-2': true };
+    state.isPaid = false;
+    currentUser = { id: 'user-finished' };
+    try { appStarted = false; } catch(_){}
+    state.currentScreen = 'auth';
+  });
+  const pr = recordPaywallFrames(page, 1200);
+  await page.evaluate(() => { try { enterAppUi(); } catch(e) { console.error(e); } });
+  const summary = await pr;
+  const outcome = await page.evaluate(() => ({
+    done: localStorage.getItem('corpus_onboarding_done'),
+    homeVisible: getComputedStyle(document.getElementById('screen-home')).display !== 'none',
+  }));
+  if (!summary.everVisible && outcome.done === '1' && outcome.homeVisible)
+    pass('Kd finished user sign-in: paywall never painted across ' + summary.frameCount + ' frames; home shown');
+  else fail('Kd finished sign-in flash', JSON.stringify({ summary, outcome }));
+  await ctx.close();
+}
+
+// K-e — paid user: paywall must never flash.
+{
+  const ctx = await browser.newContext({ viewport: { width: 393, height: 852 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => {
+    window.__CORPUS_DEBUG_BUILD = true;
+    window.Capacitor = { isNativePlatform:()=>false, getPlatform:()=>'ios', Plugins:{ Haptics:{impact:async()=>({})}, SplashScreen:{hide:async()=>({})}, App:{addListener:()=>({remove:()=>{}}), minimizeApp:()=>{}}, Preferences:{get:async()=>({})}, StatusBar:{setStyle:async()=>({})} } };
+    try { localStorage.clear(); } catch(_){}
+    localStorage.setItem('corpus_subject', 'philosophy');
+    localStorage.setItem('corpus_lang', 'en');
+    localStorage.setItem('corpus_onboarding_step', '23');
+    localStorage.setItem('corpus_onboarding_flow_version', '7');
+  });
+  await page.goto(`http://127.0.0.1:${app.port}/index.html`, { waitUntil: 'load' });
+  await page.waitForTimeout(500);
+  await page.evaluate(() => {
+    state.onbAnswers = { source: 'instagram' };
+    state.completedDays = {};
+    state.isPaid = true;
+    currentUser = { id: 'user-paid-K' };
+    try { appStarted = false; } catch(_){}
+    state.currentScreen = 'auth';
+  });
+  const pr = recordPaywallFrames(page, 1200);
+  await page.evaluate(() => { try { enterAppUi(); } catch(e) { console.error(e); } });
+  const summary = await pr;
+  if (!summary.everVisible) pass('Ke paid user sign-in: paywall never painted across ' + summary.frameCount + ' frames');
+  else fail('Ke paid user flash', JSON.stringify(summary));
+  // Belt-and-braces: direct _onbShowStep(35) on this paid user still
+  // routes through _onbComplete without painting the shell.
+  const pr2 = recordPaywallFrames(page, 600);
+  await page.evaluate(() => { try { _onbShowStep(35); } catch(e) {} });
+  const summary2 = await pr2;
+  if (!summary2.everVisible) pass('Ke paid user direct _onbShowStep(35): paywall never painted across ' + summary2.frameCount + ' frames');
+  else fail('Ke paid _onbShowStep flash', JSON.stringify(summary2));
+  await ctx.close();
+}
+
 // Case I — screenshots.
 const SHOTS = [];
 for (const lang of ['en','he']) for (const theme of ['light','dark']) for (const [vw,vh] of [[393,852],[360,640]]) SHOTS.push({ lang, theme, vw, vh });
