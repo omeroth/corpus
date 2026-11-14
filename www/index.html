@@ -16381,9 +16381,16 @@
     flex-direction: column;
     width: 100%;
     padding: 0;
-    overflow: hidden;
-    flex: 1 1 auto;
-    min-height: 0;
+    /* Previously overflow:hidden + flex:1 clipped any content that
+       exceeded the viewport. The hard-mode additions (required-line
+       + Sign out / Delete footer) push the natural content height
+       past 852 on a 393-wide viewport, so the footer rows were
+       unreachable. Let the inner take its intrinsic height and let
+       the .onb-v7-mid parent's overflow-y: auto handle the scroll.
+       Bottom padding keeps the last footer row off the home-bar. */
+    overflow: visible;
+    flex: 0 0 auto;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   }
   .onb-screen.onb-v7#onb-v2-paywall .paywall-brand {
     margin-bottom: 4px;
@@ -16418,10 +16425,31 @@
     margin: 0 0 10px;
     line-height: 1.35;
   }
+  /* Timeline on the onboarding paywall. The shared #onb-v2-paywall rule
+     (line ~9314) draws the vertical line as a border-inline-start and
+     uses a negative margin on each dot to center it on that border.
+     That center-on-border trick makes the dots straddle the container
+     edge; on the 393×852 and 360×640 viewports, the paywall-inner's
+     padding doesn't leave any room for the overhang and the left half
+     of each dot gets clipped (half-moons visible in EN; mirror in HE).
+     Switch to a pseudo-element line inside the container so the dots
+     can sit fully within the content box with no clipping. */
   .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline {
     gap: 10px;
     margin: 6px 0 10px;
-    border-inline-start-width: 2px;
+    position: relative;
+    border-inline-start: 0;
+    padding-inline-start: 14px;
+  }
+  .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 5px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    background: var(--border);
+    border-radius: 1px;
   }
   .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline-step {
     gap: 12px;
@@ -16430,7 +16458,12 @@
     width: 12px;
     height: 12px;
     margin-top: 4px;
-    margin-inline-start: -13px;
+    /* Center the 12px dot on the 2px pseudo-line at inset-inline-start
+       5px (center at x=6). Content starts at x=14 after the padding.
+       margin = -(14 - 6 + 6) = -14 → dot start at x=0, center at x=6,
+       lining up with the line while sitting entirely inside the
+       container (no overhang past inset-inline-start:0). */
+    margin-inline-start: -14px;
   }
   .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline-title {
     font-size: 15px;
@@ -16540,9 +16573,11 @@
     .onb-screen.onb-v7#onb-v2-paywall .onb-v7-paywall-head img { width: 60px; }
     .onb-screen.onb-v7#onb-v2-paywall .onb-v7-paywall-head .paywall-headline { font-size: 19px; }
     .onb-screen.onb-v7#onb-v2-paywall .paywall-sub { font-size: 12.5px; margin-bottom: 6px; }
-    .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline { gap: 2px; margin: 2px 0; border-inline-start-width: 1.5px; }
+    .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline { gap: 2px; margin: 2px 0; padding-inline-start: 12px; }
+    .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline::before { inset-inline-start: 4px; width: 1.5px; top: 8px; bottom: 8px; }
     .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline-step { gap: 8px; }
-    .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline-dot { width: 8px; height: 8px; margin-top: 3px; margin-inline-start: -11px; }
+    /* Center 8px dot on 1.5px line at inset-start 4px (center ~4.75). Content at x=12. margin = -(12 - 4.75 + 4) = -11.25. */
+    .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline-dot { width: 8px; height: 8px; margin-top: 3px; margin-inline-start: -12px; }
     .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline-title { font-size: 12px; margin-bottom: 0; }
     .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline-body { font-size: 11.5px; line-height: 1.25; }
     .onb-screen.onb-v7#onb-v2-paywall .paywall-no-payment-due { padding: 3px 8px; font-size: 11.5px; margin: 2px 0 4px; }
@@ -34012,7 +34047,6 @@ function _onbV2PrepareSource() {
   if (fig && typeof _onbThinker === 'function') fig.src = _onbThinker('curious');
   const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
   setText('onb-v2-source-head', isEn ? 'How did you hear about Corpus?' : 'איך שמעת עלינו?');
-  setText('onb-v2-source-sub',  isEn ? 'It helps us find more people like you.' : 'זה עוזר לנו למצוא עוד אנשים כמוך.');
   setText('onb-v2-source-other-cta', isEn ? 'Continue' : 'המשך');
   const inp = document.getElementById('onb-v2-source-other-input');
   if (inp) {
@@ -62672,7 +62706,6 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
       <img id="onb-v7-source-fig" class="onb-v7-fig" alt="" aria-hidden="true">
       <div class="onb-v7-bub">
         <span id="onb-v2-source-head"></span>
-        <small class="onb-v7-greeting" id="onb-v2-source-sub"></small>
       </div>
     </div>
     <div class="onb-v7-opt-list" id="onb-v2-source-options"></div>

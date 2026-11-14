@@ -792,6 +792,58 @@ async function recordPaywallFrames(page, durationMs = 1500) {
   await ctx.close();
 }
 
+// Case L — Device-test fixes:
+//   La. Timeline dots are full circles (no left-side clip). Measure
+//       each dot's getBoundingClientRect vs the paywall-inner's rect;
+//       the dot's inline-start must be >= the inner's inline-start.
+//   Lb. Hard-mode content is reachable via scroll. At 393×852 the
+//       Sign out · Delete account row must be visible after scrolling
+//       .onb-v7-mid to the bottom.
+for (const [vw, vh] of [[393, 852], [360, 640]]) {
+  for (const lang of ['en','he']) {
+    const { ctx, page } = await freshPage({ lang, source: 'instagram', vw, vh });
+    // Trial timeline IS visible for hard-mode (TRIAL_ENABLED=true).
+    // La — no clip. Each timeline-dot's bounding rect must sit fully
+    // within the paywall-inner's bounding rect.
+    const clipInfo = await page.evaluate(() => {
+      const inner = document.querySelector('#onb-v2-paywall .onb-v2-paywall-inner');
+      const innerR = inner.getBoundingClientRect();
+      const dots = Array.from(document.querySelectorAll('#onb-v2-paywall .paywall-timeline-dot'));
+      return dots.map((d, i) => {
+        const r = d.getBoundingClientRect();
+        return {
+          i,
+          leftOk:  r.left  >= innerR.left  - 0.5,
+          rightOk: r.right <= innerR.right + 0.5,
+          w: r.width,
+          h: r.height,
+        };
+      });
+    });
+    const allClear = clipInfo.length === 3 && clipInfo.every(d => d.leftOk && d.rightOk && d.w > 0 && d.h > 0);
+    if (allClear) pass('La no dot clipping ' + lang + ' ' + vw + 'x' + vh + ' (' + clipInfo.length + ' dots fully within inner)');
+    else fail('La dot clip ' + lang + ' ' + vw + 'x' + vh, JSON.stringify(clipInfo));
+
+    // Lb — reachability of hard-mode footer via scroll.
+    const reachInfo = await page.evaluate(() => {
+      const mid = document.querySelector('#onb-v2-paywall .onb-v7-mid');
+      const footer = document.querySelector('#onb-v2-paywall .paywall-hard-footer a');
+      mid.scrollTop = mid.scrollHeight;
+      const midR = mid.getBoundingClientRect();
+      const fR = footer.getBoundingClientRect();
+      return {
+        scrollHeight: mid.scrollHeight,
+        clientHeight: mid.clientHeight,
+        canScroll: mid.scrollHeight > mid.clientHeight,
+        footerVisible: fR.bottom <= midR.bottom + 1 && fR.top >= midR.top - 1,
+      };
+    });
+    if (reachInfo.footerVisible) pass('Lb hard-mode footer reachable ' + lang + ' ' + vw + 'x' + vh + ' (scrollH=' + reachInfo.scrollHeight + ' clientH=' + reachInfo.clientHeight + ')');
+    else fail('Lb footer unreachable ' + lang + ' ' + vw + 'x' + vh, JSON.stringify(reachInfo));
+    await ctx.close();
+  }
+}
+
 // Case I — screenshots.
 const SHOTS = [];
 for (const lang of ['en','he']) for (const theme of ['light','dark']) for (const [vw,vh] of [[393,852],[360,640]]) SHOTS.push({ lang, theme, vw, vh });

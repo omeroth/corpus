@@ -112,10 +112,33 @@ let FAILS = 0;
       srcHeadText: src.querySelector('#onb-v2-source-head')?.textContent,
     };
   });
-  const same = JSON.stringify(info.src) === JSON.stringify(info.q1);
+  // row + fig + bub must match Q1; hint presence is intentionally not
+  // asserted — the source step has NO subtitle after the device-test
+  // fix, so info.src.hint === false while Q1's remains true. Font-size
+  // on the head span and head text presence are the real contract.
+  const same = info.src.row === info.q1.row
+            && info.src.fig === info.q1.fig
+            && info.src.bub === info.q1.bub
+            && info.src.hint === false;
   const sameFont = info.srcHeadFontSize === info.q1HeadFontSize;
-  if (same && sameFont && info.srcHeadText) pass('header shape + font-size match Q1 (' + info.srcHeadFontSize + ')');
+  if (same && sameFont && info.srcHeadText) pass('header shape (no subtitle) + font-size match Q1 (' + info.srcHeadFontSize + ')');
   else fail('header shape/font mismatch', JSON.stringify(info));
+  await ctx.close();
+}
+
+// 1b — Subtitle element gone (device-test fix: no "It helps us find
+// more people like you." or HE equivalent, DOM and copy both removed).
+{
+  const { ctx, page } = await freshPage({});
+  const info = await page.evaluate(() => {
+    const el = document.getElementById('onb-v2-source-sub');
+    // Also sweep all .onb-v7-greeting children under the source bubble.
+    const greeting = document.querySelector('#onb-v2-source .onb-v7-row .onb-v7-bub .onb-v7-greeting');
+    const text = document.querySelector('#onb-v2-source .onb-v7-row .onb-v7-bub').textContent.trim();
+    return { el: !!el, greeting: !!greeting, text };
+  });
+  if (!info.el && !info.greeting && info.text === 'How did you hear about Corpus?') pass('subtitle removed — head is the only line');
+  else fail('subtitle still present', JSON.stringify(info));
   await ctx.close();
 }
 
