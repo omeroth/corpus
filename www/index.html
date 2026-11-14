@@ -33085,6 +33085,9 @@ function _onbComplete() {
   // post-onboarding.
   try { localStorage.removeItem('corpus_hard_paywall_escrow'); } catch (_) {}
   try { localStorage.removeItem('corpus_hard_paywall_escrow_uid'); } catch (_) {}
+  // Clear the widget-step decision so a replay (fresh install or
+  // tester reset) always re-evaluates whether the step should run.
+  try { localStorage.removeItem('corpus_onboarding_widget_decision'); } catch (_) {}
   // Defensive: clear the two body classes that hide chrome via CSS.
   // body.on-subject-screen and body.drawer-open both apply
   // visibility:hidden to .topbar / .stats-subheader / .bottom-nav
@@ -33460,30 +33463,88 @@ function _onbV2CtaMirror() { _onbAdvanceStep(15, 16); }
 //   - Both paths advance to step 33 (reviews / testimonials),
 //     skipping the null slot 32 which represents the OS dialog in
 //     flight.
-// R41h / R41i — step 31 prep. Widget prompt is a real onboarding step
-// in slot 31. Flow:
-//   • Non-iOS (web / Android) → auto-advance to 32.
-//   • iOS, widget plugin reports installed=true within 500ms → auto-
-//     advance to 32 (the user already has it; don't make them tap past
-//     a redundant screen). Debug-build-only override:
-//     localStorage._corpus_force_widget_step='1' bypasses the skip so
-//     the step still shows on a tester's phone that has the widget.
-//   • iOS, installed=false OR check fails/times out → show the step.
-// The 500ms timeout keeps the step from stalling if the native plugin
-// never resolves; shipping the prompt is strictly better than hanging
-// mid-onboarding.
-function _onbV2PrepareWidget() {
+// R41h / R41i / 2026-11-14 — step 31 prep (widget prompt).
+//
+// Historical inconsistency (device-test report, 2026-11-14): the step
+// was sometimes shown and sometimes skipped across different runs of
+// onboarding on the same device. Root cause:
+//
+//   1. 500 ms vs plugin-cold-start race. _onbV2PrepareWidget runs on
+//      every entry to step 31. If the CorpusWidgetBridge plugin is
+//      still initialising at that moment (cold start, WKWebView
+//      finishing its bootstrap), bridge.isWidgetInstalled() settles
+//      LATER than 500 ms — the timeout fires, mountStep runs, the
+//      step shows. If the plugin is already warm (any subsequent
+//      enter, same-session replay, or warm-launch), the call resolves
+//      in ~50 ms and the installed branch wins.
+//
+//   2. WidgetKit cache stickiness. Once a user has placed the Corpus
+//      widget on their home screen, iOS keeps
+//      WidgetCenter.shared.getCurrentConfigurations returning that
+//      installation across app reinstalls (same bundle id). So a
+//      tester who ran the onboarding once, installed the widget,
+//      wiped localStorage and replayed — got auto-skip on the replay
+//      even though their "user state" was fresh.
+//
+//   3. The decision was re-computed on every prepare call, so a
+//      back-then-forward navigation could flip show→skip within the
+//      same onboarding run. Not a user-visible loop (step 31 has no
+//      back arrow today), but a latent determinism gap.
+//
+// New contract:
+//   • Non-iOS (web / Android): skip permanently. No plugin call.
+//   • iOS + localStorage._corpus_force_widget_step + debug build:
+//     force-show. Diagnostic only.
+//   • iOS + already-decided this onboarding run
+//     (corpus_onboarding_widget_decision ∈ {'show','skip'}):
+//     honor the stored decision.
+//   • iOS + first decision for this run: await the installed check
+//     with a 1 s timeout (longer than before — we now hide the shell
+//     while waiting, so a 1 s wait is invisible to the user and
+//     gives the cold-start plugin time to settle). Default to SHOW
+//     on timeout, error, or plugin unavailable.
+//   • The decision is cleared in _onbComplete (next fresh onboarding
+//     starts clean) and by window.__corpusResetOnboarding (the
+//     documented tester reset path).
+async function _onbV2PrepareWidget() {
   const screen = document.getElementById('onb-v2-widget');
   if (screen && typeof _onbV7Acc === 'function') _onbV7Acc(screen);
   const isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   const isIos = isNative && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'ios';
   if (!isIos) {
+    try { localStorage.setItem('corpus_onboarding_widget_decision', 'skip'); } catch (_) {}
     _onbAdvanceStep(31, 32);
     return;
   }
 
-  // Debug-build-only override (R41i): tester can force the step to
-  // show even when the widget is installed. Flag only honored when
+  // Honor the persisted decision so back-forward navigation stays
+  // consistent within the same onboarding run.
+  let decision = null;
+  try { decision = localStorage.getItem('corpus_onboarding_widget_decision'); } catch (_) {}
+  if (decision === 'skip') {
+    _onbAdvanceStep(31, 32);
+    return;
+  }
+
+  const mountStep = (reason) => {
+    try { localStorage.setItem('corpus_onboarding_widget_decision', 'show'); } catch (_) {}
+    _widgetPromptSource = 'onboarding_step31';
+    const fig = document.getElementById('onb-v7-widget-fig');
+    if (fig && typeof _onbThinker === 'function') fig.src = _onbThinker('point');
+    if (typeof _widgetPromptPopulate === 'function') {
+      try { _widgetPromptPopulate('initial'); } catch (_) {}
+    }
+    if (screen) screen.style.visibility = '';
+    try { _phCapture('widget_prompt_shown', { source: 'onboarding_step31', reason: reason || 'resolved_not_installed' }); } catch (_) {}
+  };
+
+  if (decision === 'show') {
+    mountStep('persisted_show');
+    return;
+  }
+
+  // Debug-build-only override: tester can force the step to show even
+  // when the widget is installed. Flag only honored when
   // __CORPUS_DEBUG_BUILD is true; Release builds ignore localStorage.
   let forceShow = false;
   try {
@@ -33492,55 +33553,66 @@ function _onbV2PrepareWidget() {
       forceShow = true;
     }
   } catch (_) {}
-
-  const mountStep = () => {
-    _widgetPromptSource = 'onboarding_step31';
-    const fig = document.getElementById('onb-v7-widget-fig');
-    if (fig && typeof _onbThinker === 'function') fig.src = _onbThinker('point');
-    if (typeof _widgetPromptPopulate === 'function') {
-      try { _widgetPromptPopulate('initial'); } catch (_) {}
-    }
-    try { _phCapture('widget_prompt_shown', { source: 'onboarding_step31', forced: forceShow }); } catch (_) {}
-  };
-
   if (forceShow) {
-    mountStep();
+    mountStep('debug_force');
     return;
   }
 
-  // Ask the native plugin whether the widget is already installed.
-  // Race the plugin call against a 500ms timeout — a missing /
-  // slow-to-resolve plugin shouldn't stall onboarding.
+  // Deterministic async decision path. Hide the shell's content while
+  // the plugin check is in flight so there's no partial paint — the
+  // user sees either the empty background during the brief wait or
+  // the fully-prepared step once mountStep runs.
+  if (screen) screen.style.visibility = 'hidden';
   const bridge = window.Capacitor.Plugins && window.Capacitor.Plugins.CorpusWidgetBridge;
   if (!bridge || typeof bridge.isWidgetInstalled !== 'function') {
-    mountStep();
+    mountStep('plugin_unavailable');
     return;
   }
-  let settled = false;
-  const timeoutId = setTimeout(() => {
-    if (settled) return;
-    settled = true;
-    mountStep();
-  }, 500);
-  Promise.resolve(bridge.isWidgetInstalled()).then((res) => {
-    if (settled) return;
-    settled = true;
-    clearTimeout(timeoutId);
-    const installed = !!(res && res.installed);
-    const supported = !(res && res.supported === false);
+  const TIMEOUT_MS = 1000;
+  const result = await Promise.race([
+    Promise.resolve(bridge.isWidgetInstalled()).then(res => ({ kind: 'resolved', res })).catch(err => ({ kind: 'error', err })),
+    new Promise(r => setTimeout(() => r({ kind: 'timeout' }), TIMEOUT_MS)),
+  ]);
+  if (result.kind === 'resolved') {
+    const res = result.res || {};
+    const installed = !!res.installed;
+    const supported = !(res.supported === false);
     if (supported && installed) {
+      try { localStorage.setItem('corpus_onboarding_widget_decision', 'skip'); } catch (_) {}
       try { _phCapture('widget_prompt_auto_skipped', { source: 'onboarding_step31', reason: 'installed' }); } catch (_) {}
       _onbAdvanceStep(31, 32);
-    } else {
-      mountStep();
+      return;
     }
-  }).catch(() => {
-    if (settled) return;
-    settled = true;
-    clearTimeout(timeoutId);
-    mountStep();
-  });
+    mountStep(supported ? 'resolved_not_installed' : 'resolved_unsupported');
+    return;
+  }
+  // timeout or error → default to SHOW on supported platforms.
+  mountStep(result.kind === 'timeout' ? 'timeout' : 'plugin_error');
 }
+
+// Documented tester helper — clears every onboarding-scoped local
+// flag so the next app open re-runs the full flow deterministically,
+// including the widget step. Does NOT touch currentUser or server
+// state; sign out separately if you want a true guest replay.
+window.__corpusResetOnboarding = function () {
+  const keys = [
+    'corpus_onboarding_done',
+    'corpus_onboarding_step',
+    'corpus_onboarding_flow_version',
+    'corpus_onboarding_widget_decision',
+    'corpus_hard_paywall_escrow',
+    'corpus_hard_paywall_escrow_uid',
+  ];
+  for (const k of keys) { try { localStorage.removeItem(k); } catch (_) {} }
+  // Also clear any transient onbAnswers so the attribution question
+  // re-fires. onboarding_answers on the server is untouched — if the
+  // user signs back in with the same account, the server copy will
+  // repopulate state.onbAnswers on enterAppState.
+  if (typeof state !== 'undefined' && state) {
+    state.onbAnswers = {};
+  }
+  console.log('[__corpusResetOnboarding] cleared. Reload the app to replay onboarding.');
+};
 
 function _onbV2PrepareNotifications() {
   const screen = document.getElementById('onb-v2-notifications');
