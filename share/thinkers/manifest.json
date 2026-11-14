@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-13T09:57:22.651Z",
+  "generatedAt": "2026-11-14T16:33:36.280Z",
   "items": [
     {
       "thinkerId": "socrates",
@@ -902,6 +902,36 @@
       "page": "t/han-he.html"
     },
     {
+      "thinkerId": "galton",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "פרנסיס גלטון",
+      "era": "1822–1911",
+      "cardLandscape": "share/thinkers/he/galton.png",
+      "cardPortrait": "share/thinkers/portrait/he/galton.png",
+      "page": "t/galton-he.html"
+    },
+    {
+      "thinkerId": "asch",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "סולומון אש",
+      "era": "1907–1996",
+      "cardLandscape": "share/thinkers/he/asch.png",
+      "cardPortrait": "share/thinkers/portrait/he/asch.png",
+      "page": "t/asch-he.html"
+    },
+    {
+      "thinkerId": "festinger",
+      "subject": "psychology",
+      "lang": "he",
+      "name": "ליאון פסטינגר",
+      "era": "1919–1989",
+      "cardLandscape": "share/thinkers/he/festinger.png",
+      "cardPortrait": "share/thinkers/portrait/he/festinger.png",
+      "page": "t/festinger-he.html"
+    },
+    {
       "thinkerId": "socrates",
       "subject": "philosophy",
       "lang": "en",
@@ -1800,6 +1830,36 @@
       "cardLandscape": "share/thinkers/en/han.png",
       "cardPortrait": "share/thinkers/portrait/en/han.png",
       "page": "t/han-en.html"
+    },
+    {
+      "thinkerId": "galton",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Francis Galton",
+      "era": "1822–1911",
+      "cardLandscape": "share/thinkers/en/galton.png",
+      "cardPortrait": "share/thinkers/portrait/en/galton.png",
+      "page": "t/galton-en.html"
+    },
+    {
+      "thinkerId": "asch",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Solomon Asch",
+      "era": "1907–1996",
+      "cardLandscape": "share/thinkers/en/asch.png",
+      "cardPortrait": "share/thinkers/portrait/en/asch.png",
+      "page": "t/asch-en.html"
+    },
+    {
+      "thinkerId": "festinger",
+      "subject": "psychology",
+      "lang": "en",
+      "name": "Leon Festinger",
+      "era": "1919–1989",
+      "cardLandscape": "share/thinkers/en/festinger.png",
+      "cardPortrait": "share/thinkers/portrait/en/festinger.png",
+      "page": "t/festinger-en.html"
     }
   ]
 }
