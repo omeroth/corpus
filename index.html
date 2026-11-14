@@ -39637,7 +39637,7 @@ function loadState() {
   // hydrate entries the store already has, and normalise the field
   // types for entries that came in from a cloud merge.
   if (state.bonusNewBadge && typeof state.bonusNewBadge === 'object') {
-    for (const bid of ['bonus2', 'bonusEcon2']) {
+    for (const bid of ['bonus2', 'bonusEcon2', 'bonusPsy2']) {
       const e = state.bonusNewBadge[bid];
       if (e && typeof e === 'object') {
         e.firstShownAt = +e.firstShownAt || 0;
@@ -43482,7 +43482,7 @@ function _buildWeekLockMap(chapters) {
 //
 // ─────────────────────────────────────────────────────────────
 // Free tier = chapter 1 of each subject. Chapters 2+ and every bonus
-// chapter (string IDs like 'bonus1', 'bonusEcon1', 'bonusPsy1' —
+// chapter (string IDs like 'bonus2', 'bonusEcon2', 'bonusPsy2' —
 // never === 1) require paid entitlement.
 //
 // Paid = state.isPaid (real Supabase entitlement from RC webhook)
@@ -43964,7 +43964,7 @@ function _highlightBonusCardOnHome() {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       const bonusId = state.subject === 'economics' ? 'bonusEcon2'
-                    : state.subject === 'psychology' ? 'bonusPsy1' : 'bonus2';
+                    : state.subject === 'psychology' ? 'bonusPsy2' : 'bonus2';
       const bonusCard = document.getElementById('level-card-' + bonusId);
       if (!bonusCard) return;
       try {
@@ -46497,7 +46497,7 @@ function renderHome() {
             ${showOrderCountdown ? `<div class="bonus-countdown">${cd}</div>` : ''}
           </div>
         `;
-        // NEW-badge sticker (bonus2 / bonusEcon2 only, 14-day window,
+        // NEW-badge sticker (bonus2 / bonusEcon2 / bonusPsy2, 14-day window,
         // dismissed on tap). Appended AFTER innerHTML so the sticker
         // survives any subsequent repaint of the card body.
         try {
@@ -55887,7 +55887,7 @@ function _hasBonusProgress(bonusChapterId) {
 // reason='auto' for the fresh-install default. The merge rule in
 // _mergeBonusNewBadgeEntry uses provenance so an auto-dismissal from
 // one device never silences an eligible entry from another.
-const _BONUS_NEW_BADGE_IDS = ['bonus2', 'bonusEcon2'];
+const _BONUS_NEW_BADGE_IDS = ['bonus2', 'bonusEcon2', 'bonusPsy2'];
 const _BONUS_NEW_BADGE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
 // Cleared when a NEW cloud pull starts (enterAppState) so the decision
 // re-runs after each sign-in. Kept session-scoped: once decided this
@@ -55995,7 +55995,7 @@ function _mergeBonusNewBadgeEntry(a, b) {
   if (pa === 3) return (+a.firstShownAt <= +b.firstShownAt) ? a : b;
   return a;  // priority 4, 2, 1 ties: either is equivalent
 }
-// Cloud-pull entry point. Merges a remote {bonus2:{...}, bonusEcon2:{...}}
+// Cloud-pull entry point. Merges a remote {bonus2:{...}, bonusEcon2:{...}, bonusPsy2:{...}}
 // bucket (read from coach_marks_shown.bonusNewBadge) into state.bonusNewBadge.
 // After this returns, _decideBonusNewBadgeEligibilityOnce will fill any
 // still-missing entries from the now-merged completedDays.
