@@ -835,7 +835,7 @@ for (const [lang, chosenSrc, expectHard] of [
     try { appStarted = false; } catch(_){}
     // Don't call real enterAppState — it reads from Supabase. Jump
     // directly to the advance the postAuthContinue would fire.
-    try { _onbAdvanceStep(23, 36); } catch(e) {}
+    try { _onbAdvanceStep(23, 37); } catch(e) {}
   });
   await page.waitForTimeout(300);
   // Assert we're on source.
@@ -844,7 +844,7 @@ for (const [lang, chosenSrc, expectHard] of [
     sourceVisible: getComputedStyle(document.getElementById('onb-v2-source')).display !== 'none',
     step: localStorage.getItem('corpus_onboarding_step'),
   }));
-  if (atSource.sourceActive && atSource.sourceVisible && atSource.step === '36') pass('M ' + lang + ' 23→36 landed on source after signup');
+  if (atSource.sourceActive && atSource.sourceVisible && atSource.step === '37') pass('M ' + lang + ' 23→37 landed on source after signup');
   else fail('M ' + lang + ' source landing', JSON.stringify(atSource));
 
   // Tap the chosen source.
@@ -880,6 +880,42 @@ for (const [lang, chosenSrc, expectHard] of [
   if (atPaywall.pwActive && atPaywall.pwHard === expectHard)
     pass('M ' + lang + ' paywall at 35: hard=' + atPaywall.pwHard + ' (expected ' + expectHard + ')');
   else fail('M ' + lang + ' paywall hard-mode', JSON.stringify(atPaywall));
+  await ctx.close();
+}
+
+// Case N — Soft-paywall X completes onboarding (2026-11-14 regression).
+// Device-test bug: the source step previously occupied slot 36, which
+// was also the paywall-close completion sentinel (_paywallOnClose does
+// _onbAdvanceStep(35, 36) → n>_ONB_TOTAL_STEPS → _onbComplete). Tapping
+// X on the soft paywall landed users on the source step instead of
+// home. Source has since moved to slot 37, 36 is vacant, and this test
+// nails the completion edge.
+for (const lang of ['en', 'he']) {
+  const { ctx, page } = await freshPage({ lang, source: 'app_store' });  // soft mode → X visible
+  // Simulate that the user has gone through the full flow already:
+  // currentUser set so _onbComplete's server-side hook has an id to
+  // write against.
+  await page.evaluate(() => {
+    currentUser = { id: 'user-paywall-x' };
+    state.onbAnswers = state.onbAnswers || {};
+    state.onbAnswers.source = 'app_store';
+  });
+  // Tap the X.
+  await page.evaluate(() => {
+    const x = document.getElementById('onb-v2-paywall-skip');
+    if (x) x.click();
+  });
+  await page.waitForTimeout(400);
+  const out = await page.evaluate(() => ({
+    done: localStorage.getItem('corpus_onboarding_done'),
+    pwActive: document.getElementById('onb-v2-paywall').classList.contains('onb-active'),
+    sourceActive: document.getElementById('onb-v2-source').classList.contains('onb-active'),
+    homeVisible: getComputedStyle(document.getElementById('screen-home')).display !== 'none',
+    step: localStorage.getItem('corpus_onboarding_step'),
+  }));
+  if (out.done === '1' && !out.pwActive && !out.sourceActive && out.homeVisible && !out.step)
+    pass('N ' + lang + ' soft paywall X → _onbComplete, home visible, done=1, no source');
+  else fail('N ' + lang + ' paywall X landed wrong', JSON.stringify(out));
   await ctx.close();
 }
 

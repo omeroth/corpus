@@ -58,8 +58,10 @@ async function freshPage({ lang='en', subject='philosophy', theme='light', vw=39
       // Stable icon order for the Instagram-first assertion. Ends with
       // tail (used_before, other) per the source step's contract.
       // _onbThinker reads this — step > 10 selects the subject thinker
-      // (smith/freud) instead of Socrates. Source step lives at slot 36.
-      localStorage.setItem('corpus_onboarding_step', '36');
+      // (smith/freud) instead of Socrates. Source step lives at slot 37
+      // (satellite past _ONB_TOTAL_STEPS=35; slot 36 is the paywall-
+      // close completion sentinel).
+      localStorage.setItem('corpus_onboarding_step', '37');
       localStorage.setItem('corpus_onboarding_source_order', JSON.stringify([
         'instagram','tiktok','friend','app_store','google','linkedin','threads','ai','used_before','other'
       ]));
