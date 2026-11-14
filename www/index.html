@@ -12734,82 +12734,151 @@
   }
 
   /* ── R38 chapter-6-free announcement ──────────────────────
-     Floating gift button on home + v7 bottom sheet + "🎁 Free"
-     pill on the chapter-6 card. Button sits at bottom inline-start
-     above the bottom nav; hides during the walkthrough and any
-     active sheet/popup. Marked seen in state.ch6GiftSheetSeen
-     (synced via coach_marks_shown JSONB). */
-  #ch6-gift-btn {
+     Floating bonus-chapter button on home — the "new bonus" tile,
+     brain icon, per-subject. 2026-11 took over the slot the ch6 gift
+     button used, keeping the same position, size, CSS pulse/pop, and
+     jump-column relayout. Attention cues (pulse + sparkles) are
+     strong until the user first opens the active subject's bonus,
+     then drop to a gentle shimmer. Shown to everyone in every
+     subject, permanently. Hides during the walkthrough and any
+     active sheet/popup. */
+  #bonus-btn {
     position: fixed;
-    /* R39 — gift tile lives in the SAME column as the jump button
-       (inset-inline-end: 18px, matching .hv-jump at 17509). JS
-       (_ch6GiftRelayout) recomputes `bottom` whenever the jump
-       button's visibility changes:
-         jump visible → gift stacks 12px above jump
-         jump hidden  → gift drops into jump's slot
-       Default `bottom` here is the jump-hidden baseline so the
-       first paint before JS runs matches the final layout, no jank.
-    */
+    /* Floating tile shares the jump button's column (inset-inline-end:
+       18px). JS (_bonusBtnRelayout) recomputes `bottom` whenever the
+       jump button's visibility flips:
+         jump visible → bonus stacks 12px above jump
+         jump hidden  → bonus drops into the jump's slot
+       Default `bottom` here matches the jump-hidden baseline so first
+       paint before JS runs has no layout shift. */
     bottom: calc(76px + var(--safe-bottom, 0px));
     inset-inline-end: 18px;
     z-index: 210;
     transition: bottom 200ms cubic-bezier(.3, 1.1, .5, 1), opacity 200ms ease;
     width: 56px; height: 56px;
     display: inline-flex; align-items: center; justify-content: center;
-    background: #FFF4DE;
-    border: 2px solid #F3C866;
+    background: #FFFFFF;
+    border: 2px solid var(--accent, #7B4FD4);
     border-radius: 18px;
-    box-shadow: 0 4px 0 #E0A93A, 0 8px 20px rgba(224, 169, 58, 0.28);
-    font-size: 28px; line-height: 1;
+    box-shadow: 0 4px 0 var(--accent-dark, #5A35A8), 0 8px 20px var(--accent-glow, rgba(123, 79, 212, 0.28));
+    line-height: 1;
     cursor: pointer;
+    overflow: hidden;              /* clip shimmer sweep */
     -webkit-tap-highlight-color: transparent;
-    animation: ch6GiftPop 420ms cubic-bezier(.3, 1.5, .5, 1) both;
+    animation: bonusBtnPop 420ms cubic-bezier(.3, 1.5, .5, 1) both;
   }
-  #ch6-gift-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #E0A93A, 0 4px 10px rgba(224, 169, 58, 0.28); }
-  #ch6-gift-btn::before,
-  #ch6-gift-btn::after {
+  html.dark #bonus-btn { background: var(--surface, #1A0E3C); }
+  #bonus-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--accent-dark, #5A35A8), 0 4px 10px var(--accent-glow, rgba(123, 79, 212, 0.28)); }
+  #bonus-btn > .bonus-btn-icon {
+    display: block;
+    width: 36px; height: 36px;
+    object-fit: contain;
+    pointer-events: none;
+    /* Keep the SVG above the shimmer sweep. */
+    position: relative; z-index: 2;
+  }
+  /* Attention rings — two offset pulses, strong mode. */
+  #bonus-btn::before,
+  #bonus-btn::after {
     content: ''; position: absolute; inset: -2px;
     border-radius: 20px;
-    border: 2px solid rgba(243, 200, 102, 0.65);
+    border: 2px solid var(--accent, rgba(123, 79, 212, 0.65));
+    opacity: 0.55;
     pointer-events: none;
-    animation: ch6GiftPulse 1.6s ease-out infinite;
+    animation: bonusBtnPulse 1.6s ease-out infinite;
   }
-  #ch6-gift-btn::after { animation-delay: 0.8s; }
-  #ch6-gift-btn > .ch6-gift-dot {
-    /* Red dot at the physical top-right corner of the tile, matching
-       the mockup. Hard-coded `right` instead of logical inset-inline-
-       end so the dot stays on the right in both languages (the tile
-       itself is now screen-LEFT in both). */
+  #bonus-btn::after { animation-delay: 0.8s; }
+  /* Shimmer sweep — diagonal highlight that travels across the tile.
+     Strong mode: every 1.8s. Gentle mode (.wt-seen): every 6s. */
+  #bonus-btn > .bonus-btn-icon::after {
+    /* No-op slot so .bonus-btn-icon acts as the clipper. The sweep
+       itself lives on the button's ::before layer via a separate
+       background on hover-less animation below. */
+  }
+  #bonus-btn {
+    background-image:
+      linear-gradient(115deg,
+        transparent 0%,
+        transparent 40%,
+        rgba(255, 255, 255, 0.55) 50%,
+        transparent 60%,
+        transparent 100%);
+    background-size: 220% 100%;
+    background-position: 100% 0;
+    background-repeat: no-repeat;
+    animation: bonusBtnPop 420ms cubic-bezier(.3, 1.5, .5, 1) both,
+               bonusBtnShimmer 1.8s ease-in-out 420ms infinite;
+  }
+  html.dark #bonus-btn {
+    background-image:
+      linear-gradient(115deg,
+        transparent 0%,
+        transparent 40%,
+        rgba(255, 255, 255, 0.18) 50%,
+        transparent 60%,
+        transparent 100%);
+  }
+  /* Red dot at the top-right corner — only in strong mode. */
+  #bonus-btn > .bonus-btn-dot {
     position: absolute; top: -4px; right: -4px;
     width: 14px; height: 14px; border-radius: 50%;
     background: #E8373C; border: 2px solid #FFFFFF;
+    z-index: 3;
   }
-  @keyframes ch6GiftPop {
+  /* Twinkle sparkles — three tiny diamonds around the tile, staggered
+     fade-in/out. Strong mode only; hidden on .wt-seen. */
+  #bonus-btn > .bonus-btn-spark {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: var(--accent, #7B4FD4);
+    transform: rotate(45deg) scale(0);
+    pointer-events: none;
+    z-index: 3;
+    animation: bonusBtnSparkle 1.8s ease-in-out infinite;
+    box-shadow: 0 0 6px var(--accent-glow, rgba(123, 79, 212, 0.65));
+  }
+  #bonus-btn > .bonus-btn-spark-1 { top: -6px; left: 10px; animation-delay: 0s; }
+  #bonus-btn > .bonus-btn-spark-2 { top: 18px; right: -8px; animation-delay: 0.6s; }
+  #bonus-btn > .bonus-btn-spark-3 { bottom: -4px; left: -6px; animation-delay: 1.2s; }
+  @keyframes bonusBtnPop {
     from { opacity: 0; transform: scale(0.6) translateY(8px); }
     to   { opacity: 1; transform: none; }
   }
-  @keyframes ch6GiftPulse {
+  @keyframes bonusBtnPulse {
     0%   { opacity: 0.55; transform: scale(1); }
     80%  { opacity: 0;    transform: scale(1.55); }
     100% { opacity: 0;    transform: scale(1.55); }
   }
-  @media (prefers-reduced-motion: reduce) {
-    #ch6-gift-btn::before, #ch6-gift-btn::after { animation: none; opacity: 0; }
-    /* Pop-in animation and the R39 jump-tracking slide both drop
-       to instant when the user prefers reduced motion. */
-    #ch6-gift-btn { animation: none; transition: none; }
-    #ch6-gift-caption { transition: opacity 0ms; }
+  @keyframes bonusBtnShimmer {
+    0%   { background-position: 100% 0; }
+    60%  { background-position: -60% 0; }
+    100% { background-position: -60% 0; }
   }
-  /* R38c — after the sheet has been opened, the tile stays on home
-     as a re-entry point but strips the attention cues: no pulse,
-     no dot, no caption (handled in JS). */
-  #ch6-gift-btn.wt-seen::before,
-  #ch6-gift-btn.wt-seen::after { display: none; }
-  #ch6-gift-btn.wt-seen > .ch6-gift-dot { display: none; }
+  @keyframes bonusBtnSparkle {
+    0%, 100% { transform: rotate(45deg) scale(0); opacity: 0; }
+    30%      { transform: rotate(45deg) scale(1); opacity: 1; }
+    60%      { transform: rotate(45deg) scale(0.4); opacity: 0.6; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bonus-btn::before, #bonus-btn::after { animation: none; opacity: 0; }
+    #bonus-btn > .bonus-btn-spark { animation: none; opacity: 0; }
+    #bonus-btn { animation: none; transition: none; background-image: none; }
+    #bonus-btn-caption { transition: opacity 0ms; }
+  }
+  /* Gentle mode — after the user has entered this subject's bonus.
+     Rings + sparkles + dot gone; shimmer slows to every ~6s. */
+  #bonus-btn.wt-seen::before,
+  #bonus-btn.wt-seen::after { display: none; }
+  #bonus-btn.wt-seen > .bonus-btn-dot,
+  #bonus-btn.wt-seen > .bonus-btn-spark { display: none; }
+  #bonus-btn.wt-seen {
+    animation: bonusBtnPop 420ms cubic-bezier(.3, 1.5, .5, 1) both,
+               bonusBtnShimmer 6s ease-in-out 420ms infinite;
+  }
   /* Caption pill — dark ink, white text; sits inline-end of the
-     button. Fades out after _CH6_CAPTION_SHOW_MS; show-again on
+     button. Fades out after _BONUS_BTN_CAPTION_SHOW_MS; show-again on
      every home mount via JS until the sheet is opened. */
-  #ch6-gift-caption {
+  #bonus-btn-caption {
     position: fixed;
     /* R39 — follows the gift tile (which lives in the jump
        button's column now). JS sets the exact `bottom` to be
@@ -12833,7 +12902,7 @@
      tile. Rotated square clipped by overflow via the pill's border-
      radius isn't ideal, so draw it as a separate rotated square via
      ::after. */
-  #ch6-gift-caption::after {
+  #bonus-btn-caption::after {
     content: ''; position: absolute;
     bottom: -4px;
     /* Tail at the inline-end of the pill, pointing down toward
@@ -12843,19 +12912,19 @@
     background: #2A1266;
     transform: rotate(45deg);
   }
-  #ch6-gift-caption.fade-out { opacity: 0; }
-  html.dark #ch6-gift-caption { background: #1A0E3C; }
+  #bonus-btn-caption.fade-out { opacity: 0; }
+  html.dark #bonus-btn-caption { background: #1A0E3C; }
   /* Hide the floating affordance during the walkthrough and while any
      active sheet/popup/modal is on top. :has() is supported in
      Capacitor WKWebView (Safari 15.4+). */
-  html.walkthrough-active #ch6-gift-btn,
-  html.walkthrough-active #ch6-gift-caption,
-  html:has(.modal-overlay.active) #ch6-gift-btn,
-  html:has(.modal-overlay.active) #ch6-gift-caption,
-  html:has(.pop-v7.active)        #ch6-gift-btn,
-  html:has(.pop-v7.active)        #ch6-gift-caption,
-  html:has(#modal-paywall.active) #ch6-gift-btn,
-  html:has(#modal-paywall.active) #ch6-gift-caption {
+  html.walkthrough-active #bonus-btn,
+  html.walkthrough-active #bonus-btn-caption,
+  html:has(.modal-overlay.active) #bonus-btn,
+  html:has(.modal-overlay.active) #bonus-btn-caption,
+  html:has(.pop-v7.active)        #bonus-btn,
+  html:has(.pop-v7.active)        #bonus-btn-caption,
+  html:has(#modal-paywall.active) #bonus-btn,
+  html:has(#modal-paywall.active) #bonus-btn-caption {
     display: none !important;
   }
 
@@ -12875,7 +12944,7 @@
   html.dark .level-card-header .ch-free-pill { background: rgba(255, 255, 255, 0.92); }
   .level-card-header .ch-free-pill > span { font-size: 13px; }
 
-  /* v7 bottom sheet content for #modal-ch6-gift. The outer shell
+  /* v7 bottom sheet content for #modal-bonus-info. The outer shell
      styling comes from the shared .pop-v7 / .pop-wrap rules; this
      block only names the inner elements the gift sheet uses.
 
@@ -12899,55 +12968,35 @@
      selector). Switching to overflow:visible lets the thinker
      overflow the sheet's top edge; the content fits under 90dvh on
      every supported device so no scroll is needed. */
-  #modal-ch6-gift.pop-v7 .modal-box { overflow: visible !important; }
-  /* R39e — the sheet is always a philosophy frame (announces
-     philosophy ch6 as free). Scope the philosophy palette to this
-     modal only so economics / psychology users still see the purple
-     accent inside the sheet without the rest of the app's theme
-     changing. Values mirror html.theme-philosophy at :root. */
-  #modal-ch6-gift.pop-v7 {
-    --accent: #7B4FD4;
-    --accent-dark: #5A35A8;
-    --accent-lo: #5A35A8;
-    --accent-glow: rgba(123, 79, 212, 0.3);
-    --accent-rgb: 123, 79, 212;
-    --accent-tint: #F5EFFE;
-    --on-accent: #FFFFFF;
-    --ink: #2A1266;
-    --text: #3D1F7A;
-    --text-2: #9A80C4;
-  }
-  html.dark #modal-ch6-gift.pop-v7 {
-    /* Match html.dark.theme-philosophy's text treatment so the sheet
-       stays readable in dark mode on any subject. */
-    --text: #F5F1FF;
-    --text-2: rgba(245, 241, 255, 0.65);
-    --ink: #F5F1FF;
-  }
+  #modal-bonus-info.pop-v7 .modal-box { overflow: visible !important; }
+  /* The bonus sheet inherits the active subject's accent palette from
+     the root <html> theme class (theme-philosophy / theme-economics /
+     theme-psychology) — no hardcoded colors here, so philosophy
+     purple, economics blue, psychology amber all render naturally. */
   /* R38d — align the sheet's font stack with home / the other v7
      surfaces (Nunito for EN; Rubik → Nunito for HE). Default body
      font (DM Sans) was leaking through. */
-  #modal-ch6-gift.pop-v7,
-  #modal-ch6-gift.pop-v7 * {
+  #modal-bonus-info.pop-v7,
+  #modal-bonus-info.pop-v7 * {
     font-family: 'Nunito', system-ui, sans-serif;
   }
-  html[dir="rtl"] #modal-ch6-gift.pop-v7,
-  html[dir="rtl"] #modal-ch6-gift.pop-v7 * {
+  html[dir="rtl"] #modal-bonus-info.pop-v7,
+  html[dir="rtl"] #modal-bonus-info.pop-v7 * {
     font-family: 'Rubik', 'Nunito', system-ui, sans-serif;
   }
-  #modal-ch6-gift .pop-wrap { padding-top: 0; overflow: visible; }
-  #modal-ch6-gift .ch6g-thinker {
+  #modal-bonus-info .pop-wrap { padding-top: 0; overflow: visible; }
+  #modal-bonus-info .bonusg-thinker {
     display: block; position: relative; z-index: 2;
     width: 120px; height: auto;
     margin: -60px auto 6px;        /* half above the sheet's top edge */
     pointer-events: none;
-    animation: ch6gThinkerPop 420ms cubic-bezier(.3, 1.5, .5, 1) both;
+    animation: bonusgThinkerPop 420ms cubic-bezier(.3, 1.5, .5, 1) both;
   }
-  @keyframes ch6gThinkerPop { from { opacity: 0; transform: scale(.85) translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes bonusgThinkerPop { from { opacity: 0; transform: scale(.85) translateY(10px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) {
-    #modal-ch6-gift .ch6g-thinker { animation: none; }
+    #modal-bonus-info .bonusg-thinker { animation: none; }
   }
-  #modal-ch6-gift .ch6g-eyebrow {
+  #modal-bonus-info .bonusg-eyebrow {
     display: block; width: fit-content;
     margin: 0 auto 10px;
     background: rgba(123, 79, 212, 0.12);
@@ -12957,26 +13006,54 @@
     font-size: 12px; font-weight: 900; letter-spacing: 1.5px;
     text-transform: uppercase;
   }
-  #modal-ch6-gift .ch6g-title {
+  #modal-bonus-info .bonusg-title {
     text-align: center;
     font-size: 25px; font-weight: 900; line-height: 1.2;
     color: var(--ink);
     margin: 0 16px 10px;
   }
-  html.dark #modal-ch6-gift .ch6g-title { color: var(--text); }
-  #modal-ch6-gift .ch6g-body {
+  html.dark #modal-bonus-info .bonusg-title { color: var(--text); }
+  #modal-bonus-info .bonusg-body {
     text-align: center;
     font-size: 15.5px; font-weight: 700; line-height: 1.5;
     color: var(--text-2);
+    margin: 0 20px 14px;
+  }
+  /* Dialogue list inside the bonus sheet — plain rows, each one a
+     dialogue title + thinker. No numbering, no icons — the sheet's
+     role is "here's what's inside", not "pick one". */
+  #modal-bonus-info .bonusg-list {
+    list-style: none;
     margin: 0 20px 18px;
+    padding: 0;
+    display: flex; flex-direction: column;
+    gap: 6px;
+    text-align: start;
+  }
+  #modal-bonus-info .bonusg-list li {
+    display: flex; flex-direction: column;
+    gap: 2px;
+    padding: 8px 12px;
+    background: rgba(123, 79, 212, 0.06);
+    border-radius: 10px;
+  }
+  html.dark #modal-bonus-info .bonusg-list li { background: rgba(255, 255, 255, 0.05); }
+  #modal-bonus-info .bonusg-list-title {
+    font-size: 14px; font-weight: 800; line-height: 1.3;
+    color: var(--ink);
+  }
+  html.dark #modal-bonus-info .bonusg-list-title { color: var(--text); }
+  #modal-bonus-info .bonusg-list-thinker {
+    font-size: 12.5px; font-weight: 700; line-height: 1.25;
+    color: var(--text-2);
   }
 
   /* Chapter card inside the sheet. Mirrors the home-v7 chapter
      banner CSS (see #screen-home.home-v7 .hv-chapter > .level-card
      et al.) so a user who sees ch6 on home + in the sheet gets the
-     same visual on both. Scoped to #modal-ch6-gift. */
-  #modal-ch6-gift .hv-chapter { margin: 0 20px 14px; }
-  #modal-ch6-gift .hv-chapter > .level-card {
+     same visual on both. Scoped to #modal-bonus-info. */
+  #modal-bonus-info .hv-chapter { margin: 0 20px 14px; }
+  #modal-bonus-info .hv-chapter > .level-card {
     background: var(--accent);
     color: #FFFFFF;
     border: none;
@@ -12987,14 +13064,14 @@
     cursor: default;
     margin: 0;
   }
-  html[dir="rtl"] #modal-ch6-gift .hv-chapter > .level-card {
+  html[dir="rtl"] #modal-bonus-info .hv-chapter > .level-card {
     padding: 12px 16px 12px 12px;
   }
-  #modal-ch6-gift .hv-chapter > .level-card .level-card-header {
+  #modal-bonus-info .hv-chapter > .level-card .level-card-header {
     display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;
     padding: 0;
   }
-  #modal-ch6-gift .hv-chapter > .level-card .level-num {
+  #modal-bonus-info .hv-chapter > .level-card .level-num {
     width: 36px; height: 36px;
     background: rgba(255, 255, 255, 0.22);
     border-radius: 10px;
@@ -13003,15 +13080,15 @@
     color: #FFFFFF;
     flex: 0 0 auto;
   }
-  #modal-ch6-gift .hv-chapter > .level-card .level-card-text {
+  #modal-bonus-info .hv-chapter > .level-card .level-card-text {
     flex: 1 1 auto; min-width: 0;
     display: flex; flex-direction: column; gap: 2px;
   }
-  #modal-ch6-gift .hv-chapter > .level-card .level-eyebrow {
+  #modal-bonus-info .hv-chapter > .level-card .level-eyebrow {
     font-size: 12px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;
     color: #FFFFFF; opacity: 0.85; margin: 0;
   }
-  #modal-ch6-gift .hv-chapter > .level-card .level-title {
+  #modal-bonus-info .hv-chapter > .level-card .level-title {
     /* R38d — single line, like the home card. Font sized via clamp
        so "Political Philosophy" (the longest EN title today) fits
        inside the text column that remains after the number box
@@ -13030,12 +13107,12 @@
     text-overflow: ellipsis;
     min-width: 0;
   }
-  #modal-ch6-gift .hv-chapter > .level-card .ch-free-pill {
+  #modal-bonus-info .hv-chapter > .level-card .ch-free-pill {
     flex: 0 0 auto;
     align-self: center;
   }
 
-  #modal-ch6-gift .pop-btn {
+  #modal-bonus-info .pop-btn {
     display: block; width: calc(100% - 40px); margin: 0 20px 10px;
     padding: 14px 16px;
     background: var(--accent); color: var(--on-accent);
@@ -13044,8 +13121,8 @@
     cursor: pointer; -webkit-tap-highlight-color: transparent;
     box-shadow: 0 4px 0 var(--accent-dark);
   }
-  #modal-ch6-gift .pop-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--accent-dark); }
-  #modal-ch6-gift .pop-link {
+  #modal-bonus-info .pop-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--accent-dark); }
+  #modal-bonus-info .pop-link {
     display: block; width: 100%;
     padding: 10px 16px 18px;
     background: transparent; border: none;
@@ -13055,7 +13132,7 @@
     text-transform: none; letter-spacing: normal;
     cursor: pointer; -webkit-tap-highlight-color: transparent;
   }
-  #modal-ch6-gift .pop-link:active { opacity: 0.6; }
+  #modal-bonus-info .pop-link:active { opacity: 0.6; }
 
   /* ── Walkthrough card (R37) ──────────────────────────────────
      Overlay chrome for the seven-screen home tour, plus the three
@@ -26435,7 +26512,7 @@
       </svg>
     </button>
     <!-- R38 chapter-6-free announcement. Mounted/removed by
-         _mountCh6GiftBtn() during renderHome. Lives inside
+         _mountBonusBtn() during renderHome. Lives inside
          #screen-home so switching screens hides it naturally. -->
   </div>
 
@@ -27088,8 +27165,8 @@
      _streakRepairV7Intro / _renderRepairQuestion / _showRepairResult. -->
 <div class="modal-overlay" id="modal-streak-repair"><div class="modal-box"></div></div>
 <!-- R38 — gift sheet shell. Content mounted on open via
-     _popV7MountSheet('modal-ch6-gift', …). -->
-<div class="modal-overlay" id="modal-ch6-gift"><div class="modal-box"></div></div>
+     _popV7MountSheet('modal-bonus-info', …). -->
+<div class="modal-overlay" id="modal-bonus-info"><div class="modal-box"></div></div>
 
 <!-- Screenshot-detected prompt — bottom pill, text only, dismissible.
      Fires ONLY on the two thinker surfaces (modal + dc-thinker-screen),
@@ -45179,29 +45256,30 @@ function _hvAwaitLayoutSettled(timeoutMs) {
   });
 }
 
-// ── R38 chapter-6-free gift announcement ─────────────────────────
-// Three surfaces, one state flag:
-//   #ch6-gift-btn      — floating gift tile on home, pulses + red dot.
-//   #ch6-gift-caption  — "You have a gift!" pill next to the tile,
-//                        fades out after _CH6_CAPTION_SHOW_MS.
-//   #modal-ch6-gift    — v7 bottom sheet; opens on tile tap.
-// state.ch6GiftSheetSeen is a single-tap-forever flag synced via the
-// coach_marks_shown JSONB (same pattern as streakIntro / framesExplainer).
-// Opening the sheet, OR seeing it marked seen in state, OR having any
-// completion in philosophy chapter 6, OR the subject not being
-// philosophy ALL suppress the button for good.
-const _CH6_CAPTION_SHOW_MS = 2200;   // visible duration before fade starts
-function _ch6GiftEligible() {
-  // R39f — the gift tile mounts for every user in every subject,
-  // including users with progress in philosophy ch6 or who have
-  // completed it. The sheet still frames "chapter 6 is free for
-  // everyone" and makes a good re-entry point into the content
-  // (via the "See the chapter" CTA that scrolls to #level-card-6
-  // after setSubject('philosophy')). The seen state (dot / pulse /
-  // caption suppression) is still owned by ch6GiftSheetSeen —
-  // handled inside _mountCh6GiftBtn. Visibility suppression (home
-  // not active, walkthrough running, any sheet/popup open) stays
-  // in CSS via :has()-gated hiding rules on #ch6-gift-btn.
+// ── New-bonus floating button ─────────────────────────────────────
+// Three surfaces:
+//   #bonus-btn          — floating brain tile on home, shimmer + sparkles.
+//   #bonus-btn-caption  — "New bonus chapter" pill next to the tile,
+//                         fades out after _BONUS_BTN_CAPTION_SHOW_MS.
+//   #modal-bonus-info   — v7 bottom sheet; opens on tile tap.
+// Shown to every user in every subject, permanently. Attention cues
+// (pulse + sparkles) stay strong until the user first opens the active
+// subject's bonus chapter (any day completed); after that the tile
+// drops to a gentle shimmer. Driven by _hasBonusProgress(bonusId) —
+// no stored "seen" flag, so the state is derived cleanly from
+// progress and survives re-installs via the cloud progress sync.
+const _BONUS_BTN_CAPTION_SHOW_MS = 2200;   // visible duration before fade starts
+// Map subject → bonus week id (the 2026-11 "new" bonuses).
+const _BONUS_BTN_IDS = { philosophy: 'bonus2', economics: 'bonusEcon2', psychology: 'bonusPsy2' };
+function _bonusBtnIdForSubject(subject) {
+  return _BONUS_BTN_IDS[subject || (state && state.subject) || 'philosophy'] || 'bonus2';
+}
+// Per-subject session-shown dedupe for the bonus_button_shown event.
+const _bonusBtnShownThisSession = {};
+function _bonusBtnEligible() {
+  // Always mount. Visibility suppression (home not active, walkthrough
+  // running, any sheet/popup open) stays in CSS via :has()-gated
+  // hiding rules on #bonus-btn.
   return true;
 }
 // R39 — the gift tile shares the jump button's column (both at
@@ -45213,14 +45291,14 @@ function _ch6GiftEligible() {
 // IntersectionObserver on the next-up node) to know when to
 // relayout. One observer per mount; disconnected when the tile is
 // re-mounted or removed.
-const _CH6_JUMP_GAP      = 12;      // vertical gap between jump and gift
-const _CH6_CAP_GAP       = 8;       // vertical gap between gift and caption
-let _ch6GiftJumpObserver = null;
-let _ch6GiftResizeHandler = null;
-function _ch6GiftRelayout() {
-  const gift = document.getElementById('ch6-gift-btn');
+const _BONUS_BTN_JUMP_GAP      = 12;      // vertical gap between jump and gift
+const _BONUS_BTN_CAP_GAP       = 8;       // vertical gap between gift and caption
+let _bonusBtnJumpObserver = null;
+let _bonusBtnResizeHandler = null;
+function _bonusBtnRelayout() {
+  const gift = document.getElementById('bonus-btn');
   if (!gift) return;
-  const cap  = document.getElementById('ch6-gift-caption');
+  const cap  = document.getElementById('bonus-btn-caption');
   const jump = document.getElementById('hv-jump');
   // R39f — treat offsetHeight===0 as hidden too, so a jump button
   // mid-transition (display:'' but visibility:hidden or 0-sized by
@@ -45239,7 +45317,7 @@ function _ch6GiftRelayout() {
   if (jumpVisible) {
     const jumpBottomCss = parseFloat(getComputedStyle(jump).bottom) || 0;
     const jumpHeight    = jump.offsetHeight || 56;
-    giftBottomCss = jumpBottomCss + jumpHeight + _CH6_JUMP_GAP;
+    giftBottomCss = jumpBottomCss + jumpHeight + _BONUS_BTN_JUMP_GAP;
     gift.style.bottom = giftBottomCss + 'px';
   } else {
     gift.style.bottom = '';
@@ -45248,199 +45326,190 @@ function _ch6GiftRelayout() {
     giftBottomCss = parseFloat(getComputedStyle(gift).bottom) || 0;
   }
   if (cap) {
-    cap.style.bottom = (giftBottomCss + giftHeight + _CH6_CAP_GAP) + 'px';
+    cap.style.bottom = (giftBottomCss + giftHeight + _BONUS_BTN_CAP_GAP) + 'px';
   }
 }
-function _ch6GiftWireJumpObserver() {
-  if (_ch6GiftJumpObserver) { try { _ch6GiftJumpObserver.disconnect(); } catch(_){} _ch6GiftJumpObserver = null; }
+function _bonusBtnWireJumpObserver() {
+  if (_bonusBtnJumpObserver) { try { _bonusBtnJumpObserver.disconnect(); } catch(_){} _bonusBtnJumpObserver = null; }
   const jump = document.getElementById('hv-jump');
   if (!jump) return;
-  _ch6GiftJumpObserver = new MutationObserver(() => _ch6GiftRelayout());
-  _ch6GiftJumpObserver.observe(jump, { attributes: true, attributeFilter: ['style'] });
+  _bonusBtnJumpObserver = new MutationObserver(() => _bonusBtnRelayout());
+  _bonusBtnJumpObserver.observe(jump, { attributes: true, attributeFilter: ['style'] });
 }
 
-function _mountCh6GiftBtn() {
+function _mountBonusBtn() {
   const home = document.getElementById('screen-home');
   if (!home) return;
   // Always clean previous mount so re-renders don't stack buttons.
-  const prevBtn = document.getElementById('ch6-gift-btn');
-  const prevCap = document.getElementById('ch6-gift-caption');
+  const prevBtn = document.getElementById('bonus-btn');
+  const prevCap = document.getElementById('bonus-btn-caption');
   if (prevBtn) prevBtn.remove();
   if (prevCap) prevCap.remove();
-  if (_ch6GiftJumpObserver) { try { _ch6GiftJumpObserver.disconnect(); } catch(_){} _ch6GiftJumpObserver = null; }
-  if (_ch6GiftResizeHandler) { try { window.removeEventListener('resize', _ch6GiftResizeHandler); } catch(_){} _ch6GiftResizeHandler = null; }
-  if (!_ch6GiftEligible()) return;
+  if (_bonusBtnJumpObserver) { try { _bonusBtnJumpObserver.disconnect(); } catch(_){} _bonusBtnJumpObserver = null; }
+  if (_bonusBtnResizeHandler) { try { window.removeEventListener('resize', _bonusBtnResizeHandler); } catch(_){} _bonusBtnResizeHandler = null; }
+  if (!_bonusBtnEligible()) return;
   const isEn = state.lang === 'en';
-  const seen = !!state.ch6GiftSheetSeen;
+  const subject = state.subject || 'philosophy';
+  const bonusId = _bonusBtnIdForSubject(subject);
+  // Strong attention until the user has opened this subject's bonus
+  // (= has any completed day in that chapter). Once entered, the
+  // sparkles + pulse rings drop and the tile keeps a gentle shimmer.
+  const entered = (typeof _hasBonusProgress === 'function') && _hasBonusProgress(bonusId);
   const btn = document.createElement('button');
-  btn.id = 'ch6-gift-btn';
-  if (seen) btn.classList.add('wt-seen');       // suppresses dot + rings via CSS
-  btn.setAttribute('aria-label', isEn ? 'You have a gift' : 'יש לכם מתנה');
-  // Red dot omitted when seen; the gift tile remains tappable as a
-  // re-entry point into the sheet but without the notification affordance.
-  btn.innerHTML = '🎁' + (seen ? '' : '<span class="ch6-gift-dot" aria-hidden="true"></span>');
-  btn.onclick = _openCh6GiftSheet;
+  btn.id = 'bonus-btn';
+  if (entered) btn.classList.add('wt-seen');  // CSS suppresses dot + rings
+  btn.setAttribute('aria-label', isEn ? 'New bonus chapter' : 'פרק בונוס חדש');
+  // Brain icon via <img>; the CSS positions the sparkles + shimmer
+  // around the tile. SVG primary, PNG fallback via onerror.
+  const iconHtml = '<img class="bonus-btn-icon" src="./images/bonus-brain.svg" ' +
+    'onerror="this.onerror=null;this.src=\'./images/bonus-brain.png\';" ' +
+    'alt="" aria-hidden="true">';
+  const sparkleHtml = entered ? '' :
+    '<span class="bonus-btn-spark bonus-btn-spark-1" aria-hidden="true"></span>' +
+    '<span class="bonus-btn-spark bonus-btn-spark-2" aria-hidden="true"></span>' +
+    '<span class="bonus-btn-spark bonus-btn-spark-3" aria-hidden="true"></span>' +
+    '<span class="bonus-btn-dot" aria-hidden="true"></span>';
+  btn.innerHTML = iconHtml + sparkleHtml;
+  btn.onclick = _openBonusSheet;
   home.appendChild(btn);
-  // Caption pill — only mounted BEFORE the user has opened the sheet.
-  // After seen, no caption on any home visit.
-  if (!seen) {
+  // Caption pill — only mounted BEFORE the user has entered the
+  // bonus. After that, no caption on any home visit.
+  if (!entered) {
     const cap = document.createElement('div');
-    cap.id = 'ch6-gift-caption';
-    cap.textContent = isEn ? 'You have a gift!' : 'יש לכם מתנה!';
+    cap.id = 'bonus-btn-caption';
+    cap.textContent = isEn ? 'New bonus chapter' : 'פרק בונוס חדש';
     home.appendChild(cap);
-    setTimeout(() => { cap.classList.add('fade-out'); }, _CH6_CAPTION_SHOW_MS);
+    setTimeout(() => { cap.classList.add('fade-out'); }, _BONUS_BTN_CAPTION_SHOW_MS);
   }
-  // R39 — relayout now (so first paint picks up the current jump
-  // state) and wire the MutationObserver + resize listener so later
-  // visibility flips reposition the gift smoothly.
-  _ch6GiftRelayout();
-  _ch6GiftWireJumpObserver();
-  _ch6GiftResizeHandler = () => _ch6GiftRelayout();
-  window.addEventListener('resize', _ch6GiftResizeHandler);
-  // _hvWireJumpButton runs after _mountCh6GiftBtn in the renderHome
-  // sequence (and again after layout settles). Give it a tick to
-  // flip the jump's style before we re-measure.
-  requestAnimationFrame(() => _ch6GiftRelayout());
-  try { _phCapture('ch6_gift_shown', { subject: state.subject || null, lang: state.lang || null, is_first: !seen }); } catch (_){}
+  _bonusBtnRelayout();
+  _bonusBtnWireJumpObserver();
+  _bonusBtnResizeHandler = () => _bonusBtnRelayout();
+  window.addEventListener('resize', _bonusBtnResizeHandler);
+  requestAnimationFrame(() => _bonusBtnRelayout());
+  // Analytics: once per session per subject.
+  if (!_bonusBtnShownThisSession[subject]) {
+    _bonusBtnShownThisSession[subject] = true;
+    try { _phCapture('bonus_button_shown', { subject: subject, chapter_id: bonusId, lang: state.lang || null, entered: !!entered }); } catch (_){}
+  }
 }
-function _openCh6GiftSheet() {
+// Static per-subject copy for the sheet body line (not part of the
+// chapter data since it's a curated hook, not a transcription of the
+// chapter text).
+const _BONUS_BTN_SUBJECT_LINE = {
+  philosophy: {
+    en: 'Five thinkers on the moment you reach for your phone: are you choosing, or is it chosen for you?',
+    he: 'חמישה הוגים על הרגע שבו מושיטים יד לטלפון: האם אנחנו בוחרים, או שבוחרים בשבילנו?',
+  },
+  economics: {
+    en: 'Five economists, from Ricardo to Acemoglu, on 200 years of fearing that machines will take our jobs.',
+    he: 'חמישה כלכלנים, מריקרדו ועד אסמוגלו, על 200 שנה של חשש שמכונות ייקחו לנו את העבודה.',
+  },
+  psychology: {
+    en: "From Galton's ox to Polymarket: when the crowd gets it right, and when it's wrong together.",
+    he: 'מהשור של גלטון ועד פולימרקט: מתי ההמון צודק, ומתי הוא טועה ביחד.',
+  },
+};
+function _openBonusSheet() {
   const isEn = state.lang === 'en';
-  const isFirstOpen = !state.ch6GiftSheetSeen;
-  try { _phCapture('ch6_gift_opened', { subject: state.subject || null, lang: state.lang || null, is_first: isFirstOpen }); } catch (_){}
-  // R41 Finding 8 — tighter copy. Previous title+body told the story
-  // of why it was free; the chapter card below already says "free" via
-  // the pill, and the primary CTA says what you can do next. Users
-  // on-device were skipping the body and tapping through.
-  const title = isEn ? 'Chapter 6 is free for you' : 'פרק 6 פתוח לך בחינם';
-  const body = isEn
-    ? 'Seven thinkers on the right to rule.'
-    : 'שבעה הוגים על הזכות לשלוט.';
-  const chTitle = isEn ? 'Political Philosophy' : 'פילוסופיה פוליטית';
-  const freePill = isEn ? '🎁 Free' : '🎁 חינם';
-  // R38d — hierarchy swap: primary CTA is "See the chapter" (the
-  // meaningful next action), secondary is "Got it, thanks" (closes).
-  // Analytics `cta` values stay 'see_chapter' / 'thanks', keyed off
-  // the handlers below, so the funnel is uninterrupted.
-  const ctaPrimary = isEn ? 'See the chapter' : 'לראות את הפרק';
-  const ctaSecondary = isEn ? 'Got it, thanks' : 'יופי, תודה';
-  // R39e — the sheet always frames philosophy ch6, so the thinker
-  // and the chapter card are always Socrates + Political Philosophy,
-  // regardless of the user's current subject. _popV7Thinker is
-  // retired here because it keys off state.subject and would show
-  // Smith/Freud for economics/psychology users.
-  const thinkerSrc = './images/onb-thinkers/socrates-celebrate.png';
-  // Chapter card markup mirrors the home-v7 chapter banner (number
-  // badge inline-start, eyebrow + title stacked, Free pill inline-end).
-  // Classes are the same, scoped by #modal-ch6-gift CSS so the sheet
-  // always reflects whatever shape the home banner is in.
-  const chapterEyebrow = isEn ? 'CHAPTER 6' : 'פרק 6';
-  const chCardHtml =
-    '<div class="hv-chapter">' +
-      '<div class="level-card" id="ch6g-level-card">' +
-        '<div class="level-card-header">' +
-          '<div class="level-num">6</div>' +
-          '<div class="level-card-text">' +
-            '<div class="level-eyebrow">' + chapterEyebrow + '</div>' +
-            '<div class="level-title">' + chTitle + '</div>' +
-          '</div>' +
-          '<div class="ch-free-pill" aria-hidden="true"><span>🎁</span> ' + (isEn ? 'Free' : 'חינם') + '</div>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
+  const subject = state.subject || 'philosophy';
+  const bonusId = _bonusBtnIdForSubject(subject);
+  const paid = (typeof _isUserPaidOrTrialNow === 'function') ? !!_isUserPaidOrTrialNow() : false;
+  try { _phCapture('bonus_button_tapped', { subject: subject, chapter_id: bonusId, paid: paid }); } catch (_){}
+  // Chapter data — title, subtitle, days array for the list.
+  const wk = (typeof getW === 'function') ? getW().find(w => w && w.id === bonusId) : null;
+  const chTitle = wk ? (isEn ? (wk.titleEn || wk.title) : (wk.title || wk.titleEn)) : '';
+  const subjLine = (_BONUS_BTN_SUBJECT_LINE[subject] || _BONUS_BTN_SUBJECT_LINE.philosophy)[isEn ? 'en' : 'he'];
+  const eyebrow = isEn ? 'New bonus chapter' : 'פרק בונוס חדש';
+  const ctaPrimary = isEn ? 'Open the chapter' : 'לפתיחת הפרק';
+  // Build the dialogue list (skip day 0 intros and summary-only days).
+  const listHtml = (wk && Array.isArray(wk.days))
+    ? '<ul class="bonusg-list">' + wk.days
+        .filter(d => d && d.id !== 0)
+        .map(d => {
+          const title = isEn ? (d.titleEn || d.title) : (d.title || d.titleEn);
+          const thinker = isEn ? (d.thinkerEn || d.thinker || '') : (d.thinker || d.thinkerEn || '');
+          const titleEsc = String(title).replace(/</g, '&lt;');
+          const thinkerEsc = String(thinker).replace(/</g, '&lt;');
+          return '<li>' +
+                   '<span class="bonusg-list-title">' + titleEsc + '</span>' +
+                   (thinkerEsc ? '<span class="bonusg-list-thinker">' + thinkerEsc + '</span>' : '') +
+                 '</li>';
+        })
+        .join('') + '</ul>'
+    : '';
+  // Thinker image — subject's representative, matching the pop-v7
+  // thinker slot the sheet already uses.
+  const thinkerSlug = subject === 'economics' ? 'smith' : subject === 'psychology' ? 'freud' : 'socrates';
+  const thinkerSrc = './images/onb-thinkers/' + thinkerSlug + '-celebrate.png';
   const inner =
-    '<img class="pop-thinker ch6g-thinker" src="' + thinkerSrc + '" alt="" aria-hidden="true">' +
-    '<div class="ch6g-title">' + title + '</div>' +
-    '<div class="ch6g-body">' + body + '</div>' +
-    chCardHtml +
-    '<button type="button" class="pop-btn" data-act="see">' + ctaPrimary + '</button>' +
-    '<button type="button" class="pop-link" data-act="thanks">' + ctaSecondary + '</button>';
-  const wrap = _popV7MountSheet('modal-ch6-gift', inner, {
-    onClose: () => { _closeCh6GiftSheet(); },
+    '<img class="pop-thinker bonusg-thinker" src="' + thinkerSrc + '" alt="" aria-hidden="true">' +
+    '<div class="bonusg-eyebrow">' + eyebrow + '</div>' +
+    '<div class="bonusg-title">' + String(chTitle).replace(/</g, '&lt;') + '</div>' +
+    '<div class="bonusg-body">' + subjLine + '</div>' +
+    listHtml +
+    '<button type="button" class="pop-btn" data-act="open">' + ctaPrimary + '</button>';
+  const wrap = _popV7MountSheet('modal-bonus-info', inner, {
+    onClose: () => { _closeBonusSheet(); },
   });
   if (!wrap) return;
-  wrap.querySelector('[data-act="thanks"]').addEventListener('click', () => {
-    try { _phCapture('ch6_gift_cta', { cta: 'thanks' }); } catch (_){}
-    _closeCh6GiftSheet();
-  });
-  wrap.querySelector('[data-act="see"]').addEventListener('click', () => {
-    try { _phCapture('ch6_gift_cta', { cta: 'see_chapter', from_subject: state.subject || null }); } catch (_){}
-    const needSubjSwitch = state.subject !== 'philosophy';
-    // R39c — mark that the user came here from the gift sheet. First
-    // openReader into a FREE_CHAPTERS chapter in this session will
-    // emit free_chapter_started with via_gift: true.
-    _r39cCh6ViaGift = true;
-    _closeCh6GiftSheet();
-    requestAnimationFrame(() => {
-      // R38b — users on economics/psychology jump into philosophy to
-      // see ch6. setSubject writes the persisted subject, applies the
-      // theme and resets the home-expanded week; saveStateLocal is
-      // belt-and-braces so a refresh persists the switch.
-      if (needSubjSwitch) {
-        try { setSubject('philosophy'); } catch (_){}
-        try { saveStateLocal(); } catch (_){}
-      }
-      try { renderHome(); } catch (_){}
+  wrap.querySelector('[data-act="open"]').addEventListener('click', () => {
+    const paidNow = (typeof _isUserPaidOrTrialNow === 'function') ? !!_isUserPaidOrTrialNow() : false;
+    _closeBonusSheet();
+    if (paidNow) {
+      try { _phCapture('bonus_sheet_cta', { subject: subject, chapter_id: bonusId, paid: true, outcome: 'opened' }); } catch (_){}
+      // Same handler the home bonus card uses — openReader into the
+      // first real day. Day 0 is the intro; if the chapter has a day 0
+      // and it's not yet completed, start there; otherwise day 1.
+      const w = (typeof getW === 'function') ? getW().find(x => x && x.id === bonusId) : null;
+      const firstDay = (w && Array.isArray(w.days) && w.days.length)
+        ? (w.days[0].id)
+        : 1;
       requestAnimationFrame(() => {
-        const card = document.getElementById('level-card-6');
-        if (card && card.scrollIntoView) {
-          // R41g Finding 3 — instant (not smooth) scroll + block: 'start'
-          // so the chapter banner docks cleanly under the topbar before
-          // the popover opens. 'center' + 'smooth' left scrollIntoView
-          // mid-animation when node.click() fired, which made
-          // _hvPositionPopover's auto-scroll compute against a stale
-          // banner position and leave the popover under the sticky header.
-          try { card.scrollIntoView({ behavior: 'auto', block: 'start' }); } catch (_){}
-        }
-        // R41f Finding 3 — after the card settles under the topbar,
-        // tap its first dialogue's lesson node so the popover opens
-        // with "Start / התחל". Two rAFs so renderHome + the above
-        // scroll both land before _hvPositionPopover reads layout.
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            try {
-              const ch6 = document.getElementById('hv-chapter-6');
-              const node = ch6 && ch6.querySelector('.hv-node');
-              if (node) node.click();
-            } catch (_){}
-          });
-        });
+        try { openReader(bonusId, firstDay); } catch (_){}
       });
-    });
+      return;
+    }
+    // Unpaid: open the in-app paywall, source: bonus_button. On
+    // purchase/restore success (detected at close time via
+    // _isUserPaidOrTrialNow) land in the bonus. On close without paying,
+    // stay on home.
+    try { _phCapture('bonus_sheet_cta', { subject: subject, chapter_id: bonusId, paid: false, outcome: 'paywall' }); } catch (_){}
+    const firstDay = (wk && Array.isArray(wk.days) && wk.days.length) ? wk.days[0].id : 1;
+    try {
+      showPaywall({
+        subject: subject,
+        weekId: bonusId,
+        dayId: firstDay,
+        source: 'bonus_button',
+        entry: 'home_bonus_button',
+        onClose: () => {
+          try {
+            if (typeof _isUserPaidOrTrialNow === 'function' && _isUserPaidOrTrialNow()) {
+              requestAnimationFrame(() => { try { openReader(bonusId, firstDay); } catch (_){} });
+            }
+          } catch (_){}
+        },
+      });
+    } catch (_){}
   });
 }
-function _closeCh6GiftSheet() {
-  try { _popV7CloseSheet('modal-ch6-gift'); } catch (_){}
-  const wasFirst = !state.ch6GiftSheetSeen;
-  if (wasFirst) {
-    state.ch6GiftSheetSeen = true;
-    try { saveState(); } catch (_) { try { saveStateLocal(); } catch (__) {} }
-  }
-  // R38c — tile stays on home as a permanent re-entry point. Only on
-  // the FIRST close do we need to transition it from "unseen" (dot +
-  // pulse + caption) to "seen" (plain tile, no dot). Later closes
-  // leave it as-is.
-  if (wasFirst) {
-    const btn = document.getElementById('ch6-gift-btn');
-    const cap = document.getElementById('ch6-gift-caption');
-    if (btn) {
-      btn.classList.add('wt-seen');
-      const dot = btn.querySelector('.ch6-gift-dot');
-      if (dot) dot.remove();
-    }
-    if (cap) cap.remove();
-  }
+function _closeBonusSheet() {
+  try { _popV7CloseSheet('modal-bonus-info'); } catch (_){}
+  // No persisted seen-flag — the tile's strong/gentle state is derived
+  // from _hasBonusProgress(bonusId) on every mount.
 }
-// Dev helper — clears the seen flag and re-mounts. Mirrors
-// window._replayStreakIntroBeat / _replayOwlBeat.
-window._replayCh6Gift = function () {
-  state.ch6GiftSheetSeen = false;
-  try { saveStateLocal(); } catch (_){}
-  _mountCh6GiftBtn();
+// Dev helper — re-mounts the button so the strong-mode cues return if
+// the user hasn't entered the bonus, or re-renders the gentle state if
+// they have. Mirrors window._replayStreakIntroBeat / _replayOwlBeat.
+window._replayBonusBtn = function () {
+  _mountBonusBtn();
+  const subj = state.subject;
+  const bonusId = _bonusBtnIdForSubject(subj);
   return {
-    ch6GiftSheetSeen: !!state.ch6GiftSheetSeen,
-    subject: state.subject,
-    eligible: _ch6GiftEligible(),
-    mounted: !!document.getElementById('ch6-gift-btn'),
+    subject: subj,
+    chapter_id: bonusId,
+    entered: (typeof _hasBonusProgress === 'function') && _hasBonusProgress(bonusId),
+    mounted: !!document.getElementById('bonus-btn'),
   };
 };
 
@@ -46040,7 +46109,7 @@ function renderHome() {
   // R38 — mount the gift button if the user is eligible. Function
   // short-circuits for non-philosophy subjects, users with any ch6
   // progress, and users who have already seen the sheet (synced).
-  try { _mountCh6GiftBtn(); } catch (e) {}
+  try { _mountBonusBtn(); } catch (e) {}
   // Wire plate-tap delegation on rv-svg + pantheon-container so
   // tapping any points plate reopens the explainer. Idempotent —
   // attach-once guarded by ._feWired on the target.
@@ -60451,7 +60520,7 @@ window.__corpusTour = async function (name, opts) {
   // either primes the profile + reload-resumes, OR, if the profile
   // is already loaded, dispatches to the resume handler directly so
   // repeated clip captures don't eat a reload between every clip.
-  const REEL_TOURS = ['launch-demo-boot','home-scroll','first-reveal-tour','pantheon-view','subjects-swap','streak-view','reveal-gold-socrates','reveal-diamond-socrates','ch6-gift-sheet','paywall-top','reading-intro','quiz-one','summary-view'];
+  const REEL_TOURS = ['launch-demo-boot','home-scroll','first-reveal-tour','pantheon-view','subjects-swap','streak-view','reveal-gold-socrates','reveal-diamond-socrates','bonus-sheet','paywall-top','reading-intro','quiz-one','summary-view'];
   if (REEL_TOURS.includes(name)) {
     // Detect launch-demo signature in localStorage — survives app
     // termination between clip captures (TEST_PROFILE_ACTIVE is a
@@ -60620,12 +60689,12 @@ async function _corpusTourResume() {
   }
 
   if (name === 'gift') {
-    const giftBtn = document.getElementById('ch6-gift-btn');
+    const giftBtn = document.getElementById('bonus-btn');
     if (giftBtn && giftBtn.offsetParent !== null) {
-      await tap('#ch6-gift-btn', 'tap gift tile');
+      await tap('#bonus-btn', 'tap gift tile');
       logStep('gift sheet visible');
       await sleep(STEP_MS * 2);
-      await tap('#modal-ch6-gift .pop-link', 'tap Got it, thanks');
+      await tap('#modal-bonus-info .pop-link', 'tap Got it, thanks');
       logStep('tour complete');
     } else {
       logStep('gift tile not visible (expected on fresh-free)');
@@ -60763,10 +60832,10 @@ async function _corpusTourResume() {
     await sleep(5000);
     return;
   }
-  if (name === 'ch6-gift-sheet') {
+  if (name === 'bonus-sheet') {
     try { showScreen('home'); } catch (_) {}
     await sleep(600);
-    try { _openCh6GiftSheet(); } catch (_) {}
+    try { _openBonusSheet(); } catch (_) {}
     await sleep(2500);
     return;
   }
@@ -62262,7 +62331,7 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
     delete window._replayWalkthrough;
     delete window._replayOwlBeat;
     delete window._replayStreakIntroBeat;
-    delete window._replayCh6Gift;
+    delete window._replayBonusBtn;
     delete window.__corpusDevPremium;
     delete window.__corpusCardDiag;
     delete window.__corpusPreviewReveal;
