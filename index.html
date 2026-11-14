@@ -31457,10 +31457,15 @@ const _ONB_STEP_TO_ID = {
   20: 'onb-v2-taste-q',
   21: 'onb-v2-first-card',
   22: 'onb-v2-streak',
-  // Sign-up (moved from old step 4). Advances to building (24) on
-  // success or on Skip. postAuthContinue routes back into onboarding
-  // at step 24 (was 5 in v5). The streak CTA now advances straight
-  // here — no OS-review sheet detour, no null slot to skip past.
+  // Sign-up (moved from old step 4). Advances to source (slot 36) on
+  // success or on Skip (2026-11-14 — source was previously BEFORE
+  // signup at the same slot 36 via a 22→36→23 intercept; it now lives
+  // AFTER signup so the source attribution writes directly to the
+  // newly-signed-in account's onboarding_answers row instead of a
+  // guest state blob that depends on a later syncProgressToSupabase
+  // to carry it over). postAuthContinue callers all route to 36.
+  // The streak CTA now advances straight here — no OS-review sheet
+  // detour, no null slot to skip past.
   23: 'onb-v2-signup',
   // Act 4 — The Plan. Building spinner (24) auto-advances after 2.5s,
   // plan-ready (25) is an owl bridge, journey (26) is the dated
@@ -31500,15 +31505,20 @@ const _ONB_STEP_TO_ID = {
   34: 'onb-v2-reminder-promise',
   35: 'onb-v2-paywall',
   // Slot 36 — "How did you hear about Corpus?" source attribution.
-  // OUT OF ORDER on purpose: this slot appears visually between 22
-  // (streak) and 23 (signup), but is placed at 36 so the signup
-  // slot number stays stable for funnel continuity across versions.
-  // The 22→36→23 forward intercept lives in _onbV2CtaStreak + the
-  // streak overlay onDismiss. Back from signup routes to 36 and back
-  // from 36 routes to 22. Users resuming from an older build with a
-  // stored step of 23+ skip 36 entirely (acceptable — their source
-  // field just stays unset, and the hard-paywall rule defaults
-  // "missing source" to "show the X").
+  // OUT OF ORDER on purpose: this slot appears visually between 23
+  // (signup) and 24 (building), but the signup slot number stays
+  // stable at 23 for funnel continuity across versions.
+  // Forward flow: signup success / skip / already-authed arrival all
+  // route 23 → 36 (every signup path, see _onbSignupApple +
+  // _onbSignupGoogle postAuthContinue, _onbV2CtaSignupSkip, and the
+  // _onbV2PrepareSignup currentUser bailout). Source then forwards
+  // 36 → 24 (building). No back button — the user is signed in by
+  // the time they reach the source step, and backing out of an
+  // attribution question into a completed signup would create a
+  // confusing loop. Users resuming from an older build (v7 flow
+  // version) stored at 24+ skip 36 entirely — their source stays
+  // unset and the hard-paywall rule reads that as "missing source →
+  // show the X".
   36: 'onb-v2-source',
 };
 // Step-id annotations — rendered into the onboarding_step_shown
@@ -34118,7 +34128,7 @@ function _onbWriteSourceAndAdvance(id, otherText) {
       }
     }
   } catch (_) {}
-  _onbAdvanceStep(36, 23);
+  _onbAdvanceStep(36, 24);
 }
 function _onbV2SourceTap(id) {
   if (id === 'other') {
@@ -34171,10 +34181,9 @@ function _onbV2CtaFirstCard() { _onbAdvanceStep(21, 22); }
 // year and burning one on a taste (before the user has done anything
 // real) is wasteful. The post-first-completion moment is better-earned.
 function _onbV2CtaStreak() {
-  // 22 → 36 (source) → 23 (signup). The 36 slot is placed out of
-  // order in _ONB_STEP_TO_ID so the signup slot number stays stable;
-  // see the comment on slot 36 for the full rationale.
-  _onbAdvanceStep(22, 36);
+  // Streak → signup direct (2026-11-14). Source moved AFTER signup so
+  // the attribution writes to the signed-in account's onboarding_answers.
+  _onbAdvanceStep(22, 23);
 }
 
 // Step 22 (streak celebration) — v11 shows "day 1 today". Previously
@@ -34256,10 +34265,10 @@ function _onbV2PrepareStreak() {
       // light background + subject thinker + v7 primary button. The
       // crest + spark + ember animations are preserved verbatim.
       v7: true,
-      // Advance to source step 36 (visually between streak and
-      // signup; see the slot-36 comment in _ONB_STEP_TO_ID for why
-      // the number is out of order). Source then forwards to 23.
-      onDismiss: () => _onbAdvanceStep(22, 36),
+      // Advance to signup (23). Source (36) now lives post-signup
+      // and runs after the user has authenticated; see the slot-36
+      // comment in _ONB_STEP_TO_ID for the new order.
+      onDismiss: () => _onbAdvanceStep(22, 23),
     });
   }
 }
@@ -34444,10 +34453,12 @@ async function _onbSignupApple() {
     postAuthContinue: async (user) => {
       // State-only enter: load progress + subscription + telemetry
       // + mark-auth-resolved, but DON'T route UI to home. Then
-      // advance onboarding to step 5 (name).
+      // advance onboarding to source (36) — the attribution
+      // question that now lives after signup. Source then forwards
+      // to building (24).
       await enterAppState(user);
       try { _phCapture('onboarding_signup_completed', { method: 'apple' }); } catch(e) {}
-      _onbAdvanceStep(23, 24);
+      _onbAdvanceStep(23, 36);
     },
   });
 }
@@ -34466,7 +34477,7 @@ async function _onbSignupGoogle() {
     postAuthContinue: async (user) => {
       await enterAppState(user);
       try { _phCapture('onboarding_signup_completed', { method: 'google' }); } catch(e) {}
-      _onbAdvanceStep(23, 24);
+      _onbAdvanceStep(23, 36);
     },
   });
 }
@@ -34475,7 +34486,9 @@ function _onbV2CtaSignupSkip() {
   try {
     _phCapture('onboarding_signup_prompt_action', { action: 'skip' });
   } catch(e) {}
-  _onbAdvanceStep(23, 24);
+  // Skip still routes through source (36) — the attribution question
+  // is asked even when the user declines to sign up.
+  _onbAdvanceStep(23, 36);
 }
 
 // Screen prepare hooks — invoked from _onbShowStep once the target
@@ -35871,7 +35884,7 @@ const _ONB_STEP_HOOKS = {
   33: _onbV2PrepareTrial,          // owl + three benefit rows
   34: _onbV2PrepareReminderPromise,// bell icon into the hero slot
   35: _onbV2PreparePaywall,        // shared _renderPaywall machinery
-  // Slot 36 lives visually between 22 (streak) and 23 (signup); the
+  // Slot 36 lives visually between 23 (signup) and 24 (building); the
   // out-of-order number keeps signup's slot stable across versions.
   // See the slot-36 comment in _ONB_STEP_TO_ID for the full rationale.
   36: _onbV2PrepareSource,
@@ -35887,13 +35900,13 @@ function _onbV2PrepareSignup() {
   //      already completed the old step-4 signup. Their cursor
   //      migrates into steps 4-22 (name…streak); when they reach
   //      new step 23 the auto-advance fires and lands them on
-  //      step 24 (building).
+  //      source (36) — then source forwards to building (24).
   //   2. Any pre-authenticated arrival: e.g. sign-in-required flow
   //      that ran outside onboarding, or a re-enter after auth.
   // Fire-and-forget; no telemetry noise from the double-visit —
   // this branch is invisible to the funnel.
   if (currentUser) {
-    _onbAdvanceStep(23, 24);
+    _onbAdvanceStep(23, 36);
     return;
   }
   const screen = document.getElementById('onb-v2-signup');
@@ -62691,15 +62704,16 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
      pick. Correct answer always highlights green regardless of pick. -->
 <!-- SOURCE step — "How did you hear about Corpus?" Header matches the
      neighbouring single-choice question screens (Q1/Q2/Q3): thinker
-     figure + bubble row, head inside the bubble, sub as the muted
-     greeting beneath. Options are rendered via _onbSourceCardHTML with
-     inline SVG icons retinted by the active subject theme. "Other"
-     reveals an inline text field + Continue button under the list;
-     empty text is allowed. No Skip — every user answers. -->
+     figure + bubble row, head inside the bubble. Options are rendered
+     via _onbSourceCardHTML with inline SVG icons retinted by the
+     active subject theme. "Other" reveals an inline text field +
+     Continue button under the list; empty text is allowed. No Skip —
+     every user answers. NO BACK BUTTON — source now runs AFTER signup
+     (2026-11-14) and backing out of an attribution question past a
+     completed signup into the streak would be a confusing loop. -->
 <div id="onb-v2-source" class="onb-screen onb-v2 onb-v7 onb-bg-themed" style="display:none">
   <div class="onb-v7-top">
-    <button type="button" class="onb-v7-back" onclick="_onbAdvanceStep(36, 22)" aria-label="Back">←</button>
-    <div class="onb-v7-bar"><i style="width: 70%"></i></div>
+    <div class="onb-v7-bar"><i style="width: 72%"></i></div>
   </div>
   <div class="onb-v7-mid">
     <div class="onb-v7-row">
@@ -63260,11 +63274,10 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
 <div id="onb-v2-signup" class="onb-screen onb-v2 onb-v7 onb-bg-themed" style="display:none">
   <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-signup-skip" onclick="_onbV2CtaSignupSkip()" style="display:none"></button>
   <div class="onb-v7-top">
-    <!-- Back routes to source (slot 36), not directly to streak (22).
-         Users who came via the natural 22→36→23 path land on source;
-         users resuming from an older build stored at 23 also get
-         source here (first-time source exposure for them). -->
-    <button type="button" class="onb-v7-back" onclick="_onbAdvanceStep(23, 36)" aria-label="Back">←</button>
+    <!-- Back routes to streak (22). Source (36) is now AFTER signup
+         so backing out of signup should land on the moment before
+         signup was asked — the streak celebration. -->
+    <button type="button" class="onb-v7-back" onclick="_onbAdvanceStep(23, 22)" aria-label="Back">←</button>
     <div class="onb-v7-bar"><i style="width: 72%"></i></div>
   </div>
   <div class="onb-v7-mid">

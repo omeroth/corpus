@@ -792,6 +792,97 @@ async function recordPaywallFrames(page, durationMs = 1500) {
   await ctx.close();
 }
 
+// Case M — New flow order (2026-11-14): streak (22) → signup (23) →
+// source (36) → building (24). Simulate the signup success path and
+// assert the paywall never flashes between 22 and 36, that source
+// writes to state.onbAnswers under the signed-in user, and the
+// eventual paywall at 35 renders in the correct hard/soft mode.
+for (const [lang, chosenSrc, expectHard] of [
+  ['en', 'instagram', true],
+  ['he', 'app_store', false],
+]) {
+  const ctx = await browser.newContext({ viewport: { width: 393, height: 852 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => {
+    window.__CORPUS_DEBUG_BUILD = true;
+    window.Capacitor = { isNativePlatform:()=>false, getPlatform:()=>'ios', Plugins:{ Haptics:{impact:async()=>({})}, SplashScreen:{hide:async()=>({})}, App:{addListener:()=>({remove:()=>{}}), minimizeApp:()=>{}}, Preferences:{get:async()=>({})}, StatusBar:{setStyle:async()=>({})} } };
+    try { localStorage.clear(); } catch(_){}
+    localStorage.setItem('corpus_subject', 'philosophy');
+    localStorage.setItem('corpus_onboarding_flow_version', '7');
+    localStorage.setItem('corpus_onboarding_step', '22');
+  });
+  await page.goto(`http://127.0.0.1:${app.port}/index.html`, { waitUntil: 'load' });
+  await page.waitForTimeout(500);
+  await page.evaluate((lang) => {
+    try { if (typeof setAppLang === 'function') setAppLang(lang); } catch(_){}
+    state.onbAnswers = {};
+    state.completedDays = {};
+    state.isPaid = false;
+  }, lang);
+
+  // Start frame recording. The paywall must never be visible between
+  // now and when we naturally reach step 35.
+  const pr = recordPaywallFrames(page, 2500);
+
+  // Simulate the streak → signup → source → building sequence.
+  await page.evaluate(() => {
+    try { _onbV2CtaStreak(); } catch(e) {}   // 22 → 23
+  });
+  await page.waitForTimeout(100);
+  // Signup → source. Simulate post-auth: enterAppState + advance 23→36.
+  await page.evaluate(() => {
+    currentUser = { id: 'user-flow-A' };
+    try { appStarted = false; } catch(_){}
+    // Don't call real enterAppState — it reads from Supabase. Jump
+    // directly to the advance the postAuthContinue would fire.
+    try { _onbAdvanceStep(23, 36); } catch(e) {}
+  });
+  await page.waitForTimeout(300);
+  // Assert we're on source.
+  const atSource = await page.evaluate(() => ({
+    sourceActive: document.getElementById('onb-v2-source').classList.contains('onb-active'),
+    sourceVisible: getComputedStyle(document.getElementById('onb-v2-source')).display !== 'none',
+    step: localStorage.getItem('corpus_onboarding_step'),
+  }));
+  if (atSource.sourceActive && atSource.sourceVisible && atSource.step === '36') pass('M ' + lang + ' 23→36 landed on source after signup');
+  else fail('M ' + lang + ' source landing', JSON.stringify(atSource));
+
+  // Tap the chosen source.
+  await page.evaluate((src) => {
+    const card = document.querySelector('#onb-v2-source-options .onb-v2-card[data-source-id="' + src + '"]');
+    if (card) card.click();
+  }, chosenSrc);
+  await page.waitForTimeout(400);
+  const afterSource = await page.evaluate(() => ({
+    source: state.onbAnswers && state.onbAnswers.source,
+    step: localStorage.getItem('corpus_onboarding_step'),
+    buildingActive: document.getElementById('onb-v2-building').classList.contains('onb-active'),
+  }));
+  if (afterSource.source === chosenSrc && afterSource.step === '24' && afterSource.buildingActive)
+    pass('M ' + lang + ' source=' + chosenSrc + ' → 24 (building)');
+  else fail('M ' + lang + ' source→building', JSON.stringify(afterSource));
+
+  // Finish the frame recording to verify no paywall ever flashed.
+  const summary = await pr;
+  if (!summary.everVisible) pass('M ' + lang + ' no paywall between 22 and 24 (' + summary.frameCount + ' frames)');
+  else fail('M ' + lang + ' paywall flashed', JSON.stringify(summary));
+
+  // Jump to step 35 (end of onboarding). Paywall must render in the
+  // expected hard/soft mode based on the chosen source.
+  await page.evaluate(() => {
+    try { _onbShowStep(35); } catch(e) {}
+  });
+  await page.waitForTimeout(300);
+  const atPaywall = await page.evaluate(() => ({
+    pwActive: document.getElementById('onb-v2-paywall').classList.contains('onb-active'),
+    pwHard: document.getElementById('onb-v2-paywall').classList.contains('pw-hard'),
+  }));
+  if (atPaywall.pwActive && atPaywall.pwHard === expectHard)
+    pass('M ' + lang + ' paywall at 35: hard=' + atPaywall.pwHard + ' (expected ' + expectHard + ')');
+  else fail('M ' + lang + ' paywall hard-mode', JSON.stringify(atPaywall));
+  await ctx.close();
+}
+
 // Case L — Device-test fixes:
 //   La. Timeline dots are full circles (no left-side clip). Measure
 //       each dot's getBoundingClientRect vs the paywall-inner's rect;
