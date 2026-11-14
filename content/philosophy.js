@@ -3809,8 +3809,8 @@ const corpusData = {
           {
             type: 'depth',
             title: 'העומק שמאחורי הרעיון', titleEn: 'The Depth Behind the Idea',
-            content: '<strong>המחלוקת הזאת אינה נוגעת רק לדת</strong>. <strong>בחיינו אנחנו נדרשים להבחין בין מה שאנחנו יודעים, מה שאנחנו מאמינים בו ומה שאנחנו רק משערים</strong>.\nאבל מה בכלל מבדיל ידיעה מאמונה? וכיצד המדע קובע מה אפשר לדעת?\nבכך יעסוק הפרק הבא.',
-            contentEn: '<strong>This disagreement does not concern religion alone</strong>. <strong>In our lives we must distinguish between what we know, what we believe, and what we merely suppose</strong>.\nBut what distinguishes knowledge from belief, in the first place? And how does science determine what can be known?\nThat is what the next chapter will deal with.',
+            content: '<strong>המחלוקת הזאת אינה נוגעת רק לדת</strong>. <strong>בחיינו אנחנו נדרשים להבחין בין מה שאנחנו יודעים, מה שאנחנו מאמינים בו ומה שאנחנו רק משערים</strong>.\nובזה הגענו לסוף המסע שלנו בפילוסופיה. לאורך שבעה פרקים שאלנו איך כדאי לחיות, מה אפשר לדעת, מה אמיתי, האם אנחנו חופשיים, מי רשאי לשלוט, והאם אמונה זקוקה להוכחה. לא מצאנו תשובות סופיות, וזו גם לא הייתה המטרה. מה שהפילוסופיה משאירה לנו הוא הרגל: <strong>לעצור ולשאול, מה הסיבה שלי להאמין בזה?</strong>',
+            contentEn: '<strong>This disagreement does not concern religion alone</strong>. <strong>In our lives we must distinguish between what we know, what we believe, and what we merely suppose</strong>.\nAnd with that, we\'ve reached the end of our journey through philosophy. Over seven chapters we asked how we should live, what we can know, what is real, whether we are free, who has the right to rule, and whether faith needs proof. We didn\'t find final answers, and that was never the goal. What philosophy leaves us with is a habit: <strong>to stop and ask, what is my reason for believing this?</strong>',
           },
           {
             type: 'quiz',
@@ -3845,12 +3845,6 @@ const corpusData = {
           { type: 'quiz_summary' }
         ] },
   ],
-  },
-  {
-    id: 8,
-    title: 'פילוסופיה של המדע', titleEn: 'Philosophy of Science',
-    comingSoon: true,
-    days: [],
   },
   ],
 };
