@@ -828,7 +828,11 @@ const GRANDFATHER_LENGTH_CHECK = new Set([
   'economics:1',  'economics:2',  'economics:3',  'economics:4',
   'economics:5',  'economics:6',
   'psychology:1', 'psychology:2', 'psychology:3', 'psychology:4',
-  'psychology:5', 'psychology:6', 'psychology:bonusPsy1',
+  'psychology:5', 'psychology:6',
+  // bonusPsy1 ("Why It Is Hard to Disconnect") was retired 2026-11-14
+  // and replaced by bonusPsy2 at the same slot. Its grandfather entry
+  // is gone with it; bonusPsy2 has its own LENGTH_CHECK_EXCEPTIONS
+  // entry below.
 ]);
 // Narrow, chapter-scoped exception: psychology:7 ships with the
 // source document's distractor shape intact. The author's quiz
@@ -890,6 +894,15 @@ const LENGTH_CHECK_EXCEPTIONS = new Set([
   // 15/15 (100%) HE and 15/15 (100%) EN. Author approved import as-is;
   // rewriting distractors would mean rewriting the source doc.
   'economics:bonusEcon2',
+  // Added 2026-11-14 during the psychology:bonusPsy2 (When Is the Crowd
+  // Wise?) verbatim import. Same shape as the other 2026-11-12 bonus
+  // imports: each quiz pairs a full-sentence correct answer (restating
+  // the dialogue's Galton / Asch / Kahneman / Festinger / Polymarket+
+  // Kalshi thesis) with two short distractors that are deliberate
+  // misreadings. Strict-longest hits 12/15 (80%) HE and 11/15 (73%) EN.
+  // Author approved import as-is; rewriting distractors would mean
+  // rewriting the source doc.
+  'psychology:bonusPsy2',
 ]);
 
 const lengthIssues = [];

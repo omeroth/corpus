@@ -2462,423 +2462,407 @@ const psychologyData = {
       ],
     },
     {
-      id: 'bonusPsy1',
-      title: 'למה קשה להתנתק',
-      titleEn: 'Why It Is Hard to Disconnect',
-      subtitle: 'חמישה מבטים על הרגל אחד',
-      subtitleEn: 'Five angles on a single habit',
+      id: 'bonusPsy2',
+      title: 'מתי ההמון חכם?',
+      titleEn: 'When Is the Crowd Wise?',
+      subtitle: 'ארבעה חוקרים על חוכמת ההמונים ושוקי תחזיות',
+      subtitleEn: 'Four researchers on the wisdom of crowds and prediction markets',
       isBonus: true,
       xp: 100,
       days: [
         {
+          id: 0,
+          title: 'פתיחה: האם אפשר לסמוך על דעת הרוב?',
+          titleEn: 'Opening: Can We Trust the Majority\'s Opinion?',
+          thinker: '',
+          thinkerEn: '',
+          thinkerId: null,
+          xp: 0,
+          sections: [
+            {
+              type: 'idea',
+              title: 'על מה הפרק הזה?',
+              titleEn: 'What is this chapter about?',
+              content: 'בשנים האחרונות צמחו במהירות שוקי תחזיות כמו פולימרקט (Polymarket) וקאלשי (Kalshi), שבהם אנשים סוחרים בחוזים על שאלות כמו מי ינצח בבחירות או מה יהיה שיעור האינפלציה.\n\nלפי מכון המחקר Pew, היקף המסחר החודשי המשותף בשתי הפלטפורמות זינק מפחות מ־5 מיליארד דולר בספטמבר 2025 לכ־24 מיליארד באפריל 2026.\n\nהרעיון שמאחורי השווקים האלה הוא שכאשר אנשים רבים מהמרים על תוצאות של אירועים עתידיים, אפשר לשלב את ההערכות שלהם לכדי תחזית משותפת, שעשויה להיות מדויקת יותר מזו של מומחה יחיד.\n\nאבל למה שזה יהיה נכון? האם הרבה אנשים באמת יודעים יותר מאדם אחד? ואולי הם פשוט מושפעים זה מזה וטועים יחד?\n\nזו שאלה מרכזית בפסיכולוגיה חברתית ובחקר קבלת החלטות: מתי קבוצה מצליחה להגיע לשיפוט טוב יותר משיפוטי חבריה כבודדים, ומתי היא דווקא מגבירה את הטעויות שלהם?\n\nבפרק הזה נפגוש ארבעה חוקרים מרכזיים, ונשתמש ברעיונותיהם כדי לבחון את שוקי התחזיות המודרניים.',
+              contentEn: 'In recent years, prediction markets such as Polymarket and Kalshi have grown rapidly. On them, people trade contracts on questions such as who will win an election or what the inflation rate will be.\n\nAccording to the Pew Research Center, the combined monthly trading volume on the two platforms jumped from under $5 billion in September 2025 to about $24 billion in April 2026.\n\nThe idea behind these markets is that when many people bet on the outcomes of future events, their estimates can be combined into a shared forecast that may be more accurate than that of a single expert.\n\nBut why should that be true? Do many people really know more than one person? Or are they simply influenced by one another, and wrong together?\n\nThis is a central question in social psychology and in decision-making research: when does a group manage to reach better judgment than its members as individuals, and when does it actually amplify their mistakes?\n\nIn this chapter we will meet four key researchers, and use their ideas to examine modern prediction markets.'
+            },
+            {
+              type: 'idea',
+              title: 'מה נחקור?',
+              titleEn: 'What will we explore?',
+              content: 'פרנסיס גלטון: כיצד הניחושים של 787 אנשים הצליחו להעריך בדיוק מפתיע את משקלו של שור?\n\nסולומון אש: מדוע אנשים מסכימים לפעמים עם הרוב גם כשהם יודעים שהוא טועה?\n\nדניאל כהנמן: מה ההבדל בין טעויות שמתקזזות לבין טעויות שנשארות גם כשאנשים רבים חושבים יחד?\n\nליאון פסטינגר: כיצד הרצון להיות צודקים משפיע על האמונות והשיפוטים שלנו?\n\nפולימרקט וקאלשי: האם שוקי תחזיות מצליחים להתגבר על הבעיות האלה ולנצל את חוכמת ההמונים?\n\nבסוף הפרק נחזור לשאלה שבה פתחנו: מתי כדאי לסמוך על דעת ההמון?',
+              contentEn: 'Francis Galton: How did the guesses of 787 people manage to estimate an ox\'s weight with surprising accuracy?\n\nSolomon Asch: Why do people sometimes agree with the majority even when they know it is wrong?\n\nDaniel Kahneman: What is the difference between errors that cancel out and errors that remain even when many people think together?\n\nLeon Festinger: How does the desire to be right affect our beliefs and judgments?\n\nPolymarket and Kalshi: Do prediction markets manage to overcome these problems and harness the wisdom of crowds?\n\nAt the end of the chapter we will return to the question we started with: when is it worth trusting the opinion of the crowd?'
+            }
+          ]
+        },
+        {
           id: 1,
-          title: 'מכונת המזל בכיס',
-          titleEn: 'The Slot Machine in Your Pocket',
-          thinker: 'ב.פ. סקינר',
-          thinkerEn: 'B. F. Skinner',
-          thinkerId: 'skinner',
+          title: 'גלטון: מתי ההמון צודק?',
+          titleEn: 'Galton: When Is the Crowd Right?',
+          thinker: 'פרנסיס גלטון',
+          thinkerEn: 'Francis Galton',
+          thinkerId: "galton",
           xp: 50,
           sections: [
             {
               type: 'idea',
               title: 'הרעיון של היום',
               titleEn: 'Today\'s Idea',
-              content: 'רגע לפני שקראת את זה, הרמת את הטלפון. אולי לא זכרת שהחלטת, אולי לא הייתה שם החלטה בכלל. פשוט מצאת את עצמך עם המכשיר ביד.\n\nב.פ. סקינר לא הכיר טלפונים חכמים, אבל הוא גילה מנגנון מרכזי שבגללו קשה לנו לעזוב אותם. בשנות ה-50 הוא בדק שאלה פשוטה: מה קורה כשהתגמול לא מגיע בכל פעם?\n\nהתשובה הפתיעה אותו. יונה שזכתה בגרגר (חיזוק חיובי) אחרי <strong>כל</strong> ניקור של לחצן, הפסיקה לנקר כמעט מיד אחרי שהגרגרים הפסיקו להגיע. אבל יונה שקיבלה גרגר רק אחרי <strong>חלק מהניקורים</strong>, בלי שיטה שהיא יכולה לחזות, המשיכה ללחוץ הרבה יותר זמן אחרי שהגרגרים הפסיקו להגיע. סקינר קרא לזה <strong>חיזוק ביחס משתנה</strong>, ומצא שהוא מייצר את קצב התגובה הגבוה ביותר ואת ההתמדה הגדולה ביותר מכל תכנית חיזוקים שבדק.\n\nוזה בדיוק הפיד בטלפון שלך. רוב הגלילות אינן מספקות לנו משהו מעניין. ואז, בלי שאפשר לחזות מתי, מגיע משהו שגורם לך לצחוק, להזדהות, להרגיש משהו. לא תמיד, וזה כל העניין.',
-              contentEn: 'A moment before you read this, you picked up the phone. Maybe you do not remember deciding, maybe there was no decision there at all. You simply found yourself with the device in your hand.\n\nB. F. Skinner did not know smartphones, but he discovered a central mechanism that makes it hard for us to leave them. In the 1950s he examined a simple question: what happens when the reward does not arrive every time?\n\nThe answer surprised him. A pigeon that won a pellet (positive reinforcement) after <strong>every</strong> peck of a lever stopped pecking almost immediately after the pellets stopped arriving. But a pigeon that received a pellet only after <strong>some of the pecks</strong>, with no pattern it could predict, kept pressing for far longer after the pellets stopped arriving. Skinner called this <strong>variable ratio reinforcement</strong>, and found that it produces the highest response rate and the greatest persistence of any reinforcement schedule he tested.\n\nAnd this is exactly the feed on your phone. Most scrolls do not supply us with anything interesting. And then, without any way to predict when, something arrives that makes you laugh, identify, feel something. Not always, and that is the whole point.',
-              image: 'images/bonus/psychology/day1-idea.webp'
+              content: 'שוקי תחזיות מבוססים על רעיון מפתיע: כשאנשים רבים מנסים לחזות את אותה תוצאה, התחזית המשותפת שלהם עשויה להיות מדויקת מאוד.\n\nאבל למה שהמון אנשים, שרבים מהם אינם מומחים, יצליח להעריך משהו טוב יותר מאדם בודד?\n\nאחת ההדגמות המפורסמות של הרעיון הזה התרחשה בשנת 1906, ביריד חקלאי באנגליה.',
+              contentEn: 'Prediction markets are based on a surprising idea: when many people try to predict the same outcome, their shared forecast can be very accurate.\n\nBut why would a crowd of people, many of them not experts, be able to estimate something better than a single person?\n\nOne famous demonstration of this idea took place in 1906, at an agricultural fair in England.'
             },
             {
               type: 'source',
               title: 'קטע מקור',
-              titleEn: 'Source Material',
-              quote: '"אם בית ההימורים אינו יכול לשכנע לקוח למסור כסף בלי כל תמורה, הוא עשוי להשיג את אותה תוצאה על ידי החזרת חלק מכספו של הלקוח בלוח זמנים של יחס משתנה."',
-              quoteEn: '"If the gambling establishment cannot persuade a patron to turn over money with no return, it may achieve the same effect by returning part of the patron\'s money on a variable-ratio schedule."',
-              attr: '- ב.פ. סקינר, "Science and Human Behavior", 1953, עמ\' 397',
-              attrEn: '- B. F. Skinner, "Science and Human Behavior", 1953, p. 397'
+              titleEn: 'Source Text',
+              quote: '"לפי העיקרון הדמוקרטי של \'קול אחד, ערך אחד\', האומדן האמצעי מבטא את קול העם."',
+              quoteEn: '"According to the democratic principle of \'one vote one value,\' the middlemost estimate expresses the vox populi."',
+              attr: 'פרנסיס גלטון, "Vox Populi", כתב העת Nature, 1907',
+              attrEn: 'Francis Galton, "Vox Populi," Nature, 1907'
             },
             {
               type: 'explanation',
               title: 'הסבר',
               titleEn: 'Explanation',
-              content: 'ההיגיון הפוך מהצפוי. <strong>תגמול קבוע מייצר הרגל חלש, ותגמול אקראי מייצר הרגל חזק.</strong>\n\nהסיבה פשוטה. אם מכונת שתייה, שאמורה להוציא פחית בכל לחיצה, מקולקלת, מפסיקים ללחוץ אחרי שני ניסיונות, כי ברור שמשהו לא בסדר. אבל אם מכונת מזל לא משלמת, ממשיכים, כי מכונת מזל אף פעם לא משלמת בכל פעם. אין רגע שבו ברור שהיא נגמרה או התקלקלה.\n\nדוגמה מהחיים: אדם פותח את הפיד ל"דקה", וקם ממנו אחרי עשרים. הוא לא נהנה בעשרים הדקות האלה, ואם תשאלו אותו הוא יגיד שרובן היו משעממות. וזו בדיוק הנקודה. <strong>מה שהחזיק אותו לא היה ההנאה, אלא האפשרות שההנאה תגיע בגלילה הבאה.</strong>\n\nוהדבר עובד גם על התראות. אל הודעה שמגיעה בזמן קבוע אנחנו מתרגלים. אבל הודעה שיכולה להגיע בכל רגע מייצרת בדיקה חוזרת, כל היום.',
-              contentEn: 'The logic is the opposite of what it seems. <strong>A fixed reward produces a weak habit, and a random reward produces a strong habit.</strong>\n\nThe reason is simple. If a drinks machine, which is supposed to dispense a can with every press, is broken, people stop pressing after two attempts, because it is clear that something is wrong. But if a slot machine does not pay out, people keep going, because a slot machine never pays out every time. There is no moment at which it is clear that it has run out or broken down.\n\nA real-life example: a person opens the feed for "a minute", and gets up from it after twenty. He did not enjoy those twenty minutes, and if you ask him he will say that most of them were boring. And that is exactly the point. <strong>What held him there was not the enjoyment, but the possibility that the enjoyment would arrive on the next scroll.</strong>\n\nAnd the same works with notifications. A message that arrives at a fixed time is something we get used to. But a message that could arrive at any moment produces repeated checking, all day long.',
-              image: 'images/bonus/psychology/day1-explanation.webp'
+              content: 'ביריד נערכה תחרות: המשתתפים התבקשו לנחש מה יהיה משקלו של שור לאחר שחיטתו וניקויו.\n\nחלקם היו בעלי ניסיון בגידול ובשחיטת בקר, ואחרים לא היו מומחים בתחום.\n\nהמדען והסטטיסטיקאי פרנסיס גלטון ניתח 787 ניחושים תקינים, וגילה תוצאה מפתיעה.\n\nלפי הנתונים שפרסם גלטון בזמנו, החציון של הניחושים, כלומר הניחוש האמצעי לאחר שמסדרים את כולם מהקטן לגדול, היה 1,207 ליברות.\n\nמשקלו האמיתי של השור היה 1,198 ליברות. טעות של פחות מאחוז אחד.\n\nבהמשך חישב גלטון גם את הממוצע החשבוני של הניחושים, שהיה 1,197 ליברות, רחוק ליברה אחת בלבד מהמשקל האמיתי!\n\nכיצד קרה שההערכה המשותפת הייתה מדויקת כל כך?\n\nניחושים של אנשים שונים כוללים טעויות שונות. חלק מהאנשים מעריכים יותר מדי, ואחרים פחות מדי. כאשר הטעויות אינן נוטות באופן שיטתי לאותו כיוון, הן עשויות להתקזז בממוצע.\n\nלמשל, נניח שבצנצנת יש 100 סוכריות. אדם אחד מנחש 80, ואחר מנחש 120. שניהם טועים, אבל הממוצע שלהם הוא בדיוק 100.\n\nכך פועל אחד המנגנונים המרכזיים של "חוכמת ההמונים": שילוב של הערכות רבות עשוי להניב תוצאה מדויקת יותר מהערכותיהם של רוב האנשים בנפרד.',
+              contentEn: 'A competition was held at the fair: participants were asked to guess the weight of an ox after it had been slaughtered and dressed.\n\nSome had experience raising and slaughtering cattle, and others were not experts in the field.\n\nThe scientist and statistician Francis Galton analyzed 787 valid guesses, and found a surprising result.\n\nAccording to the data Galton published at the time, the median of the guesses, that is, the middle guess once all of them are ordered from smallest to largest, was 1,207 pounds.\n\nThe ox\'s true weight was 1,198 pounds. An error of less than one percent.\n\nGalton later also calculated the arithmetic mean of the guesses, which was 1,197 pounds, only one pound away from the true weight!\n\nHow did it happen that the shared estimate was so accurate?\n\nDifferent people\'s guesses contain different errors. Some people overestimate, and others underestimate. When the errors do not systematically lean in the same direction, they can cancel out in the average.\n\nFor example, suppose a jar contains 100 candies. One person guesses 80, and another guesses 120. Both are wrong, but their average is exactly 100.\n\nThis is one of the central mechanisms of the "wisdom of crowds": combining many estimates can produce a more accurate result than most people\'s estimates taken separately.'
             },
             {
               type: 'depth',
-              title: 'עומק',
-              titleEn: 'Depth',
-              content: 'וכאן צריך לומר משהו שהופך את זה מקוריוז למשהו רציני: <strong>זה לא צירוף מקרים.</strong> מכונות המזל תוכננו במפורש על העיקרון הזה, והיה זמן שבו הן הסתובבו רק בקזינו. היום אותו מנגנון נמצא בכיס של כמעט כל אדם ועובד בלי הפסקה.\n\nוהנקודה החדה: מי שמרגיש שבסך הכל אין לו כוח רצון להפחית את השימוש בסמארטפון מפרש לא נכון את המצב. הוא לא מתמודד רק עם חולשת כוח רצון, אלא עם <strong>תוכנית החיזוק החזקה ביותר שנמדדה אי פעם</strong>. זה לא פוטר מאחריות, אבל זה מסביר למה "פשוט תשתמש פחות" נכשל שוב ושוב.\n\nוצריך גם איזון. סקינר טען שהתנהגות היא רק תוצר של חיזוקים, ורוב התיאוריות הפסיכולוגיות דוחות את הגרסה הקיצונית הזו, כפי שראינו בפרק הראשון. אבל דווקא כאן, בהרגלים שנבנים מתגמול לא צפוי, הוא קלע בול.\n\nומכאן לדיאלוג הבא. סקינר הסביר למה קשה להניח את הטלפון. דניאל כהנמן ישאל שאלה מוקדמת יותר: מי בכלל החליט להרים אותו.',
-              contentEn: 'And here something must be said that turns this from a curiosity into something serious: <strong>it is not a coincidence.</strong> Slot machines were explicitly designed on this principle, and there was a time when they were found only in casinos. Today that same mechanism sits in the pocket of almost every person and works without stopping.\n\nAnd the sharp point: someone who feels that he simply lacks the willpower to reduce his smartphone use is misreading the situation. He is not only contending with weakness of willpower, but with <strong>the strongest reinforcement schedule ever measured</strong>. This does not exempt anyone from responsibility, but it explains why "just use it less" fails again and again.\n\nAnd balance is also needed. Skinner argued that behavior is only a product of reinforcements, and most psychological theories reject that extreme version, as we saw in the first chapter. But precisely here, in habits built on unpredictable reward, he hit the mark exactly.\n\nAnd from here to the next dialogue. Skinner explained why it is hard to put the phone down. Daniel Kahneman will ask an earlier question: who decided to pick it up in the first place.',
-              image: 'images/bonus/psychology/day1-depth.webp'
+              title: 'העומק שמאחורי הרעיון',
+              titleEn: 'The Depth Behind the Idea',
+              content: 'אבל לא כל קבוצה מצליחה להגיע לתוצאה מדויקת.\n\nכדי שטעויות יתקזזו, חשוב שהמשתתפים לא פשוט יעתיקו זה מזה.\n\nנניח שמישהו היה מכריז בקול רם שלדעתו השור שוקל 1,500 ליברות, ורוב המשתתפים היו מושפעים מהניחוש שלו (הניחוש של 1,500 ליברות עשוי לשמש "עוגן" להערכה שלהם, מושג שניתקל בו בהמשך הפרק בדיאלוג עם כהנמן). במקרה כזה, רבים היו טועים באותו כיוון, וההערכה המשותפת הייתה נפגעת.\n\nחשוב לדייק: עצמאות אינה מבטיחה דיוק, אבל היא עוזרת למנוע מצב שבו טעות אחת מתפשטת בין המשתתפים. גם ניחושים עצמאיים לא יועילו אם כולם סובלים מאותה הטיה.\n\nויש הסתייגות נוספת: התחרות של גלטון עסקה בשאלה עובדתית, שלה תשובה מספרית אחת. לא כל שאלה על דעת הרוב מתאימה לחישוב ממוצע.\n\nובחזרה לשוקי התחזיות: האם המשתתפים באמת עצמאיים, כאשר כולם יכולים לראות את המחיר ואת ההערכות של האחרים?\n\nבדיאלוג הבא סולומון אש יראה כיצד עצם החשיפה לדעות של אחרים יכולה לשנות את השיפוט שלנו.',
+              contentEn: 'But not every group manages to reach an accurate result.\n\nFor errors to cancel out, it is important that participants do not simply copy one another.\n\nSuppose someone had announced out loud that in his opinion the ox weighed 1,500 pounds, and most participants were influenced by his guess (the guess of 1,500 pounds could serve as an "anchor" for their estimates, a concept we will meet later in the chapter in the dialogue with Kahneman). In that case, many would have erred in the same direction, and the shared estimate would have suffered.\n\nIt is important to be precise: independence does not guarantee accuracy, but it helps prevent a situation in which one error spreads among the participants. Even independent guesses will not help if everyone suffers from the same bias.\n\nThere is another caveat: Galton\'s competition dealt with a factual question that has a single numerical answer. Not every question about the majority\'s opinion is suited to computing an average.\n\nAnd back to prediction markets: are participants really independent, when everyone can see the price and the estimates of others?\n\nIn the next dialogue, Solomon Asch will show how mere exposure to the opinions of others can change our judgment.'
             },
             {
               type: 'quiz',
-              intro: 'אדם פותח את הפיד ל"דקה" וקם אחרי עשרים, ומודה שרוב מה שראה היה משעמם.',
-              introEn: 'A person opens the feed for "a minute" and gets up after twenty, and admits that most of what he saw was boring.',
-              question: 'לפי סקינר, מה החזיק אותו שם?',
-              questionEn: 'According to Skinner, what held him there?',
-              options: ['ההנאה מהתוכן עצמו, שהייתה גבוהה לאורך כל הזמן', 'האפשרות שמשהו טוב יגיע בגלילה הבאה, בלי שאפשר לדעת מתי', 'החלטה מודעת שקיבל מראש להישאר עשרים דקות'],
-              optionsEn: ['Enjoyment of the content itself, which was high throughout', 'The possibility that something good would arrive on the next scroll, with no way of knowing when', 'A conscious decision he made in advance to stay for twenty minutes'],
-              correctIndex: 1,
-              explanation: 'זהו חיזוק ביחס משתנה. לא ההנאה מחזיקה, אלא חוסר הוודאות. כשהתגמול יכול להגיע בכל רגע ואין דרך לחזות מתי, אין גם רגע ברור שבו כדאי לעצור.',
-              explanationEn: 'This is variable ratio reinforcement. It is not the enjoyment that holds, but the uncertainty. When the reward can arrive at any moment and there is no way to predict when, there is also no clear moment at which it makes sense to stop.'
-            },
-            {
-              type: 'quiz',
-              intro: 'שתי מכונות: מכונת שתייה שאמורה להוציא פחית בכל לחיצה, ומכונת מזל שנותנת פרס לפעמים.',
-              introEn: 'Two machines: a drinks machine supposed to dispense a can on every press, and a slot machine that gives a prize sometimes.',
-              question: 'מדוע קל יותר להפסיק ללחוץ על מכונת שתייה כשהיא מפסיקה להוציא פחיות מאשר על מכונת מזל כשהיא מפסיקה לתת פרסים?',
-              questionEn: 'Why is it easier to stop pressing a drinks machine when it stops dispensing cans than a slot machine when it stops giving prizes?',
-              options: ['משום שמכונת שתייה נותנת תגמול קבוע, ולכן היעדרו מסמן מיד שמשהו השתנה', 'משום שמכונת מזל נותנת תגמול בכל פעם, ולכן היא נעימה יותר', 'משום שמכונת שתייה זולה יותר, ולכן ההפסד קטן'],
-              optionsEn: ['Because a drinks machine gives a fixed reward, and therefore its absence immediately signals that something has changed', 'Because a slot machine gives a reward every time, and therefore it is more pleasant', 'Because a drinks machine is cheaper, and therefore the loss is small'],
-              correctIndex: 0,
-              explanation: 'זו ההבחנה של סקינר. בתגמול קבוע, הפסקה היא סימן ברור לתקלה. בתגמול משתנה, הפסקה היא חלק מהמשחק, ולכן אין רגע שבו ברור שהגיע הזמן להפסיק.',
-              explanationEn: 'This is Skinner\'s distinction. With a fixed reward, a pause is a clear sign of a malfunction. With a variable reward, a pause is part of the game, and therefore there is no moment at which it is clear that the time has come to stop.'
-            },
-            {
-              type: 'quiz',
-              intro: 'אדם מאשים את עצמו שאין לו כוח רצון מול הטלפון.',
-              introEn: 'A person blames himself for having no willpower in the face of the phone.',
-              question: 'מה סקינר היה מוסיף לתמונה?',
-              questionEn: 'What would Skinner add to the picture?',
-              options: ['שהוא צודק, ושהבעיה כולה נעוצה בחולשת אופי שלו', 'שכוח רצון אינו קיים כלל, ולכן אין שום טעם לנסות', 'שהוא מתמודד עם תוכנית החיזוק החזקה ביותר שנמדדה, ולא רק עם כוח הרצון שלו'],
-              optionsEn: ['That he is right, and that the whole problem lies in a weakness of his character', 'That willpower does not exist at all, and therefore there is no point in trying', 'That he is contending with the strongest reinforcement schedule ever measured, and not only with his willpower'],
+              question: 'מדוע ההערכה המשותפת של 787 המשתתפים הייתה קרובה כל כך למשקלו האמיתי של השור?',
+              questionEn: 'Why was the shared estimate of the 787 participants so close to the ox\'s true weight?',
+              options: ['משום שכל המשתתפים היו בעלי ניסיון מקצועי בגידול בקר.', 'משום שגלטון בחר רק את הניחושים של המשתתפים המדויקים ביותר.', 'משום שטעויות של אנשים שונים נטו לכיוונים שונים, ולכן רבות מהן התקזזו.'],
+              optionsEn: ['Because all the participants had professional experience raising cattle.', 'Because Galton selected only the guesses of the most accurate participants.', 'Because the errors of different people leaned in different directions, so many of them canceled out.'],
               correctIndex: 2,
-              explanation: 'זו לא הסרת אחריות, זו הבנה של הכוחות. המנגנון שפועל כאן תוכנן להיות מתמיד ככל האפשר, ולכן מאמץ אישי לבדו מתמודד מול משהו חזק מאוד.',
-              explanationEn: 'This is not a removal of responsibility, it is an understanding of the forces. The mechanism operating here was designed to be as persistent as possible, and therefore personal effort alone is contending with something very strong.'
+              explanation: 'חלק מהמשתתפים העריכו את המשקל ביתר ואחרים בחסר. משום שהטעויות לא נטו כולן לאותו כיוון, השילוב של ההערכות היה קרוב מאוד למשקל האמיתי.',
+              explanationEn: 'Some participants overestimated the weight and others underestimated it. Because the errors did not all lean in the same direction, the combination of the estimates was very close to the true weight.'
             },
-            { type: 'quiz_summary' }
+            {
+              type: 'quiz',
+              question: 'נניח שכל המשתתפים היו שומעים תחילה ניחוש שגוי של אדם שנחשב למומחה, ומושפעים ממנו. מה עלול היה לקרות?',
+              questionEn: 'Suppose all the participants had first heard a wrong guess from a person considered an expert, and were influenced by it. What might have happened?',
+              options: ['הניחושים היו נעשים דומים יותר, אבל כולם עלולים היו לטעות באותו כיוון.', 'התוצאה הייתה בהכרח מדויקת יותר, משום שהמשתתפים הסתמכו על מומחה.', 'התוצאה הייתה נשארת זהה, משום שמספר גדול של ניחושים תמיד מבטיח דיוק.'],
+              optionsEn: ['The guesses would have become more similar, but everyone might have erred in the same direction.', 'The result would necessarily have been more accurate, because the participants relied on an expert.', 'The result would have stayed the same, because a large number of guesses always guarantees accuracy.'],
+              correctIndex: 0,
+              explanation: 'אם המשתתפים מושפעים מאותה הערכה שגויה, הטעויות שלהם עלולות להיות דומות. במקרה כזה הן אינן מתקזזות, גם אם משתתפים אנשים רבים.',
+              explanationEn: 'If participants are influenced by the same wrong estimate, their errors may be similar. In that case they do not cancel out, even if many people take part.'
+            },
+            {
+              type: 'quiz',
+              question: 'מדוע אי אפשר להסיק מהתוצאה של גלטון שדעת הרוב תמיד נכונה?',
+              questionEn: 'Why can\'t we conclude from Galton\'s result that the majority\'s opinion is always right?',
+              options: ['משום שממוצע של ניחושים לעולם אינו עדיף על ניחוש של מומחה.', 'משום שהדיוק תלוי בין השאר בעצמאות ההערכות ובהיעדר הטיה משותפת.', 'משום שחוכמת ההמונים פועלת רק בשאלות העוסקות בבעלי חיים.'],
+              optionsEn: ['Because an average of guesses is never better than the guess of an expert.', 'Because accuracy depends, among other things, on the independence of the estimates and the absence of a shared bias.', 'Because the wisdom of crowds works only on questions about animals.'],
+              correctIndex: 1,
+              explanation: 'הממצא של גלטון מדגים את היתרון האפשרי בשילוב הערכות שונות. הוא אינו מבטיח שהיתרון הזה יתקיים בכל מצב.',
+              explanationEn: 'Galton\'s finding demonstrates the possible advantage of combining different estimates. It does not guarantee that this advantage will hold in every situation.'
+            },
+            {
+              type: 'quiz_summary'
+            }
           ]
         },
         {
           id: 2,
-          title: 'היד זזה קודם',
-          titleEn: 'The Hand Moves First',
-          thinker: 'דניאל כהנמן',
-          thinkerEn: 'Daniel Kahneman',
-          thinkerId: 'kahneman',
+          title: 'אש: מתי ההמון הופך לעדר?',
+          titleEn: 'Asch: When Does a Crowd Become a Herd?',
+          thinker: 'סולומון אש',
+          thinkerEn: 'Solomon Asch',
+          thinkerId: "asch",
           xp: 50,
           sections: [
             {
               type: 'idea',
               title: 'הרעיון של היום',
               titleEn: 'Today\'s Idea',
-              content: 'סקינר הסביר למה קשה להניח את הטלפון. אבל יש שאלה שקודמת לה: <strong>מתי בדיוק החלטת להרים אותו?</strong>\n\nנסה להיזכר בפעם האחרונה. סביר שאין שם רגע של החלטה. היד זזה, המסך נדלק, וזהו. וזה לא פגם בזיכרון. פשוט לא הייתה החלטה מודעת.\n\nדניאל כהנמן תיאר שתי מערכות. <strong>מערכת 1</strong> מהירה, אוטומטית וחסרת מאמץ. <strong>מערכת 2</strong> איטית, מודעת ודורשת מאמץ. ואנחנו מזהים את עצמנו עם השנייה, עם החלק ששוקל ובוחר.\n\nאבל שליפת הטלפון היא פעולה של מערכת 1 כמעט תמיד. היא מופעלת על ידי רמז בסביבה, שעמום קטן, רגע של המתנה, ויברציה. <strong>אין רגע שבו אפשר לומר לשליפת הטלפון "לא", כי הפעולה קרתה לפני שהיה מי שיאמר.</strong>',
-              contentEn: 'Skinner explained why it is hard to put the phone down. But there is a question that comes before it: <strong>when exactly did you decide to pick it up?</strong>\n\nTry to recall the last time. It is likely that there is no moment of decision there. The hand moved, the screen lit up, and that is it. And this is not a flaw in memory. There simply was no conscious decision.\n\nDaniel Kahneman described two systems. <strong>System 1</strong> is fast, automatic and effortless. <strong>System 2</strong> is slow, conscious and requires effort. And we identify ourselves with the second, with the part that weighs and chooses.\n\nBut reaching for the phone is almost always an action of System 1. It is triggered by a cue in the environment, a little boredom, a moment of waiting, a vibration. <strong>There is no moment at which one can say "no" to reaching for the phone, because the action happened before there was anyone to say it.</strong>',
-              image: 'images/bonus/psychology/day2-idea.webp'
+              content: 'גלטון הראה שהערכות של אנשים רבים יכולות להשתלב לתוצאה מדויקת, במיוחד כאשר אנשים חושבים באופן עצמאי.\n\nאבל מה קורה כשאנחנו יודעים מה אחרים חושבים, לפני שאנחנו מגבשים את התשובה שלנו?\n\nבשנות ה־50 של המאה ה־20 ערך הפסיכולוג סולומון אש סדרת ניסויים מפורסמת, שבהם בדק עד כמה אנשים מוכנים להסכים עם קבוצה גם כשהיא טועה בבירור.',
+              contentEn: 'Galton showed that the estimates of many people can combine into an accurate result, especially when people think independently.\n\nBut what happens when we know what others think before we form our own answer?\n\nIn the 1950s, the psychologist Solomon Asch conducted a famous series of experiments, in which he tested how willing people are to agree with a group even when it is clearly wrong.'
             },
             {
               type: 'source',
               title: 'קטע מקור',
-              titleEn: 'Source Material',
-              quote: '"בתמונה שעולה מן המחקר, מערכת 1 האינטואיטיבית משפיעה יותר מכפי שהניסיון שלכם מספר לכם, והיא המחברת הסמויה של רבות מן הבחירות והשיפוטים שאתם עושים."',
-              quoteEn: '"In the picture that emerges from recent research, the intuitive System 1 is more influential than your experience tells you, and it is the secret author of many of the choices and judgments you make."',
-              attr: '- דניאל כהנמן, "לחשוב מהר, לחשוב לאט", 2011',
-              attrEn: '- Daniel Kahneman, "Thinking, Fast and Slow", 2011'
+              titleEn: 'Source Text',
+              quote: '"...שצעירים נבונים למדי ובעלי כוונות טובות מוכנים לקרוא ללבן שחור, זהו עניין מדאיג."',
+              quoteEn: '"...that reasonably intelligent and well-meaning young people are willing to call white black is a matter of concern."',
+              attr: 'סולומון אש, "Opinions and Social Pressure", כתב העת Scientific American, 1955',
+              attrEn: 'Solomon Asch, "Opinions and Social Pressure," Scientific American, 1955'
             },
             {
               type: 'explanation',
               title: 'הסבר',
               titleEn: 'Explanation',
-              content: 'מערכת 1 לומדת קישורים. רמז מסוים מתחיל להפעיל תגובה מסוימת, בלי שהמחשבה נדרשת באמצע.\n\nדוגמה מהחיים: אדם עומד בתור בסופר. הוא לא משועמם במיוחד ולא ציפה למשהו. תוך שנייה הטלפון בידו. אם תשאלו אותו למה, הוא ימצא סיבה: "רציתי לבדוק אם ענו לי". אבל הסיבה נבנתה אחרי המעשה, בדיוק כפי שראינו אצל פרויד בפרק השני. <strong>מה שקרה באמת הוא שרמז מוכר, המתנה משעממת בתור, הפעיל תגובה מאומנת.</strong>\n\nוכאן מתחברות שתי החתיכות. סקינר הסביר למה התגובה נלמדה בעוצמה כזו שנעשתה להרגל. כהנמן מסביר למה התגובה שנעשתה להרגל מתרחשת "בלי אישור". יחד הם מתארים מנגנון שלם: <strong>הרגל שנבנה על תגמול לא צפוי, ומופעל על ידי רמז בלי לעבור דרך התודעה.</strong>\n\nולכן שאלת "כמה זמן אתה על הטלפון" לרוב מקבלת תשובה שגויה. לא כי אנשים משקרים, אלא כי אי אפשר לזכור פעולות שלא עברו דרך המערכת הזוכרת.',
-              contentEn: 'System 1 learns associations. A particular cue begins to trigger a particular response, without thought being required in between.\n\nA real-life example: a person is standing in line at the supermarket. He is not especially bored and was not expecting anything. Within a second the phone is in his hand. If you ask him why, he will find a reason: "I wanted to check whether anyone replied to me". But the reason was constructed after the act, exactly as we saw with Freud in the second chapter. <strong>What actually happened is that a familiar cue, boring waiting in a line, triggered a trained response.</strong>\n\nAnd here the two pieces connect. Skinner explained why the response was learned so strongly that it became a habit. Kahneman explains why the response that became a habit occurs "without authorization". Together they describe a whole mechanism: <strong>a habit built on unpredictable reward, and triggered by a cue without passing through consciousness.</strong>\n\nAnd this is why the question "how much time do you spend on your phone" usually gets an incorrect answer. Not because people are lying, but because it is impossible to remember actions that did not pass through the remembering system.',
-              image: 'images/bonus/psychology/day2-explanation.webp'
+              content: 'בניסוי התבקשו המשתתפים לבצע משימה פשוטה: להשוות בין אורכם של קווים.\n\nהוצג להם קו אחד, ולצדו שלושה קווים באורכים שונים. היה עליהם לומר איזה משלושת הקווים שווה באורכו לקו הראשון.\n\nהתשובה הנכונה הייתה ברורה, וכאשר אנשים ביצעו את המשימה לבדם, הם כמעט שלא טעו.\n\nאבל בניסוי המרכזי ישב המשתתף בחדר עם אנשים נוספים, שהוצגו לו כנבדקים אחרים, אך למעשה היו משתפי פעולה של החוקר.\n\nבכמה מהסבבים אמרו שותפי החוקר, בזה אחר זה, את אותה תשובה שגויה. המשתתף האמיתי, שענה כמעט אחרון, נדרש להחליט אם להסכים איתם או לומר את מה שראה בעצמו.\n\nהתוצאה הייתה מפתיעה: בכשליש מהתגובות בסבבים שבהם הקבוצה טעתה, המשתתפים הסכימו עם התשובה השגויה.\n\nכשלושה רבעים מהמשתתפים נכנעו ללחץ הקבוצתי לפחות פעם אחת.\n\nמדוע?\n\nלעיתים אנשים חושבים שאם כולם מסכימים, אולי הקבוצה יודעת משהו שהם אינם יודעים. במקרים אחרים הם סומכים על עיניהם, אך חוששים להיות היחידים שחולקים על כולם.\n\nאלה שני מנגנונים של השפעה חברתית: השפעה אינפורמטיבית, שבה אנחנו נעזרים באחרים כדי לדעת מה נכון, והשפעה נורמטיבית, שבה אנחנו מתאימים את עצמנו לקבוצה כדי לזכות בקבלה או להימנע מדחייה.',
+              contentEn: 'In the experiment, participants were asked to perform a simple task: to compare the lengths of lines.\n\nThey were shown one line, and beside it three lines of different lengths. They had to say which of the three lines was equal in length to the first.\n\nThe correct answer was clear, and when people performed the task alone, they almost never erred.\n\nBut in the main experiment, the participant sat in a room with other people, who were presented to him as other subjects, but were in fact the researcher\'s confederates.\n\nIn several of the rounds, the researcher\'s confederates, one after another, gave the same wrong answer. The real participant, who answered almost last, had to decide whether to agree with them or to say what he saw himself.\n\nThe result was surprising: in about a third of the responses in rounds where the group was wrong, participants agreed with the wrong answer.\n\nAbout three quarters of the participants yielded to group pressure at least once.\n\nWhy?\n\nSometimes people think that if everyone agrees, perhaps the group knows something they do not. In other cases they trust their eyes, but fear being the only one who disagrees with everyone.\n\nThese are two mechanisms of social influence: informational influence, in which we rely on others to know what is true, and normative influence, in which we conform to the group in order to gain acceptance or avoid rejection.'
             },
             {
               type: 'depth',
-              title: 'עומק',
-              titleEn: 'Depth',
-              content: 'וכאן כהנמן מציע את המסקנה המעשית ביותר בפרק, והיא הפוכה לאינטואיציה.\n\nהוא נשאל שוב ושוב איך מתגברים על הטיות, וענה שהוא עצמו, אחרי עשרות שנות מחקר, כמעט לא השתפר בזיהוי ההטיות של עצמו בזמן אמת. ומכאן הסיק: <strong>אם קשה לתפוס את הפעולה ברגע, עדיף לשנות את התנאים מראש במקום להסתמך על כוח רצון בזמן אמת.</strong>\n\nבהקשר של הטלפון זה מסביר תופעה מוכרת. החלטה כמו "אשתמש פחות" פונה למערכת 2, לחלק שמנסח כוונות. אבל הפעולה עצמה מתרחשת במערכת 1, שאינה שומעת כוונות. לכן ההחלטה נשברת בלי שנרגיש שהפרנו אותה. דוגמאות לתנאים שאפשר לשנות מראש, בהקשר של הטלפון: להרחיק את הטלפון מהחדר כשרוצים להתרכז במשהו בלי הסחת דעת, למחוק אפליקציה שנכנסים אליה יותר משרוצים, וכו\'.\n\nוצריך גם ביקורת. החלוקה לשתי מערכות היא מטאפורה שימושית ולא חלוקה ממשית במוח, וחלק מהמחקרים בתחום ההטיות לא שוחזרו במלואם. אבל התובנה המרכזית עומדת: <strong>אנחנו מייחסים לעצמנו הרבה יותר שליטה מכפי שיש לנו באמת.</strong>\n\nומכאן לדיאלוג הבא. עד כה דיברנו על מנגנון. אבל למה דווקא הדבר הזה, דווקא הטלפון, מושך אותנו? היינץ קוהוט יטען שמה שממתין שם נוגע בצורך עמוק מאוד.',
-              contentEn: 'And here Kahneman offers the most practical conclusion in the chapter, and it is counterintuitive.\n\nHe was asked again and again how one overcomes biases, and answered that he himself, after decades of research, had barely improved at identifying his own biases in real time. And from this he concluded: <strong>if it is hard to catch the action in the moment, it is better to change the conditions in advance instead of relying on willpower in real time.</strong>\n\nIn the context of the phone this explains a familiar phenomenon. A decision such as "I will use it less" appeals to System 2, to the part that formulates intentions. But the action itself takes place in System 1, which does not listen to intentions. That is why the decision breaks without our feeling that we have violated it. Examples of conditions that can be changed in advance, in the context of the phone: keeping the phone out of the room when you want to concentrate on something without distraction, deleting an app you open more than you want to, and so on.\n\nAnd criticism is also needed. The division into two systems is a useful metaphor and not an actual division in the brain, and some of the studies in the field of biases were not fully replicated. But the central insight stands: <strong>we attribute to ourselves far more control than we actually have.</strong>\n\nAnd from here to the next dialogue. So far we have spoken about mechanism. But why this thing in particular, why the phone in particular, draws us? Heinz Kohut will argue that what waits there touches a very deep need.',
-              image: 'images/bonus/psychology/day2-depth.webp'
+              title: 'העומק שמאחורי הרעיון',
+              titleEn: 'The Depth Behind the Idea',
+              content: 'הניסוי של אש מציג בעיה מרכזית לחוכמת ההמונים.\n\nכשאנשים מושפעים מתשובותיהם של אחרים, ההערכות כבר אינן עצמאיות. במקום שטעויות שונות יתקזזו, טעות אחת עלולה להתפשט בקבוצה.\n\nזה יכול לקרות גם ברשתות חברתיות: כשאנחנו רואים שדעה מסוימת זכתה לאלפי לייקים, ייתכן שנתייחס אליה כמשכנעת יותר.\n\nאבל הניסוי חשף גם ממצא מעודד: כאשר אחד ממשתפי הפעולה של החוקר חלק על הרוב ונתן תשובה נכונה, הנטייה של המשתתפים האמיתיים להסכים עם הקבוצה ירדה משמעותית.\n\nכלומר, לפעמים מספיק אדם אחד שחושב אחרת כדי להקל גם על אחרים להביע דעה עצמאית.\n\nחשוב לזכור שרוב התגובות בניסוי לא היו שגויות. אש לא הראה שאנשים מצייתים לרוב באופן עיוור תמיד, אלא שלחץ קבוצתי עשוי להשפיע עליהם אפילו במשימות פשוטות מאוד.\n\nמה זה אומר על שוקי התחזיות? המחירים והעסקאות גלויים למשתתפים, ולכן הם עשויים להיות מושפעים מההערכות שכבר התגבשו בשוק.\n\nבדיאלוג הבא דניאל כהנמן יעזור לנו להבין מדוע טעויות משותפות עלולות לפגוע בדיוק של הקבוצה, גם כשאיש אינו מעתיק במכוון מאחרים.',
+              contentEn: 'Asch\'s experiment presents a central problem for the wisdom of crowds.\n\nWhen people are influenced by the answers of others, their estimates are no longer independent. Instead of different errors canceling out, a single error can spread through the group.\n\nThis can also happen on social networks: when we see that a certain opinion has received thousands of likes, we may regard it as more convincing.\n\nBut the experiment also revealed an encouraging finding: when one of the researcher\'s confederates disagreed with the majority and gave the correct answer, the real participants\' tendency to agree with the group dropped significantly.\n\nIn other words, sometimes it takes just one person who thinks differently to make it easier for others, too, to express an independent opinion.\n\nIt is important to remember that most responses in the experiment were not wrong. Asch did not show that people always blindly obey the majority, but that group pressure can influence them even on very simple tasks.\n\nWhat does this mean for prediction markets? Prices and trades are visible to participants, so they may be influenced by the estimates already formed in the market.\n\nIn the next dialogue, Daniel Kahneman will help us understand why shared errors can harm the group\'s accuracy, even when no one is deliberately copying others.'
             },
             {
               type: 'quiz',
-              intro: 'אדם עומד בתור, ותוך שנייה הטלפון בידו. כשנשאל למה, הוא עונה "רציתי לבדוק אם ענו לי".',
-              introEn: 'A person is standing in line, and within a second the phone is in his hand. When asked why, he answers "I wanted to check whether anyone replied to me".',
-              question: 'מה קרה כאן לפי כהנמן?',
-              questionEn: 'What happened here according to Kahneman?',
-              options: ['רמז בסביבה הפעיל תגובה מאומנת, וההסבר נבנה אחר כך, בדיעבד', 'הוא שקל את המצב והחליט במודע לבדוק הודעות', 'לא קרה שום תהליך מנטלי, אלא רק תנועה של השריר'],
-              optionsEn: ['A cue in the environment triggered a trained response, and the explanation was constructed afterwards, in retrospect', 'He weighed the situation and consciously decided to check messages', 'No mental process happened at all, only a movement of the muscle'],
+              question: 'מה הראה ניסוי הקווים של אש?',
+              questionEn: 'What did Asch\'s line experiment show?',
+              options: ['שאנשים עשויים להסכים עם תשובה קבוצתית שגויה גם כאשר התשובה הנכונה ברורה.', 'שרוב האנשים אינם מסוגלים להבחין בין קווים באורכים שונים.', 'שקבוצות מגיעות תמיד לתשובה מדויקת יותר מאנשים יחידים.'],
+              optionsEn: ['That people may agree with a wrong group answer even when the correct answer is clear.', 'That most people are unable to tell lines of different lengths apart.', 'That groups always reach a more accurate answer than individuals.'],
               correctIndex: 0,
-              explanation: 'ההסבר הוא לא בדיוק שקר, הוא פשוט הגיע מאוחר. מערכת 1 הגיבה לרמז מוכר, המתנה ריקה, ומערכת 2 סיפקה סיבה סבירה בדיעבד.',
-              explanationEn: 'The explanation is not exactly a lie, it simply arrived late. System 1 responded to a familiar cue, empty waiting, and System 2 supplied a reasonable reason in retrospect.'
+              explanation: 'המשתתפים ידעו לבצע את המשימה היטב לבדם, אבל כאשר הקבוצה ענתה תשובה שגויה, חלקם הסכימו איתה.',
+              explanationEn: 'Participants performed the task well alone, but when the group gave a wrong answer, some of them agreed with it.'
             },
             {
               type: 'quiz',
-              intro: 'אדם מחליט "מהיום אשתמש פחות בטלפון", ותוך יומיים חוזר להרגלו.',
-              introEn: 'A person decides "from today I will use the phone less", and within two days returns to his habit.',
-              question: 'לפי כהנמן, למה זה קורה?',
-              questionEn: 'According to Kahneman, why does this happen?',
-              options: ['משום שההחלטה לא הייתה כנה מספיק מלכתחילה', 'משום שההחלטה נוסחה במערכת האיטית, והפעולה מתרחשת במהירה', 'משום שהוא פשוט לא התאמץ מספיק ברגעים הקריטיים'],
-              optionsEn: ['Because the decision was not sincere enough in the first place', 'Because the decision was formulated in the slow system, and the action takes place in the fast one', 'Because he simply did not try hard enough at the critical moments'],
-              correctIndex: 1,
-              explanation: 'זו הבעיה המבנית. הכוונה נוסחה בחלק ששוקל, אבל הפעולה מופעלת בחלק שאינו מקשיב לכוונות. לכן ההחלטה נשברת בלי שמרגישים ברגע ההפרה.',
-              explanationEn: 'This is the structural problem. The intention was formulated in the part that weighs, but the action is triggered in the part that does not listen to intentions. That is why the decision breaks without one feeling the moment of violation.'
-            },
-            {
-              type: 'quiz',
-              intro: 'כהנמן עצמו, אחרי עשרות שנות מחקר, כמעט לא השתפר בזיהוי הטיותיו בזמן אמת.',
-              introEn: 'Kahneman himself, after decades of research, had barely improved at identifying his own biases in real time.',
-              question: 'מה המסקנה המעשית שהסיק מכך?',
-              questionEn: 'What is the practical conclusion he drew?',
-              options: ['שאין טעם לנסות, ולכן עדיף לוותר על כל שינוי', 'שיש להתאמן עוד ולהאמין ביכולת לתפוס כל הטיה בזמן אמת', 'שכדאי לשנות תנאים מראש, במקום להסתמך על ערנות ברגע ההחלטה עצמו'],
-              optionsEn: ['That there is no point in trying, and therefore it is better to give up on any change', 'That one should train more and believe in the ability to catch every bias in real time', 'That it is worth changing conditions in advance, instead of relying on alertness at the moment of decision itself'],
+              question: 'אדם בטוח שהתשובה שלו נכונה, אך משנה אותה כדי לא להיות היחיד שחולק על הקבוצה. איזה מנגנון מסביר זאת בצורה הטובה ביותר?',
+              questionEn: 'A person is sure that their answer is correct, but changes it so as not to be the only one who disagrees with the group. Which mechanism best explains this?',
+              options: ['חוכמת ההמונים: האדם מניח שהממוצע של הקבוצה מדויק יותר.', 'השפעה אינפורמטיבית: האדם סבור שלקבוצה יש מידע נוסף שאינו ברשותו.', 'השפעה נורמטיבית: האדם מתאים את תשובתו לקבוצה כדי להימנע מחריגות או מדחייה.'],
+              optionsEn: ['The wisdom of crowds: the person assumes that the group\'s average is more accurate.', 'Informational influence: the person believes the group has additional information that they lack.', 'Normative influence: the person adapts their answer to the group to avoid standing out or being rejected.'],
               correctIndex: 2,
-              explanation: 'זו מסקנה מפוכחת ולא מייאשת. אם קשה לתפוס את הפעולה כשהיא קורית, עדיף לשנות את מה שקורה לפניה: את הסביבה, את הרמזים, ואת מה שהוחלט מראש.',
-              explanationEn: 'This is a sober conclusion and not a despairing one. If it is hard to catch the action as it happens, it is better to change what happens before it: the environment, the cues, and what was decided in advance.'
+              explanation: 'בהשפעה נורמטיבית האדם עשוי לדעת שהקבוצה טועה, ובכל זאת להתאים את עצמו אליה בגלל הלחץ החברתי.',
+              explanationEn: 'In normative influence, a person may know that the group is wrong, and still conform to it because of social pressure.'
             },
-            { type: 'quiz_summary' }
+            {
+              type: 'quiz',
+              question: 'מדוע הוספת משתתף אחד שנתן תשובה נכונה הפחיתה את ההסכמה עם הקבוצה השגויה?',
+              questionEn: 'Why did adding one participant who gave the correct answer reduce agreement with the wrong group?',
+              options: ['משום שהמשימה נעשתה קלה יותר מבחינה תפיסתית.', 'משום שהמשתתף האמיתי כבר לא היה היחיד שחלק על דעת הרוב.', 'משום שהחוקרים הפסיקו להציג תשובות שגויות.'],
+              optionsEn: ['Because the task became easier perceptually.', 'Because the real participant was no longer the only one who disagreed with the majority.', 'Because the researchers stopped presenting wrong answers.'],
+              correctIndex: 1,
+              explanation: 'כאשר אדם נוסף חולק על הרוב, קל יותר להביע עמדה עצמאית. הדבר ממחיש את חשיבותו של חוסר הסכמה בתוך קבוצה.',
+              explanationEn: 'When another person disagrees with the majority, it is easier to express an independent position. This illustrates the importance of disagreement within a group.'
+            },
+            {
+              type: 'quiz_summary'
+            }
           ]
         },
         {
           id: 3,
-          title: 'לייק כשיקוף',
-          titleEn: 'A Like as Mirror',
-          thinker: 'היינץ קוהוט',
-          thinkerEn: 'Heinz Kohut',
-          thinkerId: 'kohut',
+          title: 'כהנמן: טעויות שמתקזזות וטעויות שנשארות',
+          titleEn: 'Kahneman: Errors That Cancel Out and Errors That Remain',
+          thinker: 'דניאל כהנמן',
+          thinkerEn: 'Daniel Kahneman',
+          thinkerId: "kahneman",
           xp: 50,
           sections: [
             {
               type: 'idea',
               title: 'הרעיון של היום',
               titleEn: 'Today\'s Idea',
-              content: 'עד כה דיברנו על מנגנון: הרגל חזק שמופעל בלי אישור. אבל נשארה שאלה. <strong>למה דווקא הדבר הזה?</strong> למה דווקא הטלפון והרשתות החברתיות? יש הרבה הרגלים אפשריים, ולא כולם תופסים אנשים באותה עוצמה.\n\nהיינץ קוהוט הציע תשובה. הוא טען שהצורך שמישהו יראה אותנו אינו חולשה ואינו יהירות, אלא <strong>צורך התפתחותי בסיסי</strong>. הילד זקוק לשיקוף, לפנים של מבוגר שנדלקות כשהוא מופיע, ומכך נבנית בהדרגה תחושה יציבה של "אני קיים, ויש לי ערך".\n\nוהצורך הזה אינו נעלם עם הבגרות, כפי שראינו בפרק השלישי. הוא רק משנה צורה.\n\nוכאן נמצא ההסבר. הרשתות החברתיות אינן ממציאות צורך חדש, הן פוגעות בול בצורך ותיק. <strong>לייק אינו סתם מספר. הוא אות קטן שאומר: מישהו ראה.</strong> ולכן לייק מרגיש כל כך משמעותי.',
-              contentEn: 'So far we have spoken about mechanism: a strong habit triggered without authorization. But a question remains. <strong>Why this thing in particular?</strong> Why the phone and social networks in particular? There are many possible habits, and not all of them grip people with the same intensity.\n\nHeinz Kohut offered an answer. He argued that the need for someone to see us is not a weakness and not arrogance, but <strong>a basic developmental need</strong>. The child needs mirroring, the face of an adult that lights up when he appears, and from this a stable sense of "I exist, and I have worth" is gradually built.\n\nAnd this need does not disappear with maturity, as we saw in the third chapter. It only changes form.\n\nAnd here is the explanation. Social networks do not invent a new need, they hit an old need exactly. <strong>A like is not just a number. It is a small signal that says: someone saw.</strong> And that is why a like feels so meaningful.',
-              image: 'images/bonus/psychology/day3-idea.webp'
+              content: 'גלטון הראה כיצד ניחושים שונים יכולים להשתלב להערכה מדויקת, ואש הראה כיצד השפעה חברתית עלולה לפגוע בעצמאות השיפוט.\n\nאבל גם כאשר אנשים חושבים באופן עצמאי, לא כל טעות נעלמת כשמחשבים ממוצע.\n\nדניאל כהנמן, פסיכולוג ישראלי־אמריקאי וחתן פרס נובל לכלכלה, עסק בהבחנה בין שני סוגים מרכזיים של טעויות בשיפוט: רעש והטיה.',
+              contentEn: 'Galton showed how different guesses can combine into an accurate estimate, and Asch showed how social influence can harm the independence of judgment.\n\nBut even when people think independently, not every error disappears when we compute an average.\n\nDaniel Kahneman, an Israeli-American psychologist and Nobel Prize winner in economics, dealt with the distinction between two main types of errors in judgment: noise and bias.'
             },
-            // Kohut quote verified against secondary sources only: a
-            // Psychology Today aggregator and a ResearchGate paper on
-            // Kohut and Lacan mirroring, both citing Analysis of the
-            // Self 1971 p. 116. Not verified against the primary text.
-            // Aggregator tier, same convention as the Beck source in
-            // chapter 4.
             {
               type: 'source',
               title: 'קטע מקור',
-              titleEn: 'Source Material',
-              quote: '"הניצוץ בעיניה של האם, המשקף את תצוגתו של הילד."',
-              quoteEn: '"The gleam in the mother\'s eye, which mirrors the child\'s exhibitionistic display."',
-              attr: '- היינץ קוהוט, "אנליזה של העצמי", 1971, עמ\' 116',
-              attrEn: '- Heinz Kohut, "The Analysis of the Self", 1971, p. 116'
+              titleEn: 'Source Text',
+              quote: '"בכל מקום שיש שיפוט, יש רעש, והרבה יותר מכפי שאנחנו חושבים."',
+              quoteEn: '"Wherever there is judgment, there is noise, and more of it than you think."',
+              attr: 'דניאל כהנמן, אוליבייה סיבוני וקאס סאנסטיין, "Noise", 2021',
+              attrEn: 'Daniel Kahneman, Olivier Sibony and Cass Sunstein, Noise, 2021'
             },
             {
               type: 'explanation',
               title: 'הסבר',
               titleEn: 'Explanation',
-              content: 'קוהוט תיאר שיקוף כרגע מדויק, לא ככמות. <strong>מה שבונה אינו כמות התשומת לב, אלא האם התגובה תואמת את מה שהאדם חווה.</strong>\n\nוכאן ההבדל שהופך את הדיאלוג הזה לחשוב. לייק הוא שיקוף בלי דיוק. הוא אומר "נרשמה נוכחות", אבל לא "ראיתי אותך". ולכן הוא עובד לרגע ואז מתפוגג, ודורש עוד.\n\nדוגמה מהחיים: אדם מפרסם משהו שחשוב לו. הוא חוזר לבדוק אחרי דקה, ואחרי חמש, ואחרי חצי שעה. כל בדיקה נותנת משהו קטן, וכל בדיקה מסתיימת בצורך לבדוק שוב. <strong>הוא אינו רודף אחרי מספרים, הוא מחפש את הניצוץ בעיניים.</strong> רק שהפלטפורמה שבחר מספקת רק את הצל שלו.\n\nוזה מסביר גם למה תגובה אחת מאדם משמעותי שווה יותר ממאה לייקים. הראשונה היא שיקוף מדויק, והשנייה היא ספירה.',
-              contentEn: 'Kohut described mirroring as a precise moment, not as a quantity. <strong>What builds is not the amount of attention, but whether the response matches what the person is experiencing.</strong>\n\nAnd here is the difference that makes this dialogue important. A like is mirroring without precision. It says "a presence was registered", but not "I saw you". And therefore it works for a moment and then dissipates, and demands more.\n\nA real-life example: a person posts something that matters to him. He goes back to check after a minute, and after five, and after half an hour. Every check gives something small, and every check ends with the need to check again. <strong>He is not chasing numbers, he is looking for the gleam in the eyes.</strong> Only that the medium he chose supplies only its shadow.\n\nAnd this also explains why one response from a significant person is worth more than a hundred likes. The first is precise mirroring, and the second is counting.',
-              image: 'images/bonus/psychology/day3-explanation.webp'
+              content: 'דמיינו שני קלעים שמנסים לפגוע במרכזה של מטרה.\n\nהקלע הראשון יורה פעם גבוה מדי, פעם נמוך מדי, ופעם ימינה או שמאלה. הפגיעות שלו מפוזרות סביב המרכז.\n\nזהו רעש: שונות לא רצויה בין הערכות או שיפוטים.\n\nהקלע השני יורה שוב ושוב לאותו אזור, אבל האזור שהוא פוגע בו נמצא הרחק ממרכז המטרה.\n\nזוהי הטיה: סטייה שיטתית מהתוצאה הנכונה.\n\nעכשיו נחשוב מה יקרה אם נחשב את הממוצע של כל הפגיעות.\n\nאצל הקלע הראשון, הטעויות עשויות להתקזז, כך שהממוצע יתקרב למרכז המטרה.\n\nאצל הקלע השני, הפגיעות כולן מרוכזות סביב המקום הלא נכון. לכן גם הממוצע שלהן יהיה שגוי (כלומר, הוא לא יהיה במרכז המטרה).\n\nבמילים אחרות: ממוצע של הערכות רבות יכול לצמצם רעש אקראי, אבל אינו מתקן בהכרח הטיה שיטתית.\n\nנניח שמבקשים מאנשים לנחש את גובהו של בניין. לפני שהם מנחשים, מראים לכולם מספר גבוה במיוחד.\n\nהמספר הזה עשוי להשפיע על ההערכות שלהם ולגרום לרבים לנחש מספר גבוה מדי.\n\nהתופעה נקראת עיגון (Anchoring): הערכות שלנו מושפעות מנקודת ייחוס קודמת, גם כשהיא אינה מספקת מידע רלוונטי.\n\nאם כולם מושפעים מאותו עוגן, ההערכות שלהם עלולות לסטות באותו כיוון, והממוצע לא יתקן את הטעות.',
+              contentEn: 'Imagine two marksmen trying to hit the center of a target.\n\nThe first marksman fires sometimes too high, sometimes too low, and sometimes to the right or left. His hits are scattered around the center.\n\nThis is noise: unwanted variability between estimates or judgments.\n\nThe second marksman fires again and again at the same area, but the area he hits is far from the center of the target.\n\nThis is bias: a systematic deviation from the correct result.\n\nNow let us think about what would happen if we computed the average of all the hits.\n\nFor the first marksman, the errors may cancel out, so the average would approach the center of the target.\n\nFor the second marksman, all the hits are concentrated around the wrong place. So their average too will be wrong (that is, it will not be at the center of the target).\n\nIn other words: an average of many estimates can reduce random noise, but does not necessarily correct systematic bias.\n\nSuppose people are asked to guess the height of a building. Before they guess, everyone is shown an unusually high number.\n\nThat number may influence their estimates and cause many to guess too high.\n\nThe phenomenon is called anchoring: our estimates are influenced by a prior reference point, even when it provides no relevant information.\n\nIf everyone is influenced by the same anchor, their estimates may deviate in the same direction, and the average will not correct the error.'
             },
             {
               type: 'depth',
-              title: 'עומק',
-              titleEn: 'Depth',
-              content: 'וכאן שלוש החתיכות של הפרק מתחברות. סקינר הסביר את המנגנון, כהנמן את האוטומטיות, וקוהוט מסביר למה דווקא ההרגל הזה. <strong>ההרגל הזה תפס כל כך חזק לא בגלל התוכן, אלא כי מה שממתין שם נוגע בצורך אמיתי.</strong>\n\nוזו גם הנקודה החשובה מכולן: <strong>הצורך עצמו אינו הבעיה.</strong> קוהוט התעקש שאין כאן פגם אופי. אדם שרוצה שיראו אותו אינו נרקיסיסט, הוא אדם. הקושי אינו ברצון להיראות, אלא בכך שהאמצעי מספק גרסה מהירה ורדודה שלו.\n\nוצריך גם ביקורת. קוהוט נשען על עבודה קלינית ולא על ניסויים, ותורת העצמי קשה למדידה. אבל המחקר על היענות מכווננת בין הורה לתינוק, אשר נמדד, מוצא בדיוק את מה שתיאר: הדיוק חשוב יותר מהכמות.\n\nומכאן לדיאלוג הבא. קוהוט הסביר למה אנחנו נמשכים לשם. אדוארד דצ\'י ישאל שאלה קשה יותר: מה קורה לתחביב שאהבנו כשמתחילים לספור אותו?',
-              contentEn: 'And here the three pieces of the chapter connect. Skinner explained the mechanism, Kahneman the automaticity, and Kohut explains why this particular habit. <strong>This habit took hold so strongly not because of the content, but because what waits there touches a real need.</strong>\n\nAnd this is also the most important point of all: <strong>the need itself is not the problem.</strong> Kohut insisted that there is no character flaw here. A person who wants to be seen is not a narcissist, he is a person. The difficulty is not in the wish to be seen, but in the fact that the means supplies a fast and shallow version of it.\n\nAnd criticism is also needed. Kohut relied on clinical work and not on experiments, and self psychology is hard to measure. But the research on attuned responsiveness between parent and infant, which was measured, finds exactly what he described: precision matters more than quantity.\n\nAnd from here to the next dialogue. Kohut explained why we are drawn there. Edward Deci will ask a harder question: what happens to a hobby we loved when we start counting it?',
-              image: 'images/bonus/psychology/day3-depth.webp'
+              title: 'העומק שמאחורי הרעיון',
+              titleEn: 'The Depth Behind the Idea',
+              content: 'ההבחנה בין רעש להטיה חשובה במיוחד כשאנחנו משתמשים בחוכמת ההמונים.\n\nלמשל, אם כמה רופאים בוחנים את אותו מקרה ומגיעים להערכות שונות מסיבות שאינן מוצדקות, שילוב של שיפוטיהם עשוי לצמצם חלק מהרעש.\n\nאבל אם כולם מבססים את החלטתם על אותה הנחה שגויה, שילוב ההערכות לא בהכרח יועיל.\n\nגם בשוקי תחזיות עלולה להתעורר בעיה דומה: אם רוב המשתתפים מסתמכים על אותן כותרות חדשותיות או מושפעים מאותה תפיסה מוטעית, השוק כולו עלול להיות מוטה.\n\n(עם זאת, לשוק יש מנגנון שלא קיים בניחוש ממוצע פשוט: משתתף שמזהה שהמחיר מוטה יכול לסחור נגד ההערכה המקובלת, ובכך להשפיע על המחיר. האפשרות להרוויח מתיקון טעות עשויה לעודד דיוק, אך אינה מבטיחה אותו.)\n\nכעת עולה שאלה נוספת: מדוע לפעמים אנחנו נאחזים דווקא בהערכות שגויות?\n\nבדיאלוג הבא נכיר את רעיון הדיסוננס הקוגניטיבי של ליאון פסטינגר, ונראה כיצד הרצון להצדיק את אמונותינו והחלטותינו עלול להשפיע על השיפוט שלנו.',
+              contentEn: 'The distinction between noise and bias is especially important when we use the wisdom of crowds.\n\nFor example, if several doctors examine the same case and arrive at different assessments for unjustified reasons, combining their judgments may reduce some of the noise.\n\nBut if everyone bases their decision on the same wrong assumption, combining the estimates will not necessarily help.\n\nA similar problem can arise in prediction markets too: if most participants rely on the same news headlines or are influenced by the same misconception, the entire market may be biased.\n\n(However, a market has a mechanism that does not exist in a simple average of guesses: a participant who identifies that the price is biased can trade against the accepted estimate, and thereby affect the price. The possibility of profiting from correcting an error may encourage accuracy, but does not guarantee it.)\n\nNow another question arises: why do we sometimes cling precisely to wrong estimates?\n\nIn the next dialogue we will meet Leon Festinger\'s idea of cognitive dissonance, and see how the desire to justify our beliefs and decisions can affect our judgment.'
             },
             {
               type: 'quiz',
-              intro: 'אדם מפרסם משהו שחשוב לו וחוזר לבדוק שוב ושוב.',
-              introEn: 'A person posts something that matters to him and goes back to check again and again.',
-              question: 'לפי קוהוט, מה הוא מחפש?',
-              questionEn: 'According to Kohut, what is he looking for?',
-              options: ['מספרים גבוהים, כי המספר עצמו הוא המטרה שלו', 'שום דבר, שכן זו התנהגות אקראית ללא משמעות', 'שיקוף, כלומר סימן שמישהו ראה אותו באמת'],
-              optionsEn: ['High numbers, because the number itself is his goal', 'Nothing, since this is random behavior with no meaning', 'Mirroring, that is, a sign that someone really saw him'],
-              correctIndex: 2,
-              explanation: 'הוא אינו רודף אחרי הספירה, הוא מחפש את הניצוץ בעיניים. הצורך שמישהו יראה אותנו הוא צורך התפתחותי אמיתי, והמספר הוא רק הצורה שהפלטפורמה מציעה לו.',
-              explanationEn: 'He is not chasing the count, he is looking for the gleam in the eyes. The need for someone to see us is a real developmental need, and the number is only the form the medium offers it.'
-            },
-            {
-              type: 'quiz',
-              intro: 'תגובה אחת מאדם קרוב לעומת מאה לייקים.',
-              introEn: 'One response from a close person versus a hundred likes.',
-              question: 'מדוע התגובה מאדם קרוב מרגישה לרוב משמעותית יותר?',
-              questionEn: 'Why does one response from a close person usually feel more meaningful?',
-              options: ['משום שאדם קרוב מכיר אותנו זמן רב יותר, ולכן דעתו חשובה', 'משום ששיקוף נמדד בדיוק ולא בכמות, ותגובה מדויקת אומרת ראיתי אותך', 'משום שלייקים תמיד חסרי ערך, בעוד שתגובות תמיד בעלות ערך'],
-              optionsEn: ['Because a close person has known us longer, and therefore his opinion matters', 'Because mirroring is measured by precision and not by quantity, and a precise response says I saw you', 'Because likes are always worthless, whereas responses are always valuable'],
+              question: 'מה ההבדל המרכזי בין רעש להטיה?',
+              questionEn: 'What is the main difference between noise and bias?',
+              options: ['רעש הוא סטייה שיטתית מהתוצאה הנכונה, והטיה היא שונות אקראית בין הערכות.', 'רעש הוא שונות לא רצויה בין הערכות, ואילו הטיה היא סטייה שיטתית מהתוצאה הנכונה.', 'רעש מתרחש רק אצל אנשים חסרי ידע, ואילו הטיה מתרחשת רק אצל מומחים.'],
+              optionsEn: ['Noise is a systematic deviation from the correct result, and bias is random variability between estimates.', 'Noise is unwanted variability between estimates, whereas bias is a systematic deviation from the correct result.', 'Noise occurs only among people without knowledge, whereas bias occurs only among experts.'],
               correctIndex: 1,
-              explanation: 'זו הנקודה של קוהוט. שיקוף אינו כמות תשומת לב, אלא התאמה למה שהאדם חווה. לייק מסמן נוכחות, ותגובה מדויקת מסמנת שמישהו באמת ראה.',
-              explanationEn: 'This is Kohut\'s point. Mirroring is not a quantity of attention, but a match to what the person is experiencing. A like signals presence, and a precise response signals that someone really saw.'
+              explanation: 'רעש מתבטא בפיזור לא רצוי בין הערכות, ואילו הטיה היא סטייה שיטתית מהתוצאה הנכונה. שתי התופעות יכולות להתקיים יחד: ההערכות יכולות להיות מפוזרות, ובכל זאת להיות מוטות בממוצע לכיוון מסוים.',
+              explanationEn: 'Noise shows up as unwanted scatter between estimates, whereas bias is a systematic deviation from the correct result. The two phenomena can exist together: estimates can be scattered, and still be biased on average in a certain direction.'
             },
             {
               type: 'quiz',
-              intro: 'חבר אומר: "מי שאכפת לו מלייקים הוא פשוט נרקיסיסט."',
-              introEn: 'A friend says: "Anyone who cares about likes is simply a narcissist."',
-              question: 'כיצד קוהוט היה חולק על כך?',
-              questionEn: 'How would Kohut disagree?',
-              options: ['הצורך שיראו אותנו הוא בסיסי ואנושי, והשאלה היא רק היכן מחפשים אותו', 'הוא היה מסכים, שכן הצורך בהכרה הוא תמיד סימן לפתולוגיה', 'הוא היה טוען שרק ילדים זקוקים לכך, ומבוגרים כלל לא'],
-              optionsEn: ['The need for us to be seen is basic and human, and the question is only where one looks for it', 'He would agree, since the need for recognition is always a sign of pathology', 'He would argue that only children need this, and adults not at all'],
-              correctIndex: 0,
-              explanation: 'קוהוט חלק במפורש על התפיסה שהצורך בהכרה הוא פגם. הוא ראה בו צורך התפתחותי, כמו מזון או שינה. מה שכן משתנה הוא היכן הוא נענה, ובאיזו רמת דיוק.',
-              explanationEn: 'Kohut explicitly disagreed with the view that the need for recognition is a flaw. He saw it as a developmental need, like food or sleep. What does change is where it is answered, and at what level of precision.'
+              question: 'לפני שאנשים מעריכים את גובהו של בניין, מראים לכולם מספר גבוה במיוחד. בעקבות זאת, רובם מעריכים את גובה הבניין ביתר. כיצד הדבר ישפיע על הממוצע?',
+              questionEn: 'Before people estimate the height of a building, everyone is shown an unusually high number. As a result, most of them overestimate the building\'s height. How will this affect the average?',
+              options: ['הממוצע יהיה בהכרח מדויק, משום שמשתתפים אנשים רבים וחוכמת ההמונים תקזז את השפעת העוגן.', 'הממוצע יהיה נמוך מדי, משום שאנשים נוטים לתקן הגזמות.', 'הממוצע עלול להיות גבוה מדי, משום שרבים מהמשתתפים הושפעו מאותו עוגן.'],
+              optionsEn: ['The average will necessarily be accurate, because many people participate and the wisdom of crowds will cancel out the effect of the anchor.', 'The average will be too low, because people tend to correct exaggerations.', 'The average may be too high, because many of the participants were influenced by the same anchor.'],
+              correctIndex: 2,
+              explanation: 'עיגון משותף עשוי ליצור הטיה באותו כיוון. כשהערכות רבות מוטות באופן דומה, הממוצע שלהן עלול להיות מוטה גם הוא.',
+              explanationEn: 'A shared anchor can create bias in the same direction. When many estimates are biased in a similar way, their average may be biased as well.'
             },
-            { type: 'quiz_summary' }
+            {
+              type: 'quiz',
+              question: 'כיצד שוק תחזיות עשוי להתמודד עם הטיה משותפת של המשתתפים?',
+              questionEn: 'How might a prediction market cope with a shared bias among its participants?',
+              options: ['משתתפים שמזהים שהמחיר אינו תואם את המידע הקיים יכולים לסחור נגדו ולהשפיע על המחיר.', 'עצם העובדה שהמשתתפים מסכנים כסף מבטלת כל אפשרות להטיה.', 'אם רוב המשתתפים מסכימים על תחזית, היא בהכרח מדויקת.'],
+              optionsEn: ['Participants who identify that the price does not match the available information can trade against it and affect the price.', 'The very fact that participants risk money eliminates any possibility of bias.', 'If most participants agree on a forecast, it is necessarily accurate.'],
+              correctIndex: 0,
+              explanation: 'בשוק תחזיות יש תמריץ כלכלי לזהות טעויות במחיר. עם זאת, תיקון הטעות תלוי בכך שיהיו משתתפים בעלי מידע מתאים ושיוכלו וירצו לפעול לפיו.',
+              explanationEn: 'In a prediction market there is an economic incentive to identify errors in the price. However, correcting the error depends on there being participants who have the relevant information and who are able and willing to act on it.'
+            },
+            {
+              type: 'quiz_summary'
+            }
           ]
         },
         {
           id: 4,
-          title: 'כשמתחילים לספור',
-          titleEn: 'When You Start Counting',
-          thinker: 'אדוארד דצ\'י',
-          thinkerEn: 'Edward Deci',
-          thinkerId: 'deci',
+          title: 'פסטינגר: מדוע אנחנו נאחזים במה שאנחנו רוצים להאמין בו?',
+          titleEn: 'Festinger: Why Do We Cling to What We Want to Believe?',
+          thinker: 'ליאון פסטינגר',
+          thinkerEn: 'Leon Festinger',
+          thinkerId: "festinger",
           xp: 50,
           sections: [
             {
               type: 'idea',
               title: 'הרעיון של היום',
               titleEn: 'Today\'s Idea',
-              content: 'קוהוט הסביר למה אנחנו נמשכים לרשתות החברתיות. עכשיו נשאלת שאלה אחרת, על מה שקורה למי שלא רק צורך תוכן אלא גם יוצר.\n\nאדם מצייר, כותב או מצלם מתוך אהבה. ואז הוא מתחיל לפרסם. ובשלב מסוים הוא שם לב שהוא כבר לא חושב רק על מה שהוא עושה, אלא גם על איך זה יתקבל.\n\nאדוארד דצ\'י הראה במעבדה בדיוק את המנגנון הזה. הוא הבחין בין <strong>מוטיבציה פנימית</strong>, שבה הפעולה עצמה היא הגמול, לבין <strong>מוטיבציה חיצונית</strong>, שבה הגמול נמצא מחוץ לה. וממצא המפתח שלו: <strong>תגמול חיצוני על משהו שכבר אהבנו אינו נערם על האהבה, הוא נוטה להחליף אותה.</strong>\n\nומטריקות הן תגמול חיצוני מהצורה הטהורה ביותר: מדיד, מיידי, וגלוי לעין.',
-              contentEn: 'Kohut explained why we are drawn to social networks. Now a different question arises, about what happens to someone who not only consumes content but also creates.\n\nA person draws, writes or photographs out of love. And then he starts to publish. And at a certain stage he notices that he is no longer thinking only about what he is doing, but also about how it will be received.\n\nEdward Deci demonstrated exactly this mechanism in the laboratory. He distinguished between <strong>intrinsic motivation</strong>, in which the action itself is the reward, and <strong>extrinsic motivation</strong>, in which the reward lies outside it. And his key finding: <strong>an external reward for something we already loved does not pile on top of the love, it tends to replace it.</strong>\n\nAnd metrics are external reward in its purest form: measurable, immediate, and visible to the eye.',
-              image: 'images/bonus/psychology/day4-idea.webp'
+              content: 'כהנמן הראה שטעויות משותפות אינן בהכרח מתקזזות. אבל מדוע אנחנו נאחזים באמונה גם כשמתגלות ראיות נגדה?\n\nב־1954 טענה דורותי מרטין שהעולם עומד להיהרס במבול, ושחייזרים יצילו את מאמיניה. הפסיכולוג ליאון פסטינגר ועמיתיו עקבו אחר הקבוצה כדי לבחון מה יקרה כשהנבואה לא תתגשם.\n\nהסיפור נקשר לאחת התיאוריות המפורסמות בפסיכולוגיה: דיסוננס קוגניטיבי.',
+              contentEn: 'Kahneman showed that shared errors do not necessarily cancel out. But why do we cling to a belief even when evidence against it emerges?\n\nIn 1954, Dorothy Martin claimed that the world was about to be destroyed by a flood, and that aliens would rescue her believers. The psychologist Leon Festinger and his colleagues followed the group to examine what would happen when the prophecy did not come true.\n\nThe story is tied to one of the most famous theories in psychology: cognitive dissonance.'
             },
             {
               type: 'source',
               title: 'קטע מקור',
-              titleEn: 'Source Material',
-              quote: '"הם היו זקוקים למספרים, ולכן הפנו את היצירתיות והתושייה שלהם אל השגת המספרים האלה, במקום אל ביצוע יעיל."',
-              quoteEn: '"They needed the numbers, so they directed their creativity and resourcefulness toward getting those numbers, rather than toward effective performance."',
-              attr: '- אדוארד דצ\'י וריצ\'רד ראיאן, "Intrinsic Motivation and Self-Determination in Human Behavior", 1985',
-              attrEn: '- Edward Deci and Richard Ryan, "Intrinsic Motivation and Self-Determination in Human Behavior", 1985'
+              titleEn: 'Source Text',
+              quote: '"אדם בעל שכנוע עמוק הוא אדם שקשה לשנות את דעתו."',
+              quoteEn: '"A man with a conviction is a hard man to change."',
+              attr: 'ליאון פסטינגר, הנרי ריקן וסטנלי שכטר, "When Prophecy Fails", 1956',
+              attrEn: 'Leon Festinger, Henry Riecken and Stanley Schachter, When Prophecy Fails, 1956'
             },
             {
               type: 'explanation',
               title: 'הסבר',
               titleEn: 'Explanation',
-              content: 'דצ\'י הדגיש שתגמול אינו רע כשלעצמו. <strong>מה שקובע הוא מה התגמול אומר לאדם.</strong> תגמול שמוסר מידע ("זה טוב") מחזק. תגמול שמשדר שליטה ("עשה כך כדי לקבל עוד") מזיז את הסיבה לפעולה מבפנים החוצה.\n\nוהבעיה עם ספירה היא שהיא כמעט תמיד מסוג שני. היא לא אומרת מה היה טוב, היא אומרת כמה.\n\nדוגמה מהחיים: אדם שאהב לצלם בסופי שבוע ומתחיל לפרסם. בהתחלה הוא מצלם מה שמעניין אותו. אחרי כמה חודשים הוא מוצא את עצמו שוקל מראש מה יעבוד טוב יותר. <strong>השאלה שהוא שואל את עצמו לפני הצילום השתנתה.</strong> ובשלב הבא, אם הפרסום מפסיק לעבוד, נעלם גם החשק לצלם.\n\nוזה הצד שלרוב לא מדובר עליו. <strong>הפגיעה אינה רק בזמן שמבזבזים על הטלפון, אלא במשהו שאהבנו לפני שהוא נכנס לתמונה.</strong>',
-              contentEn: 'Deci emphasized that reward is not bad in itself. <strong>What matters is what the reward says to the person.</strong> A reward that conveys information ("this is good") strengthens. A reward that conveys control ("do this in order to get more") moves the reason for the action from inside to outside.\n\nAnd the problem with counting is that it is almost always of the second kind. It does not say what was good, it says how much.\n\nA real-life example: a person who loved photographing on weekends and starts to publish. At first he photographs what interests him. After a few months he finds himself weighing in advance what will work better. <strong>The question he asks himself before taking the photo has changed.</strong> And at the next stage, if publishing stops working, the desire to photograph disappears as well.\n\nAnd this is the side that is usually not discussed. <strong>The harm is not only in the time wasted on the phone, but in something we loved before it entered the picture.</strong>',
-              image: 'images/bonus/psychology/day4-explanation.webp'
+              content: 'דיסוננס קוגניטיבי הוא מתח פסיכולוגי שעשוי להיווצר כשאמונותינו או מעשינו סותרים זה את זה.\n\nלמשל, אדם יודע שעישון מזיק לבריאות, ובכל זאת ממשיך לעשן. כדי להפחית את אי־הנוחות, הוא יכול לשנות את התנהגותו ולהפסיק לעשן, אך הוא יכול גם לשנות את אמונתו ולשכנע את עצמו שהנזקים שמזהירים מפניהם מוגזמים.\n\nכך גם בקבוצתה של מרטין: לפי התיאור המקורי, לאחר שהמבול לא הגיע, חלק מהמאמינים טענו שהאסון נמנע בזכות אמונתם, ואף ניסו להפיץ אותה.\n\nעם זאת, מחקר ארכיוני מ־2026 ערער על הטענה שחברי הקבוצה חיזקו את אמונתם בעקבות כישלון הנבואה. לכן אין לראות בסיפור הוכחה חד־משמעית לתיאוריה.',
+              contentEn: 'Cognitive dissonance is a psychological tension that may arise when our beliefs or actions contradict one another.\n\nFor example, a person knows that smoking is harmful to health, and yet continues to smoke. To reduce the discomfort, he can change his behavior and stop smoking, but he can also change his belief and convince himself that the harms people warn about are exaggerated.\n\nSo too in Martin\'s group: according to the original account, after the flood did not arrive, some of the believers claimed that the disaster had been averted thanks to their faith, and even tried to spread it.\n\nHowever, archival research from 2026 challenged the claim that the group\'s members strengthened their belief following the failure of the prophecy. Therefore, the story should not be seen as unequivocal proof of the theory.'
             },
             {
               type: 'depth',
-              title: 'עומק',
-              titleEn: 'Depth',
-              content: 'וכאן צריך דיוק, כי הרעיון הזה נמכר לרוב בגרסה מנופחת.\n\nהממצא היה שנוי במחלוקת, וב-1999 השיבו דצ\'י, קסטנר וראיאן במטה-אנליזה של 128 ניסויים שהראתה שתגמולים מוחשיים אכן שוחקים מוטיבציה פנימית. אבל שני סייגים משנים הכל. <strong>ראשית, השחיקה מתרחשת בעיקר במשימות שהיו מעניינות מלכתחילה, ואם לא הייתה אהבה, אין מה לשחוק.</strong> שנית, ומפתיע: <strong>משוב מילולי חיובי דווקא חיזק את המוטיבציה הפנימית.</strong>\n\nוזה מחזיר אותנו לקוהוט מהדיאלוג הקודם, ומחדד את שניהם. תגובה מדויקת של אדם היא משוב מילולי, וספירה היא תגמול מוחשי. לכן השתיים אינן פועלות באותו כיוון, ולכן מאה לייקים יכולים להרגיש ריקים בעוד משפט אחד מחזיק שבוע.\n\nומכאן לדיאלוג הבא. עד כה הסברנו למה קשה להתנתק ומה זה עושה לנו. אריך פרום ישאל את השאלה הכי לא נוחה: אולי אנחנו לא באמת רוצים להתנתק?',
-              contentEn: 'And here precision is needed, because this idea is usually sold in an inflated version.\n\nThe finding was controversial, and in 1999 Deci, Koestner and Ryan replied with a meta-analysis of 128 experiments which showed that tangible rewards do indeed erode intrinsic motivation. But two caveats change everything. <strong>First, the erosion occurs mainly in tasks that were interesting in the first place, and if there was no love, there is nothing to erode.</strong> Second, and surprisingly: <strong>positive verbal feedback actually strengthened intrinsic motivation.</strong>\n\nAnd this brings us back to Kohut from the previous dialogue, and sharpens both of them. A precise response from a person is verbal feedback, and counting is a tangible reward. Therefore the two do not work in the same direction, and therefore a hundred likes can feel empty while one sentence lasts a week.\n\nAnd from here to the next dialogue. So far we have explained why it is hard to disconnect and what it does to us. Erich Fromm will ask the most uncomfortable question: perhaps we do not really want to disconnect?',
-              image: 'images/bonus/psychology/day4-depth.webp'
+              title: 'העומק שמאחורי הרעיון',
+              titleEn: 'The Depth Behind the Idea',
+              content: 'לתיאוריית הדיסוננס הקוגניטיבי יש גם עדויות מניסויים מבוקרים. ב־1959 ביקשו פסטינגר וג\'יימס קרלסמית ממשתתפים לבצע משימות משעממות, ואז לספר לאדם אחר שהן מעניינות. חלקם קיבלו דולר אחד תמורת האמירה, ואחרים עשרים דולר.\n\nבאופן מפתיע, כאשר המשתתפים נשאלו לאחר מכן כמה באמת נהנו מהמשימות (הם נשאלו באופן אישי, לא בנוכחות האדם השלישי ש"שיקרו" לו, אלא מאוחר יותר), המשתתפים שקיבלו דולר אחד תיארו את המשימות כמהנות יותר מאלה שקיבלו עשרים דולר.\n\nלפי החוקרים, ההסבר לממצא הזה קשור לדיסוננס שנוצר אצל המשתתפים: הם ידעו שהמשימה משעממת, ובכל זאת הסכימו לומר לאדם אחר שהיא מעניינת. מי שקיבל עשרים דולר יכול היה להצדיק את השקר באמצעות התשלום הגבוה שקיבל בתמורה. לעומת זאת, מי שקיבל רק דולר אחד התקשה יותר להצדיק את מעשהו, ולכן עשוי היה להשתכנע (לשכנע את עצמו) בדיעבד שהמשימה באמת הייתה מעניינת. כך הוא הפחית את הדיסוננס בין מה שעשה לבין מה שחשב על המשימה.\n\nומה הקשר לשוקי תחזיות?\n\nנניח שהימרתם שמועמד מסוים ינצח בבחירות. לאחר שהשקעתם כסף, אתם עלולים להעדיף מידע שתומך בתחזית ולהתעלם מראיות שסותרות אותה. הסיבה היא שמידע שמערער על החלטה שכבר קיבלתם ומעלה את האפשרות שטעיתם עלול לעורר דיסוננס. התעלמות ממנו מאפשרת לכם להמשיך להאמין שההימור היה מוצדק, ובכך להפחית את הדיסוננס.\n\nואכן, במחקר על מהמרים במרוצי סוסים נמצא שמי שכבר הניחו הימור הביעו ביטחון רב יותר בבחירתם ממי שעמדו להמר.\n\nלכן כסף יוצר שני כוחות מנוגדים: תמריץ לדייק, אך גם רצון להצדיק החלטה שכבר קיבלנו.\n\nבדיאלוג האחרון נבחן אם שוקי תחזיות מצליחים לנצל את חוכמת ההמונים למרות הקושי הזה.',
+              contentEn: 'The theory of cognitive dissonance also has evidence from controlled experiments. In 1959, Festinger and James Carlsmith asked participants to perform boring tasks, and then to tell another person that they were interesting. Some received one dollar for saying so, and others twenty dollars.\n\nSurprisingly, when participants were later asked how much they had really enjoyed the tasks (they were asked in private, not in the presence of the third person to whom they had "lied," but later), the participants who received one dollar described the tasks as more enjoyable than those who received twenty dollars.\n\nAccording to the researchers, the explanation for this finding is related to the dissonance that arose among the participants: they knew the task was boring, and yet agreed to tell another person that it was interesting. Those who received twenty dollars could justify the lie by the high payment they received in return. By contrast, those who received only one dollar had a harder time justifying their act, and so may have become convinced (convinced themselves) in retrospect that the task really was interesting. In this way they reduced the dissonance between what they had done and what they thought about the task.\n\nAnd what is the connection to prediction markets?\n\nSuppose you bet that a certain candidate will win the election. After investing money, you may prefer information that supports the forecast and ignore evidence that contradicts it. The reason is that information that undermines a decision you have already made, and raises the possibility that you were wrong, may cause dissonance. Ignoring it allows you to keep believing that the bet was justified, and thereby reduce the dissonance.\n\nAnd indeed, a study of horse-race bettors found that those who had already placed a bet expressed greater confidence in their choice than those who were about to bet.\n\nSo money creates two opposing forces: an incentive to be accurate, but also a desire to justify a decision we have already made.\n\nIn the final dialogue we will examine whether prediction markets manage to harness the wisdom of crowds despite this difficulty.'
             },
             {
               type: 'quiz',
-              intro: 'אדם שאהב לצלם מתחיל לפרסם, ואחרי חודשים שוקל מראש מה יעבוד טוב יותר.',
-              introEn: 'A person who loved photographing starts to publish, and after months weighs in advance what will work better.',
-              question: 'לפי דצ\'י, מה קרה?',
-              questionEn: 'According to Deci, what happened?',
-              options: ['הסיבה לפעולה עברה מבפנים החוצה, מהצילום עצמו אל התגובה עליו', 'הוא פשוט התבגר ולמד לצלם בצורה מקצועית יותר', 'לא קרה דבר, שכן תגמול חיצוני אינו משפיע על אהבה לתחביב'],
-              optionsEn: ['The reason for the action moved from inside to outside, from the photography itself to the response to it', 'He simply matured and learned to photograph more professionally', 'Nothing happened, since external reward does not affect love for a hobby'],
+              question: 'מהו דיסוננס קוגניטיבי?',
+              questionEn: 'What is cognitive dissonance?',
+              options: ['מתח פסיכולוגי שעשוי להתעורר כאשר האמונות או ההתנהגויות שלנו אינן מתיישבות זו עם זו.', 'חוסר יכולת להבחין בין מידע אמיתי למידע שגוי.', 'הנטייה לשנות את דעתנו בכל פעם שאנחנו שומעים עמדה של אדם אחר.'],
+              optionsEn: ['A psychological tension that may arise when our beliefs or behaviors do not fit together.', 'An inability to tell true information from false information.', 'The tendency to change our mind every time we hear another person\'s position.'],
               correctIndex: 0,
-              explanation: 'זו השחיקה שדצ\'י תיאר. התגמול לא נערם על האהבה, הוא החליף אותה. וכשהסיבה נמצאת בחוץ, היא תלויה במה שקורה בחוץ.',
-              explanationEn: 'This is the erosion Deci described. The reward did not pile on top of the love, it replaced it. And when the reason is outside, it depends on what happens outside.'
+              explanation: 'דיסוננס קוגניטיבי הוא מתח שנוצר בעקבות חוסר התאמה בין אמונות, עמדות או התנהגויות. אנחנו עשויים להפחית אותו באמצעות שינוי התנהגותנו, שינוי אמונותינו או מציאת הצדקות לסתירה.',
+              explanationEn: 'Cognitive dissonance is a tension created by a mismatch between beliefs, attitudes, or behaviors. We may reduce it by changing our behavior, changing our beliefs, or finding justifications for the contradiction.'
             },
             {
               type: 'quiz',
-              intro: 'ספירה של לייקים לעומת תגובה מילולית מדויקת.',
-              introEn: 'Counting likes versus a precise verbal response.',
-              question: 'מדוע ספירה שוחקת יותר?',
-              questionEn: 'Why does counting erode more?',
-              options: ['משום שספירה גלויה לאחרים, ותגובה נשארת פרטית', 'משום שספירה היא תגמול מוחשי, ומשוב מילולי חיובי דווקא מחזק', 'משום שכל סוג של משוב שוחק מוטיבציה, בלי הבדל ביניהם'],
-              optionsEn: ['Because counting is visible to others, and a response remains private', 'Because counting is a tangible reward, and positive verbal feedback actually strengthens', 'Because every kind of feedback erodes motivation, with no difference between them'],
-              correctIndex: 1,
-              explanation: 'זה הסייג שמפספסים. המטה-אנליזה מצאה שתגמולים מוחשיים שוחקים, אבל משוב מילולי חיובי מחזק. לכן מספר ומשפט אינם פועלים באותו כיוון.',
-              explanationEn: 'This is the caveat people miss. The meta-analysis found that tangible rewards erode, but positive verbal feedback strengthens. Therefore a number and a sentence do not work in the same direction.'
-            },
-            {
-              type: 'quiz',
-              intro: 'בית ספר מציע פרס לתלמידים על ניקיון החצר, משימה שאיש אינו נהנה ממנה.',
-              introEn: 'A school offers a prize to students for cleaning the yard, a task no one enjoys.',
-              question: 'האם צפויה שחיקה לפי דצ\'י?',
-              questionEn: 'Is erosion expected according to Deci?',
-              options: ['כן, שכן כל תגמול חיצוני שוחק מוטיבציה בכל משימה', 'כן, והתלמידים ינקו פחות משהיו מנקים ללא כל פרס', 'לא, כי לא הייתה כאן מוטיבציה פנימית מלכתחילה שאפשר לשחוק'],
-              optionsEn: ['Yes, since every external reward erodes motivation in every task', 'Yes, and the students will clean less than they would have cleaned without any prize', 'No, because there was no intrinsic motivation here in the first place that could be eroded'],
+              question: 'בניסוי של פסטינגר וקרלסמית, מדוע המשתתפים שקיבלו דולר אחד נטו להעריך את המשימות כמהנות יותר מאלה שקיבלו עשרים דולר?',
+              questionEn: 'In the experiment of Festinger and Carlsmith, why did participants who received one dollar tend to rate the tasks as more enjoyable than those who received twenty dollars?',
+              options: ['משום שהמשימות שניתנו להם היו מעניינות יותר.', 'משום שהיה להם תמריץ כלכלי גדול יותר להציג את המשימות כמהנות.', 'משום שהיה להם קשה יותר להצדיק את העובדה ששיקרו ותיארו משימה משעממת כמהנה, ולכן הם עשויים היו לשנות את עמדתם כלפיה.'],
+              optionsEn: ['Because the tasks given to them were more interesting.', 'Because they had a greater financial incentive to present the tasks as enjoyable.', 'Because it was harder for them to justify the fact that they had lied and described a boring task as enjoyable, and so they may have changed their attitude toward it.'],
               correctIndex: 2,
-              explanation: 'השחיקה קורית כשיש משהו לשחוק. במשימה שאיש אינו אוהב, תגמול הוא בדיוק הכלי הנכון, ואין שם אהבה שתיפגע.',
-              explanationEn: 'The erosion happens when there is something to erode. In a task no one loves, a reward is exactly the right tool, and there is no love there to be harmed.'
+              explanation: 'המשתתפים שקיבלו עשרים דולר יכלו להסביר את העובדה ששיקרו באמצעות התגמול הכספי. למשתתפים שקיבלו דולר אחד הייתה הצדקה חיצונית חלשה יותר, ולכן הם עשויים היו להפחית את הדיסוננס באמצעות שינוי עמדתם.',
+              explanationEn: 'The participants who received twenty dollars could explain the fact that they had lied by the monetary reward. The participants who received one dollar had a weaker external justification, and so they may have reduced the dissonance by changing their attitude.'
             },
-            { type: 'quiz_summary' }
+            {
+              type: 'quiz',
+              question: 'אדם השקיע כסף בתחזית שמועמד מסוים ינצח, ולאחר מכן החל להתעלם מסקרים שמצביעים על ירידה בתמיכה בו. כיצד אפשר להסביר זאת באמצעות רעיונותיו של פסטינגר?',
+              questionEn: 'A person invested money in a forecast that a certain candidate would win, and then began to ignore polls showing a decline in support for him. How can this be explained using Festinger\'s ideas?',
+              options: ['ההשקעה הכספית מוכיחה שהאדם כבר האמין בעמדתו באופן חזק, ולכן הוא לא משנה את דעתו.', 'האדם עשוי להמעיט בחשיבותן של ראיות סותרות כדי להגן על החלטה שכבר קיבל.', 'עצם ההימור מבטל את האפשרות של דיסוננס קוגניטיבי.'],
+              optionsEn: ['The financial investment proves that the person already believed strongly in their position, and so does not change their mind.', 'The person may downplay contradicting evidence in order to protect a decision they have already made.', 'The very act of betting eliminates the possibility of cognitive dissonance.'],
+              correctIndex: 1,
+              explanation: 'לאחר שהתחייבנו להחלטה, מידע שמערער עליה עלול לעורר דיסוננס. אחת הדרכים להפחית את הדיסוננס היא להמעיט בחשיבותן של ראיות שסותרות את הבחירה שלנו.',
+              explanationEn: 'Once we have committed to a decision, information that undermines it may cause dissonance. One way to reduce the dissonance is to downplay evidence that contradicts our choice.'
+            },
+            {
+              type: 'quiz_summary'
+            }
           ]
         },
         {
           id: 5,
-          title: 'מנוס מהחלטה',
-          titleEn: 'Escape from Choice',
-          thinker: 'אריך פרום',
-          thinkerEn: 'Erich Fromm',
-          thinkerId: 'fromm',
+          title: 'פולימרקט וקאלשי: המבחן של חוכמת ההמונים',
+          titleEn: 'Polymarket and Kalshi: The Test of the Wisdom of Crowds',
+          thinker: 'סיכום פרק',
+          thinkerEn: 'Chapter Summary',
+          thinkerId: null,
           xp: 50,
           sections: [
             {
               type: 'idea',
               title: 'הרעיון של היום',
               titleEn: 'Today\'s Idea',
-              content: 'עד כה תיארנו כוחות שפועלים עלינו: לוח חיזוק, אוטומטיות, צורך בהכרה, שחיקה של מוטיבציה. בכל אלה אנחנו הצד שמושפע.\n\nאריך פרום היה שואל שאלה אחרת, ופחות נוחה. <strong>אולי הגלילה בטלפון אינה רק משהו שקורה לנו. אולי היא גם משהו שאנחנו מחפשים.</strong>\n\nפרום כתב על החירות שהמודרנה נתנה לנו, וטען שהיא מגיעה עם מחיר: <strong>החופש לבחור הוא גם החובה לבחור.</strong> ולכן, במקום שבו הבחירה כבדה מדי, בני אדם מוסרים אותה, ולעיתים בהקלה.\n\nעכשיו חשוב על שעה פנויה. היא חופש טהור, ולכן היא גם דורשת החלטה. מה עושים איתה, מה שווה את הזמן הזה, ומה יקרה אם נבזבז אותה. <strong>הגלילה פותרת את זה מיד: היא ממלאת את השעה בלי לדרוש שום החלטה.</strong>',
-              contentEn: 'So far we have described forces that act upon us: a reinforcement schedule, automaticity, a need for recognition, erosion of motivation. In all of these we are the side that is affected.\n\nErich Fromm would ask a different question, and a less comfortable one. <strong>Perhaps scrolling on the phone is not only something that happens to us. Perhaps it is also something we are looking for.</strong>\n\nFromm wrote about the freedom that modernity gave us, and argued that it comes with a price: <strong>the freedom to choose is also the obligation to choose.</strong> And therefore, where the choice is too heavy, human beings hand it over, and sometimes with relief.\n\nNow think about a free hour. It is pure freedom, and therefore it also demands a decision. What to do with it, what is worth this time, and what will happen if we waste it. <strong>Scrolling solves this immediately: it fills the hour without demanding any decision.</strong>',
-              image: 'images/bonus/psychology/day5-idea.webp'
+              content: 'מתי אפשר לסמוך על תחזית של המון אנשים? גלטון הדגים כיצד הערכות רבות יכולות להשתלב לתוצאה מדויקת, ואש, כהנמן ופסטינגר הראו מה עלול להשתבש.\n\nשוקי תחזיות כמו פולימרקט וקאלשי מציעים מבחן עכשווי לרעיון הזה.\n\nבשווקים אלה המשתתפים סוחרים בחוזים שמשלמים סכום מסוים אם אירוע מתרחש. למשל, חוזה שמשלם דולר אם מועמד מנצח בבחירות עשוי להיסחר ב־62 סנט.\n\nהמחיר של כל חוזה אינו נקבע בידי אדם שמחליט מה סיכויי הניצחון, אלא נוצר מתוך המסחר, בדומה למחירי מניות: כשהביקוש עולה, המחיר עשוי לעלות. לכן מחיר של 62 סנט אפשר לפרש בקירוב כהערכה של השוק שלמועמד יש סיכוי של 62% לנצח.\n\nבמובן הזה, המחיר עשוי לבטא את "חוכמת ההמונים": הערכות רבות משתלבות לתחזית משותפת.',
+              contentEn: 'When can we trust a forecast made by a crowd? Galton demonstrated how many estimates can combine into an accurate result, and Asch, Kahneman, and Festinger showed what can go wrong.\n\nPrediction markets such as Polymarket and Kalshi offer a contemporary test of this idea.\n\nIn these markets, participants trade contracts that pay a certain amount if an event occurs. For example, a contract that pays a dollar if a candidate wins the election might trade at 62 cents.\n\nThe price of each contract is not set by a person who decides the odds of winning, but emerges from trading, much like stock prices: when demand rises, the price may rise. So a price of 62 cents can be interpreted, roughly, as the market\'s estimate that the candidate has a 62% chance of winning.\n\nIn this sense, the price may express the "wisdom of crowds": many estimates combine into a shared forecast.'
             },
             {
               type: 'source',
               title: 'קטע מקור',
-              titleEn: 'Source Material',
-              quote: '"החירות, אף שהביאה לו עצמאות ותבונה, הפכה אותו למבודד, ובשל כך לחרד וחסר אונים."',
-              quoteEn: '"Freedom, though it has brought him independence and rationality, has made him isolated and, thereby, anxious and powerless."',
-              attr: '- אריך פרום, "מנוס מחופש", 1941',
-              attrEn: '- Erich Fromm, "Escape from Freedom", 1941'
+              titleEn: 'Source Text',
+              quote: '"בנסיבות הנכונות, קבוצות הן חכמות להפליא, ולעיתים קרובות חכמות יותר מהחכם שבחבריהן."',
+              quoteEn: '"Under the right circumstances, groups are remarkably intelligent, and are often smarter than the smartest people in them."',
+              attr: 'ג\'יימס סורוויצקי, "The Wisdom of Crowds", 2004',
+              attrEn: 'James Surowiecki, The Wisdom of Crowds, 2004'
             },
             {
               type: 'explanation',
               title: 'הסבר',
               titleEn: 'Explanation',
-              content: 'פרום הבחין בין <strong>חופש מ</strong> לבין <strong>חופש ל</strong>. הראשון הוא הסרת מגבלות, והשני הוא מה שעושים אחריה. והשני קשה בהרבה.\n\nדוגמה מהחיים: ערב פנוי לגמרי, בלי מטלות ובלי התחייבויות. במקום הקלה, לפעמים מגיעה דווקא תחושה עמומה של אי-נוחות. ואז הטלפון נשלף, לא מתוך רצון עז אלא מתוך הקלה. <strong>הגלילה בטלפון ממלאת את החלל, והשאלה מה לעשות עם הערב פשוט לא נשאלת.</strong>\n\nוזו הנקודה של פרום. <strong>לא ברחנו רק משעמום, ברחנו מהחלטה.</strong> הגלילה אינה רק בידור, היא גם פטור זמני מלהיות מי שקובע מה יקרה עכשיו.\n\nוזה מסביר גם למה "פשוט תעשה משהו אחר" זה נשמע קל כמו שזה נשמע. הצעה כזו מחזירה בדיוק את מה שברחנו ממנו, את הצורך לבחור.',
-              contentEn: 'Fromm distinguished between <strong>"freedom from"</strong> and <strong>"freedom to"</strong>. The first is the removal of restrictions, and the second is what one does afterwards. And the second is far harder.\n\nA real-life example: an entirely free evening, with no chores and no commitments. Instead of relief, sometimes what arrives is actually a vague sense of unease. And then the phone is pulled out, not out of a strong desire but out of relief. <strong>Scrolling on the phone fills the void, and the question of what to do with the evening is simply not asked.</strong>\n\nAnd this is Fromm\'s point. <strong>We did not flee only from boredom, we fled from a decision.</strong> Scrolling is not only entertainment, it is also a temporary exemption from being the one who determines what will happen now.\n\nAnd this also explains why "just do something else" sounds as easy as it sounds. Such a suggestion brings back exactly what we fled from, the need to choose.',
-              image: 'images/bonus/psychology/day5-explanation.webp'
+              content: 'נניח שמשתתף מעריך שסיכויי המועמד לנצח הם 90%. מבחינתו, קניית החוזה ב־62 סנט עשויה להיות עסקה משתלמת.\n\nהביקוש לקנייה עשוי להעלות את המחיר; משתתפים שסבורים שהוא גבוה מדי יכולים למכור. כך המחיר מתעדכן בעקבות עסקאות. בניגוד לניסוי של גלטון, הוא אינו ממוצע פשוט של ניחושים: משתתפים שסוחרים בסכומים גדולים עשויים להשפיע עליו יותר.\n\nכדי שהמחיר ישקף תחזית טובה, רצוי שיתקיימו כמה תנאים:\n\n<strong>עצמאות:</strong> המשתתפים מפעילים שיקול דעת משלהם, ולא רק מחקים את פעולותיהם של אחרים.\n\n<strong>גיוון:</strong> המשתתפים מביאים מידע ונקודות מבט שונות.\n\n<strong>תמריץ לדיוק:</strong> אפשר להרוויח מזיהוי טעות במחיר, אך גם להפסיד.\n\n<strong>צבירת מידע:</strong> העסקאות משלבות את ההערכות השונות למחיר אחד.',
+              contentEn: 'Suppose a participant estimates the candidate\'s chances of winning at 90%. From his perspective, buying the contract at 62 cents may be a worthwhile deal.\n\nDemand to buy may raise the price; participants who think it is too high can sell. In this way the price updates as a result of trades. Unlike Galton\'s experiment, it is not a simple average of guesses: participants who trade large sums may influence it more.\n\nFor the price to reflect a good forecast, it is desirable that several conditions hold:\n\n<strong>Independence:</strong> participants use their own judgment, and do not merely imitate the actions of others.\n\n<strong>Diversity:</strong> participants bring different information and points of view.\n\n<strong>Incentive for accuracy:</strong> one can profit from identifying a mistake in the price, but also lose.\n\n<strong>Aggregation of information:</strong> trades combine the various estimates into one price.'
             },
             {
               type: 'depth',
-              title: 'עומק',
-              titleEn: 'Depth',
-              content: 'וכאן הפרק נסגר, וכל החתיכות מתחברות.\n\nסקינר הסביר למה ההרגל חזק. כהנמן למה הוא אוטומטי. קוהוט למה דווקא שם. דצ\'י מה זה עושה למה שאהבנו. ופרום מוסיף את החלק האחרון: <strong>למה חלק מאיתנו לא ממש רוצה שזה ייפסק.</strong>\n\nוזו גם הנקודה שהופכת את הפרק לפחות נוח ויותר מדויק. אם הבעיה הייתה רק מנגנון חיצוני, היה מספיק לשנות הגדרות. אבל אם יש גם ביקוש מבפנים, אז ההסבר "האפליקציות ממכרות אותנו" נכון רק בחציו.\n\nוצריך גם איזון, כי אפשר לקרוא את פרום בצורה מאשימה, וזו טעות. הוא לא תיאר חולשה אלא מצב אנושי. <strong>לשאת את החירות לבד זה באמת קשה, והעובדה שזה קשה לא מעידה על פגם.</strong>\n\n"מנוס מחופש", ספרו של פרום, הוא תיאוריה חברתית שנכתבה בזמן אמת ולא מחקר מבוקר, גם אם המנגנונים שתיאר נמדדו אחר כך בניסויים של אש ומילגרם.\n\nאבל בכל מקרה התובנה שנשארת עומדת היא: <strong>לפעמים אנחנו לא נלכדים בטלפון. לפעמים אנחנו מוסרים לו משהו, ומקבלים בתמורה שקט מסוים.</strong>',
-              contentEn: 'And here the chapter closes, and all the pieces connect.\n\nSkinner explained why the habit is strong. Kahneman why it is automatic. Kohut why there in particular. Deci what it does to what we loved. And Fromm adds the last part: <strong>why a part of us does not really want it to stop.</strong>\n\nAnd this is also the point that makes the chapter less comfortable and more accurate. If the problem were only an external mechanism, it would be enough to change settings. But if there is also demand from within, then the explanation "the apps are addicting us" is only half right.\n\nAnd balance is also needed, because Fromm can be read in an accusatory way, and that is a mistake. He did not describe a weakness but a human condition. <strong>Bearing freedom alone is genuinely hard, and the fact that it is hard does not indicate a flaw.</strong>\n\n"Escape from Freedom", Fromm\'s book, is a social theory written in real time and not a controlled study, even if the mechanisms he described were later measured in the experiments of Asch and Milgram.\n\nBut in any case the insight that remains standing is: <strong>sometimes we are not trapped by the phone. Sometimes we hand it something, and receive in return a certain quiet.</strong>',
-              image: 'images/bonus/psychology/day5-depth.webp'
+              title: 'העומק שמאחורי הרעיון',
+              titleEn: 'The Depth Behind the Idea',
+              content: 'האם התחזיות אכן מדויקות? במחקר שפרסמה קאלשי ב־2026 נמצא שבמיליוני שווקים שהסתיימו, ההסתברויות שהמחירים שיקפו היו מכוילות היטב במצטבר. עם זאת, המחקר נערך בידי הפלטפורמה עצמה.\n\nכדי לבדוק תחזיות הסתברותיות, לא מספיק לבדוק אם תחזית אחת הצליחה. אם אירועים שקיבלו סיכוי של 70% מתרחשים בערך ב־70% מהמקרים, זו עדות לכיול טוב.\n\nאבל הסיכונים נשארים: משתתפים עשויים להיגרר אחרי אחרים (אש), לחלוק הטיה משותפת (כהנמן), או להצדיק הימור שכבר ביצעו (פסטינגר).\n\nלכן ההמון אינו חכם רק משום שהוא גדול. הוא עשוי להיות חכם כאשר אנשים מביאים מידע שונה, חושבים באופן עצמאי, ויש מנגנון שמאפשר לשלב את הערכותיהם ולתקן טעויות.\n\nבפעם הבאה שתראו תחזית של שוק הימורים, כדאי לשאול: מי המשתתפים בשוק, על איזה מידע הם מסתמכים, ועד כמה ההערכה שלהם באמת מבוססת?',
+              contentEn: 'Are the forecasts actually accurate? In a study published by Kalshi in 2026, it was found that across millions of markets that had ended, the probabilities reflected by the prices were well calibrated in aggregate. However, the study was conducted by the platform itself.\n\nTo test probabilistic forecasts, it is not enough to check whether a single forecast succeeded. If events that were given a 70% chance occur in about 70% of cases, that is evidence of good calibration.\n\nBut the risks remain: participants may be dragged along after others (Asch), share a common bias (Kahneman), or justify a bet they have already made (Festinger).\n\nSo the crowd is not wise just because it is large. It may be wise when people bring different information, think independently, and there is a mechanism that allows their estimates to be combined and errors to be corrected.\n\nThe next time you see a forecast from a betting market, it is worth asking: who are the participants in the market, what information do they rely on, and how well-founded is their estimate really?'
             },
             {
               type: 'quiz',
-              intro: 'אדם מגיע לערב פנוי לגמרי, מרגיש אי-נוחות קלה, ושולף את הטלפון.',
-              introEn: 'A person arrives at an entirely free evening, feels slight unease, and pulls out the phone.',
-              question: 'לפי פרום, ממה הוא נמלט?',
-              questionEn: 'According to Fromm, what is he fleeing from?',
-              options: ['מהצורך להחליט מה לעשות עם הזמן שנפתח לפניו', 'משעמום בלבד, שהרי אין לו מה לעשות בערב הזה', 'מעייפות פיזית, שאין לה קשר לשאלת הבחירה'],
-              optionsEn: ['From the need to decide what to do with the time that has opened before him', 'From boredom alone, since he has nothing to do this evening', 'From physical fatigue, which has no connection to the question of choice'],
-              correctIndex: 0,
-              explanation: 'זו ההבחנה של פרום. שעה פנויה היא חופש, וחופש דורש הכרעה. הגלילה ממלאת את הזמן בלי לדרוש החלטה, ולכן ההקלה מגיעה עוד לפני ההנאה.',
-              explanationEn: 'This is Fromm\'s distinction. A free hour is freedom, and freedom demands a decision. Scrolling fills the time without demanding a decision, and therefore the relief arrives even before the enjoyment.'
-            },
-            {
-              type: 'quiz',
-              intro: 'עצה מוכרת: "פשוט תעשה משהו אחר עם הזמן".',
-              introEn: 'A familiar piece of advice: "just do something else with the time".',
-              question: 'מדוע היא נכשלת לעיתים קרובות?',
-              questionEn: 'Why does it often fail?',
-              options: ['משום שאנשים אינם יודעים אילו פעילויות קיימות בעולם', 'משום שכל פעילות אחרת פחות מהנה מגלילה בטלפון', 'משום שהיא מחזירה בדיוק את מה שברחנו ממנו, את המטלה לבחור'],
-              optionsEn: ['Because people do not know what activities exist in the world', 'Because every other activity is less enjoyable than scrolling on the phone', 'Because it brings back exactly what we fled from, the chore of choosing'],
-              correctIndex: 2,
-              explanation: 'העצה נשמעת קלה, אבל היא מטילה מחדש את משקל ההחלטה. אם מה שהקל היה דווקא היעדר הבחירה, אז הצעה שדורשת לבחור אינה פותרת את הקושי המקורי.',
-              explanationEn: 'The advice sounds easy, but it re-imposes the weight of the decision. If what brought relief was precisely the absence of choice, then a suggestion that requires choosing does not solve the original difficulty.'
-            },
-            {
-              type: 'quiz',
-              intro: 'חבר אומר: "האפליקציות פשוט ממכרות אותנו, אין לנו שום חלק בהחלטה להשתמש בהן."',
-              introEn: 'A friend says: "The apps are simply addicting us, we have no part at all in the decision to use them."',
-              question: 'כיצד פרום היה מסייג את זה?',
-              questionEn: 'How would Fromm qualify this?',
-              options: ['הוא היה מסכים לחלוטין, שכן ההשפעה מגיעה רק מבחוץ', 'יש גם ביקוש מבפנים, כי לפעמים אנחנו מחפשים פטור מהחלטה', 'הוא היה טוען שאין לעיצוב האפליקציות שום השפעה על אנשים'],
-              optionsEn: ['He would agree entirely, since the influence comes only from outside', 'There is also demand from within, because sometimes we are looking for an exemption from decision', 'He would argue that the design of the apps has no influence at all on people'],
+              question: 'חוזה בשוק תחזיות עולה 62 סנט ומשלם דולר אם אירוע מסוים יתרחש. כיצד נהוג לפרש את המחיר?',
+              questionEn: 'A contract in a prediction market costs 62 cents and pays a dollar if a certain event occurs. How is the price customarily interpreted?',
+              options: ['כהוכחה שהאירוע יתרחש בוודאות.', 'כהערכה של השוק שלפיה סיכוי האירוע הוא כ־62%.', 'כהבטחה שהאירוע יתרחש בדיוק 62 פעמים מתוך 100 ניסיונות.'],
+              optionsEn: ['As proof that the event will occur with certainty.', 'As the market\'s estimate that the event has about a 62% chance.', 'As a promise that the event will occur exactly 62 times out of 100 attempts.'],
               correctIndex: 1,
-              explanation: 'פרום לא הכחיש את הכוחות החיצוניים, הוא הוסיף את הצד השני. כשמסירת הבחירה מביאה הקלה, יש כאן גם משהו שאנחנו מחפשים, ולא רק משהו שנעשה לנו.',
-              explanationEn: 'Fromm did not deny the external forces, he added the other side. When handing over the choice brings relief, there is also something here that we are looking for, and not only something that is done to us.'
+              explanation: 'מחיר החוזה משמש בקירוב כהערכה של ההסתברות לאירוע. זו אינה ודאות, והמחיר עשוי להיות מושפע גם ממאפייני המסחר.',
+              explanationEn: 'The contract\'s price serves, roughly, as an estimate of the probability of the event. It is not certainty, and the price may also be affected by features of the trading.'
             },
-            { type: 'quiz_summary' }
+            {
+              type: 'quiz',
+              question: 'שוק תחזיות העניק למועמד סיכוי של 90% לנצח, אך המועמד הפסיד. מה אפשר להסיק מכך?',
+              questionEn: 'A prediction market gave a candidate a 90% chance of winning, but the candidate lost. What can be concluded from this?',
+              options: ['התוצאה אינה מוכיחה לבדה שהתחזית הייתה גרועה; גם אירוע שסיכויו הוערך ב־10% עשוי להתרחש.', 'התוצאה מוכיחה ששוקי תחזיות אינם מסוגלים לחזות אירועים.', 'התוצאה מוכיחה שהמחיר בשוק לא שיקף הסתברות כלשהי.'],
+              optionsEn: ['The result does not by itself prove that the forecast was bad; even an event whose chance was estimated at 10% may occur.', 'The result proves that prediction markets are unable to predict events.', 'The result proves that the market price did not reflect any probability.'],
+              correctIndex: 0,
+              explanation: 'תחזית הסתברותית אינה הבטחה. כדי לבדוק אם שוק מכויל היטב, צריך לבחון תחזיות רבות ולבדוק אם התוצאות תואמות את ההסתברויות שניתנו להן.',
+              explanationEn: 'A probabilistic forecast is not a promise. To test whether a market is well calibrated, one must examine many forecasts and check whether the outcomes match the probabilities given to them.'
+            },
+            {
+              type: 'quiz',
+              question: 'מהו ההבדל המרכזי בין הניסוי של גלטון לבין האופן שבו שוק תחזיות מגבש מחיר?',
+              questionEn: 'What is the main difference between Galton\'s experiment and the way a prediction market forms a price?',
+              options: ['בניסוי של גלטון המשתתפים ידעו את התשובה, ואילו בשוק תחזיות כולם מנחשים ללא מידע.', 'בניסוי של גלטון השתתפו רק מומחים, ואילו בשוק תחזיות אסור למומחים להשתתף.', 'בניסוי של גלטון שולבו ניחושים באמצעות חישוב סטטיסטי, ואילו בשוק המחיר נוצר באמצעות עסקאות, כך שמשתתפים שונים עשויים להשפיע עליו במידה שונה.'],
+              optionsEn: ['In Galton\'s experiment the participants knew the answer, whereas in a prediction market everyone guesses without information.', 'In Galton\'s experiment only experts took part, whereas in a prediction market experts are not allowed to participate.', 'In Galton\'s experiment guesses were combined through a statistical calculation, whereas in a market the price is created through trades, so different participants may influence it to different degrees.'],
+              correctIndex: 2,
+              explanation: 'שוק תחזיות אינו מחשב ממוצע פשוט של כל המשתתפים. המחיר נוצר באמצעות קנייה ומכירה של חוזים, ולכן הוא מושפע גם מהיקף העסקאות ומהנכונות של משתתפים לסחור במחירים שונים.',
+              explanationEn: 'A prediction market does not compute a simple average of all participants. The price is created by buying and selling contracts, and so it is also affected by the volume of trades and by participants\' willingness to trade at different prices.'
+            },
+            {
+              type: 'quiz_summary'
+            }
           ]
         }
       ]
