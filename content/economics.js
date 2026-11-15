@@ -4168,12 +4168,5 @@ const economicsData = {
           ] },
       ],
     },
-    {
-      id: 8,
-      title: 'כלכלה ועתיד',
-      titleEn: 'Economics and the Future',
-      comingSoon: true,
-      days: [],
-    },
   ],
 };
