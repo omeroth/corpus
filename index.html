@@ -56816,6 +56816,139 @@ function enterAppUi() {
     if (document.body.style.overflow === 'hidden') document.body.style.overflow = '';
   } catch (_) {}
   _homeExpandedWeekId = undefined;
+  // Mid-onboarding / hard-paywall-resume gate — MUST run BEFORE the
+  // renderHome + showScreen('home') tail below. initUI paints the
+  // stored onboarding step synchronously at boot; without this gate
+  // the home tail would unconditionally overwrite that paint and a
+  // brand-new user who killed the app at step 35 would land on home
+  // (never having bought, never having finished onboarding). The
+  // defer-zone at the top of enterAppUi doesn't help here: the only
+  // state.currentScreen onboarding writes is 'auth' (from
+  // showAuthScreen at the mid-flow signup), so the defer-zone treats
+  // the user as "on auth" and falls through to the home tail.
+  //
+  // Three escape hatches route to home anyway (server-finished,
+  // paid/trial, cross-account escrow); everything else resumes the
+  // stored step and returns.
+  //
+  //   1. Already-finished-on-another-device. corpus_onboarding_done
+  //      lives in localStorage only, so a user who finished onboarding
+  //      on device A and signs in on device B won't have the flag
+  //      locally. The server-synced equivalents are
+  //      state.onbAnswers.completedAt (written by _onbComplete) and a
+  //      non-empty state.completedDays (populated post-onboarding by
+  //      the first finishDay). Either one proves "this account already
+  //      cleared onboarding"; set the local flag and fall through.
+  //   2. Paid / trial user. An entitled account must never see the
+  //      onboarding paywall. If we get here with an active entitlement,
+  //      mark onboarding done and fall through to home.
+  //   3. Stale escrow from a different account. The escrow flag lives
+  //      on the device; if user A signs out from the hard paywall and
+  //      user B later signs in on the same device, the flag belongs to
+  //      A's session and shouldn't affect B. We stamp
+  //      corpus_hard_paywall_escrow_uid alongside the flag at sign-out;
+  //      a cross-account sign-in finds the mismatch here and clears it
+  //      so the usual mid-onboarding default can route user B
+  //      correctly.
+  try {
+    const _esUid = localStorage.getItem('corpus_hard_paywall_escrow_uid') || '';
+    const _curUid = (currentUser && currentUser.id) || '';
+    if (localStorage.getItem('corpus_hard_paywall_escrow') === '1'
+        && _esUid && _curUid && _esUid !== _curUid) {
+      localStorage.removeItem('corpus_hard_paywall_escrow');
+      localStorage.removeItem('corpus_hard_paywall_escrow_uid');
+      try {
+        document.querySelectorAll('.onb-screen').forEach(s => {
+          s.style.display = 'none';
+          s.classList.remove('onb-active');
+        });
+      } catch (_) {}
+      try { localStorage.removeItem('corpus_onboarding_step'); } catch (_) {}
+      _onboardingBooted = false;
+    }
+  } catch (_) {}
+  if (!localStorage.getItem('corpus_onboarding_done')) {
+    const _resolveToHome = () => {
+      try { localStorage.setItem('corpus_onboarding_done', '1'); } catch (_) {}
+      try { localStorage.removeItem('corpus_hard_paywall_escrow'); } catch (_) {}
+      try { localStorage.removeItem('corpus_hard_paywall_escrow_uid'); } catch (_) {}
+      try { localStorage.removeItem('corpus_onboarding_step'); } catch (_) {}
+      try {
+        document.querySelectorAll('.onb-screen').forEach(s => {
+          s.style.display = 'none';
+          s.classList.remove('onb-active');
+        });
+      } catch (_) {}
+    };
+    const _serverFinished = !!(state && state.onbAnswers && state.onbAnswers.completedAt)
+      || !!(state && state.completedDays && Object.keys(state.completedDays).length > 0);
+    if (_serverFinished) {
+      _resolveToHome();
+      // Falls through to renderHome below.
+    } else if (typeof _isUserPaidOrTrialNow === 'function' && _isUserPaidOrTrialNow()) {
+      _resolveToHome();
+      // Falls through to renderHome below.
+    } else {
+      // Hard-paywall resume intercept. Fires ONLY when the escrow flag
+      // is set AND its stamped uid matches the current user — i.e. the
+      // user just signed out from the hard paywall and is signing back
+      // in with the same account. onbAnswers.source alone is NOT a
+      // trigger: the mid-flow email/SSO signup at step 23 completes
+      // AFTER the source step (23 → 37, source lives post-signup), so
+      // every signing-up user arrives here with source set. Keying on
+      // source would hijack the normal signup handoff and flash step
+      // 35 before step 24.
+      const _escrowSet = (function(){ try { return localStorage.getItem('corpus_hard_paywall_escrow') === '1'; } catch(_){ return false; } })();
+      const _esUid2 = (function(){ try { return localStorage.getItem('corpus_hard_paywall_escrow_uid') || ''; } catch(_){ return ''; } })();
+      const _curUid2 = (currentUser && currentUser.id) || '';
+      // Strip the initial-HTML `.screen.active` marker from #screen-home
+      // before any resume-onboarding return below. The static HTML ships
+      // with `<div id="screen-home" class="screen active home-v7">` so
+      // the first renderHome has somewhere to mount into; on a relaunch
+      // where we're staying in onboarding, that `.active` class is a
+      // leftover — home is not the logical current screen, no
+      // showScreen('home') will run here, and leaving `.active` on
+      // would let VoiceOver + home-only timers (launch popover,
+      // welcome-back modal, coach-marks) treat the user as if they
+      // reached home behind the paywall. The paywall's `.onb-screen`
+      // overlay at z-index 1100 covers home visually but doesn't
+      // detach its a11y tree.
+      const _stripHomeActive = () => {
+        try {
+          document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active'));
+        } catch (_) {}
+      };
+      if (_escrowSet && _esUid2 && _curUid2 && _esUid2 === _curUid2) {
+        const _storedStep = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
+        const _storedValid = _storedStep >= 1 && _ONB_STEP_TO_ID[_storedStep] !== undefined;
+        const _target = _storedValid ? _storedStep : 35;
+        try { localStorage.setItem('corpus_onboarding_step', String(_target)); } catch(_) {}
+        try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(_) {}
+        _stripHomeActive();
+        _onboardingBooted = true;
+        try { _onbShowStep(_target); } catch(_) {}
+        return;
+      }
+      // Default: mid-onboarding with a valid stored step and no escape
+      // (not finished, not paid, no matching escrow). Resume the step
+      // and return so the renderHome tail below doesn't overwrite it.
+      // This is the branch that fixes the brand-new-user-at-paywall
+      // relaunch bug. initUI already painted the step; this return
+      // just blocks the home tail.
+      const _resumeStep = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
+      const _resumeValid = _resumeStep >= 1 && _ONB_STEP_TO_ID[_resumeStep] !== undefined;
+      const _resumeFV = localStorage.getItem('corpus_onboarding_flow_version') || '';
+      if (_resumeValid && _resumeFV === _ONB_FLOW_VERSION) {
+        _stripHomeActive();
+        _onboardingBooted = true;
+        try { _onbShowStep(_resumeStep); } catch(_) {}
+        return;
+      }
+      // No valid step cursor → fall through to renderHome; the legacy
+      // `if (!step && !done) startNewUserOnboarding()` gate below will
+      // route this user back to step 1.
+    }
+  }
   renderHome();
   showScreen('home');
   // Launch scroll: open home scrolled to the next-up at ~45% viewport,
@@ -56829,123 +56962,6 @@ function enterAppUi() {
   // Resume any celebration queue persisted from a prior session that
   // closed mid-play. Session-guarded so this fires at most once per open.
   try { _resumeCelebrationsIfPending(); } catch(e) {}
-  // Hard-paywall resume: user signed out from the hard onboarding
-  // paywall and is now signing back in. authLogout wiped
-  // corpus_onboarding_step, so the normal resume gate would land them
-  // at step 1 and walk the whole flow again. But state.onbAnswers was
-  // restored from the server during enterAppState, and if it carries a
-  // source answer OR a completedAt marker the user has already been
-  // through the question. The escrow flag is a second trigger — set by
-  // _onbPaywallSignOut, survives the wipe — so even a cross-account
-  // sign-in into a fresh profile keeps them on the paywall until
-  // onboarding resolves. Both paths resume at step 35 (the paywall
-  // screen itself).
-  //
-  // Three guards must run BEFORE the intercept kicks in — all of them
-  // route the user to home instead of the paywall:
-  //
-  //   1. Already-finished-on-another-device. corpus_onboarding_done
-  //      lives in localStorage only, so a user who finished onboarding
-  //      on device A and signs in on device B won't have the flag
-  //      locally. The server-synced equivalents are
-  //      state.onbAnswers.completedAt (written by _onbComplete) and a
-  //      non-empty state.completedDays (populated post-onboarding by
-  //      the first finishDay). Either one proves "this account already
-  //      cleared onboarding"; set the local flag and skip the gate.
-  //   2. Paid / trial user. An entitled account must never see the
-  //      onboarding paywall. If we get here with an active entitlement,
-  //      mark onboarding done and route to home.
-  //   3. Stale escrow from a different account. The escrow flag lives
-  //      on the device; if user A signs out from the hard paywall and
-  //      user B later signs in on the same device, the flag belongs to
-  //      A's session and shouldn't affect B. We stamp
-  //      corpus_hard_paywall_escrow_uid alongside the flag at sign-out;
-  //      a cross-account sign-in finds the mismatch here and clears it.
-  try {
-    const _esUid = localStorage.getItem('corpus_hard_paywall_escrow_uid') || '';
-    const _curUid = (currentUser && currentUser.id) || '';
-    if (localStorage.getItem('corpus_hard_paywall_escrow') === '1'
-        && _esUid && _curUid && _esUid !== _curUid) {
-      localStorage.removeItem('corpus_hard_paywall_escrow');
-      localStorage.removeItem('corpus_hard_paywall_escrow_uid');
-      // initUI's synchronous escrow branch may have already painted the
-      // paywall before the real user id was known. Now that we've
-      // confirmed it belongs to a DIFFERENT account, tear it down and
-      // reset the step cursor so the usual gates below route user B
-      // into their own flow (home if they have progress, step 1 if
-      // not).
-      try {
-        document.querySelectorAll('.onb-screen').forEach(s => {
-          s.style.display = 'none';
-          s.classList.remove('onb-active');
-        });
-      } catch (_) {}
-      try { localStorage.removeItem('corpus_onboarding_step'); } catch (_) {}
-      _onboardingBooted = false;
-    }
-  } catch (_) {}
-  if (!localStorage.getItem('corpus_onboarding_done')) {
-    // Shared cleanup for the finished + paid gates: initUI's
-    // synchronous escrow branch may have already fired _onbShowStep(35)
-    // during boot (state.isPaid wasn't loaded yet, state.onbAnswers
-    // hadn't been server-merged). If we're here it's because the gate
-    // decided the paywall shouldn't be shown — explicitly tear down
-    // every onboarding screen so a stale paint doesn't survive.
-    const _resolveToHome = () => {
-      try { localStorage.setItem('corpus_onboarding_done', '1'); } catch (_) {}
-      try { localStorage.removeItem('corpus_hard_paywall_escrow'); } catch (_) {}
-      try { localStorage.removeItem('corpus_hard_paywall_escrow_uid'); } catch (_) {}
-      try { localStorage.removeItem('corpus_onboarding_step'); } catch (_) {}
-      try {
-        document.querySelectorAll('.onb-screen').forEach(s => {
-          s.style.display = 'none';
-          s.classList.remove('onb-active');
-        });
-      } catch (_) {}
-    };
-    // Guard 1: server-side "finished" marker.
-    const _serverFinished = !!(state && state.onbAnswers && state.onbAnswers.completedAt)
-      || !!(state && state.completedDays && Object.keys(state.completedDays).length > 0);
-    if (_serverFinished) {
-      _resolveToHome();
-      // Fall through to the home-landing branches below. The existing
-      // `if (!localStorage.getItem('corpus_onboarding_step') && !done)`
-      // gate becomes a no-op (done is now set), so enterAppUi lands on
-      // home via its earlier renderHome + showScreen('home') calls.
-    } else if (typeof _isUserPaidOrTrialNow === 'function' && _isUserPaidOrTrialNow()) {
-      // Guard 2: entitled user never sees the onboarding paywall.
-      _resolveToHome();
-    } else {
-      // Hard-paywall resume intercept. Fires ONLY when the escrow flag
-      // is set AND its stamped uid matches the current user — i.e. the
-      // user just signed out from the hard paywall and is signing back
-      // in with the same account. onbAnswers.source alone is NOT a
-      // trigger: the mid-flow email/SSO signup at step 23 completes
-      // AFTER the source step (23 → 37, source lives post-signup), so every signing-up user
-      // arrives here with source set. Keying on source would hijack
-      // the normal signup handoff and flash step 35 before step 24,
-      // which is the bug this intercept had.
-      const _escrowSet = (function(){ try { return localStorage.getItem('corpus_hard_paywall_escrow') === '1'; } catch(_){ return false; } })();
-      const _esUid2 = (function(){ try { return localStorage.getItem('corpus_hard_paywall_escrow_uid') || ''; } catch(_){ return ''; } })();
-      const _curUid2 = (currentUser && currentUser.id) || '';
-      if (_escrowSet && _esUid2 && _curUid2 && _esUid2 === _curUid2) {
-        // Resume to the stored onboarding step if present; otherwise
-        // fall back to 35 (the paywall slot, where the escrow was set).
-        // _onbPaywallSignOut wipes the cursor, so the fallback is the
-        // expected branch; the stored-step branch survives only if a
-        // same-session re-sign-in preserves the cursor.
-        const _storedStep = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
-        // Satellite-aware validity (allows slot 37 / source).
-        const _storedValid = _storedStep >= 1 && _ONB_STEP_TO_ID[_storedStep] !== undefined;
-        const _target = _storedValid ? _storedStep : 35;
-        try { localStorage.setItem('corpus_onboarding_step', String(_target)); } catch(_) {}
-        try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(_) {}
-        _onboardingBooted = true;
-        try { _onbShowStep(_target); } catch(_) {}
-        return;
-      }
-    }
-  }
   // Onboarding v2: the post-signup goal-picker chain is gone. v2 sets
   // the daily goal inline (step 12 / Q3) so no separate migration prompt
   // is needed for users who complete v2. Users on the old flow who
@@ -57318,14 +57334,23 @@ function initUI() {
       console.log('[Onboarding] Hard-paywall escrow set → resume at step 35');
       try { localStorage.setItem('corpus_onboarding_step', '35'); } catch(_) {}
       try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(_) {}
+      // Strip the initial-HTML `.active` on #screen-home so VoiceOver,
+      // home-only timers, and screen-coherence checks don't treat the
+      // user as if they're on home behind the paywall. The .onb-screen
+      // overlay covers home visually at z-index 1100 but doesn't
+      // detach its a11y tree. Matches the equivalent strip on the
+      // enterAppUi resume-step branches.
+      try { document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active')); } catch(_) {}
       _onboardingBooted = true;
       _onbShowStep(35);
     } else if (_resumeStep >= 1 && _ONB_STEP_TO_ID[_resumeStep] !== undefined) {
       console.log('[Onboarding] Resume onboarding at step', _resumeStep);
+      try { document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active')); } catch(_) {}
       _onboardingBooted = true;
       _onbShowStep(_resumeStep);
     } else if (_completedCount === 0) {
       console.log('[Onboarding] Fresh install → onboarding step 1');
+      try { document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active')); } catch(_) {}
       _onboardingBooted = true;
       _onbShowStep(1);
     } else {
