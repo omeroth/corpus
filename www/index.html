@@ -9306,7 +9306,7 @@
     height: 100%;
   }
 
-  /* Paywall trial-mode extras (step 36 with TRIAL_ENABLED on).
+  /* Paywall trial-mode extras (step 35 with TRIAL_ENABLED on).
      Timeline + no-payment pill live inside #onb-v2-paywall only —
      the modal paywall doesn't own the DOM. Selectors are #-scoped
      so the modal paywall doesn't accidentally inherit these rules
@@ -12734,82 +12734,151 @@
   }
 
   /* ── R38 chapter-6-free announcement ──────────────────────
-     Floating gift button on home + v7 bottom sheet + "🎁 Free"
-     pill on the chapter-6 card. Button sits at bottom inline-start
-     above the bottom nav; hides during the walkthrough and any
-     active sheet/popup. Marked seen in state.ch6GiftSheetSeen
-     (synced via coach_marks_shown JSONB). */
-  #ch6-gift-btn {
+     Floating bonus-chapter button on home — the "new bonus" tile,
+     brain icon, per-subject. 2026-11 took over the slot the ch6 gift
+     button used, keeping the same position, size, CSS pulse/pop, and
+     jump-column relayout. Attention cues (pulse + sparkles) are
+     strong until the user first opens the active subject's bonus,
+     then drop to a gentle shimmer. Shown to everyone in every
+     subject, permanently. Hides during the walkthrough and any
+     active sheet/popup. */
+  #bonus-btn {
     position: fixed;
-    /* R39 — gift tile lives in the SAME column as the jump button
-       (inset-inline-end: 18px, matching .hv-jump at 17509). JS
-       (_ch6GiftRelayout) recomputes `bottom` whenever the jump
-       button's visibility changes:
-         jump visible → gift stacks 12px above jump
-         jump hidden  → gift drops into jump's slot
-       Default `bottom` here is the jump-hidden baseline so the
-       first paint before JS runs matches the final layout, no jank.
-    */
+    /* Floating tile shares the jump button's column (inset-inline-end:
+       18px). JS (_bonusBtnRelayout) recomputes `bottom` whenever the
+       jump button's visibility flips:
+         jump visible → bonus stacks 12px above jump
+         jump hidden  → bonus drops into the jump's slot
+       Default `bottom` here matches the jump-hidden baseline so first
+       paint before JS runs has no layout shift. */
     bottom: calc(76px + var(--safe-bottom, 0px));
     inset-inline-end: 18px;
     z-index: 210;
     transition: bottom 200ms cubic-bezier(.3, 1.1, .5, 1), opacity 200ms ease;
     width: 56px; height: 56px;
     display: inline-flex; align-items: center; justify-content: center;
-    background: #FFF4DE;
-    border: 2px solid #F3C866;
+    background: #FFFFFF;
+    border: 2px solid var(--accent, #7B4FD4);
     border-radius: 18px;
-    box-shadow: 0 4px 0 #E0A93A, 0 8px 20px rgba(224, 169, 58, 0.28);
-    font-size: 28px; line-height: 1;
+    box-shadow: 0 4px 0 var(--accent-dark, #5A35A8), 0 8px 20px var(--accent-glow, rgba(123, 79, 212, 0.28));
+    line-height: 1;
     cursor: pointer;
+    overflow: hidden;              /* clip shimmer sweep */
     -webkit-tap-highlight-color: transparent;
-    animation: ch6GiftPop 420ms cubic-bezier(.3, 1.5, .5, 1) both;
+    animation: bonusBtnPop 420ms cubic-bezier(.3, 1.5, .5, 1) both;
   }
-  #ch6-gift-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #E0A93A, 0 4px 10px rgba(224, 169, 58, 0.28); }
-  #ch6-gift-btn::before,
-  #ch6-gift-btn::after {
+  html.dark #bonus-btn { background: var(--surface, #1A0E3C); }
+  #bonus-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--accent-dark, #5A35A8), 0 4px 10px var(--accent-glow, rgba(123, 79, 212, 0.28)); }
+  #bonus-btn > .bonus-btn-icon {
+    display: block;
+    width: 36px; height: 36px;
+    object-fit: contain;
+    pointer-events: none;
+    /* Keep the SVG above the shimmer sweep. */
+    position: relative; z-index: 2;
+  }
+  /* Attention rings — two offset pulses, strong mode. */
+  #bonus-btn::before,
+  #bonus-btn::after {
     content: ''; position: absolute; inset: -2px;
     border-radius: 20px;
-    border: 2px solid rgba(243, 200, 102, 0.65);
+    border: 2px solid var(--accent, rgba(123, 79, 212, 0.65));
+    opacity: 0.55;
     pointer-events: none;
-    animation: ch6GiftPulse 1.6s ease-out infinite;
+    animation: bonusBtnPulse 1.6s ease-out infinite;
   }
-  #ch6-gift-btn::after { animation-delay: 0.8s; }
-  #ch6-gift-btn > .ch6-gift-dot {
-    /* Red dot at the physical top-right corner of the tile, matching
-       the mockup. Hard-coded `right` instead of logical inset-inline-
-       end so the dot stays on the right in both languages (the tile
-       itself is now screen-LEFT in both). */
+  #bonus-btn::after { animation-delay: 0.8s; }
+  /* Shimmer sweep — diagonal highlight that travels across the tile.
+     Strong mode: every 1.8s. Gentle mode (.wt-seen): every 6s. */
+  #bonus-btn > .bonus-btn-icon::after {
+    /* No-op slot so .bonus-btn-icon acts as the clipper. The sweep
+       itself lives on the button's ::before layer via a separate
+       background on hover-less animation below. */
+  }
+  #bonus-btn {
+    background-image:
+      linear-gradient(115deg,
+        transparent 0%,
+        transparent 40%,
+        rgba(255, 255, 255, 0.55) 50%,
+        transparent 60%,
+        transparent 100%);
+    background-size: 220% 100%;
+    background-position: 100% 0;
+    background-repeat: no-repeat;
+    animation: bonusBtnPop 420ms cubic-bezier(.3, 1.5, .5, 1) both,
+               bonusBtnShimmer 1.8s ease-in-out 420ms infinite;
+  }
+  html.dark #bonus-btn {
+    background-image:
+      linear-gradient(115deg,
+        transparent 0%,
+        transparent 40%,
+        rgba(255, 255, 255, 0.18) 50%,
+        transparent 60%,
+        transparent 100%);
+  }
+  /* Red dot at the top-right corner — only in strong mode. */
+  #bonus-btn > .bonus-btn-dot {
     position: absolute; top: -4px; right: -4px;
     width: 14px; height: 14px; border-radius: 50%;
     background: #E8373C; border: 2px solid #FFFFFF;
+    z-index: 3;
   }
-  @keyframes ch6GiftPop {
+  /* Twinkle sparkles — three tiny diamonds around the tile, staggered
+     fade-in/out. Strong mode only; hidden on .wt-seen. */
+  #bonus-btn > .bonus-btn-spark {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: var(--accent, #7B4FD4);
+    transform: rotate(45deg) scale(0);
+    pointer-events: none;
+    z-index: 3;
+    animation: bonusBtnSparkle 1.8s ease-in-out infinite;
+    box-shadow: 0 0 6px var(--accent-glow, rgba(123, 79, 212, 0.65));
+  }
+  #bonus-btn > .bonus-btn-spark-1 { top: -6px; left: 10px; animation-delay: 0s; }
+  #bonus-btn > .bonus-btn-spark-2 { top: 18px; right: -8px; animation-delay: 0.6s; }
+  #bonus-btn > .bonus-btn-spark-3 { bottom: -4px; left: -6px; animation-delay: 1.2s; }
+  @keyframes bonusBtnPop {
     from { opacity: 0; transform: scale(0.6) translateY(8px); }
     to   { opacity: 1; transform: none; }
   }
-  @keyframes ch6GiftPulse {
+  @keyframes bonusBtnPulse {
     0%   { opacity: 0.55; transform: scale(1); }
     80%  { opacity: 0;    transform: scale(1.55); }
     100% { opacity: 0;    transform: scale(1.55); }
   }
-  @media (prefers-reduced-motion: reduce) {
-    #ch6-gift-btn::before, #ch6-gift-btn::after { animation: none; opacity: 0; }
-    /* Pop-in animation and the R39 jump-tracking slide both drop
-       to instant when the user prefers reduced motion. */
-    #ch6-gift-btn { animation: none; transition: none; }
-    #ch6-gift-caption { transition: opacity 0ms; }
+  @keyframes bonusBtnShimmer {
+    0%   { background-position: 100% 0; }
+    60%  { background-position: -60% 0; }
+    100% { background-position: -60% 0; }
   }
-  /* R38c — after the sheet has been opened, the tile stays on home
-     as a re-entry point but strips the attention cues: no pulse,
-     no dot, no caption (handled in JS). */
-  #ch6-gift-btn.wt-seen::before,
-  #ch6-gift-btn.wt-seen::after { display: none; }
-  #ch6-gift-btn.wt-seen > .ch6-gift-dot { display: none; }
+  @keyframes bonusBtnSparkle {
+    0%, 100% { transform: rotate(45deg) scale(0); opacity: 0; }
+    30%      { transform: rotate(45deg) scale(1); opacity: 1; }
+    60%      { transform: rotate(45deg) scale(0.4); opacity: 0.6; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #bonus-btn::before, #bonus-btn::after { animation: none; opacity: 0; }
+    #bonus-btn > .bonus-btn-spark { animation: none; opacity: 0; }
+    #bonus-btn { animation: none; transition: none; background-image: none; }
+    #bonus-btn-caption { transition: opacity 0ms; }
+  }
+  /* Gentle mode — after the user has entered this subject's bonus.
+     Rings + sparkles + dot gone; shimmer slows to every ~6s. */
+  #bonus-btn.wt-seen::before,
+  #bonus-btn.wt-seen::after { display: none; }
+  #bonus-btn.wt-seen > .bonus-btn-dot,
+  #bonus-btn.wt-seen > .bonus-btn-spark { display: none; }
+  #bonus-btn.wt-seen {
+    animation: bonusBtnPop 420ms cubic-bezier(.3, 1.5, .5, 1) both,
+               bonusBtnShimmer 6s ease-in-out 420ms infinite;
+  }
   /* Caption pill — dark ink, white text; sits inline-end of the
-     button. Fades out after _CH6_CAPTION_SHOW_MS; show-again on
+     button. Fades out after _BONUS_BTN_CAPTION_SHOW_MS; show-again on
      every home mount via JS until the sheet is opened. */
-  #ch6-gift-caption {
+  #bonus-btn-caption {
     position: fixed;
     /* R39 — follows the gift tile (which lives in the jump
        button's column now). JS sets the exact `bottom` to be
@@ -12833,7 +12902,7 @@
      tile. Rotated square clipped by overflow via the pill's border-
      radius isn't ideal, so draw it as a separate rotated square via
      ::after. */
-  #ch6-gift-caption::after {
+  #bonus-btn-caption::after {
     content: ''; position: absolute;
     bottom: -4px;
     /* Tail at the inline-end of the pill, pointing down toward
@@ -12843,19 +12912,19 @@
     background: #2A1266;
     transform: rotate(45deg);
   }
-  #ch6-gift-caption.fade-out { opacity: 0; }
-  html.dark #ch6-gift-caption { background: #1A0E3C; }
+  #bonus-btn-caption.fade-out { opacity: 0; }
+  html.dark #bonus-btn-caption { background: #1A0E3C; }
   /* Hide the floating affordance during the walkthrough and while any
      active sheet/popup/modal is on top. :has() is supported in
      Capacitor WKWebView (Safari 15.4+). */
-  html.walkthrough-active #ch6-gift-btn,
-  html.walkthrough-active #ch6-gift-caption,
-  html:has(.modal-overlay.active) #ch6-gift-btn,
-  html:has(.modal-overlay.active) #ch6-gift-caption,
-  html:has(.pop-v7.active)        #ch6-gift-btn,
-  html:has(.pop-v7.active)        #ch6-gift-caption,
-  html:has(#modal-paywall.active) #ch6-gift-btn,
-  html:has(#modal-paywall.active) #ch6-gift-caption {
+  html.walkthrough-active #bonus-btn,
+  html.walkthrough-active #bonus-btn-caption,
+  html:has(.modal-overlay.active) #bonus-btn,
+  html:has(.modal-overlay.active) #bonus-btn-caption,
+  html:has(.pop-v7.active)        #bonus-btn,
+  html:has(.pop-v7.active)        #bonus-btn-caption,
+  html:has(#modal-paywall.active) #bonus-btn,
+  html:has(#modal-paywall.active) #bonus-btn-caption {
     display: none !important;
   }
 
@@ -12875,7 +12944,7 @@
   html.dark .level-card-header .ch-free-pill { background: rgba(255, 255, 255, 0.92); }
   .level-card-header .ch-free-pill > span { font-size: 13px; }
 
-  /* v7 bottom sheet content for #modal-ch6-gift. The outer shell
+  /* v7 bottom sheet content for #modal-bonus-info. The outer shell
      styling comes from the shared .pop-v7 / .pop-wrap rules; this
      block only names the inner elements the gift sheet uses.
 
@@ -12899,55 +12968,35 @@
      selector). Switching to overflow:visible lets the thinker
      overflow the sheet's top edge; the content fits under 90dvh on
      every supported device so no scroll is needed. */
-  #modal-ch6-gift.pop-v7 .modal-box { overflow: visible !important; }
-  /* R39e — the sheet is always a philosophy frame (announces
-     philosophy ch6 as free). Scope the philosophy palette to this
-     modal only so economics / psychology users still see the purple
-     accent inside the sheet without the rest of the app's theme
-     changing. Values mirror html.theme-philosophy at :root. */
-  #modal-ch6-gift.pop-v7 {
-    --accent: #7B4FD4;
-    --accent-dark: #5A35A8;
-    --accent-lo: #5A35A8;
-    --accent-glow: rgba(123, 79, 212, 0.3);
-    --accent-rgb: 123, 79, 212;
-    --accent-tint: #F5EFFE;
-    --on-accent: #FFFFFF;
-    --ink: #2A1266;
-    --text: #3D1F7A;
-    --text-2: #9A80C4;
-  }
-  html.dark #modal-ch6-gift.pop-v7 {
-    /* Match html.dark.theme-philosophy's text treatment so the sheet
-       stays readable in dark mode on any subject. */
-    --text: #F5F1FF;
-    --text-2: rgba(245, 241, 255, 0.65);
-    --ink: #F5F1FF;
-  }
+  #modal-bonus-info.pop-v7 .modal-box { overflow: visible !important; }
+  /* The bonus sheet inherits the active subject's accent palette from
+     the root <html> theme class (theme-philosophy / theme-economics /
+     theme-psychology) — no hardcoded colors here, so philosophy
+     purple, economics blue, psychology amber all render naturally. */
   /* R38d — align the sheet's font stack with home / the other v7
      surfaces (Nunito for EN; Rubik → Nunito for HE). Default body
      font (DM Sans) was leaking through. */
-  #modal-ch6-gift.pop-v7,
-  #modal-ch6-gift.pop-v7 * {
+  #modal-bonus-info.pop-v7,
+  #modal-bonus-info.pop-v7 * {
     font-family: 'Nunito', system-ui, sans-serif;
   }
-  html[dir="rtl"] #modal-ch6-gift.pop-v7,
-  html[dir="rtl"] #modal-ch6-gift.pop-v7 * {
+  html[dir="rtl"] #modal-bonus-info.pop-v7,
+  html[dir="rtl"] #modal-bonus-info.pop-v7 * {
     font-family: 'Rubik', 'Nunito', system-ui, sans-serif;
   }
-  #modal-ch6-gift .pop-wrap { padding-top: 0; overflow: visible; }
-  #modal-ch6-gift .ch6g-thinker {
+  #modal-bonus-info .pop-wrap { padding-top: 0; overflow: visible; }
+  #modal-bonus-info .bonusg-thinker {
     display: block; position: relative; z-index: 2;
     width: 120px; height: auto;
     margin: -60px auto 6px;        /* half above the sheet's top edge */
     pointer-events: none;
-    animation: ch6gThinkerPop 420ms cubic-bezier(.3, 1.5, .5, 1) both;
+    animation: bonusgThinkerPop 420ms cubic-bezier(.3, 1.5, .5, 1) both;
   }
-  @keyframes ch6gThinkerPop { from { opacity: 0; transform: scale(.85) translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes bonusgThinkerPop { from { opacity: 0; transform: scale(.85) translateY(10px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) {
-    #modal-ch6-gift .ch6g-thinker { animation: none; }
+    #modal-bonus-info .bonusg-thinker { animation: none; }
   }
-  #modal-ch6-gift .ch6g-eyebrow {
+  #modal-bonus-info .bonusg-eyebrow {
     display: block; width: fit-content;
     margin: 0 auto 10px;
     background: rgba(123, 79, 212, 0.12);
@@ -12957,26 +13006,54 @@
     font-size: 12px; font-weight: 900; letter-spacing: 1.5px;
     text-transform: uppercase;
   }
-  #modal-ch6-gift .ch6g-title {
+  #modal-bonus-info .bonusg-title {
     text-align: center;
     font-size: 25px; font-weight: 900; line-height: 1.2;
     color: var(--ink);
     margin: 0 16px 10px;
   }
-  html.dark #modal-ch6-gift .ch6g-title { color: var(--text); }
-  #modal-ch6-gift .ch6g-body {
+  html.dark #modal-bonus-info .bonusg-title { color: var(--text); }
+  #modal-bonus-info .bonusg-body {
     text-align: center;
     font-size: 15.5px; font-weight: 700; line-height: 1.5;
     color: var(--text-2);
+    margin: 0 20px 14px;
+  }
+  /* Dialogue list inside the bonus sheet — plain rows, each one a
+     dialogue title + thinker. No numbering, no icons — the sheet's
+     role is "here's what's inside", not "pick one". */
+  #modal-bonus-info .bonusg-list {
+    list-style: none;
     margin: 0 20px 18px;
+    padding: 0;
+    display: flex; flex-direction: column;
+    gap: 6px;
+    text-align: start;
+  }
+  #modal-bonus-info .bonusg-list li {
+    padding: 8px 12px;
+    background: rgba(123, 79, 212, 0.06);
+    border-radius: 10px;
+    font-size: 14px; line-height: 1.35;
+    color: var(--text);
+  }
+  html.dark #modal-bonus-info .bonusg-list li { background: rgba(255, 255, 255, 0.05); }
+  #modal-bonus-info .bonusg-list-lead {
+    font-weight: 900;
+    color: var(--ink);
+  }
+  html.dark #modal-bonus-info .bonusg-list-lead { color: var(--text); }
+  #modal-bonus-info .bonusg-list-rest {
+    font-weight: 600;
+    color: var(--text-2);
   }
 
   /* Chapter card inside the sheet. Mirrors the home-v7 chapter
      banner CSS (see #screen-home.home-v7 .hv-chapter > .level-card
      et al.) so a user who sees ch6 on home + in the sheet gets the
-     same visual on both. Scoped to #modal-ch6-gift. */
-  #modal-ch6-gift .hv-chapter { margin: 0 20px 14px; }
-  #modal-ch6-gift .hv-chapter > .level-card {
+     same visual on both. Scoped to #modal-bonus-info. */
+  #modal-bonus-info .hv-chapter { margin: 0 20px 14px; }
+  #modal-bonus-info .hv-chapter > .level-card {
     background: var(--accent);
     color: #FFFFFF;
     border: none;
@@ -12987,14 +13064,14 @@
     cursor: default;
     margin: 0;
   }
-  html[dir="rtl"] #modal-ch6-gift .hv-chapter > .level-card {
+  html[dir="rtl"] #modal-bonus-info .hv-chapter > .level-card {
     padding: 12px 16px 12px 12px;
   }
-  #modal-ch6-gift .hv-chapter > .level-card .level-card-header {
+  #modal-bonus-info .hv-chapter > .level-card .level-card-header {
     display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;
     padding: 0;
   }
-  #modal-ch6-gift .hv-chapter > .level-card .level-num {
+  #modal-bonus-info .hv-chapter > .level-card .level-num {
     width: 36px; height: 36px;
     background: rgba(255, 255, 255, 0.22);
     border-radius: 10px;
@@ -13003,15 +13080,15 @@
     color: #FFFFFF;
     flex: 0 0 auto;
   }
-  #modal-ch6-gift .hv-chapter > .level-card .level-card-text {
+  #modal-bonus-info .hv-chapter > .level-card .level-card-text {
     flex: 1 1 auto; min-width: 0;
     display: flex; flex-direction: column; gap: 2px;
   }
-  #modal-ch6-gift .hv-chapter > .level-card .level-eyebrow {
+  #modal-bonus-info .hv-chapter > .level-card .level-eyebrow {
     font-size: 12px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;
     color: #FFFFFF; opacity: 0.85; margin: 0;
   }
-  #modal-ch6-gift .hv-chapter > .level-card .level-title {
+  #modal-bonus-info .hv-chapter > .level-card .level-title {
     /* R38d — single line, like the home card. Font sized via clamp
        so "Political Philosophy" (the longest EN title today) fits
        inside the text column that remains after the number box
@@ -13030,12 +13107,12 @@
     text-overflow: ellipsis;
     min-width: 0;
   }
-  #modal-ch6-gift .hv-chapter > .level-card .ch-free-pill {
+  #modal-bonus-info .hv-chapter > .level-card .ch-free-pill {
     flex: 0 0 auto;
     align-self: center;
   }
 
-  #modal-ch6-gift .pop-btn {
+  #modal-bonus-info .pop-btn {
     display: block; width: calc(100% - 40px); margin: 0 20px 10px;
     padding: 14px 16px;
     background: var(--accent); color: var(--on-accent);
@@ -13044,8 +13121,8 @@
     cursor: pointer; -webkit-tap-highlight-color: transparent;
     box-shadow: 0 4px 0 var(--accent-dark);
   }
-  #modal-ch6-gift .pop-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--accent-dark); }
-  #modal-ch6-gift .pop-link {
+  #modal-bonus-info .pop-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--accent-dark); }
+  #modal-bonus-info .pop-link {
     display: block; width: 100%;
     padding: 10px 16px 18px;
     background: transparent; border: none;
@@ -13055,7 +13132,7 @@
     text-transform: none; letter-spacing: normal;
     cursor: pointer; -webkit-tap-highlight-color: transparent;
   }
-  #modal-ch6-gift .pop-link:active { opacity: 0.6; }
+  #modal-bonus-info .pop-link:active { opacity: 0.6; }
 
   /* ── Walkthrough card (R37) ──────────────────────────────────
      Overlay chrome for the seven-screen home tour, plus the three
@@ -15317,6 +15394,83 @@
     border-color: var(--v7-acc-l);
   }
 
+  /* Source-step overrides. Reuses .onb-v2-card chrome; bumps the icon
+     slot to 42px for the inline SVGs defined in _ONB_SOURCE_ICON_SVG.
+     The icon palette (F5B83D accent, D9962A accent-dark, FBE3B0 tint)
+     is retinted to the active subject theme via attribute selectors
+     on the <svg>'s fill/stroke attrs — see the block immediately below.
+     Navy outline (#1B1446) and white highlights stay as the SVG author
+     set them. */
+  .onb-screen.onb-v7 #onb-v2-source-options .onb-v2-card-icon {
+    width: 42px;
+    height: 42px;
+  }
+  .onb-screen.onb-v7 #onb-v2-source-options .onb-v2-card-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  /* Icon retint — maps the SVG author's tri-color palette to the live
+     subject accent. Attribute selectors match the exact hex literals
+     baked into _ONB_SOURCE_ICON_SVG; no SVG rewrite needed. */
+  .onb-screen.onb-v7 #onb-v2-source-options .onb-v2-card-icon svg [fill="#F5B83D"]   { fill: var(--accent); }
+  .onb-screen.onb-v7 #onb-v2-source-options .onb-v2-card-icon svg [stroke="#F5B83D"] { stroke: var(--accent); }
+  .onb-screen.onb-v7 #onb-v2-source-options .onb-v2-card-icon svg [fill="#D9962A"]   { fill: var(--accent-dark); }
+  .onb-screen.onb-v7 #onb-v2-source-options .onb-v2-card-icon svg [stroke="#D9962A"] { stroke: var(--accent-dark); }
+  .onb-screen.onb-v7 #onb-v2-source-options .onb-v2-card-icon svg [fill="#FBE3B0"]   { fill: var(--accent-tint); }
+  /* Scrolling list — 10 options never fit between the header row and
+     the CTA holder on a 393×852 viewport (App Store/used-before/other
+     were clipped at the bottom). Let the list grow to fill the mid
+     area and scroll internally, with a bottom pad clearing the safe
+     area so the last card isn't hidden by the home indicator. */
+  .onb-screen.onb-v7 #onb-v2-source .onb-v7-mid {
+    min-height: 0;
+  }
+  .onb-screen.onb-v7 #onb-v2-source-options {
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    -webkit-overflow-scrolling: touch;
+  }
+  /* "Other" text-field. Revealed on tap of the Other card; same visual
+     weight as the card list so it reads as part of the same column. */
+  .onb-screen.onb-v7 .onb-v7-source-other-wrap {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .onb-screen.onb-v7 .onb-v7-source-other-wrap.is-open {
+    display: flex;
+  }
+  .onb-screen.onb-v7 .onb-v7-source-other-input {
+    width: 100%;
+    padding: calc(12px * var(--text-scale, 1)) 16px;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1.5px solid rgba(var(--accent-rgb), 0.18);
+    border-radius: 14px;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
+    font-weight: 700;
+    font-size: calc(16.5px * var(--text-scale));
+    line-height: 1.35;
+    text-align: start;
+    direction: inherit;
+  }
+  .onb-screen.onb-v7 .onb-v7-source-other-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  html.dark .onb-screen.onb-v7 .onb-v7-source-other-input {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+  /* Source-step head + sub reuse the shared .onb-v7-row / .onb-v7-bub /
+     .onb-v7-greeting pattern from the neighbouring Q1/Q2/Q3 screens —
+     no step-specific head/sub rules. Skip is gone; every user answers. */
+
   /* Hint under the bubble on Q1/Q2 ("pick up to 3"). Rendered by
      _onbV2PrepareMsel into .onb-v7-greeting; this scopes the color
      to a muted gray so it reads as a sub-line beneath the bold head. */
@@ -16304,9 +16458,16 @@
     flex-direction: column;
     width: 100%;
     padding: 0;
-    overflow: hidden;
-    flex: 1 1 auto;
-    min-height: 0;
+    /* Previously overflow:hidden + flex:1 clipped any content that
+       exceeded the viewport. The hard-mode additions (required-line
+       + Sign out / Delete footer) push the natural content height
+       past 852 on a 393-wide viewport, so the footer rows were
+       unreachable. Let the inner take its intrinsic height and let
+       the .onb-v7-mid parent's overflow-y: auto handle the scroll.
+       Bottom padding keeps the last footer row off the home-bar. */
+    overflow: visible;
+    flex: 0 0 auto;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   }
   .onb-screen.onb-v7#onb-v2-paywall .paywall-brand {
     margin-bottom: 4px;
@@ -16341,10 +16502,31 @@
     margin: 0 0 10px;
     line-height: 1.35;
   }
+  /* Timeline on the onboarding paywall. The shared #onb-v2-paywall rule
+     (line ~9314) draws the vertical line as a border-inline-start and
+     uses a negative margin on each dot to center it on that border.
+     That center-on-border trick makes the dots straddle the container
+     edge; on the 393×852 and 360×640 viewports, the paywall-inner's
+     padding doesn't leave any room for the overhang and the left half
+     of each dot gets clipped (half-moons visible in EN; mirror in HE).
+     Switch to a pseudo-element line inside the container so the dots
+     can sit fully within the content box with no clipping. */
   .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline {
     gap: 10px;
     margin: 6px 0 10px;
-    border-inline-start-width: 2px;
+    position: relative;
+    border-inline-start: 0;
+    padding-inline-start: 14px;
+  }
+  .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 5px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    background: var(--border);
+    border-radius: 1px;
   }
   .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline-step {
     gap: 12px;
@@ -16353,7 +16535,12 @@
     width: 12px;
     height: 12px;
     margin-top: 4px;
-    margin-inline-start: -13px;
+    /* Center the 12px dot on the 2px pseudo-line at inset-inline-start
+       5px (center at x=6). Content starts at x=14 after the padding.
+       margin = -(14 - 6 + 6) = -14 → dot start at x=0, center at x=6,
+       lining up with the line while sitting entirely inside the
+       container (no overhang past inset-inline-start:0). */
+    margin-inline-start: -14px;
   }
   .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline-title {
     font-size: 15px;
@@ -16404,6 +16591,58 @@
     font-size: 12.5px;
     margin: 2px 0 0;
   }
+  /* Hard-mode subscription-required line. Fires between .paywall-sub
+     and the cards when _onbPaywallHardMode() returns true (non-organic
+     source). Hidden otherwise. Muted neutral; no accent, no border —
+     the line is a statement, not a CTA, and shouldn't visually compete
+     with the real CTA button below the cards. */
+  .onb-screen.onb-v7#onb-v2-paywall .paywall-required-line {
+    display: none;
+    text-align: center;
+    color: var(--text-2);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 4px 0 2px;
+    padding: 0 8px;
+  }
+  .onb-screen.onb-v7#onb-v2-paywall.pw-hard .paywall-required-line {
+    display: block;
+  }
+  /* Hard-mode footer: Sign out · Delete account. Inherits the same
+     visual style as .paywall-links (Terms · Privacy) so the two rows
+     read as a single legal-area group. Appears directly under
+     .paywall-links in hard mode only. */
+  .onb-screen.onb-v7#onb-v2-paywall .paywall-hard-footer {
+    display: none;
+    font-size: 12.5px;
+    margin: 4px 0 0;
+    text-align: center;
+  }
+  .onb-screen.onb-v7#onb-v2-paywall.pw-hard .paywall-hard-footer {
+    display: block;
+  }
+  .onb-screen.onb-v7#onb-v2-paywall .paywall-hard-footer a {
+    color: var(--text-2);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+  }
+  .onb-screen.onb-v7#onb-v2-paywall .paywall-hard-footer a:active { opacity: 0.6; }
+  .onb-screen.onb-v7#onb-v2-paywall .paywall-hard-footer .paywall-links-sep {
+    color: var(--text-2);
+    padding: 0 6px;
+  }
+  /* Hard-mode X hide. Lives on the shell class so it's one declaration
+     to flip; keeps the close button in the DOM for aria/keyboard
+     consistency across soft/hard modes but makes it visually gone and
+     untappable. Visibility: hidden preserves the layout slot so the
+     progress bar's padding-inline-end (set by _onbV2PreparePaywall at
+     ~33523) doesn't change between modes. */
+  .onb-screen.onb-v7#onb-v2-paywall.pw-hard #onb-v2-paywall-skip {
+    visibility: hidden;
+    pointer-events: none;
+  }
   /* SE scale-down for the paywall internals. */
   @media (max-height: 700px) {
     .onb-screen.onb-v7#onb-v2-paywall .paywall-brand { display: none; }
@@ -16411,9 +16650,11 @@
     .onb-screen.onb-v7#onb-v2-paywall .onb-v7-paywall-head img { width: 60px; }
     .onb-screen.onb-v7#onb-v2-paywall .onb-v7-paywall-head .paywall-headline { font-size: 19px; }
     .onb-screen.onb-v7#onb-v2-paywall .paywall-sub { font-size: 12.5px; margin-bottom: 6px; }
-    .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline { gap: 2px; margin: 2px 0; border-inline-start-width: 1.5px; }
+    .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline { gap: 2px; margin: 2px 0; padding-inline-start: 12px; }
+    .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline::before { inset-inline-start: 4px; width: 1.5px; top: 8px; bottom: 8px; }
     .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline-step { gap: 8px; }
-    .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline-dot { width: 8px; height: 8px; margin-top: 3px; margin-inline-start: -11px; }
+    /* Center 8px dot on 1.5px line at inset-start 4px (center ~4.75). Content at x=12. margin = -(12 - 4.75 + 4) = -11.25. */
+    .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline-dot { width: 8px; height: 8px; margin-top: 3px; margin-inline-start: -12px; }
     .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline-title { font-size: 12px; margin-bottom: 0; }
     .onb-screen.onb-v7#onb-v2-paywall .paywall-timeline-body { font-size: 11.5px; line-height: 1.25; }
     .onb-screen.onb-v7#onb-v2-paywall .paywall-no-payment-due { padding: 3px 8px; font-size: 11.5px; margin: 2px 0 4px; }
@@ -16426,6 +16667,8 @@
     .onb-screen.onb-v7#onb-v2-paywall .paywall-restore { margin-top: 2px; font-size: 11px; padding: 2px 0; }
     .onb-screen.onb-v7#onb-v2-paywall .paywall-legal { font-size: 10px; margin: 2px 0 0; line-height: 1.25; }
     .onb-screen.onb-v7#onb-v2-paywall .paywall-links { font-size: 10.5px; margin: 1px 0 0; }
+    .onb-screen.onb-v7#onb-v2-paywall .paywall-required-line { font-size: 11.5px; margin: 2px 0 1px; }
+    .onb-screen.onb-v7#onb-v2-paywall .paywall-hard-footer { font-size: 10.5px; margin: 2px 0 0; }
   }
 
   /* ── Journey (step 26) — tightened card + features for no-scroll
@@ -26269,7 +26512,7 @@
       </svg>
     </button>
     <!-- R38 chapter-6-free announcement. Mounted/removed by
-         _mountCh6GiftBtn() during renderHome. Lives inside
+         _mountBonusBtn() during renderHome. Lives inside
          #screen-home so switching screens hides it naturally. -->
   </div>
 
@@ -26922,8 +27165,8 @@
      _streakRepairV7Intro / _renderRepairQuestion / _showRepairResult. -->
 <div class="modal-overlay" id="modal-streak-repair"><div class="modal-box"></div></div>
 <!-- R38 — gift sheet shell. Content mounted on open via
-     _popV7MountSheet('modal-ch6-gift', …). -->
-<div class="modal-overlay" id="modal-ch6-gift"><div class="modal-box"></div></div>
+     _popV7MountSheet('modal-bonus-info', …). -->
+<div class="modal-overlay" id="modal-bonus-info"><div class="modal-box"></div></div>
 
 <!-- Screenshot-detected prompt — bottom pill, text only, dismissible.
      Fires ONLY on the two thinker surfaces (modal + dc-thinker-screen),
@@ -27533,7 +27776,18 @@ const PAYWALL_ENABLED = true;
 // out of sequence." Adding a chapter here removes the paywall from
 // every call site that reads canAccessWeek, which is all of them;
 // the gift sheet announcement is wired separately in renderHome.
-const FREE_CHAPTERS = { philosophy: [6] };
+// Per-subject "free chapter" allowlist. canAccessWeek() returns true
+// for any id here. Grandfathered via _GRANDFATHERED_FREE below so
+// anyone who already started a previously-free chapter keeps access.
+// 2026-11-14 — philosophy:6 closed; the ch6 free offer has ended and
+// the bonus-button sheet is the new on-home affordance.
+const FREE_CHAPTERS = {};
+// Grandfather map — chapters that WERE free but no longer are. Users
+// with any completed day in these chapters keep chapter-level access
+// forever, so nobody loses content they already started. The lock
+// map already grants visual unlock via _hasWeekProgress; this parallel
+// check in canAccessWeek is the entitlement side.
+const _GRANDFATHERED_FREE = { philosophy: [6] };
 
 // Trial gate. Controls the trial-intro (step 34), reminder-promise
 // (step 35), and paywall trial-framing subset. Restored 2026-09-20
@@ -30260,6 +30514,24 @@ function enterAsGuest() {
   // Guest entry: reveal the app without auth.
   // Do NOT set appStarted (leave false so the real enterApp runs on sign-in).
   // Do NOT set currentUser (leave null — that's how the engine knows it's a guest).
+  // Hard-paywall escrow: if a user just signed out from the hard
+  // onboarding paywall, "continue as guest" must NOT land them on
+  // home. The escrow flag (survives the sign-out wipe) tells us to
+  // keep the user on the paywall until onboarding is otherwise
+  // resolved. The paywall's prepare will see the same flag and lock
+  // itself into hard mode even though state.onbAnswers is empty.
+  try {
+    if (localStorage.getItem('corpus_hard_paywall_escrow') === '1'
+        && !localStorage.getItem('corpus_onboarding_done')) {
+      hideAuthScreen();
+      _phCapture('onboarding_auth_choice', { choice: 'guest', method: null });
+      try { localStorage.setItem('corpus_onboarding_step', '35'); } catch(_) {}
+      try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(_) {}
+      _onboardingBooted = true;
+      try { _onbShowStep(35); } catch(_) {}
+      return;
+    }
+  } catch (_) {}
   hideAuthScreen();
   // Funnel: onboarding_auth_choice with choice='guest'.
   _phCapture('onboarding_auth_choice', { choice: 'guest', method: null });
@@ -30811,6 +31083,19 @@ function _syncIntroIframeAppearance() {
 // fired here from the message listener.
 
 function _phCapture(event, props) {
+  // Debug-build-only sink. Appends every _phCapture call to an in-page
+  // array so Playwright assertions can verify event firing without
+  // relying on the real PostHog transport. Fires BEFORE the debug
+  // analytics opt-out gate below so a debug build (which suppresses
+  // real PostHog) still records events for the assertion sink. Keyed
+  // by window.__CORPUS_DEBUG_BUILD; a production build will never
+  // set the flag and the sink stays untouched.
+  try {
+    if (window.__CORPUS_DEBUG_BUILD === true) {
+      if (!Array.isArray(window.__corpusPhLog)) window.__corpusPhLog = [];
+      window.__corpusPhLog.push({ event: event, props: props || {}, t: Date.now() });
+    }
+  } catch (_) {}
   // R39c — analytics opt-out convention for debug / dev builds. The
   // existing debug flags (_corpus_debug, _corpus_dev_test,
   // _corpus_dev_premium) also gate the DevTools helpers; mirroring
@@ -31096,6 +31381,15 @@ function _onbShowScreen(screenId) {
 // to step 1 on resume — a small population, simpler than mapping.
 const _ONB_FLOW_VERSION = '7';
 
+// _ONB_TOTAL_STEPS is 35 — the index of the last VISIBLE-on-progress-bar
+// step (paywall at 35). Restored to its pre-source-work value so the
+// paywall-close idiom `_onbAdvanceStep(35, 36)` still trips the
+// "n > _ONB_TOTAL_STEPS → _onbComplete" branch and finishes onboarding.
+// The source step lives at slot 37 as a SATELLITE: it's reachable via
+// its DOM id in _ONB_STEP_TO_ID but doesn't participate in the "last
+// visible step" progress count. See the slot 37 comment below and the
+// map-aware bound checks in _onbShowStep / _onbAdvanceStep that
+// permit satellite slots past the total.
 const _ONB_TOTAL_STEPS = 35;
 // Which phase (1..6) each step belongs to. Retained for the
 // onboarding_step_shown telemetry event; the visible progress bar is
@@ -31117,6 +31411,10 @@ const _ONB_STEP_TO_PHASE = {
   23: 1,
   26: 6, 27: 6, 28: 6, 29: 6,
   30: 6, 31: 6,
+  // Source attribution (satellite slot 37, between signup and
+  // building) — grouped with signup under phase 1 since both are
+  // part of the "who are you" opening block for funnel purposes.
+  37: 1,
 };
 
 // v11 seven-section progress model — replaces the earlier 5-act pill
@@ -31260,10 +31558,15 @@ const _ONB_STEP_TO_ID = {
   20: 'onb-v2-taste-q',
   21: 'onb-v2-first-card',
   22: 'onb-v2-streak',
-  // Sign-up (moved from old step 4). Advances to building (24) on
-  // success or on Skip. postAuthContinue routes back into onboarding
-  // at step 24 (was 5 in v5). The streak CTA now advances straight
-  // here — no OS-review sheet detour, no null slot to skip past.
+  // Sign-up (moved from old step 4). Advances to source (slot 37) on
+  // success or on Skip (2026-11-14 — source was previously BEFORE
+  // signup at the same slot 37 via a 22→37→23 intercept; it now lives
+  // AFTER signup so the source attribution writes directly to the
+  // newly-signed-in account's onboarding_answers row instead of a
+  // guest state blob that depends on a later syncProgressToSupabase
+  // to carry it over). postAuthContinue callers all route to 37.
+  // The streak CTA now advances straight here — no OS-review sheet
+  // detour, no null slot to skip past.
   23: 'onb-v2-signup',
   // Act 4 — The Plan. Building spinner (24) auto-advances after 2.5s,
   // plan-ready (25) is an owl bridge, journey (26) is the dated
@@ -31302,6 +31605,40 @@ const _ONB_STEP_TO_ID = {
   33: 'onb-v2-trial',
   34: 'onb-v2-reminder-promise',
   35: 'onb-v2-paywall',
+  // Slot 36 is INTENTIONALLY VACANT — it's the "past the last visible
+  // step" sentinel targeted by _paywallOnClose's
+  // _onbAdvanceStep(35, 36). With _ONB_TOTAL_STEPS=35, any advance to
+  // 36 trips the "to > _ONB_TOTAL_STEPS → _onbComplete" branch in
+  // _onbAdvanceStep and finishes onboarding. Restored to its pre-
+  // source-work meaning on 2026-11-14 (device-test bug: before the
+  // restoration, slot 36 held the source step, and tapping X on the
+  // soft paywall landed users on source instead of home).
+  //
+  // Slot 37 — "How did you hear about Corpus?" source attribution.
+  // SATELLITE SLOT: permitted past _ONB_TOTAL_STEPS by the map-aware
+  // bound checks in _onbShowStep and _onbAdvanceStep. Reachable only
+  // via the signup → source → building wiring; never trips the "past
+  // last" completion sentinel because slot 36 sits between 35 and 37.
+  // Forward flow: signup success / skip / already-authed arrival all
+  // route 23 → 37 (every signup path, see _onbSignupApple +
+  // _onbSignupGoogle postAuthContinue, _onbV2CtaSignupSkip, and the
+  // _onbV2PrepareSignup currentUser bailout). Source then forwards
+  // 37 → 24 (building). No back button — the user is signed in by
+  // the time they reach the source step, and backing out of an
+  // attribution question into a completed signup would create a
+  // confusing loop. Users resuming from an older build (v7 flow
+  // version) stored at 24+ skip 37 entirely — their source stays
+  // unset and the hard-paywall rule reads that as "missing source →
+  // show the X".
+  37: 'onb-v2-source',
+};
+// Step-id annotations — rendered into the onboarding_step_shown
+// payload as `step_id` so a funnel can key on the stable name instead
+// of just the slot number. Only populated for steps where the slot
+// number is out of order with the visible flow; slot-ordered steps
+// don't need it.
+const _ONB_STEP_ID_ANNOTATIONS = {
+  37: 'source',
 };
 
 // Bilingual copy map for the intro screens (1-3). Later commits will
@@ -32720,7 +33057,11 @@ function _onbMeasureLabelLeft(container) {
 // class on the step's DOM node. If the step's DOM id is null, treats
 // it as a partial-ladder ship — see the mitigation below.
 function _onbShowStep(n) {
-  if (n < 1 || n > _ONB_TOTAL_STEPS) { _onbComplete(); return; }
+  // Bound check is map-aware so satellite slots past _ONB_TOTAL_STEPS
+  // (e.g. source at 37) remain reachable. A slot that's neither
+  // in-range nor present in the registry (e.g. slot 36, the paywall-
+  // close completion sentinel) trips _onbComplete.
+  if (n < 1 || (n > _ONB_TOTAL_STEPS && _ONB_STEP_TO_ID[n] === undefined)) { _onbComplete(); return; }
   // Null slots (step 6 gender) silently advance to the next real step
   // — the slot number stays stable so the funnel's onboarding_step_shown
   // events keep lining up across flow-version bumps. R41h: step 31
@@ -32733,6 +33074,17 @@ function _onbShowStep(n) {
     return;
   }
   const id = slotEntry;
+  // Entitled-user bypass for the onboarding paywall: a paid / trial
+  // user who somehow lands on step 35 (lapsed restore on a fresh
+  // device, a dev-tool jump, a flow-version rewrite that bumped the
+  // paywall slot) should never see the onboarding paywall. Complete
+  // onboarding inline and return — _onbComplete renders home.
+  if (id === 'onb-v2-paywall'
+      && typeof _isUserPaidOrTrialNow === 'function'
+      && _isUserPaidOrTrialNow()) {
+    _onbComplete();
+    return;
+  }
   if (!id) {
     // Partial-ladder ship (v11 acts building out commit by commit):
     // this step's DOM isn't built yet. Land on home WITHOUT marking
@@ -32810,19 +33162,31 @@ function _onbShowStep(n) {
   // paths can detect an old-layout step number and reset to step 1
   // rather than resume onto the wrong screen.
   try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(e) {}
-  try { _phCapture('onboarding_step_shown', { step: n, phase: phase, flow_version: 5 }); } catch(e) {}
+  try {
+    const _payload = { step: n, phase: phase, flow_version: 5 };
+    const _stepId = _ONB_STEP_ID_ANNOTATIONS && _ONB_STEP_ID_ANNOTATIONS[n];
+    if (_stepId) _payload.step_id = _stepId;
+    _phCapture('onboarding_step_shown', _payload);
+  } catch(e) {}
 }
 
 // Move from step `from` to step `to`, optionally merging a patch of
 // answers into state.onbAnswers before saving. `to` may exceed
-// _ONB_TOTAL_STEPS to trigger completion.
+// _ONB_TOTAL_STEPS to trigger completion — specifically, slot 36 is
+// reserved as the "past last visible step" sentinel and is checked
+// here. Satellite slots that live past _ONB_TOTAL_STEPS but DO exist
+// in _ONB_STEP_TO_ID (source at 37) remain reachable.
 function _onbAdvanceStep(from, to, patch) {
   if (patch && typeof patch === 'object') {
     Object.assign(state.onbAnswers, patch);
     try { saveStateLocal(); } catch(e) {}
     try { saveState(); } catch(e) {}
   }
-  if (to > _ONB_TOTAL_STEPS) { _onbComplete(); return; }
+  // Satellite-aware completion check: same pattern as _onbShowStep —
+  // a target past _ONB_TOTAL_STEPS that isn't in the registry
+  // completes (slot 36), one that IS in the registry proceeds (slot
+  // 37 = source).
+  if (to > _ONB_TOTAL_STEPS && _ONB_STEP_TO_ID[to] === undefined) { _onbComplete(); return; }
   _onbShowStep(to);
 }
 
@@ -32837,6 +33201,15 @@ function _onbComplete() {
   const today = _streakDay();
   state.onbAnswers = state.onbAnswers || {};
   state.onbAnswers.completedAt = today;
+  // Clear the hard-paywall escrow (and the uid stamp) — onboarding
+  // resolved, so a later sign-out should not force the user back
+  // into hard-paywall mode the next time they encounter the paywall
+  // post-onboarding.
+  try { localStorage.removeItem('corpus_hard_paywall_escrow'); } catch (_) {}
+  try { localStorage.removeItem('corpus_hard_paywall_escrow_uid'); } catch (_) {}
+  // Clear the widget-step decision so a replay (fresh install or
+  // tester reset) always re-evaluates whether the step should run.
+  try { localStorage.removeItem('corpus_onboarding_widget_decision'); } catch (_) {}
   // Defensive: clear the two body classes that hide chrome via CSS.
   // body.on-subject-screen and body.drawer-open both apply
   // visibility:hidden to .topbar / .stats-subheader / .bottom-nav
@@ -33212,30 +33585,91 @@ function _onbV2CtaMirror() { _onbAdvanceStep(15, 16); }
 //   - Both paths advance to step 33 (reviews / testimonials),
 //     skipping the null slot 32 which represents the OS dialog in
 //     flight.
-// R41h / R41i — step 31 prep. Widget prompt is a real onboarding step
-// in slot 31. Flow:
-//   • Non-iOS (web / Android) → auto-advance to 32.
-//   • iOS, widget plugin reports installed=true within 500ms → auto-
-//     advance to 32 (the user already has it; don't make them tap past
-//     a redundant screen). Debug-build-only override:
-//     localStorage._corpus_force_widget_step='1' bypasses the skip so
-//     the step still shows on a tester's phone that has the widget.
-//   • iOS, installed=false OR check fails/times out → show the step.
-// The 500ms timeout keeps the step from stalling if the native plugin
-// never resolves; shipping the prompt is strictly better than hanging
-// mid-onboarding.
-function _onbV2PrepareWidget() {
+// R41h / R41i / 2026-11-14 — step 31 prep (widget prompt).
+//
+// Historical inconsistency (device-test report, 2026-11-14): the step
+// was sometimes shown and sometimes skipped across different runs of
+// onboarding on the same device. Root cause:
+//
+//   1. 500 ms vs plugin-cold-start race. _onbV2PrepareWidget runs on
+//      every entry to step 31. If the CorpusWidgetBridge plugin is
+//      still initialising at that moment (cold start, WKWebView
+//      finishing its bootstrap), bridge.isWidgetInstalled() settles
+//      LATER than 500 ms — the timeout fires, mountStep runs, the
+//      step shows. If the plugin is already warm (any subsequent
+//      enter, same-session replay, or warm-launch), the call resolves
+//      in ~50 ms and the installed branch wins.
+//
+//   2. WidgetKit cache stickiness. Once a user has placed the Corpus
+//      widget on their home screen, iOS keeps
+//      WidgetCenter.shared.getCurrentConfigurations returning that
+//      installation across app reinstalls (same bundle id). So a
+//      tester who ran the onboarding once, installed the widget,
+//      wiped localStorage and replayed — got auto-skip on the replay
+//      even though their "user state" was fresh.
+//
+//   3. The decision was re-computed on every prepare call, so a
+//      back-then-forward navigation could flip show→skip within the
+//      same onboarding run. Not a user-visible loop (step 31 has no
+//      back arrow today), but a latent determinism gap.
+//
+// New contract:
+//   • Non-iOS (web / Android): skip permanently. No plugin call.
+//   • iOS + localStorage._corpus_force_widget_step + debug build:
+//     force-show. Diagnostic only.
+//   • iOS + already-decided this onboarding run
+//     (corpus_onboarding_widget_decision ∈ {'show','skip'}):
+//     honor the stored decision.
+//   • iOS + first decision for this run: await the installed check
+//     with a 1 s timeout (longer than before — we now hide the shell
+//     while waiting, so a 1 s wait is invisible to the user and
+//     gives the cold-start plugin time to settle). Default to SHOW
+//     on timeout, error, or plugin unavailable.
+//   • The decision is cleared in _onbComplete (next fresh onboarding
+//     starts clean) and by window.__corpusResetOnboarding (the
+//     documented tester reset path).
+async function _onbV2PrepareWidget() {
   const screen = document.getElementById('onb-v2-widget');
   if (screen && typeof _onbV7Acc === 'function') _onbV7Acc(screen);
   const isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
   const isIos = isNative && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'ios';
   if (!isIos) {
+    try { localStorage.setItem('corpus_onboarding_widget_decision', 'skip'); } catch (_) {}
+    try { _phCapture('onboarding_widget_step', { decision: 'skip', reason: 'non_ios' }); } catch (_) {}
     _onbAdvanceStep(31, 32);
     return;
   }
 
-  // Debug-build-only override (R41i): tester can force the step to
-  // show even when the widget is installed. Flag only honored when
+  // Honor the persisted decision so back-forward navigation stays
+  // consistent within the same onboarding run.
+  let decision = null;
+  try { decision = localStorage.getItem('corpus_onboarding_widget_decision'); } catch (_) {}
+  if (decision === 'skip') {
+    try { _phCapture('onboarding_widget_step', { decision: 'skip', reason: 'persisted' }); } catch (_) {}
+    _onbAdvanceStep(31, 32);
+    return;
+  }
+
+  const mountStep = (reason) => {
+    try { localStorage.setItem('corpus_onboarding_widget_decision', 'show'); } catch (_) {}
+    _widgetPromptSource = 'onboarding_step31';
+    const fig = document.getElementById('onb-v7-widget-fig');
+    if (fig && typeof _onbThinker === 'function') fig.src = _onbThinker('point');
+    if (typeof _widgetPromptPopulate === 'function') {
+      try { _widgetPromptPopulate('initial'); } catch (_) {}
+    }
+    if (screen) screen.style.visibility = '';
+    try { _phCapture('widget_prompt_shown', { source: 'onboarding_step31', reason: reason || 'resolved_not_installed' }); } catch (_) {}
+  };
+
+  if (decision === 'show') {
+    try { _phCapture('onboarding_widget_step', { decision: 'show', reason: 'persisted' }); } catch (_) {}
+    mountStep('persisted_show');
+    return;
+  }
+
+  // Debug-build-only override: tester can force the step to show even
+  // when the widget is installed. Flag only honored when
   // __CORPUS_DEBUG_BUILD is true; Release builds ignore localStorage.
   let forceShow = false;
   try {
@@ -33244,55 +33678,72 @@ function _onbV2PrepareWidget() {
       forceShow = true;
     }
   } catch (_) {}
-
-  const mountStep = () => {
-    _widgetPromptSource = 'onboarding_step31';
-    const fig = document.getElementById('onb-v7-widget-fig');
-    if (fig && typeof _onbThinker === 'function') fig.src = _onbThinker('point');
-    if (typeof _widgetPromptPopulate === 'function') {
-      try { _widgetPromptPopulate('initial'); } catch (_) {}
-    }
-    try { _phCapture('widget_prompt_shown', { source: 'onboarding_step31', forced: forceShow }); } catch (_) {}
-  };
-
   if (forceShow) {
-    mountStep();
+    mountStep('debug_force');
     return;
   }
 
-  // Ask the native plugin whether the widget is already installed.
-  // Race the plugin call against a 500ms timeout — a missing /
-  // slow-to-resolve plugin shouldn't stall onboarding.
+  // Deterministic async decision path. Hide the shell's content while
+  // the plugin check is in flight so there's no partial paint — the
+  // user sees either the empty background during the brief wait or
+  // the fully-prepared step once mountStep runs.
+  if (screen) screen.style.visibility = 'hidden';
   const bridge = window.Capacitor.Plugins && window.Capacitor.Plugins.CorpusWidgetBridge;
   if (!bridge || typeof bridge.isWidgetInstalled !== 'function') {
-    mountStep();
+    try { _phCapture('onboarding_widget_step', { decision: 'show', reason: 'unsupported' }); } catch (_) {}
+    mountStep('plugin_unavailable');
     return;
   }
-  let settled = false;
-  const timeoutId = setTimeout(() => {
-    if (settled) return;
-    settled = true;
-    mountStep();
-  }, 500);
-  Promise.resolve(bridge.isWidgetInstalled()).then((res) => {
-    if (settled) return;
-    settled = true;
-    clearTimeout(timeoutId);
-    const installed = !!(res && res.installed);
-    const supported = !(res && res.supported === false);
+  const TIMEOUT_MS = 1000;
+  const result = await Promise.race([
+    Promise.resolve(bridge.isWidgetInstalled()).then(res => ({ kind: 'resolved', res })).catch(err => ({ kind: 'error', err })),
+    new Promise(r => setTimeout(() => r({ kind: 'timeout' }), TIMEOUT_MS)),
+  ]);
+  if (result.kind === 'resolved') {
+    const res = result.res || {};
+    const installed = !!res.installed;
+    const supported = !(res.supported === false);
     if (supported && installed) {
+      try { localStorage.setItem('corpus_onboarding_widget_decision', 'skip'); } catch (_) {}
       try { _phCapture('widget_prompt_auto_skipped', { source: 'onboarding_step31', reason: 'installed' }); } catch (_) {}
+      try { _phCapture('onboarding_widget_step', { decision: 'skip', reason: 'installed' }); } catch (_) {}
       _onbAdvanceStep(31, 32);
-    } else {
-      mountStep();
+      return;
     }
-  }).catch(() => {
-    if (settled) return;
-    settled = true;
-    clearTimeout(timeoutId);
-    mountStep();
-  });
+    if (!supported) {
+      try { _phCapture('onboarding_widget_step', { decision: 'show', reason: 'unsupported' }); } catch (_) {}
+    }
+    mountStep(supported ? 'resolved_not_installed' : 'resolved_unsupported');
+    return;
+  }
+  // timeout or error → default to SHOW on supported platforms.
+  try { _phCapture('onboarding_widget_step', { decision: 'show', reason: result.kind === 'timeout' ? 'timeout' : 'error' }); } catch (_) {}
+  mountStep(result.kind === 'timeout' ? 'timeout' : 'plugin_error');
 }
+
+// Documented tester helper — clears every onboarding-scoped local
+// flag so the next app open re-runs the full flow deterministically,
+// including the widget step. Does NOT touch currentUser or server
+// state; sign out separately if you want a true guest replay.
+window.__corpusResetOnboarding = function () {
+  const keys = [
+    'corpus_onboarding_done',
+    'corpus_onboarding_step',
+    'corpus_onboarding_flow_version',
+    'corpus_onboarding_widget_decision',
+    'corpus_hard_paywall_escrow',
+    'corpus_hard_paywall_escrow_uid',
+  ];
+  for (const k of keys) { try { localStorage.removeItem(k); } catch (_) {} }
+  // Also clear any transient onbAnswers so the attribution question
+  // re-fires. onboarding_answers on the server is untouched — if the
+  // user signs back in with the same account, the server copy will
+  // repopulate state.onbAnswers on enterAppState.
+  if (typeof state !== 'undefined' && state) {
+    state.onbAnswers = {};
+  }
+  console.log('[__corpusResetOnboarding] cleared. Reload the app to replay onboarding.');
+};
 
 function _onbV2PrepareNotifications() {
   const screen = document.getElementById('onb-v2-notifications');
@@ -33381,7 +33832,124 @@ async function _onbV2CtaNotifContinue() {
 //     timeline + no-payment-due pill) was dropped on 2026-09-16
 //     when the App Store Connect Introductory Offers section
 //     turned out to be missing from the account.
+// Hard-mode predicate for the ONBOARDING paywall only. Returns true
+// when the X must be hidden and the Sign out / Delete footer visible.
+//
+// Rule (see onboarding-source branch spec):
+//   - source in {app_store, google_play, used_before}  → NOT hard (X visible)
+//   - source is undefined / null / '' (older build users; legacy skip) → NOT hard
+//   - source is any other value (instagram, tiktok, friend, google,
+//     linkedin, threads, ai, other)                    → HARD (X hidden)
+//   - corpus_hard_paywall_escrow flag set (user just signed out from
+//     a hard paywall and state.onbAnswers was wiped by authLogout; we
+//     must keep them in hard mode until onboarding resolves or they
+//     sign back in and the server restores their source field)       → HARD
+function _onbPaywallHardMode() {
+  try {
+    if (localStorage.getItem('corpus_hard_paywall_escrow') === '1') return true;
+  } catch (_) {}
+  const src = (state && state.onbAnswers && state.onbAnswers.source) || null;
+  if (src == null || src === '') return false;
+  if (src === 'app_store' || src === 'google_play' || src === 'used_before') return false;
+  return true;
+}
+
+// Sign out from the HARD onboarding paywall. Mirrors authLogout's
+// teardown sequence but:
+//   1. Sets the escrow flag BEFORE the wipe so the guest / X paths on
+//      the auth screen can tell they must return the user to the
+//      paywall and not to home. The flag is not in USER_SCOPED_KEYS,
+//      so _wipeUserDataPreserveDevice leaves it intact.
+//   2. Lands on the AUTH screen (showAuthScreen with no onDismiss →
+//      X hidden), never on home. The signed-out user can only sign in.
+// Account stays intact on Supabase (scope: 'local' logout clears the
+// device token only).
+async function _onbPaywallSignOut() {
+  // Capture attribution BEFORE the wipe — _wipeUserDataPreserveDevice
+  // + state = defaultState() below drops state.onbAnswers, and the
+  // paywall_signout event still needs to carry the source label that
+  // led the user here.
+  const _attrSource = (state && state.onbAnswers && state.onbAnswers.source) || null;
+  // Snapshot the signing-out user's id alongside the escrow flag so a
+  // DIFFERENT account signing in later on the same device can tell the
+  // escrow isn't theirs and clear it (see the mismatch handler in
+  // enterAppUi). Written before the wipe — authLogout nulls
+  // currentUser, which would otherwise erase the uid we want to stamp.
+  try {
+    const _uid = (currentUser && currentUser.id) || '';
+    localStorage.setItem('corpus_hard_paywall_escrow', '1');
+    if (_uid) localStorage.setItem('corpus_hard_paywall_escrow_uid', _uid);
+    else localStorage.removeItem('corpus_hard_paywall_escrow_uid');
+  } catch (_) {}
+  _signOutInProgress = true;
+  _explicitSignOut = true;
+  _enteredWithExpiredToken = false;
+  try {
+    try { saveStateLocal(); } catch(_) {}
+    try { await sb.auth.signOut({ scope: 'local' }); } catch(e) {}
+    try { await _logOutRC(); } catch(e) {}
+    currentUser = null;
+    appStarted = false;
+    _progressLoaded = false;
+    const preserved = _wipeUserDataPreserveDevice();
+    state = defaultState();
+    state.lang = preserved.lang;
+    state.subject = preserved.subject;
+    state.appearance = preserved.appearance;
+    state.hapticsEnabled = preserved.hapticsEnabled;
+    if (preserved.dailyReminder) state.dailyReminder = preserved.dailyReminder;
+    try { _writeWidgetData(); } catch (_) {}
+    // Close the paywall screen before showing auth so the onb-screen
+    // doesn't paint through.
+    try {
+      const pw = document.getElementById('onb-v2-paywall');
+      if (pw) { pw.style.display = 'none'; pw.classList.remove('onb-active'); }
+    } catch (_) {}
+    try {
+      if (typeof showAuthScreen === 'function') showAuthScreen({});
+    } catch (_) {}
+    try {
+      // hard: always true here (this helper is only called from the
+      // hard-mode footer). source: state.onbAnswers.source if present —
+      // non-PII attribution label like 'instagram' / 'tiktok' / null.
+      _phCapture('onboarding_paywall_signout', {
+        hard: true,
+        source: _attrSource,
+      });
+    } catch (_) {}
+  } finally {
+    _explicitSignOut = false;
+    _signOutInProgress = false;
+  }
+}
+
+// Delete account from the HARD onboarding paywall. Hands off to the
+// existing showDeleteAccountConfirm → deleteAccount flow — no custom
+// teardown needed.
+function _onbPaywallDelete() {
+  try {
+    // hard: always true (helper only called from the hard-mode footer).
+    // source: state.onbAnswers.source attribution label if present.
+    _phCapture('onboarding_paywall_delete_tap', {
+      hard: true,
+      source: (state && state.onbAnswers && state.onbAnswers.source) || null,
+    });
+  } catch (_) {}
+  if (typeof showDeleteAccountConfirm === 'function') showDeleteAccountConfirm();
+}
+
 function _onbV2PreparePaywall() {
+  // Belt-and-braces: an entitled / trial user must never see the
+  // onboarding paywall, even if they somehow landed on step 35 (a
+  // lapsed user who restored on a fresh device, a reinstall that
+  // bypassed the enterAppUi gate because state hadn't synced yet, a
+  // developer-premium override). _onbComplete clears the escrow,
+  // writes the completedAt marker + corpus_onboarding_done, and
+  // renders home — exactly the outcome we want here.
+  if (typeof _isUserPaidOrTrialNow === 'function' && _isUserPaidOrTrialNow()) {
+    try { _onbComplete(); } catch (_) {}
+    return;
+  }
   const isEn = state.lang === 'en';
   const screen = document.getElementById('onb-v2-paywall');
   if (screen && typeof _onbV7Acc === 'function') _onbV7Acc(screen);
@@ -33434,16 +34002,40 @@ function _onbV2PreparePaywall() {
     }
   });
   _renderPaywall();
+  // Hard-mode: X hidden, subscription-required line shown, Sign out /
+  // Delete footer shown. See _onbPaywallHardMode for the gating rule.
+  const hard = _onbPaywallHardMode();
+  try {
+    const shell = document.getElementById('onb-v2-paywall');
+    if (shell) shell.classList.toggle('pw-hard', hard);
+    const line = document.getElementById('onb-v2-paywall-required-line');
+    if (line) line.textContent = isEn
+      ? 'A subscription is needed to continue. 7 days free, cancel anytime.'
+      : 'כדי להמשיך צריך מנוי. 7 ימים בחינם, אפשר לבטל בכל רגע.';
+    const signOut = document.getElementById('onb-v2-paywall-signout');
+    if (signOut) signOut.textContent = isEn ? 'Sign out' : 'התנתקות';
+    const del = document.getElementById('onb-v2-paywall-delete');
+    if (del) del.textContent = isEn ? 'Delete account' : 'מחיקת חשבון';
+    const footer = document.querySelector('#onb-v2-paywall .paywall-hard-footer');
+    if (footer) footer.setAttribute('aria-hidden', hard ? 'false' : 'true');
+  } catch(_) {}
   try {
     // Latch source for the whole paywall session so every follow-up
     // event in this paywall instance stamps 'onboarding'. See the
     // modal paywall_shown site for the full rationale.
     _activePaywallSource = 'onboarding';
-    posthog.capture('paywall_shown', {
+    // Routed through _phCapture (instead of posthog.capture) so the
+    // debug sink (window.__corpusPhLog) can see paywall_shown in
+    // Playwright assertions. Payload extended with hard + source for
+    // the onboarding paywall only; the modal paywall_shown call
+    // elsewhere is unchanged.
+    _phCapture('paywall_shown', {
       source:        _activePaywallSource,
       subject:       state.subject || null,
       trial_enabled: TRIAL_ENABLED,
       offering_id:   (_paywallActiveOffering() && _paywallActiveOffering().identifier) || null,
+      hard:          hard,
+      onb_source:    (state.onbAnswers && state.onbAnswers.source) || null,
     });
   } catch(e) {}
 }
@@ -33575,6 +34167,232 @@ function _onbV2CtaTasteQ() {
   _onbAdvanceStep(20, 21);
 }
 
+// ===== Source step =====
+//
+// "How did you hear about Corpus?" — single-choice option list with a
+// per-row inline SVG icon. SVGs are inlined (not loaded via <img>) so
+// the F5B83D / D9962A / FBE3B0 tri-color palette can be retinted to
+// the active subject accent via CSS attribute selectors — see the
+// .onb-v2-card-icon svg [fill=...] rules in the source-step CSS block.
+// Navy outline (#1B1446) and white highlights are kept as-is. Options
+// defined as plain data below; labels are nominative plain-text, no
+// brand styling. iOS and Android only see their own store row. Order
+// is shuffled once per device (Fisher-Yates) and persisted so revisits
+// are stable; used_before and other always sit at the end. Skip is
+// gone — every user answers.
+const _ONB_SOURCE_OPTIONS = [
+  { id: 'instagram',   en: 'Instagram',                   he: 'אינסטגרם',          icon: 'source-instagram' },
+  { id: 'tiktok',      en: 'TikTok',                      he: 'טיקטוק',            icon: 'source-tiktok' },
+  { id: 'friend',      en: 'A friend or family member',   he: 'חבר או בן משפחה',   icon: 'source-friend' },
+  { id: 'app_store',   en: 'App Store',                   he: 'App Store',         icon: 'source-store', platform: 'ios' },
+  { id: 'google_play', en: 'Google Play',                 he: 'Google Play',       icon: 'source-store', platform: 'android' },
+  { id: 'google',      en: 'Google search',               he: 'חיפוש בגוגל',       icon: 'source-google' },
+  { id: 'linkedin',    en: 'LinkedIn',                    he: 'לינקדאין',          icon: 'source-linkedin' },
+  { id: 'threads',     en: 'Threads',                     he: 'Threads',           icon: 'source-threads' },
+  { id: 'ai',          en: 'ChatGPT or another AI tool',  he: 'ChatGPT או כלי AI אחר', icon: 'source-ai' },
+  { id: 'used_before', en: "I've used Corpus before",     he: 'השתמשתי ב-Corpus בעבר', icon: 'source-used-before' },
+  { id: 'other',       en: 'Other',                       he: 'אחר',               icon: 'source-other' },
+];
+const _ONB_SOURCE_TAIL = ['used_before', 'other'];
+
+// Inline SVG markup per icon id. Mirrors images/onboarding/source-icons/
+// one-for-one (viewBox + path geometry preserved, dimension attrs
+// dropped so the <svg> scales to its 42px container). Hex literals
+// F5B83D / D9962A / FBE3B0 are retinted at render time by CSS attribute
+// selectors in the source-step CSS block.
+const _ONB_SOURCE_ICON_SVG = {
+  'source-instagram':   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><g stroke="#1B1446" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"><rect x="28" y="56" width="144" height="108" rx="28" fill="#F5B83D"/><path d="M72 56 l10 -18 h36 l10 18" fill="#F5B83D"/><path d="M172 120 v16 a28 28 0 0 1 -28 28 h-20" fill="none" stroke="#D9962A" stroke-width="7"/><circle cx="100" cy="110" r="32" fill="#FFFFFF"/><circle cx="100" cy="110" r="14" fill="#F5B83D" stroke-width="7"/><circle cx="146" cy="80" r="6" fill="#FFFFFF" stroke-width="4"/><ellipse cx="46" cy="84" rx="5" ry="9" fill="#FFFFFF" stroke="none" transform="rotate(25 46 84)"/></g></svg>',
+  'source-tiktok':      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><g stroke="#1B1446" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"><path d="M84 40 L156 26 V128" fill="none"/><path d="M84 40 L156 26 V52 L84 66 Z" fill="#F5B83D"/><line x1="84" y1="40" x2="84" y2="146"/><ellipse cx="62" cy="148" rx="26" ry="20" fill="#F5B83D" transform="rotate(-18 62 148)"/><ellipse cx="134" cy="130" rx="26" ry="20" fill="#F5B83D" transform="rotate(-18 134 130)"/><ellipse cx="52" cy="140" rx="5" ry="9" fill="#FFFFFF" stroke="none" transform="rotate(40 52 140)"/><ellipse cx="124" cy="122" rx="5" ry="9" fill="#FFFFFF" stroke="none" transform="rotate(40 124 122)"/></g></svg>',
+  'source-friend':      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><g stroke="#1B1446" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"><path d="M84 34 h74 a22 22 0 0 1 22 22 v34 a22 22 0 0 1 -22 22 h-2 l6 22 -28 -22 h-50 a22 22 0 0 1 -22 -22 v-34 a22 22 0 0 1 22 -22z" fill="#FFFFFF"/><path d="M42 78 h76 a22 22 0 0 1 22 22 v34 a22 22 0 0 1 -22 22 h-46 l-26 22 4 -22 h-4 a22 22 0 0 1 -22 -22 v-34 a22 22 0 0 1 22 -22z" fill="#F5B83D"/><path d="M118 156 a22 22 0 0 0 22 -22 v-14" fill="none" stroke="#D9962A" stroke-width="7"/><circle cx="56" cy="117" r="7" fill="#FFFFFF" stroke-width="4"/><circle cx="80" cy="117" r="7" fill="#FFFFFF" stroke-width="4"/><circle cx="104" cy="117" r="7" fill="#FFFFFF" stroke-width="4"/><ellipse cx="40" cy="96" rx="5" ry="8" fill="#FFFFFF" stroke="none" transform="rotate(25 40 96)"/></g></svg>',
+  'source-store':       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><g stroke="#1B1446" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"><rect x="54" y="20" width="92" height="160" rx="22" fill="#F5B83D"/><rect x="66" y="40" width="68" height="112" rx="10" fill="#FFFFFF"/><line x1="86" y1="166" x2="114" y2="166" stroke-width="7"/><line x1="100" y1="62" x2="100" y2="118" stroke-width="10"/><path d="M78 98 L100 122 L122 98" fill="none" stroke-width="10"/><path d="M146 140 v18 a22 22 0 0 1 -22 22 h-16" fill="none" stroke="#D9962A" stroke-width="7"/><ellipse cx="64" cy="48" rx="5" ry="9" fill="#FFFFFF" stroke="none" transform="rotate(0 64 48)"/></g></svg>',
+  'source-google':      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><g stroke="#1B1446" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"><line x1="126" y1="126" x2="172" y2="172" stroke-width="26"/><line x1="126" y1="126" x2="170" y2="170" stroke="#D9962A" stroke-width="12"/><circle cx="88" cy="88" r="56" fill="#F5B83D"/><circle cx="88" cy="88" r="38" fill="#FFFFFF"/><path d="M68 70 a26 26 0 0 1 22 -10" fill="none" stroke="#F5B83D" stroke-width="8"/></g></svg>',
+  'source-linkedin':    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><g stroke="#1B1446" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"><path d="M76 58 v-12 a10 10 0 0 1 10 -10 h28 a10 10 0 0 1 10 10 v12" fill="none"/><rect x="26" y="58" width="148" height="110" rx="22" fill="#F5B83D"/><path d="M26 100 h148" fill="none"/><path d="M174 130 v16 a22 22 0 0 1 -22 22 h-20" fill="none" stroke="#D9962A" stroke-width="7"/><rect x="88" y="90" width="24" height="22" rx="6" fill="#FFFFFF"/><ellipse cx="44" cy="80" rx="5" ry="9" fill="#FFFFFF" stroke="none" transform="rotate(25 44 80)"/></g></svg>',
+  'source-threads':     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><g stroke="#1B1446" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"><rect x="48" y="30" width="104" height="22" rx="8" fill="#D9962A"/><rect x="48" y="148" width="104" height="22" rx="8" fill="#D9962A"/><rect x="60" y="52" width="80" height="96" fill="#F5B83D"/><path d="M60 74 L140 66 M60 96 L140 88 M60 118 L140 110 M60 140 L140 132" stroke="#D9962A" stroke-width="5"/><path d="M140 110 C170 116 176 150 150 176" fill="none" stroke-width="7"/><ellipse cx="70" cy="70" rx="5" ry="9" fill="#FFFFFF" stroke="none" transform="rotate(0 70 70)"/></g></svg>',
+  'source-ai':          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><g stroke="#1B1446" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"><path d="M50 34 h100 a28 28 0 0 1 28 28 v56 a28 28 0 0 1 -28 28 h-50 l-34 28 6 -28 h-22 a28 28 0 0 1 -28 -28 v-56 a28 28 0 0 1 28 -28z" fill="#F5B83D"/><path d="M150 146 a28 28 0 0 0 28 -28 v-20" fill="none" stroke="#D9962A" stroke-width="7"/><path d="M100 56 C104 78 108 82 130 90 C108 98 104 102 100 124 C96 102 92 98 70 90 C92 82 96 78 100 56Z" fill="#FFFFFF" stroke-width="7"/><path d="M146 50 C147 56 149 58 155 59 C149 60 147 62 146 68 C145 62 143 60 137 59 C143 58 145 56 146 50Z" fill="#FFFFFF" stroke-width="4"/><ellipse cx="42" cy="66" rx="5" ry="9" fill="#FFFFFF" stroke="none" transform="rotate(25 42 66)"/></g></svg>',
+  'source-used-before': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><g stroke="#1B1446" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"><path d="M100 30 A70 70 0 1 1 33 82" fill="none" stroke="#1B1446" stroke-width="34"/><path d="M100 30 A70 70 0 1 1 33 82" fill="none" stroke="#F5B83D" stroke-width="18"/><path d="M150 150 A70 70 0 0 1 60 158" fill="none" stroke="#D9962A" stroke-width="8" stroke-linecap="round"/><path d="M14 92 L36 46 L66 92 Z" fill="#F5B83D"/><path d="M100 132 C70 112 66 92 80 84 C90 78 98 84 100 92 C102 84 110 78 120 84 C134 92 130 112 100 132Z" fill="#FFFFFF" stroke-width="8"/></g></svg>',
+  'source-other':       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><g stroke="#1B1446" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"><g transform="rotate(45 100 100)"><rect x="78" y="22" width="44" height="30" rx="10" fill="#FFFFFF"/><rect x="78" y="48" width="44" height="14" fill="#D9962A"/><rect x="78" y="58" width="44" height="82" fill="#F5B83D"/><line x1="100" y1="64" x2="100" y2="136" stroke="#D9962A" stroke-width="6"/><path d="M78 140 L100 182 L122 140 Z" fill="#FBE3B0"/><path d="M92 166 L100 182 L108 166 Z" fill="#1B1446" stroke-width="5"/><rect x="84" y="68" width="6" height="40" rx="3" fill="#FFFFFF" stroke="none"/></g></g></svg>',
+};
+
+function _onbSourcePlatform() {
+  try {
+    if (window.Capacitor && typeof window.Capacitor.getPlatform === 'function') {
+      return window.Capacitor.getPlatform();  // 'ios' | 'android' | 'web'
+    }
+  } catch (_) {}
+  return 'web';
+}
+
+// Fisher-Yates in-place shuffle of a copy.
+function _onbSourceShuffle(ids) {
+  const a = ids.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Stable per-device order. Filters out the wrong-platform store row,
+// shuffles everything that's not in _ONB_SOURCE_TAIL, appends the
+// tail. Persisted so revisits look identical. "web" (desktop debug)
+// sees both store rows so authors can review both without switching
+// platforms.
+function _onbSourceStableOrder() {
+  let stored = null;
+  try {
+    const raw = localStorage.getItem('corpus_onboarding_source_order');
+    if (raw) stored = JSON.parse(raw);
+  } catch (_) {}
+  if (Array.isArray(stored) && stored.length) {
+    const known = new Set(_ONB_SOURCE_OPTIONS.map(o => o.id));
+    const clean = stored.filter(id => known.has(id));
+    if (clean.length === stored.length) return clean;
+  }
+  const platform = _onbSourcePlatform();
+  const all = _ONB_SOURCE_OPTIONS
+    .filter(o => !o.platform || o.platform === platform || platform === 'web')
+    .map(o => o.id);
+  const tail = all.filter(id => _ONB_SOURCE_TAIL.includes(id));
+  const head = all.filter(id => !_ONB_SOURCE_TAIL.includes(id));
+  const order = _onbSourceShuffle(head).concat(tail);
+  try { localStorage.setItem('corpus_onboarding_source_order', JSON.stringify(order)); } catch (_) {}
+  return order;
+}
+
+// Card HTML builder — mirrors _onbV2CardHTML's icon + label flex row
+// but renders the inline SVG from _ONB_SOURCE_ICON_SVG so the icon's
+// tri-color palette can be retinted by the active subject theme.
+function _onbSourceCardHTML(opt, isEn) {
+  const label = isEn ? opt.en : opt.he;
+  const safe  = String(label).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const svg   = _ONB_SOURCE_ICON_SVG[opt.icon] || '';
+  return '<span class="onb-v2-card-icon" aria-hidden="true">' +
+           svg +
+         '</span>' +
+         '<span class="onb-v2-card-label">' + safe + '</span>';
+}
+
+function _onbV2PrepareSource() {
+  const isEn = state.lang === 'en';
+  const screen = document.getElementById('onb-v2-source');
+  if (screen && typeof _onbV7Acc === 'function') _onbV7Acc(screen);
+  const fig = document.getElementById('onb-v7-source-fig');
+  if (fig && typeof _onbThinker === 'function') fig.src = _onbThinker('curious');
+  const setText = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  setText('onb-v2-source-head', isEn ? 'How did you hear about Corpus?' : 'איך שמעת עלינו?');
+  setText('onb-v2-source-other-cta', isEn ? 'Continue' : 'המשך');
+  const inp = document.getElementById('onb-v2-source-other-input');
+  if (inp) {
+    inp.placeholder = isEn ? 'Where?' : 'איפה?';
+    inp.value = '';
+  }
+  const otherWrap = document.getElementById('onb-v2-source-other-wrap');
+  if (otherWrap) otherWrap.classList.remove('is-open');
+
+  const list = document.getElementById('onb-v2-source-options');
+  if (!list) return;
+  const order = _onbSourceStableOrder();
+  const byId = {};
+  for (const o of _ONB_SOURCE_OPTIONS) byId[o.id] = o;
+  list.innerHTML = '';
+  for (const id of order) {
+    const opt = byId[id];
+    if (!opt) continue;
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'onb-v2-card';
+    card.dataset.sourceId = opt.id;
+    card.innerHTML = _onbSourceCardHTML(opt, isEn);
+    card.onclick = () => _onbV2SourceTap(opt.id);
+    list.appendChild(card);
+  }
+}
+
+// Writes source answer to state.onbAnswers, fires the PostHog
+// selection event, sets the acquisition_source person property once
+// (set_once semantics: first write sticks, later re-opens of the step
+// don't overwrite a lapsed user's original attribution), persists
+// state, and advances to signup. `id` is one of _ONB_SOURCE_OPTIONS
+// ids, or 'other' for the text-field case. `otherText` is the trimmed
+// free-text or null. source_skipped is always false now — kept on
+// state for schema compatibility with earlier builds.
+function _onbWriteSourceAndAdvance(id, otherText) {
+  const platform = _onbSourcePlatform();
+  let order = [];
+  try { order = JSON.parse(localStorage.getItem('corpus_onboarding_source_order') || '[]'); } catch (_) {}
+  const position_shown = (id === 'other') ? order.indexOf('other') : order.indexOf(id);
+  if (!state.onbAnswers) state.onbAnswers = {};
+  state.onbAnswers.source         = id;
+  state.onbAnswers.source_other   = (id === 'other') ? (otherText || '') : null;
+  state.onbAnswers.source_skipped = false;
+  state.onbAnswers.source_order   = order;
+  try { saveStateLocal(); } catch (_) {}
+  try { if (typeof saveState === 'function') saveState(); } catch (_) {}
+  try {
+    _phCapture('onboarding_source_selected', {
+      source:          state.onbAnswers.source,
+      source_other:    state.onbAnswers.source_other,
+      skipped:         false,
+      position_shown:  position_shown,
+      platform:        platform,
+    });
+  } catch (_) {}
+  // Person property — set_once so a lapsed user's original attribution
+  // isn't overwritten by a later re-install that somehow re-enters the
+  // step. Mirror the .people.set / setPersonProperties fallback used
+  // elsewhere in this file.
+  try {
+    if (id != null) {
+      const props = { $set_once: { acquisition_source: id } };
+      if (typeof posthog !== 'undefined' && posthog.people && typeof posthog.people.set_once === 'function') {
+        posthog.people.set_once({ acquisition_source: id });
+      } else if (typeof posthog !== 'undefined' && typeof posthog.setPersonProperties === 'function') {
+        posthog.setPersonProperties(props);
+      }
+    }
+  } catch (_) {}
+  _onbAdvanceStep(37, 24);
+}
+function _onbV2SourceTap(id) {
+  if (id === 'other') {
+    const wrap = document.getElementById('onb-v2-source-other-wrap');
+    if (wrap) wrap.classList.add('is-open');
+    setTimeout(() => {
+      const inp = document.getElementById('onb-v2-source-other-input');
+      if (inp) try { inp.focus(); } catch (_) {}
+    }, 50);
+    return;
+  }
+  _onbWriteSourceAndAdvance(id, null);
+}
+function _onbV2CtaSourceOther() {
+  const inp = document.getElementById('onb-v2-source-other-input');
+  const text = (inp && inp.value || '').trim().slice(0, 60);
+  _onbWriteSourceAndAdvance('other', text);
+}
+
+// Debug-only opener. Hides every other onb-screen, then shows the
+// source step and calls its prepare. Also applies the user's current
+// lang/theme so EN/HE and light/dark review is one-call. Does NOT
+// write any state field and does NOT touch corpus_onboarding_step.
+window.__corpusShowSourceStep = function () {
+  try {
+    document.querySelectorAll('.onb-screen').forEach(s => {
+      s.style.display = 'none';
+      s.classList.remove('onb-active');
+    });
+    _onbV2PrepareSource();
+    const el = document.getElementById('onb-v2-source');
+    if (el) {
+      el.style.display = 'flex';
+      el.classList.add('onb-active');
+    }
+    console.log('[__corpusShowSourceStep] opened. Reload or navigate away to exit.');
+  } catch (e) {
+    console.error('[__corpusShowSourceStep] error:', e);
+  }
+};
+
 // Step 21 (first-card reveal) — advance to streak.
 function _onbV2CtaFirstCard() { _onbAdvanceStep(21, 22); }
 
@@ -33586,6 +34404,8 @@ function _onbV2CtaFirstCard() { _onbAdvanceStep(21, 22); }
 // year and burning one on a taste (before the user has done anything
 // real) is wasteful. The post-first-completion moment is better-earned.
 function _onbV2CtaStreak() {
+  // Streak → signup direct (2026-11-14). Source moved AFTER signup so
+  // the attribution writes to the signed-in account's onboarding_answers.
   _onbAdvanceStep(22, 23);
 }
 
@@ -33668,10 +34488,9 @@ function _onbV2PrepareStreak() {
       // light background + subject thinker + v7 primary button. The
       // crest + spark + ember animations are preserved verbatim.
       v7: true,
-      // Direct advance to 23 (signup). The widget-prompt gate was
-      // previously hooked here but moved to the 26 → 27 handoff so
-      // the user doesn't see two requests back-to-back (Spark →
-      // widget-add → signup).
+      // Advance to signup (23). Source (36) now lives post-signup
+      // and runs after the user has authenticated; see the slot-37
+      // comment in _ONB_STEP_TO_ID for the new order.
       onDismiss: () => _onbAdvanceStep(22, 23),
     });
   }
@@ -33857,10 +34676,12 @@ async function _onbSignupApple() {
     postAuthContinue: async (user) => {
       // State-only enter: load progress + subscription + telemetry
       // + mark-auth-resolved, but DON'T route UI to home. Then
-      // advance onboarding to step 5 (name).
+      // advance onboarding to source (37) — the attribution
+      // question that now lives after signup. Source then forwards
+      // to building (24).
       await enterAppState(user);
       try { _phCapture('onboarding_signup_completed', { method: 'apple' }); } catch(e) {}
-      _onbAdvanceStep(23, 24);
+      _onbAdvanceStep(23, 37);
     },
   });
 }
@@ -33879,7 +34700,7 @@ async function _onbSignupGoogle() {
     postAuthContinue: async (user) => {
       await enterAppState(user);
       try { _phCapture('onboarding_signup_completed', { method: 'google' }); } catch(e) {}
-      _onbAdvanceStep(23, 24);
+      _onbAdvanceStep(23, 37);
     },
   });
 }
@@ -33888,7 +34709,9 @@ function _onbV2CtaSignupSkip() {
   try {
     _phCapture('onboarding_signup_prompt_action', { action: 'skip' });
   } catch(e) {}
-  _onbAdvanceStep(23, 24);
+  // Skip still routes through source (37) — the attribution question
+  // is asked even when the user declines to sign up.
+  _onbAdvanceStep(23, 37);
 }
 
 // Screen prepare hooks — invoked from _onbShowStep once the target
@@ -35284,6 +36107,12 @@ const _ONB_STEP_HOOKS = {
   33: _onbV2PrepareTrial,          // owl + three benefit rows
   34: _onbV2PrepareReminderPromise,// bell icon into the hero slot
   35: _onbV2PreparePaywall,        // shared _renderPaywall machinery
+  // Slot 37 lives visually between 23 (signup) and 24 (building) as a
+  // satellite past _ONB_TOTAL_STEPS=35. The out-of-order number keeps
+  // signup's slot stable across versions and leaves slot 36 free as
+  // the paywall-close completion sentinel. See the slot-37 comment
+  // in _ONB_STEP_TO_ID for the full rationale.
+  37: _onbV2PrepareSource,
 };
 
 // Step 23 prepare hook — paints the subject thinker (happy) into the
@@ -35296,13 +36125,13 @@ function _onbV2PrepareSignup() {
   //      already completed the old step-4 signup. Their cursor
   //      migrates into steps 4-22 (name…streak); when they reach
   //      new step 23 the auto-advance fires and lands them on
-  //      step 24 (building).
+  //      source (37) — then source forwards to building (24).
   //   2. Any pre-authenticated arrival: e.g. sign-in-required flow
   //      that ran outside onboarding, or a re-enter after auth.
   // Fire-and-forget; no telemetry noise from the double-visit —
   // this branch is invisible to the funnel.
   if (currentUser) {
-    _onbAdvanceStep(23, 24);
+    _onbAdvanceStep(23, 37);
     return;
   }
   const screen = document.getElementById('onb-v2-signup');
@@ -35446,7 +36275,11 @@ function startNewUserOnboarding() {
     return;
   }
   _onboardingBooted = true;
-  _onbShowStep(_resumeStep >= 1 && _resumeStep <= _ONB_TOTAL_STEPS ? _resumeStep : 1);
+  // Resume gate accepts satellite slots (slot 37 / source) via
+  // registry lookup so a user stored at the source step lands
+  // correctly instead of being reset to step 1.
+  const _resumeValid = _resumeStep >= 1 && _ONB_STEP_TO_ID[_resumeStep] !== undefined;
+  _onbShowStep(_resumeValid ? _resumeStep : 1);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -38921,7 +39754,7 @@ function loadState() {
   // hydrate entries the store already has, and normalise the field
   // types for entries that came in from a cloud merge.
   if (state.bonusNewBadge && typeof state.bonusNewBadge === 'object') {
-    for (const bid of ['bonus2', 'bonusEcon2']) {
+    for (const bid of ['bonus2', 'bonusEcon2', 'bonusPsy2']) {
       const e = state.bonusNewBadge[bid];
       if (e && typeof e === 'object') {
         e.firstShownAt = +e.firstShownAt || 0;
@@ -42766,7 +43599,7 @@ function _buildWeekLockMap(chapters) {
 //
 // ─────────────────────────────────────────────────────────────
 // Free tier = chapter 1 of each subject. Chapters 2+ and every bonus
-// chapter (string IDs like 'bonus1', 'bonusEcon1', 'bonusPsy1' —
+// chapter (string IDs like 'bonus2', 'bonusEcon2', 'bonusPsy2' —
 // never === 1) require paid entitlement.
 //
 // Paid = state.isPaid (real Supabase entitlement from RC webhook)
@@ -42793,6 +43626,20 @@ function canAccessWeek(subject, weekId) {
   // Keeps the chapter-order lock intact (it's enforced in
   // _buildWeekLockMap, not here).
   if ((FREE_CHAPTERS[subject] || []).includes(weekId)) return true;
+  // Grandfathered-free: a chapter that used to be free (currently just
+  // philosophy:6, closed 2026-11-14) grants chapter-level access to
+  // any user with any completed day in it, regardless of paid status.
+  // Protects the "I was reading this when the offer ended" cohort.
+  if ((_GRANDFATHERED_FREE[subject] || []).includes(weekId)) {
+    try {
+      const chapter = getW(subject).find(w => w.id === weekId);
+      if (chapter && chapter.days
+          && chapter.days.some(d =>
+               state.completedDays && state.completedDays[dayKey(weekId, d.id, subject)])) {
+        return true;
+      }
+    } catch (_) {}
+  }
   if (state.grandfathered) return true;
   if (state.isPaid) return true;
   // Belt-and-braces: loadSubscription's no-row branch already respects
@@ -43248,7 +44095,7 @@ function _highlightBonusCardOnHome() {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       const bonusId = state.subject === 'economics' ? 'bonusEcon2'
-                    : state.subject === 'psychology' ? 'bonusPsy1' : 'bonus2';
+                    : state.subject === 'psychology' ? 'bonusPsy2' : 'bonus2';
       const bonusCard = document.getElementById('level-card-' + bonusId);
       if (!bonusCard) return;
       try {
@@ -44463,29 +45310,30 @@ function _hvAwaitLayoutSettled(timeoutMs) {
   });
 }
 
-// ── R38 chapter-6-free gift announcement ─────────────────────────
-// Three surfaces, one state flag:
-//   #ch6-gift-btn      — floating gift tile on home, pulses + red dot.
-//   #ch6-gift-caption  — "You have a gift!" pill next to the tile,
-//                        fades out after _CH6_CAPTION_SHOW_MS.
-//   #modal-ch6-gift    — v7 bottom sheet; opens on tile tap.
-// state.ch6GiftSheetSeen is a single-tap-forever flag synced via the
-// coach_marks_shown JSONB (same pattern as streakIntro / framesExplainer).
-// Opening the sheet, OR seeing it marked seen in state, OR having any
-// completion in philosophy chapter 6, OR the subject not being
-// philosophy ALL suppress the button for good.
-const _CH6_CAPTION_SHOW_MS = 2200;   // visible duration before fade starts
-function _ch6GiftEligible() {
-  // R39f — the gift tile mounts for every user in every subject,
-  // including users with progress in philosophy ch6 or who have
-  // completed it. The sheet still frames "chapter 6 is free for
-  // everyone" and makes a good re-entry point into the content
-  // (via the "See the chapter" CTA that scrolls to #level-card-6
-  // after setSubject('philosophy')). The seen state (dot / pulse /
-  // caption suppression) is still owned by ch6GiftSheetSeen —
-  // handled inside _mountCh6GiftBtn. Visibility suppression (home
-  // not active, walkthrough running, any sheet/popup open) stays
-  // in CSS via :has()-gated hiding rules on #ch6-gift-btn.
+// ── New-bonus floating button ─────────────────────────────────────
+// Three surfaces:
+//   #bonus-btn          — floating brain tile on home, shimmer + sparkles.
+//   #bonus-btn-caption  — "New bonus chapter" pill next to the tile,
+//                         fades out after _BONUS_BTN_CAPTION_SHOW_MS.
+//   #modal-bonus-info   — v7 bottom sheet; opens on tile tap.
+// Shown to every user in every subject, permanently. Attention cues
+// (pulse + sparkles) stay strong until the user first opens the active
+// subject's bonus chapter (any day completed); after that the tile
+// drops to a gentle shimmer. Driven by _hasBonusProgress(bonusId) —
+// no stored "seen" flag, so the state is derived cleanly from
+// progress and survives re-installs via the cloud progress sync.
+const _BONUS_BTN_CAPTION_SHOW_MS = 2200;   // visible duration before fade starts
+// Map subject → bonus week id (the 2026-11 "new" bonuses).
+const _BONUS_BTN_IDS = { philosophy: 'bonus2', economics: 'bonusEcon2', psychology: 'bonusPsy2' };
+function _bonusBtnIdForSubject(subject) {
+  return _BONUS_BTN_IDS[subject || (state && state.subject) || 'philosophy'] || 'bonus2';
+}
+// Per-subject session-shown dedupe for the bonus_button_shown event.
+const _bonusBtnShownThisSession = {};
+function _bonusBtnEligible() {
+  // Always mount. Visibility suppression (home not active, walkthrough
+  // running, any sheet/popup open) stays in CSS via :has()-gated
+  // hiding rules on #bonus-btn.
   return true;
 }
 // R39 — the gift tile shares the jump button's column (both at
@@ -44497,14 +45345,14 @@ function _ch6GiftEligible() {
 // IntersectionObserver on the next-up node) to know when to
 // relayout. One observer per mount; disconnected when the tile is
 // re-mounted or removed.
-const _CH6_JUMP_GAP      = 12;      // vertical gap between jump and gift
-const _CH6_CAP_GAP       = 8;       // vertical gap between gift and caption
-let _ch6GiftJumpObserver = null;
-let _ch6GiftResizeHandler = null;
-function _ch6GiftRelayout() {
-  const gift = document.getElementById('ch6-gift-btn');
+const _BONUS_BTN_JUMP_GAP      = 12;      // vertical gap between jump and gift
+const _BONUS_BTN_CAP_GAP       = 8;       // vertical gap between gift and caption
+let _bonusBtnJumpObserver = null;
+let _bonusBtnResizeHandler = null;
+function _bonusBtnRelayout() {
+  const gift = document.getElementById('bonus-btn');
   if (!gift) return;
-  const cap  = document.getElementById('ch6-gift-caption');
+  const cap  = document.getElementById('bonus-btn-caption');
   const jump = document.getElementById('hv-jump');
   // R39f — treat offsetHeight===0 as hidden too, so a jump button
   // mid-transition (display:'' but visibility:hidden or 0-sized by
@@ -44523,7 +45371,7 @@ function _ch6GiftRelayout() {
   if (jumpVisible) {
     const jumpBottomCss = parseFloat(getComputedStyle(jump).bottom) || 0;
     const jumpHeight    = jump.offsetHeight || 56;
-    giftBottomCss = jumpBottomCss + jumpHeight + _CH6_JUMP_GAP;
+    giftBottomCss = jumpBottomCss + jumpHeight + _BONUS_BTN_JUMP_GAP;
     gift.style.bottom = giftBottomCss + 'px';
   } else {
     gift.style.bottom = '';
@@ -44532,199 +45380,222 @@ function _ch6GiftRelayout() {
     giftBottomCss = parseFloat(getComputedStyle(gift).bottom) || 0;
   }
   if (cap) {
-    cap.style.bottom = (giftBottomCss + giftHeight + _CH6_CAP_GAP) + 'px';
+    cap.style.bottom = (giftBottomCss + giftHeight + _BONUS_BTN_CAP_GAP) + 'px';
   }
 }
-function _ch6GiftWireJumpObserver() {
-  if (_ch6GiftJumpObserver) { try { _ch6GiftJumpObserver.disconnect(); } catch(_){} _ch6GiftJumpObserver = null; }
+function _bonusBtnWireJumpObserver() {
+  if (_bonusBtnJumpObserver) { try { _bonusBtnJumpObserver.disconnect(); } catch(_){} _bonusBtnJumpObserver = null; }
   const jump = document.getElementById('hv-jump');
   if (!jump) return;
-  _ch6GiftJumpObserver = new MutationObserver(() => _ch6GiftRelayout());
-  _ch6GiftJumpObserver.observe(jump, { attributes: true, attributeFilter: ['style'] });
+  _bonusBtnJumpObserver = new MutationObserver(() => _bonusBtnRelayout());
+  _bonusBtnJumpObserver.observe(jump, { attributes: true, attributeFilter: ['style'] });
 }
 
-function _mountCh6GiftBtn() {
+function _mountBonusBtn() {
   const home = document.getElementById('screen-home');
   if (!home) return;
   // Always clean previous mount so re-renders don't stack buttons.
-  const prevBtn = document.getElementById('ch6-gift-btn');
-  const prevCap = document.getElementById('ch6-gift-caption');
+  const prevBtn = document.getElementById('bonus-btn');
+  const prevCap = document.getElementById('bonus-btn-caption');
   if (prevBtn) prevBtn.remove();
   if (prevCap) prevCap.remove();
-  if (_ch6GiftJumpObserver) { try { _ch6GiftJumpObserver.disconnect(); } catch(_){} _ch6GiftJumpObserver = null; }
-  if (_ch6GiftResizeHandler) { try { window.removeEventListener('resize', _ch6GiftResizeHandler); } catch(_){} _ch6GiftResizeHandler = null; }
-  if (!_ch6GiftEligible()) return;
+  if (_bonusBtnJumpObserver) { try { _bonusBtnJumpObserver.disconnect(); } catch(_){} _bonusBtnJumpObserver = null; }
+  if (_bonusBtnResizeHandler) { try { window.removeEventListener('resize', _bonusBtnResizeHandler); } catch(_){} _bonusBtnResizeHandler = null; }
+  if (!_bonusBtnEligible()) return;
   const isEn = state.lang === 'en';
-  const seen = !!state.ch6GiftSheetSeen;
+  const subject = state.subject || 'philosophy';
+  const bonusId = _bonusBtnIdForSubject(subject);
+  // Strong attention until the user has opened this subject's bonus
+  // (= has any completed day in that chapter). Once entered, the
+  // sparkles + pulse rings drop and the tile keeps a gentle shimmer.
+  const entered = (typeof _hasBonusProgress === 'function') && _hasBonusProgress(bonusId);
   const btn = document.createElement('button');
-  btn.id = 'ch6-gift-btn';
-  if (seen) btn.classList.add('wt-seen');       // suppresses dot + rings via CSS
-  btn.setAttribute('aria-label', isEn ? 'You have a gift' : 'יש לכם מתנה');
-  // Red dot omitted when seen; the gift tile remains tappable as a
-  // re-entry point into the sheet but without the notification affordance.
-  btn.innerHTML = '🎁' + (seen ? '' : '<span class="ch6-gift-dot" aria-hidden="true"></span>');
-  btn.onclick = _openCh6GiftSheet;
+  btn.id = 'bonus-btn';
+  if (entered) btn.classList.add('wt-seen');  // CSS suppresses dot + rings
+  btn.setAttribute('aria-label', isEn ? 'New bonus chapter' : 'פרק בונוס חדש');
+  // Brain icon via <img>; the CSS positions the sparkles + shimmer
+  // around the tile. SVG primary, PNG fallback via onerror.
+  const iconHtml = '<img class="bonus-btn-icon" src="./images/bonus-brain.svg" ' +
+    'onerror="this.onerror=null;this.src=\'./images/bonus-brain.png\';" ' +
+    'alt="" aria-hidden="true">';
+  const sparkleHtml = entered ? '' :
+    '<span class="bonus-btn-spark bonus-btn-spark-1" aria-hidden="true"></span>' +
+    '<span class="bonus-btn-spark bonus-btn-spark-2" aria-hidden="true"></span>' +
+    '<span class="bonus-btn-spark bonus-btn-spark-3" aria-hidden="true"></span>' +
+    '<span class="bonus-btn-dot" aria-hidden="true"></span>';
+  btn.innerHTML = iconHtml + sparkleHtml;
+  btn.onclick = _openBonusSheet;
   home.appendChild(btn);
-  // Caption pill — only mounted BEFORE the user has opened the sheet.
-  // After seen, no caption on any home visit.
-  if (!seen) {
+  // Caption pill — only mounted BEFORE the user has entered the
+  // bonus. After that, no caption on any home visit.
+  if (!entered) {
     const cap = document.createElement('div');
-    cap.id = 'ch6-gift-caption';
-    cap.textContent = isEn ? 'You have a gift!' : 'יש לכם מתנה!';
+    cap.id = 'bonus-btn-caption';
+    cap.textContent = isEn ? 'New bonus chapter' : 'פרק בונוס חדש';
     home.appendChild(cap);
-    setTimeout(() => { cap.classList.add('fade-out'); }, _CH6_CAPTION_SHOW_MS);
+    setTimeout(() => { cap.classList.add('fade-out'); }, _BONUS_BTN_CAPTION_SHOW_MS);
   }
-  // R39 — relayout now (so first paint picks up the current jump
-  // state) and wire the MutationObserver + resize listener so later
-  // visibility flips reposition the gift smoothly.
-  _ch6GiftRelayout();
-  _ch6GiftWireJumpObserver();
-  _ch6GiftResizeHandler = () => _ch6GiftRelayout();
-  window.addEventListener('resize', _ch6GiftResizeHandler);
-  // _hvWireJumpButton runs after _mountCh6GiftBtn in the renderHome
-  // sequence (and again after layout settles). Give it a tick to
-  // flip the jump's style before we re-measure.
-  requestAnimationFrame(() => _ch6GiftRelayout());
-  try { _phCapture('ch6_gift_shown', { subject: state.subject || null, lang: state.lang || null, is_first: !seen }); } catch (_){}
+  _bonusBtnRelayout();
+  _bonusBtnWireJumpObserver();
+  _bonusBtnResizeHandler = () => _bonusBtnRelayout();
+  window.addEventListener('resize', _bonusBtnResizeHandler);
+  requestAnimationFrame(() => _bonusBtnRelayout());
+  // Analytics: once per session per subject.
+  if (!_bonusBtnShownThisSession[subject]) {
+    _bonusBtnShownThisSession[subject] = true;
+    try { _phCapture('bonus_button_shown', { subject: subject, chapter_id: bonusId, lang: state.lang || null, entered: !!entered }); } catch (_){}
+  }
 }
-function _openCh6GiftSheet() {
+// Static per-subject copy for the sheet body line (not part of the
+// chapter data since it's a curated hook, not a transcription of the
+// chapter text).
+const _BONUS_BTN_SUBJECT_LINE = {
+  philosophy: {
+    en: 'Five thinkers on the moment you reach for your phone: are you choosing, or is it chosen for you?',
+    he: 'חמישה הוגים על הרגע שבו מושיטים יד לטלפון: האם אנחנו בוחרים, או שבוחרים בשבילנו?',
+  },
+  economics: {
+    en: 'Five economists, from Ricardo to Acemoglu, on 200 years of fearing that machines will take our jobs.',
+    he: 'חמישה כלכלנים, מריקרדו ועד אסמוגלו, על 200 שנה של חשש שמכונות ייקחו לנו את העבודה.',
+  },
+  psychology: {
+    en: "From Galton's ox to Polymarket: when the crowd gets it right, and when it's wrong together.",
+    he: 'מהשור של גלטון ועד פולימרקט: מתי ההמון צודק, ומתי הוא טועה ביחד.',
+  },
+};
+function _openBonusSheet() {
   const isEn = state.lang === 'en';
-  const isFirstOpen = !state.ch6GiftSheetSeen;
-  try { _phCapture('ch6_gift_opened', { subject: state.subject || null, lang: state.lang || null, is_first: isFirstOpen }); } catch (_){}
-  // R41 Finding 8 — tighter copy. Previous title+body told the story
-  // of why it was free; the chapter card below already says "free" via
-  // the pill, and the primary CTA says what you can do next. Users
-  // on-device were skipping the body and tapping through.
-  const title = isEn ? 'Chapter 6 is free for you' : 'פרק 6 פתוח לך בחינם';
-  const body = isEn
-    ? 'Seven thinkers on the right to rule.'
-    : 'שבעה הוגים על הזכות לשלוט.';
-  const chTitle = isEn ? 'Political Philosophy' : 'פילוסופיה פוליטית';
-  const freePill = isEn ? '🎁 Free' : '🎁 חינם';
-  // R38d — hierarchy swap: primary CTA is "See the chapter" (the
-  // meaningful next action), secondary is "Got it, thanks" (closes).
-  // Analytics `cta` values stay 'see_chapter' / 'thanks', keyed off
-  // the handlers below, so the funnel is uninterrupted.
-  const ctaPrimary = isEn ? 'See the chapter' : 'לראות את הפרק';
-  const ctaSecondary = isEn ? 'Got it, thanks' : 'יופי, תודה';
-  // R39e — the sheet always frames philosophy ch6, so the thinker
-  // and the chapter card are always Socrates + Political Philosophy,
-  // regardless of the user's current subject. _popV7Thinker is
-  // retired here because it keys off state.subject and would show
-  // Smith/Freud for economics/psychology users.
-  const thinkerSrc = './images/onb-thinkers/socrates-celebrate.png';
-  // Chapter card markup mirrors the home-v7 chapter banner (number
-  // badge inline-start, eyebrow + title stacked, Free pill inline-end).
-  // Classes are the same, scoped by #modal-ch6-gift CSS so the sheet
-  // always reflects whatever shape the home banner is in.
-  const chapterEyebrow = isEn ? 'CHAPTER 6' : 'פרק 6';
-  const chCardHtml =
-    '<div class="hv-chapter">' +
-      '<div class="level-card" id="ch6g-level-card">' +
-        '<div class="level-card-header">' +
-          '<div class="level-num">6</div>' +
-          '<div class="level-card-text">' +
-            '<div class="level-eyebrow">' + chapterEyebrow + '</div>' +
-            '<div class="level-title">' + chTitle + '</div>' +
-          '</div>' +
-          '<div class="ch-free-pill" aria-hidden="true"><span>🎁</span> ' + (isEn ? 'Free' : 'חינם') + '</div>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
+  const subject = state.subject || 'philosophy';
+  const bonusId = _bonusBtnIdForSubject(subject);
+  const paid = (typeof _isUserPaidOrTrialNow === 'function') ? !!_isUserPaidOrTrialNow() : false;
+  try { _phCapture('bonus_button_tapped', { subject: subject, chapter_id: bonusId, paid: paid }); } catch (_){}
+  // Chapter data — title, subtitle, days array for the list.
+  const wk = (typeof getW === 'function') ? getW().find(w => w && w.id === bonusId) : null;
+  const chTitle = wk ? (isEn ? (wk.titleEn || wk.title) : (wk.title || wk.titleEn)) : '';
+  const subjLine = (_BONUS_BTN_SUBJECT_LINE[subject] || _BONUS_BTN_SUBJECT_LINE.philosophy)[isEn ? 'en' : 'he'];
+  const eyebrow = isEn ? 'New bonus chapter' : 'פרק בונוס חדש';
+  const ctaPrimary = isEn ? 'Open the chapter' : 'לפתיחת הפרק';
+  // Build the dialogue list (skip day 0 intros). Row format:
+  //   thinker days    — lead is the FULL thinker name (from the day's
+  //                     thinker field — the dialogue title's lastname-
+  //                     only prefix would duplicate), followed by the
+  //                     question part of the title (text after the
+  //                     first colon).
+  //   no-thinker days — lead is the text before the first colon
+  //                     (e.g. psychology D5 "Polymarket and Kalshi"),
+  //                     followed by the rest.
+  const questionAfterColon = (s) => {
+    const str = String(s || '');
+    const idx = str.indexOf(':');
+    return idx < 0 ? str.trim() : str.slice(idx + 1).trim();
+  };
+  const esc = (s) => String(s || '').replace(/</g, '&lt;');
+  const listHtml = (wk && Array.isArray(wk.days))
+    ? '<ul class="bonusg-list">' + wk.days
+        .filter(d => d && d.id !== 0)
+        .map(d => {
+          const title = isEn ? (d.titleEn || d.title) : (d.title || d.titleEn);
+          const thinker = isEn ? (d.thinkerEn || d.thinker || '') : (d.thinker || d.thinkerEn || '');
+          let lead, rest;
+          if (thinker && d.thinkerId) {
+            lead = thinker;
+            rest = questionAfterColon(title);
+          } else {
+            const idx = String(title || '').indexOf(':');
+            if (idx < 0) { lead = String(title || '').trim(); rest = ''; }
+            else { lead = String(title).slice(0, idx).trim(); rest = String(title).slice(idx + 1).trim(); }
+          }
+          return '<li>' +
+                   '<span class="bonusg-list-lead">' + esc(lead) + '</span>' +
+                   (rest ? ' <span class="bonusg-list-rest">' + esc(rest) + '</span>' : '') +
+                 '</li>';
+        })
+        .join('') + '</ul>'
+    : '';
+  // Thinker image — subject's representative, matching the pop-v7
+  // thinker slot the sheet already uses.
+  const thinkerSlug = subject === 'economics' ? 'smith' : subject === 'psychology' ? 'freud' : 'socrates';
+  const thinkerSrc = './images/onb-thinkers/' + thinkerSlug + '-celebrate.png';
   const inner =
-    '<img class="pop-thinker ch6g-thinker" src="' + thinkerSrc + '" alt="" aria-hidden="true">' +
-    '<div class="ch6g-title">' + title + '</div>' +
-    '<div class="ch6g-body">' + body + '</div>' +
-    chCardHtml +
-    '<button type="button" class="pop-btn" data-act="see">' + ctaPrimary + '</button>' +
-    '<button type="button" class="pop-link" data-act="thanks">' + ctaSecondary + '</button>';
-  const wrap = _popV7MountSheet('modal-ch6-gift', inner, {
-    onClose: () => { _closeCh6GiftSheet(); },
+    '<img class="pop-thinker bonusg-thinker" src="' + thinkerSrc + '" alt="" aria-hidden="true">' +
+    '<div class="bonusg-eyebrow">' + eyebrow + '</div>' +
+    '<div class="bonusg-title">' + String(chTitle).replace(/</g, '&lt;') + '</div>' +
+    '<div class="bonusg-body">' + subjLine + '</div>' +
+    listHtml +
+    '<button type="button" class="pop-btn" data-act="open">' + ctaPrimary + '</button>';
+  const wrap = _popV7MountSheet('modal-bonus-info', inner, {
+    onClose: () => { _closeBonusSheet(); },
   });
   if (!wrap) return;
-  wrap.querySelector('[data-act="thanks"]').addEventListener('click', () => {
-    try { _phCapture('ch6_gift_cta', { cta: 'thanks' }); } catch (_){}
-    _closeCh6GiftSheet();
-  });
-  wrap.querySelector('[data-act="see"]').addEventListener('click', () => {
-    try { _phCapture('ch6_gift_cta', { cta: 'see_chapter', from_subject: state.subject || null }); } catch (_){}
-    const needSubjSwitch = state.subject !== 'philosophy';
-    // R39c — mark that the user came here from the gift sheet. First
-    // openReader into a FREE_CHAPTERS chapter in this session will
-    // emit free_chapter_started with via_gift: true.
-    _r39cCh6ViaGift = true;
-    _closeCh6GiftSheet();
-    requestAnimationFrame(() => {
-      // R38b — users on economics/psychology jump into philosophy to
-      // see ch6. setSubject writes the persisted subject, applies the
-      // theme and resets the home-expanded week; saveStateLocal is
-      // belt-and-braces so a refresh persists the switch.
-      if (needSubjSwitch) {
-        try { setSubject('philosophy'); } catch (_){}
-        try { saveStateLocal(); } catch (_){}
-      }
-      try { renderHome(); } catch (_){}
+  wrap.querySelector('[data-act="open"]').addEventListener('click', () => {
+    const paidNow = (typeof _isUserPaidOrTrialNow === 'function') ? !!_isUserPaidOrTrialNow() : false;
+    _closeBonusSheet(true);
+    if (paidNow) {
+      try { _phCapture('bonus_sheet_cta', { subject: subject, chapter_id: bonusId, paid: true, outcome: 'opened' }); } catch (_){}
+      // Same handler the home bonus card uses — openReader into the
+      // first real day. Day 0 is the intro; if the chapter has a day 0
+      // and it's not yet completed, start there; otherwise day 1.
+      const w = (typeof getW === 'function') ? getW().find(x => x && x.id === bonusId) : null;
+      const firstDay = (w && Array.isArray(w.days) && w.days.length)
+        ? (w.days[0].id)
+        : 1;
       requestAnimationFrame(() => {
-        const card = document.getElementById('level-card-6');
-        if (card && card.scrollIntoView) {
-          // R41g Finding 3 — instant (not smooth) scroll + block: 'start'
-          // so the chapter banner docks cleanly under the topbar before
-          // the popover opens. 'center' + 'smooth' left scrollIntoView
-          // mid-animation when node.click() fired, which made
-          // _hvPositionPopover's auto-scroll compute against a stale
-          // banner position and leave the popover under the sticky header.
-          try { card.scrollIntoView({ behavior: 'auto', block: 'start' }); } catch (_){}
-        }
-        // R41f Finding 3 — after the card settles under the topbar,
-        // tap its first dialogue's lesson node so the popover opens
-        // with "Start / התחל". Two rAFs so renderHome + the above
-        // scroll both land before _hvPositionPopover reads layout.
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            try {
-              const ch6 = document.getElementById('hv-chapter-6');
-              const node = ch6 && ch6.querySelector('.hv-node');
-              if (node) node.click();
-            } catch (_){}
-          });
-        });
+        try { openReader(bonusId, firstDay); } catch (_){}
       });
-    });
+      return;
+    }
+    // Unpaid: open the in-app paywall, source: bonus_button. On
+    // purchase/restore success (detected at close time via
+    // _isUserPaidOrTrialNow) land in the bonus. On close without paying,
+    // stay on home.
+    try { _phCapture('bonus_sheet_cta', { subject: subject, chapter_id: bonusId, paid: false, outcome: 'paywall' }); } catch (_){}
+    const firstDay = (wk && Array.isArray(wk.days) && wk.days.length) ? wk.days[0].id : 1;
+    try {
+      showPaywall({
+        subject: subject,
+        weekId: bonusId,
+        dayId: firstDay,
+        source: 'bonus_button',
+        entry: 'home_bonus_button',
+        onClose: () => {
+          try {
+            if (typeof _isUserPaidOrTrialNow === 'function' && _isUserPaidOrTrialNow()) {
+              requestAnimationFrame(() => { try { openReader(bonusId, firstDay); } catch (_){} });
+            }
+          } catch (_){}
+        },
+      });
+    } catch (_){}
   });
 }
-function _closeCh6GiftSheet() {
-  try { _popV7CloseSheet('modal-ch6-gift'); } catch (_){}
-  const wasFirst = !state.ch6GiftSheetSeen;
-  if (wasFirst) {
-    state.ch6GiftSheetSeen = true;
-    try { saveState(); } catch (_) { try { saveStateLocal(); } catch (__) {} }
+function _closeBonusSheet(fromCta) {
+  try { _popV7CloseSheet('modal-bonus-info'); } catch (_){}
+  // Fire dismissed event only on non-CTA close (backdrop tap, X, Esc).
+  // CTA close is already covered by bonus_sheet_cta with outcome
+  // 'opened' or 'paywall'.
+  if (!fromCta) {
+    try {
+      const subject = state.subject || 'philosophy';
+      const bonusId = (typeof _bonusBtnIdForSubject === 'function') ? _bonusBtnIdForSubject(subject) : null;
+      const paid = (typeof _isUserPaidOrTrialNow === 'function') ? !!_isUserPaidOrTrialNow() : false;
+      _phCapture('bonus_sheet_dismissed', { subject: subject, chapter_id: bonusId, paid: paid });
+    } catch (_){}
   }
-  // R38c — tile stays on home as a permanent re-entry point. Only on
-  // the FIRST close do we need to transition it from "unseen" (dot +
-  // pulse + caption) to "seen" (plain tile, no dot). Later closes
-  // leave it as-is.
-  if (wasFirst) {
-    const btn = document.getElementById('ch6-gift-btn');
-    const cap = document.getElementById('ch6-gift-caption');
-    if (btn) {
-      btn.classList.add('wt-seen');
-      const dot = btn.querySelector('.ch6-gift-dot');
-      if (dot) dot.remove();
-    }
-    if (cap) cap.remove();
-  }
+  // No persisted seen-flag — the tile's strong/gentle state is derived
+  // from _hasBonusProgress(bonusId) on every mount.
 }
-// Dev helper — clears the seen flag and re-mounts. Mirrors
-// window._replayStreakIntroBeat / _replayOwlBeat.
-window._replayCh6Gift = function () {
-  state.ch6GiftSheetSeen = false;
-  try { saveStateLocal(); } catch (_){}
-  _mountCh6GiftBtn();
+// Dev helper — re-mounts the button so the strong-mode cues return if
+// the user hasn't entered the bonus, or re-renders the gentle state if
+// they have. Mirrors window._replayStreakIntroBeat / _replayOwlBeat.
+window._replayBonusBtn = function () {
+  _mountBonusBtn();
+  const subj = state.subject;
+  const bonusId = _bonusBtnIdForSubject(subj);
   return {
-    ch6GiftSheetSeen: !!state.ch6GiftSheetSeen,
-    subject: state.subject,
-    eligible: _ch6GiftEligible(),
-    mounted: !!document.getElementById('ch6-gift-btn'),
+    subject: subj,
+    chapter_id: bonusId,
+    entered: (typeof _hasBonusProgress === 'function') && _hasBonusProgress(bonusId),
+    mounted: !!document.getElementById('bonus-btn'),
   };
 };
 
@@ -45324,7 +46195,7 @@ function renderHome() {
   // R38 — mount the gift button if the user is eligible. Function
   // short-circuits for non-philosophy subjects, users with any ch6
   // progress, and users who have already seen the sheet (synced).
-  try { _mountCh6GiftBtn(); } catch (e) {}
+  try { _mountBonusBtn(); } catch (e) {}
   // Wire plate-tap delegation on rv-svg + pantheon-container so
   // tapping any points plate reopens the explainer. Idempotent —
   // attach-once guarded by ._feWired on the target.
@@ -45781,7 +46652,7 @@ function renderHome() {
             ${showOrderCountdown ? `<div class="bonus-countdown">${cd}</div>` : ''}
           </div>
         `;
-        // NEW-badge sticker (bonus2 / bonusEcon2 only, 14-day window,
+        // NEW-badge sticker (bonus2 / bonusEcon2 / bonusPsy2, 14-day window,
         // dismissed on tap). Appended AFTER innerHTML so the sticker
         // survives any subsequent repaint of the card body.
         try {
@@ -45797,21 +46668,12 @@ function renderHome() {
       } else {
         const header = document.createElement('div');
         header.className = 'level-card-header';
-        // R38 — "🎁 Free" pill on chapters named in FREE_CHAPTERS.
-        // Renders regardless of lock state (free when reached, free
-        // forever). The chapter stays order-locked behind ch5 — this
-        // pill is just the signal, not a bypass.
-        const isFreeChapter = (FREE_CHAPTERS[state.subject] || []).includes(w.id);
-        const freePill = isFreeChapter
-          ? `<div class="ch-free-pill" aria-hidden="true"><span>🎁</span> ${isEn ? 'Free' : 'חינם'}</div>`
-          : '';
         header.innerHTML = `
           <div class="level-num">${numDisplay}</div>
           <div class="level-card-text">
             <div class="level-eyebrow">${eyebrow}</div>
             <div class="level-title">${weekTitle}</div>
           </div>
-          ${freePill}
           ${wkLocked ? `<svg viewBox="0 0 64 64" width="18" height="18" style="flex-shrink:0;opacity:0.45"><use href="#ic-lock"/></svg>` : `<div class="level-chevron">${_CHEV_SVG}</div>`}
         `;
         card.appendChild(header);
@@ -46151,6 +47013,10 @@ const CAROUSEL_ORDER = {
     // already listed above (D3), Frances (D4), Illouz (D5), Han (D6).
     // Four new ids this chapter.
     'lacan', 'frances', 'illouz', 'han',
+    // bonusPsy2: Can You Trust the Crowd? Kahneman (ch4) already listed
+    // above (D3). D5 (Polymarket + Kalshi) is a no-thinker summary day
+    // and quotes Surowiecki as the source author only. Three new ids.
+    'galton', 'asch', 'festinger',
   ],
 };
 
@@ -55167,7 +56033,7 @@ function _hasBonusProgress(bonusChapterId) {
 // reason='auto' for the fresh-install default. The merge rule in
 // _mergeBonusNewBadgeEntry uses provenance so an auto-dismissal from
 // one device never silences an eligible entry from another.
-const _BONUS_NEW_BADGE_IDS = ['bonus2', 'bonusEcon2'];
+const _BONUS_NEW_BADGE_IDS = ['bonus2', 'bonusEcon2', 'bonusPsy2'];
 const _BONUS_NEW_BADGE_TTL_MS = 14 * 24 * 60 * 60 * 1000;
 // Cleared when a NEW cloud pull starts (enterAppState) so the decision
 // re-runs after each sign-in. Kept session-scoped: once decided this
@@ -55275,7 +56141,7 @@ function _mergeBonusNewBadgeEntry(a, b) {
   if (pa === 3) return (+a.firstShownAt <= +b.firstShownAt) ? a : b;
   return a;  // priority 4, 2, 1 ties: either is equivalent
 }
-// Cloud-pull entry point. Merges a remote {bonus2:{...}, bonusEcon2:{...}}
+// Cloud-pull entry point. Merges a remote {bonus2:{...}, bonusEcon2:{...}, bonusPsy2:{...}}
 // bucket (read from coach_marks_shown.bonusNewBadge) into state.bonusNewBadge.
 // After this returns, _decideBonusNewBadgeEligibilityOnce will fill any
 // still-missing entries from the now-merged completedDays.
@@ -55950,6 +56816,139 @@ function enterAppUi() {
     if (document.body.style.overflow === 'hidden') document.body.style.overflow = '';
   } catch (_) {}
   _homeExpandedWeekId = undefined;
+  // Mid-onboarding / hard-paywall-resume gate — MUST run BEFORE the
+  // renderHome + showScreen('home') tail below. initUI paints the
+  // stored onboarding step synchronously at boot; without this gate
+  // the home tail would unconditionally overwrite that paint and a
+  // brand-new user who killed the app at step 35 would land on home
+  // (never having bought, never having finished onboarding). The
+  // defer-zone at the top of enterAppUi doesn't help here: the only
+  // state.currentScreen onboarding writes is 'auth' (from
+  // showAuthScreen at the mid-flow signup), so the defer-zone treats
+  // the user as "on auth" and falls through to the home tail.
+  //
+  // Three escape hatches route to home anyway (server-finished,
+  // paid/trial, cross-account escrow); everything else resumes the
+  // stored step and returns.
+  //
+  //   1. Already-finished-on-another-device. corpus_onboarding_done
+  //      lives in localStorage only, so a user who finished onboarding
+  //      on device A and signs in on device B won't have the flag
+  //      locally. The server-synced equivalents are
+  //      state.onbAnswers.completedAt (written by _onbComplete) and a
+  //      non-empty state.completedDays (populated post-onboarding by
+  //      the first finishDay). Either one proves "this account already
+  //      cleared onboarding"; set the local flag and fall through.
+  //   2. Paid / trial user. An entitled account must never see the
+  //      onboarding paywall. If we get here with an active entitlement,
+  //      mark onboarding done and fall through to home.
+  //   3. Stale escrow from a different account. The escrow flag lives
+  //      on the device; if user A signs out from the hard paywall and
+  //      user B later signs in on the same device, the flag belongs to
+  //      A's session and shouldn't affect B. We stamp
+  //      corpus_hard_paywall_escrow_uid alongside the flag at sign-out;
+  //      a cross-account sign-in finds the mismatch here and clears it
+  //      so the usual mid-onboarding default can route user B
+  //      correctly.
+  try {
+    const _esUid = localStorage.getItem('corpus_hard_paywall_escrow_uid') || '';
+    const _curUid = (currentUser && currentUser.id) || '';
+    if (localStorage.getItem('corpus_hard_paywall_escrow') === '1'
+        && _esUid && _curUid && _esUid !== _curUid) {
+      localStorage.removeItem('corpus_hard_paywall_escrow');
+      localStorage.removeItem('corpus_hard_paywall_escrow_uid');
+      try {
+        document.querySelectorAll('.onb-screen').forEach(s => {
+          s.style.display = 'none';
+          s.classList.remove('onb-active');
+        });
+      } catch (_) {}
+      try { localStorage.removeItem('corpus_onboarding_step'); } catch (_) {}
+      _onboardingBooted = false;
+    }
+  } catch (_) {}
+  if (!localStorage.getItem('corpus_onboarding_done')) {
+    const _resolveToHome = () => {
+      try { localStorage.setItem('corpus_onboarding_done', '1'); } catch (_) {}
+      try { localStorage.removeItem('corpus_hard_paywall_escrow'); } catch (_) {}
+      try { localStorage.removeItem('corpus_hard_paywall_escrow_uid'); } catch (_) {}
+      try { localStorage.removeItem('corpus_onboarding_step'); } catch (_) {}
+      try {
+        document.querySelectorAll('.onb-screen').forEach(s => {
+          s.style.display = 'none';
+          s.classList.remove('onb-active');
+        });
+      } catch (_) {}
+    };
+    const _serverFinished = !!(state && state.onbAnswers && state.onbAnswers.completedAt)
+      || !!(state && state.completedDays && Object.keys(state.completedDays).length > 0);
+    if (_serverFinished) {
+      _resolveToHome();
+      // Falls through to renderHome below.
+    } else if (typeof _isUserPaidOrTrialNow === 'function' && _isUserPaidOrTrialNow()) {
+      _resolveToHome();
+      // Falls through to renderHome below.
+    } else {
+      // Hard-paywall resume intercept. Fires ONLY when the escrow flag
+      // is set AND its stamped uid matches the current user — i.e. the
+      // user just signed out from the hard paywall and is signing back
+      // in with the same account. onbAnswers.source alone is NOT a
+      // trigger: the mid-flow email/SSO signup at step 23 completes
+      // AFTER the source step (23 → 37, source lives post-signup), so
+      // every signing-up user arrives here with source set. Keying on
+      // source would hijack the normal signup handoff and flash step
+      // 35 before step 24.
+      const _escrowSet = (function(){ try { return localStorage.getItem('corpus_hard_paywall_escrow') === '1'; } catch(_){ return false; } })();
+      const _esUid2 = (function(){ try { return localStorage.getItem('corpus_hard_paywall_escrow_uid') || ''; } catch(_){ return ''; } })();
+      const _curUid2 = (currentUser && currentUser.id) || '';
+      // Strip the initial-HTML `.screen.active` marker from #screen-home
+      // before any resume-onboarding return below. The static HTML ships
+      // with `<div id="screen-home" class="screen active home-v7">` so
+      // the first renderHome has somewhere to mount into; on a relaunch
+      // where we're staying in onboarding, that `.active` class is a
+      // leftover — home is not the logical current screen, no
+      // showScreen('home') will run here, and leaving `.active` on
+      // would let VoiceOver + home-only timers (launch popover,
+      // welcome-back modal, coach-marks) treat the user as if they
+      // reached home behind the paywall. The paywall's `.onb-screen`
+      // overlay at z-index 1100 covers home visually but doesn't
+      // detach its a11y tree.
+      const _stripHomeActive = () => {
+        try {
+          document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active'));
+        } catch (_) {}
+      };
+      if (_escrowSet && _esUid2 && _curUid2 && _esUid2 === _curUid2) {
+        const _storedStep = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
+        const _storedValid = _storedStep >= 1 && _ONB_STEP_TO_ID[_storedStep] !== undefined;
+        const _target = _storedValid ? _storedStep : 35;
+        try { localStorage.setItem('corpus_onboarding_step', String(_target)); } catch(_) {}
+        try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(_) {}
+        _stripHomeActive();
+        _onboardingBooted = true;
+        try { _onbShowStep(_target); } catch(_) {}
+        return;
+      }
+      // Default: mid-onboarding with a valid stored step and no escape
+      // (not finished, not paid, no matching escrow). Resume the step
+      // and return so the renderHome tail below doesn't overwrite it.
+      // This is the branch that fixes the brand-new-user-at-paywall
+      // relaunch bug. initUI already painted the step; this return
+      // just blocks the home tail.
+      const _resumeStep = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
+      const _resumeValid = _resumeStep >= 1 && _ONB_STEP_TO_ID[_resumeStep] !== undefined;
+      const _resumeFV = localStorage.getItem('corpus_onboarding_flow_version') || '';
+      if (_resumeValid && _resumeFV === _ONB_FLOW_VERSION) {
+        _stripHomeActive();
+        _onboardingBooted = true;
+        try { _onbShowStep(_resumeStep); } catch(_) {}
+        return;
+      }
+      // No valid step cursor → fall through to renderHome; the legacy
+      // `if (!step && !done) startNewUserOnboarding()` gate below will
+      // route this user back to step 1.
+    }
+  }
   renderHome();
   showScreen('home');
   // Launch scroll: open home scrolled to the next-up at ~45% viewport,
@@ -56317,17 +57316,41 @@ function initUI() {
         try { _hvJumpToNextUp({ smooth: false, openPopover: true }); } catch(_){}
       });
     };
+    // Hard-paywall escrow: cold-boot path. _onbPaywallSignOut wiped
+    // the step cursor, so without this branch the fresh-install gate
+    // below would hand the escrowed user step 1 and walk the whole
+    // flow again. The escrow + !done pair means "this device was on
+    // the hard paywall and hasn't resolved onboarding" — resume at 35.
+    // Not keyed on user id here (no session yet at initUI time); the
+    // uid mismatch is handled later in enterAppUi once the real user
+    // arrives.
+    const _escrowCold = (function(){ try { return localStorage.getItem('corpus_hard_paywall_escrow') === '1'; } catch(_){ return false; } })();
     if (_hasOnbDone) {
       console.log('[Onboarding] Onboarding done → home');
       renderHome();
       showScreen('home');
       _fireLaunchPopover();
-    } else if (_resumeStep >= 1 && _resumeStep <= _ONB_TOTAL_STEPS) {
+    } else if (_escrowCold) {
+      console.log('[Onboarding] Hard-paywall escrow set → resume at step 35');
+      try { localStorage.setItem('corpus_onboarding_step', '35'); } catch(_) {}
+      try { localStorage.setItem('corpus_onboarding_flow_version', _ONB_FLOW_VERSION); } catch(_) {}
+      // Strip the initial-HTML `.active` on #screen-home so VoiceOver,
+      // home-only timers, and screen-coherence checks don't treat the
+      // user as if they're on home behind the paywall. The .onb-screen
+      // overlay covers home visually at z-index 1100 but doesn't
+      // detach its a11y tree. Matches the equivalent strip on the
+      // enterAppUi resume-step branches.
+      try { document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active')); } catch(_) {}
+      _onboardingBooted = true;
+      _onbShowStep(35);
+    } else if (_resumeStep >= 1 && _ONB_STEP_TO_ID[_resumeStep] !== undefined) {
       console.log('[Onboarding] Resume onboarding at step', _resumeStep);
+      try { document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active')); } catch(_) {}
       _onboardingBooted = true;
       _onbShowStep(_resumeStep);
     } else if (_completedCount === 0) {
       console.log('[Onboarding] Fresh install → onboarding step 1');
+      try { document.querySelectorAll('.screen.active').forEach(s => s.classList.remove('active')); } catch(_) {}
       _onboardingBooted = true;
       _onbShowStep(1);
     } else {
@@ -59599,7 +60622,7 @@ window.__corpusTour = async function (name, opts) {
   // either primes the profile + reload-resumes, OR, if the profile
   // is already loaded, dispatches to the resume handler directly so
   // repeated clip captures don't eat a reload between every clip.
-  const REEL_TOURS = ['launch-demo-boot','home-scroll','first-reveal-tour','pantheon-view','subjects-swap','streak-view','reveal-gold-socrates','reveal-diamond-socrates','ch6-gift-sheet','paywall-top','reading-intro','quiz-one','summary-view'];
+  const REEL_TOURS = ['launch-demo-boot','home-scroll','first-reveal-tour','pantheon-view','subjects-swap','streak-view','reveal-gold-socrates','reveal-diamond-socrates','bonus-sheet','paywall-top','reading-intro','quiz-one','summary-view'];
   if (REEL_TOURS.includes(name)) {
     // Detect launch-demo signature in localStorage — survives app
     // termination between clip captures (TEST_PROFILE_ACTIVE is a
@@ -59768,12 +60791,12 @@ async function _corpusTourResume() {
   }
 
   if (name === 'gift') {
-    const giftBtn = document.getElementById('ch6-gift-btn');
+    const giftBtn = document.getElementById('bonus-btn');
     if (giftBtn && giftBtn.offsetParent !== null) {
-      await tap('#ch6-gift-btn', 'tap gift tile');
+      await tap('#bonus-btn', 'tap gift tile');
       logStep('gift sheet visible');
       await sleep(STEP_MS * 2);
-      await tap('#modal-ch6-gift .pop-link', 'tap Got it, thanks');
+      await tap('#modal-bonus-info .pop-link', 'tap Got it, thanks');
       logStep('tour complete');
     } else {
       logStep('gift tile not visible (expected on fresh-free)');
@@ -59911,10 +60934,10 @@ async function _corpusTourResume() {
     await sleep(5000);
     return;
   }
-  if (name === 'ch6-gift-sheet') {
+  if (name === 'bonus-sheet') {
     try { showScreen('home'); } catch (_) {}
     await sleep(600);
-    try { _openCh6GiftSheet(); } catch (_) {}
+    try { _openBonusSheet(); } catch (_) {}
     await sleep(2500);
     return;
   }
@@ -60147,6 +61170,18 @@ try {
           const closeBtn = document.getElementById('rd-close');
           if (closeBtn) { closeBtn.click(); return; }
           try { goBack(); } catch (_) {}
+          return;
+        }
+        // Layer 5b: hard onboarding paywall. The paywall has no back
+        // arrow (progress bar + close-X top row only), and in hard
+        // mode the X is hidden — there is nothing to click. Native
+        // back must minimize the app to the Android launcher instead
+        // of dismissing / skipping the paywall. Soft mode falls
+        // through to layer 6, which clicks the X.
+        const activePw = document.querySelector('#onb-v2-paywall.onb-active');
+        if (activePw && typeof _onbPaywallHardMode === 'function' && _onbPaywallHardMode()) {
+          try { _phCapture('onboarding_paywall_android_back', { hard: true }); } catch (_) {}
+          if (typeof App.minimizeApp === 'function') App.minimizeApp();
           return;
         }
         // Layer 6: onboarding — click the active screen's back arrow
@@ -61399,7 +62434,7 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
     delete window._replayWalkthrough;
     delete window._replayOwlBeat;
     delete window._replayStreakIntroBeat;
-    delete window._replayCh6Gift;
+    delete window._replayBonusBtn;
     delete window.__corpusDevPremium;
     delete window.__corpusCardDiag;
     delete window.__corpusPreviewReveal;
@@ -61957,6 +62992,34 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
      happy after any tap — it's a reveal, not a test) + bubble
      (scenario) + question head + option cards. CTA enables after any
      pick. Correct answer always highlights green regardless of pick. -->
+<!-- SOURCE step — "How did you hear about Corpus?" Header matches the
+     neighbouring single-choice question screens (Q1/Q2/Q3): thinker
+     figure + bubble row, head inside the bubble. Options are rendered
+     via _onbSourceCardHTML with inline SVG icons retinted by the
+     active subject theme. "Other" reveals an inline text field +
+     Continue button under the list; empty text is allowed. No Skip —
+     every user answers. NO BACK BUTTON — source now runs AFTER signup
+     (2026-11-14) and backing out of an attribution question past a
+     completed signup into the streak would be a confusing loop. -->
+<div id="onb-v2-source" class="onb-screen onb-v2 onb-v7 onb-bg-themed" style="display:none">
+  <div class="onb-v7-top">
+    <div class="onb-v7-bar"><i style="width: 72%"></i></div>
+  </div>
+  <div class="onb-v7-mid">
+    <div class="onb-v7-row">
+      <img id="onb-v7-source-fig" class="onb-v7-fig" alt="" aria-hidden="true">
+      <div class="onb-v7-bub">
+        <span id="onb-v2-source-head"></span>
+      </div>
+    </div>
+    <div class="onb-v7-opt-list" id="onb-v2-source-options"></div>
+    <div class="onb-v7-source-other-wrap" id="onb-v2-source-other-wrap">
+      <input type="text" class="onb-v7-source-other-input" id="onb-v2-source-other-input" maxlength="60" autocomplete="off" spellcheck="false">
+      <button type="button" class="onb-v7-btn" id="onb-v2-source-other-cta" onclick="_onbV2CtaSourceOther()"></button>
+    </div>
+  </div>
+</div>
+
 <div id="onb-v2-taste-q" class="onb-screen onb-v2 onb-v7 onb-bg-themed" style="display:none">
   <div class="onb-v7-top">
     <button type="button" class="onb-v7-back" onclick="_onbAdvanceStep(20, 19)" aria-label="Back">←</button>
@@ -62180,7 +63243,7 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
   </div>
 </div>
 
-<!-- Step 36 (v11) — Paywall (onboarding shell). Shares .paywall-*
+<!-- Step 35 — Paywall (onboarding shell). Shares .paywall-*
      class contracts with #modal-paywall above so a single
      _renderPaywall() drives both, scoped by _paywallActiveRoot.
      Skip corner exits and advances; purchase / restore success also
@@ -62215,6 +63278,11 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
       <h1 class="paywall-headline"></h1>
     </div>
     <p class="paywall-sub"></p>
+    <!-- Hard-mode subscription-required line. Populated + visibility
+         toggled by _onbV2PreparePaywall; CSS display is driven by the
+         .pw-hard class on the paywall shell. Copy carries the "7 days
+         free, cancel anytime" phrasing per TRIAL_ENABLED=true. -->
+    <p class="paywall-required-line" id="onb-v2-paywall-required-line"></p>
     <!-- Trial-mode Today / Day 6 / Day 7 timeline. Populated + shown
          by _renderPaywall when TRIAL_ENABLED is true; hidden inline
          when the flag is off (see _renderPaywall's trialOn branch). -->
@@ -62248,6 +63316,15 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
       <a href="#" class="paywall-terms" onclick="event.preventDefault(); _openLegalUrl('terms');"></a>
       <span class="paywall-links-sep">·</span>
       <a href="#" class="paywall-privacy" onclick="event.preventDefault(); _openLegalUrl('privacy');"></a>
+    </div>
+    <!-- Hard-mode footer: Sign out · Delete account. Hidden by default,
+         shown only when the paywall shell carries .pw-hard. Sign out
+         lands on the auth screen (never home) via _onbPaywallSignOut;
+         Delete opens the existing showDeleteAccountConfirm flow. -->
+    <div class="paywall-hard-footer" aria-hidden="true">
+      <a href="#" class="paywall-signout" id="onb-v2-paywall-signout" onclick="event.preventDefault(); _onbPaywallSignOut();"></a>
+      <span class="paywall-links-sep">·</span>
+      <a href="#" class="paywall-deleteaccount" id="onb-v2-paywall-delete" onclick="event.preventDefault(); _onbPaywallDelete();"></a>
     </div>
    </div>
   </div>
@@ -62487,6 +63564,10 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
 <div id="onb-v2-signup" class="onb-screen onb-v2 onb-v7 onb-bg-themed" style="display:none">
   <button type="button" class="onb-v2-signup-skip-corner" id="onb-v2-signup-skip" onclick="_onbV2CtaSignupSkip()" style="display:none"></button>
   <div class="onb-v7-top">
+    <!-- Back routes to streak (22). Source (36) is now AFTER signup
+         so backing out of signup should land on the moment before
+         signup was asked — the streak celebration. -->
+    <button type="button" class="onb-v7-back" onclick="_onbAdvanceStep(23, 22)" aria-label="Back">←</button>
     <div class="onb-v7-bar"><i style="width: 72%"></i></div>
   </div>
   <div class="onb-v7-mid">

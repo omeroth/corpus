@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-13T09:57:13.108Z",
+  "generatedAt": "2026-11-14T17:40:14.154Z",
   "items": [
     {
       "weekId": 1,
@@ -2746,104 +2746,106 @@
       "page": "d/psyc-4-7-en.html"
     },
     {
-      "weekId": "bonusPsy1",
+      "weekId": "bonusPsy2",
       "dayId": 1,
       "subject": "psychology",
       "lang": "he",
-      "thinkerId": "skinner",
-      "title": "מכונת המזל בכיס",
-      "card": "share/cards/he/psyc-bonusPsy1-1.png",
-      "page": "d/psyc-bonusPsy1-1-he.html"
+      "thinkerId": "galton",
+      "title": "גלטון: מתי ההמון צודק?",
+      "card": "share/cards/he/psyc-bonusPsy2-1.png",
+      "page": "d/psyc-bonusPsy2-1-he.html"
     },
     {
-      "weekId": "bonusPsy1",
+      "weekId": "bonusPsy2",
       "dayId": 1,
       "subject": "psychology",
       "lang": "en",
-      "thinkerId": "skinner",
-      "title": "The Slot Machine in Your Pocket",
-      "card": "share/cards/en/psyc-bonusPsy1-1.png",
-      "page": "d/psyc-bonusPsy1-1-en.html"
+      "thinkerId": "galton",
+      "title": "Galton: When Is the Crowd Right?",
+      "card": "share/cards/en/psyc-bonusPsy2-1.png",
+      "page": "d/psyc-bonusPsy2-1-en.html"
     },
     {
-      "weekId": "bonusPsy1",
+      "weekId": "bonusPsy2",
       "dayId": 2,
       "subject": "psychology",
       "lang": "he",
-      "thinkerId": "kahneman",
-      "title": "היד זזה קודם",
-      "card": "share/cards/he/psyc-bonusPsy1-2.png",
-      "page": "d/psyc-bonusPsy1-2-he.html"
+      "thinkerId": "asch",
+      "title": "אש: מתי ההמון הופך לעדר?",
+      "card": "share/cards/he/psyc-bonusPsy2-2.png",
+      "page": "d/psyc-bonusPsy2-2-he.html"
     },
     {
-      "weekId": "bonusPsy1",
+      "weekId": "bonusPsy2",
       "dayId": 2,
       "subject": "psychology",
       "lang": "en",
+      "thinkerId": "asch",
+      "title": "Asch: When Does a Crowd Become a Herd?",
+      "card": "share/cards/en/psyc-bonusPsy2-2.png",
+      "page": "d/psyc-bonusPsy2-2-en.html"
+    },
+    {
+      "weekId": "bonusPsy2",
+      "dayId": 3,
+      "subject": "psychology",
+      "lang": "he",
       "thinkerId": "kahneman",
-      "title": "The Hand Moves First",
-      "card": "share/cards/en/psyc-bonusPsy1-2.png",
-      "page": "d/psyc-bonusPsy1-2-en.html"
+      "title": "כהנמן: טעויות שמתקזזות וטעויות שנשארות",
+      "card": "share/cards/he/psyc-bonusPsy2-3.png",
+      "page": "d/psyc-bonusPsy2-3-he.html"
     },
     {
-      "weekId": "bonusPsy1",
-      "dayId": 3,
-      "subject": "psychology",
-      "lang": "he",
-      "thinkerId": "kohut",
-      "title": "לייק כשיקוף",
-      "card": "share/cards/he/psyc-bonusPsy1-3.png",
-      "page": "d/psyc-bonusPsy1-3-he.html"
-    },
-    {
-      "weekId": "bonusPsy1",
+      "weekId": "bonusPsy2",
       "dayId": 3,
       "subject": "psychology",
       "lang": "en",
-      "thinkerId": "kohut",
-      "title": "A Like as Mirror",
-      "card": "share/cards/en/psyc-bonusPsy1-3.png",
-      "page": "d/psyc-bonusPsy1-3-en.html"
+      "thinkerId": "kahneman",
+      "title": "Kahneman: Errors That Cancel Out and Errors That Remain",
+      "card": "share/cards/en/psyc-bonusPsy2-3.png",
+      "page": "d/psyc-bonusPsy2-3-en.html"
     },
     {
-      "weekId": "bonusPsy1",
+      "weekId": "bonusPsy2",
       "dayId": 4,
       "subject": "psychology",
       "lang": "he",
-      "thinkerId": "deci",
-      "title": "כשמתחילים לספור",
-      "card": "share/cards/he/psyc-bonusPsy1-4.png",
-      "page": "d/psyc-bonusPsy1-4-he.html"
+      "thinkerId": "festinger",
+      "title": "פסטינגר: מדוע אנחנו נאחזים במה שאנחנו רוצים להאמין בו?",
+      "card": "share/cards/he/psyc-bonusPsy2-4.png",
+      "page": "d/psyc-bonusPsy2-4-he.html"
     },
     {
-      "weekId": "bonusPsy1",
+      "weekId": "bonusPsy2",
       "dayId": 4,
       "subject": "psychology",
       "lang": "en",
-      "thinkerId": "deci",
-      "title": "When You Start Counting",
-      "card": "share/cards/en/psyc-bonusPsy1-4.png",
-      "page": "d/psyc-bonusPsy1-4-en.html"
+      "thinkerId": "festinger",
+      "title": "Festinger: Why Do We Cling to What We Want to Believe?",
+      "card": "share/cards/en/psyc-bonusPsy2-4.png",
+      "page": "d/psyc-bonusPsy2-4-en.html"
     },
     {
-      "weekId": "bonusPsy1",
+      "weekId": "bonusPsy2",
       "dayId": 5,
       "subject": "psychology",
       "lang": "he",
-      "thinkerId": "fromm",
-      "title": "מנוס מהחלטה",
-      "card": "share/cards/he/psyc-bonusPsy1-5.png",
-      "page": "d/psyc-bonusPsy1-5-he.html"
+      "thinkerId": null,
+      "kind": "other",
+      "title": "פולימרקט וקאלשי: המבחן של חוכמת ההמונים",
+      "card": "share/cards/he/psyc-bonusPsy2-5.png",
+      "page": "d/psyc-bonusPsy2-5-he.html"
     },
     {
-      "weekId": "bonusPsy1",
+      "weekId": "bonusPsy2",
       "dayId": 5,
       "subject": "psychology",
       "lang": "en",
-      "thinkerId": "fromm",
-      "title": "Escape from Choice",
-      "card": "share/cards/en/psyc-bonusPsy1-5.png",
-      "page": "d/psyc-bonusPsy1-5-en.html"
+      "thinkerId": null,
+      "kind": "other",
+      "title": "Polymarket and Kalshi: The Test of the Wisdom of Crowds",
+      "card": "share/cards/en/psyc-bonusPsy2-5.png",
+      "page": "d/psyc-bonusPsy2-5-en.html"
     },
     {
       "weekId": 5,

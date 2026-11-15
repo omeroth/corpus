@@ -1,3 +1,13 @@
+# Regression-script screenshot output (local-only verification bulk).
+scripts/source-step-shots/
+scripts/hard-paywall-shots/
+scripts/bonus-bold-shots/
+scripts/phil7-end-shots/
+scripts/econ7-end-shots/
+scripts/bonuspsy2-shots/
+scripts/bonus-btn-shots/
+scripts/analytics_audit.mjs
+
 # Python helper scripts (not part of the app)
 *.py
 __pycache__/
