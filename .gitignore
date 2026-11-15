@@ -5,6 +5,7 @@ scripts/bonus-bold-shots/
 scripts/phil7-end-shots/
 scripts/bonuspsy2-shots/
 scripts/bonus-btn-shots/
+scripts/analytics_audit.mjs
 
 # Python helper scripts (not part of the app)
 *.py

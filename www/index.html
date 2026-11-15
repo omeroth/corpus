@@ -33635,6 +33635,7 @@ async function _onbV2PrepareWidget() {
   const isIos = isNative && window.Capacitor.getPlatform && window.Capacitor.getPlatform() === 'ios';
   if (!isIos) {
     try { localStorage.setItem('corpus_onboarding_widget_decision', 'skip'); } catch (_) {}
+    try { _phCapture('onboarding_widget_step', { decision: 'skip', reason: 'non_ios' }); } catch (_) {}
     _onbAdvanceStep(31, 32);
     return;
   }
@@ -33644,6 +33645,7 @@ async function _onbV2PrepareWidget() {
   let decision = null;
   try { decision = localStorage.getItem('corpus_onboarding_widget_decision'); } catch (_) {}
   if (decision === 'skip') {
+    try { _phCapture('onboarding_widget_step', { decision: 'skip', reason: 'persisted' }); } catch (_) {}
     _onbAdvanceStep(31, 32);
     return;
   }
@@ -33661,6 +33663,7 @@ async function _onbV2PrepareWidget() {
   };
 
   if (decision === 'show') {
+    try { _phCapture('onboarding_widget_step', { decision: 'show', reason: 'persisted' }); } catch (_) {}
     mountStep('persisted_show');
     return;
   }
@@ -33687,6 +33690,7 @@ async function _onbV2PrepareWidget() {
   if (screen) screen.style.visibility = 'hidden';
   const bridge = window.Capacitor.Plugins && window.Capacitor.Plugins.CorpusWidgetBridge;
   if (!bridge || typeof bridge.isWidgetInstalled !== 'function') {
+    try { _phCapture('onboarding_widget_step', { decision: 'show', reason: 'unsupported' }); } catch (_) {}
     mountStep('plugin_unavailable');
     return;
   }
@@ -33702,13 +33706,18 @@ async function _onbV2PrepareWidget() {
     if (supported && installed) {
       try { localStorage.setItem('corpus_onboarding_widget_decision', 'skip'); } catch (_) {}
       try { _phCapture('widget_prompt_auto_skipped', { source: 'onboarding_step31', reason: 'installed' }); } catch (_) {}
+      try { _phCapture('onboarding_widget_step', { decision: 'skip', reason: 'installed' }); } catch (_) {}
       _onbAdvanceStep(31, 32);
       return;
+    }
+    if (!supported) {
+      try { _phCapture('onboarding_widget_step', { decision: 'show', reason: 'unsupported' }); } catch (_) {}
     }
     mountStep(supported ? 'resolved_not_installed' : 'resolved_unsupported');
     return;
   }
   // timeout or error → default to SHOW on supported platforms.
+  try { _phCapture('onboarding_widget_step', { decision: 'show', reason: result.kind === 'timeout' ? 'timeout' : 'error' }); } catch (_) {}
   mountStep(result.kind === 'timeout' ? 'timeout' : 'plugin_error');
 }
 
@@ -33856,6 +33865,11 @@ function _onbPaywallHardMode() {
 // Account stays intact on Supabase (scope: 'local' logout clears the
 // device token only).
 async function _onbPaywallSignOut() {
+  // Capture attribution BEFORE the wipe — _wipeUserDataPreserveDevice
+  // + state = defaultState() below drops state.onbAnswers, and the
+  // paywall_signout event still needs to carry the source label that
+  // led the user here.
+  const _attrSource = (state && state.onbAnswers && state.onbAnswers.source) || null;
   // Snapshot the signing-out user's id alongside the escrow flag so a
   // DIFFERENT account signing in later on the same device can tell the
   // escrow isn't theirs and clear it (see the mismatch handler in
@@ -33894,7 +33908,15 @@ async function _onbPaywallSignOut() {
     try {
       if (typeof showAuthScreen === 'function') showAuthScreen({});
     } catch (_) {}
-    try { _phCapture('onboarding_paywall_signout', { from: 'hard' }); } catch (_) {}
+    try {
+      // hard: always true here (this helper is only called from the
+      // hard-mode footer). source: state.onbAnswers.source if present —
+      // non-PII attribution label like 'instagram' / 'tiktok' / null.
+      _phCapture('onboarding_paywall_signout', {
+        hard: true,
+        source: _attrSource,
+      });
+    } catch (_) {}
   } finally {
     _explicitSignOut = false;
     _signOutInProgress = false;
@@ -33905,7 +33927,14 @@ async function _onbPaywallSignOut() {
 // existing showDeleteAccountConfirm → deleteAccount flow — no custom
 // teardown needed.
 function _onbPaywallDelete() {
-  try { _phCapture('onboarding_paywall_delete_tapped', { from: 'hard' }); } catch (_) {}
+  try {
+    // hard: always true (helper only called from the hard-mode footer).
+    // source: state.onbAnswers.source attribution label if present.
+    _phCapture('onboarding_paywall_delete_tap', {
+      hard: true,
+      source: (state && state.onbAnswers && state.onbAnswers.source) || null,
+    });
+  } catch (_) {}
   if (typeof showDeleteAccountConfirm === 'function') showDeleteAccountConfirm();
 }
 
@@ -45500,7 +45529,7 @@ function _openBonusSheet() {
   if (!wrap) return;
   wrap.querySelector('[data-act="open"]').addEventListener('click', () => {
     const paidNow = (typeof _isUserPaidOrTrialNow === 'function') ? !!_isUserPaidOrTrialNow() : false;
-    _closeBonusSheet();
+    _closeBonusSheet(true);
     if (paidNow) {
       try { _phCapture('bonus_sheet_cta', { subject: subject, chapter_id: bonusId, paid: true, outcome: 'opened' }); } catch (_){}
       // Same handler the home bonus card uses — openReader into the
@@ -45539,8 +45568,19 @@ function _openBonusSheet() {
     } catch (_){}
   });
 }
-function _closeBonusSheet() {
+function _closeBonusSheet(fromCta) {
   try { _popV7CloseSheet('modal-bonus-info'); } catch (_){}
+  // Fire dismissed event only on non-CTA close (backdrop tap, X, Esc).
+  // CTA close is already covered by bonus_sheet_cta with outcome
+  // 'opened' or 'paywall'.
+  if (!fromCta) {
+    try {
+      const subject = state.subject || 'philosophy';
+      const bonusId = (typeof _bonusBtnIdForSubject === 'function') ? _bonusBtnIdForSubject(subject) : null;
+      const paid = (typeof _isUserPaidOrTrialNow === 'function') ? !!_isUserPaidOrTrialNow() : false;
+      _phCapture('bonus_sheet_dismissed', { subject: subject, chapter_id: bonusId, paid: paid });
+    } catch (_){}
+  }
   // No persisted seen-flag — the tile's strong/gentle state is derived
   // from _hasBonusProgress(bonusId) on every mount.
 }
@@ -61115,6 +61155,7 @@ try {
         // through to layer 6, which clicks the X.
         const activePw = document.querySelector('#onb-v2-paywall.onb-active');
         if (activePw && typeof _onbPaywallHardMode === 'function' && _onbPaywallHardMode()) {
+          try { _phCapture('onboarding_paywall_android_back', { hard: true }); } catch (_) {}
           if (typeof App.minimizeApp === 'function') App.minimizeApp();
           return;
         }
