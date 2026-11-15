@@ -1,0 +1,20 @@
+name: Re-engage inactive 3d
+on:
+  schedule:
+    - cron: '0 9 * * *'   # daily 09:00 UTC (11:00 Israel)
+  workflow_dispatch: {}     # lets you run it manually too
+jobs:
+  reengage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Fire inactive3d events
+        env:
+          POSTHOG_HOST: https://us.posthog.com
+          POSTHOG_PROJECT: '388655'
+          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
+          LOOPS_API_KEY: ${{ secrets.LOOPS_API_KEY }}
+        run: node scripts/loops-reengage-3d.mjs
