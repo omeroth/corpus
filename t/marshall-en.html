@@ -161,6 +161,20 @@
     width: auto;
     flex: 0 0 auto;
   }
+  /* Portrait hero for thinkers without a chibi. Same slot size, same
+     row alignment; the webp is cropped to a subject-ringed circle
+     with the face anchored near the top so each thinker's likeness
+     sits where the chibi face would. */
+  .guide img.guide-portrait {
+    height: 78px;
+    width: 78px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center top;
+    border: 3px solid var(--thinker-frame);
+    background: var(--surface-2);
+    flex: 0 0 auto;
+  }
   .guide .bubble {
     flex: 1;
     position: relative;
@@ -453,7 +467,7 @@
     <a href="https://corpusapp.io">Corpus</a> / <a href="https://corpusapp.io/#economics">Economics</a> / <span>Alfred Marshall</span>
   </nav>
   <section class="guide">
-    <img class="guide-chibi" src="https://corpusapp.io/images/onb-thinkers/smith-wave.png" alt="" aria-hidden="true">
+    <img class="guide-portrait" src="https://corpusapp.io/images/marshall.webp" alt="" aria-hidden="true">
     <div class="bubble">
       <h1>Alfred Marshall</h1>
       <p class="era"><span class="era-label">Era: </span>1842–1924</p>

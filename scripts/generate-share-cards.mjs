@@ -396,11 +396,14 @@ const _SUBJECT_LABEL = {
   he: { philosophy: 'פילוסופיה', economics: 'כלכלה',    psychology: 'פסיכולוגיה' },
 };
 
-// Subject → onboarding-chibi mascot slug. Mirrors the in-app
-// _POP_V7_SUBJ_THINKER at index.html:29265 — the dialogue reader
-// shows the subject's mascot (not the current thinker) beside the
-// speech bubble, and we do the same on /t/.
-const _SUBJECT_MASCOT = { philosophy: 'socrates', economics: 'smith', psychology: 'freud' };
+// Thinker ids with a shipped chibi illustration under
+// images/onb-thinkers/{id}-wave.png. Kept as a hand-curated roster
+// (not a filesystem probe) so a stray asset can't silently flip a
+// page's hero source. These three overlap with the subject
+// mascots in _POP_V7_SUBJ_THINKER (index.html:29265) — on their
+// own pages they render their own chibi; on every other thinker's
+// page the hero falls back to the thinker's portrait webp.
+const _HAS_CHIBI = new Set(['socrates', 'smith', 'freud']);
 
 // Hebrew "About X" tag label. Three forms:
 //   עליו  — masculine singular (default)
@@ -1623,10 +1626,15 @@ function renderThinkerPage({
   const relatedLabel = isEn ? 'More thinkers' : 'הוגים נוספים';
   const subjectLabel = (_SUBJECT_LABEL[lang] || _SUBJECT_LABEL.en)[subject] || subject;
   const homeLabel = isEn ? 'Corpus' : 'Corpus';
-  // Subject mascot chibi for the guide row. Same asset the reader
-  // uses on this subject, every thinker, every day.
-  const mascotSlug = _SUBJECT_MASCOT[subject] || 'socrates';
-  const mascotUrl  = `${SITE_URL}/images/onb-thinkers/${mascotSlug}-wave.png`;
+  // Hero resolver for the guide row. Three mascot thinkers
+  // (socrates / smith / freud) ship a chibi on their own page;
+  // every other thinker falls back to their portrait webp cropped
+  // into the same 78px slot with a subject-tinted frame ring.
+  const heroIsChibi = _HAS_CHIBI.has(thinker.id);
+  const heroUrl = heroIsChibi
+    ? `${SITE_URL}/images/onb-thinkers/${thinker.id}-wave.png`
+    : portraitUrl;
+  const heroClass = heroIsChibi ? 'guide-chibi' : 'guide-portrait';
 
   // JSON-LD — Person + WebPage + BreadcrumbList in one @graph block.
   const jsonLd = {
@@ -1784,6 +1792,20 @@ ${tokenBlock}
   .guide img.guide-chibi {
     height: 78px;
     width: auto;
+    flex: 0 0 auto;
+  }
+  /* Portrait hero for thinkers without a chibi. Same slot size, same
+     row alignment; the webp is cropped to a subject-ringed circle
+     with the face anchored near the top so each thinker's likeness
+     sits where the chibi face would. */
+  .guide img.guide-portrait {
+    height: 78px;
+    width: 78px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center top;
+    border: 3px solid var(--thinker-frame);
+    background: var(--surface-2);
     flex: 0 0 auto;
   }
   .guide .bubble {
@@ -2078,7 +2100,7 @@ ${tokenBlock}
     <a href="${SITE_URL}">${escapeHtml(homeLabel)}</a> / <a href="${SITE_URL}/#${subject}">${escapeHtml(subjectLabel)}</a> / <span>${escapeHtml(nameTxt)}</span>
   </nav>
   <section class="guide">
-    <img class="guide-chibi" src="${mascotUrl}" alt="" aria-hidden="true">
+    <img class="${heroClass}" src="${heroUrl}" alt="" aria-hidden="true">
     <div class="bubble">
       <h1>${escapeHtml(nameTxt)}</h1>
       <p class="era"><span class="era-label">${escapeHtml(eraLabel)}: </span>${escapeHtml(eraTxt)}</p>
