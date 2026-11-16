@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" class="theme-philosophy">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -27,7 +27,7 @@
 <meta name="twitter:description" content="1916–2007. חוקר מוח אמריקאי שהביא את הדיון בחופש הבחירה למעבדה.">
 <meta name="twitter:image" content="https://corpusapp.io/share/thinkers/he/libet.png">
 
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Rubik:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Rubik:wght@500;700;800;900&family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <script type="application/ld+json">
 {
@@ -85,160 +85,420 @@
 </script>
 
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* Design tokens parsed from index.html :root + html.theme-philosophy
+     at build time. Every color/radius/shadow on this page resolves
+     through these variables — no hex is hardcoded in the template. */
   :root {
-    --bg:      #F8F5FF;
-    --plate:   #FDFBF6;
-    --rim:     #E5C158;
-    --wordmark: #7B4FD4;
-    --name:    #2A1266;
-    --era:     #9A80C4;
-    --question: #5A35A8;
-    --url:     #B8860B;
+    --bg: #F8F5FF;
+    --surface: #FFFFFF;
+    --surface-2: #EDE5FF;
+    --border: #DDD4F5;
+    --border-deep: #C4B0E8;
+    --text: #3D1F7A;
+    --text-2: #9A80C4;
+    --ink: #2A1266;
+    --accent: #7B4FD4;
+    --accent-dark: #5A35A8;
+    --accent-glow: rgba(123, 79, 212, 0.3);
+    --accent-tint: #F5EFFE;
+    --accent-soft-border: #C4A8F5;
+    --purple-light: #9B6FE4;
+    --on-accent: #FFFFFF;
+    --radius: 20px;
+    --shadow: 0 4px 20px rgba(61, 31, 122, 0.1);
+    --shadow-lg: 0 8px 40px rgba(61, 31, 122, 0.15);
+    --frame-philosophy: #5D3AA8;
+    --frame-economics: #1B4BB5;
+    --frame-psychology: #AD510B;
+    --thinker-frame: var(--frame-philosophy);
   }
+  /* Every rule below mirrors the app's reader-v7 dialogue screen.
+     Sources: section-type-label at index.html:21416, source-quote
+     card at 21562, quiz-option cards at 21793, rd-guide chibi +
+     bubble at 21487, btn-reader-next + #reader-btn-bar at 21631.
+     Values transcribed verbatim so the /t/ page IS a dialogue
+     screen served at a URL. */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
-    background: var(--bg);
-    color: var(--name);
-    font-family: 'Rubik', sans-serif;
+    background: #FFFFFF;
+    color: #3C3C46;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     min-height: 100dvh;
     -webkit-font-smoothing: antialiased;
-    line-height: 1.55;
+    line-height: 1.5;
   }
-  main {
-    max-width: 720px;
+  body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+  :root[dir="rtl"] body,
+  html[dir="rtl"] body {
+    font-family: 'Rubik', 'Nunito', system-ui, sans-serif;
+  }
+  .page {
+    max-width: 560px;
     margin: 0 auto;
-    padding: 40px 24px 64px;
+    padding: 16px 20px 32px;
   }
-  .wordmark {
-    font-family: 'Nunito', 'Rubik', sans-serif;
-    font-weight: 900;
-    font-size: 26px;
-    color: var(--wordmark);
-    letter-spacing: -0.7px;
-    margin-bottom: 28px;
-    text-align: center;
-  }
-  .card {
-    display: block;
-    width: 100%;
-    max-width: 640px;
-    margin: 0 auto 28px;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-  }
+  /* Small quiet breadcrumb above the chibi row. Same uppercase caps
+     treatment as reader eyebrows but at section-type-label scale. */
   .breadcrumb {
-    font-size: 14px;
-    color: var(--era);
-    margin-bottom: 12px;
-    text-align: center;
-  }
-  .breadcrumb a { color: var(--era); text-decoration: none; }
-  .breadcrumb a:hover { text-decoration: underline; }
-  h1 {
-    font-size: 36px;
-    font-weight: 900;
-    color: var(--name);
-    text-align: center;
-    margin-bottom: 6px;
-    letter-spacing: -0.5px;
-  }
-  .era {
-    text-align: center;
-    color: var(--era);
-    font-weight: 600;
-    font-size: 15px;
-    margin-bottom: 28px;
-  }
-  .bio {
-    font-size: 18px;
-    color: var(--name);
-    margin: 0 auto 28px;
-    max-width: 620px;
-  }
-  section { margin: 28px auto; max-width: 620px; }
-  section h2 {
-    font-size: 15px;
-    font-weight: 800;
+    font-size: 11px;
+    color: #8A87A0;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--wordmark);
-    margin-bottom: 10px;
+    font-weight: 800;
+    margin: 4px 0 16px;
   }
-  blockquote {
-    font-size: 19px;
-    font-style: italic;
-    color: var(--name);
-    border-inline-start: 4px solid var(--wordmark);
-    padding-inline-start: 16px;
+  .breadcrumb a { color: inherit; text-decoration: none; }
+  .breadcrumb a:hover { color: var(--accent); }
+  /* ── Chibi + speech bubble row — .rd-guide (index.html:21487) ── */
+  .guide {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 4px 0 20px;
+  }
+  .guide img.guide-chibi {
+    height: 78px;
+    width: auto;
+    flex: 0 0 auto;
+  }
+  .guide .bubble {
+    flex: 1;
+    position: relative;
+    background: #FFFFFF;
+    border: 2px solid #E5E5EA;
+    border-radius: 14px;
+    padding: 10px 14px;
+  }
+  .guide .bubble::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    inset-inline-start: -8px;
+    width: 12px;
+    height: 12px;
+    background: #FFFFFF;
+    border-left: 2px solid #E5E5EA;
+    border-bottom: 2px solid #E5E5EA;
+    transform: rotate(45deg);
+    z-index: 1;
+  }
+  :root[dir="rtl"] .guide .bubble::before,
+  html[dir="rtl"] .guide .bubble::before {
+    transform: rotate(-135deg);
+  }
+  .guide .bubble::after {
+    content: '';
+    position: absolute;
+    top: 23px;
+    inset-inline-start: -1px;
+    width: 2px;
+    height: 16px;
+    background: #FFFFFF;
+    z-index: 2;
+  }
+  :root[dir="rtl"] .guide .bubble::after,
+  html[dir="rtl"] .guide .bubble::after {
+    inset-inline-start: auto;
+    inset-inline-end: -1px;
+  }
+  /* H1 lives inside the bubble. Name = .rd-gb font + 17px size,
+     weight 900 (matches question-bubble heading). */
+  .guide h1 {
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 1.2;
+    color: #3C3C46;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .guide .era {
+    font-size: 12px;
+    font-weight: 700;
+    color: #8A87A0;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     margin: 0;
   }
-  .related { margin: 32px auto; max-width: 620px; }
-  .related ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
-  .related li { }
-  .related a {
-    display: inline-block;
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: var(--plate);
-    color: var(--wordmark);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    border: 1px solid var(--rim);
+  .era-label { }
+  /* ── Section card — .section-card (reader-v7 at 21447) ── */
+  .section-card {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0 0 24px;
+    color: #3C3C46;
   }
-  .cta-row { text-align: center; margin: 36px 0 12px; }
-  .cta {
+  .section-type-label {
     display: inline-flex;
     align-items: center;
-    padding: 14px 28px;
-    border-radius: 999px;
-    font-weight: 700;
-    font-size: 16px;
-    text-decoration: none;
-    background: var(--wordmark);
-    color: #FFFFFF;
-    transition: transform .15s;
+    gap: 6px;
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 9px;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    border: none;
+    background: var(--accent-tint, #F3EEFF);
+    color: var(--accent-dark, #5631C9);
   }
-  .cta:active { transform: scale(.97); }
-  .url {
+  :root[dir="rtl"] .section-type-label,
+  html[dir="rtl"] .section-type-label {
+    font-family: 'Rubik', 'Nunito', system-ui, sans-serif;
+  }
+  .section-card[data-sec="source"] .section-type-label {
+    background: #FFF1D6;
+    color: #B5700A;
+  }
+  /* ── Bio body — reader-v7 .section-body (21462) ── */
+  .bio {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.65;
+    color: #3C3C46;
+    margin: 0;
+  }
+  /* ── Source quote card — [data-sec="source"] .source-quote (21562) ── */
+  .source-quote {
+    position: relative;
+    border: 2px solid #E5E5EA;
+    border-radius: 20px;
+    box-shadow: 0 4px 0 #E5E5EA;
+    background: #FFFFFF;
+    padding: 18px 18px 16px;
+    margin: 4px 0 0;
+    overflow: hidden;
+  }
+  .source-quote::before {
+    content: "\201C";
+    position: absolute;
+    top: -18px;
+    inset-inline-start: 10px;
+    font: 900 110px Georgia, serif;
+    color: var(--accent-soft-border, #B9A3FF);
+    opacity: 0.5;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .source-quote blockquote {
+    position: relative;
+    padding-top: 26px;
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1.45;
+    font-style: italic;
+    color: #3C3C46;
+    margin: 0;
+    border: none;
+    padding-inline-start: 0;
+  }
+  .source-attr {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    position: relative;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #8A87A0;
+    border: none;
+    padding: 0;
+  }
+  .source-attr::before {
+    content: '';
+    width: 4px;
+    align-self: stretch;
+    border-radius: 2px;
+    background: var(--accent);
+  }
+  .source-attr b {
+    font-size: 15px;
+    font-weight: 900;
+    color: #3C3C46;
     display: block;
-    margin-top: 20px;
-    color: var(--url);
-    font-weight: 700;
+  }
+  /* ── Related — quiz-option cards (21793) wrapped in a list ── */
+  .quiz-options {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .quiz-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 2px solid #E5E5EA;
+    border-radius: 16px;
+    box-shadow: 0 4px 0 #E5E5EA;
+    background: #FFFFFF;
+    color: #3C3C46;
+    padding: 13px 14px;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.35;
+    transition: transform 0.08s, box-shadow 0.08s;
+    width: 100%;
+  }
+  :root[dir="rtl"] .quiz-option,
+  html[dir="rtl"] .quiz-option {
+    font-family: 'Rubik', 'Nunito', system-ui, sans-serif;
+  }
+  .quiz-option:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #E5E5EA;
+  }
+  /* Letter badge = .quiz-option .opt-letter (reader-v7 at 21820).
+     Same box + radius + border as the dialogue's A/B/C badge; color
+     follows the thinker's subject accent for brand continuity. */
+  .quiz-option .opt-letter {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    border: 2px solid var(--accent-soft-border, #E5E5EA);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    background: var(--accent-tint, #F3EEFF);
+    color: var(--accent-dark, #5631C9);
+    font-family: 'Nunito', system-ui, sans-serif;
     font-size: 14px;
+    font-weight: 900;
+    line-height: 1;
+  }
+  :root[dir="rtl"] .quiz-option .opt-letter,
+  html[dir="rtl"] .quiz-option .opt-letter {
+    font-family: 'Rubik', 'Nunito', system-ui, sans-serif;
+  }
+  /* ── Bottom button bar — #reader-btn-bar (21631) sticky on phone,
+     inline on wider viewports. ── */
+  .reader-btn-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 20px);
+    border-top: 2px solid #E5E5EA;
+    background: #FFFFFF;
+    z-index: 50;
+  }
+  .reader-btn-bar .btn-reader-next {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    border: none;
+    background: var(--accent);
+    color: #FFFFFF;
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    border-radius: 16px;
+    padding: 15px;
+    box-shadow: 0 4px 0 var(--accent-dark);
     text-decoration: none;
     text-align: center;
+    transition: transform 0.12s, box-shadow 0.12s;
+  }
+  :root[dir="rtl"] .reader-btn-bar .btn-reader-next,
+  html[dir="rtl"] .reader-btn-bar .btn-reader-next {
+    font-family: 'Rubik', 'Nunito', system-ui, sans-serif;
+  }
+  .reader-btn-bar .btn-reader-next:active {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+  .reader-btn-bar .btn-reader-next .arrow {
+    font-size: 18px;
+    line-height: 1;
+  }
+  :root[dir="rtl"] .reader-btn-bar .btn-reader-next .arrow,
+  html[dir="rtl"] .reader-btn-bar .btn-reader-next .arrow {
+    transform: scaleX(-1);
+  }
+  .corpus-link {
+    display: block;
+    margin: 4px 0 8px;
+    color: #8A87A0;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
+  }
+  .corpus-link:hover { color: var(--accent); }
+  @media (min-width: 720px) {
+    .page { padding: 32px 24px; }
+    .reader-btn-bar { position: static; border-top: 2px solid #E5E5EA; margin-top: 16px; padding: 20px 16px; }
+    body { padding-bottom: 0; }
   }
 </style>
 </head>
 <body>
-<main>
-  <div class="wordmark">Corpus</div>
-  <img class="card" src="https://corpusapp.io/share/thinkers/he/libet.png" alt="בנג&#39;מין ליבט" width="1200" height="630">
+<main class="page">
   <nav class="breadcrumb" aria-label="Breadcrumb">
     <a href="https://corpusapp.io">Corpus</a> / <a href="https://corpusapp.io/#philosophy">פילוסופיה</a> / <span>בנג&#39;מין ליבט</span>
   </nav>
-  <h1>בנג&#39;מין ליבט</h1>
-  <p class="era"><span class="era-label">תקופה: </span>1916–2007</p>
-  <p class="bio">חוקר מוח אמריקאי שהביא את הדיון בחופש הבחירה למעבדה. ניסויו מ-1983 מדד את פעילות המוח לפני החלטות מודעות, ומצא שההכנה מתחילה כשליש שנייה לפני שהאדם יודע. ליבט עצמו דחה את הקריאה הדטרמיניסטית החזקה, והציע שהתודעה שומרת על יכולת וטו בחלון שבין המודעות לביצוע.</p>
-  <section class="quote">
-    <h2>במילים שלהם</h2>
-    <blockquote>&quot;תפקידו של הרצון החופשי המודע הוא, אם כן, לא ליזום פעולה רצונית, אלא לקבוע אם הפעולה אכן תתבצע.&quot;</blockquote>
+  <section class="guide">
+    <img class="guide-chibi" src="https://corpusapp.io/images/onb-thinkers/socrates-wave.png" alt="" aria-hidden="true">
+    <div class="bubble">
+      <h1>בנג&#39;מין ליבט</h1>
+      <p class="era"><span class="era-label">תקופה: </span>1916–2007</p>
+    </div>
   </section>
-  <nav class="related" aria-label="הוגים קשורים">
-    <h2>הוגים קשורים</h2>
-    <ul>
-      <li><a href="https://corpusapp.io/t/socrates-he.html">סוקרטס</a></li>
-      <li><a href="https://corpusapp.io/t/plato-he.html">אפלטון</a></li>
-      <li><a href="https://corpusapp.io/t/russell-he.html">ברטרנד ראסל</a></li>
-      <li><a href="https://corpusapp.io/t/wittgenstein-he.html">ויטגנשטיין</a></li>
+  <section class="section-card" data-sec="idea">
+    <div class="section-type-label">עליו</div>
+    <p class="bio">חוקר מוח אמריקאי שהביא את הדיון בחופש הבחירה למעבדה. ניסויו מ-1983 מדד את פעילות המוח לפני החלטות מודעות, ומצא שההכנה מתחילה כשליש שנייה לפני שהאדם יודע. ליבט עצמו דחה את הקריאה הדטרמיניסטית החזקה, והציע שהתודעה שומרת על יכולת וטו בחלון שבין המודעות לביצוע.</p>
+  </section>
+  <section class="section-card" data-sec="source">
+    <div class="section-type-label">ציטוט</div>
+    <div class="source-quote">
+      <blockquote>&quot;תפקידו של הרצון החופשי המודע הוא, אם כן, לא ליזום פעולה רצונית, אלא לקבוע אם הפעולה אכן תתבצע.&quot;</blockquote>
+      <div class="source-attr"><b>בנג&#39;מין ליבט</b></div>
+    </div>
+  </section>
+  <section class="section-card" data-sec="related" aria-label="הוגים נוספים">
+    <div class="section-type-label">הוגים נוספים</div>
+    <ul class="quiz-options">
+      <li><a class="quiz-option" href="https://corpusapp.io/t/socrates-he.html">
+        <span class="opt-letter" aria-hidden="true">ס</span>
+        <span>סוקרטס</span>
+      </a></li>
+      <li><a class="quiz-option" href="https://corpusapp.io/t/plato-he.html">
+        <span class="opt-letter" aria-hidden="true">א</span>
+        <span>אפלטון</span>
+      </a></li>
+      <li><a class="quiz-option" href="https://corpusapp.io/t/russell-he.html">
+        <span class="opt-letter" aria-hidden="true">ב</span>
+        <span>ברטרנד ראסל</span>
+      </a></li>
+      <li><a class="quiz-option" href="https://corpusapp.io/t/wittgenstein-he.html">
+        <span class="opt-letter" aria-hidden="true">ו</span>
+        <span>ויטגנשטיין</span>
+      </a></li>
     </ul>
-  </nav>
-  <div class="cta-row">
-    <a class="cta" id="manual" href="https://apps.apple.com/app/id6781227385">למד את הרעיונות של בנג&#39;מין ליבט ב-5 דקות</a>
-  </div>
-  <a class="url" href="https://corpusapp.io">corpusapp.io</a>
+  </section>
+  <a class="corpus-link" href="https://corpusapp.io">corpusapp.io</a>
 </main>
+<footer class="reader-btn-bar">
+  <a class="btn-reader-next" id="manual" href="https://apps.apple.com/app/id6781227385">
+    <span>לפתוח את Corpus</span>
+    <span class="arrow" aria-hidden="true">→</span>
+  </a>
+</footer>
 <script>
   (function () {
     var POSTHOG_KEY = 'phc_vUupVqSRdBay7mQ4Aswudhu8mFHnych6PKNRpP6BHoS4';

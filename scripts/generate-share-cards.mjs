@@ -116,6 +116,70 @@ function _findJsLiteral(src, prefix) {
   throw new Error(`unclosed literal starting at index ${i}`);
 }
 
+// Parse the :root and html.theme-* CSS blocks from index.html so the
+// standalone /t/ pages can mirror the app's design tokens (colors,
+// radius, shadow) without hardcoding any hex. Returns per-subject
+// token maps: tokens[subject][name] = value. Falls back to '' on a
+// missing-block crash rather than throwing — a missing token simply
+// doesn't render, which is noisier than a nice error but keeps the
+// generator robust against future refactors of :root.
+function _extractCssBlock(src, selectorPrefix) {
+  const start = src.indexOf(selectorPrefix);
+  if (start === -1) return '';
+  let i = src.indexOf('{', start);
+  if (i === -1) return '';
+  const bodyStart = i + 1;
+  let depth = 1, j = bodyStart, inStr = false, quote = '', inBlockComment = false;
+  for (; j < src.length; j++) {
+    const c = src[j], n = src[j + 1];
+    if (inBlockComment) { if (c === '*' && n === '/') { inBlockComment = false; j++; } continue; }
+    if (inStr) { if (c === quote) inStr = false; continue; }
+    if (c === '/' && n === '*') { inBlockComment = true; j++; continue; }
+    if (c === '"' || c === "'") { inStr = true; quote = c; continue; }
+    if (c === '{') depth++;
+    else if (c === '}') { depth--; if (depth === 0) return src.slice(bodyStart, j); }
+  }
+  return '';
+}
+
+function _parseCssDeclarations(body) {
+  // Strip block comments first — they can contain colons that confuse
+  // the naive per-line parser below.
+  const stripped = body.replace(/\/\*[\s\S]*?\*\//g, '');
+  const out = new Map();
+  // Match `--name: value;` across one or more lines. Non-greedy on
+  // value so a value with a semicolon inside parens (color-mix(...))
+  // still terminates correctly on the first unparenthesized ;.
+  const re = /--([a-zA-Z0-9-]+)\s*:\s*([^;]+);/g;
+  let m;
+  while ((m = re.exec(stripped)) !== null) {
+    // Last-write-wins mirrors CSS cascade for duplicate declarations
+    // (e.g. hex fallback + color-mix pair). We only keep the final
+    // resolved value — the /t/ page target is modern engines.
+    out.set(m[1], m[2].trim());
+  }
+  return out;
+}
+
+function _loadDesignTokens() {
+  const src = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  const rootBody = _extractCssBlock(src, '\n  :root {');
+  const philBody = _extractCssBlock(src, 'html.theme-philosophy,');
+  const econBody = _extractCssBlock(src, 'html.theme-economics,');
+  const psyBody  = _extractCssBlock(src, 'html.theme-psychology,');
+  const root = _parseCssDeclarations(rootBody);
+  const merged = (themeBody) => {
+    const m = new Map(root);
+    for (const [k, v] of _parseCssDeclarations(themeBody)) m.set(k, v);
+    return m;
+  };
+  return {
+    philosophy: merged(philBody),
+    economics:  merged(econBody),
+    psychology: merged(psyBody),
+  };
+}
+
 function extractData() {
   // Post-refactor (commit fb838dd), the subject data structures moved
   // out of index.html into content/*.js. Read each from its own file
@@ -331,6 +395,19 @@ const _SUBJECT_LABEL = {
   en: { philosophy: 'Philosophy', economics: 'Economics', psychology: 'Psychology' },
   he: { philosophy: 'פילוסופיה', economics: 'כלכלה',    psychology: 'פסיכולוגיה' },
 };
+
+// Subject → onboarding-chibi mascot slug. Mirrors the in-app
+// _POP_V7_SUBJ_THINKER at index.html:29265 — the dialogue reader
+// shows the subject's mascot (not the current thinker) beside the
+// speech bubble, and we do the same on /t/.
+const _SUBJECT_MASCOT = { philosophy: 'socrates', economics: 'smith', psychology: 'freud' };
+
+// Hebrew "About X" tag label. Three forms:
+//   עליו  — masculine singular (default)
+//   עליה  — feminine singular (set below)
+//   עליהם — plural (joint entries like reinhart-rogoff)
+const _FEMALE_THINKER_IDS = new Set(['thomson', 'klein', 'anna-freud', 'illouz']);
+const _PLURAL_THINKER_IDS = new Set(['reinhart-rogoff']);
 const PLATE   = '#FDFBF6';
 const RIM     = '#E5C158';
 const URL_TXT = '#B8860B';
@@ -1424,13 +1501,67 @@ function _relatedThinkers({ list, subject, excludeId, stemFor, limit }) {
   return out;
 }
 
+// Which design tokens the /t/ page actually references. Everything
+// else in :root is omitted so the generated CSS stays scannable and
+// small. The portrait-frame tokens for all three subjects are kept
+// so a philosophy user viewing an economics thinker page still sees
+// the correct subject frame if the page theme and frame ever diverge
+// (today the page theme always matches the thinker's subject).
+const _THEME_TOKENS_USED = [
+  'bg', 'surface', 'surface-2', 'border', 'border-deep',
+  'text', 'text-2', 'ink',
+  'accent', 'accent-dark', 'accent-glow', 'accent-tint', 'accent-soft-border',
+  'purple-light', 'on-accent',
+  'radius', 'shadow', 'shadow-lg',
+  'frame-philosophy', 'frame-economics', 'frame-psychology',
+];
+
+// Read width/height from a WebP file header without decoding the image
+// body — avoids needing canvas just to size an <img>. Handles the
+// three standard chunk flavors (VP8X / VP8 / VP8L); returns null on
+// an unrecognised file so the renderer can fall back silently.
+function _webpDimensions(absPath) {
+  try {
+    const fd = fs.openSync(absPath, 'r');
+    const buf = Buffer.alloc(30);
+    fs.readSync(fd, buf, 0, 30, 0);
+    fs.closeSync(fd);
+    if (buf.toString('ascii', 0, 4) !== 'RIFF') return null;
+    if (buf.toString('ascii', 8, 12) !== 'WEBP') return null;
+    const fourcc = buf.toString('ascii', 12, 16);
+    if (fourcc === 'VP8X') {
+      const w = 1 + (buf[24] | (buf[25] << 8) | (buf[26] << 16));
+      const h = 1 + (buf[27] | (buf[28] << 8) | (buf[29] << 16));
+      return { width: w, height: h };
+    }
+    if (fourcc === 'VP8 ') {
+      return { width: buf.readUInt16LE(26) & 0x3fff, height: buf.readUInt16LE(28) & 0x3fff };
+    }
+    if (fourcc === 'VP8L') {
+      const b0 = buf[21], b1 = buf[22], b2 = buf[23], b3 = buf[24];
+      const w = 1 + (((b0) | (b1 << 8)) & 0x3fff);
+      const h = 1 + (((b1 >> 6) | (b2 << 2) | (b3 << 10)) & 0x3fff);
+      return { width: w, height: h };
+    }
+    return null;
+  } catch (e) { return null; }
+}
+
+function _emitTokenBlock(tokenMap) {
+  const lines = [];
+  for (const name of _THEME_TOKENS_USED) {
+    const v = tokenMap.get(name);
+    if (v !== undefined) lines.push(`    --${name}: ${v};`);
+  }
+  return lines.join('\n');
+}
+
 function renderThinkerPage({
   thinker, subject, lang, hasSubjectSuffix,
-  relatedList, stemFor,
+  relatedList, stemFor, themeTokens,
 }) {
   const isEn = lang === 'en';
   const dir = isEn ? 'ltr' : 'rtl';
-  const theme = THEMES[subject] || THEMES.philosophy;
   const stem = hasSubjectSuffix ? `${thinker.id}-${subject}` : thinker.id;
   const cardUrl = `${SITE_URL}/share/thinkers/${lang}/${stem}.png`;
   const pageUrl = `${SITE_URL}/t/${stem}-${lang}.html`;
@@ -1438,8 +1569,12 @@ function renderThinkerPage({
   const altEnUrl = `${SITE_URL}/t/${altStem}-en.html`;
   const altHeUrl = `${SITE_URL}/t/${altStem}-he.html`;
 
-  // Absolute portrait URL for JSON-LD Person.image. Falls through to
-  // the share card if the webp portrait isn't surfaced (dev fallback).
+  // Per-subject portrait override matches _loadThinkerPortrait and
+  // _thinkerImage in the app: multi-subject thinkers (Kahneman,
+  // Aquinas, Rawls, Nozick, James) swap illustrations per subject.
+  // Used here only as the Person.image URL in JSON-LD; the visible
+  // hero on the /t/ page is the subject mascot chibi (not the
+  // ornate webp), matching the reader's dialogue chrome.
   const portraitRel = (thinker.images && thinker.images[subject]) || thinker.image || '';
   const portraitUrl = portraitRel
     ? `${SITE_URL}/${portraitRel.replace(/^\.\//, '')}`
@@ -1447,6 +1582,8 @@ function renderThinkerPage({
 
   const bio = _stripEmDash(thinker.bio || '');
   const quote = thinker.quote && !SUSPECT_QUOTE_IDS.has(thinker.id) ? String(thinker.quote) : '';
+  const tokenMap = (themeTokens && themeTokens[subject]) || new Map();
+  const tokenBlock = _emitTokenBlock(tokenMap);
   const related = _relatedThinkers({
     list: relatedList, subject, excludeId: thinker.id, stemFor, limit: 4,
   });
@@ -1471,12 +1608,25 @@ function renderThinkerPage({
   const IOS_URL     = 'https://apps.apple.com/app/id6781227385';
   const ANDROID_URL = 'https://play.google.com/store/apps/details?id=com.corpusapp.corpus';
   const DESKTOP_URL = 'https://corpusapp.io';
-  const manualCTA = isEn ? `Learn ${nameTxt}'s ideas in 5 minutes` : `למד את הרעיונות של ${nameTxt} ב-5 דקות`;
+  const manualCTA = isEn ? 'Open Corpus' : 'לפתוח את Corpus';
   const eraLabel = isEn ? 'Era' : 'תקופה';
-  const relatedLabel = isEn ? 'Related thinkers' : 'הוגים קשורים';
-  const quoteLabel = isEn ? 'In their own words' : 'במילים שלהם';
+  // Tag labels approved for this commit: About / Quote / More thinkers
+  // in EN, and עליו/עליה / ציטוט / הוגים נוספים in HE. "About" takes
+  // the feminine form "עליה" when the thinker is in _FEMALE_THINKER_IDS;
+  // everyone else reads "עליו".
+  const _he_about =
+    _PLURAL_THINKER_IDS.has(thinker.id) ? 'עליהם'
+    : _FEMALE_THINKER_IDS.has(thinker.id) ? 'עליה'
+    : 'עליו';
+  const aboutLabel   = isEn ? 'About'         : _he_about;
+  const quoteLabel   = isEn ? 'Quote'         : 'ציטוט';
+  const relatedLabel = isEn ? 'More thinkers' : 'הוגים נוספים';
   const subjectLabel = (_SUBJECT_LABEL[lang] || _SUBJECT_LABEL.en)[subject] || subject;
   const homeLabel = isEn ? 'Corpus' : 'Corpus';
+  // Subject mascot chibi for the guide row. Same asset the reader
+  // uses on this subject, every thinker, every day.
+  const mascotSlug = _SUBJECT_MASCOT[subject] || 'socrates';
+  const mascotUrl  = `${SITE_URL}/images/onb-thinkers/${mascotSlug}-wave.png`;
 
   // JSON-LD — Person + WebPage + BreadcrumbList in one @graph block.
   const jsonLd = {
@@ -1511,23 +1661,41 @@ function renderThinkerPage({
     ],
   };
 
+  // Related thinkers rendered as reader-v7 .quiz-option cards. Letter
+  // badge uses the thinker's first-character initial — EN pages pull
+  // from the English name, HE pages from the Hebrew name, so the
+  // badge letter matches the glyph the user is reading.
+  const _initial = (s) => {
+    for (const ch of String(s || '').trim()) return ch.toUpperCase();
+    return '?';
+  };
   const relatedLinksHtml = related.length
-    ? `<nav class="related" aria-label="${escapeHtml(relatedLabel)}">
-    <h2>${escapeHtml(relatedLabel)}</h2>
-    <ul>
-${related.map(r => `      <li><a href="${SITE_URL}/t/${r.stem}-${lang}.html">${escapeHtml(r.name)}</a></li>`).join('\n')}
+    ? `<section class="section-card" data-sec="related" aria-label="${escapeHtml(relatedLabel)}">
+    <div class="section-type-label">${escapeHtml(relatedLabel)}</div>
+    <ul class="quiz-options">
+${related.map(r => `      <li><a class="quiz-option" href="${SITE_URL}/t/${r.stem}-${lang}.html">
+        <span class="opt-letter" aria-hidden="true">${escapeHtml(_initial(r.name))}</span>
+        <span>${escapeHtml(r.name)}</span>
+      </a></li>`).join('\n')}
     </ul>
-  </nav>`
+  </section>`
     : '';
 
+  // Source quote card follows .section-card[data-sec="source"]
+  // exactly: cream/amber tag pill, white card with thick bottom
+  // shadow and large faded open-quote mark, attribution with accent
+  // bar + bold name.
   const quoteHtml = quote
-    ? `<section class="quote">
-    <h2>${escapeHtml(quoteLabel)}</h2>
-    <blockquote>${escapeHtml(quote)}</blockquote>
+    ? `<section class="section-card" data-sec="source">
+    <div class="section-type-label">${escapeHtml(quoteLabel)}</div>
+    <div class="source-quote">
+      <blockquote>${escapeHtml(quote)}</blockquote>
+      <div class="source-attr"><b>${escapeHtml(nameTxt)}</b></div>
+    </div>
   </section>`
     : '';
   return `<!doctype html>
-<html lang="${lang}" dir="${dir}">
+<html lang="${lang}" dir="${dir}" class="theme-${subject}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1555,156 +1723,381 @@ ${related.map(r => `      <li><a href="${SITE_URL}/t/${r.stem}-${lang}.html">${e
 <meta name="twitter:description" content="${escapeHtml(description)}">
 <meta name="twitter:image" content="${cardUrl}">
 
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Rubik:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Rubik:wght@500;700;800;900&family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <script type="application/ld+json">
 ${JSON.stringify(jsonLd, null, 2)}
 </script>
 
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* Design tokens parsed from index.html :root + html.theme-${subject}
+     at build time. Every color/radius/shadow on this page resolves
+     through these variables — no hex is hardcoded in the template. */
   :root {
-    --bg:      ${theme.bg};
-    --plate:   ${PLATE};
-    --rim:     ${RIM};
-    --wordmark: ${theme.wordmark};
-    --name:    ${theme.name};
-    --era:     ${theme.era};
-    --question: ${theme.question};
-    --url:     ${URL_TXT};
+${tokenBlock}
+    --thinker-frame: var(--frame-${subject});
   }
+  /* Every rule below mirrors the app's reader-v7 dialogue screen.
+     Sources: section-type-label at index.html:21416, source-quote
+     card at 21562, quiz-option cards at 21793, rd-guide chibi +
+     bubble at 21487, btn-reader-next + #reader-btn-bar at 21631.
+     Values transcribed verbatim so the /t/ page IS a dialogue
+     screen served at a URL. */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
-    background: var(--bg);
-    color: var(--name);
-    font-family: 'Rubik', sans-serif;
+    background: #FFFFFF;
+    color: #3C3C46;
+    font-family: 'Nunito', 'Rubik', 'Assistant', sans-serif;
     min-height: 100dvh;
     -webkit-font-smoothing: antialiased;
-    line-height: 1.55;
+    line-height: 1.5;
   }
-  main {
-    max-width: 720px;
+  body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+  :root[dir="rtl"] body,
+  html[dir="rtl"] body {
+    font-family: 'Rubik', 'Nunito', system-ui, sans-serif;
+  }
+  .page {
+    max-width: 560px;
     margin: 0 auto;
-    padding: 40px 24px 64px;
+    padding: 16px 20px 32px;
   }
-  .wordmark {
-    font-family: 'Nunito', 'Rubik', sans-serif;
-    font-weight: 900;
-    font-size: 26px;
-    color: var(--wordmark);
-    letter-spacing: -0.7px;
-    margin-bottom: 28px;
-    text-align: center;
-  }
-  .card {
-    display: block;
-    width: 100%;
-    max-width: 640px;
-    margin: 0 auto 28px;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-  }
+  /* Small quiet breadcrumb above the chibi row. Same uppercase caps
+     treatment as reader eyebrows but at section-type-label scale. */
   .breadcrumb {
-    font-size: 14px;
-    color: var(--era);
-    margin-bottom: 12px;
-    text-align: center;
-  }
-  .breadcrumb a { color: var(--era); text-decoration: none; }
-  .breadcrumb a:hover { text-decoration: underline; }
-  h1 {
-    font-size: 36px;
-    font-weight: 900;
-    color: var(--name);
-    text-align: center;
-    margin-bottom: 6px;
-    letter-spacing: -0.5px;
-  }
-  .era {
-    text-align: center;
-    color: var(--era);
-    font-weight: 600;
-    font-size: 15px;
-    margin-bottom: 28px;
-  }
-  .bio {
-    font-size: 18px;
-    color: var(--name);
-    margin: 0 auto 28px;
-    max-width: 620px;
-  }
-  section { margin: 28px auto; max-width: 620px; }
-  section h2 {
-    font-size: 15px;
-    font-weight: 800;
+    font-size: 11px;
+    color: #8A87A0;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--wordmark);
-    margin-bottom: 10px;
+    font-weight: 800;
+    margin: 4px 0 16px;
   }
-  blockquote {
-    font-size: 19px;
-    font-style: italic;
-    color: var(--name);
-    border-inline-start: 4px solid var(--wordmark);
-    padding-inline-start: 16px;
+  .breadcrumb a { color: inherit; text-decoration: none; }
+  .breadcrumb a:hover { color: var(--accent); }
+  /* ── Chibi + speech bubble row — .rd-guide (index.html:21487) ── */
+  .guide {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 4px 0 20px;
+  }
+  .guide img.guide-chibi {
+    height: 78px;
+    width: auto;
+    flex: 0 0 auto;
+  }
+  .guide .bubble {
+    flex: 1;
+    position: relative;
+    background: #FFFFFF;
+    border: 2px solid #E5E5EA;
+    border-radius: 14px;
+    padding: 10px 14px;
+  }
+  .guide .bubble::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    inset-inline-start: -8px;
+    width: 12px;
+    height: 12px;
+    background: #FFFFFF;
+    border-left: 2px solid #E5E5EA;
+    border-bottom: 2px solid #E5E5EA;
+    transform: rotate(45deg);
+    z-index: 1;
+  }
+  :root[dir="rtl"] .guide .bubble::before,
+  html[dir="rtl"] .guide .bubble::before {
+    transform: rotate(-135deg);
+  }
+  .guide .bubble::after {
+    content: '';
+    position: absolute;
+    top: 23px;
+    inset-inline-start: -1px;
+    width: 2px;
+    height: 16px;
+    background: #FFFFFF;
+    z-index: 2;
+  }
+  :root[dir="rtl"] .guide .bubble::after,
+  html[dir="rtl"] .guide .bubble::after {
+    inset-inline-start: auto;
+    inset-inline-end: -1px;
+  }
+  /* H1 lives inside the bubble. Name = .rd-gb font + 17px size,
+     weight 900 (matches question-bubble heading). */
+  .guide h1 {
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 1.2;
+    color: #3C3C46;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .guide .era {
+    font-size: 12px;
+    font-weight: 700;
+    color: #8A87A0;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     margin: 0;
   }
-  .related { margin: 32px auto; max-width: 620px; }
-  .related ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
-  .related li { }
-  .related a {
-    display: inline-block;
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: var(--plate);
-    color: var(--wordmark);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    border: 1px solid var(--rim);
+  .era-label { }
+  /* ── Section card — .section-card (reader-v7 at 21447) ── */
+  .section-card {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0 0 24px;
+    color: #3C3C46;
   }
-  .cta-row { text-align: center; margin: 36px 0 12px; }
-  .cta {
+  .section-type-label {
     display: inline-flex;
     align-items: center;
-    padding: 14px 28px;
-    border-radius: 999px;
-    font-weight: 700;
-    font-size: 16px;
-    text-decoration: none;
-    background: var(--wordmark);
-    color: #FFFFFF;
-    transition: transform .15s;
+    gap: 6px;
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 9px;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    border: none;
+    background: var(--accent-tint, #F3EEFF);
+    color: var(--accent-dark, #5631C9);
   }
-  .cta:active { transform: scale(.97); }
-  .url {
+  :root[dir="rtl"] .section-type-label,
+  html[dir="rtl"] .section-type-label {
+    font-family: 'Rubik', 'Nunito', system-ui, sans-serif;
+  }
+  .section-card[data-sec="source"] .section-type-label {
+    background: #FFF1D6;
+    color: #B5700A;
+  }
+  /* ── Bio body — reader-v7 .section-body (21462) ── */
+  .bio {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.65;
+    color: #3C3C46;
+    margin: 0;
+  }
+  /* ── Source quote card — [data-sec="source"] .source-quote (21562) ── */
+  .source-quote {
+    position: relative;
+    border: 2px solid #E5E5EA;
+    border-radius: 20px;
+    box-shadow: 0 4px 0 #E5E5EA;
+    background: #FFFFFF;
+    padding: 18px 18px 16px;
+    margin: 4px 0 0;
+    overflow: hidden;
+  }
+  .source-quote::before {
+    content: "\\201C";
+    position: absolute;
+    top: -18px;
+    inset-inline-start: 10px;
+    font: 900 110px Georgia, serif;
+    color: var(--accent-soft-border, #B9A3FF);
+    opacity: 0.5;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .source-quote blockquote {
+    position: relative;
+    padding-top: 26px;
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1.45;
+    font-style: italic;
+    color: #3C3C46;
+    margin: 0;
+    border: none;
+    padding-inline-start: 0;
+  }
+  .source-attr {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    position: relative;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #8A87A0;
+    border: none;
+    padding: 0;
+  }
+  .source-attr::before {
+    content: '';
+    width: 4px;
+    align-self: stretch;
+    border-radius: 2px;
+    background: var(--accent);
+  }
+  .source-attr b {
+    font-size: 15px;
+    font-weight: 900;
+    color: #3C3C46;
     display: block;
-    margin-top: 20px;
-    color: var(--url);
-    font-weight: 700;
+  }
+  /* ── Related — quiz-option cards (21793) wrapped in a list ── */
+  .quiz-options {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .quiz-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 2px solid #E5E5EA;
+    border-radius: 16px;
+    box-shadow: 0 4px 0 #E5E5EA;
+    background: #FFFFFF;
+    color: #3C3C46;
+    padding: 13px 14px;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.35;
+    transition: transform 0.08s, box-shadow 0.08s;
+    width: 100%;
+  }
+  :root[dir="rtl"] .quiz-option,
+  html[dir="rtl"] .quiz-option {
+    font-family: 'Rubik', 'Nunito', system-ui, sans-serif;
+  }
+  .quiz-option:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #E5E5EA;
+  }
+  /* Letter badge = .quiz-option .opt-letter (reader-v7 at 21820).
+     Same box + radius + border as the dialogue's A/B/C badge; color
+     follows the thinker's subject accent for brand continuity. */
+  .quiz-option .opt-letter {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    border: 2px solid var(--accent-soft-border, #E5E5EA);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    background: var(--accent-tint, #F3EEFF);
+    color: var(--accent-dark, #5631C9);
+    font-family: 'Nunito', system-ui, sans-serif;
     font-size: 14px;
+    font-weight: 900;
+    line-height: 1;
+  }
+  :root[dir="rtl"] .quiz-option .opt-letter,
+  html[dir="rtl"] .quiz-option .opt-letter {
+    font-family: 'Rubik', 'Nunito', system-ui, sans-serif;
+  }
+  /* ── Bottom button bar — #reader-btn-bar (21631) sticky on phone,
+     inline on wider viewports. ── */
+  .reader-btn-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 12px 16px calc(env(safe-area-inset-bottom, 0px) + 20px);
+    border-top: 2px solid #E5E5EA;
+    background: #FFFFFF;
+    z-index: 50;
+  }
+  .reader-btn-bar .btn-reader-next {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    border: none;
+    background: var(--accent);
+    color: #FFFFFF;
+    font-family: 'Nunito', system-ui, sans-serif;
+    font-weight: 900;
+    font-size: 16px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    border-radius: 16px;
+    padding: 15px;
+    box-shadow: 0 4px 0 var(--accent-dark);
     text-decoration: none;
     text-align: center;
+    transition: transform 0.12s, box-shadow 0.12s;
+  }
+  :root[dir="rtl"] .reader-btn-bar .btn-reader-next,
+  html[dir="rtl"] .reader-btn-bar .btn-reader-next {
+    font-family: 'Rubik', 'Nunito', system-ui, sans-serif;
+  }
+  .reader-btn-bar .btn-reader-next:active {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+  .reader-btn-bar .btn-reader-next .arrow {
+    font-size: 18px;
+    line-height: 1;
+  }
+  :root[dir="rtl"] .reader-btn-bar .btn-reader-next .arrow,
+  html[dir="rtl"] .reader-btn-bar .btn-reader-next .arrow {
+    transform: scaleX(-1);
+  }
+  .corpus-link {
+    display: block;
+    margin: 4px 0 8px;
+    color: #8A87A0;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
+  }
+  .corpus-link:hover { color: var(--accent); }
+  @media (min-width: 720px) {
+    .page { padding: 32px 24px; }
+    .reader-btn-bar { position: static; border-top: 2px solid #E5E5EA; margin-top: 16px; padding: 20px 16px; }
+    body { padding-bottom: 0; }
   }
 </style>
 </head>
 <body>
-<main>
-  <div class="wordmark">Corpus</div>
-  <img class="card" src="${cardUrl}" alt="${escapeHtml(nameTxt)}" width="1200" height="630">
+<main class="page">
   <nav class="breadcrumb" aria-label="Breadcrumb">
     <a href="${SITE_URL}">${escapeHtml(homeLabel)}</a> / <a href="${SITE_URL}/#${subject}">${escapeHtml(subjectLabel)}</a> / <span>${escapeHtml(nameTxt)}</span>
   </nav>
-  <h1>${escapeHtml(nameTxt)}</h1>
-  <p class="era"><span class="era-label">${escapeHtml(eraLabel)}: </span>${escapeHtml(eraTxt)}</p>
-  <p class="bio">${escapeHtml(bio)}</p>
+  <section class="guide">
+    <img class="guide-chibi" src="${mascotUrl}" alt="" aria-hidden="true">
+    <div class="bubble">
+      <h1>${escapeHtml(nameTxt)}</h1>
+      <p class="era"><span class="era-label">${escapeHtml(eraLabel)}: </span>${escapeHtml(eraTxt)}</p>
+    </div>
+  </section>
+  <section class="section-card" data-sec="idea">
+    <div class="section-type-label">${escapeHtml(aboutLabel)}</div>
+    <p class="bio">${escapeHtml(bio)}</p>
+  </section>
   ${quoteHtml}
   ${relatedLinksHtml}
-  <div class="cta-row">
-    <a class="cta" id="manual" href="${IOS_URL}">${escapeHtml(manualCTA)}</a>
-  </div>
-  <a class="url" href="${SITE_URL}">corpusapp.io</a>
+  <a class="corpus-link" href="${SITE_URL}">corpusapp.io</a>
 </main>
+<footer class="reader-btn-bar">
+  <a class="btn-reader-next" id="manual" href="${IOS_URL}">
+    <span>${escapeHtml(manualCTA)}</span>
+    <span class="arrow" aria-hidden="true">→</span>
+  </a>
+</footer>
 <script>
   (function () {
     var POSTHOG_KEY = 'phc_vUupVqSRdBay7mQ4Aswudhu8mFHnych6PKNRpP6BHoS4';
@@ -1908,6 +2301,11 @@ async function main() {
   // subject a thinker belongs to, both languages). Multi-subject thinkers
   // (Kahneman) produce per-subject file variants so the portrait override
   // and theme match the sharing context.
+  // Design tokens parsed once from index.html :root + html.theme-*,
+  // handed to every renderThinkerPage call so the standalone pages
+  // share the app's palette without a runtime dependency.
+  const themeTokens = _loadDesignTokens();
+
   // stemFor(id, subject) resolver for related-thinker links (stem =
   // id or id-subject, matching on-disk filenames).
   const stemByIdSubject = new Map();
@@ -1957,6 +2355,7 @@ async function main() {
           thinker: t, subject, lang, hasSubjectSuffix,
           relatedList: list,
           stemFor,
+          themeTokens,
         }));
         thinkerManifest.items.push({
           thinkerId: t.id,
