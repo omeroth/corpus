@@ -303,7 +303,34 @@ const _SUBJECT_SLUG = {
 // crawlers don't surface dialogue titles + portraits before the
 // subject is officially open in-app. Drop the entry from this set at
 // the same time the subject launches.
+// Dialogue /d/ pages for these subjects emit <meta name="robots"
+// content="noindex, nofollow">. Thinker /t/ pages are always
+// indexable — the SEO pass on 2026-11-16 lifted the psychology
+// noindex for THINKER pages (bios are reusable content, not
+// dialogue teasers) while keeping the dialogue-page noindex until
+// the subject fully launches.
 const NOINDEX_SUBJECTS = new Set(['psychology']);
+
+// Thinkers whose `quote` field is flagged as an unverified paraphrase
+// in content/thinkers.js:16-21 (red + yellow audit sets, 2026-09-29
+// audit). For these ids, the SEO /t/ page omits the <blockquote>
+// entirely and lets the bio carry the page — per the "never publish
+// a flagged quote" rule set on 2026-11-16. Prune an id here when the
+// audit track moves it to a verified source.
+const SUSPECT_QUOTE_IDS = new Set([
+  // Red:
+  'plato','russell','aristotle','gettier','popper','thomson','bostrom',
+  'mill-econ','samuelson','walras','sandel','jevons','kahneman','ricardo',
+  'piketty','aquinas','pareto','rawls','nozick','hayek',
+  // Yellow:
+  'aurelius','mill','nietzsche','berkeley','friedman','adler',
+]);
+
+// Human-readable subject labels for breadcrumbs + related links.
+const _SUBJECT_LABEL = {
+  en: { philosophy: 'Philosophy', economics: 'Economics', psychology: 'Psychology' },
+  he: { philosophy: 'פילוסופיה', economics: 'כלכלה',    psychology: 'פסיכולוגיה' },
+};
 const PLATE   = '#FDFBF6';
 const RIM     = '#E5C158';
 const URL_TXT = '#B8860B';
@@ -1342,35 +1369,174 @@ function renderPage({ weekId, dayId, thinker, dayTitle, subject, lang }) {
 // ─────────────────────────────────────────────────────────────────────────
 // Thinker landing page renderer — /t/{id}[-{subject}]-{lang}.html
 // ─────────────────────────────────────────────────────────────────────────
-// Structurally identical to renderPage: same layout, same redirect + beacon
-// script, same OG/Twitter card meta. Deltas: /t/ path, description names
-// the person (not a dialogue), landing-page telemetry carries thinker_id
-// instead of dialogue_id.
+// SEO content page. Unique title/description, canonical, hreflang
+// alternates, visible H1 + bio paragraph + optional verified quote +
+// reflective question + related-thinker links, Person / WebPage /
+// BreadcrumbList JSON-LD. Mobile UAs still bounce to the store via
+// location.replace; desktop (and crawlers) stays on the content.
 
-function renderThinkerPage({ thinker, subject, lang, hasSubjectSuffix }) {
+// Strip em-dashes from authored prose we render. Keep en-dashes in
+// date ranges ("470–399 BCE") intact. Per-page rendering transform,
+// never mutates the underlying data.
+function _stripEmDash(s) {
+  if (!s) return '';
+  return String(s)
+    .replace(/\s+—\s+/g, ', ')
+    .replace(/—/g, ', ');
+}
+
+// Trim prose to <=max chars on a sentence boundary — the last full
+// sentence (ending in . / ! / ? / ׃ / HE geresh) that fits under max.
+// If no sentence fits, return the raw first sentence even if it
+// overflows: a complete sentence always beats a word-cut truncation.
+// Never emits an ellipsis — the trailing punctuation IS the stop.
+function _truncateForDescription(s, max) {
+  const t = String(s || '').replace(/\s+/g, ' ').trim();
+  if (t.length <= max) return t;
+  const sentenceEnd = /[.!?]\s|״\s|׳\s/g;
+  let lastFit = 0;
+  let m;
+  while ((m = sentenceEnd.exec(t)) !== null) {
+    const end = m.index + 1;
+    if (end <= max) lastFit = end;
+    else break;
+  }
+  if (lastFit > 0) return t.slice(0, lastFit);
+  const firstEnd = t.search(sentenceEnd);
+  return firstEnd > 0 ? t.slice(0, firstEnd + 1) : t.slice(0, max);
+}
+
+// Related thinkers in the same subject bucket that also have a /t/
+// page in the given language. Returns up to 4, excluding self.
+// `stemFor(id)` resolves the on-disk /t/ stem (id or id-subject).
+function _relatedThinkers({ list, subject, excludeId, stemFor, limit }) {
+  const out = [];
+  for (const t of list) {
+    if (!t || !t.id || t.id === excludeId) continue;
+    const subs = _subjectsForThinker(t);
+    if (!subs.includes(subject)) continue;
+    if (!t.image && !(t.images && Object.keys(t.images).length)) continue;
+    const stem = stemFor(t.id, subject);
+    if (!stem) continue;
+    out.push({ id: t.id, name: t.name, stem });
+    if (out.length >= (limit || 4)) break;
+  }
+  return out;
+}
+
+function renderThinkerPage({
+  thinker, subject, lang, hasSubjectSuffix,
+  relatedList, stemFor,
+}) {
   const isEn = lang === 'en';
   const dir = isEn ? 'ltr' : 'rtl';
   const theme = THEMES[subject] || THEMES.philosophy;
   const stem = hasSubjectSuffix ? `${thinker.id}-${subject}` : thinker.id;
   const cardUrl = `${SITE_URL}/share/thinkers/${lang}/${stem}.png`;
   const pageUrl = `${SITE_URL}/t/${stem}-${lang}.html`;
-  const title = thinker.name;
-  const description = isEn
-    ? `${thinker.name} on Corpus — ${thinker.era}. 5 minutes a day with history's greatest minds.`
-    : `${thinker.name} ב-Corpus — ${thinker.era}. 5 דקות ביום עם גדולי ההוגים.`;
+  const altStem = stem;
+  const altEnUrl = `${SITE_URL}/t/${altStem}-en.html`;
+  const altHeUrl = `${SITE_URL}/t/${altStem}-he.html`;
+
+  // Absolute portrait URL for JSON-LD Person.image. Falls through to
+  // the share card if the webp portrait isn't surfaced (dev fallback).
+  const portraitRel = (thinker.images && thinker.images[subject]) || thinker.image || '';
+  const portraitUrl = portraitRel
+    ? `${SITE_URL}/${portraitRel.replace(/^\.\//, '')}`
+    : cardUrl;
+
+  const bio = _stripEmDash(thinker.bio || '');
+  const quote = thinker.quote && !SUSPECT_QUOTE_IDS.has(thinker.id) ? String(thinker.quote) : '';
+  const related = _relatedThinkers({
+    list: relatedList, subject, excludeId: thinker.id, stemFor, limit: 4,
+  });
+
+  // Title — "{Name}: their key ideas in 5 minutes | Corpus", dropping
+  // "their " when the long form exceeds ~60 chars so long names stay
+  // under the SERP truncation cap.
+  const nameTxt = thinker.name;
+  const longTitleEn = `${nameTxt}: their key ideas in 5 minutes | Corpus`;
+  const titleEn = longTitleEn.length <= 60
+    ? longTitleEn
+    : `${nameTxt}: key ideas in 5 minutes | Corpus`;
+  const titleHe = `${nameTxt}: רעיונות המפתח ב-5 דקות | Corpus`;
+  const title = isEn ? titleEn : titleHe;
+
+  // Description — 150-160 chars, derived from bio. Prepend the era so
+  // the dates surface in SERP snippets too.
+  const eraTxt = thinker.era || '';
+  const bioForDesc = _truncateForDescription(bio, 155 - (eraTxt ? eraTxt.length + 2 : 0));
+  const description = eraTxt ? `${eraTxt}. ${bioForDesc}` : bioForDesc;
+
   const IOS_URL     = 'https://apps.apple.com/app/id6781227385';
   const ANDROID_URL = 'https://play.google.com/store/apps/details?id=com.corpusapp.corpus';
   const DESKTOP_URL = 'https://corpusapp.io';
-  const redirectingText = isEn ? 'Opening Corpus…' : 'פותח את Corpus…';
-  const manualCTA       = isEn ? 'Open Corpus'    : 'פתח את Corpus';
+  const manualCTA = isEn ? `Learn ${nameTxt}'s ideas in 5 minutes` : `למד את הרעיונות של ${nameTxt} ב-5 דקות`;
+  const eraLabel = isEn ? 'Era' : 'תקופה';
+  const relatedLabel = isEn ? 'Related thinkers' : 'הוגים קשורים';
+  const quoteLabel = isEn ? 'In their own words' : 'במילים שלהם';
+  const subjectLabel = (_SUBJECT_LABEL[lang] || _SUBJECT_LABEL.en)[subject] || subject;
+  const homeLabel = isEn ? 'Corpus' : 'Corpus';
+
+  // JSON-LD — Person + WebPage + BreadcrumbList in one @graph block.
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Person',
+        '@id': `${pageUrl}#person`,
+        name: nameTxt,
+        description: bio,
+        image: portraitUrl,
+      },
+      {
+        '@type': 'WebPage',
+        '@id': `${pageUrl}#page`,
+        url: pageUrl,
+        name: title,
+        description,
+        inLanguage: isEn ? 'en' : 'he',
+        about: { '@id': `${pageUrl}#person` },
+        primaryImageOfPage: cardUrl,
+        isPartOf: { '@type': 'WebSite', name: 'Corpus', url: SITE_URL },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: homeLabel, item: SITE_URL },
+          { '@type': 'ListItem', position: 2, name: subjectLabel, item: `${SITE_URL}/#${subject}` },
+          { '@type': 'ListItem', position: 3, name: nameTxt, item: pageUrl },
+        ],
+      },
+    ],
+  };
+
+  const relatedLinksHtml = related.length
+    ? `<nav class="related" aria-label="${escapeHtml(relatedLabel)}">
+    <h2>${escapeHtml(relatedLabel)}</h2>
+    <ul>
+${related.map(r => `      <li><a href="${SITE_URL}/t/${r.stem}-${lang}.html">${escapeHtml(r.name)}</a></li>`).join('\n')}
+    </ul>
+  </nav>`
+    : '';
+
+  const quoteHtml = quote
+    ? `<section class="quote">
+    <h2>${escapeHtml(quoteLabel)}</h2>
+    <blockquote>${escapeHtml(quote)}</blockquote>
+  </section>`
+    : '';
   return `<!doctype html>
 <html lang="${lang}" dir="${dir}">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">${NOINDEX_SUBJECTS.has(subject) ? `
-<meta name="robots" content="noindex, nofollow">` : ''}
-<title>${escapeHtml(title)} · Corpus</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${escapeHtml(title)}</title>
 <meta name="description" content="${escapeHtml(description)}">
+<link rel="canonical" href="${pageUrl}">
+<link rel="alternate" hreflang="en" href="${altEnUrl}">
+<link rel="alternate" hreflang="he" href="${altHeUrl}">
+<link rel="alternate" hreflang="x-default" href="${altEnUrl}">
 
 <meta property="og:type" content="profile">
 <meta property="og:title" content="${escapeHtml(title)}">
@@ -1391,6 +1557,10 @@ function renderThinkerPage({ thinker, subject, lang, hasSubjectSuffix }) {
 
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Rubik:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 
+<script type="application/ld+json">
+${JSON.stringify(jsonLd, null, 2)}
+</script>
+
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -1409,12 +1579,12 @@ function renderThinkerPage({ thinker, subject, lang, hasSubjectSuffix }) {
     font-family: 'Rubik', sans-serif;
     min-height: 100dvh;
     -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
   }
   main {
     max-width: 720px;
     margin: 0 auto;
-    padding: 48px 24px 64px;
-    text-align: center;
+    padding: 40px 24px 64px;
   }
   .wordmark {
     font-family: 'Nunito', 'Rubik', sans-serif;
@@ -1422,23 +1592,78 @@ function renderThinkerPage({ thinker, subject, lang, hasSubjectSuffix }) {
     font-size: 26px;
     color: var(--wordmark);
     letter-spacing: -0.7px;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
+    text-align: center;
   }
   .card {
     display: block;
     width: 100%;
     max-width: 640px;
-    margin: 0 auto 32px;
+    margin: 0 auto 28px;
     border-radius: 16px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   }
-  .redirecting {
+  .breadcrumb {
+    font-size: 14px;
+    color: var(--era);
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .breadcrumb a { color: var(--era); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  h1 {
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--name);
+    text-align: center;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+  .era {
+    text-align: center;
+    color: var(--era);
     font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 28px;
+  }
+  .bio {
     font-size: 18px;
     color: var(--name);
-    margin-bottom: 20px;
-    opacity: 0.75;
+    margin: 0 auto 28px;
+    max-width: 620px;
   }
+  section { margin: 28px auto; max-width: 620px; }
+  section h2 {
+    font-size: 15px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--wordmark);
+    margin-bottom: 10px;
+  }
+  blockquote {
+    font-size: 19px;
+    font-style: italic;
+    color: var(--name);
+    border-inline-start: 4px solid var(--wordmark);
+    padding-inline-start: 16px;
+    margin: 0;
+  }
+  .related { margin: 32px auto; max-width: 620px; }
+  .related ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+  .related li { }
+  .related a {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--plate);
+    color: var(--wordmark);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    border: 1px solid var(--rim);
+  }
+  .cta-row { text-align: center; margin: 36px 0 12px; }
   .cta {
     display: inline-flex;
     align-items: center;
@@ -1454,20 +1679,30 @@ function renderThinkerPage({ thinker, subject, lang, hasSubjectSuffix }) {
   .cta:active { transform: scale(.97); }
   .url {
     display: block;
-    margin-top: 32px;
+    margin-top: 20px;
     color: var(--url);
     font-weight: 700;
     font-size: 14px;
     text-decoration: none;
+    text-align: center;
   }
 </style>
 </head>
 <body>
 <main>
   <div class="wordmark">Corpus</div>
-  <img class="card" src="${cardUrl}" alt="${escapeHtml(thinker.name)}" width="1200" height="630">
-  <p class="redirecting">${escapeHtml(redirectingText)}</p>
-  <a class="cta" id="manual" href="${IOS_URL}">${escapeHtml(manualCTA)}</a>
+  <img class="card" src="${cardUrl}" alt="${escapeHtml(nameTxt)}" width="1200" height="630">
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="${SITE_URL}">${escapeHtml(homeLabel)}</a> / <a href="${SITE_URL}/#${subject}">${escapeHtml(subjectLabel)}</a> / <span>${escapeHtml(nameTxt)}</span>
+  </nav>
+  <h1>${escapeHtml(nameTxt)}</h1>
+  <p class="era"><span class="era-label">${escapeHtml(eraLabel)}: </span>${escapeHtml(eraTxt)}</p>
+  <p class="bio">${escapeHtml(bio)}</p>
+  ${quoteHtml}
+  ${relatedLinksHtml}
+  <div class="cta-row">
+    <a class="cta" id="manual" href="${IOS_URL}">${escapeHtml(manualCTA)}</a>
+  </div>
   <a class="url" href="${SITE_URL}">corpusapp.io</a>
 </main>
 <script>
@@ -1520,7 +1755,11 @@ function renderThinkerPage({ thinker, subject, lang, hasSubjectSuffix }) {
       });
     }
 
-    setTimeout(function () { location.replace(target); }, 250);
+    // Mobile-only auto-redirect to the store. Desktop (and crawlers)
+    // stay on the content page so humans + Googlebot both see it.
+    if (isIOS || isAndroid) {
+      setTimeout(function () { location.replace(target); }, 250);
+    }
   })();
 </script>
 </body>
@@ -1669,6 +1908,18 @@ async function main() {
   // subject a thinker belongs to, both languages). Multi-subject thinkers
   // (Kahneman) produce per-subject file variants so the portrait override
   // and theme match the sharing context.
+  // stemFor(id, subject) resolver for related-thinker links (stem =
+  // id or id-subject, matching on-disk filenames).
+  const stemByIdSubject = new Map();
+  for (const t of THINKERS_EN) {
+    if (!t || !t.id) continue;
+    if (!t.image && !(t.images && Object.keys(t.images).length)) continue;
+    const subs = _subjectsForThinker(t);
+    const multi = subs.length > 1;
+    for (const s of subs) stemByIdSubject.set(`${t.id}|${s}`, multi ? `${t.id}-${s}` : t.id);
+  }
+  const stemFor = (id, subject) => stemByIdSubject.get(`${id}|${subject}`) || '';
+
   const thinkerManifest = { generatedAt: new Date().toISOString(), items: [] };
   for (const lang of ['he', 'en']) {
     const list = (lang === 'en') ? THINKERS_EN : THINKERS;
@@ -1704,6 +1955,8 @@ async function main() {
         const pageFile = path.join(OUT_THINKER_PAGES, `${stem}-${lang}.html`);
         fs.writeFileSync(pageFile, renderThinkerPage({
           thinker: t, subject, lang, hasSubjectSuffix,
+          relatedList: list,
+          stemFor,
         }));
         thinkerManifest.items.push({
           thinkerId: t.id,
@@ -1742,11 +1995,56 @@ async function main() {
     console.log(`[gen:share] brand card  → ${path.relative(ROOT, ogFile)}`);
   }
 
+  // ─── sitemap.xml + robots.txt ─────────────────────────────────────────
+  // Writes indexable URLs only: every /t/ thinker page (both languages,
+  // all subjects — psychology /t/ pages are indexable as of the
+  // 2026-11-16 SEO pass) plus every /d/ dialogue page whose subject is
+  // NOT in NOINDEX_SUBJECTS. lastmod = today for every entry (build
+  // date), which is honest for a regenerated static site.
+  _writeSitemapAndRobots({ thinkerManifest, dialogueManifest: manifest });
+
   // Post-pass: pngquant compression. Cards render at ~200–330KB uncompressed;
   // quantizing to 70–90% quality drops that to ~50–100KB with no visible loss,
   // which keeps every card under the ~300KB WhatsApp/Twitter OG-image soft cap.
   // Skipped silently if pngquant-bin isn't installed (dev-only devDep).
   if (CANVAS_ENABLED) _compressCards();
+}
+
+function _writeSitemapAndRobots({ thinkerManifest, dialogueManifest }) {
+  const today = new Date().toISOString().slice(0, 10);
+  const urls = [];
+  // Landing + /books are landing-page work (separate commit) — included
+  // here as root entries so crawlers still discover them from the map.
+  urls.push({ loc: `${SITE_URL}/`, lastmod: today });
+  // Every indexable thinker page.
+  for (const it of thinkerManifest.items) {
+    const stem = it.page.replace(/^t\//, '').replace(/\.html$/, '');
+    urls.push({ loc: `${SITE_URL}/t/${stem}.html`, lastmod: today });
+  }
+  // Dialogue pages, skipping the subjects that still ship noindex.
+  for (const it of dialogueManifest.items) {
+    if (NOINDEX_SUBJECTS.has(it.subject)) continue;
+    const stem = it.page.replace(/^d\//, '').replace(/\.html$/, '');
+    urls.push({ loc: `${SITE_URL}/d/${stem}.html`, lastmod: today });
+  }
+  const xml = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...urls.map(u => `  <url><loc>${u.loc}</loc><lastmod>${u.lastmod}</lastmod></url>`),
+    '</urlset>',
+    '',
+  ].join('\n');
+  fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), xml);
+  const robots = [
+    'User-agent: *',
+    'Allow: /',
+    '',
+    `Sitemap: ${SITE_URL}/sitemap.xml`,
+    '',
+  ].join('\n');
+  fs.writeFileSync(path.join(ROOT, 'robots.txt'), robots);
+  console.log(`[gen:share] sitemap    → sitemap.xml (${urls.length} urls)`);
+  console.log(`[gen:share] robots     → robots.txt`);
 }
 
 function _compressCards() {

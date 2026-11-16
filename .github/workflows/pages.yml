@@ -43,6 +43,11 @@ jobs:
           cp manifest.json         _deploy/
           cp CNAME                 _deploy/
           cp version.json          _deploy/
+          # SEO assets written by scripts/generate-share-cards.mjs at
+          # repo root. Both must reach _deploy or Googlebot can't find
+          # the map at corpusapp.io/sitemap.xml.
+          if [ -f sitemap.xml ]; then cp sitemap.xml _deploy/; fi
+          if [ -f robots.txt  ]; then cp robots.txt  _deploy/; fi
           cp -r assets             _deploy/
           cp -r images             _deploy/
           cp -r content            _deploy/
