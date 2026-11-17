@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- /* AUTH-FWD-INJECTED */ -->
 <script>
-// Forward auth callbacks, PWA installs, and signed-in sessions to /app/.
-// Must run before anything else renders.
+// Forward auth callbacks and PWA installs to /app/. A signed-in user
+// who opens corpusapp.io directly should see the marketing site, so
+// localStorage sessions do NOT forward — only auth params in the URL
+// and display-mode: standalone do.
 (function(){
   try {
     var s = location.search || '';
@@ -14,21 +16,14 @@
     // Supabase sends these: #access_token=..., #error=..., &type=signup|recovery|...,
     // and PKCE flow sends ?code=...&state=....
     var isAuth =
-      /[?&](code|error|error_code|type)=/.test(s) ||
-      /^#(access_token|refresh_token|error|error_description|type)=/.test(h) ||
-      /[&#](access_token|refresh_token|error|type)=/.test(h);
+      /[?&](code|error|error_code|error_description|type|access_token|refresh_token)=/.test(s) ||
+      /^#(access_token|refresh_token|error|error_code|error_description|type|code)=/.test(h) ||
+      /[&#](access_token|refresh_token|error|error_code|error_description|type|code)=/.test(h);
     // PWA "installed" (added to home screen / standalone shortcut).
     var standalone =
       (typeof matchMedia === 'function' && matchMedia('(display-mode: standalone)').matches) ||
       window.navigator.standalone === true;
-    // Signed-in Supabase session. gotrue-js's default storageKey is
-    // sb-<project-ref>-auth-token; the project ref in this repo is
-    // xcoikjoatcrjqxzykwlt (see index.html's supabase.createClient URL).
-    // Presence of a non-empty value means the user has a Supabase session
-    // on this device.
-    var sess = false;
-    try { sess = !!localStorage.getItem('sb-xcoikjoatcrjqxzykwlt-auth-token'); } catch(_) {}
-    if (isAuth || standalone || sess) {
+    if (isAuth || standalone) {
       // Preserve BOTH search and hash so Supabase magic-link / PKCE /
       // recovery tokens survive the hop.
       location.replace('/app/' + s + h);
