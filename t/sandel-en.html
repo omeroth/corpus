@@ -6,9 +6,6 @@
 <title>Michael Sandel: their key ideas in 5 minutes | Corpus</title>
 <meta name="description" content="1953–. American political philosopher at Harvard.">
 <link rel="canonical" href="https://corpusapp.io/t/sandel-en.html">
-<link rel="alternate" hreflang="en" href="https://corpusapp.io/t/sandel-en.html">
-<link rel="alternate" hreflang="he" href="https://corpusapp.io/t/sandel-he.html">
-<link rel="alternate" hreflang="x-default" href="https://corpusapp.io/t/sandel-en.html">
 
 <meta property="og:type" content="profile">
 <meta property="og:title" content="Michael Sandel: their key ideas in 5 minutes | Corpus">
@@ -442,7 +439,43 @@
   html[dir="rtl"] .reader-btn-bar .btn-reader-next .arrow {
     transform: scaleX(-1);
   }
-  .corpus-link {
+  /* Sticky mobile store bar + dialogues-with block (rollout 2026-11-17) */
+  .store-bar { display: none; }
+  @media (max-width: 720px) {
+    .store-bar {
+      display: flex; align-items: center; gap: 10px;
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+      background: rgba(255,255,255,0.98);
+      border-top: 1px solid var(--rule, #E6E4EE);
+      box-shadow: 0 -6px 24px rgba(16,7,44,0.08);
+    }
+    .store-bar-msg {
+      flex: 1 1 auto; min-width: 0; font-size: 13px; font-weight: 800;
+      line-height: 1.25; color: var(--ink, #1F1838);
+    }
+    .store-bar-msg a { color: var(--accent); font-weight: 900; text-decoration: underline; }
+    .store-bar-badge { flex: 0 0 auto; }
+    .store-bar-badge img { height: 44px; width: auto; display: block; }
+    main, body { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+    .reader-btn-bar { display: none; }
+  }
+  .dialogues-with { margin: 32px 0 8px; }
+  .dialogues-with h2 { font-size: 11px; font-weight: 700; color: var(--text-2); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
+  .dialogues-with ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .dialogues-with a {
+    display: block; padding: 14px 16px;
+    background: var(--surface); color: var(--ink);
+    border: 1.5px solid var(--border);
+    border-bottom: 4px solid var(--border-deep);
+    border-radius: 14px; text-decoration: none;
+    font-weight: 800; font-size: 15px; line-height: 1.35;
+  }
+  .dialogues-with a .ch {
+    display: block; font-size: 12px; font-weight: 700;
+    color: var(--text-2); margin-top: 4px; letter-spacing: 0.04em;
+  }
+    .corpus-link {
     display: block;
     margin: 4px 0 8px;
     color: #8A87A0;
@@ -499,8 +532,19 @@
       </a></li>
     </ul>
   </section>
+  <section class="dialogues-with" aria-label="Dialogues with Michael Sandel">
+    <h2>Dialogues with Michael Sandel</h2>
+    <ul>
+      <li><a href="https://corpusapp.io/d/econ-2-5-en.html">Can Everything Be Priced?<span class="ch">Value and Price</span></a></li>
+    </ul>
+  </section>
   <a class="corpus-link" href="https://corpusapp.io">corpusapp.io</a>
 </main>
+<div class="store-bar" role="region" aria-label="Get Corpus">
+  <div class="store-bar-msg"><a href="https://corpusapp.io/go/?utm_source=t&utm_medium=store_bar">Continue in the app.</a></div>
+  <a class="store-bar-badge" href="https://apps.apple.com/us/app/corpus-ideas-worth-knowing/id6781227385" aria-label="App Store" data-ev="t_store_ios"><img src="/site-assets/store-badges/apple-app-store.svg" alt="Download on the App Store" height="44"></a>
+  <a class="store-bar-badge" href="https://play.google.com/store/apps/details?id=com.corpusapp.corpus" aria-label="Google Play" data-ev="t_store_android"><img src="/site-assets/store-badges/google-play.png" alt="Get it on Google Play" height="44"></a>
+</div>
 <footer class="reader-btn-bar">
   <a class="btn-reader-next" id="manual" href="https://apps.apple.com/app/id6781227385">
     <span>Open Corpus</span>
@@ -557,11 +601,10 @@
       });
     }
 
-    // Mobile-only auto-redirect to the store. Desktop (and crawlers)
-    // stay on the content page so humans + Googlebot both see it.
-    if (isIOS || isAndroid) {
-      setTimeout(function () { location.replace(target); }, 250);
-    }
+    // No mobile auto-redirect. Google treats mobile-only auto-
+    // redirects as "sneaky redirects" (spam policy violation);
+    // phones instead get the sticky bottom bar in the body plus
+    // the <meta name="apple-itunes-app"> smart banner on iOS.
   })();
 </script>
 </body>

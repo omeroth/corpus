@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-16T11:55:13.730Z",
+  "generatedAt": "2026-11-17T13:58:52.473Z",
   "items": [
     {
       "weekId": 1,
@@ -129,6 +129,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "סיכום הפרק",
+      "isSummary": true,
       "card": "share/cards/he/phil-1-7.png",
       "page": "d/phil-1-7-he.html"
     },
@@ -140,6 +141,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "Chapter Summary",
+      "isSummary": true,
       "card": "share/cards/en/phil-1-7.png",
       "page": "d/phil-1-7-en.html"
     },
@@ -151,6 +153,7 @@
       "thinkerId": null,
       "kind": "intro",
       "title": "מה הופך שאלה למוסרית?",
+      "isSummary": false,
       "card": "share/cards/he/phil-2-1.png",
       "page": "d/phil-2-1-he.html"
     },
@@ -162,6 +165,7 @@
       "thinkerId": null,
       "kind": "intro",
       "title": "What Makes a Question Moral?",
+      "isSummary": false,
       "card": "share/cards/en/phil-2-1.png",
       "page": "d/phil-2-1-en.html"
     },
@@ -273,6 +277,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "סיכום הפרק",
+      "isSummary": true,
       "card": "share/cards/he/phil-2-7.png",
       "page": "d/phil-2-7-he.html"
     },
@@ -284,6 +289,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "Chapter Summary",
+      "isSummary": true,
       "card": "share/cards/en/phil-2-7.png",
       "page": "d/phil-2-7-en.html"
     },
@@ -395,6 +401,7 @@
       "thinkerId": null,
       "kind": "intro",
       "title": "מה זה לדעת?",
+      "isSummary": false,
       "card": "share/cards/he/phil-3-1.png",
       "page": "d/phil-3-1-he.html"
     },
@@ -406,6 +413,7 @@
       "thinkerId": null,
       "kind": "intro",
       "title": "What does it mean to know?",
+      "isSummary": false,
       "card": "share/cards/en/phil-3-1.png",
       "page": "d/phil-3-1-en.html"
     },
@@ -517,6 +525,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "סיכום הפרק",
+      "isSummary": true,
       "card": "share/cards/he/phil-3-7.png",
       "page": "d/phil-3-7-he.html"
     },
@@ -528,6 +537,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "Chapter Summary",
+      "isSummary": true,
       "card": "share/cards/en/phil-3-7.png",
       "page": "d/phil-3-7-en.html"
     },
@@ -539,6 +549,7 @@
       "thinkerId": null,
       "kind": "intro",
       "title": "מה אמיתי?",
+      "isSummary": false,
       "card": "share/cards/he/phil-4-1.png",
       "page": "d/phil-4-1-he.html"
     },
@@ -550,6 +561,7 @@
       "thinkerId": null,
       "kind": "intro",
       "title": "What is Real?",
+      "isSummary": false,
       "card": "share/cards/en/phil-4-1.png",
       "page": "d/phil-4-1-en.html"
     },
@@ -621,6 +633,7 @@
       "thinkerId": null,
       "kind": "other",
       "title": "איפה כל גישה נכשלת?",
+      "isSummary": false,
       "card": "share/cards/he/phil-4-5.png",
       "page": "d/phil-4-5-he.html"
     },
@@ -632,6 +645,7 @@
       "thinkerId": null,
       "kind": "other",
       "title": "Where Each Approach Fails",
+      "isSummary": false,
       "card": "share/cards/en/phil-4-5.png",
       "page": "d/phil-4-5-en.html"
     },
@@ -663,6 +677,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "מהי המציאות? - סיכום הפרק",
+      "isSummary": true,
       "card": "share/cards/he/phil-4-7.png",
       "page": "d/phil-4-7-he.html"
     },
@@ -674,6 +689,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "What is Reality? - Chapter Summary",
+      "isSummary": true,
       "card": "share/cards/en/phil-4-7.png",
       "page": "d/phil-4-7-en.html"
     },
@@ -805,6 +821,7 @@
       "thinkerId": null,
       "kind": "other",
       "title": "האם אנחנו באמת בוחרים?",
+      "isSummary": false,
       "card": "share/cards/he/phil-5-7.png",
       "page": "d/phil-5-7-he.html"
     },
@@ -816,6 +833,7 @@
       "thinkerId": null,
       "kind": "other",
       "title": "Do we really choose?",
+      "isSummary": false,
       "card": "share/cards/en/phil-5-7.png",
       "page": "d/phil-5-7-en.html"
     },
@@ -967,6 +985,7 @@
       "thinkerId": null,
       "kind": "other",
       "title": "שבעה הוגים, שאלה אחת",
+      "isSummary": false,
       "card": "share/cards/he/phil-6-8.png",
       "page": "d/phil-6-8-he.html"
     },
@@ -978,6 +997,7 @@
       "thinkerId": null,
       "kind": "other",
       "title": "Seven Thinkers, One Question",
+      "isSummary": false,
       "card": "share/cards/en/phil-6-8.png",
       "page": "d/phil-6-8-en.html"
     },
@@ -1109,6 +1129,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "שישה הוגים, שאלה אחת",
+      "isSummary": true,
       "card": "share/cards/he/phil-7-7.png",
       "page": "d/phil-7-7-he.html"
     },
@@ -1120,6 +1141,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "Six Thinkers, One Question",
+      "isSummary": true,
       "card": "share/cards/en/phil-7-7.png",
       "page": "d/phil-7-7-en.html"
     },
@@ -1251,6 +1273,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "מה זאת בכלל כלכלה?",
+      "isSummary": true,
       "card": "share/cards/he/econ-1-7.png",
       "page": "d/econ-1-7-he.html"
     },
@@ -1262,6 +1285,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "What is Economics Anyway?",
+      "isSummary": true,
       "card": "share/cards/en/econ-1-7.png",
       "page": "d/econ-1-7-en.html"
     },
@@ -1393,6 +1417,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "מהו ערך?",
+      "isSummary": true,
       "card": "share/cards/he/econ-2-7.png",
       "page": "d/econ-2-7-he.html"
     },
@@ -1404,6 +1429,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "What is Value?",
+      "isSummary": true,
       "card": "share/cards/en/econ-2-7.png",
       "page": "d/econ-2-7-en.html"
     },
@@ -1615,6 +1641,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "הון ועבודה",
+      "isSummary": true,
       "card": "share/cards/he/econ-3-6.png",
       "page": "d/econ-3-6-he.html"
     },
@@ -1626,6 +1653,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "Capital and Labor",
+      "isSummary": true,
       "card": "share/cards/en/econ-3-6.png",
       "page": "d/econ-3-6-en.html"
     },
@@ -1757,6 +1785,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "צדק כלכלי",
+      "isSummary": true,
       "card": "share/cards/he/econ-4-7.png",
       "page": "d/econ-4-7-he.html"
     },
@@ -1768,6 +1797,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "Economic Justice",
+      "isSummary": true,
       "card": "share/cards/en/econ-4-7.png",
       "page": "d/econ-4-7-en.html"
     },
@@ -1899,6 +1929,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "עשירות ועניות",
+      "isSummary": true,
       "card": "share/cards/he/econ-5-7.png",
       "page": "d/econ-5-7-he.html"
     },
@@ -1910,6 +1941,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "Rich Countries, Poor Countries",
+      "isSummary": true,
       "card": "share/cards/en/econ-5-7.png",
       "page": "d/econ-5-7-en.html"
     },
@@ -2041,6 +2073,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "האם אנחנו באמת רציונליים?",
+      "isSummary": true,
       "card": "share/cards/he/econ-6-7.png",
       "page": "d/econ-6-7-he.html"
     },
@@ -2052,6 +2085,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "Are we really rational?",
+      "isSummary": true,
       "card": "share/cards/en/econ-6-7.png",
       "page": "d/econ-6-7-en.html"
     },
@@ -2163,6 +2197,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "משבר אחד, כל ההסברים",
+      "isSummary": true,
       "card": "share/cards/he/econ-7-6.png",
       "page": "d/econ-7-6-he.html"
     },
@@ -2174,6 +2209,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "One Crisis, Every Explanation",
+      "isSummary": true,
       "card": "share/cards/en/econ-7-6.png",
       "page": "d/econ-7-6-en.html"
     },
@@ -2305,6 +2341,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "מה זאת בכלל נפש?",
+      "isSummary": true,
       "card": "share/cards/he/psyc-1-7.png",
       "page": "d/psyc-1-7-he.html"
     },
@@ -2316,6 +2353,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "What Is the Mind, Anyway?",
+      "isSummary": true,
       "card": "share/cards/en/psyc-1-7.png",
       "page": "d/psyc-1-7-en.html"
     },
@@ -2447,6 +2485,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "שישה מנועים, שאלה אחת",
+      "isSummary": true,
       "card": "share/cards/he/psyc-2-7.png",
       "page": "d/psyc-2-7-he.html"
     },
@@ -2458,6 +2497,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "Six Engines, One Question",
+      "isSummary": true,
       "card": "share/cards/en/psyc-2-7.png",
       "page": "d/psyc-2-7-en.html"
     },
@@ -2589,6 +2629,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "שישה מקורות, אני אחד",
+      "isSummary": true,
       "card": "share/cards/he/psyc-3-7.png",
       "page": "d/psyc-3-7-he.html"
     },
@@ -2600,6 +2641,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "Six Sources, One Self",
+      "isSummary": true,
       "card": "share/cards/en/psyc-3-7.png",
       "page": "d/psyc-3-7-en.html"
     },
@@ -2731,6 +2773,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "למה כל כך קשה להיות אחר?",
+      "isSummary": true,
       "card": "share/cards/he/psyc-4-7.png",
       "page": "d/psyc-4-7-he.html"
     },
@@ -2742,6 +2785,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "Why Change Is Hard",
+      "isSummary": true,
       "card": "share/cards/en/psyc-4-7.png",
       "page": "d/psyc-4-7-en.html"
     },
@@ -2833,6 +2877,7 @@
       "thinkerId": null,
       "kind": "other",
       "title": "פולימרקט וקאלשי: המבחן של חוכמת ההמונים",
+      "isSummary": false,
       "card": "share/cards/he/psyc-bonusPsy2-5.png",
       "page": "d/psyc-bonusPsy2-5-he.html"
     },
@@ -2844,6 +2889,7 @@
       "thinkerId": null,
       "kind": "other",
       "title": "Polymarket and Kalshi: The Test of the Wisdom of Crowds",
+      "isSummary": false,
       "card": "share/cards/en/psyc-bonusPsy2-5.png",
       "page": "d/psyc-bonusPsy2-5-en.html"
     },
@@ -2975,6 +3021,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "מה אומר הסבל הנפשי?",
+      "isSummary": true,
       "card": "share/cards/he/psyc-5-7.png",
       "page": "d/psyc-5-7-he.html"
     },
@@ -2986,6 +3033,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "What does mental suffering say?",
+      "isSummary": true,
       "card": "share/cards/en/psyc-5-7.png",
       "page": "d/psyc-5-7-en.html"
     },
@@ -3117,6 +3165,7 @@
       "thinkerId": null,
       "kind": "other",
       "title": "האם השינוי אמיתי?",
+      "isSummary": false,
       "card": "share/cards/he/psyc-6-7.png",
       "page": "d/psyc-6-7-he.html"
     },
@@ -3128,6 +3177,7 @@
       "thinkerId": null,
       "kind": "other",
       "title": "Is the change real?",
+      "isSummary": false,
       "card": "share/cards/en/psyc-6-7.png",
       "page": "d/psyc-6-7-en.html"
     },
@@ -3259,6 +3309,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "חמישה הוגים, שאלה אחת",
+      "isSummary": true,
       "card": "share/cards/he/psyc-7-7.png",
       "page": "d/psyc-7-7-he.html"
     },
@@ -3270,6 +3321,7 @@
       "thinkerId": null,
       "kind": "summary",
       "title": "Five Thinkers, One Question",
+      "isSummary": true,
       "card": "share/cards/en/psyc-7-7.png",
       "page": "d/psyc-7-7-en.html"
     }

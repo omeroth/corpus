@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
 <title>בלי חופש אין מוסר · Corpus</title>
 <meta name="description" content="דיאלוג עם עמנואל קאנט. 5 דקות ביום עם גדולי ההוגים.">
 
@@ -178,9 +179,9 @@
       });
     }
 
-    // Delay one tick so the visible fallback flashes long enough to
-    // explain what's happening if the store app takes a moment to open.
-    setTimeout(function () { location.replace(target); }, 250);
+    // No mobile auto-redirect: Google policy treats mobile-only
+    // JS redirects as "sneaky redirects". The HE old-template path
+    // still serves summary/intro days; CTA handles the store hop.
   })();
 </script>
 </body>

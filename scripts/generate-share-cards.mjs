@@ -64,6 +64,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const OUT_CARDS = path.join(ROOT, 'share', 'cards');
 const OUT_PAGES = path.join(ROOT, 'd');
+// Important: never rm d/ wholesale, and never prune stale dialogue
+// pages. Older dialogue slugs (e.g. philosophy bonus1, renamed to
+// bonus2 in-data) are still live at corpusapp.io/d/phil-bonus1-*.html
+// and may already be indexed or shared from outside the app. Deleting
+// them would create 404s on URLs we don't control. If content gets
+// renumbered or renamed, leave the orphaned files in place with
+// <meta name="robots" content="noindex"> and let them age out of
+// Google's index naturally.
 // Thinker share cards + landing pages live in parallel to dialogue cards.
 // Same generator, different asset trees so a thinker page and a dialogue
 // page never share a slug. Landing paths: /t/{id}[-{subject}]-{lang}.html.
@@ -367,13 +375,13 @@ const _SUBJECT_SLUG = {
 // crawlers don't surface dialogue titles + portraits before the
 // subject is officially open in-app. Drop the entry from this set at
 // the same time the subject launches.
-// Dialogue /d/ pages for these subjects emit <meta name="robots"
-// content="noindex, nofollow">. Thinker /t/ pages are always
-// indexable — the SEO pass on 2026-11-16 lifted the psychology
-// noindex for THINKER pages (bios are reusable content, not
-// dialogue teasers) while keeping the dialogue-page noindex until
-// the subject fully launches.
-const NOINDEX_SUBJECTS = new Set(['psychology']);
+// Dialogue /d/ pages for subjects listed here emit
+// <meta name="robots" content="noindex, nofollow">. Empty today:
+// psychology was held back during soft-launch; the 2026-11-17 /d/
+// rollout upgraded every EN dialogue (non-summary) to a real
+// content page and lifted psychology at the same time. Chapter-
+// summary days still noindex via the renderPage old path.
+const NOINDEX_SUBJECTS = new Set();
 
 // Thinkers whose `quote` field is flagged as an unverified paraphrase
 // in content/thinkers.js:16-21 (red + yellow audit sets, 2026-09-29
@@ -388,6 +396,34 @@ const SUSPECT_QUOTE_IDS = new Set([
   'piketty','aquinas','pareto','rawls','nozick','hayek',
   // Yellow:
   'aurelius','mill','nietzsche','berkeley','friedman','adler',
+]);
+
+// Authors whose source-passage quotes are verifiably in the public
+// domain AND the specific English text in content/*.js matches
+// either the author's own English or a PD translation. Sign-off
+// list, 2026-11-17 rollout. Everyone else: source card omitted.
+const PD_THINKERS = new Set([
+  'hobbes', 'locke', 'hume', 'smith', 'marshall', 'bagehot',
+  'james', 'galton', 'wundt',
+]);
+
+// Overrides where the content/*.js `quoteEn` has editorial drift
+// from the author's verbatim text. Keyed by `${subject}-${weekId}-${dayId}`.
+// Values are the authentic PD-source wording. Attribution is unchanged
+// — the `attrEn` field in content already names the right work.
+const PD_QUOTE_OVERRIDES = new Map([
+  ['economics-1-2',
+    '"It is not from the benevolence of the butcher, the brewer, or the baker, that we expect our dinner, but from their regard to their own interest."'],
+  ['economics-2-1',
+    '"Nothing is more useful than water: but it will purchase scarce any thing; scarce any thing can be had in exchange for it. A diamond, on the contrary, has scarce any value in use; but a very great quantity of other goods may frequently be had in exchange for it."'],
+  ['economics-3-1',
+    '"That part which, he expects, is to afford him this revenue, is called his capital. The other is that which supplies his immediate consumption."'],
+  ['economics-2-4',
+    '"We might as reasonably dispute whether it is the upper or the under blade of a pair of scissors that cuts a piece of paper, as whether value is governed by utility or cost of production."'],
+  ['economics-7-2',
+    '"These loans should only be made at a very high rate of interest. This will operate as a heavy fine on unreasonable timidity, and will prevent the greatest number of applications by persons who do not require it."'],
+  ['psychology-1-2',
+    '"Consciousness, then, does not appear to itself chopped up in bits. Such words as \'chain\' or \'train\' do not describe it fitly as it presents itself in the first instance. It is nothing jointed; it flows. A \'river\' or a \'stream\' are the metaphors by which it is most naturally described. In talking of it hereafter, let us call it the stream of thought, of consciousness, or of subjective life."'],
 ]);
 
 // Human-readable subject labels for breadcrumbs + related links.
@@ -1233,7 +1269,7 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-function renderPage({ weekId, dayId, thinker, dayTitle, subject, lang }) {
+function renderPage({ weekId, dayId, thinker, dayTitle, subject, lang, isSummary }) {
   const isEn = lang === 'en';
   const dir = isEn ? 'ltr' : 'rtl';
   const theme = THEMES[subject] || THEMES.philosophy;
@@ -1259,8 +1295,8 @@ function renderPage({ weekId, dayId, thinker, dayTitle, subject, lang }) {
 <html lang="${lang}" dir="${dir}">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">${NOINDEX_SUBJECTS.has(subject) ? `
-<meta name="robots" content="noindex, nofollow">` : ''}
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
 <title>${escapeHtml(title)} · Corpus</title>
 <meta name="description" content="${escapeHtml(description)}">
 
@@ -1436,9 +1472,9 @@ function renderPage({ weekId, dayId, thinker, dayTitle, subject, lang }) {
       });
     }
 
-    // Delay one tick so the visible fallback flashes long enough to
-    // explain what's happening if the store app takes a moment to open.
-    setTimeout(function () { location.replace(target); }, 250);
+    // No mobile auto-redirect: Google policy treats mobile-only
+    // JS redirects as "sneaky redirects". The HE old-template path
+    // still serves summary/intro days; CTA handles the store hop.
   })();
 </script>
 </body>
@@ -1562,15 +1598,13 @@ function _emitTokenBlock(tokenMap) {
 function renderThinkerPage({
   thinker, subject, lang, hasSubjectSuffix,
   relatedList, stemFor, themeTokens,
+  thinkerDialogues,
 }) {
   const isEn = lang === 'en';
   const dir = isEn ? 'ltr' : 'rtl';
   const stem = hasSubjectSuffix ? `${thinker.id}-${subject}` : thinker.id;
   const cardUrl = `${SITE_URL}/share/thinkers/${lang}/${stem}.png`;
   const pageUrl = `${SITE_URL}/t/${stem}-${lang}.html`;
-  const altStem = stem;
-  const altEnUrl = `${SITE_URL}/t/${altStem}-en.html`;
-  const altHeUrl = `${SITE_URL}/t/${altStem}-he.html`;
 
   // Per-subject portrait override matches _loadThinkerPortrait and
   // _thinkerImage in the app: multi-subject thinkers (Kahneman,
@@ -1702,6 +1736,22 @@ ${related.map(r => `      <li><a class="quiz-option" href="${SITE_URL}/t/${r.ste
     </div>
   </section>`
     : '';
+  // ── Dialogues-with-thinker block (rollout 2026-11-17) ──
+  const dwList = Array.isArray(thinkerDialogues) ? thinkerDialogues.slice(0, 3) : [];
+  const dwLabel = isEn ? 'Dialogues with ' + nameTxt : 'דיאלוגים עם ' + nameTxt;
+  const dialoguesWithHtml = dwList.length ? `<section class="dialogues-with" aria-label="${escapeHtml(dwLabel)}">
+    <h2>${escapeHtml(dwLabel)}</h2>
+    <ul>
+${dwList.map(d => `      <li><a href="${SITE_URL}/d/${d.slug}-${d.weekId}-${d.dayId}-${lang}.html">${escapeHtml(d.title)}<span class="ch">${escapeHtml(d.chapter)}</span></a></li>`).join('\n')}
+    </ul>
+  </section>` : '';
+  // ── Sticky mobile store bar (replaces the sneaky-redirect pattern) ──
+  const storeBarHtml = `<div class="store-bar" role="region" aria-label="Get Corpus">
+  <div class="store-bar-msg"><a href="${SITE_URL}/go/?utm_source=t&utm_medium=store_bar">${escapeHtml(isEn ? 'Continue in the app.' : 'המשך באפליקציה.')}</a></div>
+  <a class="store-bar-badge" href="https://apps.apple.com/us/app/corpus-ideas-worth-knowing/id6781227385" aria-label="App Store" data-ev="t_store_ios"><img src="/site-assets/store-badges/apple-app-store.svg" alt="Download on the App Store" height="44"></a>
+  <a class="store-bar-badge" href="https://play.google.com/store/apps/details?id=com.corpusapp.corpus" aria-label="Google Play" data-ev="t_store_android"><img src="/site-assets/store-badges/google-play.png" alt="Get it on Google Play" height="44"></a>
+</div>`;
+
   return `<!doctype html>
 <html lang="${lang}" dir="${dir}" class="theme-${subject}">
 <head>
@@ -1709,10 +1759,8 @@ ${related.map(r => `      <li><a class="quiz-option" href="${SITE_URL}/t/${r.ste
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${escapeHtml(title)}</title>
 <meta name="description" content="${escapeHtml(description)}">
-<link rel="canonical" href="${pageUrl}">
-<link rel="alternate" hreflang="en" href="${altEnUrl}">
-<link rel="alternate" hreflang="he" href="${altHeUrl}">
-<link rel="alternate" hreflang="x-default" href="${altEnUrl}">
+<link rel="canonical" href="${pageUrl}">${!isEn ? `
+<meta name="robots" content="noindex, nofollow">` : ''}
 
 <meta property="og:type" content="profile">
 <meta property="og:title" content="${escapeHtml(title)}">
@@ -2075,7 +2123,43 @@ ${tokenBlock}
   html[dir="rtl"] .reader-btn-bar .btn-reader-next .arrow {
     transform: scaleX(-1);
   }
-  .corpus-link {
+  /* Sticky mobile store bar + dialogues-with block (rollout 2026-11-17) */
+  .store-bar { display: none; }
+  @media (max-width: 720px) {
+    .store-bar {
+      display: flex; align-items: center; gap: 10px;
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+      padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+      background: rgba(255,255,255,0.98);
+      border-top: 1px solid var(--rule, #E6E4EE);
+      box-shadow: 0 -6px 24px rgba(16,7,44,0.08);
+    }
+    .store-bar-msg {
+      flex: 1 1 auto; min-width: 0; font-size: 13px; font-weight: 800;
+      line-height: 1.25; color: var(--ink, #1F1838);
+    }
+    .store-bar-msg a { color: var(--accent); font-weight: 900; text-decoration: underline; }
+    .store-bar-badge { flex: 0 0 auto; }
+    .store-bar-badge img { height: 44px; width: auto; display: block; }
+    main, body { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
+    .reader-btn-bar { display: none; }
+  }
+  .dialogues-with { margin: 32px 0 8px; }
+  .dialogues-with h2 { font-size: 11px; font-weight: 700; color: var(--text-2); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 14px; }
+  .dialogues-with ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .dialogues-with a {
+    display: block; padding: 14px 16px;
+    background: var(--surface); color: var(--ink);
+    border: 1.5px solid var(--border);
+    border-bottom: 4px solid var(--border-deep);
+    border-radius: 14px; text-decoration: none;
+    font-weight: 800; font-size: 15px; line-height: 1.35;
+  }
+  .dialogues-with a .ch {
+    display: block; font-size: 12px; font-weight: 700;
+    color: var(--text-2); margin-top: 4px; letter-spacing: 0.04em;
+  }
+    .corpus-link {
     display: block;
     margin: 4px 0 8px;
     color: #8A87A0;
@@ -2112,8 +2196,10 @@ ${tokenBlock}
   </section>
   ${quoteHtml}
   ${relatedLinksHtml}
+  ${dialoguesWithHtml}
   <a class="corpus-link" href="${SITE_URL}">corpusapp.io</a>
 </main>
+${storeBarHtml}
 <footer class="reader-btn-bar">
   <a class="btn-reader-next" id="manual" href="${IOS_URL}">
     <span>${escapeHtml(manualCTA)}</span>
@@ -2170,12 +2256,382 @@ ${tokenBlock}
       });
     }
 
-    // Mobile-only auto-redirect to the store. Desktop (and crawlers)
-    // stay on the content page so humans + Googlebot both see it.
-    if (isIOS || isAndroid) {
-      setTimeout(function () { location.replace(target); }, 250);
-    }
+    // No mobile auto-redirect. Google treats mobile-only auto-
+    // redirects as "sneaky redirects" (spam policy violation);
+    // phones instead get the sticky bottom bar in the body plus
+    // the <meta name="apple-itunes-app"> smart banner on iOS.
   })();
+</script>
+</body>
+</html>
+`;
+}
+
+
+// ─── /d/ content-page helpers (2026-11-17 rollout) ──────────────────
+function _stripTags(html) {
+  return String(html || '')
+    .replace(/<\/p>/gi, '\n\n').replace(/<p[^>]*>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '')
+    .trim();
+}
+function _emDash(s) {
+  return String(s || '').replace(/\s+—\s+/g, ', ').replace(/—/g, ', ');
+}
+function _toParagraphs(text, escaper) {
+  return text.split(/\n\n+/)
+    .map(p => '<p>' + escaper(p).replace(/\n/g, '<br>') + '</p>').join('');
+}
+function _firstSentencesForMeta(text, max = 150) {
+  const t = text.replace(/\s+/g, ' ').trim();
+  if (t.length <= max) return t;
+  const slice = t.slice(0, max);
+  const stops = [slice.lastIndexOf('. '), slice.lastIndexOf('! '), slice.lastIndexOf('? ')];
+  const cut = Math.max(...stops);
+  const base = cut > max * 0.5 ? slice.slice(0, cut + 1) : slice;
+  return base.replace(/[,;: ]+$/, '') + '…';
+}
+function _buildDialogueTitle(dayTitleEn, thinkerName) {
+  const ideal = dayTitleEn + ': ' + thinkerName + "'s idea in 5 minutes | Corpus";
+  if (ideal.length <= 60) return ideal;
+  const shorter = thinkerName + ': ' + dayTitleEn + ' | Corpus';
+  if (shorter.length <= 60) return shorter;
+  const budget = 60 - ' | Corpus'.length;
+  const trimmed = dayTitleEn.length > budget
+    ? dayTitleEn.slice(0, budget).replace(/[,;: ]+$/, '') + '…'
+    : dayTitleEn;
+  return trimmed + ' | Corpus';
+}
+// Pre-compute per-subject dialogue context: siblings + other-dialogues-by-thinker.
+function _buildDialogueContext(data, thinkers) {
+  const ctx = new Map();            // weekId-dayId → ctx object
+  const byThinkerAll = new Map();   // thinkerId → [{weekId,dayId,title,chapter}]
+  const allDays = [];
+  for (const w of (data.weeks || [])) {
+    for (const d of (w.days || [])) {
+      if (!d || d.id === 0) continue;
+      if (!d.thinkerId || d.isSummary) continue;
+      allDays.push({ weekId: w.id, dayId: d.id, chapter: w, day: d });
+      const arr = byThinkerAll.get(d.thinkerId) || [];
+      arr.push({ weekId: w.id, dayId: d.id, title: d.titleEn || d.title, chapter: w.titleEn || w.title });
+      byThinkerAll.set(d.thinkerId, arr);
+    }
+  }
+  for (const it of allDays) {
+    const chapterDays = (it.chapter.days || []).filter(d => d && d.id !== 0);
+    const idx = chapterDays.findIndex(d => d.id === it.dayId);
+    const prev = idx > 0 ? chapterDays[idx - 1] : null;
+    const next = idx >= 0 && idx < chapterDays.length - 1 ? chapterDays[idx + 1] : null;
+    const byThinker = (byThinkerAll.get(it.day.thinkerId) || [])
+      .filter(d => !(d.weekId === it.weekId && d.dayId === it.dayId));
+    const sameChapter = chapterDays
+      .filter(d => d.id !== it.dayId && d.thinkerId && d.thinkerId !== it.day.thinkerId && d.titleEn)
+      .map(d => ({ weekId: it.weekId, dayId: d.id, title: d.titleEn || d.title, chapter: it.chapter.titleEn || it.chapter.title }));
+    const moreBy = (byThinker.length >= 3 ? byThinker.slice(0, 3)
+      : [...byThinker, ...sameChapter].slice(0, 3));
+    ctx.set(it.weekId + '-' + it.dayId, { prev, next, moreBy });
+  }
+  return ctx;
+}
+
+// ─── renderDialoguePage: the new /d/ content template (EN only) ─────
+function renderDialoguePage({
+  subject, weekId, dayId,
+  day, chapter, thinker,
+  siblingCtx,      // { prev, next, moreBy }
+  themeTokens,
+  stemFor,
+}) {
+  const _thinkerStem = (stemFor && stemFor(day.thinkerId, subject)) || day.thinkerId;
+  const slug = _SUBJECT_SLUG[subject] || 'phil';
+  const subjectLabel = _SUBJECT_LABEL.en[subject] || subject;
+  const subjectHub   = '/' + subject + '/';
+  const canonical    = SITE_URL + '/d/' + slug + '-' + weekId + '-' + dayId + '-en.html';
+  const ogImage      = SITE_URL + '/share/cards/en/' + slug + '-' + weekId + '-' + dayId + '.png';
+  const accentDark   = (themeTokens && themeTokens[subject] && themeTokens[subject].get('accent-dark')) || '#5A35A8';
+  const accent       = (themeTokens && themeTokens[subject] && themeTokens[subject].get('accent'))      || '#7B4FD4';
+  const accentTint   = (themeTokens && themeTokens[subject] && themeTokens[subject].get('accent-tint')) || '#F5EFFE';
+  const accentSoft   = (themeTokens && themeTokens[subject] && themeTokens[subject].get('accent-soft-border')) || '#C4A8F5';
+
+  const idea = (day.sections || []).find(s => s.type === 'idea');
+  const sourceSec = (day.sections || []).find(s => s.type === 'source');
+  const quiz = (day.sections || []).find(s => s.type === 'quiz');
+
+  const ideaText  = _emDash(_stripTags(idea && idea.contentEn || ''));
+  const ideaTitle = _emDash(idea && idea.titleEn || "Today's idea");
+  const ideaParas = _toParagraphs(ideaText, escapeHtml);
+  const title     = _buildDialogueTitle(day.titleEn || day.title || '', thinker.name);
+  const metaDesc  = _firstSentencesForMeta(ideaText);
+
+  // Source gate: only PD_THINKERS. For the 6 overrides use PD_QUOTE_OVERRIDES.
+  const key = subject + '-' + weekId + '-' + dayId;
+  const isPd = PD_THINKERS.has(day.thinkerId);
+  const quoteText = isPd
+    ? (PD_QUOTE_OVERRIDES.get(key) || (sourceSec && sourceSec.quoteEn) || '')
+    : '';
+  const sourceTitle = isPd ? _emDash(sourceSec && sourceSec.titleEn || '') : '';
+  const sourceAttr  = isPd ? _emDash((sourceSec && sourceSec.attrEn || '').replace(/^-\s*/, '')) : '';
+
+  // Quiz: one question with explanation collapsed behind the answer.
+  const quizQuestion = quiz && quiz.questionEn ? _emDash(quiz.questionEn) : '';
+  const quizIntro    = quiz && quiz.introEn    ? _emDash(quiz.introEn)    : '';
+  const quizOptions  = quiz && Array.isArray(quiz.optionsEn) ? quiz.optionsEn : [];
+  const quizCorrect  = quiz && Number.isInteger(quiz.correctIndex) ? quiz.correctIndex : 0;
+  const quizExplain  = _emDash(_stripTags(quiz && quiz.explanationEn || ''));
+  const quizOptsHtml = quizOptions.map((o, i) =>
+    '<button type="button" class="lv-opt" data-i="' + i + '"><span class="l">' +
+    String.fromCharCode(65+i) + '</span>' + escapeHtml(_emDash(o)) + '</button>'
+  ).join('');
+
+  // Siblings
+  const prev = siblingCtx.prev;
+  const next = siblingCtx.next;
+  const moreBy = siblingCtx.moreBy || [];
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'LearningResource',
+        '@id': canonical + '#resource',
+        name: day.titleEn,
+        url: canonical,
+        description: metaDesc,
+        inLanguage: 'en',
+        teaches: thinker.name,
+        educationLevel: 'All',
+        timeRequired: 'PT5M',
+        about: { '@type': 'Person', name: thinker.name },
+        isPartOf: { '@type': 'Course', name: subjectLabel + ': ' + (chapter.titleEn || chapter.title) },
+        publisher: { '@type': 'Organization', name: 'Corpus', url: SITE_URL },
+        image: ogImage,
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Corpus',      item: SITE_URL + '/' },
+          { '@type': 'ListItem', position: 2, name: subjectLabel,  item: SITE_URL + subjectHub },
+          { '@type': 'ListItem', position: 3, name: chapter.titleEn || chapter.title, item: SITE_URL + subjectHub + '#chapter-' + weekId },
+          { '@type': 'ListItem', position: 4, name: day.titleEn,  item: canonical },
+        ],
+      },
+    ],
+  };
+
+  return `<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${escapeHtml(title)}</title>
+<meta name="description" content="${escapeHtml(metaDesc)}">
+<link rel="canonical" href="${canonical}">
+<meta name="theme-color" content="${accent}">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Corpus">
+<meta property="og:title" content="${escapeHtml(day.titleEn)}">
+<meta property="og:description" content="${escapeHtml(metaDesc)}">
+<meta property="og:url" content="${canonical}">
+<meta property="og:image" content="${ogImage}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${ogImage}">
+<meta name="apple-itunes-app" content="app-id=6781227385">
+<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
+<link rel="preload" href="/site-assets/fonts/nunito-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:Nunito;src:url(/site-assets/fonts/nunito-latin-wght-normal.woff2) format("woff2");font-weight:200 1000;font-style:normal;font-display:swap}
+@font-face{font-family:Nunito;src:url(/site-assets/fonts/nunito-latin-wght-italic.woff2) format("woff2");font-weight:200 1000;font-style:italic;font-display:swap}
+:root{
+  --accent:${accent};--accent-dk:${accentDark};--accent-tint:${accentTint};--accent-soft:${accentSoft};
+  --amber-bg:#FFF1D6;--amber:#B5700A;
+  --ink:#1F1838;--text:#4B4763;--muted:#65637A;--line:#E6E4EE;--line-dk:#D5D2E0;--soft:#F8F5FF;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;--s9:96px;
+  --r-sm:12px;--r-md:20px;--r-lg:28px;
+  --wrap:900px;--pad:clamp(20px,5vw,48px);
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:#fff;color:var(--text);font:500 17px/1.6 Nunito,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{color:var(--ink);margin:0;font-weight:900;letter-spacing:-.02em}
+h1{font-size:clamp(32px,4vw,56px);line-height:1.08}
+h2{font-size:clamp(22px,2vw,28px);line-height:1.2}
+.wrap{max-width:calc(var(--wrap) + 2*var(--pad));margin:0 auto;padding:0 var(--pad)}
+.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;height:68px;gap:var(--s6)}
+.nav .logo{font-family:Nunito,sans-serif;font-weight:900;font-size:22px;color:var(--accent);letter-spacing:-.03em}
+.nav ul{display:none;gap:var(--s6);list-style:none;margin:0 0 0 var(--s4);padding:0}
+.nav ul a{font-size:14px;font-weight:800;color:var(--text)}
+.nav .btn{margin-left:auto;display:inline-flex;align-items:center;height:44px;padding:0 18px;border-radius:13px;background:var(--accent);color:#fff;font:900 13px/1 Nunito;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 4px 0 var(--accent-dk)}
+@media (min-width:720px){.nav ul{display:flex}}
+.bc{padding:var(--s6) 0 var(--s4);font-size:13px;color:var(--muted);font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.bc a{color:var(--muted)}.bc a:hover{color:var(--accent)}.bc i{opacity:.4;font-style:normal;margin:0 var(--s2)}
+.hdr{padding-bottom:var(--s7)}
+.hdr h1{margin-bottom:var(--s4)}
+.hdr .meta{font-size:15px;font-weight:700;color:var(--muted);display:flex;gap:var(--s3);flex-wrap:wrap;align-items:center}
+.hdr .meta a{color:var(--accent);font-weight:900}
+.hdr .meta span.dot{opacity:.4}
+.sec{margin-bottom:var(--s8);scroll-margin-top:80px}
+.tag{display:inline-flex;align-items:center;padding:7px 14px;border-radius:10px;font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;margin-bottom:var(--s5)}
+.tag-idea{background:var(--accent-tint);color:var(--accent-dk)}
+.tag-source{background:var(--amber-bg);color:var(--amber)}
+.tag-quiz{background:#DDF4FF;color:#1C7FB5}
+.prose{font-size:18px;line-height:1.75;color:var(--ink)}
+.prose p{margin:0 0 var(--s4)}
+.prose strong{color:var(--accent-dk);font-weight:900}
+.src{position:relative;background:#fff;border:2px solid var(--line);border-radius:var(--r-lg);box-shadow:0 8px 0 var(--line);padding:clamp(48px,5vw,64px) clamp(28px,4vw,52px) clamp(28px,3vw,40px);margin:var(--s4) 0 0}
+.src::before{content:"\\201C";position:absolute;top:-34px;left:24px;font:900 160px/1 Georgia,serif;color:var(--accent-soft)}
+.src blockquote{margin:0;font-style:italic;font-weight:850;font-size:clamp(22px,2.2vw,30px);line-height:1.42;color:var(--ink);letter-spacing:-.01em}
+.src .attr{display:flex;align-items:center;gap:var(--s3);margin-top:var(--s5);font-size:13px;font-weight:900;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.src .attr::before{content:"";width:4px;height:22px;border-radius:4px;background:var(--accent)}
+.live{position:relative;border:2px solid var(--line);border-radius:var(--r-md);background:var(--soft);padding:var(--s5);max-width:none;margin-top:var(--s4)}
+.lv-bub{position:relative;background:#fff;border:2px solid var(--line);border-radius:16px;padding:14px 18px;font-size:17px;font-weight:900;color:var(--ink);margin:0 0 var(--s4)}
+.lv-case{margin:0 0 var(--s4);border:2px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 4px 0 var(--line);padding:14px 16px;font-style:italic;font-weight:700;font-size:15px;line-height:1.45;color:#3D1F7A}
+.lv-opts{display:grid;gap:10px}
+.lv-opt{display:flex;align-items:center;gap:14px;width:100%;min-height:54px;padding:7px 14px;background:#fff;border:2px solid #E5E5EA;border-radius:16px;box-shadow:0 4px 0 #E5E5EA;font:600 17px/1.25 Nunito,sans-serif;color:#3C3C46;text-align:left;cursor:pointer;transition:transform .12s,box-shadow .12s,background .2s}
+.lv-opt:hover{background:#FAF9FD}.lv-opt:active{transform:translateY(4px);box-shadow:none}
+.lv-opt .l{flex:0 0 34px;height:34px;border-radius:10px;border:2px solid #E5E5EA;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:var(--muted)}
+.lv-opt.right{background:#E5F8EC;border-color:#58CC02;box-shadow:0 4px 0 #46A302}
+.lv-opt.right .l{background:#58CC02;border-color:#58CC02;color:#fff}
+.lv-opt.wrong{background:#FFDFE0;border-color:#FF4B4B;box-shadow:0 4px 0 #D33131}
+.lv-opt.wrong .l{background:#FF4B4B;border-color:#FF4B4B;color:#fff}
+.live[data-state="right"] .lv-expl,.live[data-state="wrong"] .lv-expl{display:block}
+.lv-expl{display:none;margin-top:var(--s4);padding:var(--s4);background:#fff;border-radius:16px;border:2px solid var(--accent-soft);box-shadow:0 4px 0 var(--accent-soft);font-size:16px;line-height:1.6;color:var(--ink);font-weight:600}
+.lv-expl strong{color:var(--accent-dk);font-weight:900}
+.cta{background:var(--accent-dk);color:#fff;border-radius:var(--r-lg);box-shadow:0 10px 0 rgba(0,0,0,.18);padding:clamp(32px,4vw,48px);text-align:center;margin:var(--s7) 0}
+.cta h2{color:#fff;margin:0 0 var(--s3);font-size:clamp(24px,2.4vw,32px)}
+.cta p{color:#fff;margin:0 0 var(--s5);font-size:17px}
+.cta .badges{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;align-items:center}
+.cta .badges img{height:56px;width:auto;display:block}
+.sibs{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);margin:var(--s7) 0}
+.sib{display:flex;flex-direction:column;gap:6px;padding:var(--s4) var(--s5);background:#fff;border:2px solid var(--line);border-radius:var(--r-md);box-shadow:0 5px 0 var(--line);min-height:72px}
+.sib em{font-style:normal;font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.sib b{font-size:17px;font-weight:900;color:var(--ink)}
+.sib.disabled{opacity:.35;pointer-events:none}
+.more{margin:var(--s7) 0}
+.more h3{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:var(--s4)}
+.more .grid{display:grid;grid-template-columns:1fr;gap:var(--s3)}
+.more a{display:flex;align-items:center;gap:var(--s3);padding:14px 16px;border:2px solid var(--line);border-radius:var(--r-md);box-shadow:0 4px 0 var(--line);background:#fff;transition:transform .12s}
+.more a:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--line)}
+.more a b{font-size:16px;font-weight:900;color:var(--ink)}
+.more a span{font-size:13px;font-weight:700;color:var(--muted);margin-left:auto}
+@media (min-width:720px){.more .grid{grid-template-columns:repeat(3,1fr)}}
+footer{border-top:1px solid var(--line);padding:var(--s7) 0 var(--s6);font-size:14px;color:var(--muted);margin-top:var(--s9)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:var(--s4);justify-content:space-between;align-items:center}
+footer a{color:var(--muted);font-weight:700}
+footer a:hover{color:var(--accent)}
+.store-bar{display:none}
+@media (max-width:720px){
+  .sibs{grid-template-columns:1fr}
+  .store-bar{display:flex;align-items:center;gap:10px;position:fixed;left:0;right:0;bottom:0;z-index:60;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));background:rgba(255,255,255,.98);border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(16,7,44,.08)}
+  .store-bar-msg{flex:1 1 auto;min-width:0;font-size:13px;font-weight:800;line-height:1.25;color:var(--ink)}
+  .store-bar-msg a{color:var(--accent);font-weight:900;text-decoration:underline}
+  .store-bar-badge{flex:0 0 auto}
+  .store-bar-badge img{height:44px;width:auto;display:block}
+  body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a href="/" class="logo">corpus</a>
+    <ul>
+      <li><a href="/philosophy/">Philosophy</a></li>
+      <li><a href="/economics/">Economics</a></li>
+      <li><a href="/psychology/">Psychology</a></li>
+    </ul>
+    <a class="btn" href="/go/?utm_source=d&amp;utm_medium=nav">Get the app</a>
+  </div>
+</header>
+<main class="wrap">
+  <nav class="bc" aria-label="Breadcrumb">
+    <a href="/">Corpus</a><i>/</i><a href="${subjectHub}">${escapeHtml(subjectLabel)}</a><i>/</i><a href="${subjectHub}#chapter-${weekId}">${escapeHtml(chapter.titleEn || chapter.title)}</a><i>/</i><span>${escapeHtml(day.titleEn)}</span>
+  </nav>
+  <header class="hdr">
+    <h1>${escapeHtml(day.titleEn)}</h1>
+    <p class="meta">
+      <a href="/t/${_thinkerStem}-en.html">${escapeHtml(thinker.name)}</a>
+      <span class="dot">·</span>
+      <span>${escapeHtml(chapter.titleEn || chapter.title)}</span>
+      <span class="dot">·</span>
+      <span>5-minute dialogue</span>
+    </p>
+  </header>
+  <section class="sec" aria-labelledby="idea-h2">
+    <span class="tag tag-idea">Today's idea</span>
+    <h2 id="idea-h2">${escapeHtml(ideaTitle)}</h2>
+    <div class="prose">${ideaParas}</div>
+  </section>
+  ${quoteText ? `<section class="sec" aria-labelledby="src-h2">
+    <span class="tag tag-source">Source</span>
+    <h2 id="src-h2">${escapeHtml(sourceTitle)}</h2>
+    <figure class="src">
+      <blockquote>${escapeHtml(_emDash(quoteText))}</blockquote>
+      <figcaption class="attr">${escapeHtml(sourceAttr)}</figcaption>
+    </figure>
+  </section>` : ''}
+  ${quiz ? `<section class="sec" aria-labelledby="qz-h2">
+    <span class="tag tag-quiz">Think it through</span>
+    <h2 id="qz-h2">A quick check</h2>
+    <div class="live" data-state="ask" data-correct="${quizCorrect}">
+      <p class="lv-bub">${escapeHtml(quizQuestion)}</p>
+      ${quizIntro ? '<p class="lv-case">' + escapeHtml(quizIntro) + '</p>' : ''}
+      <div class="lv-opts" role="group" aria-label="Answer options">${quizOptsHtml}</div>
+      ${quizExplain ? '<div class="lv-expl" aria-live="polite"><p>' + escapeHtml(quizExplain) + '</p></div>' : ''}
+    </div>
+  </section>` : ''}
+  <div class="cta">
+    <h2>Continue this dialogue in the app</h2>
+    <p>Three more sections, each about a minute. Pick it up with ${escapeHtml(thinker.name)}.</p>
+    <div class="badges">
+      <a href="https://apps.apple.com/us/app/corpus-ideas-worth-knowing/id6781227385" data-ev="d_store_ios"><img src="/site-assets/store-badges/apple-app-store.svg" alt="Download on the App Store" height="56"></a>
+      <a href="https://play.google.com/store/apps/details?id=com.corpusapp.corpus" data-ev="d_store_android"><img src="/site-assets/store-badges/google-play.png" alt="Get it on Google Play" height="56"></a>
+    </div>
+  </div>
+  <nav class="sibs" aria-label="Chapter navigation">
+    ${prev && prev.titleEn ? '<a class="sib" href="/d/' + slug + '-' + weekId + '-' + prev.id + '-en.html"><em>← Previous dialogue</em><b>' + escapeHtml(prev.titleEn) + '</b></a>' : '<span class="sib disabled"><em>← Previous dialogue</em><b>Start of chapter</b></span>'}
+    ${next && next.titleEn ? '<a class="sib" href="/d/' + slug + '-' + weekId + '-' + next.id + '-en.html"><em>Next dialogue →</em><b>' + escapeHtml(next.titleEn) + '</b></a>' : '<span class="sib disabled"><em>Next dialogue →</em><b>Chapter complete</b></span>'}
+  </nav>
+  ${moreBy.length ? `<section class="more">
+    <h3>More from ${escapeHtml(chapter.titleEn || chapter.title)}</h3>
+    <div class="grid">
+      ${moreBy.map(e => '<a href="/d/' + slug + '-' + e.weekId + '-' + e.dayId + '-en.html"><b>' + escapeHtml(e.title) + '</b><span>' + escapeHtml(e.chapter) + '</span></a>').join('')}
+    </div>
+  </section>` : ''}
+</main>
+<footer>
+  <div class="wrap">
+    <span>© 2026 Corpus</span>
+    <span><a href="https://get.corpusapp.io/privacy.html" rel="noopener">Privacy</a> · <a href="https://get.corpusapp.io/terms.html" rel="noopener">Terms</a> · <a href="mailto:hello@corpusapp.io">Contact</a></span>
+  </div>
+</footer>
+<div class="store-bar" role="region" aria-label="Get Corpus">
+  <div class="store-bar-msg"><a href="/go/?utm_source=d&amp;utm_medium=store_bar">Continue in the app.</a></div>
+  <a class="store-bar-badge" href="https://apps.apple.com/us/app/corpus-ideas-worth-knowing/id6781227385" aria-label="App Store" data-ev="d_store_ios"><img src="/site-assets/store-badges/apple-app-store.svg" alt="Download on the App Store" height="44"></a>
+  <a class="store-bar-badge" href="https://play.google.com/store/apps/details?id=com.corpusapp.corpus" aria-label="Google Play" data-ev="d_store_android"><img src="/site-assets/store-badges/google-play.png" alt="Get it on Google Play" height="44"></a>
+</div>
+<script>
+(function(){
+  var live = document.querySelector('.live');
+  if (!live) return;
+  var correct = parseInt(live.dataset.correct, 10);
+  live.querySelectorAll('.lv-opt').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if (live.dataset.state !== 'ask') return;
+      var i = parseInt(btn.dataset.i, 10);
+      var ok = i === correct;
+      btn.classList.add(ok ? 'right' : 'wrong');
+      if (!ok) live.querySelector('.lv-opt[data-i="' + correct + '"]').classList.add('right');
+      live.dataset.state = ok ? 'right' : 'wrong';
+      try { window.posthog && posthog.capture('d_quiz_answer', { correct: ok, weekId: ${weekId}, dayId: ${JSON.stringify(dayId)}, subject: ${JSON.stringify(subject)} }); } catch(_){}
+    });
+  });
+})();
 </script>
 </body>
 </html>
@@ -2199,6 +2655,27 @@ async function main() {
   _registerFonts();
 
   const { corpusData, economicsData, psychologyData, THINKERS, THINKERS_EN } = extractData();
+
+  // Per-subject dialogue siblings + more-by-thinker context, computed
+  // once at build time so renderDialoguePage can just look up.
+  const dialogueContexts = new Map();
+  dialogueContexts.set('philosophy', _buildDialogueContext(corpusData, THINKERS_EN));
+  dialogueContexts.set('economics',  _buildDialogueContext(economicsData, THINKERS_EN));
+  dialogueContexts.set('psychology', _buildDialogueContext(psychologyData, THINKERS_EN));
+  // Design tokens parsed once; passed to renderDialoguePage per subject.
+  const dialogueThemeTokens = _loadDesignTokens();
+
+  // stemFor(id, subject) resolves on-disk /t/ stem (id or id-subject).
+  // Hoisted here so renderDialoguePage can build valid /t/ links.
+  const _stemByIdSubject = new Map();
+  for (const t of THINKERS_EN) {
+    if (!t || !t.id) continue;
+    if (!t.image && !(t.images && Object.keys(t.images).length)) continue;
+    const subs = _subjectsForThinker(t);
+    const multi = subs.length > 1;
+    for (const s of subs) _stemByIdSubject.set(`${t.id}|${s}`, multi ? `${t.id}-${s}` : t.id);
+  }
+  const dialogueStemFor = (id, subject) => _stemByIdSubject.get(`${id}|${subject}`) || id;
 
   const subjects = [
     { subject: 'philosophy', data: corpusData     },
@@ -2259,9 +2736,22 @@ async function main() {
               fs.writeFileSync(path.join(cardDir, cardFileName), buf);
             }
             fs.mkdirSync(OUT_PAGES, { recursive: true });
-            fs.writeFileSync(path.join(OUT_PAGES, pageFileName), renderPage({
-              weekId: week.id, dayId: day.id, thinker, dayTitle, subject, lang,
-            }));
+            if (lang === 'en' && !day.isSummary) {
+              const ctxKey = week.id + '-' + day.id;
+              const ctxForDay = (dialogueContexts.get(subject) || new Map()).get(ctxKey) || { prev: null, next: null, moreBy: [] };
+              fs.writeFileSync(path.join(OUT_PAGES, pageFileName), renderDialoguePage({
+                subject, weekId: week.id, dayId: day.id,
+                day, chapter: week, thinker,
+                siblingCtx: ctxForDay,
+                themeTokens: dialogueThemeTokens,
+                stemFor: dialogueStemFor,
+              }));
+            } else {
+              fs.writeFileSync(path.join(OUT_PAGES, pageFileName), renderPage({
+                weekId: week.id, dayId: day.id, thinker, dayTitle, subject, lang,
+                isSummary: !!day.isSummary,
+              }));
+            }
             manifest.items.push({
               weekId: week.id, dayId: day.id, subject, lang,
               thinkerId: day.thinkerId, title: dayTitle,
@@ -2293,10 +2783,12 @@ async function main() {
               // template's field accesses don't NPE.
               thinker: { id: null, name: '', era: '', bio: '', quote: '' },
               dayTitle, subject, lang,
+              isSummary: kind === 'summary',
             }));
             manifest.items.push({
               weekId: week.id, dayId: day.id, subject, lang,
               thinkerId: null, kind, title: dayTitle,
+              isSummary: kind === 'summary',
               card: `share/cards/${lang}/${cardFileName}`,
               page: `d/${pageFileName}`,
             });
@@ -2373,11 +2865,34 @@ async function main() {
         }
         fs.mkdirSync(OUT_THINKER_PAGES, { recursive: true });
         const pageFile = path.join(OUT_THINKER_PAGES, `${stem}-${lang}.html`);
+        // "Dialogues with <thinker>" list for the new block on /t/ pages.
+        // Pull from the dialogue-context map built above; scope to this
+        // thinker in this subject; EN-only (HE /t/ pages keep the empty
+        // block — no HE /d/ rollout in this commit).
+        const _tdCtx = (lang === 'en') ? (dialogueContexts.get(subject) || new Map()) : null;
+        const _tdList = _tdCtx ? [..._tdCtx.values()]
+          .filter(_ => true)   // see below
+          : [];
+        // Flatten to rows and filter by this thinker's id.
+        const subjectData = { philosophy: corpusData, economics: economicsData, psychology: psychologyData }[subject];
+        const _tdSubj = _buildDialogueContext(subjectData, THINKERS_EN); // reuse
+        const _tdRows = [];
+        for (const w of (subjectData.weeks || [])) for (const d of (w.days || [])) {
+          if (!d || d.id === 0 || d.isSummary) continue;
+          if (d.thinkerId !== t.id) continue;
+          _tdRows.push({
+            slug: _SUBJECT_SLUG[subject] || 'phil',
+            weekId: w.id, dayId: d.id,
+            title: d.titleEn || d.title,
+            chapter: w.titleEn || w.title,
+          });
+        }
         fs.writeFileSync(pageFile, renderThinkerPage({
           thinker: t, subject, lang, hasSubjectSuffix,
           relatedList: list,
           stemFor,
           themeTokens,
+          thinkerDialogues: (lang === 'en') ? _tdRows : [],
         }));
         thinkerManifest.items.push({
           thinkerId: t.id,
@@ -2442,14 +2957,22 @@ function _writeSitemapAndRobots({ thinkerManifest, dialogueManifest }) {
   urls.push({ loc: `${SITE_URL}/philosophy/`, lastmod: today });
   urls.push({ loc: `${SITE_URL}/economics/`,  lastmod: today });
   urls.push({ loc: `${SITE_URL}/psychology/`, lastmod: today });
-  // Every indexable thinker page.
+  // Every indexable thinker page. EN only — the public site is
+  // English. HE /t/ pages still render for in-app shares but ship
+  // noindex and are excluded here.
   for (const it of thinkerManifest.items) {
+    if (it.lang && it.lang !== 'en') continue;
     const stem = it.page.replace(/^t\//, '').replace(/\.html$/, '');
     urls.push({ loc: `${SITE_URL}/t/${stem}.html`, lastmod: today });
   }
-  // Dialogue pages, skipping the subjects that still ship noindex.
+  // Dialogue pages: EN only, and only pages on the new SEO template
+  // (thinker dialogues that aren't summaries). Everything else is
+  // noindex per the public-English-only decision.
   for (const it of dialogueManifest.items) {
     if (NOINDEX_SUBJECTS.has(it.subject)) continue;
+    if (it.lang !== 'en') continue;
+    if (it.isSummary) continue;
+    if (!it.thinkerId) continue; // non-thinker (intro / comparative / summary) → old template → noindex
     const stem = it.page.replace(/^d\//, '').replace(/\.html$/, '');
     urls.push({ loc: `${SITE_URL}/d/${stem}.html`, lastmod: today });
   }
