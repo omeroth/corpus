@@ -2434,9 +2434,14 @@ async function main() {
 function _writeSitemapAndRobots({ thinkerManifest, dialogueManifest }) {
   const today = new Date().toISOString().slice(0, 10);
   const urls = [];
-  // Landing + /books are landing-page work (separate commit) — included
-  // here as root entries so crawlers still discover them from the map.
-  urls.push({ loc: `${SITE_URL}/`, lastmod: today });
+  // Marketing surfaces served from _marketing/ by the Pages workflow:
+  // home + three subject hubs. The SPA under /app/ is deliberately
+  // excluded (and gets a noindex + Disallow via the workflow's
+  // sed-injected meta robots + the robots.txt below).
+  urls.push({ loc: `${SITE_URL}/`,            lastmod: today });
+  urls.push({ loc: `${SITE_URL}/philosophy/`, lastmod: today });
+  urls.push({ loc: `${SITE_URL}/economics/`,  lastmod: today });
+  urls.push({ loc: `${SITE_URL}/psychology/`, lastmod: today });
   // Every indexable thinker page.
   for (const it of thinkerManifest.items) {
     const stem = it.page.replace(/^t\//, '').replace(/\.html$/, '');
@@ -2459,6 +2464,9 @@ function _writeSitemapAndRobots({ thinkerManifest, dialogueManifest }) {
   const robots = [
     'User-agent: *',
     'Allow: /',
+    // /app/ hosts the SPA. It's the same JS bundle as the native
+    // apps, not a page we want ranked against the marketing home.
+    'Disallow: /app/',
     '',
     `Sitemap: ${SITE_URL}/sitemap.xml`,
     '',

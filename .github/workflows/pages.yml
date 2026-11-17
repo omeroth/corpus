@@ -36,8 +36,28 @@ jobs:
           # Edge Function code, the www/ mirror, node deps, etc.) is left out
           # so the artifact stays ~12 MB, well below the 1 GB Pages limit.
           # CNAME preserves the custom domain across the source-mode switch.
-          mkdir -p _deploy
-          cp index.html            _deploy/
+          mkdir -p _deploy _deploy/app
+          # ── SPA at /app/ ──
+          # The SPA that was the site. Its repo index.html stays
+          # unchanged on disk so `npm run sync-web` keeps feeding
+          # Capacitor native the same bytes. Here we deploy it only
+          # at /app/, with two targeted substitutions baked in by
+          # sed: (a) noindex so Google never ranks the web client
+          # against the marketing home, (b) its og:url rewritten to
+          # /app/ so social shares don't fight the marketing /
+          # canonical.
+          sed \
+            -e 's#<meta charset="UTF-8">#<meta charset="UTF-8">\
+<meta name="robots" content="noindex,follow">#' \
+            -e 's#"https://corpusapp.io/"#"https://corpusapp.io/app/"#g' \
+            index.html > _deploy/app/index.html
+          # Modified manifest so a PWA install from /app/ keeps its
+          # scope there and start_url matches.
+          sed \
+            -e 's#"start_url": "/"#"start_url": "/app/"#' \
+            -e 's#"scope": "/"#"scope": "/app/"#' \
+            -e 's#"id": "/"#"id": "/app/"#' \
+            manifest.json > _deploy/app/manifest.json
           cp Onboarding_new.html   _deploy/
           cp delete-account.html   _deploy/
           cp manifest.json         _deploy/
@@ -51,6 +71,20 @@ jobs:
           cp -r assets             _deploy/
           cp -r images             _deploy/
           cp -r content            _deploy/
+          # SPA references its assets at ./ relative paths. Mirror
+          # them under /app/ too so src="./images/x.webp" from the
+          # SPA resolves against /app/images/x.webp at runtime.
+          cp -r assets             _deploy/app/
+          cp -r images             _deploy/app/
+          cp -r content            _deploy/app/
+          # ── Marketing site at / ──
+          # Four HTML pages + site-assets dir (fonts, chibi, shots,
+          # cards, img, store-badges).
+          cp    _marketing/index.html       _deploy/
+          cp -r _marketing/philosophy       _deploy/
+          cp -r _marketing/economics        _deploy/
+          cp -r _marketing/psychology       _deploy/
+          cp -r _marketing/site-assets      _deploy/
           # Share cards + dialogue landing pages (Part 2 of the share-cards
           # refactor). Generated locally via `npm run gen:share` and committed
           # to the repo so the runner doesn't need node-canvas + TTFs.

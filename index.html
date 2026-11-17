@@ -30693,7 +30693,7 @@ async function handleAuthSubmit() {
       // Universal-Link / deep-link plumbing for a seamless in-app return isn't
       // wired up yet.
       const _isNativeSignup = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
-      const _confirmRedirectTo = _isNativeSignup ? 'https://corpusapp.io/' : (window.location.origin + '/');
+      const _confirmRedirectTo = _isNativeSignup ? 'https://corpusapp.io/' : (window.location.origin + '/app/');
       let res;
       try {
         // options.data → auth.users.raw_user_meta_data on INSERT, which
@@ -30987,7 +30987,7 @@ async function _authProviderStart(provider, ctx) {
       // irrelevant. Redirect targets differ per provider — Google goes
       // to the pages mirror, Apple to the apex domain, matching what
       // each provider was configured with in Supabase.
-      const redirectTo = provider === 'apple' ? 'https://corpusapp.io/' : 'https://omeroth.github.io/corpus-app/';
+      const redirectTo = provider === 'apple' ? 'https://corpusapp.io/app/' : 'https://omeroth.github.io/corpus-app/';
       let webRes;
       try {
         webRes = await _authRace(sb.auth.signInWithOAuth({ provider, options: { redirectTo } }), _AUTH_PHASE_BUDGETS_MS.provider_call);

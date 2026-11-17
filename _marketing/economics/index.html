@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- /* AUTH-FWD-INJECTED */ -->
+<script>
+// Forward auth callbacks, PWA installs, and signed-in sessions to /app/.
+// Must run before anything else renders.
+(function(){
+  try {
+    var s = location.search || '';
+    var h = location.hash || '';
+    // Supabase sends these: #access_token=..., #error=..., &type=signup|recovery|...,
+    // and PKCE flow sends ?code=...&state=....
+    var isAuth =
+      /[?&](code|error|error_code|type)=/.test(s) ||
+      /^#(access_token|refresh_token|error|error_description|type)=/.test(h) ||
+      /[&#](access_token|refresh_token|error|type)=/.test(h);
+    // PWA "installed" (added to home screen / standalone shortcut).
+    var standalone =
+      (typeof matchMedia === 'function' && matchMedia('(display-mode: standalone)').matches) ||
+      window.navigator.standalone === true;
+    // Signed-in Supabase session. gotrue-js's default storageKey is
+    // sb-<project-ref>-auth-token; the project ref in this repo is
+    // xcoikjoatcrjqxzykwlt (see index.html's supabase.createClient URL).
+    // Presence of a non-empty value means the user has a Supabase session
+    // on this device.
+    var sess = false;
+    try { sess = !!localStorage.getItem('sb-xcoikjoatcrjqxzykwlt-auth-token'); } catch(_) {}
+    if (isAuth || standalone || sess) {
+      // Preserve BOTH search and hash so Supabase magic-link / PKCE /
+      // recovery tokens survive the hop.
+      location.replace('/app/' + s + h);
+    }
+  } catch(e) {}
+})();
+</script>
+<script>
+// PostHog + delegated click analytics, async. Mirrors the SPA's event
+// pipeline so the marketing pages contribute to the same funnel. Site
+// events are prefixed `site_` so they don't collide with the SPA's
+// own capture() names.
+!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys getNextSurveyStep onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+posthog.init('phc_vUupVqSRdBay7mQ4Aswudhu8mFHnych6PKNRpP6BHoS4',{api_host:'https://us.i.posthog.com',capture_pageview:true,persistence:'localStorage',person_profiles:'identified_only'});
+document.addEventListener('click',function(ev){
+  var el=ev.target.closest('[data-ev]'); if(!el) return;
+  try { posthog.capture('site_' + el.dataset.ev, { href: el.getAttribute('href') || null }); } catch(_) {}
+}, {capture:true});
+</script>
+<title>Learn Economics in 5 Minutes a Day | Corpus</title>
+<meta name="description" content="Short daily dialogues with Adam Smith, John Maynard Keynes, Daniel Kahneman and 27 more economists. Read their own words and learn one big idea a day.">
+<link rel="canonical" href="https://corpusapp.io/economics/">
+<meta name="theme-color" content="#7B4FD4">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Corpus">
+<meta property="og:title" content="Learn economics in five minutes a day">
+<meta property="og:description" content="Short daily dialogues with Adam Smith, John Maynard Keynes, Daniel Kahneman and 27 more economists. Read their own words and learn one big idea a day.">
+<meta property="og:url" content="https://corpusapp.io/economics/">
+<meta property="og:image" content="https://corpusapp.io/share/og-get.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="apple-itunes-app" content="app-id=6781227385">
+<link rel="preload" href="/site-assets/fonts/nunito-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "CollectionPage", "@id": "https://corpusapp.io/economics/", "url": "https://corpusapp.io/economics/", "name": "Learn Economics in 5 Minutes a Day | Corpus", "description": "Short daily dialogues with Adam Smith, John Maynard Keynes, Daniel Kahneman and 27 more economists. Read their own words and learn one big idea a day.", "inLanguage": "en", "isPartOf": {"@id": "https://corpusapp.io/#website"}}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Corpus", "item": "https://corpusapp.io/"}, {"@type": "ListItem", "position": 2, "name": "Economics", "item": "https://corpusapp.io/economics/"}]}, {"@type": "ItemList", "name": "Economics thinkers on Corpus", "numberOfItems": 30, "itemListElement": [{"@type": "ListItem", "position": 1, "url": "https://corpusapp.io/t/samuelson-en.html", "name": "Paul Samuelson"}, {"@type": "ListItem", "position": 2, "url": "https://corpusapp.io/t/smith-en.html", "name": "Adam Smith"}, {"@type": "ListItem", "position": 3, "url": "https://corpusapp.io/t/marx-en.html", "name": "Karl Marx"}, {"@type": "ListItem", "position": 4, "url": "https://corpusapp.io/t/keynes-en.html", "name": "John Maynard Keynes"}, {"@type": "ListItem", "position": 5, "url": "https://corpusapp.io/t/friedman-en.html", "name": "Milton Friedman"}, {"@type": "ListItem", "position": 6, "url": "https://corpusapp.io/t/sen-en.html", "name": "Amartya Sen"}, {"@type": "ListItem", "position": 7, "url": "https://corpusapp.io/t/jevons-en.html", "name": "William Stanley Jevons"}, {"@type": "ListItem", "position": 8, "url": "https://corpusapp.io/t/marshall-en.html", "name": "Alfred Marshall"}, {"@type": "ListItem", "position": 9, "url": "https://corpusapp.io/t/sandel-en.html", "name": "Michael Sandel"}, {"@type": "ListItem", "position": 10, "url": "https://corpusapp.io/t/kahneman-economics-en.html", "name": "Daniel Kahneman"}, {"@type": "ListItem", "position": 11, "url": "https://corpusapp.io/t/ricardo-en.html", "name": "David Ricardo"}, {"@type": "ListItem", "position": 12, "url": "https://corpusapp.io/t/simon-en.html", "name": "Herbert Simon"}, {"@type": "ListItem", "position": 13, "url": "https://corpusapp.io/t/acemoglu-en.html", "name": "Daron Acemoglu"}, {"@type": "ListItem", "position": 14, "url": "https://corpusapp.io/t/piketty-en.html", "name": "Thomas Piketty"}, {"@type": "ListItem", "position": 15, "url": "https://corpusapp.io/t/aquinas-economics-en.html", "name": "Thomas Aquinas"}, {"@type": "ListItem", "position": 16, "url": "https://corpusapp.io/t/pareto-en.html", "name": "Vilfredo Pareto"}, {"@type": "ListItem", "position": 17, "url": "https://corpusapp.io/t/rawls-economics-en.html", "name": "John Rawls"}, {"@type": "ListItem", "position": 18, "url": "https://corpusapp.io/t/nozick-economics-en.html", "name": "Robert Nozick"}, {"@type": "ListItem", "position": 19, "url": "https://corpusapp.io/t/hayek-en.html", "name": "Friedrich Hayek"}, {"@type": "ListItem", "position": 20, "url": "https://corpusapp.io/t/solow-en.html", "name": "Robert Solow"}, {"@type": "ListItem", "position": 21, "url": "https://corpusapp.io/t/romer-en.html", "name": "Paul Romer"}, {"@type": "ListItem", "position": 22, "url": "https://corpusapp.io/t/north-en.html", "name": "Douglass North"}, {"@type": "ListItem", "position": 23, "url": "https://corpusapp.io/t/easterly-en.html", "name": "William Easterly"}, {"@type": "ListItem", "position": 24, "url": "https://corpusapp.io/t/thaler-en.html", "name": "Richard Thaler"}, {"@type": "ListItem", "position": 25, "url": "https://corpusapp.io/t/shiller-en.html", "name": "Robert Shiller"}, {"@type": "ListItem", "position": 26, "url": "https://corpusapp.io/t/gigerenzer-en.html", "name": "Gerd Gigerenzer"}, {"@type": "ListItem", "position": 27, "url": "https://corpusapp.io/t/minsky-en.html", "name": "Hyman Minsky"}, {"@type": "ListItem", "position": 28, "url": "https://corpusapp.io/t/bagehot-en.html", "name": "Walter Bagehot"}, {"@type": "ListItem", "position": 29, "url": "https://corpusapp.io/t/fisher-en.html", "name": "Irving Fisher"}, {"@type": "ListItem", "position": 30, "url": "https://corpusapp.io/t/reinhart-rogoff-en.html", "name": "Reinhart and Rogoff"}]}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is this economics for beginners?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. No math or background is needed. Each dialogue explains one idea in plain language, then shows you the economist's own words."}}, {"@type": "Question", "name": "Which economists will I learn about?", "acceptedAnswer": {"@type": "Answer", "text": "You will meet 30 economists and thinkers, from Adam Smith, Ricardo and Marx to Keynes, Friedman, Hayek, Kahneman and Piketty."}}, {"@type": "Question", "name": "Does it cover today's economy?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Chapters on behavioral economics, growth and financial crises connect the big ideas to the economy you live in."}}]}]}</script>
+<style>
+@font-face{font-family:Nunito;src:url(/site-assets/fonts/nunito-latin-wght-normal.woff2) format("woff2");font-weight:200 1000;font-style:normal;font-display:swap}
+@font-face{font-family:Nunito;src:url(/site-assets/fonts/nunito-latin-wght-italic.woff2) format("woff2");font-weight:200 1000;font-style:italic;font-display:swap}
+:root{
+  --purple:#7B4FD4;--purple-dk:#5A35A8;--purple-tint:#F5EFFE;--purple-soft:#E9DEFD;
+  --blue:#2563EB;--blue-dk:#1E3A8A;--blue-tint:#EFF6FF;--blue-soft:#DBEAFE;
+  --orange:#E8853A;--orange-dk:#B9581C;--orange-tint:#FFF7ED;--orange-soft:#FDE6CF;
+  --amber-bg:#FFF1D6;--amber:#B5700A;
+  --ink:#1F1838;--text:#4B4763;--muted:#65637A;--line:#E6E4EE;--line-dk:#D5D2E0;--soft:#F8F5FF;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;--s9:96px;--s10:128px;
+  --r-sm:12px;--r-md:20px;--r-lg:28px;
+  --wrap:1360px;--pad:clamp(20px,5vw,64px);
+  --sec:clamp(80px,10vw,136px);
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:#fff;color:var(--text);font:500 17px/1.6 Nunito,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{display:block;max-width:100%;height:auto}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{color:var(--ink);margin:0;font-weight:900;letter-spacing:-.025em}
+h1{font-size:clamp(42px,5vw,84px);line-height:1.03}
+h2{font-size:clamp(32px,3.6vw,52px);line-height:1.08}
+h3{font-size:clamp(21px,1.6vw,24px);line-height:1.25}
+p{margin:0}
+.wrap{max-width:calc(var(--wrap) + 2*var(--pad));margin:0 auto;padding:0 var(--pad)}
+section{padding:var(--sec) 0}
+.eyebrow{display:inline-flex;align-items:center;gap:var(--s2);padding:7px 14px;border-radius:10px;background:var(--purple-tint);color:var(--purple-dk);font-size:13px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.lede{font-size:clamp(18px,1.5vw,21px);line-height:1.6;color:var(--text);max-width:34em}
+.head{max-width:760px;margin-bottom:var(--s8)}
+.head h2{margin:var(--s4) 0 var(--s4)}
+.head.center{margin-inline:auto;text-align:center}
+.head.center .lede{margin-inline:auto}
+.hl{color:var(--purple)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:56px;padding:0 28px;border-radius:16px;font:900 15px/1 Nunito,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--purple);box-shadow:0 5px 0 var(--purple-dk);transition:transform .15s var(--ease),box-shadow .15s var(--ease),filter .15s}
+.btn:hover{filter:brightness(1.06)}
+.btn:active{transform:translateY(5px);box-shadow:0 0 0 var(--purple-dk)}
+.btn-sm{height:44px;padding:0 18px;font-size:13px;border-radius:13px;box-shadow:0 4px 0 var(--purple-dk)}
+.btn-block{width:100%}
+.btn-economics{background:var(--blue);box-shadow:0 5px 0 var(--blue-dk)}
+.btn-psychology{background:var(--orange);box-shadow:0 5px 0 var(--orange-dk)}
+.btn-philosophy{background:var(--purple)}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.86);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s}
+.nav.scrolled{border-color:var(--line);box-shadow:0 6px 24px rgba(31,24,56,.05)}
+.nav .wrap{display:flex;align-items:center;height:76px;gap:var(--s6)}
+.logo img{height:30px;width:auto}
+.nav ul{display:flex;gap:var(--s6);list-style:none;margin:0 0 0 var(--s4);padding:0}
+.nav ul a{font-size:15px;font-weight:800;color:var(--text);transition:color .2s}
+.nav ul a:hover{color:var(--purple)}
+.nav .btn{margin-left:auto}
+
+/* hero */
+.hero{padding:clamp(40px,6vw,88px) 0 clamp(72px,8vw,120px);position:relative;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:1.12fr 1fr;gap:clamp(32px,4vw,72px);align-items:center}
+.hero h1{margin:var(--s5) 0 var(--s5)}
+.hero .lede{margin-bottom:var(--s6)}
+.hero .meta{display:flex;align-items:center;gap:var(--s3);margin-top:var(--s5);font-size:15px;font-weight:700;color:var(--muted)}
+.hero .meta .ok{flex:0 0 22px;height:22px;border-radius:7px;background:var(--purple-tint) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%237B4FD4' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/14px no-repeat}
+.stage{position:relative;height:clamp(580px,52vw,760px)}
+.stage::before{content:"";position:absolute;inset:6% 2% 4% 6%;border-radius:50%;background:radial-gradient(closest-side,var(--purple-soft),rgba(233,222,253,0) 100%);filter:blur(10px)}
+.phone{position:absolute;aspect-ratio:1179/2556;background:#16131F;border-radius:clamp(30px,3.2vw,46px);padding:clamp(7px,.7vw,10px);box-shadow:0 40px 80px -20px rgba(42,18,102,.35),0 0 0 1.5px #2C2740 inset}
+.phone img{width:100%;height:100%;object-fit:contain;border-radius:clamp(24px,2.6vw,37px);background:#fff}
+.phone::after{content:"";position:absolute;top:calc(2.4% + 2px);left:50%;width:30%;height:3.1%;transform:translateX(-50%);background:#16131F;border-radius:20px}
+.stage .p1{width:47%;left:28%;top:0;z-index:3}
+.stage .p2{width:40%;left:63%;top:11%;z-index:2;rotate:6deg}
+.chibi{position:absolute;z-index:5;filter:drop-shadow(0 12px 18px rgba(42,18,102,.18))}
+.bubble{position:absolute;z-index:6;background:#fff;border:2px solid var(--line);border-radius:18px;padding:12px 16px;font-weight:900;font-size:15px;line-height:1.3;color:var(--ink);box-shadow:0 10px 24px rgba(31,24,56,.08);white-space:nowrap}
+.bubble::after{content:"";position:absolute;width:14px;height:14px;background:#fff;border:2px solid var(--line);border-top:0;border-left:0}
+.b-down::after{left:28px;bottom:-9px;transform:rotate(45deg)}
+.b-up::after{right:30px;top:-9px;transform:rotate(-135deg)}
+.stage .c1{width:25%;left:0;bottom:6%}
+.stage .bb1{left:0;bottom:calc(6% + 31%);width:26%;white-space:normal;text-align:left}
+.float{animation:float 6s ease-in-out infinite}
+.float.dl{animation-delay:-3s}
+@keyframes float{50%{translate:0 -10px}}
+
+/* stats */
+.stats{padding:0 0 var(--sec)}
+.stats .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s4)}
+.stat{border:2px solid var(--line);border-radius:var(--r-md);box-shadow:0 5px 0 var(--line);padding:var(--s5) var(--s5) var(--s5);text-align:left}
+.stat b{display:block;font-size:clamp(36px,3.4vw,48px);font-weight:900;line-height:1;color:var(--ink);letter-spacing:-.03em}
+.stat span{display:block;margin-top:var(--s2);font-size:13px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.stat:nth-child(1) b{color:var(--purple)}.stat:nth-child(2) b{color:var(--blue)}.stat:nth-child(3) b{color:var(--orange)}
+
+/* how it works: sticky story */
+.how{background:var(--soft)}
+.story{display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,6vw,96px)}
+.steps{list-style:none;margin:0;padding:0}
+.step{min-height:64vh;display:flex;flex-direction:column;justify-content:center;opacity:.32;transition:opacity .5s var(--ease)}
+.step.on{opacity:1}
+.step .num{display:inline-flex;width:44px;height:44px;align-items:center;justify-content:center;border-radius:13px;background:#fff;border:2px solid var(--line);box-shadow:0 4px 0 var(--line);font-weight:900;color:var(--purple);margin-bottom:var(--s5)}
+.step h3{font-size:clamp(28px,2.6vw,38px);letter-spacing:-.02em;margin-bottom:var(--s4)}
+.step p{font-size:19px;max-width:28em}
+.step .inline{display:none}
+.pin{position:sticky;top:calc(50vh - min(37vh,330px));height:min(74vh,660px);display:flex;justify-content:center}
+.pin{perspective:1400px}
+.pin .phone{position:relative;height:100%;width:auto;transition:opacity .5s var(--ease),transform .6s var(--ease)}
+.pin.s4 .phone{opacity:0;transform:scale(.9) rotateY(-25deg)}
+.pin-card{position:absolute;inset:0;pointer-events:none}
+.fan{--sp:74%}
+.pin .fan img{height:68%}
+@media (max-width:1400px){.pin .fan{--sp:70%}.pin .fan img{height:56%}}
+@media (max-width:1060px){.pin .fan{--sp:66%}.pin .fan img{height:44%}}
+.fan img{position:absolute;left:50%;top:50%;height:80%;width:auto;aspect-ratio:420/752;border-radius:14px;box-shadow:0 24px 50px -16px rgba(42,18,102,.45);transform:translate(-50%,-50%) rotate(0) scale(.85);opacity:0;transition:transform .9s cubic-bezier(.2,.9,.25,1.12),opacity .4s;transition-delay:calc((var(--i) + 1) * 90ms)}
+.fan img:nth-child(2){z-index:3}
+.pin.s4 .fan img,.fan-m.in img{opacity:1;transform:translate(calc(-50% + var(--i) * var(--sp)), calc(-50% + var(--i) * var(--i) * 5%)) rotate(calc(var(--i) * 12deg))}
+.pin>.chibi{transition:opacity .4s}
+.pin.s4>.chibi{opacity:0}
+.pin.s4 .fan img:nth-child(2),.fan-m.in img:nth-child(2){transform:translate(-50%,-54%) scale(1.04)}
+@keyframes shine{to{transform:translateX(120%)}}
+.pin>.chibi{width:120px;left:calc(50% - min(37vh,330px)*.46 - 104px);bottom:4%;}
+.pin>.chibi img{position:absolute;inset:0;opacity:0;transition:opacity .4s}
+.pin>.chibi img.on{position:relative;opacity:1}
+
+
+/* live question screen (inside phone) */
+.screen{position:absolute;inset:clamp(7px,.7vw,10px);border-radius:clamp(24px,2.6vw,37px);overflow:hidden;background:#fff}
+.screen>img,.screen>.live{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .55s var(--ease)}
+.screen>.on{opacity:1}
+.screen>.live:not(.on){pointer-events:none}
+.inline .screen>.live{opacity:1;pointer-events:auto}
+.live{container-type:inline-size}
+.lv{position:absolute;top:0;left:0;width:390px;height:845px;transform-origin:0 0;transform:scale(var(--k,1));font-family:Nunito,sans-serif;color:#3C3C46;background:#fff;text-align:left}
+.lv-sb{display:flex;justify-content:space-between;align-items:center;height:47px;padding:14px 30px 0 46px;font:700 16px/1 -apple-system,"SF Pro Text",Helvetica,Arial,sans-serif;color:#000}
+.lv-sb i{display:flex;gap:6px;align-items:center}
+.lv-sb i b{display:block;background:#000;border-radius:2px}
+.lv-lbl{margin-top:30px;text-align:center;font-size:12px;font-weight:800;letter-spacing:.14em;color:#8A87A0}
+.lv-top{display:flex;align-items:center;gap:7px;padding:18px 22px 0}
+.lv-top .x{width:22px;height:22px;position:relative;margin-right:8px}
+.lv-top .x::before,.lv-top .x::after{content:"";position:absolute;left:50%;top:50%;width:20px;height:3px;border-radius:2px;background:#8A87A0;transform:translate(-50%,-50%) rotate(45deg)}
+.lv-top .x::after{transform:translate(-50%,-50%) rotate(-45deg)}
+.lv-top .bar{flex:1;height:12px;border-radius:8px;background:#E9E7F5}
+.lv-top .aa{font-weight:900;color:#8A87A0;margin-left:12px;font-size:13px}.lv-top .aa+.aa{font-size:20px;margin-left:8px}
+.lv-guide{display:flex;align-items:center;gap:12px;padding:20px 22px 0}
+.lv-guide .ch{flex:0 0 74px;height:92px;position:relative}
+.lv-guide .ch img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .3s}
+.lv-guide .ch img.on{opacity:1}
+.lv .lv-bub{max-width:none;position:relative;flex:1;border:2px solid #E5E5EA;border-radius:16px;padding:13px 15px;font-weight:900;font-size:17px;line-height:1.38;color:#3C3C46;background:#fff}
+.lv-bub::before{content:"";position:absolute;left:-8px;top:50%;width:13px;height:13px;background:#fff;border:2px solid #E5E5EA;border-top:0;border-right:0;transform:translateY(-50%) rotate(45deg)}
+.lv .lv-case{max-width:none;margin:16px 22px 0;border:2px solid #E5E5EA;border-radius:16px;box-shadow:0 4px 0 #E5E5EA;padding:14px 16px;font-style:italic;font-weight:700;font-size:15px;line-height:1.45;color:#3D1F7A}
+.lv-opts{display:grid;gap:10px;padding:14px 22px 0}
+.lv-opt{display:flex;align-items:center;gap:14px;width:100%;min-height:54px;padding:7px 14px;background:#fff;border:2px solid #E5E5EA;border-radius:16px;box-shadow:0 4px 0 #E5E5EA;font:600 17px/1.25 Nunito,sans-serif;color:#3C3C46;text-align:left;cursor:pointer;transition:transform .12s,box-shadow .12s,background .2s,border-color .2s}
+.lv-opt:hover{background:#FAF9FD}
+.lv-opt:active{transform:translateY(4px);box-shadow:none}
+.lv-opt:focus-visible{outline:3px solid var(--purple);outline-offset:2px}
+.lv-opt .l{flex:0 0 34px;height:34px;border-radius:10px;border:2px solid #E5E5EA;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#8A87A0}
+.lv-opt.right{background:#E5F8EC;border-color:#58CC02;box-shadow:0 4px 0 #46A302}
+.lv-opt.right .l{background:#58CC02;border-color:#58CC02;color:#fff}
+.lv-opt.wrong{background:#FFDFE0;border-color:#FF4B4B;box-shadow:0 4px 0 #D33131;animation:shake .4s}
+.lv-opt.wrong .l{background:#FF4B4B;border-color:#FF4B4B;color:#fff}
+.live:not([data-state="ask"]) .lv-opt{pointer-events:none}
+@keyframes shake{25%{translate:-5px 0}75%{translate:5px 0}}
+.lv-foot{position:absolute;left:0;right:0;bottom:0;padding:12px 22px 26px;border-top:2px solid #E9E7F5;background:#fff}
+.lv-back{display:flex;align-items:center;justify-content:center;width:100%;height:54px;border:2px solid #D8C4FF;border-radius:16px;box-shadow:0 4px 0 #D8C4FF;background:#fff;font:900 17px Nunito,sans-serif;letter-spacing:.06em;color:#2A1266;cursor:pointer}
+.lv-sheet{position:absolute;left:0;right:0;bottom:0;padding:22px 22px 30px;background:#D7FFB8;color:#3C7A00;transform:translateY(110%);visibility:hidden;transition:transform .45s var(--ease),visibility 0s .45s}
+.live[data-state="right"] .lv-sheet,.live[data-state="wrong"] .lv-sheet{transform:none;visibility:visible;transition:transform .45s var(--ease)}
+.live[data-state="wrong"] .lv-sheet{background:#FFDFE0;color:#C02424}
+.lv-sh{display:flex;align-items:center;gap:14px}
+.lv-ico{flex:0 0 46px;height:46px;border-radius:50%;background:#58CC02 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/24px no-repeat}
+.live[data-state="wrong"] .lv-ico{background:#FF4B4B url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 7l10 10M17 7L7 17' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round'/%3E%3C/svg%3E") center/22px no-repeat}
+.lv-tt{font-size:28px;font-weight:700}
+.lv-xp{margin-left:auto;background:#fff;color:#E8853A;font-weight:700;font-size:17px;padding:8px 12px;border-radius:12px}
+.live[data-state="wrong"] .lv-xp{display:none}
+.lv .lv-sheet p{max-width:none;margin:14px 0 18px;font-size:17px;font-weight:600;line-height:1.5}
+.lv-go{display:flex;align-items:center;justify-content:center;height:56px;border-radius:16px;background:#58CC02;box-shadow:0 5px 0 #46A302;color:#fff;font:900 18px Nunito,sans-serif;letter-spacing:.08em}
+.live[data-state="wrong"] .lv-go{background:#FF4B4B;box-shadow:0 5px 0 #D33131}
+.lv-retry{display:block;margin:14px auto 0;background:none;border:0;font:900 14px Nunito,sans-serif;letter-spacing:.06em;color:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.tap-hint{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;margin-top:var(--s4);padding:7px 12px;border-radius:10px;background:#fff;border:2px solid var(--line);font-size:14px;font-weight:800;color:var(--purple)}
+.tap-hint::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 0 0 rgba(123,79,212,.5);animation:ping 1.6s infinite}
+@keyframes ping{70%{box-shadow:0 0 0 8px rgba(123,79,212,0)}100%{box-shadow:0 0 0 0 rgba(123,79,212,0)}}
+
+/* reviews */
+.tm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s5)}
+.tm{margin:0;background:#fff;border:2px solid var(--line);border-radius:var(--r-lg);box-shadow:0 6px 0 var(--line);padding:var(--s6);display:flex;flex-direction:column;justify-content:space-between;gap:var(--s5)}
+.tm blockquote{margin:0;font-size:clamp(20px,1.7vw,24px);font-weight:900;line-height:1.35;color:var(--ink);letter-spacing:-.01em}
+.tm figcaption{display:flex;align-items:center;gap:var(--s2);font-size:15px;font-weight:900;color:var(--muted)}
+.tm figcaption::before{content:"";width:22px;height:22px;border-radius:7px;background:var(--purple-tint) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z' fill='%237B4FD4'/%3E%3C/svg%3E") center/14px no-repeat}
+.tm.feat{grid-column:span 2;background:var(--purple);border-color:var(--purple);box-shadow:0 6px 0 var(--purple-dk)}
+.tm.feat blockquote{color:#fff;font-size:clamp(26px,2.6vw,38px);line-height:1.25}
+.tm.feat figcaption{color:#E9DEFD}
+.tm.feat figcaption::before{background-color:rgba(255,255,255,.18);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z' fill='%23fff'/%3E%3C/svg%3E")}
+
+
+/* motivation */
+.game{padding-bottom:0}
+.g-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s5)}
+.g-tile{display:flex;flex-direction:column;gap:var(--s3);background:#fff;border:2px solid var(--line);border-radius:var(--r-lg);box-shadow:0 8px 0 var(--line);padding:var(--s5) var(--s5) var(--s6)}
+.g-tile h3{margin-top:var(--s3)}
+.g-tile p{font-size:16.5px}
+.g-vis{position:relative;height:190px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.g-xp .g-vis{background:#FFF4E5}
+.g-lvl .g-vis{background:var(--purple-tint)}
+.g-cards .g-vis{background:var(--blue-tint)}
+.mini-fan{position:relative;width:100%;height:100%}
+.mini-fan img{position:absolute;left:50%;top:54%;height:150px;width:auto;aspect-ratio:240/430;border-radius:8px;box-shadow:0 12px 24px -8px rgba(31,24,56,.35);transform:translate(-50%,-50%);transition:transform .8s cubic-bezier(.2,.9,.25,1.12);transition-delay:.3s}
+.mini-fan img:nth-child(2){z-index:2}
+.g-cards.in .mini-fan img:nth-child(1){transform:translate(-112%,-46%) rotate(-10deg)}
+.g-cards.in .mini-fan img:nth-child(2){transform:translate(-50%,-54%)}
+.g-cards.in .mini-fan img:nth-child(3){transform:translate(12%,-46%) rotate(10deg)}
+.xp-main{position:relative;z-index:2;display:inline-flex;align-items:center;gap:10px;background:#D7FFB8;color:#3C7A00;border-radius:16px;padding:12px 14px 12px 12px;font-weight:900;font-size:19px;box-shadow:0 5px 0 #B5E88E}
+.xp-main .ok{width:30px;height:30px;border-radius:50%;background:#58CC02 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%23fff' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/17px no-repeat}
+.xp-main b{background:#fff;color:#E8853A;border-radius:10px;padding:5px 9px;font-size:15px;margin-left:4px}
+.xp-pop{position:absolute;font-weight:900;font-size:15px;color:#E8853A;background:#fff;border-radius:10px;padding:4px 9px;box-shadow:0 4px 12px rgba(232,133,58,.18);opacity:0}
+.xp-pop.p1{left:12%;top:62%}.xp-pop.p2{right:10%;top:58%}.xp-pop.p3{left:42%;top:72%}
+.g-xp.in .xp-pop{animation:rise 3.6s var(--ease) infinite}
+.g-xp.in .xp-pop.p2{animation-delay:1.2s}.g-xp.in .xp-pop.p3{animation-delay:2.4s}
+@keyframes rise{0%{opacity:0;transform:translateY(10px) scale(.9)}15%{opacity:1;transform:none}60%{opacity:1}100%{opacity:0;transform:translateY(-70px)}}
+.lvl{display:flex;align-items:center;gap:var(--s4);background:#fff;border:2px solid var(--line);border-radius:18px;box-shadow:0 5px 0 var(--line);padding:16px 18px;width:min(86%,300px)}
+.shield{flex:0 0 58px;height:66px}
+.g-lvl.in .shield{animation:pop .7s .4s cubic-bezier(.2,.9,.25,1.4) both}
+@keyframes pop{0%{transform:scale(.6)}100%{transform:none}}
+.lvl-txt{flex:1;display:grid;gap:4px}
+.lvl-txt b{font-size:19px;font-weight:900;color:var(--ink)}
+.lvl-txt span{font-size:13px;font-weight:800;color:var(--muted)}
+.bar{height:12px;border-radius:8px;background:#E9E7F5;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;width:0;border-radius:8px;background:var(--purple);transition:width 1.6s .5s var(--ease)}
+.g-lvl.in .bar i{width:80%}
+.streak{display:flex;align-items:center;gap:10px}
+.flame{width:44px;height:55px;transform-origin:50% 100%}
+.g-streak.in .flame{animation:flick 1.8s ease-in-out infinite}
+@keyframes flick{50%{transform:scale(1.06,.96) rotate(-2deg)}}
+.sn{font-size:46px;font-weight:900;color:#E8853A;line-height:1}
+.sl{font-size:15px;font-weight:900;color:#B9581C;text-transform:uppercase;letter-spacing:.08em;max-width:4.5em;line-height:1.1}
+.week{display:flex;gap:8px;list-style:none;margin:0;padding:0}
+.week li{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#C9A27C;background:#fff;border:2px solid #F6DFC9;transition:all .35s var(--ease)}
+.g-streak.in .week li{background:#FF9F1C;border-color:#FF9F1C;color:#fff}
+.week li:nth-child(1){transition-delay:.3s}.week li:nth-child(2){transition-delay:.4s}.week li:nth-child(3){transition-delay:.5s}.week li:nth-child(4){transition-delay:.6s}.week li:nth-child(5){transition-delay:.7s}.week li:nth-child(6){transition-delay:.8s}.week li:nth-child(7){transition-delay:.9s}
+
+/* source quote */
+.quote-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:clamp(32px,6vw,96px);align-items:center}
+.src-tag{display:inline-block;padding:7px 14px;border-radius:10px;background:var(--amber-bg);color:var(--amber);font-size:13px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.src-title{margin:var(--s4) 0 var(--s6);font-size:clamp(24px,2.2vw,30px);font-weight:900;color:var(--ink);letter-spacing:-.02em}
+.src-card{margin:0;position:relative;background:#fff;border:2px solid var(--line);border-radius:var(--r-lg);box-shadow:0 8px 0 var(--line);padding:clamp(48px,5vw,64px) clamp(28px,4vw,52px) clamp(28px,3vw,40px)}
+.src-card::before{content:"\201C";position:absolute;top:-34px;left:24px;font:900 160px/1 Georgia,serif;color:var(--purple-soft)}
+.src-card blockquote{margin:0;font-style:italic;font-weight:850;font-size:clamp(26px,2.6vw,38px);line-height:1.42;color:var(--ink);letter-spacing:-.01em}
+.src-card .attr{display:flex;align-items:center;gap:var(--s3);margin-top:var(--s5);font-size:13px;font-weight:900;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.src-card .attr::before{content:"";width:4px;height:22px;border-radius:4px;background:var(--purple)}
+.quote-copy h2{margin:var(--s4) 0}
+.checks{list-style:none;padding:0;margin:var(--s6) 0 0;display:grid;gap:var(--s3)}
+.checks li{display:flex;gap:var(--s3);align-items:flex-start;font-weight:700;color:var(--ink)}
+.checks li::before{content:"";flex:0 0 26px;height:26px;border-radius:8px;background:var(--purple-tint) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12.5l4 4 8-9' fill='none' stroke='%237B4FD4' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat;margin-top:1px}
+
+/* subjects */
+.subjects .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s5)}
+.subj{--c:var(--purple);--cd:var(--purple-dk);--ct:var(--purple-tint);display:flex;flex-direction:column;background:#fff;border:2px solid var(--line);border-radius:var(--r-lg);box-shadow:0 8px 0 var(--line);overflow:hidden;transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.subj:hover{transform:translateY(-6px);box-shadow:0 14px 0 var(--line)}
+.s-philosophy{--c:var(--purple);--cd:var(--purple-dk);--ct:var(--purple-tint)}
+.s-economics{--c:var(--blue);--cd:var(--blue-dk);--ct:var(--blue-tint)}
+.s-psychology{--c:var(--orange);--cd:var(--orange-dk);--ct:var(--orange-tint)}
+.subj-top{position:relative;background:var(--ct);padding:var(--s6) var(--s6) var(--s5);min-height:268px}
+.subj-chibi{position:absolute;right:var(--s4);top:var(--s4);width:92px;transition:transform .4s var(--ease)}
+.subj:hover .subj-chibi{transform:rotate(-6deg) translateY(-4px)}
+.tag{display:inline-block;padding:6px 12px;border-radius:9px;background:#fff;color:var(--c);font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.subj h3{font-size:clamp(28px,2.4vw,34px);margin:var(--s4) 0 var(--s3)}
+.subj-top p{font-size:16px}
+.subj-top h3{margin-right:88px}
+.subj .tag{white-space:nowrap}
+.subj-top p{max-width:calc(100% - 40px)}
+.chapters{list-style:none;margin:0;padding:var(--s5) var(--s6) 0;display:grid;gap:2px}
+.chapters li{display:flex;align-items:center;gap:var(--s3);padding:9px 0;border-bottom:1px dashed var(--line);font-size:15.5px;font-weight:800;color:var(--ink)}
+.chapters li:last-child{border-bottom:0}
+.chapters .n{flex:0 0 26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;background:var(--ct);color:var(--c);font-size:13px;font-weight:900}
+.chapters .t{flex:1}
+.chapters em{font-style:normal;font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--c);padding:3px 8px;border-radius:7px}
+.people{padding:var(--s4) var(--s6) var(--s5);font-size:14.5px;color:var(--muted);font-weight:700;margin-top:auto}
+.subj .btn{margin:0 var(--s6) var(--s6);width:auto}
+
+/* wall */
+.wall-sec{padding-bottom:calc(var(--sec) - 24px);overflow:hidden}
+.wall{display:grid;gap:var(--s5);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.track{display:flex;gap:var(--s5);width:max-content;animation:marquee 90s linear infinite}
+.track.tm{animation-direction:reverse;animation-duration:100s}
+.wall:hover .track{animation-play-state:paused}
+@keyframes marquee{to{transform:translateX(-50%)}}
+.card{flex:0 0 auto;width:clamp(150px,13vw,190px);border-radius:14px;overflow:hidden;box-shadow:0 10px 24px -8px rgba(31,24,56,.28);transition:transform .3s var(--ease),box-shadow .3s}
+.card:hover{transform:translateY(-8px) rotate(-1.5deg);box-shadow:0 22px 36px -10px rgba(31,24,56,.35)}
+.card img{width:100%;aspect-ratio:335/600}
+.wall-cta{text-align:center;margin-top:var(--s7)}
+
+/* news */
+.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s5)}
+.news{background:var(--ct);border-radius:var(--r-lg);padding:var(--s6);display:flex;flex-direction:column;gap:var(--s3);transition:transform .3s var(--ease)}
+.news:hover{transform:translateY(-4px)}
+.news h3{font-size:clamp(24px,2vw,28px);margin-top:var(--s2)}
+.news p{font-size:16px}
+.news .ppl{margin-top:auto;padding-top:var(--s4);font-size:14px;font-weight:800;color:var(--c)}
+
+/* faq */
+.faq .wrap{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(32px,6vw,96px);align-items:start}
+.faq .head{position:sticky;top:120px}
+details{border:2px solid var(--line);border-radius:var(--r-md);box-shadow:0 5px 0 var(--line);background:#fff;margin-bottom:var(--s4);transition:box-shadow .2s}
+summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:var(--s4);padding:22px var(--s5);font-size:18px;font-weight:900;color:var(--ink)}
+summary::-webkit-details-marker{display:none}
+.pm{flex:0 0 28px;height:28px;border-radius:9px;background:var(--purple-tint);position:relative;transition:transform .3s var(--ease)}
+.pm::before,.pm::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:3px;border-radius:2px;background:var(--purple);transform:translate(-50%,-50%)}
+.pm::after{transform:translate(-50%,-50%) rotate(90deg);transition:transform .3s var(--ease)}
+details[open] .pm::after{transform:translate(-50%,-50%) rotate(0)}
+details p{padding:0 var(--s5) var(--s5);font-size:16.5px}
+
+/* cta */
+.cta{padding:0 0 var(--sec)}
+.cta-box{position:relative;overflow:hidden;background:var(--purple);border-radius:36px;box-shadow:0 10px 0 var(--purple-dk);padding:clamp(48px,6vw,88px) clamp(28px,6vw,88px);display:grid;grid-template-columns:1.2fr .8fr;gap:var(--s6);align-items:center;color:#fff}
+.cta-box::before{content:"";position:absolute;right:-10%;top:-40%;width:60%;aspect-ratio:1;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.18),transparent)}
+.cta-box h2{color:#fff;font-size:clamp(32px,3.4vw,50px);margin-bottom:var(--s4)}
+.cta-box p{color:#E9DEFD;font-size:19px;margin-bottom:var(--s6)}
+.trio{position:relative;height:clamp(200px,20vw,280px)}
+.trio img{position:absolute;bottom:0;width:38%}
+.trio img:nth-child(1){left:0;z-index:2}
+.trio img:nth-child(2){left:31%;bottom:14%;z-index:1}
+.trio img:nth-child(3){left:62%;z-index:2}
+
+/* footer */
+footer{border-top:1px solid var(--line);padding:var(--s8) 0 var(--s6);font-size:15px}
+.fgrid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:var(--s6)}
+footer .footer-h{margin:0 0 var(--s4);font-size:13px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
+footer ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+footer a{color:var(--text);font-weight:700}
+footer a:hover{color:var(--purple)}
+footer .about p{margin-top:var(--s4);max-width:22em;color:var(--muted);font-weight:600}
+.legal{display:flex;justify-content:space-between;gap:var(--s4);margin-top:var(--s7);padding-top:var(--s5);border-top:1px solid var(--line);color:var(--muted);font-size:14px;font-weight:600}
+
+/* reveal */
+.js .rv{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .8s var(--ease);transition-delay:var(--d,0ms)}
+.js .rv.in{opacity:1;transform:none}
+.js .hero .rv{transition-duration:1s}
+
+/* responsive */
+@media (max-width:1080px){
+  .nav ul{display:none}
+  .hero .wrap{grid-template-columns:1fr;text-align:left}
+  .stage{height:clamp(520px,110vw,640px);max-width:560px;width:100%;margin:0 auto}
+  .subjects .grid,.news-grid,.g-grid{grid-template-columns:1fr;max-width:620px;margin-inline:auto}
+  .quote-grid,.faq .wrap{grid-template-columns:1fr}
+  .tm-grid{grid-template-columns:1fr 1fr}
+  .faq .head{position:static}
+  .cta-box{grid-template-columns:1fr;text-align:left}
+  .trio{max-width:420px;width:100%}
+  .fgrid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:900px){
+  .story{grid-template-columns:1fr}
+  .pin{display:none}
+  .step{min-height:0;opacity:1;padding:var(--s7) 0;border-bottom:1px solid var(--line)}
+  .step:last-child{border-bottom:0}
+  .step .inline{display:block;position:relative;width:min(300px,78%);aspect-ratio:1179/2556;margin:var(--s6) auto 0}
+  .step .inline .tap-hint{display:none}
+  .step .fan-m{--sp:68%;display:block;position:relative;width:100%;height:400px;margin:var(--s6) 0 0;overflow:hidden}
+  .step .fan-m img{height:215px}
+  .js .fan-m.rv{opacity:1;transform:none}
+  .step .inline.phone{position:relative}
+  .stats .grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:560px){
+  body{font-size:16px}
+  .eyebrow{font-size:11.5px;letter-spacing:.08em;padding:6px 11px}
+  .stage{height:auto;aspect-ratio:1/1.12;margin-top:var(--s2)}
+  .stage .p1{width:52%;left:34%;top:0}
+  .stage .p2{width:42%;left:60%;top:9%}
+  .stage .c1{width:31%;left:0;bottom:4%}
+  .stage .bb1{width:33%;left:0;bottom:calc(4% + 40%);font-size:12.5px}
+  .nav .wrap{height:64px}
+  .logo img{height:26px}
+  .stage .bubble{font-size:13px;padding:10px 12px}.fgrid{grid-template-columns:1fr 1fr}
+  .fgrid .about{grid-column:1/-1}
+  .tm-grid{grid-template-columns:1fr}
+  .tm.feat{grid-column:auto}
+  .legal{flex-direction:column}
+  .subj-top,.chapters,.people{padding-left:var(--s5);padding-right:var(--s5)}
+  .subj .btn{margin:0 var(--s5) var(--s5)}
+  .subj-chibi{width:84px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .js .rv{opacity:1;transform:none}
+}
+.badges{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center}.store-badge{display:inline-flex;line-height:0;transition:transform .2s var(--ease)}.store-badge:hover{transform:translateY(-2px)}.store-badge img{height:56px;width:auto;display:block}.cta-box p{color:#fff}</style>
+<style>
+.hub-hero{padding:clamp(32px,5vw,72px) 0 clamp(56px,7vw,96px);background:var(--ct)}
+.hub-hero .wrap{display:grid;grid-template-columns:1.3fr .7fr;gap:var(--s7);align-items:center}
+.crumbs{display:flex;gap:var(--s2);font-size:14px;font-weight:800;color:var(--muted);margin-bottom:var(--s5)}
+.crumbs a:hover{color:var(--c)}
+.hub-hero h1{margin:var(--s4) 0 var(--s5)}
+.hub-hero .hl,.hub .hl{color:var(--c)}
+.hub-hero .eyebrow{background:#fff;color:var(--c)}
+.hub-hero .lede{margin-bottom:var(--s6)}
+.hub-art{position:relative;display:flex;justify-content:center}
+.hub-art img{width:min(320px,80%);filter:drop-shadow(0 20px 30px rgba(31,24,56,.18))}
+.hub-art .bubble{left:auto;right:58%;top:4%;position:absolute}
+.hub-stats{display:flex;flex-wrap:wrap;gap:var(--s3);margin-top:var(--s6)}
+.hub-stats span{background:#fff;border:2px solid var(--line);box-shadow:0 4px 0 var(--line);border-radius:14px;padding:10px 16px;font-weight:800;font-size:15px;color:var(--text)}
+.hub-stats b{color:var(--c);font-weight:900;font-size:18px;margin-right:4px}
+.hub .eyebrow{background:var(--ct);color:var(--c)}
+.about p{max-width:46em}
+.curr{display:grid;gap:var(--s4)}
+.ch{background:#fff;border:2px solid var(--line);border-radius:var(--r-md);box-shadow:0 6px 0 var(--line);padding:var(--s5) var(--s6)}
+.ch-h{display:flex;align-items:baseline;gap:var(--s4);flex-wrap:wrap}
+.ch-n{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 10px;border-radius:12px;background:var(--ct);color:var(--c);font-weight:900;font-size:15px;align-self:center}
+.ch h3{flex:1 1 300px}
+.ch-sub{width:100%;margin:var(--s2) 0 0;color:var(--muted);font-weight:700;font-size:15.5px}
+.ch ol{list-style:none;margin:var(--s4) 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px var(--s6)}
+.ch li{display:flex;justify-content:space-between;gap:var(--s3);padding:9px 0;border-bottom:1px dashed var(--line);font-size:15.5px;font-weight:800;color:var(--ink)}
+.ch li span{color:var(--muted);font-weight:700;text-align:right;white-space:nowrap}
+.ch li a{color:var(--c)}
+.ch.bonus{background:var(--ct);border-color:transparent;box-shadow:0 6px 0 var(--line)}
+.ch.bonus .ch-n{background:var(--c);color:#fff}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--s5)}
+.tcard{display:flex;flex-direction:column;gap:var(--s2);transition:transform .3s var(--ease)}
+.tcard:hover{transform:translateY(-6px)}
+.tcard img{border-radius:12px;box-shadow:0 10px 24px -10px rgba(31,24,56,.35);aspect-ratio:240/430;width:100%}
+.tcard b{font-size:15.5px;font-weight:900;color:var(--ink);line-height:1.25;margin-top:var(--s2)}
+.tcard span{font-size:13.5px;font-weight:700;color:var(--muted)}
+.others{display:grid;grid-template-columns:1fr 1fr;gap:var(--s5)}
+.other{display:flex;align-items:center;gap:var(--s5);background:#fff;border:2px solid var(--line);box-shadow:0 6px 0 var(--line);border-radius:var(--r-md);padding:var(--s5);transition:transform .3s var(--ease)}
+.other:hover{transform:translateY(-4px)}
+.other img{width:76px}
+.other b{display:block;font-size:22px;font-weight:900;color:var(--ink)}
+.other span{font-weight:700;color:var(--muted);font-size:15px}
+.hub .pm{background:var(--ct)}.hub .pm::before,.hub .pm::after{background:var(--c)}
+.hub summary:focus-visible{outline-color:var(--c)}
+.hub .cta-box{background:var(--c);box-shadow:0 10px 0 var(--cd)}
+@media (max-width:1080px){.hub-hero .wrap{grid-template-columns:1fr}.hub-art{display:none}}
+@media (max-width:700px){.ch ol{grid-template-columns:1fr}.ch{padding:var(--s5)}.others{grid-template-columns:1fr}.ch li span{white-space:normal}}
+</style>
+</head>
+<body class="hub" style="--c:var(--blue);--cd:var(--blue-dk);--ct:var(--blue-tint)">
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="/" aria-label="Corpus home"><img src="/site-assets/img/logo.png" alt="Corpus" width="360" height="98"></a>
+    <ul>
+      <li><a href="/#how">How it works</a></li>
+      <li><a href="/#subjects">Subjects</a></li>
+      <li><a href="#thinkers">Thinkers</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a class="btn btn-sm" href="/go/?utm_source=site&amp;utm_medium=nav" data-ev="nav_get_app">Get the app</a>
+  </div>
+</header>
+<main>
+<section class="hub-hero">
+  <div class="wrap">
+    <div>
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Corpus</a><span aria-hidden="true">/</span><span>Economics</span></nav>
+      <span class="eyebrow rv">Economics · 30 thinkers</span>
+      <h1 class="rv" style="--d:80ms">Learn economics in <span class="hl">five minutes</span> a day</h1>
+      <p class="lede rv" style="--d:160ms">Meet Adam Smith, Keynes, Kahneman and 27 more economists in short daily dialogues. Read what they actually wrote, answer one question, and see the economy around you differently.</p>
+      <div class="rv" style="--d:240ms"><div class="badges ">
+      <a class="store-badge" href="https://apps.apple.com/us/app/corpus-ideas-worth-knowing/id6781227385" data-ev="store_ios"><img src="/site-assets/store-badges/apple-app-store.svg" alt="Download on the App Store" height="56"></a>
+      <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.corpusapp.corpus" data-ev="store_android"><img src="/site-assets/store-badges/google-play.png" alt="Get it on Google Play" height="56"></a>
+    </div></div>
+      <div class="hub-stats rv" style="--d:320ms"><span><b>30</b>thinkers</span><span><b>8</b>chapters</span><span><b>53</b>dialogues</span></div>
+    </div>
+    <div class="hub-art rv" style="--d:200ms" aria-hidden="true"><img class="float" src="/site-assets/chibi/smith-wave.webp" alt="" width="340" height="420"></div>
+  </div>
+</section>
+
+<section class="about" style="padding-bottom:0">
+  <div class="wrap">
+    <div class="head rv" style="margin-bottom:0">
+      <span class="eyebrow">The path</span>
+      <h2>Your economics path, chapter by chapter</h2>
+      <p class="lede" style="max-width:46em">Economics on Corpus begins with the questions every economy has to answer and moves through value and price, capital and labor, economic justice, growth, behavioral economics, money and financial crises. Each chapter brings several economists into the same argument.</p>
+    </div>
+  </div>
+</section>
+
+<section class="chapters-sec" style="padding-top:var(--s7)">
+  <div class="wrap curr"><article class="ch rv">
+          <div class="ch-h"><span class="ch-n">1</span><h3>The Foundations</h3><p class="ch-sub">Basic questions, surprising answers</p></div>
+          <ol><li>The Inescapable Questions<span><a href="/t/samuelson-en.html">Paul Samuelson</a></span></li><li>The Order That No One Planned<span><a href="/t/smith-en.html">Adam Smith</a></span></li><li>What Smith Did Not See<span><a href="/t/marx-en.html">Karl Marx</a></span></li><li>When Balance Breaks<span><a href="/t/keynes-en.html">John Maynard Keynes</a></span></li><li>Markets and Freedom<span><a href="/t/friedman-en.html">Milton Friedman</a></span></li><li>What Economics Measures<span><a href="/t/sen-en.html">Amartya Sen</a></span></li><li>What is Economics Anyway?<span></span></li></ol>
+        </article><article class="ch rv">
+          <div class="ch-h"><span class="ch-n">2</span><h3>Value and Price</h3><p class="ch-sub">What is something worth - and who decides?</p></div>
+          <ol><li>The Paradox of Water and Diamonds<span><a href="/t/smith-en.html">Adam Smith</a></span></li><li>Surplus Value<span><a href="/t/marx-en.html">Karl Marx</a></span></li><li>The Marginal Revolution<span><a href="/t/jevons-en.html">William Stanley Jevons</a></span></li><li>Supply, Demand, and Price<span><a href="/t/marshall-en.html">Alfred Marshall</a></span></li><li>Can Everything Be Priced?<span><a href="/t/sandel-en.html">Michael Sandel</a></span></li><li>When the Mind Deceives Us<span><a href="/t/kahneman-economics-en.html">Daniel Kahneman</a></span></li><li>What is Value?<span></span></li></ol>
+        </article><article class="ch rv">
+          <div class="ch-h"><span class="ch-n">3</span><h3>Capital and Labor</h3><p class="ch-sub">Who really creates value?</p></div>
+          <ol><li>What is Capital?<span><a href="/t/smith-en.html">Adam Smith</a></span></li><li>The Law of Diminishing Returns<span><a href="/t/ricardo-en.html">David Ricardo</a></span></li><li>The Distribution of Income<span><a href="/t/ricardo-en.html">David Ricardo</a></span></li><li>The Structure of Capital<span><a href="/t/marx-en.html">Karl Marx</a></span></li><li>r &gt; g<span><a href="/t/piketty-en.html">Thomas Piketty</a></span></li><li>Capital and Labor<span></span></li></ol>
+        </article><article class="ch rv">
+          <div class="ch-h"><span class="ch-n">4</span><h3>Economic Justice</h3><p class="ch-sub">When is an economic distribution just?</p></div>
+          <ol><li>The Just Price<span><a href="/t/aquinas-economics-en.html">Thomas Aquinas</a></span></li><li>Pareto Efficiency<span><a href="/t/pareto-en.html">Vilfredo Pareto</a></span></li><li>The Veil of Ignorance<span><a href="/t/rawls-economics-en.html">John Rawls</a></span></li><li>Individual Rights<span><a href="/t/nozick-economics-en.html">Robert Nozick</a></span></li><li>Hayek and Social Justice<span><a href="/t/hayek-en.html">Friedrich Hayek</a></span></li><li>Human Capabilities<span><a href="/t/sen-en.html">Amartya Sen</a></span></li><li>Economic Justice<span></span></li></ol>
+        </article><article class="ch rv">
+          <div class="ch-h"><span class="ch-n">5</span><h3>Growth and Development</h3><p class="ch-sub">Six thinkers, six layers of an answer</p></div>
+          <ol><li>Why Growth Persists<span><a href="/t/solow-en.html">Robert Solow</a></span></li><li>Where do ideas come from?<span><a href="/t/romer-en.html">Paul Romer</a></span></li><li>Why Copying Fails<span><a href="/t/north-en.html">Douglass North</a></span></li><li>Which rules, and for whom?<span><a href="/t/acemoglu-en.html">Daron Acemoglu</a></span></li><li>Growth for the sake of what?<span><a href="/t/sen-en.html">Amartya Sen</a></span></li><li>Can Growth Be Engineered?<span><a href="/t/easterly-en.html">William Easterly</a></span></li><li>Rich Countries, Poor Countries<span></span></li></ol>
+        </article><article class="ch rv">
+          <div class="ch-h"><span class="ch-n">6</span><h3>Behavioral Economics</h3></div>
+          <ol><li>The Limits of Reason<span><a href="/t/simon-en.html">Herbert Simon</a></span></li><li>Why Losing Hurts More<span><a href="/t/kahneman-economics-en.html">Daniel Kahneman</a></span></li><li>Worth More Once It&#x27;s Yours<span><a href="/t/thaler-en.html">Richard Thaler</a></span></li><li>The Ethics of Nudging<span><a href="/t/thaler-en.html">Richard Thaler</a></span></li><li>When Biases Scale Up<span><a href="/t/shiller-en.html">Robert Shiller</a></span></li><li>Perhaps Not a Mistake?<span><a href="/t/gigerenzer-en.html">Gerd Gigerenzer</a></span></li><li>Are we really rational?<span></span></li></ol>
+        </article><article class="ch rv">
+          <div class="ch-h"><span class="ch-n">7</span><h3>Money and Crises</h3></div>
+          <ol><li>Stability Breeds the Fall<span><a href="/t/minsky-en.html">Hyman Minsky</a></span></li><li>The Moment of Panic<span><a href="/t/bagehot-en.html">Walter Bagehot</a></span></li><li>When Paying Back Hurts<span><a href="/t/fisher-en.html">Irving Fisher</a></span></li><li>When the State Pulled the Rug<span><a href="/t/friedman-en.html">Milton Friedman</a></span></li><li>The Pattern That Keeps Returning<span><a href="/t/reinhart-rogoff-en.html">Reinhart and Rogoff</a></span></li><li>One Crisis, Every Explanation<span></span></li></ol>
+        </article><article class="ch bonus rv">
+          <div class="ch-h"><span class="ch-n">Bonus</span><h3>Will AI Take Your Job?</h3><p class="ch-sub">What five economists can teach us about AI and work</p></div>
+          <ol><li>Opening: Are Machines Really Taking Jobs?<span></span></li><li>Ricardo: Can Machines Hurt Workers?<span><a href="/t/ricardo-en.html">David Ricardo</a></span></li><li>Marx: Whose Machine Is It?<span><a href="/t/marx-en.html">Karl Marx</a></span></li><li>Keynes: What If Machines Free Us?<span><a href="/t/keynes-en.html">John Maynard Keynes</a></span></li><li>Simon: Why Is It So Hard to Predict?<span><a href="/t/simon-en.html">Herbert Simon</a></span></li><li>Acemoglu: Is the Direction of Technology a Choice?<span><a href="/t/acemoglu-en.html">Daron Acemoglu</a></span></li></ol>
+        </article></div>
+</section>
+
+<section id="thinkers" style="padding-top:0">
+  <div class="wrap">
+    <div class="head rv">
+      <span class="eyebrow">The thinkers</span>
+      <h2>30 economics thinkers to meet</h2>
+      <p class="lede">Each one has an illustrated card to collect. Tap a card to learn about them.</p>
+    </div>
+    <div class="tgrid"><a class="tcard rv" href="/t/samuelson-en.html"><img src="/site-assets/cards/samuelson.webp" alt="Paul Samuelson collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Paul Samuelson</b><span>1915–2009</span></a><a class="tcard rv" href="/t/smith-en.html"><img src="/site-assets/cards/smith.webp" alt="Adam Smith collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Adam Smith</b><span>1723–1790</span></a><a class="tcard rv" href="/t/marx-en.html"><img src="/site-assets/cards/marx.webp" alt="Karl Marx collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Karl Marx</b><span>1818–1883</span></a><a class="tcard rv" href="/t/keynes-en.html"><img src="/site-assets/cards/keynes.webp" alt="John Maynard Keynes collectible card" width="240" height="430" loading="lazy" decoding="async"><b>John Maynard Keynes</b><span>1883–1946</span></a><a class="tcard rv" href="/t/friedman-en.html"><img src="/site-assets/cards/friedman.webp" alt="Milton Friedman collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Milton Friedman</b><span>1912–2006</span></a><a class="tcard rv" href="/t/sen-en.html"><img src="/site-assets/cards/sen.webp" alt="Amartya Sen collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Amartya Sen</b><span>1933–</span></a><a class="tcard rv" href="/t/jevons-en.html"><img src="/site-assets/cards/jevons.webp" alt="William Stanley Jevons collectible card" width="240" height="430" loading="lazy" decoding="async"><b>William Stanley Jevons</b><span>1835–1882</span></a><a class="tcard rv" href="/t/marshall-en.html"><img src="/site-assets/cards/marshall.webp" alt="Alfred Marshall collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Alfred Marshall</b><span>1842–1924</span></a><a class="tcard rv" href="/t/sandel-en.html"><img src="/site-assets/cards/sandel.webp" alt="Michael Sandel collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Michael Sandel</b><span>1953–</span></a><a class="tcard rv" href="/t/kahneman-economics-en.html"><img src="/site-assets/cards/kahneman-econ.webp" alt="Daniel Kahneman collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Daniel Kahneman</b><span>1934–2024</span></a><a class="tcard rv" href="/t/ricardo-en.html"><img src="/site-assets/cards/ricardo.webp" alt="David Ricardo collectible card" width="240" height="430" loading="lazy" decoding="async"><b>David Ricardo</b><span>1772–1823</span></a><a class="tcard rv" href="/t/simon-en.html"><img src="/site-assets/cards/simon.webp" alt="Herbert Simon collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Herbert Simon</b><span>1916–2001</span></a><a class="tcard rv" href="/t/acemoglu-en.html"><img src="/site-assets/cards/acemoglu.webp" alt="Daron Acemoglu collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Daron Acemoglu</b><span>1967–</span></a><a class="tcard rv" href="/t/piketty-en.html"><img src="/site-assets/cards/piketty.webp" alt="Thomas Piketty collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Thomas Piketty</b><span>1971–</span></a><a class="tcard rv" href="/t/aquinas-economics-en.html"><img src="/site-assets/cards/aquinas.webp" alt="Thomas Aquinas collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Thomas Aquinas</b><span>1225–1274</span></a><a class="tcard rv" href="/t/pareto-en.html"><img src="/site-assets/cards/pareto.webp" alt="Vilfredo Pareto collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Vilfredo Pareto</b><span>1848–1923</span></a><a class="tcard rv" href="/t/rawls-economics-en.html"><img src="/site-assets/cards/rawls-econ.webp" alt="John Rawls collectible card" width="240" height="430" loading="lazy" decoding="async"><b>John Rawls</b><span>1921–2002</span></a><a class="tcard rv" href="/t/nozick-economics-en.html"><img src="/site-assets/cards/nozick-econ.webp" alt="Robert Nozick collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Robert Nozick</b><span>1938–2002</span></a><a class="tcard rv" href="/t/hayek-en.html"><img src="/site-assets/cards/hayek.webp" alt="Friedrich Hayek collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Friedrich Hayek</b><span>1899–1992</span></a><a class="tcard rv" href="/t/solow-en.html"><img src="/site-assets/cards/solow.webp" alt="Robert Solow collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Robert Solow</b><span>1924–2023</span></a><a class="tcard rv" href="/t/romer-en.html"><img src="/site-assets/cards/romer.webp" alt="Paul Romer collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Paul Romer</b><span>1955–</span></a><a class="tcard rv" href="/t/north-en.html"><img src="/site-assets/cards/north.webp" alt="Douglass North collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Douglass North</b><span>1920–2015</span></a><a class="tcard rv" href="/t/easterly-en.html"><img src="/site-assets/cards/easterly.webp" alt="William Easterly collectible card" width="240" height="430" loading="lazy" decoding="async"><b>William Easterly</b><span>1957–</span></a><a class="tcard rv" href="/t/thaler-en.html"><img src="/site-assets/cards/thaler.webp" alt="Richard Thaler collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Richard Thaler</b><span>1945–</span></a><a class="tcard rv" href="/t/shiller-en.html"><img src="/site-assets/cards/shiller.webp" alt="Robert Shiller collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Robert Shiller</b><span>1946–</span></a><a class="tcard rv" href="/t/gigerenzer-en.html"><img src="/site-assets/cards/gigerenzer.webp" alt="Gerd Gigerenzer collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Gerd Gigerenzer</b><span>1947–</span></a><a class="tcard rv" href="/t/minsky-en.html"><img src="/site-assets/cards/minsky.webp" alt="Hyman Minsky collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Hyman Minsky</b><span>1919–1996</span></a><a class="tcard rv" href="/t/bagehot-en.html"><img src="/site-assets/cards/bagehot.webp" alt="Walter Bagehot collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Walter Bagehot</b><span>1826–1877</span></a><a class="tcard rv" href="/t/fisher-en.html"><img src="/site-assets/cards/fisher.webp" alt="Irving Fisher collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Irving Fisher</b><span>1867–1947</span></a><a class="tcard rv" href="/t/reinhart-rogoff-en.html"><img src="/site-assets/cards/reinhart-rogoff.webp" alt="Reinhart and Rogoff collectible card" width="240" height="430" loading="lazy" decoding="async"><b>Reinhart and Rogoff</b><span>1955– · 1953–</span></a></div>
+  </div>
+</section>
+
+<section class="faq" id="faq" style="padding-top:0">
+  <div class="wrap">
+    <div class="head rv"><span class="eyebrow">FAQ</span><h2>About economics on Corpus</h2></div>
+    <div><details class="rv"><summary>Is this economics for beginners?<span class="pm" aria-hidden="true"></span></summary><p>Yes. No math or background is needed. Each dialogue explains one idea in plain language, then shows you the economist&#x27;s own words.</p></details><details class="rv"><summary>Which economists will I learn about?<span class="pm" aria-hidden="true"></span></summary><p>You will meet 30 economists and thinkers, from Adam Smith, Ricardo and Marx to Keynes, Friedman, Hayek, Kahneman and Piketty.</p></details><details class="rv"><summary>Does it cover today&#x27;s economy?<span class="pm" aria-hidden="true"></span></summary><p>Yes. Chapters on behavioral economics, growth and financial crises connect the big ideas to the economy you live in.</p></details></div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="head rv" style="margin-bottom:var(--s6)"><span class="eyebrow">Keep exploring</span><h2>More subjects</h2></div>
+    <div class="others"><a class="other" href="/philosophy/"><img src="/site-assets/chibi/socrates-wave.webp" alt="" width="340" height="420" loading="lazy" decoding="async"><div><b>Philosophy</b><span>56 dialogues</span></div></a><a class="other" href="/psychology/"><img src="/site-assets/chibi/freud-wave.webp" alt="" width="340" height="420" loading="lazy" decoding="async"><div><b>Psychology</b><span>55 dialogues</span></div></a></div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <div class="cta-box rv">
+      <div>
+        <h2>Start your first economics dialogue today.</h2>
+        <p>Five minutes. One thinker. One idea.</p>
+        <div class="badges on-dark">
+      <a class="store-badge" href="https://apps.apple.com/us/app/corpus-ideas-worth-knowing/id6781227385" data-ev="store_ios"><img src="/site-assets/store-badges/apple-app-store.svg" alt="Download on the App Store" height="56"></a>
+      <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.corpusapp.corpus" data-ev="store_android"><img src="/site-assets/store-badges/google-play.png" alt="Get it on Google Play" height="56"></a>
+    </div>
+      </div>
+      <div class="trio" aria-hidden="true"><img class="float" style="left:20%;width:60%" src="/site-assets/chibi/smith-celebrate.webp" alt="" width="340" height="420" loading="lazy" decoding="async"></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div class="about"><a class="logo" href="/"><img src="/site-assets/img/logo.png" alt="Corpus" width="360" height="98" style="height:28px;width:auto"></a><p>Five minutes a day with history's greatest minds.</p></div>
+      <div><h3 class="footer-h">Subjects</h3><ul><li><a href="/philosophy/">Philosophy</a></li><li><a href="/economics/">Economics</a></li><li><a href="/psychology/">Psychology</a></li></ul></div>
+      <div><h3 class="footer-h">Thinkers</h3><ul><li><a href="/t/socrates-en.html">Socrates</a></li><li><a href="/t/nietzsche-en.html">Friedrich Nietzsche</a></li><li><a href="/t/kant-en.html">Immanuel Kant</a></li><li><a href="/t/smith-en.html">Adam Smith</a></li><li><a href="/t/keynes-en.html">John Maynard Keynes</a></li><li><a href="/t/freud-en.html">Sigmund Freud</a></li><li><a href="/t/jung-en.html">Carl Gustav Jung</a></li></ul></div>
+      <div><h3 class="footer-h">Corpus</h3><ul><li><a href="https://apps.apple.com/us/app/corpus-ideas-worth-knowing/id6781227385">App Store</a></li><li><a href="https://play.google.com/store/apps/details?id=com.corpusapp.corpus">Google Play</a></li><li><a href="https://get.corpusapp.io/privacy.html" rel="noopener">Privacy</a></li><li><a href="https://get.corpusapp.io/terms.html" rel="noopener">Terms</a></li><li><a href="mailto:hello@corpusapp.io">Contact</a></li></ul></div>
+    </div>
+    <div class="legal"><span>© 2026 Corpus</span><span>Made for curious minds, not endless feeds.</span></div>
+  </div>
+</footer>
+<script>
+(function(){
+  var d=document,de=d.documentElement,rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  de.classList.add('js');
+  var nav=d.getElementById('nav');
+  /* unified scroll handler — see bottom of script */
+  var rv=[].slice.call(d.querySelectorAll('.rv'));
+  function show(e){e.classList.add('in')}
+  if(rm){rv.forEach(show)}else{
+    // Reveal anything already on screen, then reveal on scroll. Several fallbacks
+    // so content can never stay hidden (embedded frames, missed observer callbacks).
+    var pend=rv.slice();
+    function check(){var h=innerHeight||de.clientHeight;pend=pend.filter(function(e){var r=e.getBoundingClientRect();if(r.top<h*.94){show(e);return false}return true})}
+    check();addEventListener('resize',check);
+    if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){show(e.target);io.unobserve(e.target)}})},{threshold:.05});rv.forEach(function(e){io.observe(e)})}
+    setTimeout(function(){if(d.querySelectorAll('.rv.in').length<2)rv.forEach(show)},2500);
+  }
+  // count up
+  var cs=d.querySelectorAll('[data-count]');
+  var co=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;co.unobserve(e.target);var el=e.target,to=+el.dataset.count;if(rm){el.textContent=to;return}var t0=performance.now(),dur=1300;(function f(t){var p=Math.min(1,(t-t0)/dur),k=1-Math.pow(1-p,3);el.textContent=Math.round(to*k);if(p<1)requestAnimationFrame(f)})(t0)})},{threshold:.6});
+  cs.forEach(function(e){co.observe(e)});
+  // live question screens
+  var lives=d.querySelectorAll('.live');
+  function fit(){lives.forEach(function(l){var w=l.clientWidth,h=l.clientHeight;if(w&&h){var k=w/390,v=l.firstElementChild;v.style.setProperty('--k',k);v.style.height=(h/k)+'px'}})}
+  fit();addEventListener('resize',fit);if(window.ResizeObserver){var ro=new ResizeObserver(fit);lives.forEach(function(l){ro.observe(l)})}
+  function answer(l,i){if(l.dataset.state!=='ask')return;var ok=i===0;l.querySelector('.lv-opt[data-i="'+i+'"]').classList.add(ok?'right':'wrong');if(!ok)l.querySelector('.lv-opt[data-i="0"]').classList.add('right');l.dataset.state=ok?'right':'wrong';l.querySelector('.lv-tt').textContent=ok?'Excellent!':'Not quite';l.querySelectorAll('.ch img').forEach(function(p){p.classList.toggle('on',p.dataset.pose===(ok?'right':'wrong'))});try{window.posthog&&posthog.capture('site_quiz_answer',{correct:ok})}catch(_){}}
+  function reset(l){delete l.dataset.auto;l.dataset.state='ask';l.querySelectorAll('.lv-opt').forEach(function(b){b.classList.remove('right','wrong')});l.querySelectorAll('.ch img').forEach(function(p){p.classList.toggle('on',p.dataset.pose==='ask')})}
+  lives.forEach(function(l){l.querySelectorAll('.lv-opt').forEach(function(b){b.addEventListener('click',function(){answer(l,+b.dataset.i)})});l.querySelectorAll('.lv-retry,.lv-back').forEach(function(b){b.addEventListener('click',function(){reset(l)})})});
+  // story
+  var steps=d.querySelectorAll('.step'),pin=d.querySelector('.pin'),layers=pin?pin.querySelectorAll('.screen>*'):[],poses=d.querySelectorAll('.pin>.chibi img'),pinLive=pin&&pin.querySelector('.live');
+  function setStep(i){steps.forEach(function(s,j){s.classList.toggle('on',j===i)});layers.forEach(function(s,j){s.classList.toggle('on',j===Math.min(i,2))});poses.forEach(function(s,j){s.classList.toggle('on',j===i)});if(pin)pin.classList.toggle('s4',i===3);if(pinLive)fit();}
+  setStep(0);
+  if('IntersectionObserver' in window){var so=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)setStep(+e.target.dataset.step)})},{rootMargin:'-45% 0px -45% 0px'});steps.forEach(function(s){so.observe(s)});}
+  // marquee pause off-screen
+if('IntersectionObserver' in window){var wall=d.querySelector('.wall');if(wall){var tracks=wall.querySelectorAll('.track');function mq(on){tracks.forEach(function(t){t.style.animationPlayState=on?'running':'paused'})}mq(false);var mo=new IntersectionObserver(function(es){es.forEach(function(e){mq(e.isIntersecting)})},{threshold:0.01});mo.observe(wall);}}
+// parallax
+  var ps=d.querySelectorAll('[data-par]'),tk=false;
+addEventListener('scroll',function(){if(tk)return;tk=true;requestAnimationFrame(function(){
+  var y=scrollY;
+  nav.classList.toggle('scrolled',y>8);
+  if(!rm){check();if(y<1200)ps.forEach(function(p){p.style.translate='0 '+(y*+p.dataset.par)+'px'});}
+  tk=false;
+})},{passive:true});
+})();
+</script>
+</body>
+</html>
