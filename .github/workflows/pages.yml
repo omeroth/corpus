@@ -47,8 +47,7 @@ jobs:
           # /app/ so social shares don't fight the marketing /
           # canonical.
           sed \
-            -e 's#<meta charset="UTF-8">#<meta charset="UTF-8">\
-<meta name="robots" content="noindex,follow">#' \
+            -e 's#<meta charset="UTF-8">#<meta charset="UTF-8"><meta name="robots" content="noindex,follow">#' \
             -e 's#"https://corpusapp.io/"#"https://corpusapp.io/app/"#g' \
             index.html > _deploy/app/index.html
           # Modified manifest so a PWA install from /app/ keeps its
