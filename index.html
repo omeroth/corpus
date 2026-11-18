@@ -39078,6 +39078,50 @@ function _feEverythingClosed() {
   if (goalMet && goalMet.classList.contains('active')) return false;
   const levelUp = document.getElementById('modal-levelup');
   if (levelUp && levelUp.classList.contains('active')) return false;
+  // Round 45 — additions for the renderHome auto-popover gate. Each
+  // bullet maps to the CLAUDE.md z-index table (ordered low → high);
+  // anything that can be visible on home must suppress the auto-open
+  // or the popover slots underneath it and the tap feels broken.
+  //
+  //   z:400   #thinker-intro            — next-dialogue preview card
+  //   z:1100  .onb-screen               — any onboarding step incl. the
+  //                                       bonus-unlock coach mark, which
+  //                                       mounts under this class
+  //   z:999+  .walkthrough-active (on <html>) — covers the walkthrough
+  //                                             owl + speech bubble +
+  //                                             dots + spotlight; the
+  //                                             frames-owl beat and
+  //                                             streak-intro beat set
+  //                                             this before they mount
+  //   z:1700  #modal-paywall            — in-app paywall
+  //   z:1800  #modal-signin-required    — sign-in prompt
+  //   z:2000  .sk-earn                  — streak-badge ignition
+  //   z:3000  #update-banner            — app-update banner
+  //   z:10000 .levelup-overlay          — level-up chest overlay
+  //
+  // The generic `.modal-overlay.active` sweep below already catches the
+  // welcome-back / library / share / guest-signup / NPS / paywall
+  // sign-in combos, but a few of the layers above don't use that class
+  // (walkthrough beats, coach marks, update banner, sk-earn, levelup)
+  // and must be probed by id / class directly.
+  if (document.documentElement.classList.contains('walkthrough-active')) return false;
+  const thinkerIntro = document.getElementById('thinker-intro');
+  if (thinkerIntro) {
+    const cs = getComputedStyle(thinkerIntro);
+    if (cs.display !== 'none' && cs.visibility !== 'hidden') return false;
+  }
+  const paywall = document.getElementById('modal-paywall');
+  if (paywall && paywall.classList.contains('active')) return false;
+  const signin = document.getElementById('modal-signin-required');
+  if (signin && signin.classList.contains('active')) return false;
+  const updateBanner = document.getElementById('update-banner');
+  if (updateBanner) {
+    const cs = getComputedStyle(updateBanner);
+    if (cs.display !== 'none' && cs.visibility !== 'hidden') return false;
+  }
+  if (document.querySelector('.onb-screen')) return false;
+  if (document.querySelector('.sk-earn')) return false;
+  if (document.querySelector('.levelup-overlay')) return false;
   // Any other visible .modal-overlay (welcome-back, thinker detail,
   // library, share, guest-signup, NPS, paywall, streak repair modal).
   // Excludes our own overlay so a plate-tap reopen doesn't self-gate.
@@ -39935,6 +39979,13 @@ function showScreen(id) {
     try {
       window._homeScrollSaved = window.scrollY || window.pageYOffset || 0;
     } catch (_) {}
+    // Round 45 — the auto-popover's per-visit dismissed flag is in-
+    // memory and lives only for the duration of a home visit. Leaving
+    // home (reader, profile, pantheon, subject-select, auth) clears
+    // it so the next return to home opens the sheet again. Resume
+    // from background does NOT come through showScreen, so this
+    // intentionally does not clear on appStateChange.
+    _hvHomeAutoDismissed = false;
   }
   // Reader exit → fire dialogue_abandoned if the dialogue hasn't been
   // marked complete. Runs BEFORE the reader teardown so state fields are
@@ -44843,6 +44894,11 @@ const _HV_COPY = {
   start:    { en: 'Start',             he: 'התחלה' },
   review:   { en: 'Review',            he: 'חזרה' },
   locked:   { en: 'Locked',            he: 'נעול' },
+  // Round 45c — paywall-lock label. Separate from the `locked` entry
+  // because paying actually resolves a paywall lock (button opens
+  // showPaywall), while `locked` is still used for order locks
+  // (previous day/chapter not finished) where paying does nothing.
+  lockPaywall: { en: 'Unlock',         he: 'לפתיחה' },
   lockLesson: { en: 'Finish the lesson before this one to unlock it.',
                 he: 'סיימו את השיעור הקודם כדי לפתוח אותו.' },
   lockChapter: { en: 'Finish the chapter before this one to unlock it.',
@@ -44995,16 +45051,30 @@ function _hvOpenPopover(w, d, di, meta) {
         .replace('{i}', i).replace('{n}', n)
         + (d.thinker ? ' · ' + d.thinker : ''));
   const title = isEn ? (d.titleEn || d.title) : d.title;
+  // Round 45c — split paywall lock from order lock. Paywall lock is
+  // the only one paying resolves; order locks (prior day / prior
+  // chapter not finished) don't care about paying. meta.lessonLocked
+  // is the composite flag from the render-time closure at 46795.
+  const isPaywallLocked = meta.lessonLocked
+    && typeof canAccessWeek === 'function'
+    && !canAccessWeek((state && state.subject) || 'philosophy', w.id);
+  const isOrderLocked = meta.lessonLocked && !isPaywallLocked;
   let btnLabel, btnKind;
-  if (meta.lessonLocked)      { btnLabel = _HV_COPY.locked[isEn ? 'en' : 'he']; btnKind = 'locked'; }
-  else if (meta.isDone)       { btnLabel = _HV_COPY.review[isEn ? 'en' : 'he']; btnKind = 'review'; }
-  else                        { btnLabel = _HV_COPY.start [isEn ? 'en' : 'he']; btnKind = 'start'; }
+  if (isPaywallLocked)        { btnLabel = _HV_COPY.lockPaywall[isEn ? 'en' : 'he']; btnKind = 'locked'; }
+  else if (isOrderLocked)     { btnLabel = _HV_COPY.locked     [isEn ? 'en' : 'he']; btnKind = 'locked'; }
+  else if (meta.isDone)       { btnLabel = _HV_COPY.review     [isEn ? 'en' : 'he']; btnKind = 'review'; }
+  else                        { btnLabel = _HV_COPY.start      [isEn ? 'en' : 'he']; btnKind = 'start'; }
   const thinkerSrc = _hvThinkerForDay(d);
   const initial = (d.thinker || '?').trim().charAt(0).toUpperCase();
   pop.className = 'hv-popover' + (meta.lessonLocked ? ' hv-popover-locked' : ' hv-popover-active');
   // Thinker portrait removed per device feedback — text starts at the
   // inline-start padding, keeping the popover compact.
   void thinkerSrc; void initial;
+  // Round 45b/c — the paywall-locked button is tappable (opens the
+  // paywall). The order-locked button keeps its pre-R45 behaviour:
+  // `disabled aria-disabled`, no handler. Same `.hv-pop-btn-locked`
+  // class + styling for both, so the grey chip reads consistently
+  // as "not your primary action" even when it's a working CTA.
   pop.innerHTML =
     '<div class="hv-pop-arrow" aria-hidden="true"></div>' +
     '<div class="hv-pop-inner">' +
@@ -45013,7 +45083,7 @@ function _hvOpenPopover(w, d, di, meta) {
         '<div class="hv-pop-sub">' + subLine + '</div>' +
       '</div>' +
       '<button type="button" class="hv-pop-btn hv-pop-btn-' + btnKind + '"' +
-        (meta.lessonLocked ? ' disabled aria-disabled="true"' : '') + '>' +
+        (isOrderLocked ? ' disabled aria-disabled="true"' : '') + '>' +
         btnLabel +
       '</button>' +
     '</div>';
@@ -45034,22 +45104,48 @@ function _hvOpenPopover(w, d, di, meta) {
   // underlying nodes don't both react.
   pop.onclick = (e) => { e.stopPropagation(); };
   pop.ontouchstart = (e) => { e.stopPropagation(); };
-  if (!meta.lessonLocked) {
-    const btn = pop.querySelector('.hv-pop-btn');
-    if (btn) btn.onclick = (e) => {
+  const btn = pop.querySelector('.hv-pop-btn');
+  if (btn && !meta.lessonLocked) {
+    btn.onclick = (e) => {
       e.stopPropagation();
       try { if (typeof _haptic === 'function') _haptic('continue'); } catch(_){}
-      _hvClosePopover();
+      // Start-button close is NOT a dismiss — the user is entering the
+      // lesson, not rejecting the sheet. `showScreen` on the reader
+      // switch will clear _hvHomeAutoDismissed on its own anyway.
+      _hvClosePopover('render');
       openReader(w.id, d.id, { entry: 'home_card' });
     };
+  } else if (btn && isPaywallLocked) {
+    // Round 45b — paywall-locked variant opens the paywall. Reuses
+    // showPaywall (29501), the same entry point every other locked-
+    // content tap uses (46576 bonus-card-tap, 45622 bonus-button,
+    // 43960 mid-chapter, 44456 deep-link gate). Close with 'render'
+    // because the user is moving TO the paywall, not rejecting the
+    // sheet; the showScreen flag reset doesn't fire here (paywall is a
+    // modal, not a screen), so the dismissed flag correctly stays
+    // whatever it was.
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      _hvClosePopover('render');
+      try {
+        showPaywall({
+          subject: (state && state.subject) || 'philosophy',
+          weekId:  w.id,
+          dayId:   d.id,
+          source:  'home_locked_popover',
+        });
+      } catch(_){}
+    };
   }
+  // Order-locked: no onclick. Button is `disabled`; the lockLesson /
+  // lockChapter sub-line already explains what's required.
   _hvPositionPopover(node);
   if (!window._hvDocHandler) {
     window._hvDocHandler = (e) => {
       const pop2 = document.getElementById('hv-popover');
       if (!pop2 || pop2.style.display === 'none') return;
       if (pop2.contains(e.target) || e.target.closest('.hv-node')) return;
-      _hvClosePopover();
+      _hvClosePopover('user');
     };
     document.addEventListener('click', window._hvDocHandler, true);
   }
@@ -45168,9 +45264,23 @@ function _hvPositionPopover(node) {
   void availH;
 }
 
-function _hvClosePopover() {
+// Round 45 — in-memory, per-home-visit dismissed flag. Set only when
+// the user themselves closes the popover (source === 'user'); cleared
+// when showScreen leaves home. NOT persisted and NOT cleared on
+// Capacitor resume / visibilitychange — coming back from another app
+// is not leaving home.
+let _hvHomeAutoDismissed = false;
+// `source`:
+//   'user'    — user tapped the close affordance or the outside-click
+//               handler fired. Sets the dismissed flag so the end-of-
+//               renderHome auto-open stays suppressed this home visit.
+//   'render'  — renderHome's own DOM-wipe cleanup (line ~46376).
+//   undefined — pre-R45 callers; treated as 'render' so they don't
+//               accidentally latch the dismissed flag.
+function _hvClosePopover(source) {
   const pop = document.getElementById('hv-popover');
   if (!pop) return;
+  if (source === 'user') _hvHomeAutoDismissed = true;
   pop.style.display = 'none';
   pop.setAttribute('aria-hidden', 'true');
   // Return the popover to its original parent (#screen-home) so the
@@ -46947,6 +47057,130 @@ function renderHome() {
   // done + never seen it" state. See _maybePostSubscriptionBonusReveal
   // for the full gate set.
   try { _maybePostSubscriptionBonusReveal(); } catch(e) {}
+  // Round 45 — auto-open the Start popover on every home render. The
+  // launch/resume triggers at _fireLaunchPopover (57314) and the
+  // appStateChange handler (43207) already call _hvJumpToNextUp with
+  // openPopover:true; they survive, but the real fix is here, because
+  // renderHome's own DOM-wipe at 46376 destroys the popover any time a
+  // later caller re-renders home — _markAuthResolved at 28242 fires
+  // renderHome when auth lands, which lands in the same ~30ms window
+  // as the launch _hvAwaitLayoutSettled(1500) schedule and tears down
+  // the host node before the deferred open runs. Hooking at the END of
+  // renderHome means the popover re-opens after every wipe, including
+  // the auth-resolved pass, so launch no longer loses the race.
+  try { _hvMaybeAutoOpenPopover(); } catch(e) {}
+}
+
+// Round 45 — end-of-renderHome auto-open. Reuses _hvOpenNextUpPopover
+// (the exact code path the tap handler takes), gated on:
+//   • a next-up node exists (or, round 45b, a locked fallback target
+//     whose chapter rendered its nodes)
+//   • the screen is otherwise clear (_feEverythingClosed())
+//   • the user hasn't dismissed it during this home visit
+//   • state.currentScreen === 'home' (defence against renderHome
+//     firing while a mid-transition caller is between screens)
+// The rAF yield lets the DOM nodes _just_ written by renderHome settle
+// before we try to measure and anchor the popover.
+function _hvMaybeAutoOpenPopover() {
+  if (!state || state.currentScreen !== 'home') return;
+  if (_hvHomeAutoDismissed) return;
+  if (!_feEverythingClosed()) return;
+  requestAnimationFrame(() => {
+    // Re-check after the yield: an overlay could have mounted between
+    // renderHome's exit and the next frame (celebration, paywall).
+    if (!state || state.currentScreen !== 'home') return;
+    if (_hvHomeAutoDismissed) return;
+    if (!_feEverythingClosed()) return;
+    const target = _hvAutoOpenTarget();
+    if (!target) return;
+    if (target.locked) {
+      // Instrumentation for the paywall funnel. Fires ONLY on the new
+      // auto-locked path, not on user taps on locked lessons — the tap
+      // behaviour is separate signal, already observable via the
+      // paywall-shown event. `lock_reason` is always 'paywall' today
+      // (the fallback resolver only targets paywall-locked chapters;
+      // see _hvAutoOpenTarget), carried explicitly so future callers
+      // can distinguish without a schema migration.
+      try {
+        _phCapture('home_auto_popover_locked_shown', {
+          subject:     (state && state.subject) || null,
+          week_id:     target.weekId,
+          day_id:      target.dayId,
+          locked:      true,
+          lock_reason: target.lockReason || 'paywall',
+        });
+      } catch(_){}
+    }
+    // Both paths simulate node.click(): the onclick handler at
+    // index.html:46795 reads the closure-captured meta (isNextUp /
+    // lessonLocked / wkLocked), so the locked node opens the locked
+    // variant and the next-up node opens the Start variant without
+    // this function having to re-derive meta.
+    try { target.node.click(); } catch(_){}
+  });
+}
+
+// Round 45b/c — resolve the auto-open target. Returns:
+//   { node, locked:false, weekId, dayId }
+//       — canonical next-up (reuses _hvMainNextUpNode selector logic).
+//   { node, locked:true,  weekId, dayId, lockReason:'paywall' }
+//       — first uncompleted dialogue in a chapter the user cannot
+//         currently access because of the paywall. Walks regular-
+//         before-bonus, same order as _findNextUpLessonRegularFirst
+//         (44807). The chapter MUST have rendered nodes in the DOM;
+//         a locked bonus renders none (gate at 46690) and we skip-
+//         open rather than force a render.
+//   null — nothing to open.
+//
+// Order locks (prior day / prior chapter unfinished) are intentionally
+// NOT eligible for the fallback. If the normal resolver returned null,
+// every chapter the user can access is already fully complete, so
+// any remaining uncompleted day MUST live behind the paywall — an
+// order-locked-but-not-paywall-locked chapter necessarily has prior
+// chapters the user can access, and _findNextUpLessonRegularFirst
+// would have returned a day in one of those. Filtering here makes
+// that invariant explicit: if a hypothetical state somehow produced
+// a pure-order-lock fallback target, we skip-open rather than
+// mislabel the sheet (paying does not resolve an order lock, so the
+// Unlock CTA would be wrong).
+function _hvAutoOpenTarget() {
+  const nextNode = _hvMainNextUpNode();
+  if (nextNode) {
+    const chapEl = nextNode.closest('.hv-chapter');
+    const weekRaw = chapEl ? chapEl.id.replace(/^hv-chapter-/, '') : null;
+    // Chapter ids are numeric for regular, string for bonus — mirror
+    // getW()'s native typing so analytics match the rest of the app.
+    const weekId = (weekRaw != null && /^\d+$/.test(weekRaw)) ? parseInt(weekRaw, 10) : weekRaw;
+    return { node: nextNode, locked: false, weekId, dayId: null };
+  }
+  const chapters = (typeof getW === 'function') ? getW() : [];
+  const subj = (state && state.subject) || 'philosophy';
+  const pickFrom = (filterFn) => {
+    for (const w of chapters || []) {
+      if (!w || !Array.isArray(w.days)) continue;
+      if (!filterFn(w)) continue;
+      // Content flags take everything out of circulation — don't
+      // surface coming-soon or admin-locked content under any CTA.
+      if (w.locked || w.comingSoon) continue;
+      // Paywall-lock gate. If the chapter IS accessible under the
+      // paywall, the normal next-up resolver would have found work
+      // here (or there is none); either way, don't fall back into it.
+      if (typeof canAccessWeek === 'function' && canAccessWeek(subj, w.id)) continue;
+      const nodes = document.querySelectorAll('#hv-chapter-' + w.id + ' .hv-node');
+      if (!nodes.length) continue;
+      for (let di = 0; di < w.days.length; di++) {
+        const d = w.days[di];
+        if (!d) continue;
+        const k = (typeof dayKey === 'function') ? dayKey(w.id, d.id) : null;
+        if (k && state.completedDays && state.completedDays[k]) continue;
+        const node = nodes[di];
+        if (!node) continue;
+        return { node, locked: true, weekId: w.id, dayId: d.id, lockReason: 'paywall' };
+      }
+    }
+    return null;
+  };
+  return pickFrom(w => !w.isBonus) || pickFrom(w => !!w.isBonus);
 }
 
 const CAROUSEL_ORDER = {
