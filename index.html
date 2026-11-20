@@ -17974,20 +17974,26 @@
     text-transform: uppercase;
     -webkit-tap-highlight-color: transparent;
   }
+  /* Round 45e — .hv-pop-btn-paywall rides the same accent card as
+     start/review (the paywall-locked popover now uses the active
+     variant), so it matches their white-on-accent chip look. */
   .hv-pop-btn-start,
-  .hv-pop-btn-review {
+  .hv-pop-btn-review,
+  .hv-pop-btn-paywall {
     background: #FFFFFF;
     color: var(--accent-text);
     border: 2px solid #E5E5EA;
     box-shadow: 0 3px 0 #E5E5EA;
   }
   .hv-pop-btn-start:active,
-  .hv-pop-btn-review:active {
+  .hv-pop-btn-review:active,
+  .hv-pop-btn-paywall:active {
     transform: translateY(2px);
     box-shadow: 0 1px 0 #E5E5EA;
   }
   html.dark .hv-pop-btn-start,
-  html.dark .hv-pop-btn-review {
+  html.dark .hv-pop-btn-review,
+  html.dark .hv-pop-btn-paywall {
     background: var(--surface);
     color: var(--accent-rim);
     border-color: rgba(245, 241, 255, 0.14);
@@ -26506,7 +26512,7 @@
     <!-- v7 lesson popover (opens below a tapped node). -->
     <div class="hv-popover" id="hv-popover" style="display:none" aria-hidden="true"></div>
     <!-- v7 jump button (visible only when the next-up node is off screen). -->
-    <button class="hv-jump" id="hv-jump" style="display:none" onclick="_hvJumpToNextUp()" aria-label="Jump to current lesson">
+    <button class="hv-jump" id="hv-jump" style="display:none" onclick="_hvJumpToNextUp({openPopover: true})" aria-label="Jump to current lesson">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 5v14M5 12l7 7 7-7"/>
       </svg>
@@ -39119,9 +39125,17 @@ function _feEverythingClosed() {
     const cs = getComputedStyle(updateBanner);
     if (cs.display !== 'none' && cs.visibility !== 'hidden') return false;
   }
-  if (document.querySelector('.onb-screen')) return false;
-  if (document.querySelector('.sk-earn')) return false;
-  if (document.querySelector('.levelup-overlay')) return false;
+  // .onb-screen alone matches 30+ templates that live permanently in
+  // markup with display:none; the activation class is .onb-active
+  // (CSS at 7411 / 14617). Without this filter the check is
+  // unconditionally truthy and blocks every auto-open past cold boot.
+  if (document.querySelector('.onb-screen.onb-active')) return false;
+  // Both .sk-earn and .levelup-overlay live as static markup styled
+  // inert when not .active (see pointer-events rule at 18287-18289).
+  // Previous unqualified selectors matched the dormant elements and
+  // gated every auto-open off.
+  if (document.querySelector('.sk-earn.active')) return false;
+  if (document.querySelector('.levelup-overlay.active')) return false;
   // Any other visible .modal-overlay (welcome-back, thinker detail,
   // library, share, guest-signup, NPS, paywall, streak repair modal).
   // Excludes our own overlay so a plate-tap reopen doesn't self-gate.
@@ -40111,23 +40125,26 @@ function showScreen(id) {
   // the user lands short. Beats showScreen's `window.scrollTo(0, 0)`
   // on line 38629 because that scroll ran before this rAF.
   if (id === 'home' && _priorScreen && _priorScreen !== 'home') {
-    const saved = (typeof window._homeScrollSaved === 'number') ? window._homeScrollSaved : null;
-    if (saved != null) {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          try { window.scrollTo(0, saved); } catch (_) {}
-          // Clear so a subsequent cold-launch to home doesn't restore
-          // a stale position from a prior app session.
-          window._homeScrollSaved = null;
-        });
-      });
-    } else if (_priorScreen === 'reader') {
-      // No saved position (first-time home from reader) — fall back to
-      // the pre-R41 next-up jump.
-      requestAnimationFrame(() => {
-        try { _hvJumpToNextUp({ smooth: false }); } catch(_){}
-      });
-    }
+    // Round 45e — restoring the saved scroll on return leaves the auto-
+    // popover opening wherever the user was last scrolled to, which is
+    // often off-screen relative to the next-up node. Scroll TO the
+    // next-up at ~45% viewport instead so the sheet that opens below
+    // is in view. Instant, not smooth — a self-animating page on
+    // return feels like the app is scrolling on its own. Still clear
+    // _homeScrollSaved so a cold-launch doesn't carry a stale value.
+    try { window._homeScrollSaved = null; } catch(_) {}
+    requestAnimationFrame(() => {
+      try { _hvJumpToNextUp({ smooth: false }); } catch(_){}
+    });
+    // Round 45d — showScreen('home') doesn't always re-run renderHome
+    // (returning from pantheon / profile / subject-select just toggles
+    // #screen-home back to display:block; the DOM is still populated
+    // from the prior visit). The renderHome-end hook at 47143 then
+    // never fires on return, and the Start sheet stays closed. Re-fire
+    // the gate here too; _hvMaybeAutoOpenPopover is idempotent (early-
+    // returns when the popover is already visible) so a renderHome
+    // path that ALSO schedules the open doesn't double-fire.
+    try { _hvMaybeAutoOpenPopover(); } catch(_){}
   }
 }
 
@@ -40202,11 +40219,21 @@ function _exitAllScopes() {
 }
 
 function goHome() {
+  // Round 45f — tapping the Home bottom-nav tab while already on home
+  // used to be a no-op (showScreen's return-to-home branch at 40121
+  // only fires when _priorScreen !== 'home'). Treat it as a re-engage:
+  // clear any latched dismiss, scroll to the next-up at 45% viewport,
+  // open the sheet. Same intent as the floating jump arrow.
+  const wasOnHome = state && state.currentScreen === 'home';
   _exitAllScopes();
   renderHome();
   showScreen('home');
   updateBottomNav('home');
   animateScreen(document.getElementById('screen-home'), 'anim-fade');
+  if (wasOnHome) {
+    try { _hvHomeAutoDismissed = false; } catch(_){}
+    try { _hvJumpToNextUp({ openPopover: true }); } catch(_){}
+  }
 }
 
 function goBack() {
@@ -45060,13 +45087,25 @@ function _hvOpenPopover(w, d, di, meta) {
     && !canAccessWeek((state && state.subject) || 'philosophy', w.id);
   const isOrderLocked = meta.lessonLocked && !isPaywallLocked;
   let btnLabel, btnKind;
-  if (isPaywallLocked)        { btnLabel = _HV_COPY.lockPaywall[isEn ? 'en' : 'he']; btnKind = 'locked'; }
+  // Round 45e — distinct btnKind for paywall vs order so each can
+  // style independently. Paywall sits on an accent card and matches
+  // start/review visuals; order stays grey/disabled.
+  if (isPaywallLocked)        { btnLabel = _HV_COPY.lockPaywall[isEn ? 'en' : 'he']; btnKind = 'paywall'; }
   else if (isOrderLocked)     { btnLabel = _HV_COPY.locked     [isEn ? 'en' : 'he']; btnKind = 'locked'; }
   else if (meta.isDone)       { btnLabel = _HV_COPY.review     [isEn ? 'en' : 'he']; btnKind = 'review'; }
   else                        { btnLabel = _HV_COPY.start      [isEn ? 'en' : 'he']; btnKind = 'start'; }
   const thinkerSrc = _hvThinkerForDay(d);
   const initial = (d.thinker || '?').trim().charAt(0).toUpperCase();
-  pop.className = 'hv-popover' + (meta.lessonLocked ? ' hv-popover-locked' : ' hv-popover-active');
+  // Round 45e — paywall-locked uses the ACTIVE variant (accent card +
+  // white button) so the sheet reads as a full-colour CTA sitting on
+  // top of the surrounding chapter dim. The dim itself (level-card.
+  // locked-week opacity 0.5, .hv-ch-thinker grayscale) is deliberately
+  // kept: it's what signals "this chapter needs unlocking". The sheet
+  // just needs to not visually merge with it. Order-locked keeps the
+  // white .hv-popover-locked styling because its button is disabled.
+  pop.className = 'hv-popover' +
+    ((meta.lessonLocked && !isPaywallLocked) ? ' hv-popover-locked'
+                                             : ' hv-popover-active');
   // Thinker portrait removed per device feedback — text starts at the
   // inline-start padding, keeping the popover compact.
   void thinkerSrc; void initial;
@@ -45144,7 +45183,24 @@ function _hvOpenPopover(w, d, di, meta) {
     window._hvDocHandler = (e) => {
       const pop2 = document.getElementById('hv-popover');
       if (!pop2 || pop2.style.display === 'none') return;
-      if (pop2.contains(e.target) || e.target.closest('.hv-node')) return;
+      // Round 45f — only latch _hvHomeAutoDismissed when the tap landed
+      // on non-interactive content (background whitespace, path lines,
+      // thinker illustrations, static chapter banners). Any tap on an
+      // actual control is an action, not a dismissal, so the sheet
+      // should re-open on the next renderHome / screen-return — even
+      // if the control happens to close the sheet as a side-effect.
+      //
+      // The selector covers every standard interactive element and the
+      // inline `[onclick]` HTML attribute. Caveat: `[onclick]` matches
+      // only the attribute, not element.onclick property assignments —
+      // which is why `.hv-bonus-card` is listed explicitly (its tap is
+      // wired via pointerdown/pointerup, not an inline attribute). If
+      // any future control uses a property-assigned handler on a <div>,
+      // either add an inline `onclick=` attribute or append its class
+      // to this selector; otherwise its tap will latch the flag.
+      if (pop2.contains(e.target) || e.target.closest(
+        '.hv-node, button, a, [role="button"], input, select, label, [onclick], .hv-bonus-card'
+      )) return;
       _hvClosePopover('user');
     };
     document.addEventListener('click', window._hvDocHandler, true);
@@ -45203,12 +45259,15 @@ function _hvPositionPopover(node) {
   const aboveRoom = nodeRect.top - topLimit - 12;
   const fitsBelow = belowRoom >= popH;
   const fitsAbove = aboveRoom >= popH;
-  // Prefer below (natural reading order) when it fits. If below is
-  // short because of the next-chapter banner, go above. If neither
-  // fits, pick whichever gives more room — the auto-scroll block
-  // further down then nudges the page so the popover clears both
-  // the docked banner and the next-chapter banner.
-  const placeBelow = fitsBelow || (!fitsAbove && belowRoom >= aboveRoom);
+  // Prefer below (natural reading order) when it fits. "Above" is
+  // only picked when above ACTUALLY fits: if it doesn't, going above
+  // would clip the popover's top edge behind the sticky chapter
+  // banner (z:10 beats the popover's z:5 in the chapter stacking
+  // context — see 17851-17854). Falling back to below in that case
+  // lets the auto-scroll block below nudge the page so the popover
+  // clears the bottom-nav zone, which is more forgiving than hiding
+  // behind the banner.
+  const placeBelow = fitsBelow || !fitsAbove;
 
   // Vertical: popover TOP in path coords.
   const nodeTopInPath = nodeRect.top - pathRect.top;
@@ -45321,6 +45380,30 @@ function _hvMainNextUpNode() {
   return null;
 }
 
+// Round 45h — the scroll/jump target. Prefers the unlocked next-up
+// (_hvMainNextUpNode); when none exists, falls back to the locked
+// target _hvAutoOpenTarget would resolve (first paywall-locked
+// uncompleted dialogue, regular-before-bonus). Returns null only when
+// there is genuinely nothing to open — every dialogue complete, or
+// the only remaining work lives in an unrendered locked bonus.
+//
+// Shared by _hvJumpToNextUp (scroll), _hvWireJumpButton (arrow
+// visibility), _hvOpenNextUpPopover (click-through open), and
+// renderHome's self-anchor scroll. Before this helper existed, every
+// one of those bailed on a paywalled account because they all
+// queried .lesson-circle.next-up, which doesn't exist when the user
+// is blocked from every remaining chapter.
+function _hvTargetNode() {
+  const next = _hvMainNextUpNode();
+  if (next) return next;
+  try {
+    const t = (typeof _hvAutoOpenTarget === 'function') ? _hvAutoOpenTarget() : null;
+    return (t && t.node) ? t.node : null;
+  } catch (_) {
+    return null;
+  }
+}
+
 // Auto-expand the bonus chapter when the next-up lives inside it, so
 // the jump target is actually rendered + measurable. Idempotent.
 function _hvEnsureBonusExpandedIfNextUp() {
@@ -45363,7 +45446,12 @@ function _hvOpenNextUpPopover() {
   if (state && state.currentScreen !== 'home') return false;
   const pop = document.getElementById('hv-popover');
   if (pop && pop.style.display === 'block') return false;
-  const node = _hvMainNextUpNode();
+  // Round 45h — use the broader target so paywalled users (no .next-up)
+  // still get the popover opened via the locked-fallback node. The
+  // node's own onclick closes over its render-time meta, so a locked
+  // node opens the paywall-locked variant and an unlocked node opens
+  // the Start variant — no need to re-derive meta here.
+  const node = _hvTargetNode();
   if (!node) return false;
   try { node.click(); return true; } catch (_) { return false; }
 }
@@ -45709,6 +45797,33 @@ window._replayBonusBtn = function () {
   };
 };
 
+// Round 45i — shared centring helper. Centres the node vertically in
+// the viewport with a floor at the sticky-banner bottom. Returns true
+// if a scroll was issued (delta >= 4px), false otherwise. Both
+// _hvJumpToNextUp.run() and _hvMaybeAutoOpenPopover call this so the
+// launch path (anchor + open) and the arrow path (single jump) use
+// exactly the same math — no second pass can compete.
+function _hvScrollNodeToCenter(node, smooth) {
+  if (!node) return false;
+  const rect = node.getBoundingClientRect();
+  const vh = window.innerHeight;
+  const topbarH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--home-topbar-h')) || 64;
+  const chap = node.closest('.hv-chapter');
+  const chapBanner = chap && (chap.querySelector(':scope > .level-card') || chap.querySelector(':scope > .hv-bonus-card'));
+  const bannerH = chapBanner ? chapBanner.getBoundingClientRect().height : 60;
+  const minNodeTopVp = topbarH + bannerH + 12;
+  let targetNodeTopVp = (vh - rect.height) / 2;
+  if (targetNodeTopVp < minNodeTopVp) targetNodeTopVp = minNodeTopVp;
+  const delta = rect.top - targetNodeTopVp;
+  if (Math.abs(delta) < 4) return false;
+  const se = document.scrollingElement || document.documentElement;
+  const nextY = Math.max(0, se.scrollTop + delta);
+  se.scrollTop = nextY;
+  try { window.scrollTo({ top: nextY, behavior: smooth ? 'smooth' : 'auto' }); } catch(_){}
+  _hvProgrammaticScrollUntil = Date.now() + 700;
+  return true;
+}
+
 function _hvJumpToNextUp(opts) {
   opts = opts || {};
   const smooth = opts.smooth !== false;    // default smooth
@@ -45735,31 +45850,16 @@ function _hvJumpToNextUp(opts) {
   // node has moved we re-anchor. Idempotent and cheap.
   const run = () => {
     if (!alive()) return false;
-    const node = _hvMainNextUpNode();
+    // Round 45h — broader target so paywalled accounts scroll to and
+    // centre their locked fallback dialogue just like unlocked users.
+    const node = _hvTargetNode();
     if (!node) {
       const btn = document.getElementById('hv-jump');
       if (btn) { btn.style.display = 'none'; btn.setAttribute('aria-hidden', 'true'); }
       return false;
     }
-    const rect = node.getBoundingClientRect();
-    const targetY = window.innerHeight * 0.45;
-    const delta = rect.top - targetY;
-    // Skip the scroll if we're already within a few px of the target —
-    // avoids a jarring micro-nudge when a later pass finds the node has
-    // barely moved.
-    if (Math.abs(delta) < 4) return true;
-    // document.scrollingElement is the real scroll container on both
-    // mobile Safari and desktop; window.scrollTo mostly delegates to it
-    // but has been seen to no-op in WKWebView states where the body is
-    // in a static flow and only the html element scrolls, so set
-    // scrollTop directly and fire scrollTo as a belt + braces smooth
-    // path when requested.
-    const se = document.scrollingElement || document.documentElement;
-    const nextY = Math.max(0, se.scrollTop + delta);
-    se.scrollTop = nextY;
-    try { window.scrollTo({ top: nextY, behavior: smooth ? 'smooth' : 'auto' }); } catch(_){}
-    // Suppress scroll-detent haptics during this programmatic scroll.
-    _hvProgrammaticScrollUntil = Date.now() + 700;
+    // Round 45i — single source of centring truth: _hvScrollNodeToCenter.
+    _hvScrollNodeToCenter(node, smooth);
     if (smooth) {
       try { if (typeof _haptic === 'function') _haptic('box-tap', { tap: 0 }); } catch(_){}
     }
@@ -45790,7 +45890,11 @@ function _hvWireJumpButton() {
   const btn = document.getElementById('hv-jump');
   if (!btn) return;
   if (_hvNextUpObserver) { try { _hvNextUpObserver.disconnect(); } catch(_){} _hvNextUpObserver = null; }
-  const node = _hvMainNextUpNode();
+  // Round 45h — observe the broader target so the arrow appears for
+  // paywalled accounts when they scroll away from the locked target.
+  // Before this, _hvMainNextUpNode returned null for that cohort and
+  // the arrow stayed display:none, leaving them with no recovery UI.
+  const node = _hvTargetNode();
   if (!node) {
     btn.style.display = 'none';
     btn.setAttribute('aria-hidden', 'true');
@@ -46977,22 +47081,17 @@ function renderHome() {
       hl.appendChild(chapterWrap);
     });
 
-    // After cards are appended: scroll the next-up node into view at
-    // ~45% of the viewport (home-v7). Instant on first render; smooth
-    // when a completion bumped the expansion.
+    // After cards are appended: centre the next-up node vertically
+    // (Round 45i — uses the shared _hvScrollNodeToCenter helper so
+    // this path and _hvJumpToNextUp.run() and _hvMaybeAutoOpenPopover
+    // all do identical math). Smooth when a completion bumped the
+    // expansion; instant otherwise.
     requestAnimationFrame(() => {
       try {
-        const next = document.querySelector('.lesson-circle.next-up');
-        if (next) {
-          const nodeRect = next.getBoundingClientRect();
-          const targetY  = window.innerHeight * 0.45;
-          const delta    = nodeRect.top - targetY;
-          window.scrollTo({
-            top: Math.max(0, window.scrollY + delta),
-            behavior: _expansionBumpedDueToCompletion ? 'smooth' : 'auto',
-          });
-          _hvProgrammaticScrollUntil = Date.now() + 500;
-        }
+        const next = (typeof _hvTargetNode === 'function')
+          ? _hvTargetNode()
+          : document.querySelector('.lesson-circle.next-up');
+        if (next) _hvScrollNodeToCenter(next, !!_expansionBumpedDueToCompletion);
       } catch(e) {}
       // Wire the jump button + IntersectionObserver for the next-up node.
       // ALWAYS runs — the all-complete path (no next-up) relies on this
@@ -47085,38 +47184,65 @@ function _hvMaybeAutoOpenPopover() {
   if (!state || state.currentScreen !== 'home') return;
   if (_hvHomeAutoDismissed) return;
   if (!_feEverythingClosed()) return;
+  // Round 45d — don't re-run the open when the popover is already
+  // visible. renderHome and showScreen both call this; on a transition
+  // that fires both in the same frame (e.g. a showScreen that also
+  // triggers a renderHome), the second rAF would re-write innerHTML
+  // and cause a visible flicker. The existing _hvOpenNextUpPopover
+  // already short-circuits the next-up path at the same check (45255),
+  // but the locked fallback at target.node.click() has no such guard.
+  const popNow = document.getElementById('hv-popover');
+  if (popNow && popNow.style.display === 'block') return;
+  // Round 45i — serialize scroll BEFORE open. Previously renderHome's
+  // self-anchor scroll (47147), _hvMaybeAutoOpenPopover's open, and
+  // _fireLaunchPopover's _hvJumpToNextUp all raced on launch — each
+  // one's rAF could observe a mid-flight scroll state. On paywalled
+  // state A the net result was nodeCenter landing ~149px below the
+  // viewport centre at launch, while the arrow path (clean single
+  // scroll-then-open) centred perfectly. Sequence here now mirrors
+  // the arrow path exactly:
+  //   1) resolve target, 2) scroll node to centre synchronously,
+  //   3) wait a frame for layout to commit, 4) click to open.
   requestAnimationFrame(() => {
-    // Re-check after the yield: an overlay could have mounted between
-    // renderHome's exit and the next frame (celebration, paywall).
     if (!state || state.currentScreen !== 'home') return;
     if (_hvHomeAutoDismissed) return;
     if (!_feEverythingClosed()) return;
+    const popCheck = document.getElementById('hv-popover');
+    if (popCheck && popCheck.style.display === 'block') return;
     const target = _hvAutoOpenTarget();
     if (!target) return;
-    if (target.locked) {
-      // Instrumentation for the paywall funnel. Fires ONLY on the new
-      // auto-locked path, not on user taps on locked lessons — the tap
-      // behaviour is separate signal, already observable via the
-      // paywall-shown event. `lock_reason` is always 'paywall' today
-      // (the fallback resolver only targets paywall-locked chapters;
-      // see _hvAutoOpenTarget), carried explicitly so future callers
-      // can distinguish without a schema migration.
-      try {
-        _phCapture('home_auto_popover_locked_shown', {
-          subject:     (state && state.subject) || null,
-          week_id:     target.weekId,
-          day_id:      target.dayId,
-          locked:      true,
-          lock_reason: target.lockReason || 'paywall',
-        });
-      } catch(_){}
-    }
-    // Both paths simulate node.click(): the onclick handler at
-    // index.html:46795 reads the closure-captured meta (isNextUp /
-    // lessonLocked / wkLocked), so the locked node opens the locked
-    // variant and the next-up node opens the Start variant without
-    // this function having to re-derive meta.
-    try { target.node.click(); } catch(_){}
+    // Scroll to centre BEFORE opening — same math the arrow path uses.
+    try { _hvScrollNodeToCenter(target.node, false); } catch(_){}
+    // Let the scroll commit before the popover measures + positions.
+    requestAnimationFrame(() => {
+      if (!state || state.currentScreen !== 'home') return;
+      if (_hvHomeAutoDismissed) return;
+      if (!_feEverythingClosed()) return;
+      const popNow = document.getElementById('hv-popover');
+      if (popNow && popNow.style.display === 'block') return;
+      if (target.locked) {
+        // Instrumentation for the paywall funnel. Fires ONLY on the
+        // auto-locked path, not on user taps on locked lessons — the
+        // tap behaviour is separate signal, already observable via the
+        // paywall-shown event. `lock_reason` is 'paywall' today
+        // (fallback resolver only targets paywall-locked chapters;
+        // see _hvAutoOpenTarget), carried explicitly so future callers
+        // can distinguish without a schema migration.
+        try {
+          _phCapture('home_auto_popover_locked_shown', {
+            subject:     (state && state.subject) || null,
+            week_id:     target.weekId,
+            day_id:      target.dayId,
+            locked:      true,
+            lock_reason: target.lockReason || 'paywall',
+          });
+        } catch(_){}
+      }
+      // Click to open. The node's onclick (46795) reads its render-
+      // time meta — locked nodes open the locked variant, next-up
+      // nodes open Start — no need to re-derive meta here.
+      try { target.node.click(); } catch(_){}
+    });
   });
 }
 
