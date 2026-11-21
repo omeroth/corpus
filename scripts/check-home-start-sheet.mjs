@@ -134,6 +134,32 @@ function assertSync(name, pass, detail) {
   if (!label(name, pass, detail)) allPass = false;
 }
 
+// Visibility probe: `visible` iff computed display != 'none' AND the
+// element has a non-zero bounding box. Inline .style.display is NOT
+// enough — it's what we SET, not what the user sees (a !important CSS
+// rule can suppress the element entirely). That exact gap once hid a
+// cross-subject card (`body.on-home-v7 #practice-card { display: none
+// !important }`) while the inline-only check passed, so every visibility
+// assertion in this file now goes through here.
+async function probeVisible(page, selector) {
+  return await page.evaluate((sel) => {
+    const el = document.querySelector(sel);
+    if (!el) return { exists: false };
+    const cs = getComputedStyle(el);
+    const r = el.getBoundingClientRect();
+    return {
+      exists: true,
+      inlineDisplay: el.style.display || '',
+      computedDisplay: cs.display,
+      visibility: cs.visibility,
+      width: r.width,
+      height: r.height,
+      visible: cs.display !== 'none' && cs.visibility !== 'hidden'
+               && r.width > 0 && r.height > 0,
+    };
+  }, selector);
+}
+
 // Helper: nodeCenter of the resolved auto-open target vs viewport centre.
 async function measureCentre(page) {
   return await page.evaluate(() => {
@@ -157,18 +183,18 @@ async function measureCentre(page) {
 {
   const h = await bootWithState([[1, 1], [1, 2]]);
   const m = await measureCentre(h.page);
+  const popVis = await probeVisible(h.page, '#hv-popover');
   const pop = await h.page.evaluate(() => {
     const p = document.getElementById('hv-popover');
     const btn = p && p.querySelector('.hv-pop-btn');
     return {
-      display: p && p.style.display,
       title: p && p.querySelector('.hv-pop-title') ? p.querySelector('.hv-pop-title').textContent : null,
       btnClass: btn ? [...btn.classList].find(c => c.startsWith('hv-pop-btn-')) : null,
     };
   });
-  assertSync('A1 · launch unlocked: sheet open',
-    pop.display === 'block',
-    `display=${pop.display} title="${pop.title}" btn=${pop.btnClass}`);
+  assertSync('A1 · launch unlocked: sheet visible',
+    popVis.visible,
+    `visible=${popVis.visible} computedDisplay=${popVis.computedDisplay} rect=${popVis.width}x${popVis.height} title="${pop.title}" btn=${pop.btnClass}`);
   const deltaA = (typeof m.center === 'number') ? Math.abs(m.center - m.viewportH / 2) : null;
   assertSync('A2 · launch unlocked: node centred within 2 px',
     deltaA != null && deltaA <= 2,
@@ -184,22 +210,23 @@ let paywallHandle = null;
 {
   const h = await bootWithState([[1, 1], [1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7]]);
   const m = await measureCentre(h.page);
+  const popVis = await probeVisible(h.page, '#hv-popover');
+  const btnVis = await probeVisible(h.page, '#hv-popover .hv-pop-btn');
   const pop = await h.page.evaluate(() => {
     const p = document.getElementById('hv-popover');
     const btn = p && p.querySelector('.hv-pop-btn');
     return {
-      display: p && p.style.display,
       title: p && p.querySelector('.hv-pop-title') ? p.querySelector('.hv-pop-title').textContent : null,
       btnText: btn ? btn.textContent : null,
       btnDisabled: btn ? btn.disabled : null,
     };
   });
-  assertSync('B1 · launch paywalled: sheet open on locked target',
-    pop.display === 'block' && m.locked === true,
-    `display=${pop.display} locked=${m.locked} tgt=w${m.weekId}d${m.dayId} title="${pop.title}"`);
-  assertSync('B2 · launch paywalled: button reads "Unlock"',
-    pop.btnText === 'Unlock' && pop.btnDisabled === false,
-    `btnText="${pop.btnText}" disabled=${pop.btnDisabled}`);
+  assertSync('B1 · launch paywalled: sheet visible on locked target',
+    popVis.visible && m.locked === true,
+    `visible=${popVis.visible} computedDisplay=${popVis.computedDisplay} rect=${popVis.width}x${popVis.height} locked=${m.locked} tgt=w${m.weekId}d${m.dayId} title="${pop.title}"`);
+  assertSync('B2 · launch paywalled: Unlock button is visible with the right text',
+    btnVis.visible && pop.btnText === 'Unlock' && pop.btnDisabled === false,
+    `btnVisible=${btnVis.visible} rect=${btnVis.width}x${btnVis.height} btnText="${pop.btnText}" disabled=${pop.btnDisabled}`);
   const deltaB = (typeof m.center === 'number') ? Math.abs(m.center - m.viewportH / 2) : null;
   assertSync('B3 · launch paywalled: node centred within 2 px',
     deltaB != null && deltaB <= 2,
@@ -213,28 +240,26 @@ let paywallHandle = null;
 // ─────────────────────────────────────────────────────────────────────
 {
   const h = await bootWithState([[1, 1], [1, 2]]);
-  // Confirm the sheet is open before we dismiss.
-  const openBefore = await h.page.evaluate(() => document.getElementById('hv-popover').style.display);
+  // Confirm the sheet is visible before we dismiss.
+  const openBefore = await probeVisible(h.page, '#hv-popover');
   // Tap a known-empty home spot: below the sheet but above the bottom nav.
   // The .hv-path at (50, 720) is non-interactive and not covered by the
   // outside-tap exemption selector.
   await h.page.mouse.click(50, 720);
   await h.page.waitForTimeout(400);
-  const stateAfter1 = await h.page.evaluate(() => ({
-    popDisplay: document.getElementById('hv-popover').style.display,
-    // _hvHomeAutoDismissed is a module-level `let` — not on `window`.
-    // Probe it as a free identifier via the SPA's inline script scope.
-    dismissed: (() => { try { return _hvHomeAutoDismissed; } catch(_) { return 'unreadable'; } })(),
-  }));
+  const vis1 = await probeVisible(h.page, '#hv-popover');
+  const dismissed1 = await h.page.evaluate(() =>
+    (() => { try { return _hvHomeAutoDismissed; } catch(_) { return 'unreadable'; } })()
+  );
   // Wait 3 s to confirm nothing re-opens it while the user stays on home.
   await h.page.waitForTimeout(3000);
-  const stateAfter2 = await h.page.evaluate(() => document.getElementById('hv-popover').style.display);
+  const vis2 = await probeVisible(h.page, '#hv-popover');
   assertSync('C1 · outside-tap closes the sheet',
-    openBefore === 'block' && stateAfter1.popDisplay === 'none',
-    `before=${openBefore} after=${stateAfter1.popDisplay} dismissedFlag=${stateAfter1.dismissed}`);
+    openBefore.visible === true && vis1.visible === false,
+    `before=${openBefore.visible} after=${vis1.visible} computedAfter=${vis1.computedDisplay} dismissedFlag=${dismissed1}`);
   assertSync('C2 · sheet stays closed while on home',
-    stateAfter2 === 'none' && stateAfter1.dismissed === true,
-    `after3s=${stateAfter2} dismissedFlag=${stateAfter1.dismissed}`);
+    vis2.visible === false && dismissed1 === true,
+    `after3s.visible=${vis2.visible} computed=${vis2.computedDisplay} dismissedFlag=${dismissed1}`);
   await closeCtx(h);
 }
 
@@ -247,17 +272,17 @@ let paywallHandle = null;
   // showScreen hook, not from a stale open that never closed.
   await h.page.mouse.click(50, 720);
   await h.page.waitForTimeout(400);
-  const dismissed = await h.page.evaluate(() => document.getElementById('hv-popover').style.display === 'none');
+  const dismissVis = await probeVisible(h.page, '#hv-popover');
   await h.page.evaluate(() => showScreen('pantheon'));
   await h.page.waitForTimeout(600);
   await h.page.evaluate(() => showScreen('home'));
   await h.page.waitForTimeout(2500);
   const m = await measureCentre(h.page);
-  const popAfter = await h.page.evaluate(() => document.getElementById('hv-popover').style.display);
+  const popAfter = await probeVisible(h.page, '#hv-popover');
   const deltaD = (typeof m.center === 'number') ? Math.abs(m.center - m.viewportH / 2) : null;
   assertSync('D1 · return to home reopens the sheet',
-    dismissed === true && popAfter === 'block',
-    `beforeLeave=closed afterReturn=${popAfter}`);
+    dismissVis.visible === false && popAfter.visible === true,
+    `beforeLeave.visible=${dismissVis.visible} afterReturn.visible=${popAfter.visible} computed=${popAfter.computedDisplay} rect=${popAfter.width}x${popAfter.height}`);
   assertSync('D2 · reopened sheet is centred within 2 px',
     deltaD != null && deltaD <= 2,
     `nodeCenter=${m.center && m.center.toFixed(2)} delta=${deltaD && deltaD.toFixed(2)}px`);
@@ -267,24 +292,24 @@ let paywallHandle = null;
 // ─────────────────────────────────────────────────────────────────────
 // E — Jump arrow visible after scroll away (unlocked + paywalled).
 // ─────────────────────────────────────────────────────────────────────
-async function arrowVisibleAfterScroll(h) {
+async function arrowProbeAfterScroll(h) {
   await h.page.evaluate(() => { try { _hvClosePopover('render'); } catch(_) {} window.scrollTo(0, 1800); });
   await h.page.waitForTimeout(700);
-  return await h.page.evaluate(() => document.getElementById('hv-jump').style.display);
+  return await probeVisible(h.page, '#hv-jump');
 }
 {
   const hU = await bootWithState([[1, 1], [1, 2]]);
-  const dispUnlocked = await arrowVisibleAfterScroll(hU);
+  const arrowU = await arrowProbeAfterScroll(hU);
   assertSync('E1 · unlocked: jump arrow visible after scroll',
-    dispUnlocked === 'flex',
-    `#hv-jump display=${dispUnlocked}`);
+    arrowU.visible === true,
+    `visible=${arrowU.visible} computedDisplay=${arrowU.computedDisplay} rect=${arrowU.width}x${arrowU.height}`);
   // For F: use this handle (unlocked) to tap the arrow below.
   // Keep the paywalled handle (paywallHandle) for E2.
 
-  const dispPaywall = await arrowVisibleAfterScroll(paywallHandle);
+  const arrowP = await arrowProbeAfterScroll(paywallHandle);
   assertSync('E2 · paywalled: jump arrow visible after scroll',
-    dispPaywall === 'flex',
-    `#hv-jump display=${dispPaywall}`);
+    arrowP.visible === true,
+    `visible=${arrowP.visible} computedDisplay=${arrowP.computedDisplay} rect=${arrowP.width}x${arrowP.height}`);
 
   // ───────────────────────────────────────────────────────────────────
   // F — Arrow tap re-centres + reopens, in BOTH states.
@@ -300,19 +325,19 @@ async function arrowVisibleAfterScroll(h) {
   }
   await tapArrow(hU);
   const mU = await measureCentre(hU.page);
-  const popU = await hU.page.evaluate(() => document.getElementById('hv-popover').style.display);
+  const popU = await probeVisible(hU.page, '#hv-popover');
   const deltaU = (typeof mU.center === 'number') ? Math.abs(mU.center - mU.viewportH / 2) : null;
   assertSync('F1 · unlocked: arrow tap reopens + centres within 2 px',
-    popU === 'block' && deltaU != null && deltaU <= 2,
-    `pop=${popU} nodeCenter=${mU.center && mU.center.toFixed(2)} delta=${deltaU && deltaU.toFixed(2)}px`);
+    popU.visible === true && deltaU != null && deltaU <= 2,
+    `pop.visible=${popU.visible} computed=${popU.computedDisplay} rect=${popU.width}x${popU.height} nodeCenter=${mU.center && mU.center.toFixed(2)} delta=${deltaU && deltaU.toFixed(2)}px`);
 
   await tapArrow(paywallHandle);
   const mP = await measureCentre(paywallHandle.page);
-  const popP = await paywallHandle.page.evaluate(() => document.getElementById('hv-popover').style.display);
+  const popP = await probeVisible(paywallHandle.page, '#hv-popover');
   const deltaP = (typeof mP.center === 'number') ? Math.abs(mP.center - mP.viewportH / 2) : null;
   assertSync('F2 · paywalled: arrow tap reopens + centres within 2 px',
-    popP === 'block' && deltaP != null && deltaP <= 2,
-    `pop=${popP} nodeCenter=${mP.center && mP.center.toFixed(2)} delta=${deltaP && deltaP.toFixed(2)}px`);
+    popP.visible === true && deltaP != null && deltaP <= 2,
+    `pop.visible=${popP.visible} computed=${popP.computedDisplay} rect=${popP.width}x${popP.height} nodeCenter=${mP.center && mP.center.toFixed(2)} delta=${deltaP && deltaP.toFixed(2)}px`);
 
   await closeCtx(hU);
   await closeCtx(paywallHandle);
@@ -342,12 +367,14 @@ async function arrowVisibleAfterScroll(h) {
       canAccess: canAccessWeek(state.subject, w.id),
     };
   });
-  assertSync('G1 · order-locked button reads "Locked"',
-    r.btnText === 'Locked',
-    `btnText="${r.btnText}" canAccessWeek=${r.canAccess}`);
+  const popVisG = await probeVisible(h.page, '#hv-popover');
+  const btnVisG = await probeVisible(h.page, '#hv-popover .hv-pop-btn');
+  assertSync('G1 · order-locked sheet visible with "Locked" button',
+    popVisG.visible && btnVisG.visible && r.btnText === 'Locked',
+    `popVisible=${popVisG.visible} btnVisible=${btnVisG.visible} btnText="${r.btnText}" canAccessWeek=${r.canAccess}`);
   assertSync('G2 · order-locked button is disabled with no handler',
-    r.btnDisabled === true && r.hasOnclick === false,
-    `disabled=${r.btnDisabled} hasOnclick=${r.hasOnclick}`);
+    btnVisG.visible && r.btnDisabled === true && r.hasOnclick === false,
+    `btnVisible=${btnVisG.visible} disabled=${r.btnDisabled} hasOnclick=${r.hasOnclick}`);
   // Tap the button; verify the paywall does NOT open.
   await h.page.evaluate(() => {
     const btn = document.querySelector('#hv-popover .hv-pop-btn');
@@ -362,6 +389,148 @@ async function arrowVisibleAfterScroll(h) {
     paywallActive === false,
     `#modal-paywall.active=${paywallActive}`);
   await closeCtx(h);
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// H — Current subject fully complete → cross-subject card appears.
+//     Uses the dev-premium flag so canAccessWeek returns true for every
+//     paid chapter — otherwise _anyLockedRemains fires and the user
+//     sees the "Continue with Corpus / Unlock" card instead, which is
+//     the correct in-subject behaviour.
+//     Seeds every philosophy day complete; expects the practice card
+//     to offer economics (next in SUBJECTS order after philosophy).
+// ─────────────────────────────────────────────────────────────────────
+{
+  const ctx = await browser.newContext({
+    viewport: { width: 393, height: 852 },
+    deviceScaleFactor: 2, isMobile: true, hasTouch: true,
+  });
+  await ctx.addInitScript(() => {
+    window.__CORPUS_DEBUG_BUILD = true;
+    window.__phEvents = [];
+    window.posthog = {
+      capture: (name, props) => { window.__phEvents.push({ name, props: props || {} }); },
+      identify: () => {}, reset: () => {}, register: () => {}, people: { set: () => {} },
+      onFeatureFlags: () => {}, isFeatureEnabled: () => false, getFeatureFlag: () => undefined,
+    };
+    window.Capacitor = { isNativePlatform: () => true, getPlatform: () => 'ios', Plugins: {
+      Haptics: { impact: async () => ({}) },
+      SplashScreen: { hide: async () => ({}) },
+      App: { addListener: () => ({ remove: () => {} }) },
+      Preferences: { get: async () => ({}) },
+      StatusBar: { setStyle: async () => ({}) },
+      CorpusWidgetBridge: { isWidgetInstalled: async () => ({ installed: false, supported: true }) },
+      LocalNotifications: {
+        checkPermissions:  async () => ({ display: 'granted' }),
+        requestPermissions:async () => ({ display: 'granted' }),
+        schedule:          async () => ({ notifications: [] }),
+        cancel:            async () => ({}),
+        getPending:        async () => ({ notifications: [] }),
+      },
+    } };
+    try {
+      localStorage.setItem('corpus_onboarding_done', '1');
+      // Unlock every chapter via the dev-premium override (gated on
+      // debug flag) so the user state is "paid, all content accessed".
+      localStorage.setItem('_corpus_dev_premium', '1');
+      localStorage.setItem('_corpus_debug', '1');
+    } catch(_) {}
+  });
+  const page = await ctx.newPage();
+  await page.goto(`http://127.0.0.1:${app.port}/index.html`, { waitUntil: 'load' });
+  await page.waitForFunction(() => document.getElementById('screen-home'), { timeout: 15000 });
+  await page.waitForFunction(
+    () => typeof window.dayKey === 'function'
+      && (() => { try { return !!state; } catch(_) { return false; } })(),
+    { timeout: 15000 }
+  );
+  // Seed every philosophy dialogue complete, including the day-0
+  // preambles — the in-subject resolver treats d0 like any other day
+  // and would otherwise flag bonus2/d0 as "Opening:…" next-up.
+  await page.evaluate(() => {
+    const ws = getW('philosophy') || [];
+    for (const w of ws) {
+      for (const d of (w.days || [])) {
+        if (!d) continue;
+        state.completedDays[dayKey(w.id, d.id, 'philosophy')] = true;
+      }
+    }
+    try { if (typeof saveStateLocal === 'function') saveStateLocal(); } catch(_) {}
+  });
+  await page.reload({ waitUntil: 'load' });
+  await page.waitForFunction(() => document.getElementById('screen-home'), { timeout: 15000 });
+  await page.waitForTimeout(4500);
+  // Drop the posthog stub since _phCapture short-circuits on the
+  // dev-premium flag (31113) and never calls window.posthog.capture.
+  // Clear and re-trigger renderHome so we can read from __corpusPhLog,
+  // the sink that _phCapture writes BEFORE the opt-out gate.
+  await page.evaluate(() => {
+    window.__corpusPhLog = [];
+    try { renderHome(); } catch(_) {}
+  });
+  await page.waitForTimeout(500);
+  const pcVis    = await probeVisible(page, '#practice-card');
+  const titleVis = await probeVisible(page, '#practice-card .practice-card-title');
+  const btnVisH  = await probeVisible(page, '#practice-card .practice-btn');
+  const r = await page.evaluate(() => {
+    const pc = document.getElementById('practice-card');
+    const title = pc && pc.querySelector('.practice-card-title');
+    const btn = pc && pc.querySelector('.practice-btn');
+    const target = (typeof _hvCrossSubjectTarget === 'function') ? _hvCrossSubjectTarget() : null;
+    const log = window.__corpusPhLog || [];
+    const ev = log.find(e => e.event === 'home_cross_subject_card_shown');
+    return {
+      titleText: title && title.textContent,
+      btnText: btn && btn.textContent.trim().replace(/\s+/g, ' ').split(' ')[0],
+      target,
+      ev,
+    };
+  });
+  assertSync('H1 · cross-subject card is VISIBLE (not just inline display:block)',
+    pcVis.visible === true && !!r.target,
+    `pc.visible=${pcVis.visible} computedDisplay=${pcVis.computedDisplay} rect=${pcVis.width}x${pcVis.height} target=${JSON.stringify(r.target)}`);
+  assertSync('H2 · card offers economics as next subject',
+    r.target && r.target.subject === 'economics',
+    `target.subject=${r.target && r.target.subject}`);
+  assertSync('H3 · card title visible and mentions both subjects in English',
+    titleVis.visible && typeof r.titleText === 'string' && /Philosophy/.test(r.titleText) && /Economics/.test(r.titleText),
+    `titleVisible=${titleVis.visible} rect=${titleVis.width}x${titleVis.height} text="${r.titleText}"`);
+  assertSync('H4 · dev-premium path: Start button is visible with the right text',
+    btnVisH.visible && r.btnText === 'Start' && r.target && r.target.locked === false,
+    `btnVisible=${btnVisH.visible} rect=${btnVisH.width}x${btnVisH.height} btnText="${r.btnText}" locked=${r.target && r.target.locked}`);
+  assertSync('H5 · PostHog home_cross_subject_card_shown fires with the right props',
+    r.ev
+      && r.ev.props.from_subject === 'philosophy'
+      && r.ev.props.to_subject === 'economics'
+      && r.ev.props.locked === false
+      && r.ev.props.week_id === 1
+      && typeof r.ev.props.day_id !== 'undefined',
+    `event=${JSON.stringify(r.ev)}`);
+  // H6 — general overlap guard: nothing else is painted on top of the
+  // card's CTA button. Hit-tests the button's centre via
+  // document.elementFromPoint and asserts the hit is the button or a
+  // descendant. Catches the whole family of "fixed-position neighbour
+  // sits on top of the card's primary action" bugs — #bonus-btn today,
+  // anything else tomorrow.
+  const overlap = await page.evaluate(() => {
+    const btn = document.querySelector('#practice-card .practice-btn');
+    if (!btn) return { err: 'no button' };
+    const r = btn.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    const hit = document.elementFromPoint(cx, cy);
+    return {
+      cx, cy,
+      hitTag: hit && hit.tagName,
+      hitId: hit && hit.id,
+      hitClass: hit && typeof hit.className === 'string' ? hit.className : null,
+      hitIsButtonOrInside: !!(hit && (hit === btn || btn.contains(hit))),
+    };
+  });
+  assertSync('H6 · nothing is painted on top of the card\'s CTA button',
+    overlap.hitIsButtonOrInside === true,
+    `cx=${overlap.cx} cy=${overlap.cy} hit=${overlap.hitTag}#${overlap.hitId}.${overlap.hitClass} inside=${overlap.hitIsButtonOrInside}`);
+  await ctx.close();
 }
 
 await browser.close();
