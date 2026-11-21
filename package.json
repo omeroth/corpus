@@ -15,7 +15,8 @@
     "render-corpus-flame": "node scripts/render-corpus-flame.mjs",
     "check-reader-overflow": "node scripts/check-reader-overflow.mjs",
     "check-walkthrough-autoopen": "node scripts/check-walkthrough-autoopen.mjs",
-    "check-home-start-sheet": "node scripts/check-home-start-sheet.mjs"
+    "check-home-start-sheet": "node scripts/check-home-start-sheet.mjs",
+    "check-reminder-toggle": "node scripts/check-reminder-toggle.mjs"
   },
   "repository": {
     "type": "git",
