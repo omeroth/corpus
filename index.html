@@ -17018,37 +17018,6 @@
      of whatever inline style showScreen or practice-render code sets.
      The START bubble + jump button replace it in v7. */
   body.on-home-v7 #practice-card { display: none !important; }
-  /* Round 46 — carve-out for the cross-subject variant of the card.
-     That variant isn't the "Next up" CTA the rule above was retiring:
-     it only fires in renderHome's final else-branch (47140), i.e. when
-     every reachable dialogue in the current subject is complete AND no
-     paywall-locked chapter remains. In that end-of-subject moment the
-     fixed-bottom card is the only surface the user has for the "try
-     another subject" offer — the START bubble is absent (no next-up
-     node), the jump arrow is absent (nothing to jump to), and without
-     this override the user sees a fully-checked path with no CTA at
-     all. The .practice-card-crosssubj class is added by the else-
-     branch and removed by every other branch, so this never fights
-     the original hide rule for the Next-up card. !important mirrors
-     the specificity of the rule above so the override is deterministic
-     regardless of load order. */
-  /* `display: block` matches the other practice-card variants (the
-     branches at 47247 / 47263 set it inline as block). Earlier
-     attempt used `flex` which turned #practice-card itself into a
-     flex container and let .practice-card-inner shrink-to-fit its
-     content width — overflowing past the card's right edge and
-     pushing the CTA button off-screen. */
-  body.on-home-v7 #practice-card.practice-card-crosssubj { display: block !important; }
-  /* Round 46 — hide #bonus-btn while the cross-subject card is up.
-     The brain-button sits fixed at the bottom-right (CSS at 12745, z:210)
-     and overlaps the right side of the card (fixed bottom:54px, 65px
-     tall). The card's Start/Unlock button lives in that same corner,
-     so the brain was eclipsing the primary CTA — see the elementFromPoint
-     assertion in scripts/check-home-start-sheet.mjs that guards this.
-     Honest hide rather than reposition: the brain points at the current
-     subject's bonus chapter, which the user has already completed by
-     the time this card appears. */
-  body.on-home-v7:has(#practice-card.practice-card-crosssubj) #bonus-btn { display: none !important; }
 
   /* Home background: flat white (light) / near-black (dark), overriding
      the body's lavender gradient. Scoped to the home surfaces so the
@@ -27382,7 +27351,7 @@ if (typeof corpusData === 'undefined' || typeof economicsData === 'undefined'
 // App Store release. The iOS-only update-banner checkForUpdate() compares
 // this against corpusapp.io/version.json to decide whether to prompt the
 // user to grab the newest App Store build.
-const APP_VERSION = '2.0.4';
+const APP_VERSION = '2.0.5';
 
 // ── Haptics ────────────────────────────────────────────────────────────
 // Single entry point for every haptic in the app. Kinds:
@@ -44894,7 +44863,20 @@ function _findNextUpLesson() {
     if (!w || !w.days) continue;
     const wkUnlocked = weekLockMap[w.id] !== undefined ? weekLockMap[w.id] : true;
     if (w.locked || w.comingSoon || !wkUnlocked) continue;
-    if (!canAccessWeek(state.subject, w.id)) { anyLockedRemains = true; continue; }
+    if (!canAccessWeek(state.subject, w.id)) {
+      // anyLockedRemains must mean "paywall-locked chapter with at
+      // least one uncompleted day". Setting it on any paywall-locked
+      // chapter (regardless of completion state) made the practice-
+      // card "Continue with Corpus / Unlock" branch fire for a
+      // lapsed/post-expiry subscriber whose every day is already
+      // completed — an "unlock to re-read content you already have"
+      // nudge that reads badly.
+      const hasUndone = (w.days || []).some(d =>
+        d && !state.completedDays[dayKey(w.id, d.id)]
+      );
+      if (hasUndone) anyLockedRemains = true;
+      continue;
+    }
     for (let di = 0; di < w.days.length; di++) {
       const d = w.days[di];
       const lessonLocked = di > 0 && !state.completedDays[dayKey(w.id, w.days[di - 1].id)];
@@ -44913,106 +44895,6 @@ function _findNextUpLesson() {
 // chapters and only falls back to the bonus when every regular
 // chapter is done or paywall-locked. See the comment above
 // _findNextUpLesson for the history.
-// Round 46 — cross-subject target. Fires in renderHome's practice-card
-// final else-branch (47140) when the current subject has no accessible
-// next-up AND no paywall-locked work left (_anyLockedRemains=false),
-// i.e. the user is truly done with this subject.
-//
-// Phase 1: first other subject (SUBJECTS order) with a CURRENTLY
-//          ACCESSIBLE uncompleted dialogue. Button reads "Start",
-//          onclick switches subject + renderHome → the existing
-//          auto-open opens the sheet on that dialogue.
-// Phase 2: fallback — other subject with the MOST completed days
-//          that still has any uncompleted content. Target is the first
-//          uncompleted dialogue regardless of access (will be paywall-
-//          locked for a free user who's hit this state). Button reads
-//          "Unlock", opens showPaywall with source 'home_cross_subject'.
-// Returns null when there is literally no uncompleted work in any
-// non-locked, non-current subject (the "truly finished the app" case).
-function _hvCrossSubjectTarget() {
-  if (typeof SUBJECTS === 'undefined') return null;
-  if (!state || !state.subject) return null;
-  const current = state.subject;
-  const locked = (typeof LOCKED_SUBJECTS !== 'undefined') ? LOCKED_SUBJECTS : [];
-  const candidates = SUBJECTS.filter(s => s.id !== current && !locked.includes(s.id));
-  if (!candidates.length) return null;
-
-  // Phase 1 — regular-before-bonus within each subject, same policy as
-  // _findNextUpLessonRegularFirst. SUBJECTS order is the tiebreaker.
-  const pickAccessibleIn = (subjectId) => {
-    const chapters = (typeof getW === 'function') ? (getW(subjectId) || []) : [];
-    const walk = (filterFn) => {
-      for (const w of chapters) {
-        if (!w || !Array.isArray(w.days)) continue;
-        if (!filterFn(w)) continue;
-        if (w.locked || w.comingSoon) continue;
-        if (typeof canAccessWeek === 'function' && !canAccessWeek(subjectId, w.id)) continue;
-        for (let di = 0; di < w.days.length; di++) {
-          const d = w.days[di];
-          if (!d || d.id === 0) continue;
-          if (state.completedDays && state.completedDays[dayKey(w.id, d.id, subjectId)]) continue;
-          // Sequential lock within an accessible chapter.
-          if (di > 0 && state.completedDays && !state.completedDays[dayKey(w.id, w.days[di - 1].id, subjectId)]) break;
-          return { weekId: w.id, dayId: d.id };
-        }
-      }
-      return null;
-    };
-    return walk(w => !w.isBonus) || walk(w => !!w.isBonus);
-  };
-  for (const s of candidates) {
-    const hit = pickAccessibleIn(s.id);
-    if (hit) return { subject: s.id, weekId: hit.weekId, dayId: hit.dayId, locked: false };
-  }
-
-  // Phase 2 — most-progress fallback. Walk every candidate, count
-  // completed days, remember the first uncompleted (regular-then-bonus
-  // order). Highest progress wins; SUBJECTS order breaks ties because
-  // we iterate it and use strict `> best.progress`, so the first
-  // encountered at a given count stays best.
-  let best = null;
-  for (const s of candidates) {
-    const chapters = (typeof getW === 'function') ? (getW(s.id) || []) : [];
-    let progress = 0;
-    let firstUndone = null;
-    const scanSection = (filterFn) => {
-      for (const w of chapters) {
-        if (!w || !Array.isArray(w.days)) continue;
-        if (!filterFn(w)) continue;
-        if (w.locked || w.comingSoon) continue;
-        for (let di = 0; di < w.days.length; di++) {
-          const d = w.days[di];
-          if (!d || d.id === 0) continue;
-          if (state.completedDays && state.completedDays[dayKey(w.id, d.id, s.id)]) {
-            progress++;
-          } else if (!firstUndone) {
-            firstUndone = { weekId: w.id, dayId: d.id };
-          }
-        }
-      }
-    };
-    scanSection(w => !w.isBonus);
-    scanSection(w => !!w.isBonus);
-    if (firstUndone && (!best || progress > best.progress)) {
-      best = { subject: s.id, weekId: firstUndone.weekId, dayId: firstUndone.dayId, progress };
-    }
-  }
-  if (best) return { subject: best.subject, weekId: best.weekId, dayId: best.dayId, locked: true };
-  return null;
-}
-
-// Executed by the cross-subject card's Start button. Mirrors
-// _hvPickSubject (46345) but carries its own PH source so the funnel
-// can isolate this cohort. renderHome runs after setSubject; its
-// own end-of-render _hvMaybeAutoOpenPopover opens the sheet in the
-// new subject — no explicit open call needed here.
-function _hvCrossSubjectStart(toSubject) {
-  const from = (state && state.subject) || null;
-  try { _phCapture && _phCapture('subject_switched', { from, to: toSubject, source: 'home_cross_subject_card' }); } catch(_){}
-  try { setSubject(toSubject); } catch(_){}
-  try { renderHome(); } catch(_){}
-}
-
 function _findNextUpLessonRegularFirst() {
   const chapters = getW();
   const weekLockMap = _buildWeekLockMap(chapters);
@@ -45023,7 +44905,16 @@ function _findNextUpLessonRegularFirst() {
       if (!filterFn(w)) continue;
       const wkUnlocked = weekLockMap[w.id] !== undefined ? weekLockMap[w.id] : true;
       if (w.locked || w.comingSoon || !wkUnlocked) continue;
-      if (!canAccessWeek(state.subject, w.id)) { anyLockedRemains = true; continue; }
+      if (!canAccessWeek(state.subject, w.id)) {
+        // See _findNextUpLesson above for rationale; same predicate.
+        // This function has the same bug because it was copy-descended
+        // from _findNextUpLesson.
+        const hasUndone = (w.days || []).some(d =>
+          d && !state.completedDays[dayKey(w.id, d.id)]
+        );
+        if (hasUndone) anyLockedRemains = true;
+        continue;
+      }
       for (let di = 0; di < w.days.length; di++) {
         const d = w.days[di];
         const lessonLocked = di > 0 && !state.completedDays[dayKey(w.id, w.days[di - 1].id)];
@@ -47235,11 +47126,6 @@ function renderHome() {
     // Practice card (fixed bottom)
     const pc = document.getElementById('practice-card');
     if (pc) {
-      // Round 46 — carve-out class for the cross-subject variant.
-      // Strip it on entry so every non-cross-subject branch below
-      // leaves #practice-card hidden on home-v7 (see hide rule at
-      // 17020) without needing to touch classList themselves.
-      pc.classList.remove('practice-card-crosssubj');
       if (nextUpWeekId !== null) {
         const nw = chapters.find(w => w.id === nextUpWeekId);
         const nd = nw ? (nw.days || []).find(d => d.id === nextUpDayId) : null;
@@ -47274,58 +47160,13 @@ function renderHome() {
           <button class="practice-btn" onclick="event.stopPropagation();showPaywall({source:'practice-card-continue-corpus'})">${isEn ? 'Unlock' : 'לפתיחה'} ${_CHEV_SVG}</button>
         </div>`;
       } else {
-        // Round 46 — current subject has no reachable work AND no paywall-
-        // locked content left (_anyLockedRemains=false). Try to offer
-        // another subject before falling back to the finished-everything
-        // epitaph. Helper is defined at ~44885 adjacent to the within-
-        // subject resolver.
-        const _cross = (typeof _hvCrossSubjectTarget === 'function') ? _hvCrossSubjectTarget() : null;
-        if (_cross) {
-          const _fromSubj = SUBJECTS.find(s => s.id === state.subject);
-          const _toSubj   = SUBJECTS.find(s => s.id === _cross.subject);
-          const _fromName = _fromSubj ? (isEn ? _fromSubj.name : _fromSubj.nameHe) : state.subject;
-          const _toName   = _toSubj   ? (isEn ? _toSubj.name   : _toSubj.nameHe)   : _cross.subject;
-          const _headline = isEn
-            ? `You've finished ${_fromName}. Ready for ${_toName}?`
-            : `סיימתם את ${_fromName}. ממשיכים ל${_toName}?`;
-          const _btnLabel = _cross.locked
-            ? (isEn ? 'Unlock' : 'לפתיחה')
-            : (isEn ? 'Start'  : 'התחלה');
-          const _wIdJs = typeof _cross.weekId === 'string' ? `'${_cross.weekId}'` : _cross.weekId;
-          const _onclick = _cross.locked
-            ? `showPaywall({subject:'${_cross.subject}',weekId:${_wIdJs},dayId:${_cross.dayId},source:'home_cross_subject'})`
-            : `_hvCrossSubjectStart('${_cross.subject}')`;
-          try {
-            _phCapture && _phCapture('home_cross_subject_card_shown', {
-              from_subject: state.subject,
-              to_subject:   _cross.subject,
-              week_id:      _cross.weekId,
-              day_id:       _cross.dayId,
-              locked:       _cross.locked,
-            });
-          } catch(_){}
-          // Add the carve-out class so the body.on-home-v7 hide rule
-          // (17020) doesn't suppress us. Removed again on the next
-          // renderHome whose state doesn't fall into this branch.
-          pc.classList.add('practice-card-crosssubj');
-          pc.style.display = 'block';
-          pc.innerHTML = `<div class="practice-card-inner" onclick="${_onclick}">
-            <div class="practice-card-text">
-              <div class="practice-card-eyebrow">✦ ${isEn ? 'Complete!' : 'הושלם!'}</div>
-              <div class="practice-card-title">${_headline}</div>
-            </div>
-            <button class="practice-btn" onclick="event.stopPropagation();${_onclick}">${_btnLabel} ${_CHEV_SVG}</button>
-          </div>`;
-        } else {
-          // Truly done — nothing uncompleted anywhere.
-          pc.style.display = 'block';
-          pc.innerHTML = `<div class="practice-card-inner" style="justify-content:center">
-            <div class="practice-card-text" style="text-align:center">
-              <div class="practice-card-eyebrow">✦ ${isEn ? 'Complete!' : 'הושלם!'}</div>
-              <div class="practice-card-title">${isEn ? "You've completed everything!" : 'סיימת הכל! 🎉'}</div>
-            </div>
-          </div>`;
-        }
+        pc.style.display = 'block';
+        pc.innerHTML = `<div class="practice-card-inner" style="justify-content:center">
+          <div class="practice-card-text" style="text-align:center">
+            <div class="practice-card-eyebrow">✦ ${isEn ? 'Complete!' : 'הושלם!'}</div>
+            <div class="practice-card-title">${isEn ? "You've completed everything!" : 'סיימת הכל! 🎉'}</div>
+          </div>
+        </div>`;
       }
     }
   } catch(e) { console.error('renderHome: levels error', e); }
