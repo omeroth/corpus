@@ -57,6 +57,158 @@ function jsonResponse(body: unknown, status = 200): Response {
 }
 
 const LOOPS_UPDATE_URL = "https://app.loops.so/api/v1/contacts/update";
+const LOOPS_EVENTS_URL = "https://app.loops.so/api/v1/events/send";
+
+// ─── Onboarding plan copy ──────────────────────────────────────────
+// Bilingual copy lookup for the three onboarding answers that drive
+// the "Your plan" email template. Keys here MUST match the client-
+// side option ids:
+//   - q1 (state.onbAnswers.q1[0]) → onbGoal / onbGoalHow
+//   - q2 (state.onbAnswers.q2[0]) → onbWho / onbWhoHow
+//   - dailyGoal (state.onbAnswers.dailyGoal) → onbRhythm
+// See index.html _ONB_COPY (~31817 q1, ~31877 q2, ~32253 goal) for
+// the authored client-side option lists; the keys below must stay
+// in lockstep with those id values.
+//
+// DEFAULTS when the answer is missing or doesn't match a known id:
+//   q1        → build-habit
+//   q2        → own-ideas
+//   dailyGoal → one
+// Chosen so a user who somehow lands at _onbComplete without an
+// answer still receives a plan email that reads as intentional.
+//
+// Hebrew copy uses the plural voice (סיימתם / תדעו / תוכלו), per
+// the Corpus copy rule.
+//
+// If you change a string here, also run scripts/_verify_loops.mjs
+// so the verifier's expected-output changes propagate to review.
+const ONB_PLAN_COPY = {
+  q1: {
+    "understand-ideas": {
+      en: { term: "Understand the big ideas",
+            how: "Each dialogue explains one big idea in plain language, in about five minutes." },
+      he: { term: "להבין את הרעיונות הגדולים",
+            how: "כל דיאלוג מסביר רעיון גדול אחד בשפה פשוטה, בערך בחמש דקות." },
+    },
+    "worth-reading": {
+      en: { term: "Read something worth your time",
+            how: "Every day you read a real passage by a great thinker, instead of another feed." },
+      he: { term: "לקרוא משהו ששווה את הזמן",
+            how: "כל יום קוראים קטע אמיתי של הוגה גדול, במקום עוד פיד." },
+    },
+    "hold-own": {
+      en: { term: "Hold your own in a deep conversation",
+            how: "You'll know what the great thinkers actually said, and bring it up with confidence." },
+      he: { term: "להחזיק מעמד בשיחה עמוקה",
+            how: "תדעו מה ההוגים הגדולים אמרו באמת, ותוכלו להביא את זה לשיחה בביטחון." },
+    },
+    "read-thinkers": {
+      en: { term: "Get to know the great thinkers",
+            how: "You'll meet the great thinkers through their own words, one at a time." },
+      he: { term: "להכיר את ההוגים הגדולים",
+            how: "תפגשו את ההוגים הגדולים דרך המילים שלהם, אחד בכל פעם." },
+    },
+    "build-habit": {
+      en: { term: "Build a daily learning habit",
+            how: "Five minutes a day, with streaks and reminders that help you keep going." },
+      he: { term: "לבנות הרגל למידה יומי",
+            how: "חמש דקות ביום, עם רצפים ותזכורות שעוזרים להתמיד." },
+    },
+  },
+  q2: {
+    "own-ideas": {
+      en: { term: "Someone who thinks for themselves",
+            how: "Every dialogue ends with a question about what you think, not what to memorize." },
+      he: { term: "מישהו שחושב בעצמו",
+            how: "כל דיאלוג נגמר בשאלה על מה שאתם חושבים, לא על מה לשנן." },
+    },
+    "explain-clearly": {
+      en: { term: "Someone who explains ideas clearly",
+            how: "You'll leave each dialogue able to explain one idea in a sentence." },
+      he: { term: "מישהו שמסביר רעיונות בבהירות",
+            how: "מכל דיאלוג תצאו עם רעיון אחד שתוכלו להסביר במשפט." },
+    },
+    "know-where": {
+      en: { term: "Someone who knows where ideas come from",
+            how: "Every idea comes with its source: who said it, where and when." },
+      he: { term: "מישהו שיודע מאיפה רעיונות מגיעים",
+            how: "כל רעיון מגיע עם המקור שלו: מי אמר, איפה ומתי." },
+    },
+    "well-read": {
+      en: { term: "Someone with broad knowledge",
+            how: "Chapter by chapter, you'll get to know the key thinkers of philosophy, economics and psychology." },
+      he: { term: "מישהו בעל ידע רחב",
+            how: "פרק אחרי פרק, תכירו את ההוגים החשובים בפילוסופיה, בכלכלה ובפסיכולוגיה." },
+    },
+    "understand-world": {
+      en: { term: "Someone who understands the world",
+            how: "Bonus chapters connect the big ideas to what's happening in the news." },
+      he: { term: "מישהו שמבין את העולם",
+            how: "פרקי הבונוס מחברים את הרעיונות הגדולים למה שקורה בחדשות." },
+    },
+  },
+  dailyGoal: {
+    "one":      { en: "One dialogue a day, about 5 minutes",   he: "דיאלוג אחד ביום, בערך 5 דקות" },
+    "two":      { en: "Two dialogues a day, about 10 minutes", he: "שני דיאלוגים ביום, בערך 10 דקות" },
+    "own_pace": { en: "At your own pace",                       he: "בקצב שלכם" },
+  },
+  reminderSuffix: {
+    en: " · Reminder at {time}",
+    he: " · תזכורת ב-{time}",
+  },
+} as const;
+type OnbLang = "en" | "he";
+function pickLang(raw: unknown): OnbLang {
+  return raw === "en" ? "en" : "he";
+}
+// Derives the 5 "plan" contact properties from a user_progress row.
+// Returns { onbGoal, onbGoalHow, onbWho, onbWhoHow, onbRhythm } as
+// plain strings (not nullable) — defaults kick in on missing /
+// unknown answers so the body always has all five fields.
+function derivePlanProps(record: Record<string, unknown>): {
+  onbGoal:     string;
+  onbGoalHow:  string;
+  onbWho:      string;
+  onbWhoHow:   string;
+  onbRhythm:   string;
+} {
+  const lang = pickLang(record.lang);
+  const onb = (record.onboarding_answers && typeof record.onboarding_answers === "object")
+    ? (record.onboarding_answers as Record<string, unknown>)
+    : {};
+  // q1 / q2 are single-choice arrays (length-1). Accept any truthy
+  // first element; otherwise fall back to the default id.
+  const q1Arr = Array.isArray(onb.q1) ? onb.q1 : [];
+  const q2Arr = Array.isArray(onb.q2) ? onb.q2 : [];
+  const q1Id: string = (typeof q1Arr[0] === "string" && q1Arr[0] in ONB_PLAN_COPY.q1) ? q1Arr[0] as string : "build-habit";
+  const q2Id: string = (typeof q2Arr[0] === "string" && q2Arr[0] in ONB_PLAN_COPY.q2) ? q2Arr[0] as string : "own-ideas";
+  const q1Entry = ONB_PLAN_COPY.q1[q1Id as keyof typeof ONB_PLAN_COPY.q1];
+  const q2Entry = ONB_PLAN_COPY.q2[q2Id as keyof typeof ONB_PLAN_COPY.q2];
+
+  const dgRaw = typeof onb.dailyGoal === "string" ? onb.dailyGoal : "";
+  const dgId: string = (dgRaw && dgRaw in ONB_PLAN_COPY.dailyGoal) ? dgRaw : "one";
+  let rhythm: string = ONB_PLAN_COPY.dailyGoal[dgId as keyof typeof ONB_PLAN_COPY.dailyGoal][lang];
+
+  // daily_reminder is a jsonb column { enabled: bool, time: 'HH:MM', ... }.
+  // Only append the suffix when enabled=true AND time is a string. A
+  // malformed value silently skips — bad input must not break the main
+  // plan send.
+  const dr = (record.daily_reminder && typeof record.daily_reminder === "object")
+    ? (record.daily_reminder as Record<string, unknown>)
+    : {};
+  if (dr.enabled === true && typeof dr.time === "string" && /^\d{1,2}:\d{2}$/.test(dr.time)) {
+    rhythm += ONB_PLAN_COPY.reminderSuffix[lang].replace("{time}", dr.time);
+  }
+
+  return {
+    onbGoal:    q1Entry[lang].term,
+    onbGoalHow: q1Entry[lang].how,
+    onbWho:     q2Entry[lang].term,
+    onbWhoHow:  q2Entry[lang].how,
+    onbRhythm:  rhythm,
+  };
+}
+export { derivePlanProps, ONB_PLAN_COPY };
 
 function timingSafeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;
@@ -300,13 +452,108 @@ serve(async (req: Request): Promise<Response> => {
       },
       body: JSON.stringify(body),
     });
-    if (updateRes.ok) {
-      return jsonResponse({ ok: true, action: "updated", props: derived }, 200);
+    if (!updateRes.ok) {
+      let errText = "";
+      try { errText = await updateRes.text(); } catch (_) {}
+      console.error(`[loops-progress] update failed: ${updateRes.status} ${errText}`);
+      return jsonResponse({ ok: false, error: "Loops update failed" }, 502);
     }
-    let errText = "";
-    try { errText = await updateRes.text(); } catch (_) {}
-    console.error(`[loops-progress] update failed: ${updateRes.status} ${errText}`);
-    return jsonResponse({ ok: false, error: "Loops update failed" }, 502);
+
+    // ─── Onboarding-plan one-shot ─────────────────────────────────
+    // Gate: onboarding_done = true AND loops_onb_plan_sent_at IS
+    // NULL. A dedicated column (not reuse of onboarding_done alone)
+    // because onboarding_done is sent on every subsequent sync —
+    // without the sent_at stamp we'd fire "onboarding_completed"
+    // every time this function runs for the user.
+    //
+    // Sequence: 1) PATCH the 5 plan contact properties (+ lastSubject
+    // belt-and-braces, already sent in the main update above but
+    // repeating it here keeps a Loops workflow self-contained if
+    // anyone ever splits the two POSTs). 2) /events/send with
+    // eventName: "onboarding_completed" and the userId. 3) Only on
+    // event-send success, stamp loops_onb_plan_sent_at. A failed
+    // event-send leaves the stamp NULL and the next trigger fire
+    // retries — at most one duplicate /events/send for Loops to
+    // de-dupe via its own "fire once per contact" workflow setting.
+    let planResult: Record<string, unknown> = { onb_plan_sent: false };
+    const isOnbDone = record.onboarding_done === true;
+    const alreadySent = record.loops_onb_plan_sent_at != null;
+    if (isOnbDone && !alreadySent) {
+      try {
+        const plan = derivePlanProps(record);
+        const planBody: Record<string, unknown> = {
+          email,
+          onbGoal:    plan.onbGoal,
+          onbGoalHow: plan.onbGoalHow,
+          onbWho:     plan.onbWho,
+          onbWhoHow:  plan.onbWhoHow,
+          onbRhythm:  plan.onbRhythm,
+        };
+        if (derived.lastSubject) planBody.lastSubject = derived.lastSubject;
+        const planPatch = await fetch(LOOPS_UPDATE_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type":  "application/json",
+            "Authorization": `Bearer ${LOOPS_API_KEY}`,
+          },
+          body: JSON.stringify(planBody),
+        });
+        if (!planPatch.ok) {
+          let pet = "";
+          try { pet = await planPatch.text(); } catch (_) {}
+          console.warn(`[loops-progress] plan contact-update failed: ${planPatch.status} ${pet.slice(0, 200)}`);
+          planResult = { onb_plan_sent: false, reason: "contact_update_failed", status: planPatch.status };
+        } else {
+          const userId = typeof record.user_id === "string" ? record.user_id : null;
+          const eventBody: Record<string, unknown> = {
+            email,
+            eventName: "onboarding_completed",
+          };
+          if (userId) eventBody.userId = userId;
+          const eventRes = await fetch(LOOPS_EVENTS_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type":  "application/json",
+              "Authorization": `Bearer ${LOOPS_API_KEY}`,
+            },
+            body: JSON.stringify(eventBody),
+          });
+          if (!eventRes.ok) {
+            let eet = "";
+            try { eet = await eventRes.text(); } catch (_) {}
+            console.warn(`[loops-progress] onboarding_completed event failed: ${eventRes.status} ${eet.slice(0, 200)}`);
+            planResult = { onb_plan_sent: false, reason: "event_send_failed", status: eventRes.status };
+          } else {
+            // Stamp loops_onb_plan_sent_at. Service-role client reaches
+            // user_progress bypassing RLS. The UPDATE itself re-fires
+            // notify_loops_progress but that fire is a no-op because
+            // the 30-second debounce or the NEW IS NOT DISTINCT FROM
+            // OLD.last_active_at guard (we're only touching
+            // loops_onb_plan_sent_at here) catches the re-entry.
+            const SUPABASE_URL              = Deno.env.get("SUPABASE_URL");
+            const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+            if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY && typeof record.user_id === "string") {
+              const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+                auth: { autoRefreshToken: false, persistSession: false },
+              });
+              const { error: stampErr } = await admin
+                .from("user_progress")
+                .update({ loops_onb_plan_sent_at: new Date().toISOString() })
+                .eq("user_id", record.user_id);
+              if (stampErr) {
+                console.warn("[loops-progress] stamp loops_onb_plan_sent_at failed:", stampErr);
+              }
+            }
+            planResult = { onb_plan_sent: true, plan: plan };
+          }
+        }
+      } catch (e) {
+        console.warn("[loops-progress] onboarding plan path threw:", e);
+        planResult = { onb_plan_sent: false, reason: "threw" };
+      }
+    }
+
+    return jsonResponse({ ok: true, action: "updated", props: derived, ...planResult }, 200);
   } catch (e) {
     console.error("[loops-progress] update threw:", e);
     return jsonResponse({ ok: false, error: "Loops update threw" }, 502);

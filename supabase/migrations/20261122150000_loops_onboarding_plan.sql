@@ -1,0 +1,23 @@
+-- user_progress.loops_onb_plan_sent_at — timestamp (nullable) stamped
+-- by the loops-progress Edge Function the first time it observes
+-- onboarding_done = true for this user and successfully sends the
+-- "onboarding_completed" Loops event + plan contact-properties.
+--
+-- NULL means "never sent". Once stamped it stays stamped forever —
+-- the Loops-side workflow (trigger: event "onboarding_completed")
+-- is a one-shot per user; a re-fire would double-send the plan
+-- email, which is exactly what this column exists to prevent.
+--
+-- Intentionally NOT backfilled: existing users at the time this
+-- migration ships have already finished onboarding (or won't) and
+-- have also already had a signup / progress / re-engage email
+-- journey. Sending the plan email to a user who completed
+-- onboarding weeks ago reads as a mis-wired automation; the
+-- backfill-free launch limits the audience to users who complete
+-- onboarding FROM THIS DEPLOY FORWARD.
+--
+-- Column is forwarded automatically to loops-progress via the
+-- existing notify_loops_progress trigger's row_to_json(NEW)
+-- payload — no trigger change required.
+alter table public.user_progress
+  add column if not exists loops_onb_plan_sent_at timestamptz;

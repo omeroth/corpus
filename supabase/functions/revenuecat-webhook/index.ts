@@ -108,6 +108,93 @@ async function pushSubscriptionToLoops(
   }
 }
 
+const LOOPS_EVENTS_URL = "https://app.loops.so/api/v1/events/send";
+
+// Fires a Loops event (/events/send) with 30-day dedup. Called from
+// the CANCELLATION / TRIAL_CANCELLED branches. Three guards:
+//   1. Skip if cancel_reason is BILLING_ERROR — RC fires CANCELLATION
+//      for payment-method failures mid-period that aren't a user
+//      decision; those get the billing-retry + grace-period flow,
+//      not a cancellation email.
+//   2. Skip if the dedup column on the subscriptions row is within
+//      the last 30 days — handles users who cancel-uncancel-cancel
+//      within a billing cycle.
+//   3. Skip if email is missing — same as pushSubscriptionToLoops.
+// Stamp is written AFTER the event-send POST succeeds; a failure
+// leaves the stamp null and the next CANCELLATION (if any) retries.
+async function pushCancellationEventToLoops(
+  db: ReturnType<typeof createClient>,
+  email: string | null,
+  userId: string,
+  eventName: "trial_cancelled" | "subscription_cancelled",
+  dedupColumn: "loops_trial_cancelled_sent_at" | "loops_subscription_cancelled_sent_at",
+  cancelReason: string | undefined,
+  loopsApiKey: string,
+): Promise<{ sent: boolean; reason?: string }> {
+  if (!loopsApiKey) return { sent: false, reason: "no_api_key" };
+  if (!email) return { sent: false, reason: "no_email" };
+  if (cancelReason === "BILLING_ERROR") {
+    console.log(`[rc-webhook→loops] ${eventName} skipped — cancel_reason=BILLING_ERROR`, { userId });
+    return { sent: false, reason: "billing_error" };
+  }
+  // Dedup read
+  try {
+    const { data: row } = await db.from("subscriptions")
+      .select(dedupColumn)
+      .eq("user_id", userId)
+      .maybeSingle();
+    const lastSent = row && (row as Record<string, unknown>)[dedupColumn];
+    if (typeof lastSent === "string") {
+      const ageMs = Date.now() - new Date(lastSent).getTime();
+      if (ageMs < 30 * 24 * 60 * 60 * 1000) {
+        console.log(`[rc-webhook→loops] ${eventName} skipped — dedup (last sent ${Math.floor(ageMs / 86400000)}d ago)`, { userId });
+        return { sent: false, reason: "dedup_30d" };
+      }
+    }
+  } catch (e) {
+    // A failed dedup read shouldn't block the send — worst case is a
+    // duplicate send Loops' workflow dedups via "fire once per
+    // contact per N days". Log and continue.
+    console.warn(`[rc-webhook→loops] ${eventName} dedup read threw:`, e);
+  }
+  // Send
+  try {
+    const res = await fetch(LOOPS_EVENTS_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type":  "application/json",
+        "Authorization": `Bearer ${loopsApiKey}`,
+      },
+      body: JSON.stringify({ email, eventName, userId }),
+    });
+    if (!res.ok) {
+      let errText = "";
+      try { errText = await res.text(); } catch (_) {}
+      console.warn(`[rc-webhook→loops] ${eventName} /events/send failed: ${res.status} ${errText.slice(0, 200)}`);
+      return { sent: false, reason: "send_failed" };
+    }
+  } catch (e) {
+    console.warn(`[rc-webhook→loops] ${eventName} /events/send threw:`, e);
+    return { sent: false, reason: "send_threw" };
+  }
+  // Stamp the dedup column. Service-role row update; failure here
+  // leaves the stamp null and may cause a duplicate on a near-term
+  // re-cancel. Logged, not surfaced.
+  try {
+    const patch: Record<string, unknown> = {};
+    patch[dedupColumn] = new Date().toISOString();
+    const { error } = await db.from("subscriptions")
+      .update(patch)
+      .eq("user_id", userId);
+    if (error) {
+      console.warn(`[rc-webhook→loops] ${eventName} stamp ${dedupColumn} failed:`, error);
+    }
+  } catch (e) {
+    console.warn(`[rc-webhook→loops] ${eventName} stamp ${dedupColumn} threw:`, e);
+  }
+  return { sent: true };
+}
+
 // Looks up the email for a subscriber via the auth.users table. Uses
 // service role (already the client's auth mode) which has direct read
 // access to auth.users. Returns null when the user has no email (phone-
@@ -146,6 +233,12 @@ type RCEvent = {
   original_purchase_date_ms?: number;
   is_family_share?: boolean;
   is_refund?: boolean;
+  // cancel_reason: present on CANCELLATION / TRIAL_CANCELLED / EXPIRATION.
+  // Documented values: UNSUBSCRIBE, BILLING_ERROR, DEVELOPER_INITIATED,
+  // PRICE_INCREASE, CUSTOMER_SUPPORT, UNKNOWN, and auto-cancel variants
+  // for trials. We only key off BILLING_ERROR (skip Loops send); all other
+  // values are treated the same for email-firing purposes.
+  cancel_reason?: string;
   // RC also sends price, currency, country_code, subscriber_attributes,
   // aliases, and offer/discount metadata. Deliberately omitted from this
   // type so no future edit accidentally references them — they should
@@ -164,6 +257,12 @@ type SubRow = {
   will_renew: boolean;
   originally_purchased_at: string | null;
   raw_event: Record<string, unknown>;
+  // Dedup stamps for the two Loops cancellation events. Written by
+  // pushCancellationEventToLoops after a successful /events/send; read
+  // on the next CANCELLATION / TRIAL_CANCELLED to skip re-firing within
+  // 30 days. See migration 20261122150100_loops_cancellation_dedup.sql.
+  loops_trial_cancelled_sent_at?: string | null;
+  loops_subscription_cancelled_sent_at?: string | null;
 };
 
 // ─── Auth ───────────────────────────────────────────────────────────────
@@ -291,7 +390,30 @@ async function handleEvent(
     const { error } = await partialUpdate(db, e.app_user_id, { will_renew: false }, raw);
     if (error) return { status: 500, body: { ok: false, where: "partialUpdate", type: t, error: String(error) } };
     await patchLoopsFromCurrentRow();
-    return { status: 200, body: { ok: true, type: t, action: "will_renew=false" } };
+    // Cancellation email dispatch. TRIAL_CANCELLED OR
+    // (CANCELLATION AND period_type=TRIAL) → trial_cancelled.
+    // CANCELLATION AND period_type=NORMAL → subscription_cancelled.
+    // Everything else (INTRO / PROMOTIONAL period_type variants) is
+    // deliberately not emailed — unclear user intent, sub-1% volume.
+    let eventName: "trial_cancelled" | "subscription_cancelled" | null = null;
+    let dedupColumn: "loops_trial_cancelled_sent_at" | "loops_subscription_cancelled_sent_at" | null = null;
+    if (t === "TRIAL_CANCELLED" || (t === "CANCELLATION" && e.period_type === "TRIAL")) {
+      eventName = "trial_cancelled";
+      dedupColumn = "loops_trial_cancelled_sent_at";
+    } else if (t === "CANCELLATION" && e.period_type === "NORMAL") {
+      eventName = "subscription_cancelled";
+      dedupColumn = "loops_subscription_cancelled_sent_at";
+    }
+    let cancelResult: Record<string, unknown> = {};
+    if (eventName && dedupColumn) {
+      const email = await getEmailForUser(db, e.app_user_id);
+      cancelResult = await pushCancellationEventToLoops(
+        db, email, e.app_user_id, eventName, dedupColumn, e.cancel_reason, loopsApiKey,
+      );
+    } else {
+      cancelResult = { sent: false, reason: "period_type_not_eligible", period_type: e.period_type ?? null };
+    }
+    return { status: 200, body: { ok: true, type: t, action: "will_renew=false", loops_event: cancelResult } };
   }
   if (t === "UNCANCELLATION") {
     const { error } = await partialUpdate(db, e.app_user_id, { will_renew: true }, raw);
