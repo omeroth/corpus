@@ -84,6 +84,12 @@ jobs:
           cp -r _marketing/economics        _deploy/
           cp -r _marketing/psychology       _deploy/
           cp -r _marketing/site-assets      _deploy/
+          # Loops email icons — 3 subject folders of 192px PNGs, served at
+          # https://corpusapp.io/email-icons/<subject>/<file>.png. Referenced
+          # by onbGoalIcon / onbWhoIcon / onbRhythmIcon contact properties on
+          # Loops (see supabase/functions/loops-progress/index.ts). Not in
+          # sitemap.xml — image-only, nothing for Google to crawl here.
+          cp -r _marketing/email-icons      _deploy/
           # Share cards + dialogue landing pages (Part 2 of the share-cards
           # refactor). Generated locally via `npm run gen:share` and committed
           # to the repo so the runner doesn't need node-canvas + TTFs.

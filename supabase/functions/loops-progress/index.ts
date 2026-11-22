@@ -148,9 +148,13 @@ const ONB_PLAN_COPY = {
     },
   },
   dailyGoal: {
-    "one":      { en: "One dialogue a day, about 5 minutes",   he: "דיאלוג אחד ביום, בערך 5 דקות" },
-    "two":      { en: "Two dialogues a day, about 10 minutes", he: "שני דיאלוגים ביום, בערך 10 דקות" },
-    "own_pace": { en: "At your own pace",                       he: "בקצב שלכם" },
+    // Duration ("about N minutes") was dropped from this line — the
+    // email renders the duration next to the glyph in its own slot,
+    // and doubling it up read as cluttered. Example rendered rhythm:
+    // "One dialogue a day · Reminder at 20:00".
+    "one":      { en: "One dialogue a day",   he: "דיאלוג אחד ביום" },
+    "two":      { en: "Two dialogues a day",  he: "שני דיאלוגים ביום" },
+    "own_pace": { en: "At your own pace",     he: "בקצב שלכם" },
   },
   reminderSuffix: {
     en: " · Reminder at {time}",
@@ -165,12 +169,24 @@ function pickLang(raw: unknown): OnbLang {
 // Returns { onbGoal, onbGoalHow, onbWho, onbWhoHow, onbRhythm } as
 // plain strings (not nullable) — defaults kick in on missing /
 // unknown answers so the body always has all five fields.
+// Base URL for the 192px PNG icons hosted at corpusapp.io/email-icons/<subject>/.
+// Deployed by .github/workflows/pages.yml from _marketing/email-icons/.
+const EMAIL_ICON_BASE = "https://corpusapp.io/email-icons";
+const KNOWN_SUBJECTS = new Set(["philosophy", "economics", "psychology"]);
+function pickSubject(raw: unknown): "philosophy" | "economics" | "psychology" {
+  return (typeof raw === "string" && KNOWN_SUBJECTS.has(raw))
+    ? raw as "philosophy" | "economics" | "psychology"
+    : "philosophy";
+}
 function derivePlanProps(record: Record<string, unknown>): {
-  onbGoal:     string;
-  onbGoalHow:  string;
-  onbWho:      string;
-  onbWhoHow:   string;
-  onbRhythm:   string;
+  onbGoal:       string;
+  onbGoalHow:    string;
+  onbWho:        string;
+  onbWhoHow:     string;
+  onbRhythm:     string;
+  onbGoalIcon:   string;
+  onbWhoIcon:    string;
+  onbRhythmIcon: string;
 } {
   const lang = pickLang(record.lang);
   const onb = (record.onboarding_answers && typeof record.onboarding_answers === "object")
@@ -200,12 +216,16 @@ function derivePlanProps(record: Record<string, unknown>): {
     rhythm += ONB_PLAN_COPY.reminderSuffix[lang].replace("{time}", dr.time);
   }
 
+  const subject = pickSubject(record.last_subject);
   return {
-    onbGoal:    q1Entry[lang].term,
-    onbGoalHow: q1Entry[lang].how,
-    onbWho:     q2Entry[lang].term,
-    onbWhoHow:  q2Entry[lang].how,
-    onbRhythm:  rhythm,
+    onbGoal:       q1Entry[lang].term,
+    onbGoalHow:    q1Entry[lang].how,
+    onbWho:        q2Entry[lang].term,
+    onbWhoHow:     q2Entry[lang].how,
+    onbRhythm:     rhythm,
+    onbGoalIcon:   `${EMAIL_ICON_BASE}/${subject}/q1-${q1Id}.png`,
+    onbWhoIcon:    `${EMAIL_ICON_BASE}/${subject}/q2-${q2Id}.png`,
+    onbRhythmIcon: `${EMAIL_ICON_BASE}/${subject}/dailyGoal-${dgId}.png`,
   };
 }
 export { derivePlanProps, ONB_PLAN_COPY };
@@ -483,11 +503,14 @@ serve(async (req: Request): Promise<Response> => {
         const plan = derivePlanProps(record);
         const planBody: Record<string, unknown> = {
           email,
-          onbGoal:    plan.onbGoal,
-          onbGoalHow: plan.onbGoalHow,
-          onbWho:     plan.onbWho,
-          onbWhoHow:  plan.onbWhoHow,
-          onbRhythm:  plan.onbRhythm,
+          onbGoal:       plan.onbGoal,
+          onbGoalHow:    plan.onbGoalHow,
+          onbWho:        plan.onbWho,
+          onbWhoHow:     plan.onbWhoHow,
+          onbRhythm:     plan.onbRhythm,
+          onbGoalIcon:   plan.onbGoalIcon,
+          onbWhoIcon:    plan.onbWhoIcon,
+          onbRhythmIcon: plan.onbRhythmIcon,
         };
         if (derived.lastSubject) planBody.lastSubject = derived.lastSubject;
         const planPatch = await fetch(LOOPS_UPDATE_URL, {
