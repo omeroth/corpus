@@ -18,12 +18,16 @@ mkdirSync(OUT, { recursive: true });
 const INDEX_URL = pathToFileURL('/Users/omeroth/CORPUS/index.html').href;
 
 // Synthetic prices — 50% off a $89.99 yearly to match the mockup.
+// Includes the custom 'bf_annual_trial' package that drives the
+// onboarding shell's trial SKU, same price as the no-trial yearly.
 const SYNTHETIC_BF = {
   identifier: 'black_friday',
   metadata: { theme: 'black_friday', ends_at: '2026-12-01T07:59:00Z' },
   availablePackages: [
     { identifier: '$rc_annual', packageType: 'ANNUAL',
       product: { identifier: 'corpus_yearly_bf', priceString: '$44.99', price: 44.99, currencyCode: 'USD' } },
+    { identifier: 'bf_annual_trial', packageType: 'ANNUAL',
+      product: { identifier: 'corpus_yearly_bf_trial', priceString: '$44.99', price: 44.99, currencyCode: 'USD' } },
     { identifier: '$rc_monthly', packageType: 'MONTHLY',
       product: { identifier: 'corpus_monthly', priceString: '$12.99', price: 12.99, currencyCode: 'USD' } },
   ],
@@ -76,6 +80,17 @@ async function openModalPaywall(page, { subject, lang, bfOn }) {
 }
 
 async function openOnbPaywall(page, { subject, lang, bfOn }) {
+  // Stub the Capacitor Purchases plugin's trial-eligibility probe to
+  // return 'eligible' for corpus_yearly_bf_trial so the onboarding BF
+  // shot captures the "START FREE TRIAL" copy. Modal shots don't touch
+  // eligibility so this stub is harmless on modal pages.
+  await page.evaluate(() => {
+    window.Capacitor = window.Capacitor || {};
+    window.Capacitor.Plugins = window.Capacitor.Plugins || {};
+    window.Capacitor.Plugins.Purchases = window.Capacitor.Plugins.Purchases || {};
+    window.Capacitor.Plugins.Purchases.checkTrialOrIntroductoryPriceEligibility =
+      async () => ({ corpus_yearly_bf_trial: { status: 2, description: 'eligible' } });
+  });
   await page.evaluate(({ subject, lang, bf, std, bfOn }) => {
     window.state = window.state || {};
     state.subject = subject;
@@ -97,7 +112,9 @@ async function openOnbPaywall(page, { subject, lang, bfOn }) {
     _activePaywallSource = 'onboarding';
     _renderPaywall();
   }, { subject, lang, bf: SYNTHETIC_BF, std: SYNTHETIC_STD, bfOn });
-  await page.waitForTimeout(400);
+  // Trial-eligibility probe is async — wait long enough for the
+  // re-render to land before the screenshot.
+  await page.waitForTimeout(800);
 }
 
 const SUBJECTS = ['philosophy', 'economics', 'psychology'];

@@ -29591,9 +29591,13 @@ function _paywallBfPrices() {
   const bf  = _rcOfferingBlackFriday;
   const std = _rcOfferingStandard;
   if (!bf) return null;
-  const bfYearly  = (bf.availablePackages  || []).find(p => p.packageType === 'ANNUAL');
-  const bfMonthly = (bf.availablePackages  || []).find(p => p.packageType === 'MONTHLY');
-  const stdYearly = (std && std.availablePackages || []).find(p => p.packageType === 'ANNUAL');
+  // Mode-aware yearly: onboarding uses the trial SKU (bf_annual_trial),
+  // modal uses the no-trial SKU ($rc_annual). Same price in both, so
+  // the strikethrough / discount / per-month computations don't change.
+  const bfYearly  = _bfYearlyPackage(_paywallMode)
+    || (bf.availablePackages || []).find(p => p.packageType === 'ANNUAL');
+  const bfMonthly = (bf.availablePackages  || []).find(p => p.identifier === '$rc_monthly' || p.packageType === 'MONTHLY');
+  const stdYearly = (std && std.availablePackages || []).find(p => p.identifier === '$rc_annual' || p.packageType === 'ANNUAL');
 
   const regularPriceString = (stdYearly && stdYearly.product && stdYearly.product.priceString) || null;
   const regularPrice       = (stdYearly && stdYearly.product && typeof stdYearly.product.price === 'number') ? stdYearly.product.price : null;
@@ -29648,12 +29652,16 @@ async function _primeBfTrialEligibility() {
     return _bfTrialEligibility;
   }
   try {
+    // Eligibility is probed on the TRIAL product (corpus_yearly_bf_trial),
+    // not the no-trial one — RC only returns a usable eligibility status
+    // for a SKU that has an intro offer attached. corpus_yearly_bf has no
+    // intro, so probing it always comes back as -1 / 0 / 'unknown'.
     const res = await P.checkTrialOrIntroductoryPriceEligibility({
-      productIdentifiers: ['corpus_yearly_bf'],
+      productIdentifiers: ['corpus_yearly_bf_trial'],
     });
-    // RC returns { "corpus_yearly_bf": { status: 2 | 1 | 0, description } }
+    // RC returns { "corpus_yearly_bf_trial": { status: 2 | 1 | 0, description } }
     // status: 2 = eligible, 1 = ineligible, 0 = unknown, -1 = no intro offered.
-    const entry = res && res['corpus_yearly_bf'];
+    const entry = res && res['corpus_yearly_bf_trial'];
     if (!entry) { _bfTrialEligibility = 'unknown'; return _bfTrialEligibility; }
     _bfTrialEligibility = entry.status === 2 ? 'eligible'
                          : entry.status === 1 ? 'ineligible'
@@ -29705,11 +29713,34 @@ let _paywallShownThisSession = false;
 // hardcoded USD values so the paywall is renderable before products are
 // live in App Store Connect / Play. When falling back, pkg is null and
 // the CTA is disabled — you can't purchase without a real RC package.
+// Pick the right YEARLY package from the Black Friday offering by the
+// paywall's current mode:
+//   - 'onboarding' → 'bf_annual_trial' (corpus_yearly_bf_trial, 7-day intro)
+//   - 'modal'      → '$rc_annual'      (corpus_yearly_bf,       no intro)
+// Falls back to $rc_annual if the custom package is missing (RC Dashboard
+// still being wired) so the paywall never renders empty; worst case the
+// onboarding user is offered the no-trial SKU, which is a visible error
+// but not a broken paywall. Returns null when the offering isn't BF.
+function _bfYearlyPackage(mode) {
+  const off = _rcOfferingBlackFriday;
+  if (!off) return null;
+  const pkgs = (off.availablePackages || []);
+  if (mode === 'onboarding') {
+    const trial = pkgs.find(p => p.identifier === 'bf_annual_trial');
+    if (trial) return trial;
+    console.warn('[BF] bf_annual_trial package missing from RC black_friday offering; onboarding will fall back to $rc_annual (no trial granted)');
+  }
+  return pkgs.find(p => p.identifier === '$rc_annual' || p.packageType === 'ANNUAL') || null;
+}
 function _paywallPrices() {
   const off = _paywallActiveOffering();
   const pkgs = (off && off.availablePackages) || [];
   const monthly = pkgs.find(p => p.identifier === '$rc_monthly' || p.packageType === 'MONTHLY');
-  const yearly  = pkgs.find(p => p.identifier === '$rc_annual'  || p.packageType === 'ANNUAL');
+  // BF selects yearly by mode (trial package for onboarding, no-trial for
+  // modal); every other offering picks the single annual package.
+  const yearly  = _isBlackFridayActive()
+    ? _bfYearlyPackage(_paywallMode)
+    : pkgs.find(p => p.identifier === '$rc_annual'  || p.packageType === 'ANNUAL');
   const isEn = state.lang === 'en';
   // Numeric price is exposed alongside priceString so downstream
   // formatters (e.g. the yearly card's monthly-equivalent display)
@@ -30358,12 +30389,21 @@ function _renderPaywallBf() {
   q('.paywall-bf-yearly').classList.toggle('selected',  _paywallSelectedPkg === 'yearly');
   q('.paywall-bf-monthly').classList.toggle('selected', _paywallSelectedPkg === 'monthly');
 
-  // CTA — "START FREE TRIAL" when eligible AND yearly is selected (the
-  // BF trial lives on corpus_yearly_bf); monthly has no intro so it
-  // always reads "SUBSCRIBE". Protects against promising a trial on a
-  // package that won't apply one at checkout.
+  // CTA — mode-gated trial.
+  //   onboarding shell: "START FREE TRIAL" when eligible for the trial
+  //                     SKU (corpus_yearly_bf_trial) AND yearly selected;
+  //                     every other combo reads "SUBSCRIBE".
+  //   modal shell     : ALWAYS "SUBSCRIBE". The modal shell purchases
+  //                     corpus_yearly_bf (no intro offer), so a trial-
+  //                     labelled CTA would misrepresent the charge.
+  //                     No eligibility probe runs for the modal shell
+  //                     (see _renderPaywall's _primeBfTrialEligibility
+  //                     call site).
   const ctaEl = q('.paywall-bf-cta');
-  const canTrialYearly = _bfTrialEligibility === 'eligible' && _paywallSelectedPkg === 'yearly';
+  const isOnbMode = _paywallMode === 'onboarding';
+  const canTrialYearly = isOnbMode
+    && _bfTrialEligibility === 'eligible'
+    && _paywallSelectedPkg === 'yearly';
   ctaEl.textContent = canTrialYearly
     ? (isEn ? 'START FREE TRIAL' : 'התחלת ניסיון חינם')
     : (isEn ? 'SUBSCRIBE'        : 'הרשמה למנוי');
@@ -30406,8 +30446,11 @@ function _renderPaywall() {
   const root = _paywallActiveRoot;
   if (root) root.classList.toggle('paywall-bf', _isBlackFridayActive());
   if (_isBlackFridayActive()) {
-    // Fire-and-forget trial-eligibility probe; CTA re-renders on resolve.
-    if (_bfTrialEligibility == null) {
+    // Trial eligibility is relevant only when the onboarding shell is
+    // rendering (modal shell always shows SUBSCRIBE). Skip the probe on
+    // modal so we don't incur the RC round-trip + possible unknown-
+    // status fallback for a decision we never show.
+    if (_paywallMode === 'onboarding' && _bfTrialEligibility == null) {
       _primeBfTrialEligibility().then(() => {
         if (_isBlackFridayActive() && _paywallActiveRoot
             && _paywallActiveRoot.classList.contains('paywall-bf')) {
