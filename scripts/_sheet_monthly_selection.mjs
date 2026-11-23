@@ -117,4 +117,67 @@ assert('after : main CTA is START FREE TRIAL', /start my 7-day free trial/i.test
 assert('after : main legal mentions monthly',  /\$12\.99/.test(result.afterTap.mainLegal) && /month/.test(result.afterTap.mainLegal));
 assert('purchase: product is corpus_monthly',  purchased && purchased.productId === 'corpus_monthly');
 assert('purchase: identifier is $rc_monthly',  purchased && purchased.identifier === '$rc_monthly');
+
+// Regression — empty perMonth on ineligible light (device bug seen on
+// 2026-11-26). Simulates a boot where p.yearly.pkg is null (no
+// offering loaded). The renderer must either derive perMonth from
+// the USD fallback priceString OR hide h2 + billed-yearly. Never
+// render "for  a month" with a blank price.
+console.log('\n--- empty-perMonth fallback ---');
+const emptyPerMonthResult = await page.evaluate(() => {
+  __corpusSetOfferingsForDev({ black_friday: null, standard: null, trial: null });
+  _onbTrialEligibility = 'ineligible';
+  _bfTrialEligibility  = 'ineligible';
+  _paywallSelectedPkg  = 'yearly';
+  document.querySelectorAll('.onb-screen').forEach(s => { s.style.display = 'none'; s.classList.remove('onb-active'); });
+  const el = document.getElementById('onb-v2-paywall');
+  el.style.display = ''; el.classList.add('onb-active');
+  _paywallActiveRoot = el; _paywallMode = 'onboarding'; _activePaywallSource = 'onboarding';
+  _renderPaywall();
+  const h2 = document.querySelector('#onb-v2-paywall .pw-trial-h2');
+  const billed = document.querySelector('#onb-v2-paywall .pw-trial-billed');
+  return {
+    h2Text: h2 ? h2.innerText : '',
+    h2Display: h2 ? h2.style.display : null,
+    billedDisplay: billed ? billed.style.display : null,
+  };
+});
+console.log('  h2:', JSON.stringify(emptyPerMonthResult.h2Text), 'display:', emptyPerMonthResult.h2Display);
+console.log('  billed display:', emptyPerMonthResult.billedDisplay);
+// Pass if h2 either rendered a real currency amount OR was hidden.
+const h2OK = emptyPerMonthResult.h2Display === 'none'
+          || /\$[0-9]/.test(emptyPerMonthResult.h2Text);
+assert('empty-perMonth: no broken "for  a month" copy', h2OK);
+assert('empty-perMonth: no bare blank price',           !/^\s*(for|ב-)\s+(a month|לחודש)\s*$/i.test(emptyPerMonthResult.h2Text));
+
+// Regression — __corpusPreviewTrialFlow opens the right first screen
+// across all 4 combos (bf × eligible) with no empty-price copy.
+console.log('\n--- __corpusPreviewTrialFlow combos ---');
+for (const bf of [false, true]) for (const elig of [true, false]) {
+  await page.evaluate(async ({ bf, elig }) => {
+    await __corpusPreviewTrialFlow({ bf, eligible: elig, lang: 'en' });
+  }, { bf, elig });
+  // Let the async .then() inside _onbV2PrepareTrial resolve before
+  // we query the DOM (eligibility probe is a Promise).
+  await page.waitForTimeout(500);
+  const r = await page.evaluate(() => {
+    const actives = Array.from(document.querySelectorAll('.onb-screen.onb-active'));
+    const activeId = actives.length ? actives[actives.length - 1].id : null;
+    let priceText = '';
+    const el = activeId ? document.getElementById(activeId) : null;
+    if (el && activeId === 'onb-v2-paywall') {
+      const h2 = el.querySelector('.pw-trial-h2');
+      const billed = el.querySelector('.pw-trial-billed');
+      priceText = (h2 ? h2.innerText : '') + ' | ' + (billed ? billed.innerText : '');
+    } else if (el && activeId === 'onb-v2-trial') {
+      priceText = el.querySelector('.onb-v2-trialintro-accent')?.innerText || '';
+    }
+    return { activeId, priceText };
+  });
+  const expected = elig ? 'onb-v2-trial' : 'onb-v2-paywall';
+  const noEmptyPrice = !/for\s+a month|ב-\s+לחודש|\(\s*billed yearly\s*\)/i.test(r.priceText || '');
+  assert(`preview bf=${bf} elig=${elig} → opens ${expected}`, r.activeId === expected);
+  assert(`preview bf=${bf} elig=${elig} → no empty-price copy`, noEmptyPrice);
+}
+
 await b.close();

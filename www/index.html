@@ -31184,8 +31184,12 @@ async function _primeOnbTrialEligibility() {
       p => p.identifier === '$rc_annual' || p.packageType === 'ANNUAL'
     );
     const productId = pkg && pkg.product && pkg.product.identifier;
-    if (!productId) { _onbTrialEligibility = 'ineligible'; return _onbTrialEligibility; }
-    _onbTrialEligibility = await _probeTrialEligibility(productId, pkg.identifier);
+    // Call the probe even when productId is null — the probe's debug
+    // override (__CORPUS_DEBUG_BUILD + _corpus_trial_force) fires
+    // regardless of the product arg, and short-circuiting here would
+    // make __corpusPreviewTrialFlow fail when offerings aren't loaded
+    // yet (RC plugin absent in Playwright, cold boot on device).
+    _onbTrialEligibility = await _probeTrialEligibility(productId || null, pkg ? pkg.identifier : null);
   } catch (_) { _onbTrialEligibility = 'ineligible'; }
   return _onbTrialEligibility;
 }
@@ -31234,12 +31238,30 @@ function _renderPaywallTrial() {
     }
   }
 
-  // Headlines + prices
-  const yearlyStr  = (bf && bf.yearly.priceString) || (p.yearly && p.yearly.priceString) || '';
-  const perMonth   = (bf && bf.yearly.perMonthString)
-    || (typeof _bfPerMonthFromYearly === 'function' && p.yearly && p.yearly.pkg
-        ? _bfPerMonthFromYearly(p.yearly.pkg)
-        : null);
+  // Headlines + prices. perMonth must resolve whenever the yearly
+  // package exists. Try (1) BF's pre-derived perMonthString, (2) the
+  // standard pricing pkg if available, (3) synthesize from the
+  // priceString + numeric price pair — which works even when
+  // p.yearly.pkg is null because _paywallPrices fell back to the USD
+  // placeholder before offerings loaded. If all three fail, perMonth
+  // stays null and the caller hides h2 + billed-yearly instead of
+  // rendering "for  a month" with a blank price.
+  const yearlyStr   = (bf && bf.yearly.priceString) || (p.yearly && p.yearly.priceString) || '';
+  const yearlyPrice = (bf && typeof bf.yearly.price === 'number' && bf.yearly.price > 0)
+                      ? bf.yearly.price
+                      : ((p.yearly && typeof p.yearly.price === 'number' && p.yearly.price > 0) ? p.yearly.price : null);
+  let perMonth = (bf && bf.yearly.perMonthString) || null;
+  if (!perMonth && typeof _bfPerMonthFromYearly === 'function') {
+    if (p.yearly && p.yearly.pkg) {
+      perMonth = _bfPerMonthFromYearly(p.yearly.pkg);
+    }
+    if (!perMonth && yearlyStr && yearlyPrice != null) {
+      // Synthesize a pkg-shaped arg so _bfPerMonthFromYearly can
+      // substitute the numeric portion of the yearly priceString
+      // without needing the real RC package object.
+      perMonth = _bfPerMonthFromYearly({ product: { priceString: yearlyStr, price: yearlyPrice } });
+    }
+  }
   const regularStr = (bf && bf.yearly.regularPriceString) || null;
 
   // When monthly is the selected package, step 35 reflects it:
@@ -31267,6 +31289,7 @@ function _renderPaywallTrial() {
   //     h1 accent "Unlock every big idea,"/ h2 "for {monthly} a month"
   const h1El = q('.pw-trial-h1');
   const h2El = q('.pw-trial-h2');
+  if (h2El) h2El.style.display = '';
   if (eligible) {
     if (h1El) { h1El.textContent = isEn ? 'Try 7 days free,' : 'נסו 7 ימים בחינם,'; h1El.style.display = ''; }
     if (h2El) h2El.innerHTML = isEn
@@ -31291,6 +31314,14 @@ function _renderPaywallTrial() {
       ? 'for ' + bdi(displayPerMonth || '') + ' a month'
       : 'ב-'  + bdi(displayPerMonth || '') + ' לחודש';
   }
+  // Safety net: if we still couldn't resolve a per-month price (every
+  // branch above had to render with an empty bdi), HIDE h2 instead of
+  // showing broken copy ("for  a month"). h1 remains — it's price-
+  // independent. Billed-yearly line is handled below via the same
+  // check (billedEl.style.display = 'none' when no yearlyStr).
+  if (!displayPerMonth || !String(displayPerMonth).trim()) {
+    if (h2El) { h2El.innerHTML = ''; h2El.style.display = 'none'; }
+  }
 
   // Billed-yearly line (18px / 700 / ink per spec #2). Flex layout
   // with explicit open/close paren spans pins the paren glyphs at
@@ -31300,10 +31331,10 @@ function _renderPaywallTrial() {
   // isolates the currency + digits from the RTL run.
   const billedEl = q('.pw-trial-billed');
   if (billedEl) {
-    // Hidden when monthly is selected — the "{monthly} a month"
-    // headline already carries the full billing detail. Also drop
-    // the strikethrough in that case.
-    if (monthlySelected) {
+    // Hidden when monthly is selected OR when yearlyStr couldn't be
+    // resolved — the fallback would render "( billed yearly)" with a
+    // blank price, which is worse than no line at all.
+    if (monthlySelected || !yearlyStr || !String(yearlyStr).trim()) {
       billedEl.innerHTML = '';
       billedEl.style.display = 'none';
     } else {
@@ -36301,6 +36332,70 @@ function _onbV2CtaSourceOther() {
   const text = (inp && inp.value || '').trim().slice(0, 60);
   _onbWriteSourceAndAdvance('other', text);
 }
+
+// Debug-only one-shot trial-flow preview. Lets a developer open the
+// right first screen (step 33 if eligible, step 35 if not) with BF
+// or non-BF theme and language flip, from a single DevTools call.
+// Refreshes RC offerings so real prices land. No Supabase writes,
+// no persisted onboarding cursor change — purely a DOM takeover.
+//
+// Guarded on __CORPUS_DEBUG_BUILD; never reachable in Release.
+window.__corpusPreviewTrialFlow = async function (opts) {
+  if (window.__CORPUS_DEBUG_BUILD !== true) {
+    console.warn('[__corpusPreviewTrialFlow] debug builds only.');
+    return { error: 'not a debug build' };
+  }
+  opts = opts || {};
+  const bf       = !!opts.bf;
+  const eligible = !!opts.eligible;
+  const lang     = (opts.lang === 'he') ? 'he' : 'en';
+  try {
+    if (bf) localStorage.setItem('_corpus_bf_force', '1');
+    else    localStorage.removeItem('_corpus_bf_force');
+    if (eligible) localStorage.setItem('_corpus_trial_force', '1');
+    else          localStorage.removeItem('_corpus_trial_force');
+  } catch (_) {}
+  // Clear cached eligibility so the next render reruns the probe
+  // against the force-flag override we just set.
+  _onbTrialEligibility = null;
+  _bfTrialEligibility  = null;
+  // Apply language so the right copy renders.
+  if (state) state.lang = lang;
+  try { if (typeof setAppLang === 'function') setAppLang(lang); } catch (_) {}
+  // Refresh RC offerings so real prices land (await, not fire-and-forget).
+  try { if (typeof _fetchOfferings === 'function') await _fetchOfferings(); } catch (e) {
+    console.warn('[__corpusPreviewTrialFlow] _fetchOfferings failed:', e);
+  }
+  // Clear every onb-screen before taking over.
+  document.querySelectorAll('.onb-screen').forEach(s => {
+    s.style.display = 'none';
+    s.classList.remove('onb-active');
+  });
+  if (eligible) {
+    const el = document.getElementById('onb-v2-trial');
+    if (el) {
+      el.style.display = 'flex';
+      el.classList.add('onb-active');
+      _onbV2PrepareTrial();
+    }
+  } else {
+    const el = document.getElementById('onb-v2-paywall');
+    if (el) {
+      el.style.display = '';
+      el.classList.add('onb-active');
+      _paywallActiveRoot    = el;
+      _paywallMode          = 'onboarding';
+      _activePaywallSource  = 'onboarding';
+      // Explicit marker so _renderPaywall routes to the trial shell's
+      // ineligible branch immediately without re-probing.
+      _onbTrialEligibility  = 'ineligible';
+      _bfTrialEligibility   = 'ineligible';
+      _renderPaywall();
+    }
+  }
+  console.log('[__corpusPreviewTrialFlow] opened', { bf, eligible, lang });
+  return { opened: eligible ? 'step 33' : 'step 35', bf, eligible, lang };
+};
 
 // Debug-only opener. Hides every other onb-screen, then shows the
 // source step and calls its prepare. Also applies the user's current
@@ -64981,6 +65076,7 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
     delete window.__corpusTestRestore;
     delete window.__corpusClock;
     delete window.__corpusTour;
+    delete window.__corpusPreviewTrialFlow;
   } catch (_) {}
 }
 
