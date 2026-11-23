@@ -14843,7 +14843,10 @@
   .onb-screen.onb-v7 .onb-v7-accent { color: var(--accent); font-weight: inherit; }
   /* ── Step 33 — "The promise" ─────────────────────────────────────
      Single large chibi wave, 2-line headline, subject-accent kicker,
-     CTA. Light theme always; no BF styling on this step. */
+     CTA. Light theme always; no BF styling on this step. Progress
+     bar hidden — same treatment as step 35 — so the fixed top-left
+     X has no overlap. */
+  #onb-v2-trial .onb-v7-bar { display: none !important; }
   .onb-v2-trialintro-mid {
     display: flex !important;
     flex-direction: column;
@@ -30987,12 +30990,9 @@ function _renderPaywallBf() {
   // Benefits — fixed copy per spec. Three bullets. Thinker count is
   // computed from the loaded content/thinkers.js (array) rather than
   // hardcoded; if it ever changes, the paywall copy follows.
-  const thinkerCount = (Array.isArray(window.THINKERS) ? window.THINKERS.length
-                      : (typeof THINKERS !== 'undefined' && Array.isArray(THINKERS) ? THINKERS.length : 0));
-  const thinkerCopy = thinkerCount > 0
-    ? (isEn ? ('All ' + thinkerCount + ' thinker cards')
-            : ('כל ' + thinkerCount + ' כרטיסי ההוגים'))
-    : (isEn ? 'Every thinker card' : 'כל כרטיסי ההוגים');
+  // Spec: no hardcoded number on the benefit line, even if we can
+  // compute it. Keeps the copy evergreen as the thinker roster grows.
+  const thinkerCopy = isEn ? 'All thinker cards' : 'כל כרטיסי ההוגים';
   const BENEFITS = isEn ? [
     'Every chapter in all three subjects',
     'Every bonus chapter',
@@ -31142,6 +31142,8 @@ function _renderPaywallTrial() {
     ? (typeof _paywallBfPrices === 'function' ? _paywallBfPrices() : null)
     : null;
   const inBf = !!bf;
+  const eligible = _onbTrialEligibility === 'eligible';
+  root.classList.toggle('pw-trial-ineligible', !eligible);
   const subject = state.subject || 'philosophy';
   // Chibi celebrate — reuse existing onb-thinkers art.
   const CELEBRATE = { philosophy: 'socrates', economics: 'smith', psychology: 'freud' };
@@ -31177,10 +31179,36 @@ function _renderPaywallTrial() {
         : null);
   const regularStr = (bf && bf.yearly.regularPriceString) || null;
 
-  q('.pw-trial-h1').textContent = isEn ? 'Try 7 days free,' : 'נסו 7 ימים בחינם,';
-  q('.pw-trial-h2').innerHTML   = isEn
-    ? 'then ' + bdi(perMonth || '') + ' a month'
-    : 'ואז '  + bdi(perMonth || '') + ' לחודש';
+  // Headlines branch by eligibility.
+  // Eligible:
+  //   h1 "Try 7 days free," (accent) / h2 "then {perMonth} a month"
+  // Ineligible BF with known pct:
+  //   h1 "{pct}% off a year of big ideas" (accent) / h2 "then {perMonth} a month"
+  // Ineligible non-BF:
+  //   h1 hidden / h2 "{perMonth} a month" (promoted to the single headline)
+  const h1El = q('.pw-trial-h1');
+  const h2El = q('.pw-trial-h2');
+  if (eligible) {
+    if (h1El) { h1El.textContent = isEn ? 'Try 7 days free,' : 'נסו 7 ימים בחינם,'; h1El.style.display = ''; }
+    if (h2El) h2El.innerHTML   = isEn
+      ? 'then ' + bdi(perMonth || '') + ' a month'
+      : 'ואז '  + bdi(perMonth || '') + ' לחודש';
+  } else if (inBf && bf && bf.yearly.discountPct != null) {
+    const pct = bf.yearly.discountPct;
+    if (h1El) {
+      h1El.textContent = isEn ? pct + '% off a year of big ideas'
+                              : pct + '% הנחה על שנה של רעיונות גדולים';
+      h1El.style.display = '';
+    }
+    if (h2El) h2El.innerHTML   = isEn
+      ? 'then ' + bdi(perMonth || '') + ' a month'
+      : 'ואז '  + bdi(perMonth || '') + ' לחודש';
+  } else {
+    if (h1El) { h1El.textContent = ''; h1El.style.display = 'none'; }
+    if (h2El) h2El.innerHTML = isEn
+      ? bdi(perMonth || '') + ' a month'
+      : bdi(perMonth || '') + ' לחודש';
+  }
 
   // Billed-yearly line (18px / 700 / ink per spec #2). Flex layout
   // with explicit open/close paren spans pins the paren glyphs at
@@ -31224,13 +31252,36 @@ function _renderPaywallTrial() {
 
   // "View all plans" link
   q('.pw-trial-viewall').textContent = isEn ? 'View all plans' : 'לכל המסלולים';
-  // "No charge today..." line
-  q('.pw-trial-nocharge').textContent = isEn
-    ? 'No charge today. Cancel anytime in two taps.'
-    : 'בלי חיוב היום. ביטול בכל רגע בשתי לחיצות.';
+  // "No charge today..." pre-CTA line + legal line below the CTA
+  // branch by eligibility. Eligible shows the no-charge reassurance
+  // (and no separate legal line because the CTA label already carries
+  // the "7-day free trial" promise). Ineligible shows a plain
+  // "{yearly}/year. Renews at this price. Cancel anytime." legal line
+  // in place of the reassurance so the user sees what they'll pay.
+  const nochargeEl = q('.pw-trial-nocharge');
+  if (eligible) {
+    nochargeEl.textContent = isEn
+      ? 'No charge today. Cancel anytime in two taps.'
+      : 'בלי חיוב היום. ביטול בכל רגע בשתי לחיצות.';
+  } else {
+    nochargeEl.innerHTML = isEn
+      ? bdi(yearlyStr) + '/year. Renews at this price. Cancel anytime.'
+      : bdi(yearlyStr) + '/שנה. מתחדש באותו מחיר. אפשר לבטל בכל רגע.';
+  }
+
   // CTA
+  //   eligible:    "START MY 7-DAY FREE TRIAL"
+  //   ineligible + BF with pct: "CLAIM {pct}% OFF"
+  //   ineligible other: "CONTINUE"
   const ctaEl = q('.pw-trial-cta');
-  ctaEl.textContent = isEn ? 'START MY 7-DAY FREE TRIAL' : 'להתחיל 7 ימי ניסיון בחינם';
+  if (eligible) {
+    ctaEl.textContent = isEn ? 'START MY 7-DAY FREE TRIAL' : 'להתחיל 7 ימי ניסיון בחינם';
+  } else if (inBf && bf && bf.yearly.discountPct != null) {
+    const pct = bf.yearly.discountPct;
+    ctaEl.textContent = isEn ? 'CLAIM ' + pct + '% OFF' : 'לקבל ' + pct + '% הנחה';
+  } else {
+    ctaEl.textContent = isEn ? 'CONTINUE' : 'להמשיך';
+  }
   ctaEl.disabled = _paywallPurchasing;
 
   // Legal row
@@ -31297,10 +31348,19 @@ function _renderPaywallPlansSheet() {
   // Yearly card
   q('.pw-plans-yearly .pw-plans-title').textContent = isEn ? 'Yearly' : 'שנתי';
   const yearlyBadgeEl = q('.pw-plans-yearly-badge');
-  if (inBf && bf.yearly.discountPct != null) {
+  const eligible = _onbTrialEligibility === 'eligible';
+  if (!eligible && inBf && bf.yearly.discountPct != null) {
+    yearlyBadgeEl.textContent = isEn ? 'BLACK FRIDAY' : 'בלאק פריידי';
+    yearlyBadgeEl.style.display = '';
+  } else if (!eligible) {
+    yearlyBadgeEl.textContent = '';
+    yearlyBadgeEl.style.display = 'none';
+  } else if (inBf && bf.yearly.discountPct != null) {
     yearlyBadgeEl.textContent = (isEn ? 'BLACK FRIDAY · 7 DAYS FREE' : 'בלאק פריידי · 7 ימים בחינם');
+    yearlyBadgeEl.style.display = '';
   } else {
     yearlyBadgeEl.textContent = isEn ? '7 DAYS FREE' : '7 ימים בחינם';
+    yearlyBadgeEl.style.display = '';
   }
   const yearlyStr  = (bf && bf.yearly.priceString) || (p.yearly && p.yearly.priceString) || '';
   const regularStr = (bf && bf.yearly.regularPriceString) || null;
@@ -31323,8 +31383,16 @@ function _renderPaywallPlansSheet() {
   const monthlyStr = (bf && bf.monthly.priceString) || (p.monthly && p.monthly.priceString) || '';
   q('.pw-plans-monthly-amount').innerHTML = bdi(monthlyStr) + (isEn ? '/mo' : '/חודש');
 
-  // CTA mirrors the main paywall trial CTA (only shown when eligible)
-  q('.pw-plans-cta').textContent = isEn ? 'START MY 7-DAY FREE TRIAL' : 'להתחיל 7 ימי ניסיון בחינם';
+  // CTA mirrors the main step-35 CTA (same branching on eligibility).
+  const ctaEl = q('.pw-plans-cta');
+  if (eligible) {
+    ctaEl.textContent = isEn ? 'START MY 7-DAY FREE TRIAL' : 'להתחיל 7 ימי ניסיון בחינם';
+  } else if (inBf && bf.yearly.discountPct != null) {
+    const pct = bf.yearly.discountPct;
+    ctaEl.textContent = isEn ? 'CLAIM ' + pct + '% OFF' : 'לקבל ' + pct + '% הנחה';
+  } else {
+    ctaEl.textContent = isEn ? 'CONTINUE' : 'להמשיך';
+  }
 }
 
 function _renderPaywall() {
@@ -31351,11 +31419,19 @@ function _renderPaywall() {
       }
     });
   }
-  const trialOk = onbMode && _onbTrialEligibility === 'eligible';
-  if (root) root.classList.toggle('pw-trial-active', trialOk);
-  if (trialOk) {
+  // Trial-mode shell drives BOTH the eligible ("Try 7 days free") and
+  // the ineligible ("{pct}% off a year of big ideas" / plain monthly)
+  // layouts for the onboarding paywall — the same DOM, different copy
+  // and CTAs. Route every onboarding render through it once the probe
+  // has resolved; while the probe is still pending (_onbTrialEligibility
+  // === null) we show nothing, letting the first _renderPaywall call
+  // after the probe resolve paint.
+  if (onbMode && _onbTrialEligibility != null) {
+    if (root) root.classList.add('pw-trial-active');
     _renderPaywallTrial();
     return;
+  } else if (root) {
+    root.classList.remove('pw-trial-active');
   }
   if (_isBlackFridayActive()) {
     // Trial eligibility is relevant only when the onboarding shell is
@@ -36310,43 +36386,11 @@ function _onbV2CtaReviews() {
 
 // Step 34 (v11) — Trial intro. Owl-fronted invitation with a three-
 // item benefit list. Only reachable when TRIAL_ENABLED is true.
-// Step 33 CTA — "I'M READY". Probes platform-specific trial eligibility
-// for the onboarding yearly SKU and skips step 34 when the user is not
-// eligible. Rationale: step 34 ("reminder-promise") is an explicit
-// promise of a 7-day trial; showing it to an account that won't get
-// one is a bait-and-switch. Skipping straight to step 35's paywall is
-// the honest alternative.
-async function _onbV2CtaTrial() {
-  const btn = document.getElementById('onb-v2-trial-cta');
-  // Visual lock while the (sub-second) probe resolves.
-  const originalLabel = btn && btn.textContent;
-  if (btn) { btn.disabled = true; btn.setAttribute('aria-busy', 'true'); }
-  let eligibility = 'ineligible';
-  try {
-    // Pick the product id that will actually be charged on step 35.
-    // Onboarding uses $rc_annual (which resolves to corpus_yearly_bf_trial
-    // under BF, or corpus_yearly during the standard offering).
-    const off = (typeof _paywallActiveOffering === 'function') ? _paywallActiveOffering() : null;
-    const pkg = (off && off.availablePackages || []).find(
-      p => p.identifier === '$rc_annual' || p.packageType === 'ANNUAL'
-    );
-    const productId = pkg && pkg.product && pkg.product.identifier;
-    if (productId) {
-      eligibility = await _probeTrialEligibility(productId, pkg.identifier);
-    }
-  } catch (_) { eligibility = 'ineligible'; }
-  if (btn) { btn.disabled = false; btn.removeAttribute('aria-busy'); if (originalLabel != null) btn.textContent = originalLabel; }
-  try {
-    _phCapture('paywall_trial_eligibility_probed', {
-      step: 33,
-      result: eligibility,
-    });
-  } catch (_) {}
-  // Eligible → walk through step 34's promise then into step 35.
-  // Ineligible → skip step 34 (no trial to promise) and go straight
-  // to step 35; _renderPaywall will branch to the no-trial copy.
-  if (eligibility === 'eligible') _onbAdvanceStep(33, 34);
-  else                            _onbAdvanceStep(33, 35);
+// Step 33 CTA — "I'M READY". Eligibility was resolved at prepare time
+// (see _onbV2PrepareTrial), so this CTA only fires when the user is
+// eligible; advance straight to step 34's promise.
+function _onbV2CtaTrial() {
+  _onbAdvanceStep(33, 34);
 }
 
 // Step 35 (v11) — Reminder promise. Amber bell hero + head + sub +
@@ -37124,29 +37168,53 @@ function _onbV2PrepareReviews() {
 // 33's advance skips this hook entirely. Static owl expression
 // (neutral / waving) matches the low-pressure invitation framing.
 function _onbV2PrepareTrial() {
-  // v7 trial-intro rebuild ("The promise"): single chibi wave, 2-line
-  // headline, subject-accent kicker, CTA "I'M READY". Light theme
-  // always; BF styling is applied on step 35 only.
+  // v7 trial-intro ("The promise"). Probes trial eligibility FIRST,
+  // behind a neutral loading state, so an ineligible user never sees
+  // the "7 days free" copy. If ineligible, skip 33 AND 34 and land
+  // on step 35 directly (where _renderPaywallTrial paints the no-
+  // trial layout — chibi + prices + CTA "CONTINUE" / "CLAIM X% OFF",
+  // no trial headline, no trial clause in the legal line).
   const screen = document.getElementById('onb-v2-trial');
   if (screen && typeof _onbV7Acc === 'function') _onbV7Acc(screen);
-  const fig = document.getElementById('onb-v7-trialintro-fig');
-  if (fig) fig.src = (typeof _onbThinker === 'function') ? _onbThinker('wave') : '';
-  const isEn = state.lang === 'en';
-  const headEl   = document.getElementById('onb-v2-trial-head');
-  const accentEl = document.getElementById('onb-v2-trial-accent');
-  const ctaEl    = document.getElementById('onb-v2-trial-cta');
-  if (headEl)   headEl.textContent   = isEn ? "Five minutes a day with history's greatest minds."
-                                            : 'חמש דקות ביום עם המוחות הגדולים בהיסטוריה.';
-  if (accentEl) accentEl.textContent = isEn ? 'Start free for 7 days.' : 'התחילו בחינם ל-7 ימים.';
-  if (ctaEl)    ctaEl.textContent    = isEn ? "I'M READY" : 'אני מוכן/ה';
-  // Fire paywall_step_viewed with step 33 so the funnel sees it at
-  // render time (not only at advance).
-  try {
-    _phCapture('paywall_step_viewed', {
-      step: 33,
-      paywall_theme: (typeof _isBlackFridayActive === 'function' && _isBlackFridayActive()) ? 'black_friday' : 'default',
-    });
-  } catch (_) {}
+  // Neutral loading state: hide the step's content while the probe
+  // resolves (sub-second in practice). The .onb-v2-trialintro-mid
+  // children stay in flow so the screen's height doesn't jump when
+  // they reappear.
+  const mid = document.querySelector('#onb-v2-trial .onb-v2-trialintro-mid');
+  const cta = document.getElementById('onb-v2-trial-cta');
+  if (mid) mid.style.visibility = 'hidden';
+  if (cta) cta.style.visibility = 'hidden';
+  _primeOnbTrialEligibility().then(() => {
+    if (_onbTrialEligibility !== 'eligible') {
+      try {
+        _phCapture('paywall_step_skipped', {
+          step: 33,
+          reason: 'ineligible',
+          resolved: _onbTrialEligibility,
+        });
+      } catch (_) {}
+      _onbAdvanceStep(33, 35);
+      return;
+    }
+    // Eligible → paint the promise.
+    const fig = document.getElementById('onb-v7-trialintro-fig');
+    if (fig) fig.src = (typeof _onbThinker === 'function') ? _onbThinker('wave') : '';
+    const isEn = state.lang === 'en';
+    const headEl   = document.getElementById('onb-v2-trial-head');
+    const accentEl = document.getElementById('onb-v2-trial-accent');
+    if (headEl)   headEl.textContent   = isEn ? "Five minutes a day with history's greatest minds."
+                                              : 'חמש דקות ביום עם המוחות הגדולים בהיסטוריה.';
+    if (accentEl) accentEl.textContent = isEn ? 'Start free for 7 days.' : 'התחילו בחינם ל-7 ימים.';
+    if (cta)      cta.textContent      = isEn ? "I'M READY" : 'אני מוכן/ה';
+    if (mid) mid.style.visibility = '';
+    if (cta) cta.style.visibility = '';
+    try {
+      _phCapture('paywall_step_viewed', {
+        step: 33,
+        paywall_theme: (typeof _isBlackFridayActive === 'function' && _isBlackFridayActive()) ? 'black_friday' : 'default',
+      });
+    } catch (_) {}
+  });
 }
 
 // Skip (X) on step 33 — advances to the paywall (step 35) so the user
