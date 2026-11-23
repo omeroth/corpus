@@ -16643,6 +16643,330 @@
     visibility: hidden;
     pointer-events: none;
   }
+  /* ──────────────────────────────────────────────────────────────
+     Black Friday paywall theme. Scoped under .paywall-bf on the
+     active shell (#modal-paywall or #onb-v2-paywall). When the class
+     is OFF the entire .paywall-bf-shell subtree stays display:none
+     and the existing paywall markup renders unchanged. When ON the
+     existing markup is hidden and the subtree takes over. Only the
+     close X (.pwv7-x on modal, .onb-v7-close on onboarding) is kept
+     visible in both modes.
+
+     Dark gradient varies per subject — defaults to philosophy's
+     indigo. Overrides live on html.theme-{economics,psychology}.
+     ────────────────────────────────────────────────────────────── */
+  .paywall-bf-shell { display: none; }
+  #modal-paywall.paywall-bf   .paywall-topbar,
+  #modal-paywall.paywall-bf   .paywall-brand,
+  #modal-paywall.paywall-bf   .paywall-eyebrow,
+  #modal-paywall.paywall-bf   .paywall-headline,
+  #modal-paywall.paywall-bf   .paywall-sub,
+  #modal-paywall.paywall-bf   .pwv7-body,
+  #modal-paywall.paywall-bf   .pwv7-foot,
+  #onb-v2-paywall.paywall-bf  .paywall-brand,
+  #onb-v2-paywall.paywall-bf  .paywall-eyebrow,
+  #onb-v2-paywall.paywall-bf  .onb-v7-paywall-head,
+  #onb-v2-paywall.paywall-bf  .paywall-sub,
+  #onb-v2-paywall.paywall-bf  .paywall-required-line,
+  #onb-v2-paywall.paywall-bf  .paywall-timeline,
+  #onb-v2-paywall.paywall-bf  .paywall-no-payment-due,
+  #onb-v2-paywall.paywall-bf  .paywall-cards,
+  #onb-v2-paywall.paywall-bf  .paywall-cta,
+  #onb-v2-paywall.paywall-bf  .paywall-restore,
+  #onb-v2-paywall.paywall-bf  .paywall-legal,
+  #onb-v2-paywall.paywall-bf  .paywall-links,
+  #onb-v2-paywall.paywall-bf  .paywall-hard-footer { display: none !important; }
+  #modal-paywall.paywall-bf   .paywall-bf-shell,
+  #onb-v2-paywall.paywall-bf  .paywall-bf-shell {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 100%;
+    padding: 20px 20px 24px;
+  }
+  /* Modal shell: X is position:fixed at env+14; reserve ~56px+env so
+     the "BLACK FRIDAY" eyebrow sits below it. */
+  #modal-paywall.paywall-bf .paywall-bf-shell {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 56px);
+  }
+  /* Onboarding shell: the X lives inside .onb-v7-top (its own row
+     above .onb-v7-mid), so no reserve is needed — bring the eyebrow
+     up to the top of the mid area. Saves ~40px, enough to float the
+     legal-row above the fold on Psychology HE where the Hebrew
+     character height pushes a little further than the other combos. */
+  #onb-v2-paywall.paywall-bf .paywall-bf-shell {
+    padding-top: 4px;
+  }
+  /* Dark surface — philosophy default; themed via html.theme-* below. */
+  #modal-paywall.paywall-bf,
+  #modal-paywall.paywall-bf .modal-box.paywall-box,
+  #onb-v2-paywall.paywall-bf {
+    background: linear-gradient(180deg, #120D24 0%, #1E1538 100%) !important;
+    color: #FFFFFF;
+  }
+  html.theme-economics  #modal-paywall.paywall-bf,
+  html.theme-economics  #modal-paywall.paywall-bf .modal-box.paywall-box,
+  html.theme-economics  #onb-v2-paywall.paywall-bf {
+    background: linear-gradient(180deg, #0A1430 0%, #12224A 100%) !important;
+  }
+  html.theme-psychology #modal-paywall.paywall-bf,
+  html.theme-psychology #modal-paywall.paywall-bf .modal-box.paywall-box,
+  html.theme-psychology #onb-v2-paywall.paywall-bf {
+    background: linear-gradient(180deg, #1F0F06 0%, #33190B 100%) !important;
+  }
+  /* The modal shell is usually a centered rounded card — in BF mode
+     it stretches to fill the overlay so the dark gradient reaches
+     every edge. */
+  #modal-paywall.paywall-bf .modal-box.paywall-box {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+  /* Keep the close X visible even though .pwv7-band is hidden above.
+     The X is inside .pwv7-band in the DOM; promote it out of the
+     display:none cascade so it stays tappable. Position stays the
+     same (fixed top-left with safe-area inset) via the base .pwv7-x
+     rule, we just restore visibility + raise z-index above the BF
+     subtree. */
+  #modal-paywall.paywall-bf .pwv7-band { display: contents !important; }
+  #modal-paywall.paywall-bf .pwv7-band > :not(.pwv7-x) { display: none !important; }
+  #modal-paywall.paywall-bf .pwv7-x {
+    display: flex !important;
+    position: fixed !important;
+    top: calc(env(safe-area-inset-top, 0px) + 14px);
+    inset-inline-start: 12px;
+    color: rgba(255,255,255,.9);
+    z-index: 20;
+  }
+  /* .onb-v7-close is already visible in soft mode; recolour to white. */
+  #onb-v2-paywall.paywall-bf .onb-v7-close { color: rgba(255,255,255,.9); }
+  #onb-v2-paywall.paywall-bf .onb-v7-top .onb-v7-bar { display: none; }
+
+  /* Gold eyebrow — "BLACK FRIDAY" */
+  .paywall-bf-eyebrow {
+    color: #F5B800;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 1.6px;
+    text-align: center;
+    margin: 0 0 8px;
+  }
+  /* Hero region — chibi + sticker overlay */
+  .paywall-bf-hero {
+    position: relative;
+    width: 125px;
+    height: 125px;
+    margin: 0 auto 6px;
+  }
+  .paywall-bf-chibi {
+    width: 125px;
+    height: 125px;
+    object-fit: contain;
+    display: block;
+  }
+  .paywall-bf-sticker {
+    position: absolute;
+    top: 8px;
+    inset-inline-start: -18px;
+    background: #F5B800;
+    color: #1E1538;
+    font-weight: 900;
+    border-radius: 10px;
+    padding: 5px 10px 6px;
+    transform: rotate(-12deg);
+    box-shadow: 0 3px 0 rgba(0,0,0,.25);
+    text-align: center;
+    line-height: 1;
+    min-width: 62px;
+  }
+  html[dir="rtl"] .paywall-bf-sticker {
+    transform: rotate(12deg);
+    inset-inline-start: auto;
+    inset-inline-end: -18px;
+  }
+  .paywall-bf-sticker-pct { font-size: 18px; display: block; letter-spacing: -0.3px; }
+  .paywall-bf-sticker-off { font-size: 10px; display: block; letter-spacing: 1px; margin-top: 2px; }
+
+  .paywall-bf-headline {
+    color: #FFFFFF;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin: 2px 16px 8px;
+    text-align: center;
+    /* Balance so the last line can't sit as a single orphan word. */
+    text-wrap: balance;
+  }
+  .paywall-bf-ends {
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 16px;
+  }
+  /* Subject accent varies — use the themed --accent, but brighten so it
+     reads on dark. */
+  html.theme-philosophy #modal-paywall.paywall-bf .paywall-bf-ends,
+  html.theme-philosophy #onb-v2-paywall.paywall-bf .paywall-bf-ends { color: #B995F3; }
+  html.theme-economics  #modal-paywall.paywall-bf .paywall-bf-ends,
+  html.theme-economics  #onb-v2-paywall.paywall-bf .paywall-bf-ends { color: #6B96F2; }
+  html.theme-psychology #modal-paywall.paywall-bf .paywall-bf-ends,
+  html.theme-psychology #onb-v2-paywall.paywall-bf .paywall-bf-ends { color: #FDBA74; }
+
+  .paywall-bf-benefits {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 18px;
+  }
+  .paywall-bf-benefit {
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 6px;
+    padding-inline-start: 34px;
+    position: relative;
+    text-align: start;
+  }
+  .paywall-bf-benefit::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    top: 2px;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: #F5B800;
+    /* Checkmark via inline SVG as mask */
+    -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 12.5l4 4 10-10' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 12.5l4 4 10-10' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  }
+  .paywall-bf-benefit::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: 4px;
+    top: 6px;
+    width: 14px;
+    height: 10px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 12.5l4 4 10-10' fill='none' stroke='%231E1538' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  /* Cards */
+  .paywall-bf-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0 0 20px;
+  }
+  .paywall-bf-card {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 16px;
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.04);
+    color: #FFFFFF;
+    text-align: start;
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .paywall-bf-yearly { padding-top: 26px; }
+  /* Selected: gold border + warm gold wash. Both cards use the same
+     .selected hook so tapping monthly flips the border + badge
+     visibility to it. */
+  .paywall-bf-card.selected {
+    border-color: #F5B800;
+    background: rgba(245,184,0,.08);
+  }
+  /* Yearly badge only visible when yearly is selected (gold ribbon
+     at the top). Spec: monthly has no badge. */
+  .paywall-bf-yearly:not(.selected) .paywall-bf-yearly-badge { display: none; }
+  /* Yearly amount colour follows selection; monthly amount stays white
+     to avoid double-emphasising both cards at the same time. */
+  .paywall-bf-yearly:not(.selected) .paywall-bf-yearly-amount { color: #FFFFFF; }
+  .paywall-bf-yearly-badge {
+    position: absolute;
+    top: -12px;
+    inset-inline-start: 16px;
+    background: #F5B800;
+    color: #1E1538;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    padding: 5px 10px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+  .paywall-bf-yearly-badge:empty { display: none; }
+  .paywall-bf-card-title { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
+  .paywall-bf-yearly-permonth { font-size: 13px; color: rgba(255,255,255,.72); }
+  .paywall-bf-monthly-sub    { font-size: 13px; color: rgba(255,255,255,.72); }
+  .paywall-bf-card-price { text-align: end; }
+  .paywall-bf-yearly-strike {
+    font-size: 13px;
+    color: rgba(255,255,255,.55);
+    text-decoration: line-through;
+    margin-bottom: 2px;
+  }
+  .paywall-bf-yearly-strike:empty { display: none; }
+  .paywall-bf-yearly-amount { font-size: 26px; font-weight: 900; color: #F5B800; line-height: 1; }
+  .paywall-bf-yearly-period { font-size: 12px; color: rgba(255,255,255,.72); margin-top: 3px; }
+  .paywall-bf-monthly-amount { font-size: 22px; font-weight: 800; color: #FFFFFF; line-height: 1; }
+  .paywall-bf-monthly-period { font-size: 12px; color: rgba(255,255,255,.72); margin-top: 3px; }
+
+  .paywall-bf-cta {
+    background: #F5B800;
+    color: #1E1538;
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    border: 0;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin: 8px 0 14px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 4px 0 rgba(0,0,0,.25);
+  }
+  .paywall-bf-cta:active { transform: translateY(2px); box-shadow: none; }
+  .paywall-bf-legal {
+    color: rgba(255,255,255,.65);
+    font-size: 11.5px;
+    text-align: center;
+    margin: 0 0 6px;
+    line-height: 1.5;
+    padding: 0 10px;
+  }
+  .paywall-bf-legal-row {
+    text-align: center;
+    font-size: 11.5px;
+    color: rgba(255,255,255,.65);
+  }
+  .paywall-bf-legal-row > * { color: rgba(255,255,255,.75); }
+  .paywall-bf-restore,
+  .paywall-bf-terms,
+  .paywall-bf-privacy {
+    background: transparent;
+    border: 0;
+    color: rgba(255,255,255,.75);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+  }
+  .paywall-bf-sep { padding: 0 6px; color: rgba(255,255,255,.4); }
+
   /* SE scale-down for the paywall internals. */
   @media (max-height: 700px) {
     .onb-screen.onb-v7#onb-v2-paywall .paywall-brand { display: none; }
@@ -27351,7 +27675,7 @@ if (typeof corpusData === 'undefined' || typeof economicsData === 'undefined'
 // App Store release. The iOS-only update-banner checkForUpdate() compares
 // this against corpusapp.io/version.json to decide whether to prompt the
 // user to grab the newest App Store build.
-const APP_VERSION = '2.0.5';
+const APP_VERSION = '2.0.6';
 
 // ── Haptics ────────────────────────────────────────────────────────────
 // Single entry point for every haptic in the app. Kinds:
@@ -29028,6 +29352,28 @@ let _rcConfigured = false;
 // stale cache is worse than a re-fetch.
 let _rcOfferingTrial = null;
 let _rcOfferingStandard = null;
+// Black Friday 2026: holds res.all.black_friday when the Dashboard has
+// published an offering with that identifier. Existing in res.all alone
+// does NOT activate the theme — _isBlackFridayActive requires that it
+// also be the Current offering. See _isBlackFridayActive for the gate.
+let _rcOfferingBlackFriday = null;
+// Debug-build-only hook for the BF screenshot harness and manual
+// device-review. Lets a dev set the three offering globals from
+// Playwright / Web Inspector without going through RC. Guarded by
+// window.__CORPUS_DEBUG_BUILD so it can't be called from a Release
+// build (same gate as _isDevPremium). No-op in production.
+try {
+  if (typeof window !== 'undefined') {
+    window.__corpusSetOfferingsForDev = function (opts) {
+      if (window.__CORPUS_DEBUG_BUILD !== true) return false;
+      if (!opts || typeof opts !== 'object') return false;
+      if ('black_friday' in opts) _rcOfferingBlackFriday = opts.black_friday;
+      if ('standard'     in opts) _rcOfferingStandard    = opts.standard;
+      if ('trial'        in opts) _rcOfferingTrial       = opts.trial;
+      return true;
+    };
+  }
+} catch (_) {}
 
 async function _configureRC(userId) {
   if (!window.Capacitor || !window.Capacitor.isNativePlatform || !window.Capacitor.isNativePlatform()) return;
@@ -29079,12 +29425,16 @@ async function _fetchOfferings() {
   if (!P) return;
   try {
     const res = await P.getOfferings();
-    _rcOfferingTrial    = (res && res.current) || null;
-    _rcOfferingStandard = (res && res.all && res.all.standard) || null;
+    _rcOfferingTrial       = (res && res.current) || null;
+    _rcOfferingStandard    = (res && res.all && res.all.standard) || null;
+    _rcOfferingBlackFriday = (res && res.all && res.all.black_friday) || null;
     const trialPkgs = (_rcOfferingTrial    && _rcOfferingTrial.availablePackages    || []).map(p => p.identifier);
     const stdPkgs   = (_rcOfferingStandard && _rcOfferingStandard.availablePackages || []).map(p => p.identifier);
+    const bfPkgs    = (_rcOfferingBlackFriday && _rcOfferingBlackFriday.availablePackages || []).map(p => p.identifier);
     console.log('[RC] trial offering:',    (_rcOfferingTrial    && _rcOfferingTrial.identifier)    || 'none', 'packages:', trialPkgs);
     console.log('[RC] standard offering:', (_rcOfferingStandard && _rcOfferingStandard.identifier) || 'none', 'packages:', stdPkgs);
+    console.log('[RC] black_friday:',      (_rcOfferingBlackFriday && _rcOfferingBlackFriday.identifier) || 'none', 'packages:', bfPkgs,
+      'current?', (_rcOfferingTrial && _rcOfferingTrial.identifier) === 'black_friday');
     if (!_rcOfferingStandard) {
       console.warn('[RC] standard offering missing from getOfferings() — modal paywall will fall back to trial offering until the RC config lands');
     } else if (stdPkgs.length === 0) {
@@ -29116,11 +29466,202 @@ async function _fetchOfferings() {
 // far better than a modal paywall with no visible prices for the
 // weeks Apple takes to approve the products.
 function _paywallActiveOffering() {
+  // Black Friday takeover: when the gate is satisfied, both shells switch
+  // to the BF offering. The BF offering ships with both $rc_annual (points
+  // at corpus_yearly_bf with its 7-day intro) and $rc_monthly, so a single
+  // offering drives onboarding + modal paywalls identically. See
+  // _isBlackFridayActive for the gate.
+  if (_isBlackFridayActive()) return _rcOfferingBlackFriday;
   if (_paywallMode === 'onboarding') return _rcOfferingTrial;
   const stdHasPkgs = _rcOfferingStandard
     && _rcOfferingStandard.availablePackages
     && _rcOfferingStandard.availablePackages.length > 0;
   return stdHasPkgs ? _rcOfferingStandard : _rcOfferingTrial;
+}
+
+// Gate for the Black Friday paywall theme.
+// Primary condition: RevenueCat's CURRENT offering identifier must be
+// 'black_friday'. _rcOfferingTrial is seeded from res.current in
+// _fetchOfferings, so .identifier there is a reliable proxy for "this
+// is the Dashboard's active offering." Merely existing in res.all is
+// NOT enough — a defined-but-not-current offering must stay invisible
+// to clients.
+//
+// Belt-and-braces: IF the RC Capacitor plugin surfaces the Offering
+// metadata dictionary on the object (some plugin versions do, some
+// don't), additionally require metadata.theme === 'black_friday' AND
+// metadata.ends_at to parse into a future Date. This catches the case
+// where the offering is accidentally left Current past the campaign
+// end, and lets the Dashboard end the sale by updating metadata rather
+// than by immediately flipping Current back to standard.
+//
+// If metadata isn't exposed (plugin returns undefined), the current-
+// identifier check alone governs — no plugin upgrade is forced.
+//
+// Dev override: on debug builds only, localStorage._corpus_bf_force='1'
+// forces this to return true as long as _rcOfferingBlackFriday is set
+// (synthetic or real). Same gating pattern as _isDevPremium.
+function _isBlackFridayActive() {
+  if (!_rcOfferingBlackFriday) return false;
+  // Dev override — debug builds, same gate as _isDevPremium.
+  try {
+    if (window.__CORPUS_DEBUG_BUILD === true
+        && localStorage.getItem('_corpus_bf_force') === '1') {
+      return true;
+    }
+  } catch (_) {}
+  // Primary gate: Dashboard's Current offering must BE black_friday.
+  const currentId = (_rcOfferingTrial && _rcOfferingTrial.identifier) || null;
+  if (currentId !== 'black_friday') return false;
+  // Optional secondary gate — honoured only when the plugin exposes it.
+  const meta = _rcOfferingBlackFriday.metadata;
+  if (meta && typeof meta === 'object') {
+    if (meta.theme !== 'black_friday') return false;
+    const ends = Date.parse(meta.ends_at || '');
+    if (!Number.isFinite(ends) || ends <= Date.now()) return false;
+  }
+  return true;
+}
+
+// Build a per-month display string by substituting a new numeric
+// value into the yearly package's priceString, preserving every
+// non-numeric detail (symbol, symbol position, nbsp/space, decimal
+// separator, thousands separator). Returns null on any unexpected
+// shape — caller falls back to Intl.NumberFormat.
+//
+// Approach: match the first run of digits (with embedded . and ,).
+// If the integer form of that run equals Math.round(num), we treat
+// any separators as thousands and preserve zero decimals (e.g. yen
+// '¥4499' or '¥4,499'). Otherwise, the LAST separator is the decimal
+// separator; an earlier one is the thousands separator. Decimal count
+// is preserved exactly. Thousands grouping is reapplied to the
+// per-month value.
+//
+// Examples (both sides using the same yearly.price=44.99):
+//   "$44.99"   → "$3.75"
+//   "£44.99"   → "£3.75"
+//   "44,99 €"  → "3,75 €"
+//   "¥4499"    → "¥374"   (price=4499, integer)
+//   "₪44.99"   → "₪3.75"
+function _bfPerMonthFromYearly(yearlyPkg) {
+  const str = yearlyPkg && yearlyPkg.product && yearlyPkg.product.priceString;
+  const num = yearlyPkg && yearlyPkg.product && yearlyPkg.product.price;
+  if (typeof str !== 'string' || typeof num !== 'number' || !isFinite(num) || num <= 0) return null;
+  const m = str.match(/\d[\d.,]*/);
+  if (!m) return null;
+  const numStr = m[0];
+  const digitOnly = numStr.replace(/[^\d]/g, '');
+  if (!digitOnly) return null;
+
+  let decSep = '', thousandSep = '', decimals = 0;
+  if (parseInt(digitOnly, 10) === Math.round(num)) {
+    // Integer currency (zero decimals shown). Any separator is thousands.
+    const firstSep = numStr.match(/[^\d]/);
+    thousandSep = firstSep ? firstSep[0] : '';
+    decimals = 0;
+  } else {
+    const seps = numStr.match(/[^\d]/g) || [];
+    if (!seps.length) return null;
+    decSep = seps[seps.length - 1];
+    decimals = numStr.length - numStr.lastIndexOf(decSep) - 1;
+    if (seps.length > 1) thousandSep = seps[0];
+  }
+
+  const perMonth = num / 12;
+  let formatted = perMonth.toFixed(decimals);
+  if (decSep && decSep !== '.') formatted = formatted.replace('.', decSep);
+  if (thousandSep) {
+    const [intPart, decPart] = decSep ? formatted.split(decSep) : [formatted, ''];
+    const withT = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSep);
+    formatted = decPart ? (withT + decSep + decPart) : withT;
+  }
+  return str.replace(numStr, formatted);
+}
+
+// Returns the BF presentation prices + derived discount %, or null if
+// _rcOfferingBlackFriday isn't populated. Separate from _paywallPrices
+// because the BF card ALSO needs the regular standard yearly price for
+// the strikethrough + %-off computation; pulling those here keeps the
+// render function clean. All three fail-safes apply:
+//   regularPriceString null → caller hides strikethrough
+//   discountPct null        → caller falls back to generic headline
+//                             and drops the "X% OFF" sticker + card tag
+//   perMonthString null     → caller hides the per-month line
+function _paywallBfPrices() {
+  const bf  = _rcOfferingBlackFriday;
+  const std = _rcOfferingStandard;
+  if (!bf) return null;
+  const bfYearly  = (bf.availablePackages  || []).find(p => p.packageType === 'ANNUAL');
+  const bfMonthly = (bf.availablePackages  || []).find(p => p.packageType === 'MONTHLY');
+  const stdYearly = (std && std.availablePackages || []).find(p => p.packageType === 'ANNUAL');
+
+  const regularPriceString = (stdYearly && stdYearly.product && stdYearly.product.priceString) || null;
+  const regularPrice       = (stdYearly && stdYearly.product && typeof stdYearly.product.price === 'number') ? stdYearly.product.price : null;
+  const bfYearlyPrice      = (bfYearly  && bfYearly.product  && typeof bfYearly.product.price  === 'number') ? bfYearly.product.price  : null;
+  const bfYearlyPriceStr   = (bfYearly  && bfYearly.product  && bfYearly.product.priceString) || null;
+  const currencyCode       = (bfYearly  && bfYearly.product  && bfYearly.product.currencyCode) || 'USD';
+  const bfMonthlyPriceStr  = (bfMonthly && bfMonthly.product && bfMonthly.product.priceString) || null;
+
+  let discountPct = null;
+  if (bfYearlyPrice != null && regularPrice != null && regularPrice > 0) {
+    discountPct = Math.floor((1 - bfYearlyPrice / regularPrice) * 100);   // rounded DOWN per spec
+    if (discountPct <= 0) discountPct = null;                             // defensive — no sale, no badge
+  }
+
+  // Per-month display is derived from the YEARLY priceString itself by
+  // substituting the numeric portion. This guarantees the symbol,
+  // symbol position, whitespace (nbsp vs plain space), decimal
+  // separator, and thousands separator exactly match what the store
+  // renders for the yearly price — so "$44.99" → "$3.75",
+  // "4,99 €" → "0,42 €", "¥4499" → "¥374", etc. Falls back to Intl
+  // (and hides the line if Intl also fails) if the priceString shape
+  // is unexpected.
+  let perMonthString = _bfPerMonthFromYearly(bfYearly);
+  if (perMonthString == null && bfYearlyPrice != null) {
+    try {
+      perMonthString = new Intl.NumberFormat(
+        state.lang === 'en' ? 'en-US' : 'he-IL',
+        { style: 'currency', currency: currencyCode, maximumFractionDigits: 2 }
+      ).format(bfYearlyPrice / 12);
+    } catch (_) {
+      perMonthString = null;
+    }
+  }
+
+  return {
+    yearly:  { priceString: bfYearlyPriceStr, perMonthString, regularPriceString, discountPct },
+    monthly: { priceString: bfMonthlyPriceStr },
+  };
+}
+
+// Trial-eligibility cache for the BF yearly SKU. Populated lazily the
+// first time a BF paywall renders. Values: 'eligible' | 'ineligible' |
+// 'unknown'. The CTA renders "START FREE TRIAL" only on 'eligible';
+// 'ineligible' and 'unknown' both fall back to "SUBSCRIBE" so we never
+// mis-promise a trial a user won't actually get.
+let _bfTrialEligibility = null;
+async function _primeBfTrialEligibility() {
+  if (_bfTrialEligibility) return _bfTrialEligibility;
+  const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
+  if (!P || typeof P.checkTrialOrIntroductoryPriceEligibility !== 'function') {
+    _bfTrialEligibility = 'unknown';
+    return _bfTrialEligibility;
+  }
+  try {
+    const res = await P.checkTrialOrIntroductoryPriceEligibility({
+      productIdentifiers: ['corpus_yearly_bf'],
+    });
+    // RC returns { "corpus_yearly_bf": { status: 2 | 1 | 0, description } }
+    // status: 2 = eligible, 1 = ineligible, 0 = unknown, -1 = no intro offered.
+    const entry = res && res['corpus_yearly_bf'];
+    if (!entry) { _bfTrialEligibility = 'unknown'; return _bfTrialEligibility; }
+    _bfTrialEligibility = entry.status === 2 ? 'eligible'
+                         : entry.status === 1 ? 'ineligible'
+                         : 'unknown';
+  } catch (_) {
+    _bfTrialEligibility = 'unknown';
+  }
+  return _bfTrialEligibility;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -29563,6 +30104,8 @@ function showPaywall(opts) {
     _activePaywallSource = opts.source || 'unknown';
     posthog.capture('paywall_shown', {
       source: _activePaywallSource,
+      paywall_trigger: _paywallSource(),
+      paywall_theme:   _isBlackFridayActive() ? 'black_friday' : 'default',
       subject: opts.subject || state.subject || null,
       week_id: typeof opts.weekId !== 'undefined' ? opts.weekId : null,
       day_id:  typeof opts.dayId  !== 'undefined' ? opts.dayId  : null,
@@ -29638,6 +30181,8 @@ function _exitPaywall(reason) {
   try {
     posthog.capture('paywall_dismissed', {
       source:           _paywallSource(),
+      paywall_trigger:  _paywallSource(),
+      paywall_theme:    _isBlackFridayActive() ? 'black_friday' : 'default',
       package_selected: _paywallSelectedPkg,
       source_mode:      _paywallMode,
       reason:           reason || 'unknown',
@@ -29665,15 +30210,217 @@ function _selectPaywallPackage(which) {
   _renderPaywall();
 }
 
+// Black Friday renderer. Called from _renderPaywall when the gate is on.
+// Writes into the .paywall-bf-shell subtree inside the active shell. The
+// existing paywall markup stays untouched — CSS (.paywall-bf) hides it
+// and reveals the BF subtree. Keeps the existing close X wired because
+// the shell's .pwv7-x / .onb-v7-close CSS already positions above this.
+function _renderPaywallBf() {
+  const isEn = state.lang === 'en';
+  const root = _paywallActiveRoot;
+  if (!root) return;
+  const q = (sel) => root.querySelector(sel);
+  const bf = _paywallBfPrices();
+  // meta.ends_at is required for the "Ends …" line; defensively parse.
+  const meta = (_rcOfferingBlackFriday && _rcOfferingBlackFriday.metadata) || {};
+  const subject = state.subject || 'philosophy';
+
+  // Eyebrow
+  q('.paywall-bf-eyebrow').textContent = isEn ? 'BLACK FRIDAY' : 'בלאק פריידי';
+
+  // Chibi — reuse the existing onb-thinkers celebrate PNGs.
+  const CHIBI_BY_SUBJECT = {
+    philosophy: 'socrates',
+    economics:  'smith',
+    psychology: 'freud',
+  };
+  const chibiSlug = CHIBI_BY_SUBJECT[subject] || 'socrates';
+  const chibiImg = q('.paywall-bf-chibi');
+  if (chibiImg) chibiImg.src = './images/onb-thinkers/' + chibiSlug + '-celebrate.png';
+
+  // Sticker — hide when discountPct is unavailable (spec: "hide the
+  // strikethrough and the % badge rather than guess").
+  const stickerEl = q('.paywall-bf-sticker');
+  const pctEl     = q('.paywall-bf-sticker-pct');
+  const offEl     = q('.paywall-bf-sticker-off');
+  if (bf && bf.yearly.discountPct != null) {
+    pctEl.textContent = bf.yearly.discountPct + '%';
+    offEl.textContent = isEn ? 'OFF' : 'הנחה';
+    stickerEl.style.display = '';
+  } else {
+    stickerEl.style.display = 'none';
+  }
+
+  // Headline — 50 → "Half price…"; other → "{N}% off…"; null → generic.
+  const headlineEl = q('.paywall-bf-headline');
+  if (bf && bf.yearly.discountPct === 50) {
+    headlineEl.textContent = isEn ? 'Half price on a year of big ideas'
+                                  : 'חצי מחיר על שנה של רעיונות גדולים';
+  } else if (bf && bf.yearly.discountPct != null) {
+    const pct = bf.yearly.discountPct;
+    headlineEl.textContent = isEn ? pct + '% off a year of big ideas'
+                                  : pct + '% הנחה על שנה של רעיונות גדולים';
+  } else {
+    headlineEl.textContent = isEn ? 'Big ideas on sale' : 'רעיונות גדולים בהנחה';
+  }
+
+  // "Ends {weekday, date}" — parsed from metadata.ends_at. Hidden if the
+  // date isn't parseable (shouldn't happen in production, but survives
+  // a missing metadata case on older RC plugin versions). HE is
+  // 'עד ' + label (prefix); the earlier 'label + עד' suffix rendered
+  // reversed because Hebrew is RTL — the date got pushed to the right
+  // of the word, producing the wrong read order.
+  const endsEl = q('.paywall-bf-ends');
+  const ends = Date.parse(meta.ends_at || '');
+  if (Number.isFinite(ends)) {
+    try {
+      const fmt = new Intl.DateTimeFormat(isEn ? 'en-US' : 'he-IL', {
+        weekday: 'long', month: 'short', day: 'numeric',
+      });
+      const label = fmt.format(new Date(ends));
+      endsEl.textContent = isEn ? 'Ends ' + label : 'עד ' + label;
+      endsEl.style.display = '';
+    } catch (_) {
+      endsEl.style.display = 'none';
+    }
+  } else {
+    endsEl.style.display = 'none';
+  }
+
+  // Benefits — fixed copy per spec. Three bullets. Thinker count is
+  // computed from the loaded content/thinkers.js (array) rather than
+  // hardcoded; if it ever changes, the paywall copy follows.
+  const thinkerCount = (Array.isArray(window.THINKERS) ? window.THINKERS.length
+                      : (typeof THINKERS !== 'undefined' && Array.isArray(THINKERS) ? THINKERS.length : 0));
+  const thinkerCopy = thinkerCount > 0
+    ? (isEn ? ('All ' + thinkerCount + ' thinker cards')
+            : ('כל ' + thinkerCount + ' כרטיסי ההוגים'))
+    : (isEn ? 'Every thinker card' : 'כל כרטיסי ההוגים');
+  const BENEFITS = isEn ? [
+    'Every chapter in all three subjects',
+    'Every bonus chapter',
+    thinkerCopy,
+  ] : [
+    'כל פרק בכל שלושת התחומים',
+    'כל פרק בונוס',
+    thinkerCopy,
+  ];
+  const benefitEls = root.querySelectorAll('.paywall-bf-benefit');
+  benefitEls.forEach((el, i) => { el.textContent = BENEFITS[i] || ''; });
+
+  // Yearly card
+  const yearlyBadgeEl    = q('.paywall-bf-yearly-badge');
+  const yearlyStrikeEl   = q('.paywall-bf-yearly-strike');
+  const yearlyAmountEl   = q('.paywall-bf-yearly-amount');
+  const yearlyPeriodEl   = q('.paywall-bf-yearly-period');
+  const yearlyTitleEl    = q('.paywall-bf-yearly .paywall-bf-card-title');
+  const yearlyPerMonthEl = q('.paywall-bf-yearly-permonth');
+
+  yearlyTitleEl.textContent = isEn ? 'Yearly' : 'שנתי';
+  if (bf && bf.yearly.discountPct != null) {
+    yearlyBadgeEl.textContent = (isEn ? 'BLACK FRIDAY · ' : 'בלאק פריידי · ')
+                              + bf.yearly.discountPct + '% ' + (isEn ? 'OFF' : 'הנחה');
+  } else {
+    yearlyBadgeEl.textContent = isEn ? 'BLACK FRIDAY' : 'בלאק פריידי';
+  }
+  // Prices wrap in <bdi> so the currency sign + digits never flip in
+  // RTL mode. innerHTML is safe here — bf.*.priceString and
+  // regularPriceString come from the RC product object, not user input;
+  // StoreKit / Google Play format them with the device's locale rules
+  // and don't inject HTML.
+  const bdi = (s) => s ? '<bdi>' + s + '</bdi>' : '';
+  yearlyStrikeEl.innerHTML   = bdi(bf && bf.yearly.regularPriceString);
+  yearlyAmountEl.innerHTML   = bdi(bf && bf.yearly.priceString);
+  yearlyPeriodEl.textContent = isEn ? 'per year' : 'לשנה';
+  // Per-month line: HE uses "{price} לחודש" (no slash — slash with a
+  // Hebrew word reads as a typo). EN keeps "/ month" since / is fine
+  // between an EN word and a number.
+  if (bf && bf.yearly.perMonthString) {
+    yearlyPerMonthEl.innerHTML = isEn
+      ? bdi(bf.yearly.perMonthString) + ' / month'
+      : bdi(bf.yearly.perMonthString) + ' לחודש';
+  } else {
+    yearlyPerMonthEl.textContent = '';
+  }
+
+  // Monthly card
+  q('.paywall-bf-monthly .paywall-bf-card-title').textContent = isEn ? 'Monthly' : 'חודשי';
+  q('.paywall-bf-monthly-sub').textContent    = isEn ? 'Billed monthly' : 'בחיוב חודשי';
+  q('.paywall-bf-monthly-amount').innerHTML   = bdi(bf && bf.monthly.priceString);
+  q('.paywall-bf-monthly-period').textContent = isEn ? 'per month' : 'לחודש';
+
+  // Selection state — _paywallSelectedPkg is set by _selectPaywallPackage
+  // on card tap; _renderPaywall is called again from there so this block
+  // re-paints the border + CTA + legal on every flip.
+  if (_paywallSelectedPkg !== 'yearly' && _paywallSelectedPkg !== 'monthly') {
+    _paywallSelectedPkg = 'yearly';
+  }
+  q('.paywall-bf-yearly').classList.toggle('selected',  _paywallSelectedPkg === 'yearly');
+  q('.paywall-bf-monthly').classList.toggle('selected', _paywallSelectedPkg === 'monthly');
+
+  // CTA — "START FREE TRIAL" when eligible AND yearly is selected (the
+  // BF trial lives on corpus_yearly_bf); monthly has no intro so it
+  // always reads "SUBSCRIBE". Protects against promising a trial on a
+  // package that won't apply one at checkout.
+  const ctaEl = q('.paywall-bf-cta');
+  const canTrialYearly = _bfTrialEligibility === 'eligible' && _paywallSelectedPkg === 'yearly';
+  ctaEl.textContent = canTrialYearly
+    ? (isEn ? 'START FREE TRIAL' : 'התחלת ניסיון חינם')
+    : (isEn ? 'SUBSCRIBE'        : 'הרשמה למנוי');
+  ctaEl.disabled = _paywallPurchasing;
+
+  // Legal — spec: "7-day free trial, then {price}/year. Renews at this
+  // price. Cancel anytime." Drop the trial clause when ineligible OR
+  // monthly is selected. Price + period reflect the selected package.
+  // HE joins the price to a period word ("לשנה" / "לחודש") rather than
+  // using the slash form; the price itself is bdi-wrapped so it stays
+  // LTR inside the RTL sentence.
+  const selPriceStr = _paywallSelectedPkg === 'yearly'
+    ? ((bf && bf.yearly.priceString) || '')
+    : ((bf && bf.monthly.priceString) || '');
+  const perLabelEn  = _paywallSelectedPkg === 'yearly' ? 'year' : 'month';
+  const perWordHe   = _paywallSelectedPkg === 'yearly' ? 'לשנה' : 'לחודש';
+  const legalEl = q('.paywall-bf-legal');
+  const priceBdi = bdi(selPriceStr);
+  if (canTrialYearly) {
+    legalEl.innerHTML = isEn
+      ? '7-day free trial, then ' + priceBdi + '/year. Renews at this price. Cancel anytime.'
+      : 'ניסיון חינם ל-7 ימים, ולאחר מכן ' + priceBdi + ' לשנה. מתחדש באותו מחיר. אפשר לבטל בכל רגע.';
+  } else {
+    legalEl.innerHTML = isEn
+      ? priceBdi + '/' + perLabelEn + '. Renews at this price. Cancel anytime.'
+      : priceBdi + ' ' + perWordHe + '. מתחדש באותו מחיר. אפשר לבטל בכל רגע.';
+  }
+
+  // Legal row labels
+  q('.paywall-bf-restore').textContent = isEn ? 'Restore purchases' : 'שחזרו רכישות';
+  q('.paywall-bf-terms').textContent   = isEn ? 'Terms'   : 'תנאי שימוש';
+  q('.paywall-bf-privacy').textContent = isEn ? 'Privacy' : 'מדיניות פרטיות';
+}
+
 function _renderPaywall() {
   const isEn = state.lang === 'en';
+  // Black Friday takeover — before _paywallPrices (which reads the BF
+  // offering via _paywallActiveOffering). _renderPaywallBf drives the
+  // BF subtree; CSS hides the standard subtree.
+  const root = _paywallActiveRoot;
+  if (root) root.classList.toggle('paywall-bf', _isBlackFridayActive());
+  if (_isBlackFridayActive()) {
+    // Fire-and-forget trial-eligibility probe; CTA re-renders on resolve.
+    if (_bfTrialEligibility == null) {
+      _primeBfTrialEligibility().then(() => {
+        if (_isBlackFridayActive() && _paywallActiveRoot
+            && _paywallActiveRoot.classList.contains('paywall-bf')) {
+          try { _renderPaywallBf(); } catch (_) {}
+        }
+      });
+    }
+    _renderPaywallBf();
+    return;
+  }
   const p = _paywallPrices();
   const ctx = _paywallContext || {};
-  // Scope every lookup to the active shell (#modal-paywall in modal
-  // mode, #onb-v2-paywall in onboarding mode). Both shells carry
-  // identical .paywall-* class contracts; the one that isn't active
-  // sits idle in the DOM without contending for these queries.
-  const root = _paywallActiveRoot;
+  // `root` was captured above for the paywall-bf class toggle; reuse it.
   if (!root) return;
   const q = (sel) => root.querySelector(sel);
 
@@ -30151,6 +30898,8 @@ async function startPurchase() {
       })();
       try { posthog.capture('paywall_purchase_succeeded', {
         source: _paywallSource(),
+        paywall_trigger: _paywallSource(),
+        paywall_theme:   _isBlackFridayActive() ? 'black_friday' : 'default',
         package_id: sel.pkg.identifier,
         is_trial: TRIAL_ENABLED && _paywallMode === 'onboarding',
         offering_id: _offeringId,
@@ -30315,7 +31064,7 @@ async function restorePurchases() {
       })();
       // Explicit .catch() — try/catch would not catch the async rejection.
       loadSubscription().catch(e => console.error('[Sub] loadSubscription (restore) failed:', e));
-      try { posthog.capture('paywall_restore_result', { source: _paywallSource(), found: true }); } catch(e) {}
+      try { posthog.capture('paywall_restore_result', { source: _paywallSource(), paywall_trigger: _paywallSource(), found: true }); } catch(e) {}
       const returnTo = _paywallReturnTo;
       const wasModalMode = _paywallMode === 'modal';
       _exitPaywall('restore_success');
@@ -30333,7 +31082,7 @@ async function restorePurchases() {
         }, 500);
       }
     } else {
-      try { posthog.capture('paywall_restore_result', { source: _paywallSource(), found: false }); } catch(e) {}
+      try { posthog.capture('paywall_restore_result', { source: _paywallSource(), paywall_trigger: _paywallSource(), found: false }); } catch(e) {}
       const plat = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || 'ios';
       const storeName = plat === 'android' ? (isEn ? 'Google Play account' : 'חשבון Google Play')
                                            : (isEn ? 'Apple ID' : 'Apple ID');
@@ -33838,26 +34587,29 @@ async function _onbV2CtaNotifContinue() {
 //     timeline + no-payment-due pill) was dropped on 2026-09-16
 //     when the App Store Connect Introductory Offers section
 //     turned out to be missing from the account.
-// Hard-mode predicate for the ONBOARDING paywall only. Returns true
-// when the X must be hidden and the Sign out / Delete footer visible.
+// Onboarding paywall is now soft for every cohort. Returns false
+// unconditionally so .pw-hard is never applied, which keeps the X
+// (#onb-v2-paywall-skip) visible, the Sign out / Delete footer
+// hidden, and the subscription-required line hidden for all users.
 //
-// Rule (see onboarding-source branch spec):
-//   - source in {app_store, google_play, used_before}  → NOT hard (X visible)
-//   - source is undefined / null / '' (older build users; legacy skip) → NOT hard
-//   - source is any other value (instagram, tiktok, friend, google,
-//     linkedin, threads, ai, other)                    → HARD (X hidden)
-//   - corpus_hard_paywall_escrow flag set (user just signed out from
-//     a hard paywall and state.onbAnswers was wiped by authLogout; we
-//     must keep them in hard mode until onboarding resolves or they
-//     sign back in and the server restores their source field)       → HARD
+// Previously the result branched on state.onbAnswers.source (hard for
+// everyone except app_store / google_play / used_before) plus a
+// corpus_hard_paywall_escrow localStorage override that kept
+// post-signout users in hard mode until they re-authenticated. Both
+// branches were stripped on 2026-11-23: X is universally available
+// again, _exitPaywall('skip') dispatches as before, and callers of
+// this function still get a stable boolean so no touch is required
+// at the eight sites that read it.
+//
+// The .pw-hard CSS rules at index.html:16609/16622/16642 and the
+// escrow read sites at ~30530 / ~57238 / ~57709 are now dead code
+// paths — left in place because their default branches already do
+// the right thing (hide the hard UI, treat the user as a normal
+// soft-paywall cohort). _onbPaywallSignOut / _onbPaywallDelete can
+// no longer be reached because the .paywall-hard-footer that hosts
+// their onclicks is CSS-hidden by default without .pw-hard.
 function _onbPaywallHardMode() {
-  try {
-    if (localStorage.getItem('corpus_hard_paywall_escrow') === '1') return true;
-  } catch (_) {}
-  const src = (state && state.onbAnswers && state.onbAnswers.source) || null;
-  if (src == null || src === '') return false;
-  if (src === 'app_store' || src === 'google_play' || src === 'used_before') return false;
-  return true;
+  return false;
 }
 
 // Sign out from the HARD onboarding paywall. Mirrors authLogout's
@@ -34036,8 +34788,10 @@ function _onbV2PreparePaywall() {
     // the onboarding paywall only; the modal paywall_shown call
     // elsewhere is unchanged.
     _phCapture('paywall_shown', {
-      source:        _activePaywallSource,
-      subject:       state.subject || null,
+      source:          _activePaywallSource,
+      paywall_trigger: _paywallSource(),
+      paywall_theme:   _isBlackFridayActive() ? 'black_friday' : 'default',
+      subject:         state.subject || null,
       trial_enabled: TRIAL_ENABLED,
       offering_id:   (_paywallActiveOffering() && _paywallActiveOffering().identifier) || null,
       hard:          hard,
@@ -63716,6 +64470,60 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
       <a href="#" class="paywall-deleteaccount" id="onb-v2-paywall-delete" onclick="event.preventDefault(); _onbPaywallDelete();"></a>
     </div>
    </div>
+   <!-- Black Friday theme subtree. Renders only when #onb-v2-paywall
+        carries .paywall-bf (set by _renderPaywall when _isBlackFridayActive).
+        All text + image + card content populated by _renderPaywallBf. See
+        the sibling block inside #modal-paywall for the shell-shared skeleton. -->
+   <div class="paywall-bf-shell" aria-hidden="true">
+     <div class="paywall-bf-eyebrow"></div>
+     <div class="paywall-bf-hero">
+       <img class="paywall-bf-chibi" alt="" aria-hidden="true">
+       <div class="paywall-bf-sticker" aria-hidden="true">
+         <span class="paywall-bf-sticker-pct"></span>
+         <span class="paywall-bf-sticker-off"></span>
+       </div>
+     </div>
+     <h1 class="paywall-bf-headline"></h1>
+     <p class="paywall-bf-ends"></p>
+     <ul class="paywall-bf-benefits" aria-hidden="true">
+       <li class="paywall-bf-benefit"></li>
+       <li class="paywall-bf-benefit"></li>
+       <li class="paywall-bf-benefit"></li>
+     </ul>
+     <div class="paywall-bf-cards">
+       <button type="button" class="paywall-bf-card paywall-bf-yearly" onclick="_selectPaywallPackage('yearly')">
+         <div class="paywall-bf-yearly-badge"></div>
+         <div class="paywall-bf-card-main">
+           <div class="paywall-bf-card-title"></div>
+           <div class="paywall-bf-yearly-permonth"></div>
+         </div>
+         <div class="paywall-bf-card-price">
+           <div class="paywall-bf-yearly-strike" aria-hidden="true"></div>
+           <div class="paywall-bf-yearly-amount"></div>
+           <div class="paywall-bf-yearly-period"></div>
+         </div>
+       </button>
+       <button type="button" class="paywall-bf-card paywall-bf-monthly" onclick="_selectPaywallPackage('monthly')">
+         <div class="paywall-bf-card-main">
+           <div class="paywall-bf-card-title"></div>
+           <div class="paywall-bf-monthly-sub"></div>
+         </div>
+         <div class="paywall-bf-card-price">
+           <div class="paywall-bf-monthly-amount"></div>
+           <div class="paywall-bf-monthly-period"></div>
+         </div>
+       </button>
+     </div>
+     <button type="button" class="paywall-bf-cta" onclick="startPurchase()"></button>
+     <p class="paywall-bf-legal"></p>
+     <div class="paywall-bf-legal-row">
+       <button type="button" class="paywall-bf-restore" onclick="restorePurchases()"></button>
+       <span class="paywall-bf-sep">·</span>
+       <a href="#" class="paywall-bf-terms" onclick="event.preventDefault(); _openLegalUrl('terms');"></a>
+       <span class="paywall-bf-sep">·</span>
+       <a href="#" class="paywall-bf-privacy" onclick="event.preventDefault(); _openLegalUrl('privacy');"></a>
+     </div>
+   </div>
   </div>
 </div>
 
@@ -64121,6 +64929,60 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
         <a href="#" class="paywall-terms-legacy" aria-hidden="true" onclick="event.preventDefault(); _openLegalUrl('terms');"></a>
         <span class="paywall-links-sep" aria-hidden="true">·</span>
         <a href="#" class="paywall-privacy-legacy" aria-hidden="true" onclick="event.preventDefault(); _openLegalUrl('privacy');"></a>
+      </div>
+    </div>
+    <!-- Black Friday theme subtree (sibling of .pwv7-foot). Only one close
+         X stays wired: the existing .pwv7-x above the band — reused in BF
+         mode. All .paywall-bf-* children render only when the shell carries
+         .paywall-bf (see CSS near :16720 and _renderPaywallBf). -->
+    <div class="paywall-bf-shell" aria-hidden="true">
+      <div class="paywall-bf-eyebrow"></div>
+      <div class="paywall-bf-hero">
+        <img class="paywall-bf-chibi" alt="" aria-hidden="true">
+        <div class="paywall-bf-sticker" aria-hidden="true">
+          <span class="paywall-bf-sticker-pct"></span>
+          <span class="paywall-bf-sticker-off"></span>
+        </div>
+      </div>
+      <h1 class="paywall-bf-headline"></h1>
+      <p class="paywall-bf-ends"></p>
+      <ul class="paywall-bf-benefits" aria-hidden="true">
+        <li class="paywall-bf-benefit"></li>
+        <li class="paywall-bf-benefit"></li>
+        <li class="paywall-bf-benefit"></li>
+      </ul>
+      <div class="paywall-bf-cards">
+        <button type="button" class="paywall-bf-card paywall-bf-yearly" onclick="_selectPaywallPackage('yearly')">
+          <div class="paywall-bf-yearly-badge"></div>
+          <div class="paywall-bf-card-main">
+            <div class="paywall-bf-card-title"></div>
+            <div class="paywall-bf-yearly-permonth"></div>
+          </div>
+          <div class="paywall-bf-card-price">
+            <div class="paywall-bf-yearly-strike" aria-hidden="true"></div>
+            <div class="paywall-bf-yearly-amount"></div>
+            <div class="paywall-bf-yearly-period"></div>
+          </div>
+        </button>
+        <button type="button" class="paywall-bf-card paywall-bf-monthly" onclick="_selectPaywallPackage('monthly')">
+          <div class="paywall-bf-card-main">
+            <div class="paywall-bf-card-title"></div>
+            <div class="paywall-bf-monthly-sub"></div>
+          </div>
+          <div class="paywall-bf-card-price">
+            <div class="paywall-bf-monthly-amount"></div>
+            <div class="paywall-bf-monthly-period"></div>
+          </div>
+        </button>
+      </div>
+      <button type="button" class="paywall-bf-cta" onclick="startPurchase()"></button>
+      <p class="paywall-bf-legal"></p>
+      <div class="paywall-bf-legal-row">
+        <button type="button" class="paywall-bf-restore" onclick="restorePurchases()"></button>
+        <span class="paywall-bf-sep">·</span>
+        <a href="#" class="paywall-bf-terms" onclick="event.preventDefault(); _openLegalUrl('terms');"></a>
+        <span class="paywall-bf-sep">·</span>
+        <a href="#" class="paywall-bf-privacy" onclick="event.preventDefault(); _openLegalUrl('privacy');"></a>
       </div>
     </div>
   </div>
