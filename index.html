@@ -14847,8 +14847,27 @@
      bar hidden — same treatment as step 35 — so the fixed top-left
      X has no overlap. */
   #onb-v2-trial .onb-v7-bar { display: none !important; }
+  /* Step 33 layout: .onb-v7-mid becomes a plain flex column that
+     flex-grows to fill the viewport minus the top/CTA holders. The
+     actual centering happens on the .onb-v2-trialintro-centerwrap
+     child, which takes flex:1 inside .onb-v2-trialintro-mid with
+     justify-content:center. Overriding .onb-v7-mid's base
+     overflow-y:auto with overflow:hidden prevents Mobile WebKit from
+     reserving space for a scrollbar that silently defeats center
+     alignment at content heights near the viewport. */
   .onb-v2-trialintro-mid {
     display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 0;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .onb-v2-trialintro-centerwrap {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -17131,6 +17150,20 @@
   .pw-trial-shell { display: none; }
   #onb-v2-paywall.pw-trial-active .onb-v2-paywall-inner { display: none !important; }
   #onb-v2-paywall.pw-trial-active .paywall-bf-shell     { display: none !important; }
+  /* iOS WebKit: height:100% on a child of a flex item is 0 unless the
+     item has definite height or min-height:0. Force .onb-v7-mid to a
+     clean flex column with min-height:0 in trial mode, then let
+     .pw-trial-shell flex-grow to fill it. Previously the shell used
+     height:100% which collapsed on-device while Playwright headless
+     Chromium resolved it to a positive value. */
+  #onb-v2-paywall.pw-trial-active .onb-v7-mid {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0;
+  }
   #onb-v2-paywall.pw-trial-active .pw-trial-shell {
     display: flex !important;
     flex-direction: column;
@@ -17138,7 +17171,8 @@
     padding: calc(env(safe-area-inset-top, 0px) + 56px) 20px calc(env(safe-area-inset-bottom, 0px) + 12px);
     box-sizing: border-box;
     width: 100%;
-    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
     overflow: hidden;
     gap: 0;
   }
@@ -17426,10 +17460,14 @@
     margin-bottom: 10px;
     width: 100%;
   }
-  .pw-plans-yearly {
-    border-color: var(--accent);
-    padding-top: 22px;
-  }
+  .pw-plans-yearly { padding-top: 22px; }
+  /* Selection — the selected card gets the accent border; unselected
+     stays on the default muted border. _renderPaywallPlansSheet
+     toggles .selected based on _paywallSelectedPkg so taps on either
+     card flip the visual state. */
+  .pw-plans-card.selected { border-color: var(--accent); }
+  #onb-v2-paywall.paywall-bf .pw-plans-card.selected { border-color: #F5B800; background: rgba(245,184,0,.08); }
+  #onb-v2-paywall.paywall-bf .pw-plans-card:not(.selected) { background: rgba(255,255,255,.04); }
   .pw-plans-yearly-badge {
     position: absolute;
     top: -11px;
@@ -17484,11 +17522,10 @@
   #onb-v2-paywall.paywall-bf .pw-plans-yearly-sub,
   #onb-v2-paywall.paywall-bf .pw-plans-yearly-strike,
   #onb-v2-paywall.paywall-bf .pw-plans-yearly-per { color: rgba(255,255,255,.65); }
-  #onb-v2-paywall.paywall-bf .pw-plans-yearly {
-    border-color: #F5B800; background: rgba(245,184,0,.08);
-  }
-  #onb-v2-paywall.paywall-bf .pw-plans-monthly {
-    border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.04);
+  /* BF default card borders under the sheet — the .selected rule
+     above wins on the selected card. */
+  #onb-v2-paywall.paywall-bf .pw-plans-card:not(.selected) {
+    border-color: rgba(255,255,255,.18);
   }
   #onb-v2-paywall.paywall-bf .pw-plans-yearly-badge { background: #F5B800; color: #1E1538; }
   #onb-v2-paywall.paywall-bf .pw-plans-cta { background: #F5B800; color: #1E1538; }
@@ -30917,6 +30954,17 @@ function _selectPaywallPackage(which) {
   if (which !== 'monthly' && which !== 'yearly') return;
   _paywallSelectedPkg = which;
   _renderPaywall();
+  // If the plans sheet is open, re-paint it too — the main
+  // _renderPaywall writes into the paywall shell, not the sheet
+  // subtree, so without this call the sheet shows stale selection +
+  // CTA state.
+  try {
+    const root = _paywallActiveRoot;
+    const sheet = root && root.querySelector('.pw-plans-sheet');
+    if (sheet && sheet.classList.contains('pw-plans-open')) {
+      _renderPaywallPlansSheet();
+    }
+  } catch (_) {}
 }
 
 // Black Friday renderer. Called from _renderPaywall when the gate is on.
@@ -31194,24 +31242,37 @@ function _renderPaywallTrial() {
         : null);
   const regularStr = (bf && bf.yearly.regularPriceString) || null;
 
-  // Headlines branch by eligibility.
-  //   Eligible:
+  // When monthly is the selected package, step 35 reflects it:
+  //   h2 switches to "{monthly} a month" (no per-month derivation —
+  //        the monthly priceString IS the per-month figure).
+  //   The billed-yearly line + the strikethrough are hidden entirely.
+  //   The ends-date line (BF) stays — it's a sale-window cue, not a
+  //        billing detail.
+  const monthlySelected = _paywallSelectedPkg === 'monthly';
+  const displayPerMonth = monthlySelected
+    ? ((bf && bf.monthly.priceString) || (p.monthly && p.monthly.priceString) || '')
+    : perMonth;
+
+  // Headlines branch by eligibility + selection.
+  //   Eligible yearly:
   //     h1 accent "Try 7 days free,"      / h2 "then {perMonth} a month"
-  //   Ineligible, BF with known pct:
+  //   Eligible monthly:
+  //     h1 accent "Try 7 days free,"      / h2 "then {monthly} a month"
+  //   Ineligible yearly BF (pct known):
   //     h1 accent "{pct}% off a year of big ideas"
   //                                         h2 "then {perMonth} a month"
-  //   Ineligible, no BF (or BF without pct):
-  //     h1 accent "Unlock every big idea," / h2 "for {perMonth} a month"
-  // All three variants keep h1 populated so the vertical rhythm reads
-  // the same whether the user is trial-eligible or not.
+  //   Ineligible yearly non-BF:
+  //     h1 accent "Unlock every big idea,"/ h2 "for {perMonth} a month"
+  //   Ineligible monthly:
+  //     h1 accent "Unlock every big idea,"/ h2 "for {monthly} a month"
   const h1El = q('.pw-trial-h1');
   const h2El = q('.pw-trial-h2');
   if (eligible) {
     if (h1El) { h1El.textContent = isEn ? 'Try 7 days free,' : 'נסו 7 ימים בחינם,'; h1El.style.display = ''; }
     if (h2El) h2El.innerHTML = isEn
-      ? 'then ' + bdi(perMonth || '') + ' a month'
-      : 'ואז '  + bdi(perMonth || '') + ' לחודש';
-  } else if (inBf && bf && bf.yearly.discountPct != null) {
+      ? 'then ' + bdi(displayPerMonth || '') + ' a month'
+      : 'ואז '  + bdi(displayPerMonth || '') + ' לחודש';
+  } else if (!monthlySelected && inBf && bf && bf.yearly.discountPct != null) {
     const pct = bf.yearly.discountPct;
     if (h1El) {
       h1El.textContent = isEn ? pct + '% off a year of big ideas'
@@ -31219,16 +31280,16 @@ function _renderPaywallTrial() {
       h1El.style.display = '';
     }
     if (h2El) h2El.innerHTML = isEn
-      ? 'then ' + bdi(perMonth || '') + ' a month'
-      : 'ואז '  + bdi(perMonth || '') + ' לחודש';
+      ? 'then ' + bdi(displayPerMonth || '') + ' a month'
+      : 'ואז '  + bdi(displayPerMonth || '') + ' לחודש';
   } else {
     if (h1El) {
       h1El.textContent = isEn ? 'Unlock every big idea,' : 'כל הרעיונות הגדולים, פתוחים,';
       h1El.style.display = '';
     }
     if (h2El) h2El.innerHTML = isEn
-      ? 'for ' + bdi(perMonth || '') + ' a month'
-      : 'ב-'  + bdi(perMonth || '') + ' לחודש';
+      ? 'for ' + bdi(displayPerMonth || '') + ' a month'
+      : 'ב-'  + bdi(displayPerMonth || '') + ' לחודש';
   }
 
   // Billed-yearly line (18px / 700 / ink per spec #2). Flex layout
@@ -31239,17 +31300,26 @@ function _renderPaywallTrial() {
   // isolates the currency + digits from the RTL run.
   const billedEl = q('.pw-trial-billed');
   if (billedEl) {
-    const midHtml = inBf && regularStr
-      ? (isEn
-          ? bdi(yearlyStr) + ' billed yearly, <s>' + bdi(regularStr) + '</s>'
-          : bdi(yearlyStr) + ' בחיוב שנתי, <s>' + bdi(regularStr) + '</s>')
-      : (isEn
-          ? bdi(yearlyStr) + ' billed yearly'
-          : bdi(yearlyStr) + ' בחיוב שנתי');
-    billedEl.innerHTML =
-        '<span class="pw-trial-billed-paren">(</span>'
-      + '<span class="pw-trial-billed-mid" dir="' + (isEn ? 'ltr' : 'rtl') + '">' + midHtml + '</span>'
-      + '<span class="pw-trial-billed-paren">)</span>';
+    // Hidden when monthly is selected — the "{monthly} a month"
+    // headline already carries the full billing detail. Also drop
+    // the strikethrough in that case.
+    if (monthlySelected) {
+      billedEl.innerHTML = '';
+      billedEl.style.display = 'none';
+    } else {
+      billedEl.style.display = '';
+      const midHtml = inBf && regularStr
+        ? (isEn
+            ? bdi(yearlyStr) + ' billed yearly, <s>' + bdi(regularStr) + '</s>'
+            : bdi(yearlyStr) + ' בחיוב שנתי, <s>' + bdi(regularStr) + '</s>')
+        : (isEn
+            ? bdi(yearlyStr) + ' billed yearly'
+            : bdi(yearlyStr) + ' בחיוב שנתי');
+      billedEl.innerHTML =
+          '<span class="pw-trial-billed-paren">(</span>'
+        + '<span class="pw-trial-billed-mid" dir="' + (isEn ? 'ltr' : 'rtl') + '">' + midHtml + '</span>'
+        + '<span class="pw-trial-billed-paren">)</span>';
+    }
   }
 
   // Ends date (BF only)
@@ -31274,16 +31344,25 @@ function _renderPaywallTrial() {
   // "View all plans" link
   q('.pw-trial-viewall').textContent = isEn ? 'View all plans' : 'לכל המסלולים';
   // "No charge today..." pre-CTA line + legal line below the CTA
-  // branch by eligibility. Eligible shows the no-charge reassurance
-  // (and no separate legal line because the CTA label already carries
-  // the "7-day free trial" promise). Ineligible shows a plain
-  // "{yearly}/year. Renews at this price. Cancel anytime." legal line
-  // in place of the reassurance so the user sees what they'll pay.
+  // branch by eligibility AND selection. Eligible shows the no-charge
+  // reassurance. Ineligible shows the per-package renewal copy so the
+  // user sees what they'll actually pay.
   const nochargeEl = q('.pw-trial-nocharge');
+  const monthlyStr = (bf && bf.monthly.priceString) || (p.monthly && p.monthly.priceString) || '';
   if (eligible) {
-    nochargeEl.textContent = isEn
-      ? 'No charge today. Cancel anytime in two taps.'
-      : 'בלי חיוב היום. ביטול בכל רגע בשתי לחיצות.';
+    if (monthlySelected) {
+      nochargeEl.innerHTML = isEn
+        ? '7-day free trial, then ' + bdi(monthlyStr) + '/month. Cancel anytime.'
+        : 'ניסיון חינם ל-7 ימים, ולאחר מכן ' + bdi(monthlyStr) + '/חודש. ביטול בכל רגע.';
+    } else {
+      nochargeEl.textContent = isEn
+        ? 'No charge today. Cancel anytime in two taps.'
+        : 'בלי חיוב היום. ביטול בכל רגע בשתי לחיצות.';
+    }
+  } else if (monthlySelected) {
+    nochargeEl.innerHTML = isEn
+      ? bdi(monthlyStr) + '/month. Renews at this price. Cancel anytime.'
+      : bdi(monthlyStr) + '/חודש. מתחדש באותו מחיר. אפשר לבטל בכל רגע.';
   } else {
     nochargeEl.innerHTML = isEn
       ? bdi(yearlyStr) + '/year. Renews at this price. Cancel anytime.'
@@ -31352,6 +31431,14 @@ function _renderPaywallPlansSheet() {
     ? (typeof _paywallBfPrices === 'function' ? _paywallBfPrices() : null)
     : null;
   const inBf = !!bf;
+
+  // Selection: fall back to yearly if _paywallSelectedPkg is unset.
+  if (_paywallSelectedPkg !== 'monthly' && _paywallSelectedPkg !== 'yearly') {
+    _paywallSelectedPkg = 'yearly';
+  }
+  q('.pw-plans-yearly').classList.toggle('selected',  _paywallSelectedPkg === 'yearly');
+  q('.pw-plans-monthly').classList.toggle('selected', _paywallSelectedPkg === 'monthly');
+
   q('.pw-plans-heading').textContent = isEn ? 'Choose your plan' : 'בחרו תוכנית';
   const BENEFITS = isEn ? [
     'Every chapter in all three subjects',
@@ -31404,7 +31491,17 @@ function _renderPaywallPlansSheet() {
   const monthlyStr = (bf && bf.monthly.priceString) || (p.monthly && p.monthly.priceString) || '';
   q('.pw-plans-monthly-amount').innerHTML = bdi(monthlyStr) + (isEn ? '/mo' : '/חודש');
 
-  // CTA mirrors the main step-35 CTA (same branching on eligibility).
+  // CTA follows BOTH eligibility AND the selected package:
+  //   eligible + yearly selected OR monthly selected
+  //                    → "START MY 7-DAY FREE TRIAL"
+  //   ineligible + BF  → "CLAIM {pct}% OFF"
+  //   ineligible other → "CONTINUE"
+  // Per spec: a monthly trial fires only when the user is eligible AND
+  // the monthly product carries an intro offer. We key off the user's
+  // eligibility result for the yearly SKU as a proxy — StoreKit's
+  // eligibility is group-scoped, so an eligible user is eligible for
+  // both. The store config decides whether the monthly actually grants
+  // the trial on purchase.
   const ctaEl = q('.pw-plans-cta');
   if (eligible) {
     ctaEl.textContent = isEn ? 'START MY 7-DAY FREE TRIAL' : 'להתחיל 7 ימי ניסיון בחינם';
@@ -65650,9 +65747,16 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
     <div class="onb-v7-bar"><i style="width: 97%"></i></div>
   </div>
   <div class="onb-v7-mid onb-v2-trialintro-mid">
-    <img id="onb-v7-trialintro-fig" class="onb-v7-trialintro-fig" alt="" aria-hidden="true">
-    <h1 class="onb-v2-trialintro-head" id="onb-v2-trial-head"></h1>
-    <p class="onb-v2-trialintro-accent" id="onb-v2-trial-accent"></p>
+    <!-- Flex:1 wrapper so the chibi + headline + accent actually
+         centers on real iOS WebKit, not just in Playwright. The base
+         .onb-v7-mid is flex-start + overflow-y:auto; wrapping the
+         content gives us a clean centering context that overrides
+         both. See the CSS near :15144. -->
+    <div class="onb-v2-trialintro-centerwrap">
+      <img id="onb-v7-trialintro-fig" class="onb-v7-trialintro-fig" alt="" aria-hidden="true">
+      <h1 class="onb-v2-trialintro-head" id="onb-v2-trial-head"></h1>
+      <p class="onb-v2-trialintro-accent" id="onb-v2-trial-accent"></p>
+    </div>
   </div>
   <div class="onb-v7-cta-holder">
     <button type="button" class="onb-v7-btn" id="onb-v2-trial-cta" onclick="_onbV2CtaTrial()"></button>
