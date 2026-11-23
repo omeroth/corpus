@@ -45244,18 +45244,41 @@ async function _scheduleTrialEndReminder() {
 }
 // Cancel the trial-end reminder when RC customerInfo shows the trial
 // is no longer active OR won't renew. Fires on every enterApp /
-// foreground after loadSubscription resolves. Plugin / permission
-// absence is a no-op.
+// foreground. Reads AUTHORITATIVELY from RC's getCustomerInfo rather
+// than state.subscription, because the Supabase subscriptions row
+// (which populates state.subscription) carries will_renew but NO
+// periodType — we can't distinguish TRIAL vs NORMAL vs INTRO from
+// that row alone, and reading state.subscription.periodType gives
+// undefined for every user, causing the reminder to be cancelled on
+// every app open. Plugin / permission absence is a no-op.
 async function _maybeCancelTrialEndReminder() {
-  const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
-  if (!P) return;
+  const LN = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
+  if (!LN) return;
+  const Purchases = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
+  // No RC plugin → can't tell; stay conservative, do not cancel.
+  if (!Purchases || typeof Purchases.getCustomerInfo !== 'function') return;
+  let ent = null;
   try {
-    const ent = state && state.subscription;
-    const isTrial = ent && typeof ent.periodType === 'string' && /trial/i.test(ent.periodType);
-    const willRenew = ent && ent.willRenew !== false; // treat missing as "will renew"
-    if (isTrial && willRenew) return; // still a live trial that will renew → keep the reminder.
-    await P.cancel({ notifications: [{ id: TRIAL_REMINDER_ID }] });
-  } catch (_) { /* no-op */ }
+    const info = await Purchases.getCustomerInfo();
+    const ci = info && (info.customerInfo || info);
+    ent = ci && ci.entitlements && ci.entitlements.active
+          && ci.entitlements.active[PAYWALL_ENTITLEMENT_ID];
+  } catch (_) {
+    return; // RC error → don't cancel on noise; next app open retries.
+  }
+  // No active entitlement at all → nothing to remind about; cancel.
+  if (!ent) {
+    try { await LN.cancel({ notifications: [{ id: TRIAL_REMINDER_ID }] }); } catch (_) {}
+    return;
+  }
+  // Entitlement active. Check if it's a trial that will renew.
+  // Field shape differs between iOS (camelCase periodType / willRenew)
+  // and Android (same keys in Capacitor SDK, snake_case on webhook).
+  const periodRaw = ent.periodType || ent.period_type || '';
+  const isTrial   = typeof periodRaw === 'string' && /trial/i.test(periodRaw);
+  const willRenew = ent.willRenew !== false; // treat undefined as "will renew"
+  if (isTrial && willRenew) return; // live trial that will renew — keep the reminder.
+  try { await LN.cancel({ notifications: [{ id: TRIAL_REMINDER_ID }] }); } catch (_) {}
 }
 
 async function rescheduleReminderFromToday() {

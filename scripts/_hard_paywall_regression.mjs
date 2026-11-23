@@ -1,34 +1,39 @@
-// Hard onboarding paywall regression.
+// Onboarding paywall (soft-mode) regression.
+//
+// Hard mode was dropped on 2026-11-23 (_onbPaywallHardMode → return false;
+// .pw-hard never applied; escrow flag ignored). This suite now asserts
+// the SOFT-mode invariants: X always visible, no .pw-hard class, no
+// subscription-required line, no sign-out/delete-account footer, no
+// hard-persistence across reload. The purchase + restore smoke checks
+// still exercise the wire-up and the shell-rendering screenshots are
+// preserved so a CSS regression on the onboarding paywall gets caught.
 //
 // Cases:
-//   A. Source X-state matrix.
-//      - instagram          → .pw-hard present, #onb-v2-paywall-skip hidden
-//      - app_store          → .pw-hard absent,  skip visible
-//      - used_before        → .pw-hard absent,  skip visible
-//      - missing (no source)→ .pw-hard absent,  skip visible
-//      - escrow flag set    → .pw-hard present, skip hidden
+//   A. Source X-state matrix. For every cohort (instagram / app_store /
+//      used_before / missing / escrow flag), .pw-hard must be ABSENT
+//      and #onb-v2-paywall-skip must be VISIBLE. The 'instagram' and
+//      'escrow' rows previously asserted the opposite — now flipped.
 //   B. Debug sink.
-//      - paywall_shown fires with hard: true + onb_source: 'instagram'
-//        into window.__corpusPhLog under __CORPUS_DEBUG_BUILD.
+//      - paywall_shown fires with hard: false + onb_source captured.
 //      - onboarding_source_selected lands in the sink too.
-//   C. Copy.
-//      - EN line: "A subscription is needed to continue. 7 days free,
-//        cancel anytime."
-//      - HE line: "כדי להמשיך צריך מנוי. 7 ימים בחינם, אפשר לבטל בכל רגע."
-//      - EN footer: Sign out · Delete account
-//      - HE footer: התנתקות · מחיקת חשבון
-//   D. Hard-paywall sign-out → auth screen (never home). Escrow set,
-//      corpus_onboarding_done still unset.
-//   E. Guest path block: _authDismissToGuest / enterAsGuest reopens
-//      the paywall (hard mode persists via escrow) instead of going
-//      to home.
-//   F. Android back handler: _hard_ → App.minimizeApp called, paywall
-//      stays active. _soft_ → fallback behaviour (no crash).
-//   G. Delete tap opens #modal-delete-account.
-//   H. Reload-on-paywall persistence: the hard paywall reappears after
-//      a full page reload.
-//   I. Screenshots: EN + HE × light + dark × 393x852 and 360x640 of
-//      the hard paywall shell (8 shots).
+//   C. Copy. EN + HE subscription-required line and footer text still
+//      renders in the DOM (used as a copy sanity check). The hard
+//      footer DOM itself is hidden by CSS; we read textContent.
+//   D. Sign-out path from paywall footer lands on auth screen (soft or
+//      hard). Escrow is no longer set but the auth route is preserved
+//      via the surviving _onbPaywallSignOut handler.
+//   E. Guest path: _authDismissToGuest / enterAsGuest routes to home;
+//      no paywall re-open because escrow is a no-op in soft mode.
+//   F. Android back handler: no hard-mode minimizeApp; paywall closes
+//      normally (if a close path is wired) or stays mountable.
+//   G. Delete tap opens #modal-delete-account (unchanged).
+//   H. Reload persistence: no escrow re-open in soft mode; the paywall
+//      may still appear via resume cursor on step 35, with .pw-hard
+//      ABSENT.
+//   I. Screenshots preserved (used for visual regression on the
+//      onboarding paywall shell under both themes + viewports).
+//   L. Soft-mode footer visibility: the .paywall-hard-footer is CSS-
+//      hidden entirely under soft mode. Asserted NOT visible.
 //
 // Purchase + Restore buttons wire through startPurchase() /
 // restorePurchases() which hit RevenueCat; verifying they still run is
@@ -117,12 +122,15 @@ function pass(label) { console.log('PASS ' + label); }
 let FAILS = 0;
 
 // Case A — source X-state matrix.
+// Soft mode: hard is false for EVERY source. Escrow row kept so the
+// no-op path is exercised (the flag is set on the page but
+// _onbPaywallHardMode ignores it).
 const MATRIX = [
-  { name: 'instagram',  source: 'instagram',  hardExpected: true  },
+  { name: 'instagram',  source: 'instagram',  hardExpected: false },
   { name: 'app_store',  source: 'app_store',  hardExpected: false },
   { name: 'used_before',source: 'used_before',hardExpected: false },
   { name: 'missing',    source: null,         hardExpected: false },
-  { name: 'escrow',     source: null, escrow: true, hardExpected: true },
+  { name: 'escrow',     source: null, escrow: true, hardExpected: false },
 ];
 for (const m of MATRIX) {
   const { ctx, page } = await freshPage({ source: m.source, escrow: !!m.escrow });
@@ -158,7 +166,7 @@ for (const m of MATRIX) {
   // the test's explicit prepare fires again after we seeded source).
   // Assert the SEEDED one is in the log, not necessarily the first.
   const shown = log.filter(e => e.event === 'paywall_shown').pop();
-  if (shown && shown.props.hard === true && shown.props.onb_source === 'instagram') pass('debug sink: paywall_shown {hard:true, onb_source:instagram}');
+  if (shown && shown.props.hard === false && shown.props.onb_source === 'instagram') pass('debug sink: paywall_shown {hard:false, onb_source:instagram}');
   else fail('debug sink: paywall_shown', JSON.stringify(shown));
   // Now exercise the source step and assert onboarding_source_selected
   // lands in the sink too.
@@ -244,11 +252,12 @@ for (const [lang, line, signOut, del] of [
     hard:       document.getElementById('onb-v2-paywall').classList.contains('pw-hard'),
     homeDisplay: getComputedStyle(document.getElementById('screen-home')).display,
   }));
-  // homeDisplay may be 'block' underneath — the paywall covers it at
-  // z-index 1100 per the CLAUDE.md overlay map. What matters is the
-  // paywall is up, hard, auth is closed; the user cannot see or
-  // interact with home while the paywall is active.
-  if (!info.authActive && info.pwDisplay !== 'none' && info.pwActive && info.hard) pass('guest path routed to hard paywall, not home');
+  // Soft-mode invariant: enterAsGuest routes to home (hidden under the
+  // paywall shell is acceptable). Previously asserted hard=true because
+  // the escrow flag re-pinned the paywall; now escrow is a no-op and
+  // the paywall shell may still be mounted via the onboarding step
+  // cursor — what matters is the shell is NOT in hard mode.
+  if (!info.authActive && !info.hard) pass('guest path routes to soft paywall (hard:false)');
   else fail('guest path routing', JSON.stringify(info));
   await ctx.close();
 }
@@ -308,7 +317,11 @@ for (const [lang, line, signOut, del] of [
       listenerAttached: typeof window.__backListener === 'function',
     };
   });
-  if (info.listenerAttached && info.minimizeDelta === 1 && info.pwActive && info.pwVisible) pass('Android back on hard paywall → minimizeApp (paywall intact)');
+  // Soft mode: there is no hard-mode minimizeApp branch — the back
+  // handler either exits the paywall via _exitPaywall('skip') or
+  // falls through to default navigation. Either way, minimizeApp is
+  // NOT called and the test just confirms the back-listener is wired.
+  if (info.listenerAttached && info.minimizeDelta === 0) pass('Android back on soft paywall → no minimize branch (back-listener wired)');
   else fail('Android back hard path', JSON.stringify(info));
   await ctx.close();
 }
@@ -351,7 +364,11 @@ for (const [lang, line, signOut, del] of [
     hard: document.getElementById('onb-v2-paywall').classList.contains('pw-hard'),
     escrow: localStorage.getItem('corpus_hard_paywall_escrow'),
   }));
-  if (info.pwActive && info.pwVisible && info.hard && info.escrow === '1') pass('reload while on hard paywall → re-lands on hard paywall');
+  // Soft mode: reload keeps the paywall shell mounted via the step-35
+  // cursor resume (if that was the pre-reload state). .pw-hard must be
+  // absent — escrow is a no-op now. The localStorage value survives
+  // reload (we don't clear it) but it carries no meaning.
+  if (info.pwActive && info.pwVisible && !info.hard) pass('reload keeps paywall shell, soft mode (hard:false)');
   else fail('reload persistence', JSON.stringify(info));
   await ctx.close();
 }
@@ -710,8 +727,9 @@ async function recordPaywallFrames(page, durationMs = 1500) {
     pwVisible: getComputedStyle(document.getElementById('onb-v2-paywall')).display !== 'none',
     step: localStorage.getItem('corpus_onboarding_step'),
   }));
-  if (info.pwActive && info.pwHard && info.pwVisible && info.step === '35')
-    pass('Kc hard user sign-out → sign-in: hard paywall painted at step 35');
+  // Soft mode: paywall resumes at step 35 but with .pw-hard ABSENT.
+  if (info.pwActive && !info.pwHard && info.pwVisible && info.step === '35')
+    pass('Kc post-signout re-sign-in: soft paywall painted at step 35');
   else fail('Kc hard resume regression', JSON.stringify(info));
   await ctx.close();
 }
@@ -797,8 +815,9 @@ async function recordPaywallFrames(page, durationMs = 1500) {
 // assert the paywall never flashes between 22 and 36, that source
 // writes to state.onbAnswers under the signed-in user, and the
 // eventual paywall at 35 renders in the correct hard/soft mode.
+// Soft mode: expectHard is false for every source now.
 for (const [lang, chosenSrc, expectHard] of [
-  ['en', 'instagram', true],
+  ['en', 'instagram', false],
   ['he', 'app_store', false],
 ]) {
   const ctx = await browser.newContext({ viewport: { width: 393, height: 852 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
@@ -951,22 +970,20 @@ for (const [vw, vh] of [[393, 852], [360, 640]]) {
     if (allClear) pass('La no dot clipping ' + lang + ' ' + vw + 'x' + vh + ' (' + clipInfo.length + ' dots fully within inner)');
     else fail('La dot clip ' + lang + ' ' + vw + 'x' + vh, JSON.stringify(clipInfo));
 
-    // Lb — reachability of hard-mode footer via scroll.
+    // Lb — soft mode: .paywall-hard-footer is CSS-hidden entirely
+    // (display:none by default; .pw-hard override is never applied).
+    // Assert the footer is NOT rendered as a visible element.
     const reachInfo = await page.evaluate(() => {
-      const mid = document.querySelector('#onb-v2-paywall .onb-v7-mid');
-      const footer = document.querySelector('#onb-v2-paywall .paywall-hard-footer a');
-      mid.scrollTop = mid.scrollHeight;
-      const midR = mid.getBoundingClientRect();
-      const fR = footer.getBoundingClientRect();
+      const footer = document.querySelector('#onb-v2-paywall .paywall-hard-footer');
+      const cs = footer ? getComputedStyle(footer) : null;
       return {
-        scrollHeight: mid.scrollHeight,
-        clientHeight: mid.clientHeight,
-        canScroll: mid.scrollHeight > mid.clientHeight,
-        footerVisible: fR.bottom <= midR.bottom + 1 && fR.top >= midR.top - 1,
+        footerPresent: !!footer,
+        footerDisplay: cs ? cs.display : null,
+        footerVisible: cs ? (cs.display !== 'none' && cs.visibility !== 'hidden') : false,
       };
     });
-    if (reachInfo.footerVisible) pass('Lb hard-mode footer reachable ' + lang + ' ' + vw + 'x' + vh + ' (scrollH=' + reachInfo.scrollHeight + ' clientH=' + reachInfo.clientHeight + ')');
-    else fail('Lb footer unreachable ' + lang + ' ' + vw + 'x' + vh, JSON.stringify(reachInfo));
+    if (!reachInfo.footerVisible) pass('Lb soft-mode footer hidden ' + lang + ' ' + vw + 'x' + vh + ' (display=' + reachInfo.footerDisplay + ')');
+    else fail('Lb footer unexpectedly visible ' + lang + ' ' + vw + 'x' + vh, JSON.stringify(reachInfo));
     await ctx.close();
   }
 }
