@@ -17321,10 +17321,57 @@
     margin: 0 0 8px;
     cursor: pointer;
     text-transform: uppercase;
+    /* 3D press: 4px bottom shadow at rest → reduce by 3 on press, body
+       drops 3px to meet it. Mirrors .onb-v7-btn. */
     box-shadow: 0 4px 0 rgba(0,0,0,.18);
     width: 100%;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 80ms ease, box-shadow 80ms ease, opacity 120ms ease;
   }
-  .pw-trial-cta:active { transform: translateY(2px); box-shadow: none; }
+  .pw-trial-cta:active,
+  .pw-trial-cta.pressed {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 rgba(0,0,0,.18);
+  }
+  /* Purchasing state: dim + lock, hide label, show spinner glyph. The
+     label is kept in the DOM (opacity:0) so the button height doesn't
+     collapse while the spinner is on. */
+  .pw-trial-cta:disabled,
+  .pw-trial-cta.pw-busy {
+    opacity: 0.7;
+    cursor: default;
+    pointer-events: none;
+    transform: none;
+    box-shadow: 0 4px 0 rgba(0,0,0,.18);
+  }
+  .pw-trial-cta.pw-busy { position: relative; color: transparent; }
+  .pw-trial-cta.pw-busy::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.35);
+    border-top-color: #FFFFFF;
+    animation: pw-cta-spin 0.7s linear infinite;
+  }
+  #onb-v2-paywall.pw-trial-active.paywall-bf .pw-trial-cta.pw-busy::after {
+    border-color: rgba(30,21,56,.25);
+    border-top-color: #1E1538;
+  }
+  @keyframes pw-cta-spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .pw-trial-cta.pw-busy::after { animation: none; border-top-color: #FFFFFF; }
+  }
+  /* View-all-plans link: dim + lock while purchasing. */
+  .pw-trial-viewall:disabled,
+  .pw-trial-viewall.pw-busy {
+    opacity: 0.5;
+    cursor: default;
+    pointer-events: none;
+  }
   .pw-trial-legal-row {
     text-align: center;
     font-size: 11.5px;
@@ -17379,15 +17426,21 @@
     display: none;
     pointer-events: none;
   }
-  .pw-plans-sheet.pw-plans-open { display: block; pointer-events: auto; }
+  /* .pw-plans-mounted: in the DOM + taking pointer events, but the
+     dialog hasn't animated in yet (one frame of paint before the
+     transition kicks in — otherwise the sheet jumps straight to 0).
+     .pw-plans-open: the open end-state (backdrop opacity 1, dialog
+     translateY 0). */
+  .pw-plans-sheet.pw-plans-mounted { display: block; pointer-events: auto; }
   .pw-plans-backdrop {
     position: absolute;
     inset: 0;
     background: rgba(0,0,0,.45);
     opacity: 0;
-    transition: opacity 180ms ease;
+    transition: opacity 250ms ease;
   }
   .pw-plans-sheet.pw-plans-open .pw-plans-backdrop { opacity: 1; }
+  .pw-plans-sheet.pw-plans-closing .pw-plans-backdrop { opacity: 0; }
   .pw-plans-dialog {
     position: absolute;
     left: 0; right: 0; bottom: 0;
@@ -17397,11 +17450,29 @@
     padding: 18px 20px calc(env(safe-area-inset-bottom, 0px) + 16px);
     box-shadow: 0 -8px 32px rgba(0,0,0,.35);
     transform: translateY(100%);
-    transition: transform 240ms cubic-bezier(.4,0,.2,1);
+    /* Native iOS feel: slight overshoot curve in, ease-in out. */
+    transition: transform 380ms cubic-bezier(0.32, 0.72, 0, 1);
     max-height: 85vh;
     overflow-y: auto;
+    will-change: transform;
+    touch-action: pan-y;
   }
   .pw-plans-sheet.pw-plans-open .pw-plans-dialog { transform: translateY(0); }
+  .pw-plans-sheet.pw-plans-closing .pw-plans-dialog {
+    transform: translateY(100%);
+    transition: transform 280ms ease-in;
+  }
+  /* While the finger is dragging, we drive the transform inline from
+     JS. Disable the CSS transition so every pointer frame paints
+     immediately. */
+  .pw-plans-sheet.pw-plans-dragging .pw-plans-dialog { transition: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .pw-plans-backdrop { transition: opacity 150ms ease; }
+    .pw-plans-dialog { transition: opacity 150ms ease; transform: none !important; opacity: 0; }
+    .pw-plans-sheet.pw-plans-open .pw-plans-dialog { opacity: 1; }
+    .pw-plans-sheet.pw-plans-closing .pw-plans-dialog { opacity: 0; transition: opacity 150ms ease; }
+    .pw-plans-sheet.pw-plans-dragging .pw-plans-dialog { transition: none; }
+  }
   .pw-plans-close {
     position: absolute;
     top: 12px; inset-inline-end: 12px;
@@ -17504,6 +17575,44 @@
     margin: 8px 0 0;
     cursor: pointer;
     text-transform: uppercase;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 4px 0 rgba(0,0,0,.18);
+    transition: transform 80ms ease, box-shadow 80ms ease, opacity 120ms ease;
+    position: relative;
+  }
+  .pw-plans-cta:active,
+  .pw-plans-cta.pressed {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 rgba(0,0,0,.18);
+  }
+  .pw-plans-cta:disabled,
+  .pw-plans-cta.pw-busy {
+    opacity: 0.7;
+    cursor: default;
+    pointer-events: none;
+    transform: none;
+    box-shadow: 0 4px 0 rgba(0,0,0,.18);
+  }
+  .pw-plans-cta.pw-busy { color: transparent; }
+  .pw-plans-cta.pw-busy::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.35);
+    border-top-color: #FFFFFF;
+    animation: pw-cta-spin 0.7s linear infinite;
+  }
+  #onb-v2-paywall.paywall-bf .pw-plans-cta.pw-busy::after,
+  #modal-paywall.paywall-bf .pw-plans-cta.pw-busy::after {
+    border-color: rgba(30,21,56,.25);
+    border-top-color: #1E1538;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pw-plans-cta.pw-busy::after { animation: none; }
   }
   /* BF variant for the sheet. */
   #onb-v2-paywall.paywall-bf .pw-plans-dialog,
@@ -31413,7 +31522,10 @@ function _renderPaywallTrial() {
   } else {
     ctaEl.textContent = isEn ? 'CONTINUE' : 'להמשיך';
   }
-  ctaEl.disabled = _paywallPurchasing;
+  _installPaywallCtaPress(ctaEl);
+  const viewAllEl = q('.pw-trial-viewall');
+  if (viewAllEl) _installPaywallCtaPress(viewAllEl);
+  _applyPaywallPurchasingState(_paywallActiveRoot);
 
   // Legal row
   q('.pw-trial-restore').textContent = isEn ? 'Restore purchases' : 'שחזרו רכישות';
@@ -31434,8 +31546,22 @@ function _openPaywallPlansSheet() {
   const sheet = root.querySelector('.pw-plans-sheet');
   if (!sheet) return;
   _renderPaywallPlansSheet();
-  sheet.classList.add('pw-plans-open');
+  // Clear any lingering drag inline transform (prior close-by-flick).
+  const dlg = sheet.querySelector('.pw-plans-dialog');
+  if (dlg) dlg.style.transform = '';
+  sheet.classList.remove('pw-plans-closing', 'pw-plans-dragging');
+  // Mount first (display:block via .pw-plans-mounted), paint the start
+  // state (backdrop opacity 0, dialog translateY(100%)), THEN add the
+  // open class on the next frame so the transition actually runs.
+  sheet.classList.add('pw-plans-mounted');
   sheet.setAttribute('aria-hidden', 'false');
+  // Force layout so the browser paints the start state before the
+  // class flip triggers the transition.
+  void sheet.offsetHeight;
+  requestAnimationFrame(() => {
+    sheet.classList.add('pw-plans-open');
+  });
+  _installPaywallSheetSwipe(sheet);
   try {
     _phCapture('paywall_step_viewed', {
       step: 'sheet',
@@ -31448,8 +31574,109 @@ function _closePaywallPlansSheet() {
   if (!root) return;
   const sheet = root.querySelector('.pw-plans-sheet');
   if (!sheet) return;
-  sheet.classList.remove('pw-plans-open');
+  if (!sheet.classList.contains('pw-plans-mounted')) return;
+  const dlg = sheet.querySelector('.pw-plans-dialog');
+  // Clear any drag-leftover inline transform so the CSS closing rule
+  // (translateY(100%)) governs the exit animation.
+  if (dlg) dlg.style.transform = '';
+  sheet.classList.remove('pw-plans-open', 'pw-plans-dragging');
+  sheet.classList.add('pw-plans-closing');
   sheet.setAttribute('aria-hidden', 'true');
+  const DUR = _prefersReducedMotion() ? 150 : 280;
+  clearTimeout(sheet.__closeTimer);
+  sheet.__closeTimer = setTimeout(() => {
+    sheet.classList.remove('pw-plans-closing', 'pw-plans-mounted');
+  }, DUR);
+}
+function _prefersReducedMotion() {
+  try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+  catch (_) { return false; }
+}
+// Swipe-down-to-dismiss. Installed each time the sheet opens so the
+// handler captures the current dialog node (re-renders replace it).
+function _installPaywallSheetSwipe(sheet) {
+  const dlg = sheet.querySelector('.pw-plans-dialog');
+  if (!dlg || dlg.__swipeInstalled) return;
+  dlg.__swipeInstalled = true;
+  let startY = 0, startT = 0, dragging = false, height = 0;
+  const onStart = (e) => {
+    // Don't start a drag if the user is scrolling inside the dialog
+    // and the dialog isn't at scrollTop 0 — let the native scroll win.
+    if (dlg.scrollTop > 0) return;
+    const t = e.touches ? e.touches[0] : e;
+    startY = t.clientY;
+    startT = performance.now();
+    height = dlg.offsetHeight || 1;
+    dragging = true;
+    sheet.classList.add('pw-plans-dragging');
+  };
+  const onMove = (e) => {
+    if (!dragging) return;
+    const t = e.touches ? e.touches[0] : e;
+    const dy = t.clientY - startY;
+    if (dy <= 0) { dlg.style.transform = 'translateY(0)'; return; }
+    dlg.style.transform = 'translateY(' + dy + 'px)';
+  };
+  const onEnd = (e) => {
+    if (!dragging) return;
+    dragging = false;
+    sheet.classList.remove('pw-plans-dragging');
+    const t = (e.changedTouches && e.changedTouches[0]) || e;
+    const dy = Math.max(0, (t.clientY || 0) - startY);
+    const dt = performance.now() - startT;
+    const velocity = dy / Math.max(dt, 1); // px per ms
+    const pastThreshold = dy > height * 0.3;
+    const fastFlick = velocity > 0.6 && dy > 24;
+    if (pastThreshold || fastFlick) {
+      _closePaywallPlansSheet();
+    } else {
+      // Spring back. Clear inline transform so CSS .pw-plans-open rule
+      // takes over.
+      dlg.style.transform = '';
+    }
+  };
+  dlg.addEventListener('touchstart', onStart, { passive: true });
+  dlg.addEventListener('touchmove',  onMove,  { passive: true });
+  dlg.addEventListener('touchend',   onEnd,   { passive: true });
+  dlg.addEventListener('touchcancel',onEnd,   { passive: true });
+}
+// 3D press feedback for the two paywall CTAs. iOS WebKit drops :active
+// mid-scroll, so we also toggle a .pressed class via pointer events.
+// Haptic fires once per press (touchstart / mousedown).
+function _installPaywallCtaPress(el) {
+  if (!el || el.__pressInstalled) return;
+  el.__pressInstalled = true;
+  const down = () => {
+    if (el.disabled || el.classList.contains('pw-busy')) return;
+    el.classList.add('pressed');
+    try { _haptic('nav'); } catch (_) {}
+  };
+  const up = () => { el.classList.remove('pressed'); };
+  el.addEventListener('touchstart', down, { passive: true });
+  el.addEventListener('touchend',   up,   { passive: true });
+  el.addEventListener('touchcancel',up,   { passive: true });
+  el.addEventListener('mousedown',  down);
+  el.addEventListener('mouseup',    up);
+  el.addEventListener('mouseleave', up);
+}
+// Toggle every paywall CTA + view-all link into/out of purchasing
+// state. Called from _renderPaywallTrial / _renderPaywallPlansSheet
+// right after the CTA text is set. Also installed as a global
+// side-effect of those renders so the _paywallPurchasing value picked
+// up by _renderPaywall after startPurchase sets it to true is reflected
+// uniformly across light + BF, main + sheet.
+function _applyPaywallPurchasingState(root) {
+  if (!root) return;
+  const busy = !!_paywallPurchasing;
+  root.querySelectorAll('.pw-trial-cta, .pw-plans-cta').forEach((btn) => {
+    btn.classList.toggle('pw-busy', busy);
+    btn.disabled = busy;
+    if (busy) btn.classList.remove('pressed');
+  });
+  root.querySelectorAll('.pw-trial-viewall').forEach((btn) => {
+    btn.classList.toggle('pw-busy', busy);
+    btn.disabled = busy;
+  });
 }
 function _renderPaywallPlansSheet() {
   const isEn = state.lang === 'en';
@@ -31542,6 +31769,8 @@ function _renderPaywallPlansSheet() {
   } else {
     ctaEl.textContent = isEn ? 'CONTINUE' : 'להמשיך';
   }
+  _installPaywallCtaPress(ctaEl);
+  _applyPaywallPurchasingState(_paywallActiveRoot);
 }
 
 function _renderPaywall() {
