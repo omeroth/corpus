@@ -17143,7 +17143,10 @@
     gap: 0;
   }
   /* Top group: flex-grow + centered so chibi + text + link sit in the
-     vertical middle of the free space, not pinned to the top. */
+     vertical middle of the free space, not pinned to the top. A small
+     padding-bottom biases the centering reference upward so the chibi
+     clears the ≤25%-of-viewport target on iPhone 14 class devices
+     (verified empirically — pure center dropped chibi top to 28%). */
   #onb-v2-paywall.pw-trial-active .pw-trial-topgroup {
     flex: 1 1 auto;
     min-height: 0;
@@ -17151,6 +17154,7 @@
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
+    padding-bottom: 60px;
     gap: 4px;
   }
   #onb-v2-paywall.pw-trial-active .pw-trial-bottomgroup {
@@ -31180,17 +31184,20 @@ function _renderPaywallTrial() {
   const regularStr = (bf && bf.yearly.regularPriceString) || null;
 
   // Headlines branch by eligibility.
-  // Eligible:
-  //   h1 "Try 7 days free," (accent) / h2 "then {perMonth} a month"
-  // Ineligible BF with known pct:
-  //   h1 "{pct}% off a year of big ideas" (accent) / h2 "then {perMonth} a month"
-  // Ineligible non-BF:
-  //   h1 hidden / h2 "{perMonth} a month" (promoted to the single headline)
+  //   Eligible:
+  //     h1 accent "Try 7 days free,"      / h2 "then {perMonth} a month"
+  //   Ineligible, BF with known pct:
+  //     h1 accent "{pct}% off a year of big ideas"
+  //                                         h2 "then {perMonth} a month"
+  //   Ineligible, no BF (or BF without pct):
+  //     h1 accent "Unlock every big idea," / h2 "for {perMonth} a month"
+  // All three variants keep h1 populated so the vertical rhythm reads
+  // the same whether the user is trial-eligible or not.
   const h1El = q('.pw-trial-h1');
   const h2El = q('.pw-trial-h2');
   if (eligible) {
     if (h1El) { h1El.textContent = isEn ? 'Try 7 days free,' : 'נסו 7 ימים בחינם,'; h1El.style.display = ''; }
-    if (h2El) h2El.innerHTML   = isEn
+    if (h2El) h2El.innerHTML = isEn
       ? 'then ' + bdi(perMonth || '') + ' a month'
       : 'ואז '  + bdi(perMonth || '') + ' לחודש';
   } else if (inBf && bf && bf.yearly.discountPct != null) {
@@ -31200,14 +31207,17 @@ function _renderPaywallTrial() {
                               : pct + '% הנחה על שנה של רעיונות גדולים';
       h1El.style.display = '';
     }
-    if (h2El) h2El.innerHTML   = isEn
+    if (h2El) h2El.innerHTML = isEn
       ? 'then ' + bdi(perMonth || '') + ' a month'
       : 'ואז '  + bdi(perMonth || '') + ' לחודש';
   } else {
-    if (h1El) { h1El.textContent = ''; h1El.style.display = 'none'; }
+    if (h1El) {
+      h1El.textContent = isEn ? 'Unlock every big idea,' : 'כל הרעיונות הגדולים, פתוחים,';
+      h1El.style.display = '';
+    }
     if (h2El) h2El.innerHTML = isEn
-      ? bdi(perMonth || '') + ' a month'
-      : bdi(perMonth || '') + ' לחודש';
+      ? 'for ' + bdi(perMonth || '') + ' a month'
+      : 'ב-'  + bdi(perMonth || '') + ' לחודש';
   }
 
   // Billed-yearly line (18px / 700 / ink per spec #2). Flex layout
