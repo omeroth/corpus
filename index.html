@@ -14903,6 +14903,11 @@
     z-index: 10;
   }
   #onb-v2-paywall.pw-trial-active.paywall-bf #onb-v2-paywall-skip { color: rgba(255,255,255,.9); }
+  /* Progress bar is hidden on step 35 — the X is the only chrome, and
+     the progress bar overlapping the fixed X at the top-left was the
+     visible bug reported on-device. Step 35 is the terminus of the
+     onboarding progress; no bar needed. */
+  #onb-v2-paywall.pw-trial-active .onb-v7-bar { display: none !important; }
   /* Adaptive for SE / mini — hero shrinks, headline tightens. */
   @media (max-height: 799px) {
     .onb-v7-trialintro-fig { width: 140px; height: 140px; }
@@ -16505,7 +16510,11 @@
   .onb-screen.onb-v7 .onb-v7-rp-bellgroup .onb-v7-rp-bell { margin-bottom: 0; }
   .onb-screen.onb-v7 .onb-v7-rp-badge {
     position: absolute;
-    inset-inline-start: 50%;
+    /* Physical left:50% + translateX(-50%) keeps the badge centered
+       under the bell in BOTH LTR and RTL. Using inset-inline-start
+       with translateX(-50%) broke HE: in RTL the inline-start is the
+       right edge, so the badge drifted off-center to the right. */
+    left: 50%;
     bottom: -22px;
     transform: translateX(-50%);
     background: #F2A72E;
@@ -17128,7 +17137,21 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    gap: 2px;
+    gap: 0;
+  }
+  /* Top group: flex-grow + centered so chibi + text + link sit in the
+     vertical middle of the free space, not pinned to the top. */
+  #onb-v2-paywall.pw-trial-active .pw-trial-topgroup {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 4px;
+  }
+  #onb-v2-paywall.pw-trial-active .pw-trial-bottomgroup {
+    flex: 0 0 auto;
   }
   /* Light theme is default; BF reuses the dark gradient already set on
      #onb-v2-paywall.paywall-bf. No extra CSS needed for the dark BG. */
@@ -17142,13 +17165,13 @@
   }
   .pw-trial-hero {
     position: relative;
-    width: 150px;
-    height: 150px;
-    margin: 4px auto 6px;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 6px;
   }
   .pw-trial-chibi {
-    width: 150px;
-    height: 150px;
+    width: 180px;
+    height: 180px;
     object-fit: contain;
     display: block;
   }
@@ -17194,15 +17217,26 @@
     line-height: 1.18;
   }
   /* Billed-yearly line — 18px / 700 / FULL INK per spec #2. Must be
-     clearly readable (not muted). */
+     clearly readable (not muted). Flex row with the parens pinned at
+     the visual edges by inline-flex order (direction:ltr guarantees
+     visual order [paren][mid][paren] regardless of page direction).
+     The middle span carries its own dir so the content reads
+     naturally in HE. */
   .pw-trial-billed {
     color: var(--ink);
     font-size: 18px;
     font-weight: 700;
-    text-align: center;
-    margin: 0 0 4px;
     line-height: 1.25;
+    margin: 0 0 4px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: baseline;
+    gap: 0;
+    direction: ltr;
   }
+  .pw-trial-billed-paren { flex: 0 0 auto; }
+  .pw-trial-billed-mid   { flex: 0 1 auto; }
   .pw-trial-billed s { opacity: 0.55; text-decoration-color: currentColor; }
   .pw-trial-ends {
     color: var(--accent);
@@ -17225,27 +17259,29 @@
     margin: 4px 0 0;
     text-align: center;
   }
-  /* Push the CTA to the bottom of the shell. */
   .pw-trial-nocharge {
-    margin-top: auto;
     color: var(--text-2);
     font-size: 13px;
     text-align: center;
-    padding: 8px 10px 4px;
+    padding: 0 10px 8px;
+    margin: 0;
   }
   .pw-trial-cta {
     background: var(--accent);
     color: #FFFFFF;
-    font-size: 17px;
-    font-weight: 900;
-    letter-spacing: 1px;
+    /* Match the onboarding CTA (Nunito 900 15px / 0.8px). At 15px
+       "START MY 7-DAY FREE TRIAL" fits on one line at 375px with the
+       padding below. */
+    font: 900 15px 'Nunito', 'Rubik', 'Assistant', sans-serif;
+    letter-spacing: 0.8px;
     border: 0;
     border-radius: 14px;
-    padding: 16px 20px;
+    padding: 15px 16px;
     margin: 0 0 8px;
     cursor: pointer;
     text-transform: uppercase;
     box-shadow: 0 4px 0 rgba(0,0,0,.18);
+    width: 100%;
   }
   .pw-trial-cta:active { transform: translateY(2px); box-shadow: none; }
   .pw-trial-legal-row {
@@ -17279,19 +17315,19 @@
 
   /* Adaptive heights (reuse the same breakpoints as the BF shell). */
   @media (max-height: 799px) {
-    .pw-trial-hero { width: 120px; height: 120px; }
-    .pw-trial-chibi { width: 120px; height: 120px; }
+    .pw-trial-hero { width: 140px; height: 140px; }
+    .pw-trial-chibi { width: 140px; height: 140px; }
     .pw-trial-h1, .pw-trial-h2 { font-size: 22px; }
     .pw-trial-billed { font-size: 17px; }
-    .pw-trial-cta { padding: 13px 20px; font-size: 16px; }
+    .pw-trial-cta { padding: 13px 16px; }
   }
   @media (max-height: 699px) {
-    .pw-trial-hero { width: 90px; height: 90px; margin: 0 auto 4px; }
-    .pw-trial-chibi { width: 90px; height: 90px; }
+    .pw-trial-hero { width: 100px; height: 100px; margin: 0 auto 4px; }
+    .pw-trial-chibi { width: 100px; height: 100px; }
     .pw-trial-h1, .pw-trial-h2 { font-size: 20px; }
     .pw-trial-billed { font-size: 16px; }
     .pw-trial-viewall { font-size: 15px; }
-    .pw-trial-cta { padding: 12px 18px; font-size: 15px; }
+    .pw-trial-cta { padding: 12px 16px; }
   }
 
   /* ── View-all-plans bottom sheet ─────────────────────────────── */
@@ -17415,12 +17451,11 @@
     width: 100%;
     background: var(--accent);
     color: #FFFFFF;
-    font-size: 17px;
-    font-weight: 900;
-    letter-spacing: 1px;
+    font: 900 15px 'Nunito', 'Rubik', 'Assistant', sans-serif;
+    letter-spacing: 0.8px;
     border: 0;
     border-radius: 14px;
-    padding: 14px 20px;
+    padding: 14px 16px;
     margin: 8px 0 0;
     cursor: pointer;
     text-transform: uppercase;
@@ -31147,18 +31182,25 @@ function _renderPaywallTrial() {
     ? 'then ' + bdi(perMonth || '') + ' a month'
     : 'ואז '  + bdi(perMonth || '') + ' לחודש';
 
-  // Billed-yearly line (18px / 700 / ink per spec #2).
+  // Billed-yearly line (18px / 700 / ink per spec #2). Flex layout
+  // with explicit open/close paren spans pins the paren glyphs at
+  // the visual edges in both languages regardless of the enclosing
+  // bidi direction. The middle span's own `dir` follows the page
+  // language so the content reads naturally; <bdi> around each price
+  // isolates the currency + digits from the RTL run.
   const billedEl = q('.pw-trial-billed');
   if (billedEl) {
-    if (inBf && regularStr) {
-      billedEl.innerHTML = isEn
-        ? '(' + bdi(yearlyStr) + ' billed yearly, <s>' + bdi(regularStr) + '</s>)'
-        : '(' + bdi(yearlyStr) + ' בחיוב שנתי, <s>' + bdi(regularStr) + '</s>)';
-    } else {
-      billedEl.innerHTML = isEn
-        ? '(' + bdi(yearlyStr) + ' billed yearly)'
-        : '(' + bdi(yearlyStr) + ' בחיוב שנתי)';
-    }
+    const midHtml = inBf && regularStr
+      ? (isEn
+          ? bdi(yearlyStr) + ' billed yearly, <s>' + bdi(regularStr) + '</s>'
+          : bdi(yearlyStr) + ' בחיוב שנתי, <s>' + bdi(regularStr) + '</s>')
+      : (isEn
+          ? bdi(yearlyStr) + ' billed yearly'
+          : bdi(yearlyStr) + ' בחיוב שנתי');
+    billedEl.innerHTML =
+        '<span class="pw-trial-billed-paren">(</span>'
+      + '<span class="pw-trial-billed-mid" dir="' + (isEn ? 'ltr' : 'rtl') + '">' + midHtml + '</span>'
+      + '<span class="pw-trial-billed-paren">)</span>';
   }
 
   // Ends date (BF only)
@@ -31239,15 +31281,14 @@ function _renderPaywallPlansSheet() {
     : null;
   const inBf = !!bf;
   q('.pw-plans-heading').textContent = isEn ? 'Choose your plan' : 'בחרו תוכנית';
-  const thinkerCount = Array.isArray(window.THINKERS) ? window.THINKERS.length : 88;
   const BENEFITS = isEn ? [
     'Every chapter in all three subjects',
     'Every bonus chapter',
-    'All ' + thinkerCount + ' thinker cards',
+    'All thinker cards',
   ] : [
     'כל פרק בכל שלושת התחומים',
     'כל פרק בונוס',
-    'כל ' + thinkerCount + ' כרטיסי ההוגים',
+    'כל כרטיסי ההוגים',
   ];
   root.querySelectorAll('.pw-plans-sheet .pw-plans-benefit').forEach((el, i) => {
     el.textContent = BENEFITS[i] || '';
@@ -65650,27 +65691,34 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
         .paywall-bf — the dark gradient from .paywall-bf scopes still
         applies and this subtree inherits via CSS. -->
    <div class="pw-trial-shell" aria-hidden="true">
-     <div class="pw-trial-eyebrow"></div>
-     <div class="pw-trial-hero">
-       <img class="pw-trial-chibi" alt="" aria-hidden="true">
-       <div class="pw-trial-sticker" aria-hidden="true">
-         <span class="pw-trial-sticker-pct"></span>
-         <span class="pw-trial-sticker-off"></span>
+     <!-- Top group — vertically centered in the free space above the
+          bottom CTA block via flex:1 + justify-content:center. -->
+     <div class="pw-trial-topgroup">
+       <div class="pw-trial-eyebrow"></div>
+       <div class="pw-trial-hero">
+         <img class="pw-trial-chibi" alt="" aria-hidden="true">
+         <div class="pw-trial-sticker" aria-hidden="true">
+           <span class="pw-trial-sticker-pct"></span>
+           <span class="pw-trial-sticker-off"></span>
+         </div>
        </div>
+       <h1 class="pw-trial-h1"></h1>
+       <h1 class="pw-trial-h2"></h1>
+       <p class="pw-trial-billed"></p>
+       <p class="pw-trial-ends"></p>
+       <button type="button" class="pw-trial-viewall" onclick="_openPaywallPlansSheet()"></button>
      </div>
-     <h1 class="pw-trial-h1"></h1>
-     <h1 class="pw-trial-h2"></h1>
-     <p class="pw-trial-billed"></p>
-     <p class="pw-trial-ends"></p>
-     <button type="button" class="pw-trial-viewall" onclick="_openPaywallPlansSheet()"></button>
-     <p class="pw-trial-nocharge"></p>
-     <button type="button" class="pw-trial-cta" onclick="startPurchase()"></button>
-     <div class="pw-trial-legal-row">
-       <button type="button" class="pw-trial-restore" onclick="restorePurchases()"></button>
-       <span class="pw-trial-sep">·</span>
-       <a href="#" class="pw-trial-terms" onclick="event.preventDefault(); _openLegalUrl('terms');"></a>
-       <span class="pw-trial-sep">·</span>
-       <a href="#" class="pw-trial-privacy" onclick="event.preventDefault(); _openLegalUrl('privacy');"></a>
+     <!-- Bottom group — anchored at the shell's bottom. -->
+     <div class="pw-trial-bottomgroup">
+       <p class="pw-trial-nocharge"></p>
+       <button type="button" class="pw-trial-cta" onclick="startPurchase()"></button>
+       <div class="pw-trial-legal-row">
+         <button type="button" class="pw-trial-restore" onclick="restorePurchases()"></button>
+         <span class="pw-trial-sep">·</span>
+         <a href="#" class="pw-trial-terms" onclick="event.preventDefault(); _openLegalUrl('terms');"></a>
+         <span class="pw-trial-sep">·</span>
+         <a href="#" class="pw-trial-privacy" onclick="event.preventDefault(); _openLegalUrl('privacy');"></a>
+       </div>
      </div>
    </div>
    <!-- Black Friday theme subtree. Renders only when #onb-v2-paywall
