@@ -14841,6 +14841,65 @@
      is on economics blue or psychology orange sees that colour, not
      philosophy purple. */
   .onb-screen.onb-v7 .onb-v7-accent { color: var(--accent); font-weight: inherit; }
+  /* ── Step 33 — "The promise" ─────────────────────────────────────
+     Single large chibi wave, 2-line headline, subject-accent kicker,
+     CTA. Light theme always; no BF styling on this step. */
+  .onb-v2-trialintro-mid {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    text-align: center;
+    gap: 14px;
+  }
+  .onb-v7-trialintro-fig {
+    width: 170px;
+    height: 170px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+  }
+  .onb-v2-trialintro-head {
+    color: var(--ink);
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.18;
+    margin: 4px 0 0;
+    text-wrap: balance;
+  }
+  .onb-v2-trialintro-accent {
+    color: var(--accent);
+    font-size: 20px;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.2;
+  }
+  /* X top-left on step 33 — mirrors the modal paywall and step-35 X.
+     Position:fixed avoids needing position:relative on any ancestor
+     and matches the pattern already used on the BF paywall's X. */
+  .onb-v7-close-trialintro {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 14px);
+    inset-inline-start: 12px;
+    width: 36px; height: 36px;
+    background: transparent; border: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text);
+    cursor: pointer; padding: 0;
+    z-index: 10;
+  }
+  /* Adaptive for SE / mini — hero shrinks, headline tightens. */
+  @media (max-height: 799px) {
+    .onb-v7-trialintro-fig { width: 140px; height: 140px; }
+    .onb-v2-trialintro-head { font-size: 23px; }
+    .onb-v2-trialintro-accent { font-size: 18px; }
+  }
+  @media (max-height: 699px) {
+    .onb-v7-trialintro-fig { width: 110px; height: 110px; }
+    .onb-v2-trialintro-head { font-size: 21px; }
+    .onb-v2-trialintro-accent { font-size: 17px; }
+  }
   .onb-screen.onb-v7 .onb-v7-bub .onb-v7-em,
   .onb-screen.onb-v7 .onb-v7-em { color: var(--v7-acc); }
 
@@ -29781,6 +29840,54 @@ function _paywallBfPrices() {
 // 'ineligible' and 'unknown' both fall back to "SUBSCRIBE" so we never
 // mis-promise a trial a user won't actually get.
 let _bfTrialEligibility = null;
+// Platform-specific trial-eligibility probe. Called by _onbV2CtaTrial
+// at the 33 → 34/35 fork. See the inline comments for the two paths.
+async function _probeTrialEligibility(productId, packageIdentifier) {
+  const platform = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || 'web';
+  if (platform === 'ios') {
+    // StoreKit: 2 = eligible, 1 = ineligible, 0 = unknown, -1 = no intro.
+    // We treat ONLY status 2 as eligible — "unknown" bills immediately
+    // if the user consents, which reads as a bait-and-switch.
+    const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
+    if (!P || typeof P.checkTrialOrIntroductoryPriceEligibility !== 'function') return 'ineligible';
+    try {
+      const res = await P.checkTrialOrIntroductoryPriceEligibility({ productIdentifiers: [productId] });
+      const entry = res && res[productId];
+      return (entry && entry.status === 2) ? 'eligible' : 'ineligible';
+    } catch (_) { return 'ineligible'; }
+  }
+  if (platform === 'android') {
+    // Google Play surfaces only offers the signed-in Play account is
+    // eligible for. RC Capacitor exposes this via
+    // package.product.defaultOption — if it carries a .freePhase (or
+    // any pricingPhase with amountMicros === 0) the user WILL get the
+    // trial on purchase. No defaultOption means no subscription offer
+    // is available at all → treat as ineligible.
+    const off = (typeof _paywallActiveOffering === 'function') ? _paywallActiveOffering() : null;
+    const pkg = (off && off.availablePackages || []).find(
+      p => (p.identifier === packageIdentifier) || (p.product && p.product.identifier === productId)
+    );
+    const defOpt = pkg && pkg.product && pkg.product.defaultOption;
+    if (!defOpt) return 'ineligible';
+    if (defOpt.freePhase) return 'eligible';
+    const phases = defOpt.pricingPhases || [];
+    const anyFree = phases.some(p => {
+      const micros = p && p.price && p.price.amountMicros;
+      return micros === 0 || micros === '0' || Number(micros) === 0;
+    });
+    return anyFree ? 'eligible' : 'ineligible';
+  }
+  // Web / debug: treat as ineligible unless a dev override forces
+  // 'eligible' (used by the screenshot harness).
+  try {
+    if (window.__CORPUS_DEBUG_BUILD === true
+        && localStorage.getItem('_corpus_trial_force_eligible') === '1') {
+      return 'eligible';
+    }
+  } catch (_) {}
+  return 'ineligible';
+}
+
 async function _primeBfTrialEligibility() {
   if (_bfTrialEligibility) return _bfTrialEligibility;
   const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Purchases;
@@ -35565,7 +35672,44 @@ function _onbV2CtaReviews() {
 
 // Step 34 (v11) — Trial intro. Owl-fronted invitation with a three-
 // item benefit list. Only reachable when TRIAL_ENABLED is true.
-function _onbV2CtaTrial() { _onbAdvanceStep(33, 34); }
+// Step 33 CTA — "I'M READY". Probes platform-specific trial eligibility
+// for the onboarding yearly SKU and skips step 34 when the user is not
+// eligible. Rationale: step 34 ("reminder-promise") is an explicit
+// promise of a 7-day trial; showing it to an account that won't get
+// one is a bait-and-switch. Skipping straight to step 35's paywall is
+// the honest alternative.
+async function _onbV2CtaTrial() {
+  const btn = document.getElementById('onb-v2-trial-cta');
+  // Visual lock while the (sub-second) probe resolves.
+  const originalLabel = btn && btn.textContent;
+  if (btn) { btn.disabled = true; btn.setAttribute('aria-busy', 'true'); }
+  let eligibility = 'ineligible';
+  try {
+    // Pick the product id that will actually be charged on step 35.
+    // Onboarding uses $rc_annual (which resolves to corpus_yearly_bf_trial
+    // under BF, or corpus_yearly during the standard offering).
+    const off = (typeof _paywallActiveOffering === 'function') ? _paywallActiveOffering() : null;
+    const pkg = (off && off.availablePackages || []).find(
+      p => p.identifier === '$rc_annual' || p.packageType === 'ANNUAL'
+    );
+    const productId = pkg && pkg.product && pkg.product.identifier;
+    if (productId) {
+      eligibility = await _probeTrialEligibility(productId, pkg.identifier);
+    }
+  } catch (_) { eligibility = 'ineligible'; }
+  if (btn) { btn.disabled = false; btn.removeAttribute('aria-busy'); if (originalLabel != null) btn.textContent = originalLabel; }
+  try {
+    _phCapture('paywall_trial_eligibility_probed', {
+      step: 33,
+      result: eligibility,
+    });
+  } catch (_) {}
+  // Eligible → walk through step 34's promise then into step 35.
+  // Ineligible → skip step 34 (no trial to promise) and go straight
+  // to step 35; _renderPaywall will branch to the no-trial copy.
+  if (eligibility === 'eligible') _onbAdvanceStep(33, 34);
+  else                            _onbAdvanceStep(33, 35);
+}
 
 // Step 35 (v11) — Reminder promise. Amber bell hero + head + sub +
 // "Continue for free" CTA. Only reachable when TRIAL_ENABLED is true.
@@ -36342,32 +36486,36 @@ function _onbV2PrepareReviews() {
 // 33's advance skips this hook entirely. Static owl expression
 // (neutral / waving) matches the low-pressure invitation framing.
 function _onbV2PrepareTrial() {
-  // v7 — question layout: subject thinker point + bubble (headline),
-  // then fanned portraits on Pro (hidden on SE), then full-width
-  // benefit cards. Benefits use the same icon set as before.
+  // v7 trial-intro rebuild ("The promise"): single chibi wave, 2-line
+  // headline, subject-accent kicker, CTA "I'M READY". Light theme
+  // always; BF styling is applied on step 35 only.
   const screen = document.getElementById('onb-v2-trial');
-  const fig    = document.getElementById('onb-v7-trial-fig');
   if (screen && typeof _onbV7Acc === 'function') _onbV7Acc(screen);
-  if (fig) fig.src = (typeof _onbThinker === 'function') ? _onbThinker('point') : '';
-  const list = document.getElementById('onb-v2-trial-benefits');
-  if (!list) return;
+  const fig = document.getElementById('onb-v7-trialintro-fig');
+  if (fig) fig.src = (typeof _onbThinker === 'function') ? _onbThinker('wave') : '';
   const isEn = state.lang === 'en';
-  const items = (_ONB_COPY.trial && _ONB_COPY.trial.items) || [];
-  list.innerHTML = '';
-  items.forEach((item) => {
-    const row = document.createElement('div');
-    row.className = 'onb-v7-trial-benefit';
-    const iconWrap = document.createElement('span');
-    iconWrap.className = 'onb-v7-trial-benefit-icon';
-    iconWrap.setAttribute('aria-hidden', 'true');
-    iconWrap.innerHTML = '<svg viewBox="0 0 64 64"><use href="#' + item.icon + '"/></svg>';
-    const text = document.createElement('span');
-    text.className = 'onb-v7-trial-benefit-text';
-    text.textContent = isEn ? item.text.en : item.text.he;
-    row.appendChild(iconWrap);
-    row.appendChild(text);
-    list.appendChild(row);
-  });
+  const headEl   = document.getElementById('onb-v2-trial-head');
+  const accentEl = document.getElementById('onb-v2-trial-accent');
+  const ctaEl    = document.getElementById('onb-v2-trial-cta');
+  if (headEl)   headEl.textContent   = isEn ? "Five minutes a day with history's greatest minds."
+                                            : 'חמש דקות ביום עם המוחות הגדולים בהיסטוריה.';
+  if (accentEl) accentEl.textContent = isEn ? 'Start free for 7 days.' : 'התחילו בחינם ל-7 ימים.';
+  if (ctaEl)    ctaEl.textContent    = isEn ? "I'M READY" : 'אני מוכן/ה';
+  // Fire paywall_step_viewed with step 33 so the funnel sees it at
+  // render time (not only at advance).
+  try {
+    _phCapture('paywall_step_viewed', {
+      step: 33,
+      paywall_theme: (typeof _isBlackFridayActive === 'function' && _isBlackFridayActive()) ? 'black_friday' : 'default',
+    });
+  } catch (_) {}
+}
+
+// Skip (X) on step 33 — advances to the paywall (step 35) so the user
+// still sees the ask. The paywall's own X then exits onboarding.
+function _onbV2CtaTrialSkip() {
+  try { _phCapture('paywall_step_skipped', { step: 33 }); } catch (_) {}
+  _onbAdvanceStep(33, 35);
 }
 
 // Step 35 (reminder promise) — head + sub are static (bound in
@@ -64684,14 +64832,19 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
      the benefits are the message, not the cover.) -->
 <div id="onb-v2-trial" class="onb-screen onb-v2 onb-v7 onb-bg-themed" style="display:none">
   <div class="onb-v7-top">
+    <!-- X top-left — matches the modal paywall and step 35 X, per the
+         soft-paywall spec. Advances to step 35 (the paywall) so the
+         skip-user still sees the ask; the paywall's own X then exits
+         onboarding. -->
+    <button type="button" class="onb-v7-close onb-v7-close-trialintro" onclick="_onbV2CtaTrialSkip()" aria-label="Close">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg>
+    </button>
     <div class="onb-v7-bar"><i style="width: 97%"></i></div>
   </div>
-  <div class="onb-v7-mid">
-    <div class="onb-v7-row">
-      <img id="onb-v7-trial-fig" class="onb-v7-fig" alt="" aria-hidden="true">
-      <div class="onb-v7-bub"><span id="onb-v2-trial-head"></span></div>
-    </div>
-    <div class="onb-v7-trial-benefits" id="onb-v2-trial-benefits"></div>
+  <div class="onb-v7-mid onb-v2-trialintro-mid">
+    <img id="onb-v7-trialintro-fig" class="onb-v7-trialintro-fig" alt="" aria-hidden="true">
+    <h1 class="onb-v2-trialintro-head" id="onb-v2-trial-head"></h1>
+    <p class="onb-v2-trialintro-accent" id="onb-v2-trial-accent"></p>
   </div>
   <div class="onb-v7-cta-holder">
     <button type="button" class="onb-v7-btn" id="onb-v2-trial-cta" onclick="_onbV2CtaTrial()"></button>
