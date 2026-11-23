@@ -30238,6 +30238,22 @@ let _bfTrialEligibility = null;
 // Platform-specific trial-eligibility probe. Called by _onbV2CtaTrial
 // at the 33 → 34/35 fork. See the inline comments for the two paths.
 async function _probeTrialEligibility(productId, packageIdentifier) {
+  // Debug-only override: force 'eligible' on every platform (iOS +
+  // Android + web) when the debug-build flag is set AND the
+  // localStorage toggle is '1'. __CORPUS_DEBUG_BUILD is never true in
+  // Release/TestFlight/App-Store builds (iOS AppDelegate.swift sets
+  // it under #if DEBUG; Android MainActivity.java under
+  // BuildConfig.DEBUG; index.html's head-script additionally deletes
+  // the property on any non-debug boot). So this branch cannot fire
+  // in production. '_corpus_trial_force_eligible' is kept as an alias
+  // so the screenshot harnesses that already set it continue to work.
+  try {
+    if (window.__CORPUS_DEBUG_BUILD === true) {
+      const v1 = localStorage.getItem('_corpus_trial_force');
+      const v2 = localStorage.getItem('_corpus_trial_force_eligible');
+      if (v1 === '1' || v2 === '1') return 'eligible';
+    }
+  } catch (_) {}
   const platform = (window.Capacitor && window.Capacitor.getPlatform && window.Capacitor.getPlatform()) || 'web';
   if (platform === 'ios') {
     // StoreKit: 2 = eligible, 1 = ineligible, 0 = unknown, -1 = no intro.
@@ -30272,14 +30288,9 @@ async function _probeTrialEligibility(productId, packageIdentifier) {
     });
     return anyFree ? 'eligible' : 'ineligible';
   }
-  // Web / debug: treat as ineligible unless a dev override forces
-  // 'eligible' (used by the screenshot harness).
-  try {
-    if (window.__CORPUS_DEBUG_BUILD === true
-        && localStorage.getItem('_corpus_trial_force_eligible') === '1') {
-      return 'eligible';
-    }
-  } catch (_) {}
+  // Web / unknown platform: no store to probe. The debug override at
+  // the top of this function has already short-circuited if active;
+  // reaching here means debug is off or the flag isn't set.
   return 'ineligible';
 }
 
