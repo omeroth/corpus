@@ -56692,6 +56692,13 @@ function setSubject(value) {
   // Widget: thinker + colours change with subject. Native-only via
   // internal guard; web is a no-op.
   try { _writeWidgetData(); } catch (_) {}
+  // Push the new subject to Supabase immediately. Without this the user
+  // can switch subject in the drawer and bounce out of the app before any
+  // other saveState()-triggering action — leaving user_progress.last_subject
+  // and the Loops lastSubject contact prop stale until their next real
+  // interaction. saveState routes through syncProgressToSupabase, which the
+  // notify_loops_progress trigger forwards to Loops on its normal cadence.
+  try { saveState(); } catch (_) {}
 }
 
 function _subjGetIdx() {

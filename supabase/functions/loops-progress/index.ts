@@ -358,7 +358,6 @@ function deriveProgressProps(record: Record<string, unknown>) {
   // "" or null, which Loops would treat as a clear.
   const props: Record<string, unknown> = {
     lastActiveAt:      typeof record.last_active_at === "string" ? record.last_active_at : null,
-    lastSubject:       typeof record.last_subject   === "string" ? record.last_subject   : null,
     subjectsStarted,
     bonusUnlocked,
     chaptersCompleted: chapterCompleteShown.length,
@@ -368,6 +367,17 @@ function deriveProgressProps(record: Record<string, unknown>) {
     inactive7d:  false,
     inactive14d: false,
   };
+  // lastSubject: omit when absent so a user whose user_progress.last_subject
+  // is briefly null (OAuth signup before subject pick; pre-onboarding state)
+  // doesn't have their Loops lastSubject wiped. Matches the "only send when
+  // present" pattern used for every other optional prop below (language,
+  // platform, firstName, timezone, utcOffset). The earlier version sent
+  // null explicitly, which Loops treats as "clear this property" — a 2026-11-23
+  // audit found 56/511 users with null last_subject, meaning the trigger
+  // silently cleared any previously-set value every time one of them touched
+  // the app. See scripts/backfill-loops-subject-lang.mjs for the one-time
+  // repair of users whose Loops value was already wiped.
+  if (typeof record.last_subject === "string" && record.last_subject) props.lastSubject = record.last_subject;
   if (typeof record.lang === "string" && record.lang) props.language = record.lang;
   if (typeof record.platform === "string" && record.platform) props.platform = record.platform;
   if (firstName) props.firstName = firstName;
