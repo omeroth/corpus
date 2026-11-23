@@ -36349,52 +36349,88 @@ window.__corpusPreviewTrialFlow = async function (opts) {
   const bf       = !!opts.bf;
   const eligible = !!opts.eligible;
   const lang     = (opts.lang === 'he') ? 'he' : 'en';
+  // 1) Force flags. The probe + BF gate read these on every call.
   try {
     if (bf) localStorage.setItem('_corpus_bf_force', '1');
     else    localStorage.removeItem('_corpus_bf_force');
     if (eligible) localStorage.setItem('_corpus_trial_force', '1');
     else          localStorage.removeItem('_corpus_trial_force');
   } catch (_) {}
-  // Clear cached eligibility so the next render reruns the probe
-  // against the force-flag override we just set.
-  _onbTrialEligibility = null;
-  _bfTrialEligibility  = null;
-  // Apply language so the right copy renders.
+  // 2) Language.
   if (state) state.lang = lang;
   try { if (typeof setAppLang === 'function') setAppLang(lang); } catch (_) {}
-  // Refresh RC offerings so real prices land (await, not fire-and-forget).
+  // 3) Pre-fetch reset. Some code paths (sign-in, a prior paywall
+  //    render) can prime the eligibility caches to 'ineligible' before
+  //    the force flags were set. Clear BEFORE awaiting offerings so
+  //    anything that re-reads mid-fetch sees a fresh state.
+  _onbTrialEligibility = null;
+  _bfTrialEligibility  = null;
+  // 4) Refresh offerings so BF/trial prices are the ones RC now holds.
   try { if (typeof _fetchOfferings === 'function') await _fetchOfferings(); } catch (e) {
     console.warn('[__corpusPreviewTrialFlow] _fetchOfferings failed:', e);
   }
-  // Clear every onb-screen before taking over.
+  // 5) Post-fetch reset. _fetchOfferings itself doesn't touch the
+  //    eligibility caches, but any concurrent render that fired during
+  //    the await (sign-in flow, home auto-renders) could have. Reset
+  //    again so the explicit values we set below win.
+  _onbTrialEligibility = null;
+  _bfTrialEligibility  = null;
+  // 6) Tear down every visible paywall/onboarding surface. Without this
+  //    the previous shell stays painted beneath whatever we show next —
+  //    on device the user saw the OLD step 35 because #modal-paywall or
+  //    a prior #onb-v2-paywall was still active.
   document.querySelectorAll('.onb-screen').forEach(s => {
     s.style.display = 'none';
     s.classList.remove('onb-active');
   });
+  const modalPw = document.getElementById('modal-paywall');
+  if (modalPw) {
+    modalPw.classList.remove('active');
+    modalPw.style.display = 'none';
+  }
+  try { if (typeof _closePaywallPlansSheet === 'function') _closePaywallPlansSheet(); } catch (_) {}
+  // Reset paywall routing globals so _renderPaywall picks the shell we
+  // just mounted, not a stale one.
+  _paywallActiveRoot   = null;
+  _paywallMode         = null;
+  _activePaywallSource = null;
+  // 7) Set the eligibility caches to the REQUESTED state explicitly.
+  //    This beats the probe race entirely — _onbV2PrepareTrial's
+  //    _primeOnbTrialEligibility short-circuits on a non-null cache
+  //    and _renderPaywall reads these directly.
+  _onbTrialEligibility = eligible ? 'eligible' : 'ineligible';
+  _bfTrialEligibility  = eligible ? 'eligible' : 'ineligible';
+  // 8) Mount the right first screen and force a fresh render.
+  let targetId;
   if (eligible) {
-    const el = document.getElementById('onb-v2-trial');
+    targetId = 'onb-v2-trial';
+    const el = document.getElementById(targetId);
     if (el) {
       el.style.display = 'flex';
       el.classList.add('onb-active');
       _onbV2PrepareTrial();
     }
   } else {
-    const el = document.getElementById('onb-v2-paywall');
+    targetId = 'onb-v2-paywall';
+    const el = document.getElementById(targetId);
     if (el) {
       el.style.display = '';
       el.classList.add('onb-active');
-      _paywallActiveRoot    = el;
-      _paywallMode          = 'onboarding';
-      _activePaywallSource  = 'onboarding';
-      // Explicit marker so _renderPaywall routes to the trial shell's
-      // ineligible branch immediately without re-probing.
-      _onbTrialEligibility  = 'ineligible';
-      _bfTrialEligibility   = 'ineligible';
+      _paywallActiveRoot   = el;
+      _paywallMode         = 'onboarding';
+      _activePaywallSource = 'onboarding';
       _renderPaywall();
     }
   }
-  console.log('[__corpusPreviewTrialFlow] opened', { bf, eligible, lang });
-  return { opened: eligible ? 'step 33' : 'step 35', bf, eligible, lang };
+  // 9) Log the actually-visible screen id (not just the intended one).
+  //    Defer one frame so _onbV2PrepareTrial's microtask has a chance
+  //    to advance (33→35 for ineligible) before we snapshot.
+  await new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
+  const actives = Array.from(document.querySelectorAll('.onb-screen.onb-active'));
+  const visibleId = actives.length ? actives[actives.length - 1].id : null;
+  const result = { opened: targetId, visibleId, bf, eligible, lang };
+  console.log('[__corpusPreviewTrialFlow] opened', result);
+  return result;
 };
 
 // Debug-only opener. Hides every other onb-screen, then shows the

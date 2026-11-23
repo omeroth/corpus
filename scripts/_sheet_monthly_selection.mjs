@@ -154,8 +154,21 @@ assert('empty-perMonth: no bare blank price',           !/^\s*(for|ב-)\s+(a mon
 // across all 4 combos (bf × eligible) with no empty-price copy.
 console.log('\n--- __corpusPreviewTrialFlow combos ---');
 for (const bf of [false, true]) for (const elig of [true, false]) {
-  await page.evaluate(async ({ bf, elig }) => {
-    await __corpusPreviewTrialFlow({ bf, eligible: elig, lang: 'en' });
+  // Before each combo, paint a STALE ineligible step 35 so we exercise
+  // the teardown path the device bug hit (previous shell still visible).
+  await page.evaluate(({ std }) => {
+    __corpusSetOfferingsForDev({ black_friday: null, standard: std, trial: std });
+    _onbTrialEligibility = 'ineligible';
+    _bfTrialEligibility  = 'ineligible';
+    _paywallSelectedPkg  = 'yearly';
+    document.querySelectorAll('.onb-screen').forEach(s => { s.style.display = 'none'; s.classList.remove('onb-active'); });
+    const el = document.getElementById('onb-v2-paywall');
+    el.style.display = ''; el.classList.add('onb-active');
+    _paywallActiveRoot = el; _paywallMode = 'onboarding'; _activePaywallSource = 'onboarding';
+    _renderPaywall();
+  }, { std: STD });
+  const helperResult = await page.evaluate(async ({ bf, elig }) => {
+    return await __corpusPreviewTrialFlow({ bf, eligible: elig, lang: 'en' });
   }, { bf, elig });
   // Let the async .then() inside _onbV2PrepareTrial resolve before
   // we query the DOM (eligibility probe is a Promise).
@@ -178,6 +191,7 @@ for (const bf of [false, true]) for (const elig of [true, false]) {
   const noEmptyPrice = !/for\s+a month|ב-\s+לחודש|\(\s*billed yearly\s*\)/i.test(r.priceText || '');
   assert(`preview bf=${bf} elig=${elig} → opens ${expected}`, r.activeId === expected);
   assert(`preview bf=${bf} elig=${elig} → no empty-price copy`, noEmptyPrice);
+  assert(`preview bf=${bf} elig=${elig} → helper reports visibleId`, helperResult && helperResult.visibleId === expected);
 }
 
 await b.close();
