@@ -18,18 +18,21 @@ mkdirSync(OUT, { recursive: true });
 const INDEX_URL = pathToFileURL('/Users/omeroth/CORPUS/index.html').href;
 
 // Synthetic prices — 50% off a $89.99 yearly to match the mockup.
-// Includes the custom 'bf_annual_trial' package that drives the
-// onboarding shell's trial SKU, same price as the no-trial yearly.
+// 4-package BF offering. The $rc_* slots carry the TRIAL SKUs so a
+// 2.0.5 client resolving by standard package identifier lands on the
+// trial yearly; 2.0.6 modal paywalls route around via the paid slots.
 const SYNTHETIC_BF = {
   identifier: 'black_friday',
   metadata: { theme: 'black_friday', ends_at: '2026-12-01T07:59:00Z' },
   availablePackages: [
     { identifier: '$rc_annual', packageType: 'ANNUAL',
-      product: { identifier: 'corpus_yearly_bf', priceString: '$44.99', price: 44.99, currencyCode: 'USD' } },
-    { identifier: 'bf_annual_trial', packageType: 'ANNUAL',
       product: { identifier: 'corpus_yearly_bf_trial', priceString: '$44.99', price: 44.99, currencyCode: 'USD' } },
     { identifier: '$rc_monthly', packageType: 'MONTHLY',
-      product: { identifier: 'corpus_monthly', priceString: '$12.99', price: 12.99, currencyCode: 'USD' } },
+      product: { identifier: 'corpus_monthly',         priceString: '$12.99', price: 12.99, currencyCode: 'USD' } },
+    { identifier: 'bf_annual_paid', packageType: 'ANNUAL',
+      product: { identifier: 'corpus_yearly_bf',       priceString: '$44.99', price: 44.99, currencyCode: 'USD' } },
+    { identifier: 'bf_monthly_paid', packageType: 'MONTHLY',
+      product: { identifier: 'corpus_monthly_standard', priceString: '$12.99', price: 12.99, currencyCode: 'USD' } },
   ],
 };
 const SYNTHETIC_STD = {

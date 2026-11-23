@@ -29591,12 +29591,13 @@ function _paywallBfPrices() {
   const bf  = _rcOfferingBlackFriday;
   const std = _rcOfferingStandard;
   if (!bf) return null;
-  // Mode-aware yearly: onboarding uses the trial SKU (bf_annual_trial),
-  // modal uses the no-trial SKU ($rc_annual). Same price in both, so
-  // the strikethrough / discount / per-month computations don't change.
+  // Mode-aware yearly + monthly. Same price across trial / no-trial SKUs
+  // (RC Dashboard requirement), so the strikethrough / discount /
+  // per-month computations don't change between modal and onboarding.
   const bfYearly  = _bfYearlyPackage(_paywallMode)
     || (bf.availablePackages || []).find(p => p.packageType === 'ANNUAL');
-  const bfMonthly = (bf.availablePackages  || []).find(p => p.identifier === '$rc_monthly' || p.packageType === 'MONTHLY');
+  const bfMonthly = _bfMonthlyPackage(_paywallMode)
+    || (bf.availablePackages || []).find(p => p.identifier === '$rc_monthly' || p.packageType === 'MONTHLY');
   const stdYearly = (std && std.availablePackages || []).find(p => p.identifier === '$rc_annual' || p.packageType === 'ANNUAL');
 
   const regularPriceString = (stdYearly && stdYearly.product && stdYearly.product.priceString) || null;
@@ -29713,32 +29714,60 @@ let _paywallShownThisSession = false;
 // hardcoded USD values so the paywall is renderable before products are
 // live in App Store Connect / Play. When falling back, pkg is null and
 // the CTA is disabled — you can't purchase without a real RC package.
-// Pick the right YEARLY package from the Black Friday offering by the
-// paywall's current mode:
-//   - 'onboarding' → 'bf_annual_trial' (corpus_yearly_bf_trial, 7-day intro)
-//   - 'modal'      → '$rc_annual'      (corpus_yearly_bf,       no intro)
-// Falls back to $rc_annual if the custom package is missing (RC Dashboard
-// still being wired) so the paywall never renders empty; worst case the
-// onboarding user is offered the no-trial SKU, which is a visible error
-// but not a broken paywall. Returns null when the offering isn't BF.
+// Pick BF packages by paywall mode. The $rc_annual / $rc_monthly slots
+// map to the TRIAL SKUs (corpus_yearly_bf_trial, corpus_monthly) so a
+// 2.0.5 client — which reads res.current and resolves packages by the
+// standard $rc_* identifiers — automatically lands on the trial SKUs
+// for its onboarding paywall. The 2.0.6 modal paywalls route around
+// those via the two custom packages:
+//
+//   $rc_annual       → corpus_yearly_bf_trial   (onboarding, has intro)
+//   $rc_monthly      → corpus_monthly           (onboarding, same as today)
+//   bf_annual_paid   → corpus_yearly_bf         (modal, no intro)
+//   bf_monthly_paid  → corpus_monthly_standard  (modal, no intro)
+//
+// Mode routing:
+//   'modal'      → bf_annual_paid / bf_monthly_paid
+//   'onboarding' → $rc_annual     / $rc_monthly
+//
+// Fallbacks: if a custom modal-only package is missing (RC Dashboard
+// still being wired), fall back to the $rc_* slot for that type. Worst
+// case a modal user is offered the trial SKU — a visible error, but
+// not a broken paywall. Null returned when the offering isn't BF.
 function _bfYearlyPackage(mode) {
   const off = _rcOfferingBlackFriday;
   if (!off) return null;
   const pkgs = (off.availablePackages || []);
-  if (mode === 'onboarding') {
-    const trial = pkgs.find(p => p.identifier === 'bf_annual_trial');
-    if (trial) return trial;
-    console.warn('[BF] bf_annual_trial package missing from RC black_friday offering; onboarding will fall back to $rc_annual (no trial granted)');
+  if (mode === 'modal') {
+    const paid = pkgs.find(p => p.identifier === 'bf_annual_paid');
+    if (paid) return paid;
+    console.warn('[BF] bf_annual_paid package missing from RC black_friday offering; modal will fall back to $rc_annual (trial may be granted)');
   }
   return pkgs.find(p => p.identifier === '$rc_annual' || p.packageType === 'ANNUAL') || null;
+}
+function _bfMonthlyPackage(mode) {
+  const off = _rcOfferingBlackFriday;
+  if (!off) return null;
+  const pkgs = (off.availablePackages || []);
+  if (mode === 'modal') {
+    const paid = pkgs.find(p => p.identifier === 'bf_monthly_paid');
+    if (paid) return paid;
+    console.warn('[BF] bf_monthly_paid package missing from RC black_friday offering; modal will fall back to $rc_monthly');
+  }
+  return pkgs.find(p => p.identifier === '$rc_monthly' || p.packageType === 'MONTHLY') || null;
 }
 function _paywallPrices() {
   const off = _paywallActiveOffering();
   const pkgs = (off && off.availablePackages) || [];
-  const monthly = pkgs.find(p => p.identifier === '$rc_monthly' || p.packageType === 'MONTHLY');
-  // BF selects yearly by mode (trial package for onboarding, no-trial for
-  // modal); every other offering picks the single annual package.
-  const yearly  = _isBlackFridayActive()
+  // BF selects BOTH yearly and monthly by mode so the modal paywalls
+  // route to the no-trial custom packages (bf_annual_paid /
+  // bf_monthly_paid), and the onboarding paywall routes to the $rc_*
+  // slots that carry the trial SKUs. See _bfYearlyPackage / _bfMonthlyPackage.
+  const bfOn = _isBlackFridayActive();
+  const monthly = bfOn
+    ? _bfMonthlyPackage(_paywallMode)
+    : pkgs.find(p => p.identifier === '$rc_monthly' || p.packageType === 'MONTHLY');
+  const yearly  = bfOn
     ? _bfYearlyPackage(_paywallMode)
     : pkgs.find(p => p.identifier === '$rc_annual'  || p.packageType === 'ANNUAL');
   const isEn = state.lang === 'en';
