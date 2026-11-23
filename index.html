@@ -14889,6 +14889,20 @@
     cursor: pointer; padding: 0;
     z-index: 10;
   }
+  /* Step 35 X — pin to the top-left on the trial-mode onboarding
+     paywall too, overriding the existing right-aligned position on
+     #onb-v2-paywall-skip. Spec #3 requires top-left on all three
+     trial-flow steps. The BF paywall already does this via its own
+     .onb-v7-close scope; extend to the light trial mode. */
+  #onb-v2-paywall.pw-trial-active #onb-v2-paywall-skip {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 14px);
+    inset-inline-start: 12px;
+    inset-inline-end: auto;
+    color: var(--text);
+    z-index: 10;
+  }
+  #onb-v2-paywall.pw-trial-active.paywall-bf #onb-v2-paywall-skip { color: rgba(255,255,255,.9); }
   /* Adaptive for SE / mini — hero shrinks, headline tightens. */
   @media (max-height: 799px) {
     .onb-v7-trialintro-fig { width: 140px; height: 140px; }
@@ -28972,6 +28986,7 @@ async function _enterFromStoredOrOnboarding(reason) {
     _enteredWithExpiredToken = true;
     await enterApp(stored.user);
     rescheduleReminderFromToday();
+    _maybeCancelTrialEndReminder();
     _backgroundRefresh(stored.refresh_token);
     return true;
   }
@@ -28982,6 +28997,7 @@ async function _enterFromStoredOrOnboarding(reason) {
   _markAuthResolved();
   startNewUserOnboarding();
   rescheduleReminderFromToday();
+  _maybeCancelTrialEndReminder();
   return false;
 }
 
@@ -31837,6 +31853,14 @@ async function startPurchase() {
           name:   _eventName,
           params: _params,
         });
+        // Trial-end reminder: schedule a local notification for day 5
+        // of a 7-day trial (2 days before auto-renew). Fire-and-forget;
+        // permission handling + plugin availability wrapped in try/catch
+        // inside _scheduleTrialEndReminder so a failure here never
+        // breaks the purchase success flow.
+        if (_isTrial) {
+          _scheduleTrialEndReminder().catch(e => console.warn('[Trial reminder] schedule failed:', e));
+        }
       } catch(e) {
         console.warn('[Meta] purchase event log failed (non-fatal):', e);
       }
@@ -35689,6 +35713,7 @@ function _onbV2PreparePaywall() {
       source:          _activePaywallSource,
       paywall_trigger: _paywallSource(),
       paywall_theme:   _isBlackFridayActive() ? 'black_friday' : 'default',
+      paywall_step:    35,
       subject:         state.subject || null,
       trial_enabled: TRIAL_ENABLED,
       offering_id:   (_paywallActiveOffering() && _paywallActiveOffering().identifier) || null,
@@ -45175,6 +45200,64 @@ async function _reconcileReminders(opts) {
 
 // Kept name so existing callers (initApp, visibilitychange→visible) don't
 // need to change. Delegates to the new reconciler.
+// Trial-end local notification. Scheduled at purchase success on a
+// successful free-trial start; cancelled on next app open if RC
+// customerInfo shows the trial is no longer active (user cancelled
+// in Settings, converted early, etc.). Permission handling:
+//   - If already granted (from the onboarding notifications step),
+//     schedule silently.
+//   - If not granted, ask ONCE here. Denial → silent skip, no retry.
+//   - Plugin absent / any throw → silent skip.
+// No new UI prompt before scheduling — per spec #4.
+const TRIAL_REMINDER_ID = 9002;
+const TRIAL_REMINDER_DAYS_AFTER_START = 5; // 2 days before auto-renew on a 7-day trial
+async function _scheduleTrialEndReminder() {
+  const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
+  if (!P) return;
+  let perm = 'prompt';
+  try { const r = await P.checkPermissions(); perm = (r && (r.display || r.publicLookup || r.alert)) || 'prompt'; } catch (_) {}
+  if (perm !== 'granted') {
+    try { const r = await P.requestPermissions(); perm = (r && (r.display || r.alert)) || 'denied'; } catch (_) { perm = 'denied'; }
+    if (perm !== 'granted') {
+      console.log('[Trial reminder] notification permission not granted; skipping schedule.');
+      return;
+    }
+  }
+  // Fire at trial-start + 5 days, 10:00 local.
+  const at = new Date();
+  at.setDate(at.getDate() + TRIAL_REMINDER_DAYS_AFTER_START);
+  at.setHours(10, 0, 0, 0);
+  const isEn = state.lang === 'en';
+  try {
+    await P.schedule({
+      notifications: [{
+        id: TRIAL_REMINDER_ID,
+        title: isEn ? 'Your free trial ends in 2 days.' : 'הניסיון החינמי שלכם מסתיים בעוד יומיים.',
+        body:  isEn ? 'Keep exploring, or cancel anytime in Settings.' : 'המשיכו ללמוד, או בטלו בכל רגע בהגדרות.',
+        schedule: { at: at },
+      }],
+    });
+    try { _phCapture('trial_reminder_scheduled', { fires_at: at.toISOString() }); } catch (_) {}
+  } catch (e) {
+    console.warn('[Trial reminder] schedule threw:', e);
+  }
+}
+// Cancel the trial-end reminder when RC customerInfo shows the trial
+// is no longer active OR won't renew. Fires on every enterApp /
+// foreground after loadSubscription resolves. Plugin / permission
+// absence is a no-op.
+async function _maybeCancelTrialEndReminder() {
+  const P = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
+  if (!P) return;
+  try {
+    const ent = state && state.subscription;
+    const isTrial = ent && typeof ent.periodType === 'string' && /trial/i.test(ent.periodType);
+    const willRenew = ent && ent.willRenew !== false; // treat missing as "will renew"
+    if (isTrial && willRenew) return; // still a live trial that will renew → keep the reminder.
+    await P.cancel({ notifications: [{ id: TRIAL_REMINDER_ID }] });
+  } catch (_) { /* no-op */ }
+}
+
 async function rescheduleReminderFromToday() {
   await _reconcileReminders();
 }
