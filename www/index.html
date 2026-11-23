@@ -17101,6 +17101,343 @@
   }
   .paywall-bf-sep { padding: 0 6px; color: rgba(255,255,255,.4); }
 
+  /* ── Trial-mode onboarding paywall (.pw-trial-shell) ─────────── */
+  .pw-trial-shell { display: none; }
+  #onb-v2-paywall.pw-trial-active .onb-v2-paywall-inner { display: none !important; }
+  #onb-v2-paywall.pw-trial-active .paywall-bf-shell     { display: none !important; }
+  #onb-v2-paywall.pw-trial-active .pw-trial-shell {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    padding: calc(env(safe-area-inset-top, 0px) + 56px) 20px calc(env(safe-area-inset-bottom, 0px) + 12px);
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    gap: 2px;
+  }
+  /* Light theme is default; BF reuses the dark gradient already set on
+     #onb-v2-paywall.paywall-bf. No extra CSS needed for the dark BG. */
+  .pw-trial-eyebrow {
+    color: #F5B800;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 1.6px;
+    text-align: center;
+    margin: 0;
+  }
+  .pw-trial-hero {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 4px auto 6px;
+  }
+  .pw-trial-chibi {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    display: block;
+  }
+  .pw-trial-sticker {
+    position: absolute;
+    top: 10px;
+    inset-inline-start: -14px;
+    background: #F5B800;
+    color: #1E1538;
+    font-weight: 900;
+    border-radius: 12px;
+    padding: 6px 11px 7px;
+    transform: rotate(-12deg);
+    box-shadow: 0 3px 0 rgba(0,0,0,.25);
+    text-align: center;
+    line-height: 1;
+    min-width: 72px;
+  }
+  html[dir="rtl"] .pw-trial-sticker {
+    transform: rotate(12deg);
+    inset-inline-start: auto;
+    inset-inline-end: -14px;
+  }
+  .pw-trial-sticker-pct { font-size: 20px; display: block; letter-spacing: -0.4px; }
+  .pw-trial-sticker-off { font-size: 11px; display: block; letter-spacing: 1px; margin-top: 2px; }
+
+  /* Headlines — "Try 7 days free," (accent) / "then $3.75 a month" (ink).
+     Both at the same weight class per Apple 3.1.2. */
+  .pw-trial-h1 {
+    color: var(--accent);
+    font-size: 26px;
+    font-weight: 800;
+    text-align: center;
+    margin: 4px 0 0;
+    line-height: 1.18;
+  }
+  .pw-trial-h2 {
+    color: var(--ink);
+    font-size: 26px;
+    font-weight: 800;
+    text-align: center;
+    margin: 0 0 4px;
+    line-height: 1.18;
+  }
+  /* Billed-yearly line — 18px / 700 / FULL INK per spec #2. Must be
+     clearly readable (not muted). */
+  .pw-trial-billed {
+    color: var(--ink);
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 4px;
+    line-height: 1.25;
+  }
+  .pw-trial-billed s { opacity: 0.55; text-decoration-color: currentColor; }
+  .pw-trial-ends {
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 6px;
+  }
+  .pw-trial-viewall {
+    background: transparent;
+    border: 0;
+    color: var(--accent);
+    font: inherit;
+    font-weight: 700;
+    font-size: 16px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    padding: 6px 0;
+    margin: 4px 0 0;
+    text-align: center;
+  }
+  /* Push the CTA to the bottom of the shell. */
+  .pw-trial-nocharge {
+    margin-top: auto;
+    color: var(--text-2);
+    font-size: 13px;
+    text-align: center;
+    padding: 8px 10px 4px;
+  }
+  .pw-trial-cta {
+    background: var(--accent);
+    color: #FFFFFF;
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    border: 0;
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin: 0 0 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 4px 0 rgba(0,0,0,.18);
+  }
+  .pw-trial-cta:active { transform: translateY(2px); box-shadow: none; }
+  .pw-trial-legal-row {
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--text-2);
+  }
+  .pw-trial-restore,
+  .pw-trial-terms,
+  .pw-trial-privacy {
+    background: transparent; border: 0; color: var(--text-2); font: inherit;
+    text-decoration: underline; text-underline-offset: 2px; cursor: pointer; padding: 0;
+  }
+  .pw-trial-sep { padding: 0 6px; color: var(--text-2); opacity: 0.6; }
+
+  /* BF variant — gold accents on the dark gradient. */
+  #onb-v2-paywall.pw-trial-active.paywall-bf .pw-trial-h1,
+  #onb-v2-paywall.pw-trial-active.paywall-bf .pw-trial-ends { color: #F5B800; }
+  #onb-v2-paywall.pw-trial-active.paywall-bf .pw-trial-h2,
+  #onb-v2-paywall.pw-trial-active.paywall-bf .pw-trial-billed { color: #FFFFFF; }
+  #onb-v2-paywall.pw-trial-active.paywall-bf .pw-trial-billed s { color: rgba(255,255,255,.55); }
+  #onb-v2-paywall.pw-trial-active.paywall-bf .pw-trial-viewall { color: #F5B800; }
+  #onb-v2-paywall.pw-trial-active.paywall-bf .pw-trial-nocharge { color: rgba(255,255,255,.65); }
+  #onb-v2-paywall.pw-trial-active.paywall-bf .pw-trial-cta {
+    background: #F5B800; color: #1E1538; box-shadow: 0 4px 0 rgba(0,0,0,.25);
+  }
+  #onb-v2-paywall.pw-trial-active.paywall-bf .pw-trial-legal-row,
+  #onb-v2-paywall.pw-trial-active.paywall-bf .pw-trial-restore,
+  #onb-v2-paywall.pw-trial-active.paywall-bf .pw-trial-terms,
+  #onb-v2-paywall.pw-trial-active.paywall-bf .pw-trial-privacy { color: rgba(255,255,255,.75); }
+
+  /* Adaptive heights (reuse the same breakpoints as the BF shell). */
+  @media (max-height: 799px) {
+    .pw-trial-hero { width: 120px; height: 120px; }
+    .pw-trial-chibi { width: 120px; height: 120px; }
+    .pw-trial-h1, .pw-trial-h2 { font-size: 22px; }
+    .pw-trial-billed { font-size: 17px; }
+    .pw-trial-cta { padding: 13px 20px; font-size: 16px; }
+  }
+  @media (max-height: 699px) {
+    .pw-trial-hero { width: 90px; height: 90px; margin: 0 auto 4px; }
+    .pw-trial-chibi { width: 90px; height: 90px; }
+    .pw-trial-h1, .pw-trial-h2 { font-size: 20px; }
+    .pw-trial-billed { font-size: 16px; }
+    .pw-trial-viewall { font-size: 15px; }
+    .pw-trial-cta { padding: 12px 18px; font-size: 15px; }
+  }
+
+  /* ── View-all-plans bottom sheet ─────────────────────────────── */
+  .pw-plans-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 1900;
+    display: none;
+    pointer-events: none;
+  }
+  .pw-plans-sheet.pw-plans-open { display: block; pointer-events: auto; }
+  .pw-plans-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    opacity: 0;
+    transition: opacity 180ms ease;
+  }
+  .pw-plans-sheet.pw-plans-open .pw-plans-backdrop { opacity: 1; }
+  .pw-plans-dialog {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 20px 20px 0 0;
+    padding: 18px 20px calc(env(safe-area-inset-bottom, 0px) + 16px);
+    box-shadow: 0 -8px 32px rgba(0,0,0,.35);
+    transform: translateY(100%);
+    transition: transform 240ms cubic-bezier(.4,0,.2,1);
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .pw-plans-sheet.pw-plans-open .pw-plans-dialog { transform: translateY(0); }
+  .pw-plans-close {
+    position: absolute;
+    top: 12px; inset-inline-end: 12px;
+    width: 32px; height: 32px;
+    background: transparent; border: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text);
+    cursor: pointer; padding: 0;
+  }
+  .pw-plans-heading {
+    color: var(--ink);
+    font-size: 22px;
+    font-weight: 800;
+    margin: 0 36px 14px 0;
+  }
+  .pw-plans-benefits { list-style: none; padding: 0; margin: 0 0 14px; }
+  .pw-plans-benefit {
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 600;
+    padding-inline-start: 30px;
+    position: relative;
+    margin-bottom: 6px;
+    text-align: start;
+  }
+  .pw-plans-benefit::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    top: 2px;
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    background: #F5B800;
+  }
+  .pw-plans-benefit::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: 4px;
+    top: 7px;
+    width: 14px; height: 10px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 12.5l4 4 10-10' fill='none' stroke='%231E1538' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  .pw-plans-card {
+    position: relative;
+    display: block;
+    padding: 14px 14px;
+    border-radius: 14px;
+    border: 2px solid rgba(var(--accent-rgb), .18);
+    background: var(--surface);
+    color: var(--ink);
+    text-align: start;
+    font-family: inherit;
+    cursor: pointer;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+  .pw-plans-yearly {
+    border-color: var(--accent);
+    padding-top: 22px;
+  }
+  .pw-plans-yearly-badge {
+    position: absolute;
+    top: -11px;
+    inset-inline-start: 14px;
+    background: var(--accent);
+    color: #FFFFFF;
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 1.2px;
+    padding: 4px 9px;
+    border-radius: 10px;
+  }
+  .pw-plans-row {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .pw-plans-title { font-size: 17px; font-weight: 800; }
+  .pw-plans-yearly-sub { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+  .pw-plans-col-price { text-align: end; }
+  .pw-plans-yearly-strike { font-size: 13px; color: var(--text-2); text-decoration: line-through; }
+  .pw-plans-yearly-strike:empty { display: none; }
+  .pw-plans-yearly-amount { font-size: 19px; font-weight: 800; }
+  .pw-plans-yearly-per { font-size: 12px; color: var(--text-2); }
+  .pw-plans-monthly-amount { font-size: 17px; font-weight: 800; }
+  .pw-plans-cta {
+    display: block;
+    width: 100%;
+    background: var(--accent);
+    color: #FFFFFF;
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    border: 0;
+    border-radius: 14px;
+    padding: 14px 20px;
+    margin: 8px 0 0;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  /* BF variant for the sheet. */
+  #onb-v2-paywall.paywall-bf .pw-plans-dialog,
+  #modal-paywall.paywall-bf .pw-plans-dialog {
+    background: #1E1538; color: #FFFFFF;
+  }
+  html.theme-economics  #onb-v2-paywall.paywall-bf .pw-plans-dialog,
+  html.theme-economics  #modal-paywall.paywall-bf  .pw-plans-dialog { background: #12224A; }
+  html.theme-psychology #onb-v2-paywall.paywall-bf .pw-plans-dialog,
+  html.theme-psychology #modal-paywall.paywall-bf  .pw-plans-dialog { background: #33190B; }
+  #onb-v2-paywall.paywall-bf .pw-plans-heading,
+  #onb-v2-paywall.paywall-bf .pw-plans-benefit,
+  #onb-v2-paywall.paywall-bf .pw-plans-title,
+  #onb-v2-paywall.paywall-bf .pw-plans-yearly-amount,
+  #onb-v2-paywall.paywall-bf .pw-plans-monthly-amount { color: #FFFFFF; }
+  #onb-v2-paywall.paywall-bf .pw-plans-yearly-sub,
+  #onb-v2-paywall.paywall-bf .pw-plans-yearly-strike,
+  #onb-v2-paywall.paywall-bf .pw-plans-yearly-per { color: rgba(255,255,255,.65); }
+  #onb-v2-paywall.paywall-bf .pw-plans-yearly {
+    border-color: #F5B800; background: rgba(245,184,0,.08);
+  }
+  #onb-v2-paywall.paywall-bf .pw-plans-monthly {
+    border-color: rgba(255,255,255,.18); background: rgba(255,255,255,.04);
+  }
+  #onb-v2-paywall.paywall-bf .pw-plans-yearly-badge { background: #F5B800; color: #1E1538; }
+  #onb-v2-paywall.paywall-bf .pw-plans-cta { background: #F5B800; color: #1E1538; }
+  #onb-v2-paywall.paywall-bf .pw-plans-close { color: rgba(255,255,255,.9); }
+
   /* Adaptive sizes per viewport height. Keeps the whole paywall in
      frame without scrolling on every iPhone we ship.
        ≥800px : current (default) layout
@@ -30721,19 +31058,254 @@ function _renderPaywallBf() {
   q('.paywall-bf-privacy').textContent = isEn ? 'Privacy' : 'מדיניות פרטיות';
 }
 
+// Cached onboarding trial-eligibility result. Primed once per session
+// by _primeOnbTrialEligibility, read by _renderPaywall to route to
+// the trial subtree. Values: 'eligible' | 'ineligible' | 'unknown'.
+let _onbTrialEligibility = null;
+async function _primeOnbTrialEligibility() {
+  if (_onbTrialEligibility != null) return _onbTrialEligibility;
+  try {
+    const off = _paywallActiveOffering();
+    const pkg = (off && off.availablePackages || []).find(
+      p => p.identifier === '$rc_annual' || p.packageType === 'ANNUAL'
+    );
+    const productId = pkg && pkg.product && pkg.product.identifier;
+    if (!productId) { _onbTrialEligibility = 'ineligible'; return _onbTrialEligibility; }
+    _onbTrialEligibility = await _probeTrialEligibility(productId, pkg.identifier);
+  } catch (_) { _onbTrialEligibility = 'ineligible'; }
+  return _onbTrialEligibility;
+}
+
+// Paint the trial-mode onboarding paywall (.pw-trial-shell). Light
+// theme by default; BF when the shell also carries .paywall-bf. All
+// strings + prices computed up-front and injected via text/innerHTML
+// (<bdi> around prices so HE RTL doesn't flip the currency).
+function _renderPaywallTrial() {
+  const isEn = state.lang === 'en';
+  const root = _paywallActiveRoot;
+  if (!root) return;
+  const q = (sel) => root.querySelector(sel);
+  const bdi = (s) => s ? '<bdi>' + s + '</bdi>' : '';
+  const p  = _paywallPrices();
+  const bf = (typeof _isBlackFridayActive === 'function' && _isBlackFridayActive())
+    ? (typeof _paywallBfPrices === 'function' ? _paywallBfPrices() : null)
+    : null;
+  const inBf = !!bf;
+  const subject = state.subject || 'philosophy';
+  // Chibi celebrate — reuse existing onb-thinkers art.
+  const CELEBRATE = { philosophy: 'socrates', economics: 'smith', psychology: 'freud' };
+  const chibiSlug = CELEBRATE[subject] || 'socrates';
+  const chibiImg = q('.pw-trial-chibi');
+  if (chibiImg) chibiImg.src = './images/onb-thinkers/' + chibiSlug + '-celebrate.png';
+
+  // Eyebrow (BF-only "BLACK FRIDAY")
+  const eyebrowEl = q('.pw-trial-eyebrow');
+  if (eyebrowEl) {
+    eyebrowEl.textContent = inBf ? (isEn ? 'BLACK FRIDAY' : 'בלאק פריידי') : '';
+    eyebrowEl.style.display = inBf ? '' : 'none';
+  }
+  // Sticker (BF-only)
+  const stickerEl = q('.pw-trial-sticker');
+  if (stickerEl) {
+    if (inBf && bf.yearly.discountPct != null) {
+      const p1 = stickerEl.querySelector('.pw-trial-sticker-pct');
+      const o1 = stickerEl.querySelector('.pw-trial-sticker-off');
+      if (p1) p1.textContent = bf.yearly.discountPct + '%';
+      if (o1) o1.textContent = isEn ? 'OFF' : 'הנחה';
+      stickerEl.style.display = '';
+    } else {
+      stickerEl.style.display = 'none';
+    }
+  }
+
+  // Headlines + prices
+  const yearlyStr  = (bf && bf.yearly.priceString) || (p.yearly && p.yearly.priceString) || '';
+  const perMonth   = (bf && bf.yearly.perMonthString)
+    || (typeof _bfPerMonthFromYearly === 'function' && p.yearly && p.yearly.pkg
+        ? _bfPerMonthFromYearly(p.yearly.pkg)
+        : null);
+  const regularStr = (bf && bf.yearly.regularPriceString) || null;
+
+  q('.pw-trial-h1').textContent = isEn ? 'Try 7 days free,' : 'נסו 7 ימים בחינם,';
+  q('.pw-trial-h2').innerHTML   = isEn
+    ? 'then ' + bdi(perMonth || '') + ' a month'
+    : 'ואז '  + bdi(perMonth || '') + ' לחודש';
+
+  // Billed-yearly line (18px / 700 / ink per spec #2).
+  const billedEl = q('.pw-trial-billed');
+  if (billedEl) {
+    if (inBf && regularStr) {
+      billedEl.innerHTML = isEn
+        ? '(' + bdi(yearlyStr) + ' billed yearly, <s>' + bdi(regularStr) + '</s>)'
+        : '(' + bdi(yearlyStr) + ' בחיוב שנתי, <s>' + bdi(regularStr) + '</s>)';
+    } else {
+      billedEl.innerHTML = isEn
+        ? '(' + bdi(yearlyStr) + ' billed yearly)'
+        : '(' + bdi(yearlyStr) + ' בחיוב שנתי)';
+    }
+  }
+
+  // Ends date (BF only)
+  const endsEl = q('.pw-trial-ends');
+  if (endsEl) {
+    const meta = (_rcOfferingBlackFriday && _rcOfferingBlackFriday.metadata) || {};
+    const ends = Date.parse(meta.ends_at || '');
+    if (inBf && Number.isFinite(ends)) {
+      try {
+        const fmt = new Intl.DateTimeFormat(isEn ? 'en-US' : 'he-IL',
+          { weekday: 'long', month: 'short', day: 'numeric' });
+        const label = fmt.format(new Date(ends));
+        endsEl.textContent = isEn ? 'Ends ' + label : 'עד ' + label;
+        endsEl.style.display = '';
+      } catch (_) { endsEl.style.display = 'none'; }
+    } else {
+      endsEl.textContent = '';
+      endsEl.style.display = 'none';
+    }
+  }
+
+  // "View all plans" link
+  q('.pw-trial-viewall').textContent = isEn ? 'View all plans' : 'לכל המסלולים';
+  // "No charge today..." line
+  q('.pw-trial-nocharge').textContent = isEn
+    ? 'No charge today. Cancel anytime in two taps.'
+    : 'בלי חיוב היום. ביטול בכל רגע בשתי לחיצות.';
+  // CTA
+  const ctaEl = q('.pw-trial-cta');
+  ctaEl.textContent = isEn ? 'START MY 7-DAY FREE TRIAL' : 'להתחיל 7 ימי ניסיון בחינם';
+  ctaEl.disabled = _paywallPurchasing;
+
+  // Legal row
+  q('.pw-trial-restore').textContent = isEn ? 'Restore purchases' : 'שחזרו רכישות';
+  q('.pw-trial-terms').textContent   = isEn ? 'Terms'   : 'תנאי שימוש';
+  q('.pw-trial-privacy').textContent = isEn ? 'Privacy' : 'מדיניות פרטיות';
+
+  try {
+    _phCapture('paywall_step_viewed', {
+      step: 35,
+      paywall_theme: inBf ? 'black_friday' : 'default',
+    });
+  } catch (_) {}
+}
+
+function _openPaywallPlansSheet() {
+  const root = _paywallActiveRoot;
+  if (!root) return;
+  const sheet = root.querySelector('.pw-plans-sheet');
+  if (!sheet) return;
+  _renderPaywallPlansSheet();
+  sheet.classList.add('pw-plans-open');
+  sheet.setAttribute('aria-hidden', 'false');
+  try {
+    _phCapture('paywall_step_viewed', {
+      step: 'sheet',
+      paywall_theme: _isBlackFridayActive() ? 'black_friday' : 'default',
+    });
+  } catch (_) {}
+}
+function _closePaywallPlansSheet() {
+  const root = _paywallActiveRoot;
+  if (!root) return;
+  const sheet = root.querySelector('.pw-plans-sheet');
+  if (!sheet) return;
+  sheet.classList.remove('pw-plans-open');
+  sheet.setAttribute('aria-hidden', 'true');
+}
+function _renderPaywallPlansSheet() {
+  const isEn = state.lang === 'en';
+  const root = _paywallActiveRoot;
+  if (!root) return;
+  const q = (sel) => root.querySelector('.pw-plans-sheet ' + sel);
+  const bdi = (s) => s ? '<bdi>' + s + '</bdi>' : '';
+  const p  = _paywallPrices();
+  const bf = (typeof _isBlackFridayActive === 'function' && _isBlackFridayActive())
+    ? (typeof _paywallBfPrices === 'function' ? _paywallBfPrices() : null)
+    : null;
+  const inBf = !!bf;
+  q('.pw-plans-heading').textContent = isEn ? 'Choose your plan' : 'בחרו תוכנית';
+  const thinkerCount = Array.isArray(window.THINKERS) ? window.THINKERS.length : 88;
+  const BENEFITS = isEn ? [
+    'Every chapter in all three subjects',
+    'Every bonus chapter',
+    'All ' + thinkerCount + ' thinker cards',
+  ] : [
+    'כל פרק בכל שלושת התחומים',
+    'כל פרק בונוס',
+    'כל ' + thinkerCount + ' כרטיסי ההוגים',
+  ];
+  root.querySelectorAll('.pw-plans-sheet .pw-plans-benefit').forEach((el, i) => {
+    el.textContent = BENEFITS[i] || '';
+  });
+
+  // Yearly card
+  q('.pw-plans-yearly .pw-plans-title').textContent = isEn ? 'Yearly' : 'שנתי';
+  const yearlyBadgeEl = q('.pw-plans-yearly-badge');
+  if (inBf && bf.yearly.discountPct != null) {
+    yearlyBadgeEl.textContent = (isEn ? 'BLACK FRIDAY · 7 DAYS FREE' : 'בלאק פריידי · 7 ימים בחינם');
+  } else {
+    yearlyBadgeEl.textContent = isEn ? '7 DAYS FREE' : '7 ימים בחינם';
+  }
+  const yearlyStr  = (bf && bf.yearly.priceString) || (p.yearly && p.yearly.priceString) || '';
+  const regularStr = (bf && bf.yearly.regularPriceString) || null;
+  const perMonth   = (bf && bf.yearly.perMonthString)
+    || (typeof _bfPerMonthFromYearly === 'function' && p.yearly && p.yearly.pkg
+        ? _bfPerMonthFromYearly(p.yearly.pkg)
+        : null);
+  const strikeEl = q('.pw-plans-yearly-strike');
+  if (strikeEl) strikeEl.innerHTML = (inBf && regularStr) ? bdi(regularStr) : '';
+  q('.pw-plans-yearly-amount').innerHTML = bdi(yearlyStr) + (isEn ? '/yr' : '/שנה');
+  q('.pw-plans-yearly-per').innerHTML    = perMonth
+    ? '(' + bdi(perMonth) + (isEn ? '/mo' : '/חודש') + ')'
+    : '';
+  q('.pw-plans-yearly-sub').textContent = (inBf && bf.yearly.discountPct != null)
+    ? (isEn ? bf.yearly.discountPct + '% off, every year' : bf.yearly.discountPct + '% הנחה, כל שנה')
+    : '';
+
+  // Monthly card
+  q('.pw-plans-monthly .pw-plans-title').textContent = isEn ? 'Monthly' : 'חודשי';
+  const monthlyStr = (bf && bf.monthly.priceString) || (p.monthly && p.monthly.priceString) || '';
+  q('.pw-plans-monthly-amount').innerHTML = bdi(monthlyStr) + (isEn ? '/mo' : '/חודש');
+
+  // CTA mirrors the main paywall trial CTA (only shown when eligible)
+  q('.pw-plans-cta').textContent = isEn ? 'START MY 7-DAY FREE TRIAL' : 'להתחיל 7 ימי ניסיון בחינם';
+}
+
 function _renderPaywall() {
   const isEn = state.lang === 'en';
-  // Black Friday takeover — before _paywallPrices (which reads the BF
-  // offering via _paywallActiveOffering). _renderPaywallBf drives the
-  // BF subtree; CSS hides the standard subtree.
+  // Black Friday + trial-mode class toggles — before _paywallPrices (which
+  // reads the BF offering via _paywallActiveOffering). The trial-mode
+  // onboarding paywall has its own subtree (.pw-trial-shell) that lives
+  // on top of the default + BF subtrees; CSS hides whichever two aren't
+  // active. See _renderPaywallTrial for the trial-mode paint logic.
   const root = _paywallActiveRoot;
   if (root) root.classList.toggle('paywall-bf', _isBlackFridayActive());
+
+  // Trial-mode routing. Only applies to the onboarding shell — every
+  // modal placement charges immediately (no trial). On first render
+  // after the shell mounts, the eligibility result hasn't resolved
+  // yet; we fire the probe and re-render once it lands. While unknown,
+  // we show the no-trial variant to avoid promising something the
+  // user won't get.
+  const onbMode = _paywallMode === 'onboarding';
+  if (onbMode && _onbTrialEligibility == null) {
+    _primeOnbTrialEligibility().then(() => {
+      if (_paywallActiveRoot && _paywallMode === 'onboarding') {
+        try { _renderPaywall(); } catch (_) {}
+      }
+    });
+  }
+  const trialOk = onbMode && _onbTrialEligibility === 'eligible';
+  if (root) root.classList.toggle('pw-trial-active', trialOk);
+  if (trialOk) {
+    _renderPaywallTrial();
+    return;
+  }
   if (_isBlackFridayActive()) {
     // Trial eligibility is relevant only when the onboarding shell is
     // rendering (modal shell always shows SUBSCRIBE). Skip the probe on
     // modal so we don't incur the RC round-trip + possible unknown-
     // status fallback for a decision we never show.
-    if (_paywallMode === 'onboarding' && _bfTrialEligibility == null) {
+    if (onbMode && _bfTrialEligibility == null) {
       _primeBfTrialEligibility().then(() => {
         if (_isBlackFridayActive() && _paywallActiveRoot
             && _paywallActiveRoot.classList.contains('paywall-bf')) {
@@ -64965,6 +65537,36 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
       <a href="#" class="paywall-deleteaccount" id="onb-v2-paywall-delete" onclick="event.preventDefault(); _onbPaywallDelete();"></a>
     </div>
    </div>
+   <!-- Trial-mode onboarding paywall subtree. Shown when the shell
+        carries .pw-trial-active (set by _renderPaywall when the user
+        is trial-eligible). Populated by _renderPaywallTrial. Light
+        theme by default; BF theme when the shell also carries
+        .paywall-bf — the dark gradient from .paywall-bf scopes still
+        applies and this subtree inherits via CSS. -->
+   <div class="pw-trial-shell" aria-hidden="true">
+     <div class="pw-trial-eyebrow"></div>
+     <div class="pw-trial-hero">
+       <img class="pw-trial-chibi" alt="" aria-hidden="true">
+       <div class="pw-trial-sticker" aria-hidden="true">
+         <span class="pw-trial-sticker-pct"></span>
+         <span class="pw-trial-sticker-off"></span>
+       </div>
+     </div>
+     <h1 class="pw-trial-h1"></h1>
+     <h1 class="pw-trial-h2"></h1>
+     <p class="pw-trial-billed"></p>
+     <p class="pw-trial-ends"></p>
+     <button type="button" class="pw-trial-viewall" onclick="_openPaywallPlansSheet()"></button>
+     <p class="pw-trial-nocharge"></p>
+     <button type="button" class="pw-trial-cta" onclick="startPurchase()"></button>
+     <div class="pw-trial-legal-row">
+       <button type="button" class="pw-trial-restore" onclick="restorePurchases()"></button>
+       <span class="pw-trial-sep">·</span>
+       <a href="#" class="pw-trial-terms" onclick="event.preventDefault(); _openLegalUrl('terms');"></a>
+       <span class="pw-trial-sep">·</span>
+       <a href="#" class="pw-trial-privacy" onclick="event.preventDefault(); _openLegalUrl('privacy');"></a>
+     </div>
+   </div>
    <!-- Black Friday theme subtree. Renders only when #onb-v2-paywall
         carries .paywall-bf (set by _renderPaywall when _isBlackFridayActive).
         All text + image + card content populated by _renderPaywallBf. See
@@ -65028,6 +65630,48 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
        <a href="#" class="paywall-bf-terms" onclick="event.preventDefault(); _openLegalUrl('terms');"></a>
        <span class="paywall-bf-sep">·</span>
        <a href="#" class="paywall-bf-privacy" onclick="event.preventDefault(); _openLegalUrl('privacy');"></a>
+     </div>
+   </div>
+   <!-- View-all-plans bottom sheet. Opens from the trial-mode paywall
+        (#onb-v2-paywall .pw-trial-viewall). Inherits .paywall-bf when
+        the shell is BF. All text populated by _renderPaywallPlansSheet. -->
+   <div class="pw-plans-sheet" aria-hidden="true">
+     <div class="pw-plans-backdrop" onclick="_closePaywallPlansSheet()"></div>
+     <div class="pw-plans-dialog" role="dialog" aria-modal="true">
+       <button type="button" class="pw-plans-close" onclick="_closePaywallPlansSheet()" aria-label="Close">
+         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+       </button>
+       <h2 class="pw-plans-heading"></h2>
+       <ul class="pw-plans-benefits" aria-hidden="true">
+         <li class="pw-plans-benefit"></li>
+         <li class="pw-plans-benefit"></li>
+         <li class="pw-plans-benefit"></li>
+       </ul>
+       <button type="button" class="pw-plans-card pw-plans-yearly" onclick="_selectPaywallPackage('yearly')">
+         <div class="pw-plans-yearly-badge"></div>
+         <div class="pw-plans-row">
+           <div class="pw-plans-col-main">
+             <div class="pw-plans-title"></div>
+             <div class="pw-plans-yearly-sub"></div>
+           </div>
+           <div class="pw-plans-col-price">
+             <div class="pw-plans-yearly-strike" aria-hidden="true"></div>
+             <div class="pw-plans-yearly-amount"></div>
+             <div class="pw-plans-yearly-per"></div>
+           </div>
+         </div>
+       </button>
+       <button type="button" class="pw-plans-card pw-plans-monthly" onclick="_selectPaywallPackage('monthly')">
+         <div class="pw-plans-row">
+           <div class="pw-plans-col-main">
+             <div class="pw-plans-title"></div>
+           </div>
+           <div class="pw-plans-col-price">
+             <div class="pw-plans-monthly-amount"></div>
+           </div>
+         </div>
+       </button>
+       <button type="button" class="pw-plans-cta" onclick="startPurchase()"></button>
      </div>
    </div>
   </div>
