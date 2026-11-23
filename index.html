@@ -16922,8 +16922,19 @@
   }
   .paywall-bf-sticker {
     position: absolute;
-    top: 8px;
-    inset-inline-start: -18px;
+    /* Chibi head occupies the top ~45% of the frame. Place the sticker
+       beside the upper body (torso), never over the face. Horizontal:
+       mostly outside the chibi width, ≤15% overlap.
+       The modal-paywall box scales to 0.8× on device, which shrinks the
+       raw pixel offsets — and the -12deg rotation expands the sticker's
+       bounding rect both up (~5px) and inward (~8px). The CSS top +
+       inset-inline-start below are chosen so that after the scale AND
+       the rotation the bounding rect still clears the head and stays
+       under 15% horizontal overlap on both the modal (scaled) and the
+       trial-flow (unscaled) shells. Freud's wide eye-line is why the
+       default top:8px overlapped faces. */
+    top: 56px;
+    inset-inline-start: -58px;
     background: #F5B800;
     color: #1E1538;
     font-weight: 900;
@@ -16936,9 +16947,9 @@
     min-width: 62px;
   }
   html[dir="rtl"] .paywall-bf-sticker {
+    /* Only flip the tilt. inset-inline-start already auto-mirrors to the
+       visual right in RTL — no horizontal override needed. */
     transform: rotate(12deg);
-    inset-inline-start: auto;
-    inset-inline-end: -18px;
   }
   .paywall-bf-sticker-pct { font-size: 18px; display: block; letter-spacing: -0.3px; }
   .paywall-bf-sticker-off { font-size: 10px; display: block; letter-spacing: 1px; margin-top: 2px; }
@@ -17218,8 +17229,14 @@
   }
   .pw-trial-sticker {
     position: absolute;
-    top: 10px;
-    inset-inline-start: -14px;
+    /* 180px chibi: head top ~81px (top 45%). Place sticker at ~50% of
+       height — beside the upper body, well clear of the face.
+       Horizontal: ≤15% overlap of the 180px chibi (≈27px). Sticker
+       ~90px wide → inset-inline-start:-72px leaves 18px inside.
+       (Checked across Socrates / Smith / Freud; Freud's head is the
+       widest and still clears with margin to spare.) */
+    top: 95px;
+    inset-inline-start: -72px;
     background: #F5B800;
     color: #1E1538;
     font-weight: 900;
@@ -17232,9 +17249,8 @@
     min-width: 72px;
   }
   html[dir="rtl"] .pw-trial-sticker {
+    /* Only flip the tilt — inset-inline-start auto-mirrors in RTL. */
     transform: rotate(12deg);
-    inset-inline-start: auto;
-    inset-inline-end: -14px;
   }
   .pw-trial-sticker-pct { font-size: 20px; display: block; letter-spacing: -0.4px; }
   .pw-trial-sticker-off { font-size: 11px; display: block; letter-spacing: 1px; margin-top: 2px; }
@@ -17405,6 +17421,8 @@
   @media (max-height: 799px) {
     .pw-trial-hero { width: 140px; height: 140px; }
     .pw-trial-chibi { width: 140px; height: 140px; }
+    /* 140px chibi: head top ~63px. Clear with ~50% vertical offset. */
+    .pw-trial-sticker { top: 74px; inset-inline-start: -58px; }
     .pw-trial-h1, .pw-trial-h2 { font-size: 22px; }
     .pw-trial-billed { font-size: 17px; }
     .pw-trial-cta { padding: 13px 16px; }
@@ -17412,6 +17430,8 @@
   @media (max-height: 699px) {
     .pw-trial-hero { width: 100px; height: 100px; margin: 0 auto 4px; }
     .pw-trial-chibi { width: 100px; height: 100px; }
+    /* 100px chibi: head top ~45px. */
+    .pw-trial-sticker { top: 52px; inset-inline-start: -46px; min-width: 60px; padding: 5px 9px 6px; }
     .pw-trial-h1, .pw-trial-h2 { font-size: 20px; }
     .pw-trial-billed { font-size: 16px; }
     .pw-trial-viewall { font-size: 15px; }
@@ -17651,7 +17671,8 @@
   @media (max-height: 799px) {
     .paywall-bf-hero   { width: 96px; height: 96px; margin: 0 auto 4px; }
     .paywall-bf-chibi  { width: 96px; height: 96px; }
-    .paywall-bf-sticker { top: 6px; padding: 4px 8px 5px; min-width: 56px; }
+    /* 96px chibi: head top ~43px, torso starts ~45. */
+    .paywall-bf-sticker { top: 54px; padding: 4px 8px 5px; min-width: 56px; inset-inline-start: -54px; }
     .paywall-bf-sticker-pct { font-size: 15px; }
     .paywall-bf-sticker-off { font-size: 9px; }
     .paywall-bf-headline { font-size: 20px; margin: 0 16px 4px; }
@@ -31070,7 +31091,13 @@ function _selectPaywallPackage(which) {
   try {
     const root = _paywallActiveRoot;
     const sheet = root && root.querySelector('.pw-plans-sheet');
-    if (sheet && sheet.classList.contains('pw-plans-open')) {
+    // `.pw-plans-mounted` is on the sheet from the frame display:block
+    // is applied until the close animation finishes — that's the
+    // window during which the sheet CTA is visible and needs to
+    // reflect the selection. `.pw-plans-open` only lands on the next
+    // rAF after mount, so checking for it misses a selection change
+    // fired right after _openPaywallPlansSheet.
+    if (sheet && sheet.classList.contains('pw-plans-mounted')) {
       _renderPaywallPlansSheet();
     }
   } catch (_) {}
@@ -31241,12 +31268,17 @@ function _renderPaywallBf() {
     && _bfTrialEligibility === 'eligible'
     && _paywallSelectedPkg === 'yearly';
   const ctaPct = bf && bf.yearly.discountPct;
+  const bfMonthlySelected = _paywallSelectedPkg === 'monthly';
   if (canTrialYearly) {
     ctaEl.textContent = isEn ? 'START FREE TRIAL' : 'התחלת ניסיון חינם';
-  } else if (ctaPct != null) {
+  } else if (!bfMonthlySelected && ctaPct != null) {
     ctaEl.textContent = isEn
       ? 'CLAIM ' + ctaPct + '% OFF'
       : 'לקבל ' + ctaPct + '% הנחה';
+  } else if (bfMonthlySelected) {
+    // Monthly doesn't carry the BF discount — never claim an "X% off"
+    // the user won't actually get.
+    ctaEl.textContent = isEn ? 'CONTINUE' : 'להמשיך';
   } else {
     ctaEl.textContent = isEn ? 'GET THE DEAL' : 'לקבל את ההנחה';
   }
@@ -31516,10 +31548,11 @@ function _renderPaywallTrial() {
   const ctaEl = q('.pw-trial-cta');
   if (eligible) {
     ctaEl.textContent = isEn ? 'START MY 7-DAY FREE TRIAL' : 'להתחיל 7 ימי ניסיון בחינם';
-  } else if (inBf && bf && bf.yearly.discountPct != null) {
+  } else if (!monthlySelected && inBf && bf && bf.yearly.discountPct != null) {
     const pct = bf.yearly.discountPct;
     ctaEl.textContent = isEn ? 'CLAIM ' + pct + '% OFF' : 'לקבל ' + pct + '% הנחה';
   } else {
+    // Monthly has no BF discount — "CLAIM X% OFF" would be false.
     ctaEl.textContent = isEn ? 'CONTINUE' : 'להמשיך';
   }
   _installPaywallCtaPress(ctaEl);
@@ -31761,12 +31794,14 @@ function _renderPaywallPlansSheet() {
   // both. The store config decides whether the monthly actually grants
   // the trial on purchase.
   const ctaEl = q('.pw-plans-cta');
+  const sheetMonthlySelected = _paywallSelectedPkg === 'monthly';
   if (eligible) {
     ctaEl.textContent = isEn ? 'START MY 7-DAY FREE TRIAL' : 'להתחיל 7 ימי ניסיון בחינם';
-  } else if (inBf && bf.yearly.discountPct != null) {
+  } else if (!sheetMonthlySelected && inBf && bf.yearly.discountPct != null) {
     const pct = bf.yearly.discountPct;
     ctaEl.textContent = isEn ? 'CLAIM ' + pct + '% OFF' : 'לקבל ' + pct + '% הנחה';
   } else {
+    // Monthly has no BF discount — swap to a neutral label.
     ctaEl.textContent = isEn ? 'CONTINUE' : 'להמשיך';
   }
   _installPaywallCtaPress(ctaEl);
