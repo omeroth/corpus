@@ -35032,7 +35032,17 @@ function _onbSourceCardHTML(opt, isEn) {
          '<span class="onb-v2-card-label">' + safe + '</span>';
 }
 
+// Session-only guard so a single user-intent on the source step resolves
+// to a single _onbWriteSourceAndAdvance call. Reset every time the step
+// mounts; set on first write. Defends against an iOS WKWebView edge
+// case we hit on Debug builds where the delegated capture-phase haptic
+// listener + the card's own onclick each produced a call for one tap
+// on-device (not reproducible in Playwright). The guard also keeps the
+// "answer saved once, analytics fires once" invariant across any future
+// re-entry path.
+let _onbSourceAnswered = false;
 function _onbV2PrepareSource() {
+  _onbSourceAnswered = false;
   const isEn = state.lang === 'en';
   const screen = document.getElementById('onb-v2-source');
   if (screen && typeof _onbV7Acc === 'function') _onbV7Acc(screen);
@@ -35077,6 +35087,9 @@ function _onbV2PrepareSource() {
 // free-text or null. source_skipped is always false now — kept on
 // state for schema compatibility with earlier builds.
 function _onbWriteSourceAndAdvance(id, otherText) {
+  // Idempotent: one write per step mount. See _onbSourceAnswered above.
+  if (_onbSourceAnswered) return;
+  _onbSourceAnswered = true;
   const platform = _onbSourcePlatform();
   let order = [];
   try { order = JSON.parse(localStorage.getItem('corpus_onboarding_source_order') || '[]'); } catch (_) {}
@@ -44673,6 +44686,72 @@ function _isUserPaidOrTrialNow() {
   if (opt && opt.until && Date.parse(opt.until) > Date.now()) return true;
   return false;
 }
+// Black Friday launch paywall. Called from enterAppUi after home
+// renders. Gates:
+//   1. BF offering must be live (_isBlackFridayActive() === true).
+//   2. User must NOT be paid / trial — _isUserPaidOrTrialNow() === false.
+//   3. User must not have already seen the launch paywall today. Dedupe
+//      key: "bf_launch_" + ends_at + "_" + local YYYY-MM-DD. Keyed on
+//      ends_at so a new sale window gets a fresh daily window even if
+//      the previous key is still in localStorage.
+//   4. No other modal / reveal must be visible when the timer fires —
+//      checked inside the setTimeout since the current state may change
+//      between the schedule and the fire.
+//   5. User must be on the home screen (state.currentScreen === 'home').
+//      Onboarding, reader, pantheon, profile all skip — opening a
+//      paywall over those is disorienting and the user may have just
+//      resumed into them from a cold open.
+// Fires at ~1.5s after home renders. paywall_trigger: 'bf_launch'.
+function _maybeShowBfLaunchPaywall() {
+  if (typeof _isBlackFridayActive !== 'function' || !_isBlackFridayActive()) return;
+  if (typeof _isUserPaidOrTrialNow === 'function' && _isUserPaidOrTrialNow()) return;
+  // Build per-day dedupe key. The sale's ends_at is the per-sale namespace;
+  // the local YYYY-MM-DD scopes to a single calendar day (user's clock).
+  const meta = (typeof _rcOfferingBlackFriday !== 'undefined'
+    && _rcOfferingBlackFriday && _rcOfferingBlackFriday.metadata) || {};
+  const endsAtRaw = (meta.ends_at || '').trim();
+  const today = (function () {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  })();
+  const dedupeKey = 'bf_launch_' + endsAtRaw + '_' + today;
+  try { if (localStorage.getItem(dedupeKey) === '1') return; } catch (_) {}
+
+  setTimeout(() => {
+    // Re-check all gates at fire time — 1.5s is long enough for another
+    // modal to open or the user to navigate away.
+    try {
+      if (!_isBlackFridayActive()) return;
+      if (_isUserPaidOrTrialNow()) return;
+      if (state && state.currentScreen !== 'home') return;
+      // Any overlay already up: celebration-queue items, modal-complete,
+      // sign-in-required, update-banner, celebration-queue stage overlays.
+      // Checking .active on the known overlay ids + the celebration-queue
+      // in-flight flag covers everything.
+      const overlayActive = !!document.querySelector(
+        '#modal-paywall.active, #onb-v2-paywall.onb-active, #modal-complete.active, ' +
+        '#modal-signin-required.active, #chapter-complete-overlay.active, ' +
+        '#unlock-overlay.active, .levelup-overlay.active, .sk-earn.active, ' +
+        '.toast-fullscreen.active'
+      );
+      if (overlayActive) return;
+      // Celebration queue in flight (chapter-complete, unlock, levelup,
+      // streak-badge, goal-met) — the items play sequentially off
+      // state.pendingCelebrations. A non-empty queue means at least one
+      // is about to render. Skip.
+      if ((state && state.pendingCelebrations || []).length > 0) return;
+      try { localStorage.setItem(dedupeKey, '1'); } catch (_) {}
+      showPaywall({
+        subject: state.subject || 'philosophy',
+        source:  'bf_launch',
+      });
+    } catch (e) { console.warn('[bf-launch] fire failed:', e); }
+  }, 1500);
+}
+
 function _maybeFlagMidChapterPaywall(weekId, dayId) {
   if (_isUserPaidOrTrialNow()) return;
   // R38 — never arm the mid-chapter paywall inside a FREE_CHAPTERS
@@ -44684,7 +44763,12 @@ function _maybeFlagMidChapterPaywall(weekId, dayId) {
   if (dayId !== 3 && dayId !== 6) return;
   const subj = state.subject || 'philosophy';
   const key  = subj + '-d' + dayId;
-  if (state.midChapterPaywallShown && state.midChapterPaywallShown[key]) return;
+  // Black-Friday bypass: ignore the once-per-user dedupe while the sale
+  // is live so every non-paying user hits d3 + d6 for the duration.
+  // The saved flags are NOT cleared — once the sale ends the normal
+  // dedupe applies again from exactly the state it was in.
+  const bfBypass = typeof _isBlackFridayActive === 'function' && _isBlackFridayActive();
+  if (!bfBypass && state.midChapterPaywallShown && state.midChapterPaywallShown[key]) return;
   _pendingMidChapterPaywall = { subject: subj, dayId: dayId, source: 'ch1-d' + dayId, key: key };
 }
 
@@ -58105,6 +58189,10 @@ function enterAppUi() {
   // Resume any celebration queue persisted from a prior session that
   // closed mid-play. Session-guarded so this fires at most once per open.
   try { _resumeCelebrationsIfPending(); } catch(e) {}
+  // Black Friday launch paywall. Non-paying users get one impression on
+  // app open per calendar day during the sale, over the home screen,
+  // never on top of another modal / reveal. See _maybeShowBfLaunchPaywall.
+  try { _maybeShowBfLaunchPaywall(); } catch(e) {}
   // Onboarding v2: the post-signup goal-picker chain is gone. v2 sets
   // the daily goal inline (step 12 / Q3) so no separate migration prompt
   // is needed for users who complete v2. Users on the old flow who
