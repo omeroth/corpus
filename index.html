@@ -16880,7 +16880,23 @@
     font-family: inherit;
     cursor: pointer;
   }
-  .paywall-bf-yearly { padding-top: 26px; }
+  .paywall-bf-yearly {
+    padding-top: 26px;
+    /* Column-stack so the per-month line sits full-width directly
+       under the title + price row. Keeps the biggest number (the
+       yearly price) in the row above, per Apple 3.1.2. */
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .paywall-bf-yearly-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
   /* Selected: gold border + warm gold wash. Both cards use the same
      .selected hook so tapping monthly flips the border + badge
      visibility to it. */
@@ -16909,7 +16925,20 @@
   }
   .paywall-bf-yearly-badge:empty { display: none; }
   .paywall-bf-card-title { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
-  .paywall-bf-yearly-permonth { font-size: 13px; color: rgba(255,255,255,.72); }
+  .paywall-bf-yearly-permonth {
+    /* Prominent but strictly SMALLER than .paywall-bf-yearly-amount
+       (26px, gold) so the yearly price remains the single largest price
+       on the card (Apple 3.1.2 — the billed price must be the primary
+       figure, not a derived per-month equivalent). 15px/700 is the max
+       weight I can put here without competing with the 26px amount for
+       visual dominance. */
+    font-size: 15px;
+    font-weight: 700;
+    color: #F5B800;
+    text-align: start;
+    line-height: 1.2;
+  }
+  .paywall-bf-yearly-permonth:empty { display: none; }
   .paywall-bf-monthly-sub    { font-size: 13px; color: rgba(255,255,255,.72); }
   .paywall-bf-card-price { text-align: end; }
   .paywall-bf-yearly-strike {
@@ -30392,13 +30421,13 @@ function _renderPaywallBf() {
   yearlyStrikeEl.innerHTML   = bdi(bf && bf.yearly.regularPriceString);
   yearlyAmountEl.innerHTML   = bdi(bf && bf.yearly.priceString);
   yearlyPeriodEl.textContent = isEn ? 'per year' : 'לשנה';
-  // Per-month line: HE uses "{price} לחודש" (no slash — slash with a
-  // Hebrew word reads as a typo). EN keeps "/ month" since / is fine
-  // between an EN word and a number.
+  // Per-month line: full prominent copy under the price row. HE wraps
+  // the price in <bdi> so the currency sign + digits stay LTR inside
+  // the RTL sentence.
   if (bf && bf.yearly.perMonthString) {
     yearlyPerMonthEl.innerHTML = isEn
-      ? bdi(bf.yearly.perMonthString) + ' / month'
-      : bdi(bf.yearly.perMonthString) + ' לחודש';
+      ? 'Just ' + bdi(bf.yearly.perMonthString) + ' a month'
+      : 'רק '  + bdi(bf.yearly.perMonthString) + ' לחודש';
   } else {
     yearlyPerMonthEl.textContent = '';
   }
@@ -64668,15 +64697,17 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
      <div class="paywall-bf-cards">
        <button type="button" class="paywall-bf-card paywall-bf-yearly" onclick="_selectPaywallPackage('yearly')">
          <div class="paywall-bf-yearly-badge"></div>
-         <div class="paywall-bf-card-main">
-           <div class="paywall-bf-card-title"></div>
-           <div class="paywall-bf-yearly-permonth"></div>
+         <div class="paywall-bf-yearly-row">
+           <div class="paywall-bf-card-main">
+             <div class="paywall-bf-card-title"></div>
+           </div>
+           <div class="paywall-bf-card-price">
+             <div class="paywall-bf-yearly-strike" aria-hidden="true"></div>
+             <div class="paywall-bf-yearly-amount"></div>
+             <div class="paywall-bf-yearly-period"></div>
+           </div>
          </div>
-         <div class="paywall-bf-card-price">
-           <div class="paywall-bf-yearly-strike" aria-hidden="true"></div>
-           <div class="paywall-bf-yearly-amount"></div>
-           <div class="paywall-bf-yearly-period"></div>
-         </div>
+         <div class="paywall-bf-yearly-permonth"></div>
        </button>
        <button type="button" class="paywall-bf-card paywall-bf-monthly" onclick="_selectPaywallPackage('monthly')">
          <div class="paywall-bf-card-main">
@@ -65129,15 +65160,17 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
       <div class="paywall-bf-cards">
         <button type="button" class="paywall-bf-card paywall-bf-yearly" onclick="_selectPaywallPackage('yearly')">
           <div class="paywall-bf-yearly-badge"></div>
-          <div class="paywall-bf-card-main">
-            <div class="paywall-bf-card-title"></div>
-            <div class="paywall-bf-yearly-permonth"></div>
+          <div class="paywall-bf-yearly-row">
+            <div class="paywall-bf-card-main">
+              <div class="paywall-bf-card-title"></div>
+            </div>
+            <div class="paywall-bf-card-price">
+              <div class="paywall-bf-yearly-strike" aria-hidden="true"></div>
+              <div class="paywall-bf-yearly-amount"></div>
+              <div class="paywall-bf-yearly-period"></div>
+            </div>
           </div>
-          <div class="paywall-bf-card-price">
-            <div class="paywall-bf-yearly-strike" aria-hidden="true"></div>
-            <div class="paywall-bf-yearly-amount"></div>
-            <div class="paywall-bf-yearly-period"></div>
-          </div>
+          <div class="paywall-bf-yearly-permonth"></div>
         </button>
         <button type="button" class="paywall-bf-card paywall-bf-monthly" onclick="_selectPaywallPackage('monthly')">
           <div class="paywall-bf-card-main">
