@@ -58162,6 +58162,21 @@ function enterAppUi() {
       // This is the branch that fixes the brand-new-user-at-paywall
       // relaunch bug. initUI already painted the step; this return
       // just blocks the home tail.
+      //
+      // Re-entry guard: enterAppUi gets called twice around an email
+      // signup — once from handleAuthSubmit's await enterApp, once
+      // from the onAuthStateChange SIGNED_IN deferred enterApp. The
+      // second call hits this branch with the cursor already advanced
+      // (e.g. from 23 to 37 via _onbV2PrepareSignup's auto-advance),
+      // and re-calls _onbShowStep(cursor) — which re-runs the prepare
+      // hook, which rebuilds the step's DOM content (source step wipes
+      // #onb-v2-source-options and recreates the cards). A tap in
+      // flight during that wipe lands on nothing, producing the
+      // "requires two taps" bug on the source step. If an onboarding
+      // screen is already mounted (any .onb-active element), the
+      // first enterAppUi already resumed — skip the re-call.
+      const _onbActive = !!document.querySelector('.onb-screen.onb-active');
+      if (_onbActive) { return; }
       const _resumeStep = parseInt(localStorage.getItem('corpus_onboarding_step') || '0', 10);
       const _resumeValid = _resumeStep >= 1 && _ONB_STEP_TO_ID[_resumeStep] !== undefined;
       const _resumeFV = localStorage.getItem('corpus_onboarding_flow_version') || '';
