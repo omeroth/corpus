@@ -14836,6 +14836,11 @@
     from { opacity: 0; transform: scale(0.85); }
     to   { opacity: 1; transform: none; }
   }
+  /* Inline accent span inside onb screens (bubble headers, headlines
+     with a highlighted phrase). Uses the subject accent so a user who
+     is on economics blue or psychology orange sees that colour, not
+     philosophy purple. */
+  .onb-screen.onb-v7 .onb-v7-accent { color: var(--accent); font-weight: inherit; }
   .onb-screen.onb-v7 .onb-v7-bub .onb-v7-em,
   .onb-screen.onb-v7 .onb-v7-em { color: var(--v7-acc); }
 
@@ -16656,6 +16661,21 @@
      indigo. Overrides live on html.theme-{economics,psychology}.
      ────────────────────────────────────────────────────────────── */
   .paywall-bf-shell { display: none; }
+  /* Full-viewport, zero-scroll shell. The BF paywall must fit in the
+     visible viewport at every supported iPhone size — scroll on a
+     paywall is a store-review risk (the user might not see the legal
+     line / price). height:100dvh + overflow:hidden on the shell
+     container, adaptive sizing on the content below. Safe-area insets
+     are exposed as CSS custom props so Playwright can inject synthetic
+     values for the regression tests. */
+  #modal-paywall.paywall-bf,
+  #onb-v2-paywall.paywall-bf {
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+  }
   #modal-paywall.paywall-bf   .paywall-topbar,
   #modal-paywall.paywall-bf   .paywall-brand,
   #modal-paywall.paywall-bf   .paywall-eyebrow,
@@ -16683,21 +16703,43 @@
     align-items: stretch;
     box-sizing: border-box;
     width: 100%;
-    min-height: 100%;
-    padding: 20px 20px 24px;
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+    padding: 20px 20px calc(var(--sab) + 12px);
   }
-  /* Modal shell: X is position:fixed at env+14; reserve ~56px+env so
-     the "BLACK FRIDAY" eyebrow sits below it. */
+  /* Modal shell: X is position:fixed at env+14; reserve ~56px + top
+     inset so the "BLACK FRIDAY" eyebrow sits below it. */
   #modal-paywall.paywall-bf .paywall-bf-shell {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 56px);
+    padding-top: calc(var(--sat) + 56px);
   }
-  /* Onboarding shell: the X lives inside .onb-v7-top (its own row
-     above .onb-v7-mid), so no reserve is needed — bring the eyebrow
-     up to the top of the mid area. Saves ~40px, enough to float the
-     legal-row above the fold on Psychology HE where the Hebrew
-     character height pushes a little further than the other combos. */
+  /* Onboarding shell: hide .onb-v2-paywall-inner (the default paywall
+     subtree), promote the X out of .onb-v7-top via display:contents so
+     it stays tappable but the bar itself claims zero layout space.
+     .onb-v7-mid becomes the direct container of .paywall-bf-shell. */
+  #onb-v2-paywall.paywall-bf .onb-v2-paywall-inner { display: none !important; }
+  #onb-v2-paywall.paywall-bf .onb-v7-top { display: contents !important; }
+  #onb-v2-paywall.paywall-bf .onb-v7-top > :not(.onb-v7-close) { display: none !important; }
+  #onb-v2-paywall.paywall-bf .onb-v7-close {
+    display: flex !important;
+    position: fixed !important;
+    top: calc(var(--sat) + 14px);
+    inset-inline-start: 12px;
+    width: 36px; height: 36px;
+    align-items: center; justify-content: center;
+    background: transparent; border: 0;
+    color: rgba(255,255,255,.9);
+    cursor: pointer; z-index: 20; padding: 0;
+  }
+  #onb-v2-paywall.paywall-bf .onb-v7-mid {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0;
+    height: 100%;
+  }
   #onb-v2-paywall.paywall-bf .paywall-bf-shell {
-    padding-top: 4px;
+    padding-top: calc(var(--sat) + 56px);
   }
   /* Dark surface — philosophy default; themed via html.theme-* below. */
   #modal-paywall.paywall-bf,
@@ -16757,16 +16799,20 @@
     text-align: center;
     margin: 0 0 8px;
   }
+  /* Inline sticker hidden at ≥700 viewport heights (overlay sticker
+     over the chibi carries the visual there). Shown by the <700
+     media-query block below when the hero is hidden. */
+  .paywall-bf-sticker-inline { display: none; }
   /* Hero region — chibi + sticker overlay */
   .paywall-bf-hero {
     position: relative;
-    width: 125px;
-    height: 125px;
-    margin: 0 auto 6px;
+    width: 95px;
+    height: 95px;
+    margin: 0 auto 2px;
   }
   .paywall-bf-chibi {
-    width: 125px;
-    height: 125px;
+    width: 95px;
+    height: 95px;
     object-fit: contain;
     display: block;
   }
@@ -16795,20 +16841,20 @@
 
   .paywall-bf-headline {
     color: #FFFFFF;
-    font-size: 22px;
+    font-size: 21px;
     font-weight: 800;
     line-height: 1.15;
-    margin: 2px 16px 8px;
+    margin: 0 16px 4px;
     text-align: center;
     /* Balance so the last line can't sit as a single orphan word. */
     text-wrap: balance;
   }
   .paywall-bf-ends {
     color: var(--accent);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     text-align: center;
-    margin: 0 0 16px;
+    margin: 0 0 10px;
   }
   /* Subject accent varies — use the themed --accent, but brighten so it
      reads on dark. */
@@ -16822,14 +16868,14 @@
   .paywall-bf-benefits {
     list-style: none;
     padding: 0;
-    margin: 0 0 18px;
+    margin: 0 0 8px;
   }
   .paywall-bf-benefit {
     color: #FFFFFF;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
-    margin: 0 0 6px;
-    padding-inline-start: 34px;
+    margin: 0 0 4px;
+    padding-inline-start: 30px;
     position: relative;
     text-align: start;
   }
@@ -16862,8 +16908,8 @@
   .paywall-bf-cards {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin: 0 0 20px;
+    gap: 10px;
+    margin: 0 0 14px;
   }
   .paywall-bf-card {
     position: relative;
@@ -16871,8 +16917,8 @@
     justify-content: space-between;
     align-items: center;
     gap: 12px;
-    padding: 18px 16px;
-    border-radius: 16px;
+    padding: 13px 14px;
+    border-radius: 14px;
     border: 2px solid rgba(255,255,255,.14);
     background: rgba(255,255,255,.04);
     color: #FFFFFF;
@@ -16881,13 +16927,13 @@
     cursor: pointer;
   }
   .paywall-bf-yearly {
-    padding-top: 26px;
+    padding-top: 20px;
     /* Column-stack so the per-month line sits full-width directly
        under the title + price row. Keeps the biggest number (the
        yearly price) in the row above, per Apple 3.1.2. */
     flex-direction: column;
     align-items: stretch;
-    gap: 8px;
+    gap: 6px;
   }
   .paywall-bf-yearly-row {
     display: flex;
@@ -16956,13 +17002,13 @@
   .paywall-bf-cta {
     background: #F5B800;
     color: #1E1538;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 900;
     letter-spacing: 1px;
     border: 0;
     border-radius: 14px;
-    padding: 18px 20px;
-    margin: 8px 0 14px;
+    padding: 14px 20px;
+    margin: 4px 0 8px;
     cursor: pointer;
     text-transform: uppercase;
     box-shadow: 0 4px 0 rgba(0,0,0,.25);
@@ -16995,6 +17041,67 @@
     padding: 0;
   }
   .paywall-bf-sep { padding: 0 6px; color: rgba(255,255,255,.4); }
+
+  /* Adaptive sizes per viewport height. Keeps the whole paywall in
+     frame without scrolling on every iPhone we ship.
+       ≥800px : current (default) layout
+       700–799px: hero 96, headline 20, tighter gaps
+       <700px  : hide the hero image (sticker floats next to eyebrow),
+                 benefits 14, tighter cards
+     Legal text is NEVER shrunk below 11px (Apple review minimum for
+     fine print on a store listing / IAP shell). */
+  @media (max-height: 799px) {
+    .paywall-bf-hero   { width: 96px; height: 96px; margin: 0 auto 4px; }
+    .paywall-bf-chibi  { width: 96px; height: 96px; }
+    .paywall-bf-sticker { top: 6px; padding: 4px 8px 5px; min-width: 56px; }
+    .paywall-bf-sticker-pct { font-size: 15px; }
+    .paywall-bf-sticker-off { font-size: 9px; }
+    .paywall-bf-headline { font-size: 20px; margin: 0 16px 4px; }
+    .paywall-bf-ends     { font-size: 14px; margin-bottom: 10px; }
+    .paywall-bf-benefit  { margin-bottom: 4px; }
+    .paywall-bf-cards    { gap: 10px; margin-bottom: 14px; }
+    .paywall-bf-card     { padding: 14px 14px; }
+    .paywall-bf-yearly   { padding-top: 22px; gap: 6px; }
+    .paywall-bf-yearly-amount { font-size: 24px; }
+    .paywall-bf-yearly-permonth { font-size: 14px; }
+    .paywall-bf-cta      { padding: 15px 20px; margin: 4px 0 10px; font-size: 16px; }
+  }
+  @media (max-height: 699px) {
+    /* Hide the chibi entirely; inline sticker (sibling of eyebrow text)
+       takes over. Keeps the BLACK FRIDAY cue + % OFF visible without
+       spending vertical space on art. */
+    .paywall-bf-hero   { display: none; }
+    .paywall-bf-eyebrow {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin-bottom: 6px;
+    }
+    .paywall-bf-sticker-inline {
+      display: inline-flex;
+      position: static;
+      flex-direction: column;
+      transform: rotate(-6deg);
+      min-width: 48px;
+      padding: 3px 7px 4px;
+    }
+    html[dir="rtl"] .paywall-bf-sticker-inline { transform: rotate(6deg); }
+    .paywall-bf-headline { font-size: 19px; line-height: 1.12; margin: 0 8px 4px; }
+    .paywall-bf-ends     { font-size: 13px; margin-bottom: 8px; }
+    .paywall-bf-benefits { margin-bottom: 10px; }
+    .paywall-bf-benefit  { font-size: 14px; margin-bottom: 4px; padding-inline-start: 28px; }
+    .paywall-bf-benefit::before { width: 18px; height: 18px; }
+    .paywall-bf-benefit::after  { top: 5px; width: 11px; height: 8px; }
+    .paywall-bf-cards    { gap: 8px; margin-bottom: 12px; }
+    .paywall-bf-card     { padding: 11px 12px; border-radius: 12px; }
+    .paywall-bf-yearly   { padding-top: 18px; gap: 4px; }
+    .paywall-bf-yearly-badge { top: -9px; font-size: 10px; padding: 3px 8px; }
+    .paywall-bf-card-title   { font-size: 17px; }
+    .paywall-bf-yearly-amount { font-size: 22px; }
+    .paywall-bf-yearly-permonth { font-size: 13px; }
+    .paywall-bf-monthly-amount { font-size: 19px; }
+    .paywall-bf-cta      { padding: 13px 20px; margin: 2px 0 8px; font-size: 15px; }
+    /* Legal copy stays at 11.5px — the base value is already at the
+       floor. No override below this breakpoint. */
+  }
 
   /* SE scale-down for the paywall internals. */
   @media (max-height: 700px) {
@@ -30314,8 +30421,10 @@ function _renderPaywallBf() {
   const meta = (_rcOfferingBlackFriday && _rcOfferingBlackFriday.metadata) || {};
   const subject = state.subject || 'philosophy';
 
-  // Eyebrow
-  q('.paywall-bf-eyebrow').textContent = isEn ? 'BLACK FRIDAY' : 'בלאק פריידי';
+  // Eyebrow — text now lives inside .paywall-bf-eyebrow-text so the
+  // inline sticker chip (sibling at <700 viewports) can sit next to it.
+  const eyebrowTextEl = q('.paywall-bf-eyebrow-text');
+  if (eyebrowTextEl) eyebrowTextEl.textContent = isEn ? 'BLACK FRIDAY' : 'בלאק פריידי';
 
   // Chibi — reuse the existing onb-thinkers celebrate PNGs.
   const CHIBI_BY_SUBJECT = {
@@ -30327,17 +30436,21 @@ function _renderPaywallBf() {
   const chibiImg = q('.paywall-bf-chibi');
   if (chibiImg) chibiImg.src = './images/onb-thinkers/' + chibiSlug + '-celebrate.png';
 
-  // Sticker — hide when discountPct is unavailable (spec: "hide the
-  // strikethrough and the % badge rather than guess").
-  const stickerEl = q('.paywall-bf-sticker');
-  const pctEl     = q('.paywall-bf-sticker-pct');
-  const offEl     = q('.paywall-bf-sticker-off');
+  // Sticker — two instances in the DOM (overlay over the chibi for
+  // default/medium viewports; inline next to the eyebrow for <700
+  // viewports where the hero is hidden). CSS decides which is visible;
+  // both get populated. Hide both when discountPct is unavailable.
+  const stickerEls = root.querySelectorAll('.paywall-bf-sticker');
   if (bf && bf.yearly.discountPct != null) {
-    pctEl.textContent = bf.yearly.discountPct + '%';
-    offEl.textContent = isEn ? 'OFF' : 'הנחה';
-    stickerEl.style.display = '';
+    stickerEls.forEach(el => {
+      const p = el.querySelector('.paywall-bf-sticker-pct');
+      const o = el.querySelector('.paywall-bf-sticker-off');
+      if (p) p.textContent = bf.yearly.discountPct + '%';
+      if (o) o.textContent = isEn ? 'OFF' : 'הנחה';
+      el.style.display = '';
+    });
   } else {
-    stickerEl.style.display = 'none';
+    stickerEls.forEach(el => { el.style.display = 'none'; });
   }
 
   // Headline — 50 → "Half price…"; other → "{N}% off…"; null → generic.
@@ -30448,23 +30561,28 @@ function _renderPaywallBf() {
   q('.paywall-bf-monthly').classList.toggle('selected', _paywallSelectedPkg === 'monthly');
 
   // CTA — mode-gated trial.
-  //   onboarding shell: "START FREE TRIAL" when eligible for the trial
-  //                     SKU (corpus_yearly_bf_trial) AND yearly selected;
-  //                     every other combo reads "SUBSCRIBE".
-  //   modal shell     : ALWAYS "SUBSCRIBE". The modal shell purchases
-  //                     corpus_yearly_bf (no intro offer), so a trial-
-  //                     labelled CTA would misrepresent the charge.
-  //                     No eligibility probe runs for the modal shell
-  //                     (see _renderPaywall's _primeBfTrialEligibility
-  //                     call site).
+  //   onboarding shell, trial-eligible, yearly selected
+  //                     → "START FREE TRIAL"
+  //   every other case  → "CLAIM {pct}% OFF" when discountPct known
+  //                     → "GET THE DEAL"      when discountPct null
+  //     (modal shell never shows trial copy — the modal purchases
+  //      corpus_yearly_bf which has no intro offer, and the eligibility
+  //      probe is skipped entirely for the modal shell in _renderPaywall.)
   const ctaEl = q('.paywall-bf-cta');
   const isOnbMode = _paywallMode === 'onboarding';
   const canTrialYearly = isOnbMode
     && _bfTrialEligibility === 'eligible'
     && _paywallSelectedPkg === 'yearly';
-  ctaEl.textContent = canTrialYearly
-    ? (isEn ? 'START FREE TRIAL' : 'התחלת ניסיון חינם')
-    : (isEn ? 'SUBSCRIBE'        : 'הרשמה למנוי');
+  const ctaPct = bf && bf.yearly.discountPct;
+  if (canTrialYearly) {
+    ctaEl.textContent = isEn ? 'START FREE TRIAL' : 'התחלת ניסיון חינם';
+  } else if (ctaPct != null) {
+    ctaEl.textContent = isEn
+      ? 'CLAIM ' + ctaPct + '% OFF'
+      : 'לקבל ' + ctaPct + '% הנחה';
+  } else {
+    ctaEl.textContent = isEn ? 'GET THE DEAL' : 'לקבל את ההנחה';
+  }
   ctaEl.disabled = _paywallPurchasing;
 
   // Legal — spec: "7-day free trial, then {price}/year. Renews at this
@@ -36262,10 +36380,30 @@ function _onbV2PrepareReminderPromise() {
   const fig    = document.getElementById('onb-v7-rp-fig');
   if (screen && typeof _onbV7Acc === 'function') _onbV7Acc(screen);
   if (fig) fig.src = (typeof _onbThinker === 'function') ? _onbThinker('point') : '';
-  // "Day 6" badge — the subscription trial lands on day 7, so the
-  // reminder is a 24-hour head's-up.
+  // "DAY 5" badge — reminder fires at day 5 of the 7-day trial so the
+  // user has 2 full days to cancel before the card is charged. Mirrors
+  // the bubble copy ("2 days before it ends").
   const badge = document.getElementById('onb-v7-rp-badge-text');
-  if (badge) badge.textContent = state.lang === 'en' ? 'DAY 6' : 'יום 6';
+  if (badge) badge.textContent = state.lang === 'en' ? 'DAY 5' : 'יום 5';
+  // Bubble head with an accent span around "2 days" / "יומיים" so the
+  // reminder window reads as the promise, not just a date. Set via
+  // innerHTML because textContent would strip the span.
+  const headEl = document.getElementById('onb-v2-reminder-promise-head');
+  if (headEl) {
+    headEl.innerHTML = state.lang === 'en'
+      ? "We'll remind you <span class=\"onb-v7-accent\">2 days</span> before it ends"
+      : "נזכיר לכם <span class=\"onb-v7-accent\">יומיים</span> לפני שהניסיון מסתיים";
+  }
+  const subEl = document.getElementById('onb-v2-reminder-promise-sub');
+  if (subEl) {
+    subEl.textContent = state.lang === 'en'
+      ? "No surprise charge. You'll know before anything happens."
+      : 'בלי חיובים מפתיעים. תדעו לפני שמשהו קורה.';
+  }
+  const ctaEl = document.getElementById('onb-v2-reminder-promise-cta');
+  if (ctaEl) {
+    ctaEl.textContent = state.lang === 'en' ? 'CONTINUE FOR FREE' : 'להמשיך בחינם';
+  }
 }
 
 // Helper: read taste config for the current subject with a
@@ -64679,10 +64817,19 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
         All text + image + card content populated by _renderPaywallBf. See
         the sibling block inside #modal-paywall for the shell-shared skeleton. -->
    <div class="paywall-bf-shell" aria-hidden="true">
-     <div class="paywall-bf-eyebrow"></div>
+     <div class="paywall-bf-eyebrow">
+       <span class="paywall-bf-eyebrow-text"></span>
+       <!-- Inline sticker chip used at viewport heights < 700px when the
+            hero image is hidden. Default/medium viewports hide this one
+            via CSS and show the chibi-overlapping sticker inside .hero. -->
+       <span class="paywall-bf-sticker paywall-bf-sticker-inline" aria-hidden="true">
+         <span class="paywall-bf-sticker-pct"></span>
+         <span class="paywall-bf-sticker-off"></span>
+       </span>
+     </div>
      <div class="paywall-bf-hero">
        <img class="paywall-bf-chibi" alt="" aria-hidden="true">
-       <div class="paywall-bf-sticker" aria-hidden="true">
+       <div class="paywall-bf-sticker paywall-bf-sticker-overlay" aria-hidden="true">
          <span class="paywall-bf-sticker-pct"></span>
          <span class="paywall-bf-sticker-off"></span>
        </div>
@@ -65142,10 +65289,18 @@ if (window.__CORPUS_DEBUG_BUILD !== true) {
          mode. All .paywall-bf-* children render only when the shell carries
          .paywall-bf (see CSS near :16720 and _renderPaywallBf). -->
     <div class="paywall-bf-shell" aria-hidden="true">
-      <div class="paywall-bf-eyebrow"></div>
+      <div class="paywall-bf-eyebrow">
+        <span class="paywall-bf-eyebrow-text"></span>
+        <!-- Inline sticker chip shown at viewport heights < 700px when the
+             hero image is hidden. Default/medium hide this via CSS. -->
+        <span class="paywall-bf-sticker paywall-bf-sticker-inline" aria-hidden="true">
+          <span class="paywall-bf-sticker-pct"></span>
+          <span class="paywall-bf-sticker-off"></span>
+        </span>
+      </div>
       <div class="paywall-bf-hero">
         <img class="paywall-bf-chibi" alt="" aria-hidden="true">
-        <div class="paywall-bf-sticker" aria-hidden="true">
+        <div class="paywall-bf-sticker paywall-bf-sticker-overlay" aria-hidden="true">
           <span class="paywall-bf-sticker-pct"></span>
           <span class="paywall-bf-sticker-off"></span>
         </div>
