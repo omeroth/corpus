@@ -15,16 +15,19 @@
 // single cron interval so a missed hourly run self-heals on the next —
 // the dedup column is what guarantees one-shot-per-user.
 //
-// English-only for now (Loops currently filters language = en for this
-// campaign). The sweep filters user_progress.language = 'en' before
-// sending. HE users get the event once the Loops copy lands.
+// Every eligible trial user receives the event regardless of
+// user_progress.language — the email body is English for everyone,
+// so there's no per-language gate at this layer.
 //
 // Properties sent to Loops per contact:
-//   trialEndDate   : "Friday, November 28" (in user_progress.timezone,
-//                    fallback UTC, EN format)
-//   planName       : "yearly" | "monthly"
-//   lastSubject    : from user_progress.last_subject (omitted when null)
-//   language       : "en"
+//   trialEndDate : "Friday, November 28" (in user_progress.timezone,
+//                  fallback UTC, EN format)
+//   planName     : "yearly" | "monthly"
+//   lastSubject  : from user_progress.last_subject (omitted when null)
+//
+// No language property on the PATCH either — the user's existing
+// `language` contact field in Loops is untouched by this sweep; the
+// workflow fans out the same EN copy irrespective of its value.
 //
 // No price in the payload. The email copy doesn't include one, so the
 // sweep deliberately carries no per-SKU table, no currency read, and
@@ -181,7 +184,7 @@ type Candidate = {
   productId: string | null;
   trialEnd:  string;    // ISO-8601
   timezone:  string | null;
-  language:  string;
+  language:  string | null;   // carried through for the dry-run report only
   lastSubject: string | null;
   // Resolved for the Loops PATCH:
   trialEndDate: string;
@@ -292,11 +295,8 @@ serve(async (req: Request): Promise<Response> => {
     const email = emailById.get(s.user_id);
     if (!email) { skipped.push({ userId: s.user_id, reason: "no_email" }); continue; }
     const prog  = progById.get(s.user_id) || { timezone: null, language: null, last_subject: null };
-    // English-only for now. HE users skipped until the Loops copy lands.
-    if (prog.language !== "en") {
-      skipped.push({ userId: s.user_id, reason: `language=${prog.language ?? "null"}` });
-      continue;
-    }
+    // No language filter — the email is EN for everyone. Carry
+    // prog.language into the dry-run report only.
     const trialEndDate = formatTrialEndDate(s.trial_end, prog.timezone);
     candidates.push({
       userId:      s.user_id,
@@ -304,7 +304,7 @@ serve(async (req: Request): Promise<Response> => {
       productId:   s.product_id,
       trialEnd:    s.trial_end,
       timezone:    prog.timezone,
-      language:    "en",
+      language:    prog.language,
       lastSubject: prog.last_subject,
       trialEndDate,
       planName:    planNameFor(s.product_id),
@@ -324,11 +324,14 @@ serve(async (req: Request): Promise<Response> => {
         productId: c.productId,
         trialEnd:  c.trialEnd,
         timezone:  c.timezone,
+        // user_progress.language carried through the dry-run output
+        // for eyeball sanity only; NOT sent to Loops in live mode
+        // (the EN email is fanned out regardless of this value).
+        language: c.language,
         properties: {
           trialEndDate: c.trialEndDate,
           planName:     c.planName,
           lastSubject:  c.lastSubject,
-          language:     c.language,
         },
       })),
       skipped,
@@ -342,7 +345,6 @@ serve(async (req: Request): Promise<Response> => {
     const patchBody: Record<string, unknown> = {
       trialEndDate: c.trialEndDate,
       planName:     c.planName,
-      language:     c.language,
     };
     // lastSubject: send only when non-null so we don't clobber an
     // existing value in Loops with null for a user whose row is sparse.
