@@ -98,6 +98,77 @@ function planNameFor(productId: string | null): "yearly" | "monthly" {
   return productId.includes("yearly") ? "yearly" : "monthly";
 }
 
+// Thinker → subject lookup, used by resolveLastSubject when the user's
+// user_progress.last_subject column is null. Covers every id surfaced
+// via user_progress.unlocked_thinkers in content/thinkers.js; built by
+// scanning that file for `id: '...'` + nearest `subject: '...'`, then
+// filling in the un-tagged classics by section (the first batch in
+// the HE THINKERS array is all philosophy — subject wasn't required
+// when those entries were authored). If the content file adds a new
+// thinker to a subject, append it here; a missing id falls through
+// the "derived" lookup to the "philosophy" fallback.
+const THINKER_SUBJECT: Record<string, "philosophy" | "economics" | "psychology"> = {
+  // philosophy
+  socrates: "philosophy", plato: "philosophy", russell: "philosophy",
+  wittgenstein: "philosophy", aurelius: "philosophy", aristotle: "philosophy",
+  descartes: "philosophy", kant: "philosophy", mill: "philosophy",
+  nietzsche: "philosophy", hume: "philosophy", gettier: "philosophy",
+  popper: "philosophy", spinoza: "philosophy", berkeley: "philosophy",
+  bostrom: "philosophy", thomson: "philosophy", laplace: "philosophy",
+  sartre: "philosophy", libet: "philosophy", hobbes: "philosophy",
+  rousseau: "philosophy", locke: "philosophy",
+  // economics
+  "mill-econ": "economics", smith: "economics", samuelson: "economics",
+  marx: "economics", walras: "economics", sandel: "economics",
+  keynes: "economics", friedman: "economics", sen: "economics",
+  jevons: "economics", marshall: "economics", ricardo: "economics",
+  piketty: "economics", pareto: "economics", nozick: "economics",
+  hayek: "economics", solow: "economics", romer: "economics",
+  north: "economics", acemoglu: "economics", easterly: "economics",
+  simon: "economics", thaler: "economics", shiller: "economics",
+  gigerenzer: "economics", minsky: "economics", bagehot: "economics",
+  fisher: "economics", "reinhart-rogoff": "economics", kahneman: "economics",
+  aquinas: "economics", rawls: "economics",
+  // psychology
+  wundt: "psychology", james: "psychology", freud: "psychology",
+  jung: "psychology", skinner: "psychology", rogers: "psychology",
+  breuer: "psychology", miller: "psychology", adler: "psychology",
+  maslow: "psychology", frankl: "psychology", fromm: "psychology",
+  deci: "psychology", bowlby: "psychology", winnicott: "psychology",
+  erikson: "psychology", kohut: "psychology", bandura: "psychology",
+  klein: "psychology", "anna-freud": "psychology", beck: "psychology",
+  "van-der-kolk": "psychology", foucault: "psychology", lacan: "psychology",
+  frances: "psychology", illouz: "psychology", han: "psychology",
+  galton: "psychology", asch: "psychology", festinger: "psychology",
+};
+
+type Subject = "philosophy" | "economics" | "psychology";
+type SubjectSource = "last_subject" | "derived" | "fallback";
+
+// Resolve the lastSubject property, with the source label so the
+// dry-run output can be eyeballed. Order:
+//   1. user_progress.last_subject (if a known subject string)
+//   2. first mappable id in user_progress.unlocked_thinkers
+//   3. "philosophy" fallback (matches CLAUDE.md's LOCKED_SUBJECTS note —
+//      economics / psychology are gated today, every real user on
+//      prod is on philosophy)
+function resolveLastSubject(
+  lastSubject: string | null,
+  unlockedThinkers: unknown,
+): { value: Subject; source: SubjectSource } {
+  if (lastSubject === "philosophy" || lastSubject === "economics" || lastSubject === "psychology") {
+    return { value: lastSubject, source: "last_subject" };
+  }
+  if (Array.isArray(unlockedThinkers)) {
+    for (const id of unlockedThinkers) {
+      if (typeof id !== "string") continue;
+      const subj = THINKER_SUBJECT[id];
+      if (subj) return { value: subj, source: "derived" };
+    }
+  }
+  return { value: "philosophy", source: "fallback" };
+}
+
 // EN format, timezone-aware. "Friday, November 28" shape.
 function formatTrialEndDate(iso: string, timezone: string | null): string {
   const d = new Date(iso);
@@ -185,10 +256,11 @@ type Candidate = {
   trialEnd:  string;    // ISO-8601
   timezone:  string | null;
   language:  string | null;   // carried through for the dry-run report only
-  lastSubject: string | null;
   // Resolved for the Loops PATCH:
   trialEndDate: string;
   planName:     "yearly" | "monthly";
+  lastSubject:  Subject;
+  lastSubjectSource: SubjectSource;
 };
 
 // ─── Main handler ───────────────────────────────────────────────────────
@@ -258,19 +330,35 @@ serve(async (req: Request): Promise<Response> => {
     return jsonResponse({ ok: true, mode, window: { lower: LOWER, upper: UPPER }, candidates: [], totals: { eligible: 0 } }, 200);
   }
 
-  // user_progress for timezone + language + last_subject.
+  // user_progress for timezone + lang + last_subject + unlocked_thinkers.
+  // (Column is `lang`, not `language` — a previous version of this
+  // function selected `language` which PostgREST happily returned as
+  // null for every row; with language filtering removed the mismatch
+  // was invisible, but resolveLastSubject's derivation step reads a
+  // real array now so the schema has to match.)
   const userIds = subs.map(s => s.user_id);
   const { data: progRows, error: progErr } = await admin
     .from("user_progress")
-    .select("user_id, timezone, language, last_subject")
+    .select("user_id, timezone, lang, last_subject, unlocked_thinkers")
     .in("user_id", userIds);
   if (progErr) {
     console.error("[trial-ending-sweep] user_progress fetch failed:", progErr);
     return jsonResponse({ ok: false, error: "user_progress fetch failed" }, 500);
   }
-  const progById = new Map<string, { timezone: string | null; language: string | null; last_subject: string | null }>();
-  for (const r of (progRows || []) as Array<{ user_id: string; timezone: string | null; language: string | null; last_subject: string | null }>) {
-    progById.set(r.user_id, { timezone: r.timezone, language: r.language, last_subject: r.last_subject });
+  type ProgRow = {
+    timezone: string | null;
+    lang: string | null;
+    last_subject: string | null;
+    unlocked_thinkers: unknown;
+  };
+  const progById = new Map<string, ProgRow>();
+  for (const r of (progRows || []) as Array<ProgRow & { user_id: string }>) {
+    progById.set(r.user_id, {
+      timezone:          r.timezone,
+      lang:              r.lang,
+      last_subject:      r.last_subject,
+      unlocked_thinkers: r.unlocked_thinkers,
+    });
   }
 
   // auth.users for email. Paginated listUsers — same pattern as
@@ -294,20 +382,23 @@ serve(async (req: Request): Promise<Response> => {
   for (const s of subs) {
     const email = emailById.get(s.user_id);
     if (!email) { skipped.push({ userId: s.user_id, reason: "no_email" }); continue; }
-    const prog  = progById.get(s.user_id) || { timezone: null, language: null, last_subject: null };
+    const prog = progById.get(s.user_id)
+      || { timezone: null, lang: null, last_subject: null, unlocked_thinkers: null };
     // No language filter — the email is EN for everyone. Carry
-    // prog.language into the dry-run report only.
+    // prog.lang into the dry-run report only.
     const trialEndDate = formatTrialEndDate(s.trial_end, prog.timezone);
+    const resolvedSubject = resolveLastSubject(prog.last_subject, prog.unlocked_thinkers);
     candidates.push({
-      userId:      s.user_id,
+      userId:            s.user_id,
       email,
-      productId:   s.product_id,
-      trialEnd:    s.trial_end,
-      timezone:    prog.timezone,
-      language:    prog.language,
-      lastSubject: prog.last_subject,
+      productId:         s.product_id,
+      trialEnd:          s.trial_end,
+      timezone:          prog.timezone,
+      language:          prog.lang,
       trialEndDate,
-      planName:    planNameFor(s.product_id),
+      planName:          planNameFor(s.product_id),
+      lastSubject:       resolvedSubject.value,
+      lastSubjectSource: resolvedSubject.source,
     });
   }
 
@@ -333,6 +424,9 @@ serve(async (req: Request): Promise<Response> => {
           planName:     c.planName,
           lastSubject:  c.lastSubject,
         },
+        // Where lastSubject came from — not sent to Loops, only
+        // surfaced here so the dry-run report explains itself.
+        lastSubjectSource: c.lastSubjectSource,
       })),
       skipped,
     }, 200);
@@ -342,13 +436,14 @@ serve(async (req: Request): Promise<Response> => {
   let sent = 0, failedPatch = 0, failedEvent = 0, failedStamp = 0;
   const errors: Array<{ userId: string; stage: string; status: number; error: string }> = [];
   for (const c of candidates) {
+    // lastSubject is ALWAYS sent now — resolveLastSubject guarantees
+    // a defined subject string (last_subject → derived → "philosophy"
+    // fallback), so there's no "omit on null" branch here anymore.
     const patchBody: Record<string, unknown> = {
       trialEndDate: c.trialEndDate,
       planName:     c.planName,
+      lastSubject:  c.lastSubject,
     };
-    // lastSubject: send only when non-null so we don't clobber an
-    // existing value in Loops with null for a user whose row is sparse.
-    if (c.lastSubject) patchBody.lastSubject = c.lastSubject;
 
     const p = await patchContact(c.email, patchBody, LOOPS_API_KEY!);
     if (!p.ok) {
