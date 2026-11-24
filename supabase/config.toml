@@ -40,6 +40,15 @@ verify_jwt = false
 import_map = "./functions/loops-inactive-sweep/deno.json"
 entrypoint = "./functions/loops-inactive-sweep/index.ts"
 
+# loops-trial-ending-sweep: verify_jwt MUST stay false. pg_cron POSTs
+# with X-Loops-Webhook-Secret, not a Supabase JWT (same auth shape as
+# loops-inactive-sweep and the other Loops sweeps).
+[functions.loops-trial-ending-sweep]
+enabled = true
+verify_jwt = false
+import_map = "./functions/loops-trial-ending-sweep/deno.json"
+entrypoint = "./functions/loops-trial-ending-sweep/index.ts"
+
 # revenuecat-webhook: verify_jwt MUST be false. RevenueCat doesn't send a
 # Supabase JWT — it sends a static bearer token that the function verifies
 # against REVENUECAT_WEBHOOK_SECRET (see verifyAuth in index.ts). If the
