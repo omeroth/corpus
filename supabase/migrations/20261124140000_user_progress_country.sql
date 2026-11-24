@@ -1,0 +1,31 @@
+-- user_progress.country — ISO-3166-1 alpha-2 code for the user's
+-- country ("IL", "US", "GB", …). Sticky cache so loops-progress and
+-- loops-trial-ending-sweep can read a known value instead of calling
+-- PostHog on every sync.
+--
+-- Resolution cascade (applied once, when this column is null — see
+-- loops-progress and scripts/backfill-loops-country.mjs):
+--   1. PostHog person.properties.$geoip_country_code
+--   2. PostHog person.properties.$initial_geoip_country_code
+--   3. Static IANA timezone → country lookup (user_progress.timezone)
+--   4. lang = 'he' → 'IL'
+--   5. leave null (unresolved)
+--
+-- Why sticky-cache vs resolve-every-sync: PostHog's /persons GET is a
+-- paid-tier Personal-API-Key call that adds ~200ms + a round-trip to
+-- every loops-progress invocation. With ~500 users and multi-save
+-- sessions, that's thousands of PH hits per day for a signal that
+-- changes only when a user travels country-of-residence. Cache the
+-- resolution, forward from the row, let the next null-case heal
+-- naturally via the backfill script.
+--
+-- Forwarded to Loops by loops-progress as the `country` contact
+-- property — alpha-2, omitted from the PATCH when null so an
+-- unresolved row doesn't clear a value Loops already has.
+--
+-- Not backfilled in SQL; see scripts/backfill-loops-country.mjs for
+-- the one-shot that reads PostHog + fills the sticky cache + PATCHes
+-- Loops in one pass (idempotent, safe to re-run).
+
+ALTER TABLE public.user_progress
+  ADD COLUMN IF NOT EXISTS country text;

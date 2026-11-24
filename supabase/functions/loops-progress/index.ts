@@ -33,12 +33,25 @@
 //                       to true when the user's last_active_at falls
 //                       between 7 and 60 days ago.
 //   inactive14d       : same shape, 14-to-60-day window.
+//   country           : ISO-3166-1 alpha-2 (e.g. 'IL', 'US', 'GB').
+//                       Sticky-cached on user_progress.country (migration
+//                       20261124140000). Resolution cascade when the row
+//                       column is null: PostHog person.properties.
+//                       $geoip_country_code → $initial_geoip_country_code
+//                       → static IANA-timezone lookup → lang='he' → 'IL'
+//                       → omit from PATCH. On resolution we UPDATE
+//                       user_progress.country so subsequent syncs
+//                       short-circuit without the PostHog hit. See
+//                       scripts/backfill-loops-country.mjs for the
+//                       one-shot that primes existing rows.
 //
 // Required env vars (auto-populated by Supabase Edge Functions runtime):
 //   - SUPABASE_URL
 //   - SUPABASE_SERVICE_ROLE_KEY
 // Required env vars (set manually via `supabase secrets set`):
 //   - LOOPS_API_KEY
+//   - POSTHOG_PERSONAL_API_KEY  (country resolution; absent → PH step
+//                                skipped, TZ/lang fallback still runs)
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -294,6 +307,123 @@ function computeUtcOffset(timezone: string, when: Date = new Date()): string | n
   }
 }
 
+// ─── country resolution ─────────────────────────────────────────────
+// Static IANA timezone → ISO-3166-1 alpha-2. Only unambiguous zones.
+// MUST stay byte-identical to the same table in scripts/backfill-loops-
+// country.mjs — the two code paths resolve country for the same
+// cohort of users and divergence would silently split the audience.
+const TZ_COUNTRY: Record<string, string> = {
+  // Asia
+  "Asia/Jerusalem": "IL", "Asia/Tel_Aviv": "IL",
+  "Asia/Tokyo": "JP", "Asia/Seoul": "KR", "Asia/Shanghai": "CN",
+  "Asia/Hong_Kong": "HK", "Asia/Singapore": "SG", "Asia/Bangkok": "TH",
+  "Asia/Jakarta": "ID", "Asia/Kolkata": "IN", "Asia/Calcutta": "IN",
+  "Asia/Karachi": "PK", "Asia/Dhaka": "BD", "Asia/Manila": "PH",
+  "Asia/Ho_Chi_Minh": "VN", "Asia/Taipei": "TW", "Asia/Kuala_Lumpur": "MY",
+  "Asia/Dubai": "AE", "Asia/Riyadh": "SA", "Asia/Qatar": "QA",
+  "Asia/Kuwait": "KW", "Asia/Tehran": "IR",
+  // Europe
+  "Europe/London": "GB", "Europe/Berlin": "DE", "Europe/Paris": "FR",
+  "Europe/Madrid": "ES", "Europe/Rome": "IT", "Europe/Amsterdam": "NL",
+  "Europe/Zurich": "CH", "Europe/Vienna": "AT", "Europe/Brussels": "BE",
+  "Europe/Stockholm": "SE", "Europe/Copenhagen": "DK", "Europe/Helsinki": "FI",
+  "Europe/Oslo": "NO", "Europe/Warsaw": "PL", "Europe/Prague": "CZ",
+  "Europe/Budapest": "HU", "Europe/Dublin": "IE", "Europe/Lisbon": "PT",
+  "Europe/Athens": "GR", "Europe/Moscow": "RU", "Europe/Istanbul": "TR",
+  "Europe/Kiev": "UA", "Europe/Kyiv": "UA", "Europe/Bucharest": "RO",
+  "Europe/Sofia": "BG",
+  // Africa
+  "Africa/Johannesburg": "ZA", "Africa/Cairo": "EG", "Africa/Lagos": "NG",
+  "Africa/Nairobi": "KE", "Africa/Casablanca": "MA", "Africa/Algiers": "DZ",
+  "Africa/Tunis": "TN", "Africa/Accra": "GH",
+  // Americas — US
+  "America/New_York": "US", "America/Chicago": "US", "America/Denver": "US",
+  "America/Los_Angeles": "US", "America/Phoenix": "US", "America/Anchorage": "US",
+  "America/Detroit": "US", "America/Indianapolis": "US",
+  "America/Indiana/Indianapolis": "US", "Pacific/Honolulu": "US",
+  // Americas — CA
+  "America/Toronto": "CA", "America/Vancouver": "CA", "America/Montreal": "CA",
+  "America/Edmonton": "CA", "America/Winnipeg": "CA", "America/Halifax": "CA",
+  // Americas — LatAm
+  "America/Mexico_City": "MX", "America/Sao_Paulo": "BR",
+  "America/Buenos_Aires": "AR", "America/Argentina/Buenos_Aires": "AR",
+  "America/Santiago": "CL", "America/Bogota": "CO", "America/Lima": "PE",
+  "America/Caracas": "VE",
+  // Oceania
+  "Australia/Sydney": "AU", "Australia/Melbourne": "AU",
+  "Australia/Brisbane": "AU", "Australia/Perth": "AU",
+  "Australia/Adelaide": "AU", "Australia/Darwin": "AU",
+  "Australia/Hobart": "AU", "Pacific/Auckland": "NZ",
+};
+
+function normalizeCountry(code: unknown): string | null {
+  if (typeof code !== "string") return null;
+  const c = code.trim().toUpperCase();
+  return /^[A-Z]{2}$/.test(c) ? c : null;
+}
+
+// PostHog project id + host — same constants delete-account uses
+// (supabase/functions/delete-account/index.ts). Distinct id is the
+// Supabase auth.users uuid because that's what posthog.identify(user.id)
+// sets client-side (index.html:59620 / 60823).
+const POSTHOG_HOST       = "https://us.posthog.com";
+const POSTHOG_PROJECT_ID = 388655;
+
+async function fetchPosthogCountry(
+  userId: string,
+  apiKey: string,
+): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `${POSTHOG_HOST}/api/projects/${POSTHOG_PROJECT_ID}/persons/?distinct_id=${encodeURIComponent(userId)}`,
+      { headers: { Authorization: `Bearer ${apiKey}` } },
+    );
+    if (!res.ok) {
+      console.warn(`[loops-progress] posthog persons GET ${res.status}`);
+      return null;
+    }
+    const body = await res.json();
+    const person = body?.results?.[0];
+    if (!person) return null;
+    const props = person.properties || {};
+    return normalizeCountry(props.$geoip_country_code)
+        || normalizeCountry(props.$initial_geoip_country_code);
+  } catch (e) {
+    console.warn("[loops-progress] posthog persons GET threw:", e);
+    return null;
+  }
+}
+
+// Returns { country, resolved } where country is alpha-2 or null.
+// `resolved` is true iff the call ran the cascade (vs took the
+// fast-path row cache) — the caller writes the sticky-cache UPDATE
+// only when resolved=true AND country was derived (don't rewrite a
+// cache that already served the request).
+async function resolveCountry(
+  record: Record<string, unknown>,
+  userId: string | null,
+  posthogApiKey: string | null,
+): Promise<{ country: string | null; resolved: boolean; source: "cache" | "posthog" | "timezone" | "lang" | "none" }> {
+  // Fast path: cached on the row (migration 20261124140000).
+  const cached = normalizeCountry(record.country);
+  if (cached) return { country: cached, resolved: false, source: "cache" };
+
+  // Step 1-2: PostHog (both geoip fields).
+  if (posthogApiKey && typeof userId === "string" && userId) {
+    const ph = await fetchPosthogCountry(userId, posthogApiKey);
+    if (ph) return { country: ph, resolved: true, source: "posthog" };
+  }
+  // Step 3: static timezone map.
+  if (typeof record.timezone === "string" && record.timezone) {
+    const tzCountry = normalizeCountry(TZ_COUNTRY[record.timezone]);
+    if (tzCountry) return { country: tzCountry, resolved: true, source: "timezone" };
+  }
+  // Step 4: HE lang → IL.
+  if (record.lang === "he") return { country: "IL", resolved: true, source: "lang" };
+  // Step 5: unresolved.
+  return { country: null, resolved: true, source: "none" };
+}
+
 // Validates a candidate first-name string against a minimal "is this
 // plausibly a name?" rule. No length floor — single-letter names are
 // normal in Chinese and Korean, and two-letter names appear across
@@ -448,6 +578,13 @@ serve(async (req: Request): Promise<Response> => {
   const record = (payload.record || {}) as Record<string, unknown>;
   const derived = deriveProgressProps(record);
 
+  // country resolution: fast path reads record.country; slow path hits
+  // PostHog + falls through to timezone / lang. Resolution is best-
+  // effort — a PostHog outage does not block the sync.
+  const POSTHOG_PERSONAL_API_KEY = Deno.env.get("POSTHOG_PERSONAL_API_KEY") || null;
+  const userIdForPh = typeof record.user_id === "string" ? record.user_id : null;
+  const countryResult = await resolveCountry(record, userIdForPh, POSTHOG_PERSONAL_API_KEY);
+
   // Loops /contacts/update is an upsert-ish PATCH: mints missing fields on
   // the existing contact. loops-signup guarantees a create at auth-signup
   // time, so the contact exists whenever this function fires. If it somehow
@@ -472,6 +609,9 @@ serve(async (req: Request): Promise<Response> => {
   if (typeof derived.firstName === "string") body.firstName = derived.firstName;
   if (typeof derived.timezone  === "string") body.timezone  = derived.timezone;
   if (typeof derived.utcOffset === "string") body.utcOffset = derived.utcOffset;
+  // country: send only when resolved. Omit (never null) so a Loops
+  // contact never gets its country wiped by an unresolved sync.
+  if (typeof countryResult.country === "string") body.country = countryResult.country;
 
   try {
     const updateRes = await fetch(LOOPS_UPDATE_URL, {
@@ -487,6 +627,30 @@ serve(async (req: Request): Promise<Response> => {
       try { errText = await updateRes.text(); } catch (_) {}
       console.error(`[loops-progress] update failed: ${updateRes.status} ${errText}`);
       return jsonResponse({ ok: false, error: "Loops update failed" }, 502);
+    }
+
+    // Sticky-cache the resolved country on user_progress so the next
+    // sync hits the fast path (no PostHog call). Only writes when the
+    // cascade ran AND produced a value — a cache-hit sync skips this,
+    // an unresolved sync skips this. A write failure here isn't
+    // fatal: the next sync will re-resolve and try again.
+    if (countryResult.resolved && countryResult.country && userIdForPh) {
+      try {
+        const SUPABASE_URL              = Deno.env.get("SUPABASE_URL");
+        const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+        if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+          const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+            auth: { autoRefreshToken: false, persistSession: false },
+          });
+          const { error: cacheErr } = await admin
+            .from("user_progress")
+            .update({ country: countryResult.country })
+            .eq("user_id", userIdForPh);
+          if (cacheErr) console.warn("[loops-progress] country cache write failed:", cacheErr);
+        }
+      } catch (e) {
+        console.warn("[loops-progress] country cache write threw:", e);
+      }
     }
 
     // ─── Onboarding-plan one-shot ─────────────────────────────────
