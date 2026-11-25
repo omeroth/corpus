@@ -18926,14 +18926,21 @@
   .hv-popover {
     /* position:absolute so the popover anchors to its node parent and
        scrolls with it. The host-node also gets position:relative at open
-       time (see _hvOpenPopover). z-index 5 keeps the popover above path
-       lines (z:0) and nodes (z:1) but UNDER the sticky chapter banner
-       (z:10) and the top bar (z:100) — so a popover opened on a
-       next-up node near the top of the chapter still slides under the
-       banner when the user scrolls. */
+       time (see _hvOpenPopover).
+       z-index 15 keeps the popover above path lines (z:0), nodes (z:1)
+       AND every sticky chapter banner (regular .level-card and bonus
+       .hv-bonus-card both at z:10). Under the stats-subheader (z:99)
+       and top bar (z:100), so the chrome still wins over the sheet.
+       Earlier z:5 let a next-chapter's sticky banner paint over the
+       popover's start button when the popover opened on the last-lesson
+       (summary) node of the current chapter — the next chapter's
+       in-flow banner sits directly below that node, and position-side
+       clamping can't avoid the collision at every scroll offset.
+       Raising above the banner z makes the overlap impossible by
+       stacking order, independent of position math. */
     position: absolute;
     width: 300px;
-    z-index: 5;
+    z-index: 15;
     background: #FFFFFF;
     border: 2px solid #E5E5EA;
     border-radius: 14px;
@@ -47807,13 +47814,12 @@ function _hvPositionPopover(node) {
   const fitsBelow = belowRoom >= popH;
   const fitsAbove = aboveRoom >= popH;
   // Prefer below (natural reading order) when it fits. "Above" is
-  // only picked when above ACTUALLY fits: if it doesn't, going above
-  // would clip the popover's top edge behind the sticky chapter
-  // banner (z:10 beats the popover's z:5 in the chapter stacking
-  // context — see 17851-17854). Falling back to below in that case
-  // lets the auto-scroll block below nudge the page so the popover
-  // clears the bottom-nav zone, which is more forgiving than hiding
-  // behind the banner.
+  // only picked when above ACTUALLY fits — kept as a layout
+  // preference so the popover doesn't visually crowd its host node.
+  // (Earlier comment referenced popover z:5 vs banner z:10; popover
+  // is now z:15, so paint-order collisions with either chapter
+  // banner are impossible at any scroll offset. See .hv-popover
+  // rule around line 18925 for the full z-index story.)
   const placeBelow = fitsBelow || !fitsAbove;
 
   // Vertical: popover TOP in path coords.

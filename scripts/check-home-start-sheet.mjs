@@ -391,6 +391,102 @@ async function arrowProbeAfterScroll(h) {
   await closeCtx(h);
 }
 
+// ─────────────────────────────────────────────────────────────────────
+// H — Summary-next-up stacking. On the last lesson (summary) of every
+//     chapter, the next chapter's sticky banner sits directly below
+//     the summary node. At some scroll offsets the position function
+//     can't avoid the two boxes colliding in viewport Y — the fix is
+//     stacking order (popover z-index above the chapter banner's),
+//     so the button must still PAINT on top and RECEIVE taps.
+//     Checked at every end-of-chapter boundary including the bonus
+//     chapter. Repros the on-device bug from ch2 summary.
+// ─────────────────────────────────────────────────────────────────────
+async function summaryCase(seed, forcedWeekId, label) {
+  const h = await bootWithState(seed);
+  const r = await h.page.evaluate((wkId) => {
+    const ws = getW();
+    // forcedWeekId lets us target a specific chapter end even when the
+    // next-up resolver would have picked an earlier one. For the raw
+    // auto-open case (wkId === null) we go through _hvAutoOpenTarget.
+    let node, chap;
+    if (wkId == null) {
+      const t = _hvAutoOpenTarget();
+      node = t && t.node;
+    } else {
+      const w = ws.find(x => x && x.id === wkId);
+      if (!w) return { err: 'no chapter ' + wkId };
+      const nodes = document.querySelectorAll('#hv-chapter-' + wkId + ' .hv-node');
+      const di = w.days.length - 1;
+      node = nodes[di];
+      if (!node) return { err: 'no node for last day of ' + wkId };
+      _hvOpenPopover(w, w.days[di], di, { isDone:false, isNextUp:true, lessonLocked:false, isSummary: wkId !== 'bonus2', wkLocked:false });
+    }
+    if (!node) return { err: 'no node' };
+    chap = node.closest('.hv-chapter, .hv-chapter-bonus');
+    // Force the near-top scroll shape that drives the position
+    // function toward the (overlapping) below-placement. The fix is
+    // strictly stacking order, so painting + hit-test must still pass.
+    const nr = node.getBoundingClientRect();
+    window.scrollBy({ top: nr.top - 160, behavior: 'instant' });
+    if (typeof _hvPositionPopover === 'function') _hvPositionPopover(node);
+    const pop = document.getElementById('hv-popover');
+    const btn = pop && pop.querySelector('.hv-pop-btn');
+    const btnR = btn && btn.getBoundingClientRect();
+    const chapNext = chap && chap.nextElementSibling;
+    const nextBanner = chapNext && (chapNext.querySelector(':scope > .level-card') || chapNext.querySelector(':scope > .hv-bonus-card'));
+    const nextR = nextBanner && nextBanner.getBoundingClientRect();
+    const btnCenter = btnR && { x: btnR.left + btnR.width / 2, y: btnR.top + btnR.height / 2 };
+    const atPoint = btnCenter ? document.elementFromPoint(btnCenter.x, btnCenter.y) : null;
+    const popZ = pop && getComputedStyle(pop).zIndex;
+    const bannerZ = nextBanner && getComputedStyle(nextBanner).zIndex;
+    const overlapY = (btnR && nextR)
+      ? Math.max(0, Math.min(btnR.bottom, nextR.bottom) - Math.max(btnR.top, nextR.top))
+      : 0;
+    return {
+      chapId: chap && chap.id,
+      nextId: chapNext && chapNext.id,
+      popZ, bannerZ, overlapY,
+      btnReachable: !!(btn && atPoint && (atPoint === btn || btn.contains(atPoint))),
+      atTag: atPoint && atPoint.tagName,
+      atCls: atPoint && atPoint.className,
+    };
+  }, forcedWeekId);
+  const popVis = await probeVisible(h.page, '#hv-popover');
+  const btnVis = await probeVisible(h.page, '#hv-popover .hv-pop-btn');
+  assertSync(`H · ${label} — popover visible`,
+    popVis.visible,
+    `visible=${popVis.visible} rect=${popVis.width}x${popVis.height} chap=${r.chapId} next=${r.nextId}`);
+  assertSync(`H · ${label} — start button visible per probeVisible`,
+    btnVis.visible,
+    `visible=${btnVis.visible} rect=${btnVis.width}x${btnVis.height}`);
+  assertSync(`H · ${label} — elementFromPoint at button center resolves to the button`,
+    r.btnReachable === true,
+    `popZ=${r.popZ} bannerZ=${r.bannerZ} overlapY=${r.overlapY && r.overlapY.toFixed(1)}px atPoint=<${r.atTag} class="${r.atCls}">`);
+  await closeCtx(h);
+}
+
+// ch2 → ch3 (auto-open). The exact scenario from the on-device report.
+await summaryCase([[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[1,7],
+                   [2,1],[2,2],[2,3],[2,4],[2,5],[2,6]],
+                  null, 'ch2 summary next-up (auto-open)');
+// Every other end-of-chapter boundary (forced).
+for (const ch of [3, 4, 5, 6]) {
+  const seed = [];
+  for (let w = 1; w < ch; w++) for (let d = 1; d <= 7; d++) seed.push([w, d]);
+  for (let d = 1; d <= 6; d++) seed.push([ch, d]);
+  await summaryCase(seed, ch, `ch${ch} summary → next chapter`);
+}
+// Bonus boundary: last day of bonus2 is the next-up. Use the
+// auto-open path (forcedWeekId=null) because the bonus wrap is
+// collapsed by default and only expands when it holds the next-up
+// target — the same code path the on-device user hits.
+{
+  const seed = [];
+  for (let w = 1; w <= 2; w++) for (let d = 1; d <= 7; d++) seed.push([w, d]);
+  for (let d = 0; d <= 4; d++) seed.push(['bonus2', d]);
+  await summaryCase(seed, null, 'bonus2 last day → next chapter (auto-open)');
+}
+
 await browser.close();
 app.s.close();
 

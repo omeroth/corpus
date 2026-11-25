@@ -115,6 +115,8 @@ Ordered **low → high**. Only layers that are `position: fixed` (or absolute-fu
 
 | z-index | Element | Purpose |
 |---|---|---|
+| **10** | `.hv-chapter > .level-card`, `.hv-chapter-bonus .hv-bonus-card` | Sticky chapter banner (regular + bonus). Docks under the top bar on scroll. |
+| **15** | `.hv-popover` | Lesson start sheet on the home-screen journey. **Must stay above the chapter banners (z:10)** — raised from z:5 on 2026-11-25 to fix the on-device bug where a next-chapter sticky banner painted over the popover's start button when the popover opened on a summary (last-lesson) node. Under the stats-subheader (z:99) + top bar (z:100). |
 | **99** | `.stats-subheader` | Stats strip below topbar |
 | **100** | `.topbar` | Top bar |
 | **200** | `.bottom-nav` | Bottom navigation |
@@ -139,6 +141,7 @@ Ordered **low → high**. Only layers that are `position: fixed` (or absolute-fu
 
 ### Coexistence rules (what can be visible at the same time)
 
+- **`.hv-popover` + chapter banners**: the popover opens anchored to a lesson node inside its chapter's `.hv-path`. When the node is the chapter's last-lesson (summary), the NEXT chapter's sticky banner sits directly below in document flow; at some scroll offsets the popover's below-placement overlaps the next banner's Y range. The fix is paint-order — popover z:15 > banner z:10 — so the overlap is harmless. **Never** drop the popover below z:11 without also adding a position-side guarantee that the overlap can't happen (none currently exists). Historical: popover was z:5 pre-2026-11-25 and the next banner painted over + intercepted taps on the start button.
 - **Celebration queue items** (`streak_badge`, `bonus_unlock`, `chapter_complete`, `level_up`, `goal_met`) play **sequentially**, never overlapping. Each fires on a cleared stage (`modal-complete` deactivated via `_wrapWithQueuePlay`). The ordering above matters only if two could coexist — they can't within the queue.
 - **`#modal-complete` + `#modal-paywall`**: mid-chapter paywall fires over the thinker-card screen. Modal-paywall at 1700 must stay above modal-complete at 1500. 
 - **`#modal-paywall` + `#modal-signin-required`**: guest taps Subscribe or Restore on a paywall → signin modal opens while the paywall is still active. Signin at 1800 must stay above paywall at 1700. Historical: this was 1150 vs 300 before the paywall was raised; the earlier raise inverted the relationship until 1800.
