@@ -109,6 +109,14 @@ jobs:
           # Static assets referenced by Loops re-engagement emails (bonus
           # unlocked art, etc). Not consumed by the app itself.
           if [ -d email ]; then cp -r email _deploy/; fi
+          # Static prototype pages served under /try/<slug>/. Each HTML is
+          # self-contained and carries its own <meta name="robots"
+          # content="noindex"> (injected once at copy time from
+          # /Users/omeroth/corpus-try/*). Not linked from anywhere else
+          # on the site and not listed in sitemap.xml — strictly a
+          # share-this-URL prototype surface. Guarded so the deploy
+          # still succeeds if the directory is ever removed.
+          if [ -d try ];   then cp -r try   _deploy/; fi
           echo "--- _deploy summary ---"
           find _deploy -type f | wc -l
           du -sh _deploy
